@@ -11,27 +11,32 @@
 |---|---|
 | กลุ่มเป้าหมาย | Dev / DevOps ที่ใช้ AI CLI มากกว่า 1 บัญชี (งานส่วนตัว + งานลูกค้า + งานทีม) |
 | ความรู้พื้นฐาน | Linux shell พื้นฐาน, environment variable, สิทธิ์ไฟล์ (chmod), Node.js/npm เบื้องต้น |
-| ระยะเวลา | 6 ชั่วโมง (บรรยาย 2 ชม. + Lab 3.5 ชม. + ตรวจรับ 0.5 ชม.) |
+| ระยะเวลา | 6.5 ชั่วโมง (กรณีศึกษา 0.5 ชม. + บรรยาย 2 ชม. + Lab 3.5 ชม. + ตรวจรับ 0.5 ชม.) |
 | รูปแบบ | สอนแบบ **ปัญหานำ → แนวคิด → สาธิต → Lab → จุดตรวจ** |
 | ผลลัพธ์ | ผู้เรียนได้ installer ที่รันซ้ำได้ + คำสั่ง `yolo1..5`, `cyolo1..5`, `qyolo1..3` ใช้งานจริง |
+| หลักฐานจริง | ทุก Module อ้างอิงแล็บที่รันจริงวันที่ 2026-09-03 ใน `labs/` (Lab A/B/C) ผัง `img/d1–d6` และบทเรียนเว็บ `lesson.html` |
 
 ### ผลลัพธ์การเรียนรู้ (Learning Outcomes)
 
 จบหลักสูตรแล้วผู้เรียนต้อง:
 
-1. **อธิบาย** ได้ว่าทำไม config root ต่อ CLI จึงเป็นวิธีที่ถูกต้องกว่าการสลับ `$HOME`
-2. **ระบุ** กลไก official ของแต่ละ CLI สำหรับกำหนด config root ได้ พร้อมบอกแหล่งอ้างอิง
-3. **เขียน** wrapper script ที่ส่งต่อ argument และตั้ง env ได้ถูกต้อง
-4. **จัดการ** credential อย่างปลอดภัย (สิทธิ์ 600, ไม่รั่วผ่าน process list / log)
-5. **ออกแบบ** shared skills/MCP ที่แก้ที่เดียวแล้วทุก account เห็น
-6. **เขียน** installer ที่ idempotent (รันซ้ำไม่ทำลายของเดิม)
-7. **ทดสอบและรายงานผล** ตามจริงในรูปแบบ PASS / FAIL / SKIP
+1. **เปรียบเทียบ** โมเดลตามประเภทงาน คุณภาพ ราคา ความเร็ว และโควตา โดยไม่ยึดอันดับรวมเพียงอย่างเดียว
+2. **เลือก** โมเดลและบัญชีให้เหมาะกับงาน พร้อมอธิบายเหตุผลด้านคุณภาพและต้นทุนได้
+3. **อธิบาย** ได้ว่าทำไม config root ต่อ CLI จึงเป็นวิธีที่ถูกต้องกว่าการสลับ `$HOME`
+4. **ระบุ** กลไก official ของแต่ละ CLI สำหรับกำหนด config root ได้ พร้อมบอกแหล่งอ้างอิง
+5. **เขียน** wrapper script ที่ส่งต่อ argument และตั้ง env ได้ถูกต้อง
+6. **จัดการ** credential อย่างปลอดภัย (สิทธิ์ 600, ไม่รั่วผ่าน process list / log)
+7. **ออกแบบ** shared skills/MCP ที่แก้ที่เดียวแล้วทุก account เห็น
+8. **เขียน** installer ที่ idempotent (รันซ้ำไม่ทำลายของเดิม)
+9. **ทดสอบและรายงานผล** ตามจริงในรูปแบบ PASS / FAIL / SKIP
 
 ### แผนการสอน (Teaching Sequence)
 
 ลำดับนี้ออกแบบให้ **แต่ละ Module ใช้ผลลัพธ์ของ Module ก่อนหน้า** — ห้ามข้ามลำดับ
 
 ```
+P0  กรณีศึกษา LMArena: เลือกโมเดลให้ถูกงาน   (30 นาที)  ── เหตุผลทางธุรกิจ
+     │
 M0  เตรียมเครื่อง + ตรวจเวอร์ชันจริง         (30 นาที)  ── พื้นฐาน
      │
 M1  ปัญหา: ทำไม account ชนกัน                (20 นาที)  ── แรงจูงใจ
@@ -51,9 +56,107 @@ M7  Installer ที่รันซ้ำได้                    (45 นา
 M8  ทดสอบ + ตรวจรับ + รายงาน                 (30 นาที)  ── ปิดจ๊อบ
 ```
 
-**เหตุผลของลำดับนี้:** M1 สร้างแรงจูงใจก่อนสอนวิธีแก้ · M2 วางโครงให้ทุก Module หลังอ้างอิงได้
+**เหตุผลของลำดับนี้:** P0 ทำให้ผู้เรียนเห็นจากข้อมูลจริงว่าไม่มีโมเดลเดียวเหมาะกับทุกงาน และเชื่อมคุณภาพ
+กับราคา/โควตาไปสู่เหตุผลของ Multi-Model และ Multi-Account · M1 ทำให้เห็นปัญหาทางเทคนิคก่อนสอนวิธีแก้
+· M2 วางโครงให้ทุก Module หลังอ้างอิงได้
 · M3 เป็นแนวคิดแกน ถ้าไม่เข้าใจ M4–M7 จะกลายเป็นการ copy-paste · M7 เอาทุกอย่างมาห่อรวม
 จึงต้องอยู่หลังสุดก่อนทดสอบ
+
+---
+
+## ผลการทดลองจริง (2026-09-03) — อ่านก่อนสอน
+
+สื่อชุดนี้ถูกปรับจากการรันจริง 3 แล็บ (รายละเอียดเต็มใน `lesson.html` และโฟลเดอร์ `labs/`):
+
+| แล็บ | ทำอะไร | ที่ไหน | ผลสำคัญ |
+|---|---|---|---|
+| Lab A fresh-install | container Ubuntu 24.04 เปล่า → ติดตั้ง claude 2.1.258 / codex 0.152.1 / qwen 0.22.3 → ทำตาม `prompt_multi_account_cli.md` → ทดสอบ | `labs/labA-fresh-install/` | PASS 14 · FAIL 0 · SKIP 4 (ข้อที่ต้อง login จริง); container เปล่า → wrapper ใช้ได้ ≈ 16 s ของคำสั่ง; gotcha 12 ข้อใน report §2 |
+| Lab B collision | พิสูจน์ path ชนกัน / `$HOME` switch พัง / config root แก้ได้ (strace + md5) | `labs/labB-collision/` | `{"fake":"A"}` → `{"fake":"B"}` ทับทันที; HOME switch ทำ git identity หายแต่ ssh ไม่ย้าย; `CLAUDE_CONFIG_DIR` / `CODEX_HOME` / `QWEN_HOME` แยกครบ 5 อย่าง |
+| Lab C multimodel | เรียก 7 โมเดลผ่าน yolo1–3 + cyolo1: matrix / tool / effort / fan-out / relay / verify + โควตา | `labs/labC-multimodel/` (`bash run_all.sh`) | 29 การเรียกใน 306 s; UC1 6/7 ถูก (gpt-5.3-codex-spark เร็วสุดแต่ผิด); สั่งใช้เชลล์แล้วโมเดลเล็กถูกหมด; relay 4 hop ถูก; fan-out 5/6 ถูกและ parent จับตัวผิดได้; verify พบช่องโหว่สเปกที่ hidden test ไม่ครอบคลุม |
+
+ผัง Excalidraw 6 ภาพอยู่ใน `img/` (ไฟล์แก้ไขได้ใน `img/src/*.excalidraw`): d1 โครงสร้าง BASE_PATH · d2 เส้นทางคำสั่ง wrapper · d3 ไม่แยก/HOME switch/config root · d4 4 บัญชี → 7 โมเดล · d5 4 รูปแบบ multi-model · d6 สถาปัตยกรรมการทดลอง
+
+กับดักที่ต้องบอกนักศึกษาตั้งแต่ต้น (ยืนยันแล้วในแล็บ):
+
+1. npm ≥ 12 บล็อก postinstall ของ Claude Code → `Error: claude native binary not installed.` → ติดตั้งด้วย `--allow-scripts=@anthropic-ai/claude-code,@qwen-code/audio-capture`
+2. รันเป็น root: `--dangerously-skip-permissions cannot be used with root/sudo privileges` → wrapper ต้องตั้ง `IS_SANDBOX=1`
+3. `CODEX_HOME` ต้อง `mkdir -p` ก่อน และ `codex login status` เชื่อไม่ได้ (ตอบ "Logged in" ให้ `auth.json` ปลอม) → ยืนยันด้วย `codex exec`
+4. Qwen: `-y` ซ่อนจาก `--help`, sub-command ห้ามใส่ `-y`, OAuth ฟรียกเลิกแล้ว (2026-04-15) → API key ตาม plan
+5. `VAR=x; claude` (มี `;`) ไม่ export → CLI ใช้ default เงียบ ๆ ต้องเขียน `VAR=x claude` หรือ export แล้วตรวจด้วย `find <root>`
+6. บน WSL2 + Docker Desktop port 2222–2280 bind ไม่ได้ → เลือก port ถัดไป และตรวจ container ด้วย `docker exec` แทน localhost
+
+use case ทุกข้อในบทเรียนใหม่ใช้โมเดลต่างกันอย่างน้อย 3 ตัว (สูงสุด 7) — ดูตาราง S7 ใน `lesson.html`
+
+---
+
+## ช่วงเปิดบทเรียน P0 — จาก Leaderboard สู่เหตุผลของ Multi-Account AI CLI
+
+### คำถามตั้งต้น
+
+> เราควรถามว่า “โมเดลใดเก่งที่สุด” หรือควรถามว่า “งานนี้ควรใช้โมเดลใด บัญชีใด และมีต้นทุนเท่าใด”
+
+### จุดประสงค์
+
+ผู้เรียนอ่าน Leaderboard อย่างมีวิจารณญาณ เปรียบเทียบโมเดลตามประเภทงาน และเชื่อมผลที่เห็นไปสู่เหตุผล
+ในการติดตั้ง AI CLI หลายค่ายและหลายบัญชี
+
+### กิจกรรม P0.1 — อ่าน LMArena แบบไม่ยึดอันดับรวม
+
+เปิด [LMArena Leaderboard](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard) แล้วให้ผู้เรียนเลือกอย่างน้อย
+3 หมวดงาน เช่น Coding, งานที่ใช้บริบทยาว และงานทั่วไป จากนั้นบันทึกผลที่เห็น ณ วันสอน
+
+> **ข้อควรระวัง:** Leaderboard เปลี่ยนแปลงได้ตามรุ่นโมเดลและข้อมูลโหวต จึงไม่ควรเขียนชื่อโมเดลหรืออันดับ
+> แบบตายตัวลงในสื่อ ให้ผู้เรียนอ่านค่าปัจจุบันจากหน้าเว็บและบันทึกวันที่ทุกครั้ง
+
+| ประเภทงาน | โมเดลที่น่าสนใจ ณ วันสอน | เหตุผลจากข้อมูล | ราคา/โควตา | ตัวเลือกที่เหมาะสม |
+|---|---|---|---|---|
+| Coding / Frontend | | | | |
+| Long context / วิเคราะห์ | | | | |
+| งานทั่วไป | | | | |
+
+#### ตัวอย่างอภิปรายจากข้อมูลวันที่ 2 กันยายน 2026
+
+ในหมวด WebDev Overall หน้าเว็บแสดง `qwen3.8-max-0902` อยู่ในกลุ่มอันดับ 2–5 คะแนน 1688
+ที่ราคา input/output $2/$6 ต่อหนึ่งล้านโทเคน ขณะที่โมเดลอันดับสูงสุดในตารางมีราคา $10/$50
+ตัวเลขนี้ไม่ได้พิสูจน์ว่า Qwen ดีกว่าในทุกกรณี แต่เป็นตัวอย่างชัดเจนว่าโมเดลที่คะแนนใกล้กลุ่มบน
+อาจมีต้นทุนต่ำกว่ามาก ผู้เรียนจึงต้องตัดสินใจจาก **ประเภทงาน + ช่วงความเชื่อมั่น + ราคา + ข้อจำกัดจริง**
+
+![ตัวอย่าง LMArena WebDev](lmarena-webdev.png)
+
+### กิจกรรม P0.2 — ตัดสินใจด้วยหลายปัจจัย
+
+อันดับสูงไม่ได้แปลว่าเหมาะที่สุดเสมอ ให้ประเมินอย่างน้อย 6 ด้าน:
+
+1. **คุณภาพตามประเภทงาน** — ผลในหมวดที่ตรงกับงานจริง ไม่ใช่อันดับ Overall เพียงอย่างเดียว
+2. **ราคา** — คุณภาพที่เพิ่มขึ้นคุ้มกับค่าใช้จ่ายหรือไม่
+3. **ความเร็ว** — งานแบบโต้ตอบและงาน batch ต้องการ latency ต่างกัน
+4. **โควตา** — แต่ละบัญชีหรือแพ็กเกจมีข้อจำกัดไม่เท่ากัน
+5. **ความเป็นส่วนตัว** — ข้อมูลของลูกค้าหรือองค์กรส่งไปยังบริการใดได้บ้าง
+6. **เครื่องมือและ workflow** — CLI ใดรองรับงาน เครื่องมือ และ automation ที่ต้องใช้
+
+### กิจกรรม P0.3 — เชื่อมสู่ Multi-Model และ Multi-Account
+
+ใช้สถานการณ์ตัวอย่าง: โมเดลหนึ่งอาจเหมาะกับการสร้าง Frontend หรือต้นแบบและมีต้นทุนต่ำกว่า
+ขณะที่อีกโมเดลเหมาะกับการวิเคราะห์หรือรีวิวโค้ดที่ซับซ้อน แม้มีราคาสูงกว่า จึงควรใช้โมเดลราคาแพง
+เฉพาะขั้นตอนที่สร้างคุณค่าเพิ่มจริง
+
+การติดตั้ง Claude Code, Codex CLI และ Qwen Code ร่วมกันช่วยให้:
+
+- เลือกโมเดลให้ตรงกับงาน แทนการบังคับใช้ตัวเดียวกับทุกงาน
+- ควบคุมต้นทุนและกระจายการใช้โควตา
+- เปรียบเทียบคำตอบหรือใช้โมเดลหนึ่งสร้างและอีกโมเดลตรวจ
+- ทำงานต่อได้เมื่อบริการหนึ่งติดโควตาหรือขัดข้อง
+- ลดการผูกติดกับผู้ให้บริการรายเดียว
+
+ส่วน **Multi-Account** จำเป็นเมื่อมีบัญชีส่วนตัว บัญชีทีม บัญชีลูกค้า หรือแพ็กเกจต่างกัน เพราะต้องป้องกัน
+credential, config, session, history และ cache ปะปนกัน นี่คือปัญหาที่จะพิสูจน์ใน Module 1
+
+### จุดตรวจ P0
+
+- [ ] เปรียบเทียบอย่างน้อย 3 ประเภทงานจากข้อมูล ณ วันสอน
+- [ ] อธิบายได้ว่าทำไมอันดับ Overall ไม่เพียงพอต่อการเลือกโมเดล
+- [ ] เสนอ workflow อย่างน้อย 1 แบบที่ใช้มากกว่าหนึ่งโมเดล พร้อมเหตุผลด้านคุณภาพและต้นทุน
+- [ ] อธิบายความต่างระหว่างเหตุผลของ Multi-Model และ Multi-Account ได้
 
 ---
 
@@ -80,13 +183,13 @@ codex --help | less
 qwen  --help | less
 ```
 
-### ใบจดบันทึก (ให้ผู้เรียนกรอกเอง — ห้ามลอกจากสไลด์)
+### ใบจดบันทึก (ค่าที่ยืนยันแล้ว 2026-09-03 จาก Lab A — ผู้เรียนต้องตรวจซ้ำกับเวอร์ชันของตนเอง)
 
 | CLI | เวอร์ชันจริง | env กำหนด config root | flag skip permission | หมายเหตุ/ข้อจำกัด |
 |---|---|---|---|---|
-| Claude Code | | `CLAUDE_CONFIG_DIR` | `--dangerously-skip-permissions` | |
-| Codex CLI | | `CODEX_HOME` | (bypass approval/sandbox — ยืนยันจาก help) | |
-| Qwen Code | | *ต้องยืนยันจาก docs ล่าสุด* | (ยืนยันจาก help) | |
+| Claude Code | 2.1.258 (latest วันนั้น 2.1.259) | `CLAUDE_CONFIG_DIR` (พิสูจน์ด้วย strace/find) | `--dangerously-skip-permissions` | native binary ไม่มี `cli.js`; รันเป็น root ต้อง `IS_SANDBOX=1`; npm 12 ต้อง `--allow-scripts`; MCP log ไป `~/.cache/claude-cli-nodejs` (ย้ายด้วย `XDG_CACHE_HOME`) |
+| Codex CLI | 0.152.1 (latest 0.153.0) | `CODEX_HOME` (ต้อง mkdir ก่อน) | `--dangerously-bypass-approvals-and-sandbox` (บรรทัด 96 ของ `codex --help`) | `login status` ไม่ validate token; ครั้งแรกที่ `exec` สร้าง system skills + sqlite ≈ 77 MB ต่อ account |
+| Qwen Code | 0.22.3 | `QWEN_HOME` (ยืนยันจาก source + strace; `~/.qwen` ไม่ถูกแตะ) | `-y` / `--yolo` / `--approval-mode` (ซ่อนจาก `--help` แต่ใช้ได้; sub-command ห้ามใส่) | OAuth ฟรียกเลิก 2026-04-15 → API key ตาม plan ใน `$QWEN_HOME/.env` (600) + `settings.json`; CLI เขียน settings.json ทับเป็น 644 |
 
 ### แหล่งอ้างอิงทางการ
 - https://code.claude.com/docs/
@@ -239,6 +342,7 @@ find "$BASE_PATH/.Claude/yolo1" "$BASE_PATH/.Claude/yolo2" -maxdepth 2 -type f
 set -euo pipefail
 BASE_PATH="/root/workspace"                       # อ้างอิงตัวแปรกลางเสมอ
 export CLAUDE_CONFIG_DIR="$BASE_PATH/.Claude/yolo1"
+export IS_SANDBOX=1                               # จำเป็นเมื่อรันเป็น root (2.1.258 ปฏิเสธ skip-permissions ของ root)
 exec claude --dangerously-skip-permissions "$@"   # exec = ไม่เหลือ process ซ้อน
 ```
 
@@ -261,6 +365,8 @@ exec claude --dangerously-skip-permissions "$@"   # exec = ไม่เหลื
 
 ### 5.1 เลือก plan ตอนใช้ `qyoloN` ครั้งแรก
 ให้ผู้ใช้เลือก 1 ใน 4 แล้วกรอก API key แบบ **ซ่อนตัวอักษร**:
+
+> ผลจริง 2026-09-03 (Lab A): Qwen OAuth ฟรีถูกยกเลิกตั้งแต่ 2026-04-15 จึงเหลือ API key ตาม plan เท่านั้น · Qwen Code 0.22.3 โหลด `$QWEN_HOME/.env` ก่อน · ชื่อตัวแปรที่พบใน source: `BAILIAN_CODING_PLAN_API_KEY`, `BAILIAN_TOKEN_PLAN_API_KEY`, `DASHSCOPE_API_KEY`, `OPENAI_API_KEY` · docs ของ Pay-as-you-go ไม่สอดคล้องกันเอง (provider `qwen3.6-plus` แต่ model `qwen3.7-plus`) ให้เจ้าของ key ยืนยัน · ดู `labs/labA-fresh-install/help-excerpts.md` §4
 
 | Plan | endpoint | credential variable | default model |
 |---|---|---|---|
@@ -344,9 +450,11 @@ done
 | เขียน wrapper | เขียนทับได้ (เป็น generated file ไม่มี secret) |
 
 ### Lab 7
-1. เขียน `install.sh` ครอบคลุม M2–M6
-2. รันรอบที่ 1 → ตรวจผล
-3. รันรอบที่ 2 → **credential และ config เดิมต้องอยู่ครบ ไม่ถูกแตะ**
+1. ใช้ `readme.original.md` เป็น Master Prompt ส่งให้ AI agent
+2. ให้ agent ตรวจ OS และสร้าง `install.sh` สำหรับ Ubuntu หรือ PowerShell installer สำหรับ Windows
+3. ตรวจ dry-run plan ก่อนอนุญาตให้ agent แก้เครื่อง
+4. รันรอบที่ 1 → ตรวจผล
+5. รันรอบที่ 2 → **credential และ config เดิมต้องอยู่ครบ ไม่ถูกแตะ**
 
 ### จุดตรวจ M7
 - [ ] รันรอบที่ 2 แล้ว credential เดิมยังอยู่ (เทียบ checksum ก่อน/หลัง)
@@ -357,6 +465,15 @@ done
 ## Module 8 — ทดสอบและตรวจรับ
 
 > **รายงานตามจริงเท่านั้น: PASS / FAIL / SKIP** — ห้ามเขียน PASS ถ้ายังไม่ได้ทดสอบจริง
+> ตัวอย่างรายงานจริง: `labs/labA-fresh-install/report.md` §3 (PASS 14 · FAIL 0 · SKIP 4) และ `labs/labB-collision/report.md` §1–5
+
+### ทดสอบแบบ Disposable ก่อนแตะ Host
+
+- Ubuntu: ใช้ container ใหม่หรือ VM snapshot และ mount เฉพาะ installer ที่ทดสอบ
+- Windows: ใช้ Windows Sandbox, disposable VM หรือ test user
+- ใช้ fake credential เท่านั้นในรอบทดสอบ และปิด network ถ้าไม่จำเป็น
+- ผลจาก Linux container ยืนยันได้เฉพาะส่วน Linux/Bash ห้ามนำไปอ้างว่า PowerShell/Windows ผ่านแล้ว
+- ให้ AI agent แสดง environment report, dry-run, หลักฐานการทดสอบ และ rollback plan
 
 | # | รายการทดสอบ | ผล |
 |---|---|---|
@@ -366,6 +483,7 @@ done
 | 4 | รัน installer รอบ 2 → ไม่ทำลายของเดิม | ☐ |
 | 5 | Git / SSH ยังทำงานปกติ | ☐ |
 | 6 | เทสต์ที่ต้องใช้ credential จริง → ให้เจ้าของ credential เป็นผู้รัน (มิฉะนั้นรายงาน **SKIP**) | ☐ |
+| 7 | ทดสอบ installer ใน container/sandbox/VM แยกจาก host ก่อน | ☐ |
 
 ### สิ่งที่ต้องส่งพร้อมรายงาน
 - **config root** ของแต่ละ CLI
@@ -379,6 +497,7 @@ done
 
 | Module | แนวคิดที่ต้องได้ | Lab ส่งอะไร | เวลา |
 |---|---|---|---|
+| P0 | ไม่มีโมเดลเดียวเหมาะกับทุกงาน | ตารางเปรียบเทียบคุณภาพ/ราคา/โควตา | 30' |
 | M0 | ห้ามเดา — ยืนยันจาก `--help`/docs | ตารางเวอร์ชัน + env | 30' |
 | M1 | แยก 5 อย่าง, ห้ามแตะ `$HOME` | คำอธิบายปัญหา | 20' |
 | M2 | Single source of truth | โครงสร้างไดเรกทอรี | 30' |
@@ -404,6 +523,9 @@ done
 ข้อกำหนดตั้งต้นเก็บไว้ที่ `readme.original.md` (ไฟล์เดิมก่อนจัดเรียงใหม่)
 เนื้อหาถูกกระจายเข้าสู่ Module ตามนี้:
 
+สำหรับกิจกรรมเลือก Agent แบบทีละขั้นและตัวอย่าง Routing Card ให้ใช้
+`agent-routing-prompt.md` คู่กับข้อ 3, 4, 9, 10 และ 11 ของ `readme.original.md`
+
 | ข้อกำหนดเดิม | อยู่ใน Module |
 |---|---|
 | ตัวแปร `BASE_PATH`, โครงสร้าง, รายการคำสั่ง | M2 |
@@ -414,3 +536,19 @@ done
 | Installer ข้อ 9–10 | M7 |
 | Docs ข้อ 11 | M0 (ยกขึ้นเป็นกฎเหล็กของทั้งหลักสูตร) |
 | รายการทดสอบ | M8 |
+
+## ภาคผนวก D — ไฟล์หลักฐาน ผัง และเครื่องมือทำแล็บซ้ำ
+
+| ไฟล์ / โฟลเดอร์ | ใช้ทำอะไร |
+|---|---|
+| `lesson.html` | บทเรียนเว็บฉบับปรับปรุง (ออกแบบโดย Claude Fable ตาม `labs/lesson-design-spec.md`, เขียนโดย Codex, ตรวจด้วย Playwright) · ฉบับเดิม `lesson.original.html` |
+| `labs/labA-fresh-install/` | transcript, report (PASS/FAIL/SKIP), help-excerpts, `install-cli-accounts.sh`, `agent-yolo` ที่ทดสอบใน container |
+| `labs/labB-collision/` | transcript 27 ขั้น + strace, report E1–E5 |
+| `labs/labC-multimodel/` | `run_all.sh`, `uc1_matrix.sh` … `uc7_quota.sh`, `lib.sh`, `parse.py`, `answers.py`, `results/summary.md`, `results/results.json` |
+| `labs/capture_screenshots.py` | จับภาพ `lesson.html` ด้วย Playwright (desktop/mobile/full page) + รายงาน console error และรูปที่โหลดไม่ได้ |
+| `img/d1..d6-*.png` + `img/src/*.excalidraw` | ผัง 6 ภาพ (Excalidraw MCP) แก้ไขต่อได้ |
+| `img/screenshots/` | ภาพจากการตรวจหน้าเว็บจริงด้วย Playwright |
+| `prompt_multi_account_cli.md` | setup prompt (แก้ตัวอักษรเพี้ยนแล้ว + หมายเหตุจากการทดลอง) |
+| `agent-routing-prompt.md` | ขั้นตอนเลือก Agent + Routing Card |
+
+ทำแล็บซ้ำ: `docker run -dit --name devtools-<lab>-<hash> --privileged -p <port>:22 tuchsanai/devtools:2569_1` → `docker exec -i … bash -lc '…'` → `docker rm -f` เมื่อจบ · Lab C: `bash labs/labC-multimodel/run_all.sh` (ต้อง login yolo1–3 และ cyolo1 บน host ก่อน) · Playwright/Excalidraw: `pw-up`, `ex-up`

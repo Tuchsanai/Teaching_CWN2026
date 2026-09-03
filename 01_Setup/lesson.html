@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เลือก AI ให้ถูกงาน — Multi-Account AI CLI (Teaching Deck)</title>
+  <meta name="description" content="สไลด์สอน: ไม่มีโมเดลเดียวชนะทุกงาน เลือก AI Agent หลายตัว แบ่งงาน กระจายโหลด ตรวจกันเอง และแชร์ project knowledge โดยไม่แชร์ credential">
+  <style>
+:root{
+  --ink:#14213d;--muted:#5b6579;--paper:#f3f0e8;--card:#ffffff;--line:#dcd6c8;--soft:#f8f6f0;
+  --blue:#2364aa;--blue-dk:#174d87;--cyan:#3da5d9;--gold:#f0b429;--green:#287a63;--red:#c0392b;
+  --purple:#7048a8;--orange:#d9711c;
+  --claude:#2364aa;--codex:#7048a8;--qwen:#d9711c;--voice:#287a63;
+  --radius:22px;--shadow:0 14px 40px rgba(20,33,61,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:"Noto Sans Thai","Sarabun","Tahoma",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.75;overflow-x:hidden}
+a{color:var(--blue)}
+img{max-width:100%;height:auto}
+h1,h2,h3,h4{line-height:1.25;margin:0}
+p{margin:.6rem 0 1rem}
+code{padding:.1rem .4rem;border-radius:6px;background:#eceff5;font-family:"Cascadia Code","Consolas","JetBrains Mono",monospace;font-size:.92em}
+pre{margin:1rem 0 0;overflow:auto;padding:1.2rem 1.35rem;border-radius:16px;background:#0f1f38;color:#e9f4ff;font-family:"Cascadia Code","Consolas","JetBrains Mono",monospace;font-size:.9rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+pre code{background:transparent;padding:0;color:inherit}
+.sr{position:absolute;left:-9999px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;display:grid;place-items:center;min-height:84vh;padding:5rem 6vw 4rem;color:#fff;
+  background:radial-gradient(circle at 85% 15%,rgba(61,165,217,.55) 0 8%,transparent 9%),
+             radial-gradient(circle at 10% 90%,rgba(240,180,41,.35) 0 10%,transparent 11%),
+             linear-gradient(135deg,#0f1f38 0%,#1e4f8f 55%,#287a63 100%)}
+.hero-inner{width:min(1120px,100%)}
+.eyebrow{display:inline-flex;gap:.6rem;align-items:center;letter-spacing:.14em;text-transform:uppercase;font-weight:800;font-size:.8rem;color:#bde9ff}
+.eyebrow::before{content:"";width:2.2rem;height:3px;background:var(--gold);border-radius:3px}
+.hero h1{margin:1rem 0 1.2rem;max-width:18ch;font-size:clamp(2.3rem,6vw,5.4rem);line-height:1.08;letter-spacing:-.01em}
+.hero .lead{max-width:44rem;font-size:clamp(1.05rem,1.8vw,1.4rem);color:#e6f2ff}
+.hero .question{margin-top:2.2rem;padding:1.1rem 1.4rem;max-width:52rem;border-left:6px solid var(--gold);background:rgba(255,255,255,.1);border-radius:0 16px 16px 0;font-size:1.15rem}
+.hero .meta{display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin-top:2.2rem;font-size:.9rem;color:#cfe4f7}
+.hero .meta span::before{content:"◆ ";color:var(--gold)}
+
+/* ---------- nav ---------- */
+nav.deck-nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.25rem;padding:.55rem 4vw;background:rgba(255,253,248,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
+nav.deck-nav a{flex:0 0 auto;padding:.45rem .8rem;border-radius:999px;color:var(--ink);text-decoration:none;font-weight:700;font-size:.92rem;white-space:nowrap}
+nav.deck-nav a:hover{background:#eef3fa}
+nav.deck-nav a.current{background:var(--ink);color:#fff}
+nav.deck-nav .spacer{flex:1 0 .5rem}
+nav.deck-nav button{flex:0 0 auto;padding:.45rem .9rem;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
+
+/* ---------- slides ---------- */
+main{width:min(1180px,94vw);margin:0 auto;padding:2.5rem 0 3rem}
+.slide{position:relative;scroll-margin-top:4.2rem;margin:0 0 2.5rem;padding:clamp(1.4rem,3.5vw,3rem) clamp(1.2rem,4vw,3.4rem);background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.slide-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.4rem;padding-bottom:.9rem;border-bottom:1px solid var(--line);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.slide-head .num{display:inline-grid;place-items:center;min-width:2.6rem;height:2.6rem;margin-right:.8rem;border-radius:12px;background:var(--ink);color:#fff;font-size:1.1rem;letter-spacing:0}
+.slide-head .deck{white-space:nowrap}
+.slide h2{font-size:clamp(1.7rem,3.4vw,2.7rem);max-width:26ch}
+.goal{margin:.7rem 0 1.6rem;padding:.75rem 1rem;border-radius:12px;background:var(--soft);border-left:5px solid var(--green);color:#1f3b32;font-weight:600}
+.goal::before{content:"เป้าหมายสไลด์นี้ · ";color:var(--green);font-weight:800}
+h3{font-size:1.28rem;margin:1.8rem 0 .6rem}
+h3.sub{color:var(--blue-dk)}
+.takeaway{margin-top:2rem;padding:1rem 1.2rem;border-radius:14px;background:#0f1f38;color:#e9f4ff;display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start}
+.takeaway b{color:var(--gold);white-space:nowrap}
+
+/* ---------- reusable blocks ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.2rem 0}
+.card{padding:1.2rem 1.3rem;border:1px solid var(--line);border-radius:16px;background:var(--soft)}
+.card strong{display:block;margin-bottom:.3rem;font-size:1.08rem}
+.card .number{display:inline-grid;place-items:center;width:2.1rem;height:2.1rem;margin-bottom:.6rem;border-radius:50%;background:var(--blue);color:#fff;font-weight:800}
+.card.accent{background:#fff;border-top:5px solid var(--blue)}
+.card.accent.codex{border-top-color:var(--codex)}
+.card.accent.qwen{border-top-color:var(--qwen)}
+.callout{margin:1.4rem 0;padding:1.1rem 1.3rem;border-radius:14px;background:#e6f5ef;border-left:6px solid var(--green)}
+.callout.warning{background:#fff4d9;border-left-color:var(--gold)}
+.callout.danger{background:#fdecea;border-left-color:var(--red)}
+.callout p:last-child{margin-bottom:0}
+figure{margin:1.6rem 0;padding:.9rem;border:1px solid var(--line);border-radius:18px;background:#fff}
+figure img{display:block;width:100%;border-radius:10px;cursor:zoom-in}
+figcaption{padding:.7rem .3rem .1rem;color:var(--muted);font-size:.92rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+
+/* tables */
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+table{width:100%;border-collapse:collapse}
+th,td{padding:.95rem 1rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:#eef3fa;font-size:.9rem;letter-spacing:.03em;color:var(--blue-dk);white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfaf7}
+tbody tr:last-child td{border-bottom:0}
+table.usecases{min-width:880px;table-layout:fixed}
+table.usecases th:nth-child(1){width:4.5rem}
+table.usecases th:nth-child(2){width:20%}
+table.usecases th:nth-child(3){width:17%}
+table.usecases th:nth-child(4){width:25%}
+table.usecases td:nth-child(3){color:var(--muted)}
+table.usecases th,table.usecases td{white-space:normal;overflow-wrap:anywhere}
+.idx{display:inline-grid;place-items:center;width:2.1rem;height:2.1rem;border-radius:10px;background:var(--ink);color:#fff;font-weight:800;font-size:.85rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{display:inline-flex;flex-direction:column;gap:.05rem;padding:.35rem .6rem;border-radius:10px;border:1px solid;background:#fff;font-size:.85rem;line-height:1.35}
+.chip code{background:transparent;padding:0;font-weight:800}
+.chip .role{color:var(--muted);font-size:.78rem}
+.chip.claude{border-color:var(--claude)}.chip.claude code{color:var(--claude)}
+.chip.codex{border-color:var(--codex)}.chip.codex code{color:var(--codex)}
+.chip.qwen{border-color:var(--qwen)}.chip.qwen code{color:var(--qwen)}
+.chip.voice{border-color:var(--voice)}.chip.voice code{color:var(--voice)}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;margin:.6rem 0 1rem;font-size:.9rem;color:var(--muted)}
+.legend i{display:inline-block;width:.9rem;height:.9rem;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+table.form td{height:3.4rem}
+
+/* pipeline / flow */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin:1.2rem 0}
+.pipeline div{position:relative;padding:.9rem .7rem;text-align:center;border-radius:12px;background:#eef3fa;font-weight:700;font-size:.95rem}
+.pipeline div:not(:last-child)::after{content:"›";position:absolute;right:-.62rem;top:50%;transform:translateY(-50%);color:var(--blue);font-size:1.5rem;font-weight:900}
+.orchestra{display:grid;grid-template-columns:1fr 2.2fr 1fr;gap:1rem;align-items:center;margin:1.4rem 0}
+.orchestra .col{display:grid;gap:.6rem}
+.orchestra .box{padding:.85rem 1rem;border-radius:14px;border:2px solid var(--line);background:#fff;text-align:center;font-weight:700}
+.orchestra .box small{display:block;font-weight:500;color:var(--muted)}
+.orchestra .box.parent{border-color:var(--gold);background:#fff7dd}
+.orchestra .box.claude{border-color:var(--claude)}.orchestra .box.codex{border-color:var(--codex)}.orchestra .box.qwen{border-color:var(--qwen)}
+.orchestra .box.know{border-style:dashed;border-color:var(--green);background:#e6f5ef}
+.orchestra .workers{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem}
+.share{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.share ul{margin:.4rem 0 0;padding-left:1.2rem}
+.share .ok{border-top:5px solid var(--green)}
+.share .no{border-top:5px solid var(--red)}
+
+/* setup prompt */
+.prompt-full{margin:1.2rem 0;border:1px solid var(--line);border-radius:18px;background:#fbfaf6;overflow:hidden}
+.prompt-full .bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.6rem;padding:.8rem 1.1rem;background:#eef3fa;border-bottom:1px solid var(--line);font-size:.9rem}
+.prompt-full .bar b{color:var(--blue-dk)}
+.prompt-full .bar button{padding:.45rem .9rem;border:1px solid var(--blue);border-radius:999px;background:#fff;color:var(--blue-dk);font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
+.prompt-full .bar button:hover{background:var(--blue);color:#fff}
+.prompt-full pre{margin:0;padding:1.4rem 1.5rem;border-radius:0;background:#fbfaf6;color:var(--ink);font-size:.86rem;line-height:1.62}
+.prompt-full .stat{color:var(--muted)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin:1.2rem 0}
+.step{padding:1.2rem 1.3rem;border:1px solid var(--line);border-radius:16px;background:#fff}
+.step .badge{display:inline-block;padding:.15rem .7rem;margin-bottom:.5rem;border-radius:999px;color:#fff;background:var(--green);font-weight:800;font-size:.85rem}
+.step h3{margin:.2rem 0 .3rem;font-size:1.12rem}
+.step p{margin:0;color:#2f3b52}
+.match{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:.8rem 0}
+.match>div{padding:.9rem 1rem;border-radius:12px;background:var(--soft);border:1px solid var(--line)}
+.match .join{border:0;background:transparent;color:var(--blue);font-size:1.5rem;font-weight:900;text-align:center}
+
+/* simulator */
+.router{display:grid;grid-template-columns:minmax(260px,1fr) 1.6fr;gap:1.2rem;margin-top:1.2rem}
+.control-panel,.network-panel,.output{padding:1.3rem;border:1px solid var(--line);border-radius:18px;background:#fff}
+.control-panel label{display:block;margin:.9rem 0 .35rem;font-weight:800}
+.control-panel label:first-child{margin-top:0}
+select,button.run{width:100%;padding:.8rem 1rem;border:1px solid #aeb8c8;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.seg label{margin:0;position:relative}
+.seg input{position:absolute;opacity:0;inset:0}
+.seg span{display:block;padding:.6rem .4rem;text-align:center;border:1px solid #aeb8c8;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer}
+.seg input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg input:focus-visible+span{outline:3px solid var(--gold)}
+button.run{margin-top:1.2rem;color:#fff;background:var(--blue);border-color:var(--blue);font-weight:800;cursor:pointer}
+button.run:hover{background:var(--blue-dk)}
+.network{display:grid;grid-template-columns:1fr .5fr 1.3fr;gap:.7rem;align-items:center;min-height:260px}
+.node{padding:.8rem .9rem;text-align:center;border:2px solid var(--line);border-radius:14px;background:var(--soft);transition:.25s;position:relative}
+.node small{display:block;color:var(--muted);font-weight:500;font-size:.78rem;line-height:1.35}
+.node.router-node{border-color:var(--gold);background:#fff7dd;font-weight:800}
+.node.agent{text-align:left}
+.node.agent.claude{border-left:6px solid var(--claude)}.node.agent.codex{border-left:6px solid var(--codex)}
+.node.agent.qwen{border-left:6px solid var(--qwen)}.node.agent.voice{border-left:6px solid var(--voice)}
+.node.agent .tag{position:absolute;top:.5rem;right:.6rem;padding:.1rem .55rem;border-radius:999px;font-size:.72rem;font-weight:800;color:#fff;background:var(--green);display:none}
+.node.agent.primary{background:#e6f5ef;border-color:var(--green);box-shadow:0 8px 20px rgba(40,122,99,.2);transform:translateY(-2px)}
+.node.agent.primary .tag{display:inline-block}
+.node.agent.verifier{background:#eef3fa;border-color:var(--blue)}
+.node.agent.verifier .tag{display:inline-block;background:var(--blue)}
+.agents{display:grid;gap:.55rem}
+.wires{display:grid;gap:.6rem}
+.wire{height:3px;background:linear-gradient(90deg,var(--gold),var(--green))}
+.output{grid-column:1/-1;min-height:120px;background:#0f1f38;color:#e9f4ff}
+.output strong{color:#7ed8ff}
+.output h4{color:#fff;font-size:1.15rem;margin-bottom:.4rem}
+.output dl{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1rem;margin:.6rem 0 0}
+.output dt{color:#7ed8ff;font-weight:800}
+.output dd{margin:0}
+.output ol{margin:.5rem 0 0;padding-left:1.3rem}
+.output .warn{display:inline-block;margin-top:.7rem;padding:.35rem .7rem;border-radius:8px;background:#f0b42933;color:#ffe08a;font-weight:700}
+.output .alert{display:inline-block;margin-top:.7rem;padding:.35rem .7rem;border-radius:8px;background:#c0392b44;color:#ffb3ab;font-weight:700}
+
+/* routing card */
+.routing-card{display:grid;grid-template-columns:auto 1fr;gap:.35rem 1.2rem;margin:.8rem 0 1.2rem;padding:1.2rem 1.4rem;border-radius:16px;background:#0f1f38;color:#e9f4ff}
+.routing-card dt{color:#7ed8ff;font-weight:800;white-space:nowrap}
+.routing-card dd{margin:0}
+.examples{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+
+footer{padding:2.5rem 5vw;color:#d9e9f8;background:#0f1f38;text-align:center;font-size:.95rem}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:3vw;background:rgba(15,31,56,.88);cursor:zoom-out}
+.lightbox.open{display:grid}
+.lightbox img{max-width:96vw;max-height:92vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .two,.share,.orchestra{grid-template-columns:1fr}
+  .orchestra .workers{grid-template-columns:repeat(2,1fr)}
+  .router{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  body{font-size:16px}
+  .hero{min-height:auto;padding:4rem 6vw 3rem}
+  main{width:min(1180px,96vw)}
+  .slide{border-radius:16px}
+  .slide-head .deck{display:none}
+  .pipeline{grid-template-columns:1fr}
+  .pipeline div:not(:last-child)::after{content:"⌄";right:auto;left:50%;top:auto;bottom:-1.05rem;transform:translateX(-50%)}
+  .network{grid-template-columns:1fr;min-height:0}
+  .wires{grid-template-columns:1fr}
+  .wire{width:3px;height:1.4rem;margin:0 auto;background:linear-gradient(180deg,var(--gold),var(--green))}
+  .match{grid-template-columns:1fr}
+  .match .join{transform:rotate(90deg)}
+  .takeaway{grid-template-columns:1fr}
+  .orchestra .workers{grid-template-columns:1fr}
+  .routing-card{grid-template-columns:1fr;gap:.1rem}
+  .routing-card dd{margin-bottom:.5rem}
+  .output dl{grid-template-columns:1fr}
+  /* stacked use-case table */
+  table.usecases{min-width:0}
+  table.usecases thead{display:none}
+  table.usecases tr{display:block;padding:.6rem .2rem;border-bottom:1px solid var(--line)}
+  table.usecases td{display:block;padding:.35rem .5rem;border:0;width:auto}
+  table.usecases td::before{content:attr(data-label);display:block;font-size:.74rem;font-weight:800;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.1rem}
+  table.usecases td:first-child{padding-bottom:0}
+  table.usecases td:first-child::before{display:none}
+}
+
+/* ---------- print / PDF ---------- */
+@page{size:A4 landscape;margin:12mm 14mm}
+@media print{
+  html,body{background:#fff;font-size:12.5pt}
+  nav.deck-nav,.lightbox,.prompt-full .bar button,button.run{display:none!important}
+  .hero{min-height:auto;padding:2.5rem 0;color:var(--ink);background:#fff;break-after:page}
+  .hero .lead,.hero .meta,.hero .eyebrow{color:var(--ink)}
+  .hero .question{background:#f3f0e8;color:var(--ink)}
+  main{width:100%;padding:0}
+  .slide{break-before:page;break-after:auto;margin:0 0 1.5rem;padding:0 0 1rem;border:0;border-radius:0;box-shadow:none}
+  .slide-head{margin-bottom:1rem}
+  .card,.step,.callout,figure,.routing-card,.takeaway,.node,.match,.orchestra .box,tr{break-inside:avoid}
+  pre,.prompt-full pre{background:#fbfaf6!important;color:var(--ink)!important;border:1px solid var(--line);white-space:pre-wrap;break-inside:auto;font-size:9.5pt}
+  .prompt-full{break-inside:auto}
+  .takeaway,.routing-card,.output{background:#f3f0e8!important;color:var(--ink)!important;border:1px solid var(--line)}
+  .takeaway b,.routing-card dt,.output strong,.output dt{color:var(--blue-dk)!important}
+  .output h4{color:var(--ink)}
+  footer{background:#fff;color:var(--muted);padding:1rem 0}
+  a{text-decoration:none;color:var(--ink)}
+  figure img{cursor:default}
+  table.usecases{min-width:0;font-size:10.5pt}
+  .table-wrap{overflow:visible;border:0}
+  th{background:#eef3fa!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .chip,.idx,.node,.badge,.number,.seg span{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div class="eyebrow">Teaching deck · Multi-Account AI CLI · 8 สไลด์</div>
+    <h1>เลือก AI ให้ถูกงาน ไม่ใช่เลือกผู้ชนะตัวเดียว</h1>
+    <p class="lead">Leaderboard บอกว่าแต่ละโมเดลเก่งคนละหมวด ดังนั้นหนึ่งสถานการณ์จึงควรใช้ AI Agent หลายตัว แบ่งงาน กระจายโหลด ตรวจซึ่งกันและกัน และแชร์ความรู้ของโปรเจกต์ โดยไม่แชร์ credential</p>
+    <div class="question">คำถามเปิดชั้นเรียน: “งานนี้ควรใช้โมเดลใด กี่ตัว บัญชีใด ตรวจอย่างไร และรู้ได้อย่างไรว่าถูก?”</div>
+    <div class="meta"><span>Claude Code · Codex CLI · Qwen Code</span><span>Ubuntu · หลายบัญชี แยก credential 100%</span><span>ข้อมูลอ้างอิง ณ 2026-09-03</span></div>
+  </div>
+</header>
+
+<nav class="deck-nav" aria-label="หัวข้อสไลด์">
+  <a href="#leaderboard">1 Leaderboard</a>
+  <a href="#use-cases">2 15 Use Cases</a>
+  <a href="#multi-agent">3 Multi-Agent</a>
+  <a href="#setup-prompt">4 Setup Prompt</a>
+  <a href="#routing-steps">5 วิธีเลือก Agent</a>
+  <a href="#simulator">6 Simulator</a>
+  <a href="#prompt-lab">7 Prompt Lab</a>
+  <a href="#activity">8 กิจกรรม</a>
+  <span class="spacer"></span>
+  <button type="button" id="printBtn" title="พิมพ์หรือบันทึกเป็น PDF">พิมพ์ / PDF</button>
+</nav>
+
+<main>
+
+<!-- ===================================================== 01 -->
+<section class="slide" id="leaderboard" aria-labelledby="h-leaderboard">
+  <div class="slide-head"><span><span class="num">01</span>Evidence before opinion</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-leaderboard">Leaderboard บอกว่า ไม่มีโมเดลเดียวชนะทุกประเภทงาน</h2>
+  <p class="goal">อ่าน LMArena ให้เป็น: ดูหมวดที่ตรงกับงาน ดูช่วงความไม่แน่นอน ดูราคา และบันทึกวันที่</p>
+  <p>LMArena แยกอันดับตามประเภทงาน เช่น Text, WebDev, Vision, Document และ Search โมเดลที่นำในหมวดหนึ่งอาจตามหลังในอีกหมวด และคะแนนของกลุ่มบนมักใกล้กันจนช่วงอันดับทับซ้อน จึงไม่ควรตัดสินจากอันดับ Overall เพียงค่าเดียว</p>
+  <figure>
+    <img src="lmarena-webdev.png" alt="ภาพหน้าจอ LMArena หมวด WebDev แสดงอันดับ คะแนน ช่วงอันดับ ราคา และจำนวนโหวต" loading="lazy">
+    <figcaption>หน้า WebDev ของ LMArena ณ วันที่ 2 กันยายน 2026 ใช้ฝึกอ่านคะแนน ช่วงอันดับ ราคา จำนวนโหวต และ context ร่วมกัน ที่มา: <a href="https://lmarena.ai/leaderboard/code/webdev">lmarena.ai/leaderboard/code/webdev</a> (คลิกภาพเพื่อขยาย)</figcaption>
+  </figure>
+  <div class="callout warning"><strong>ตัวอย่างเพื่ออภิปราย:</strong> ในภาพ Qwen รุ่นหนึ่งอยู่ในกลุ่มอันดับ 2–5 ด้วยคะแนน 1688 ที่ราคา $2/$6 ต่อล้านโทเคน ขณะที่โมเดลอันดับสูงสุดราคา $10/$50 ข้อสรุปไม่ใช่ “Qwen เก่งกว่าทุกงาน” แต่คือ “คุณภาพใกล้กลุ่มบนอาจได้มาด้วยต้นทุนต่ำกว่ามากในบางหมวด” และตัวเลขนี้เปลี่ยนได้ทุกวัน</div>
+  <div class="grid">
+    <div class="card"><span class="number">1</span><strong>ดูหมวดงาน</strong>เลือก Coding, WebDev, Long context หรือหมวดที่ตรงกับโจทย์ ไม่ใช่ Overall</div>
+    <div class="card"><span class="number">2</span><strong>ดูความไม่แน่นอน</strong>คะแนนใกล้กันและช่วงอันดับทับซ้อน แปลว่ายังสรุปผู้ชนะไม่ได้</div>
+    <div class="card"><span class="number">3</span><strong>ดูต้นทุน</strong>เทียบ input/output price, context และโควตาของบัญชีควบคู่กับคุณภาพ</div>
+    <div class="card"><span class="number">4</span><strong>บันทึกวันที่</strong>อันดับและราคาเปลี่ยนได้ ห้ามใช้ตัวเลขเก่าเสมือนข้อเท็จจริงถาวร</div>
+  </div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>เมื่อไม่มีผู้ชนะตัวเดียว ทางออกคือเลือก Agent ต่อประเภทงาน และให้หลายตัวช่วยกันในสถานการณ์เดียว</span></div>
+</section>
+
+<!-- ===================================================== 02 -->
+<section class="slide" id="use-cases" aria-labelledby="h-usecases">
+  <div class="slide-head"><span><span class="num">02</span>Model routing</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-usecases">15 Use Cases: หนึ่งสถานการณ์ เลือก Agent ได้หลายตัว</h2>
+  <p class="goal">เห็นว่าทุกสถานการณ์มี Agent หลัก Agent ตรวจ และวิธีแบ่งงานที่ต่างกัน</p>
+  <div class="callout"><strong>ชื่อ wrapper ในตารางเป็นตัวอย่างสมมติสำหรับสอน:</strong> <code>yolo1</code> = Claude Code (เช่น Claude Fable), <code>yolo2</code> = Claude Code (เช่น Claude Opus), <code>cyolo1</code> = Codex CLI (เช่น GPT ตระกูล Sol), <code>qyolo1</code> = Qwen Code รุ่นคุณภาพสูง, <code>qyolo2</code> = Qwen Code รุ่นเร็ว/ประหยัด ก่อนใช้จริงต้องตรวจชื่อโมเดล ราคา และสิทธิ์ของบัญชีนั้นทุกครั้ง</div>
+  <div class="legend"><span><i style="background:var(--claude)"></i>Claude Code (yoloN)</span><span><i style="background:var(--codex)"></i>Codex CLI (cyoloN)</span><span><i style="background:var(--qwen)"></i>Qwen Code (qyoloN)</span><span><i style="background:var(--voice)"></i>Voice / External API</span></div>
+  <div class="table-wrap">
+    <table class="usecases">
+      <thead><tr><th>#</th><th>สถานการณ์</th><th>สิ่งที่ให้ความสำคัญ</th><th>Agent (ตัวอย่าง wrapper · บทบาท)</th><th>แบ่งงานและตรวจอย่างไร</th></tr></thead>
+      <tbody>
+<tr id="uc-frontend"><td data-label="#"><span class="idx">01</span></td><td data-label="สถานการณ์"><strong>สร้าง Frontend หรือต้นแบบหน้าเว็บ</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">คุณภาพหมวด WebDev · ความเร็วในการวนแก้ · ราคาต่อรอบ</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip qwen"><code>qyolo1</code><span class="role">สร้าง</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">ตรวจเมื่อขึ้น production</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Qwen สร้างต้นแบบเร็วและถูก คนตรวจหน้าจอและ interaction ถ้าเป็น production ให้ Codex ตรวจโค้ดอีกรอบ</td></tr>
+<tr id="uc-architecture"><td data-label="#"><span class="idx">02</span></td><td data-label="สถานการณ์"><strong>วิเคราะห์สถาปัตยกรรมหรือรีวิวงานซับซ้อน</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ความถูกต้อง · reasoning · context ยาว</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip claude"><code>yolo2</code><span class="role">วิเคราะห์</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">ตรวจยืนยัน</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Claude วิเคราะห์ trade-off จากภาพรวม Codex ตรวจสมมติฐานกับโค้ดจริง รวมเฉพาะข้อสรุปที่ทั้งสองฝ่ายตรงกัน</td></tr>
+<tr id="uc-batch"><td data-label="#"><span class="idx">03</span></td><td data-label="สถานการณ์"><strong>ประมวลผลไฟล์จำนวนมาก (batch)</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ราคา · rate limit ต่อบัญชี · automation</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip qwen"><code>qyolo2</code><span class="role">ประมวลผลหลัก</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">สุ่มตรวจ</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">แบ่งไฟล์เป็นชุด ส่ง path ให้ worker หลายบัญชีทำขนาน Codex สุ่มตรวจตัวอย่าง parent เทียบผลรวมด้วยสคริปต์</td></tr>
+<tr id="uc-client"><td data-label="#"><span class="idx">04</span></td><td data-label="สถานการณ์"><strong>แก้โค้ดในโปรเจกต์ลูกค้า</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">สิทธิ์บัญชี · privacy · audit trail</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">บัญชีลูกค้าเท่านั้น</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">ใช้ wrapper ที่ผูกกับบัญชีของลูกค้าเท่านั้น แยก credential จากบัญชีส่วนตัว verifier ตาม policy ลูกค้า คนอนุมัติก่อน merge</td></tr>
+<tr id="uc-backend"><td data-label="#"><span class="idx">05</span></td><td data-label="สถานการณ์"><strong>สร้าง Backend หรือเชื่อม API</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ความถูกต้องของ interface · testability</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">implement + test</span></span> <span class="chip claude"><code>yolo1</code><span class="role">ตรวจ contract</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Codex เขียน implementation พร้อม test Claude ตรวจ API contract และ error handling เมื่อระบบซับซ้อน</td></tr>
+<tr id="uc-debug"><td data-label="#"><span class="idx">06</span></td><td data-label="สถานการณ์"><strong>Debug ปัญหาที่หาสาเหตุยาก</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">หลักฐานจาก log · reproduce ซ้ำได้</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">reproduce</span></span> <span class="chip claude"><code>yolo1</code><span class="role">ท้าทายสมมติฐาน</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Codex ทำให้ bug เกิดซ้ำได้ก่อน Claude ตั้งคำถามกับสมมติฐาน สรุปเฉพาะสาเหตุที่พิสูจน์ด้วยการรันจริง</td></tr>
+<tr id="uc-testing"><td data-label="#"><span class="idx">07</span></td><td data-label="สถานการณ์"><strong>สร้างชุดทดสอบและตรวจ regression</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">coverage · edge cases · เวลาใน CI</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">เขียนและรัน test</span></span> <span class="chip qwen"><code>qyolo2</code><span class="role">เสนอ edge cases</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Codex เขียนและรัน test จริง Qwen รุ่นประหยัดช่วยไล่ edge cases เพิ่ม รายงานเฉพาะผลที่รันผ่านจริง</td></tr>
+<tr id="uc-docs"><td data-label="#"><span class="idx">08</span></td><td data-label="สถานการณ์"><strong>สรุปเอกสารหรือ codebase ขนาดใหญ่</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">context length · ความครบถ้วน · citation</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip claude"><code>yolo2</code><span class="role">อ่านภาพรวม</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">ตรวจการอ้างอิง</span></span> <span class="chip qwen"><code>qyolo2</code><span class="role">จัดรูปแบบ</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Claude อ่านทั้งชุดแล้วสรุป Codex ตรวจว่าจุดที่อ้างถึงโค้ดมีจริง Qwen รุ่นประหยัดจัดรูปแบบเอกสารสุดท้าย</td></tr>
+<tr id="uc-security"><td data-label="#"><span class="idx">09</span></td><td data-label="สถานการณ์"><strong>ตรวจ Security หรือ configuration สำคัญ</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ความเสี่ยงสูง · false positive · human approval</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">ตรวจรอบ 1</span></span> <span class="chip claude"><code>yolo2</code><span class="role">ตรวจรอบ 2</span></span> <span class="chip claude"><code>yolo1</code><span class="role">ตัดสินข้อขัดแย้ง</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">สอง Agent ต่างค่ายตรวจอิสระ Agent ที่สามตัดสินเฉพาะจุดที่เห็นไม่ตรงกัน คนอนุมัติทุกการแก้ก่อนใช้จริง</td></tr>
+<tr id="uc-research"><td data-label="#"><span class="idx">10</span></td><td data-label="สถานการณ์"><strong>Research หรือวิเคราะห์ข้อมูลหลายแหล่ง</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ความน่าเชื่อถือ · ความใหม่ของข้อมูล · ต้นทุน</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip qwen"><code>qyolo1</code><span class="role">รวบรวมและจัดรูป</span></span> <span class="chip claude"><code>yolo1</code><span class="role">ตรวจข้อสรุป</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Qwen รวบรวมและจัดตารางข้อมูลพร้อมแหล่งที่มา Claude ตรวจข้อสรุปสำคัญและชี้จุดที่หลักฐานไม่พอ</td></tr>
+<tr id="uc-stt"><td data-label="#"><span class="idx">11</span></td><td data-label="สถานการณ์"><strong>ถอดเสียงประชุมเป็นข้อความ (Speech-to-Text)</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">ภาษา · ชื่อเฉพาะ · privacy ของเสียง</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip voice"><code>Voice / External API</code><span class="role">ถอดเสียง</span></span> <span class="chip claude"><code>yolo1</code><span class="role">สรุป</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">ตรวจ action items</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">STT API ถอดเสียง Claude สรุปประเด็น Codex ตรวจว่า action item ทุกข้อมีอยู่ใน transcript จริง</td></tr>
+<tr id="uc-tts"><td data-label="#"><span class="idx">12</span></td><td data-label="สถานการณ์"><strong>สร้างเสียงบรรยายบทเรียน (Text-to-Speech)</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">คุณภาพเสียง · ภาษาไทย · ราคาต่อนาที</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip qwen"><code>qyolo2</code><span class="role">ร่างสคริปต์</span></span> <span class="chip claude"><code>yolo1</code><span class="role">ตรวจภาษา</span></span> <span class="chip voice"><code>Voice / External API</code><span class="role">สังเคราะห์เสียง</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">Qwen รุ่นประหยัดร่างสคริปต์ Claude หรือผู้สอนตรวจภาษาและความหมาย จึงส่ง TTS API สร้างไฟล์เสียง</td></tr>
+<tr id="uc-fallback"><td data-label="#"><span class="idx">13</span></td><td data-label="สถานการณ์"><strong>สลับ API เมื่อบริการหลักล่มหรือติดโควตา</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">compatibility · fallback policy · data policy</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip codex"><code>cyolo1</code><span class="role">ทำ interface กลาง</span></span> <span class="chip qwen"><code>qyolo2</code><span class="role">endpoint สำรอง</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">เขียน adapter กลางให้สลับปลายทางได้ ตรวจว่า backup รองรับ schema และได้รับอนุญาตให้รับข้อมูลชุดนั้นก่อนสลับ</td></tr>
+<tr id="uc-same-vendor"><td data-label="#"><span class="idx">14</span></td><td data-label="สถานการณ์"><strong>ใช้หลายโมเดลของผู้ให้บริการเดียวกัน</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">quality tier · latency · โควตาแยกถัง</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip qwen"><code>qyolo1</code><span class="role">งานยาก</span></span> <span class="chip qwen"><code>qyolo2</code><span class="role">งานเร็ว/จำนวนมาก</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">บัญชีเดียวกันค่ายเดียวกันแต่แยก account และ config งานยากไปรุ่นคุณภาพ งานซ้ำ ๆ ไปรุ่นเร็ว แล้วเทียบผลกันเอง</td></tr>
+<tr id="uc-knowledge"><td data-label="#"><span class="idx">15</span></td><td data-label="สถานการณ์"><strong>หลาย Agent แชร์ Knowledge แล้วรวมคำตอบ</strong></td><td data-label="สิ่งที่ให้ความสำคัญ">source of truth · provenance · conflict resolution</td><td data-label="Agent (ตัวอย่าง wrapper)"><div class="chips"><span class="chip claude"><code>yolo1</code><span class="role">parent รวมผล</span></span> <span class="chip codex"><code>cyolo1</code><span class="role">worker</span></span> <span class="chip qwen"><code>qyolo1</code><span class="role">worker</span></span></div></td><td data-label="แบ่งงานและตรวจอย่างไร">ทุก Agent อ่าน requirement และ schema จากโฟลเดอร์ knowledge เดียวกัน เขียนผลพร้อมแหล่งที่มา parent รวมและแก้ข้อขัดแย้ง ไม่แชร์ credential</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warning"><strong>แชร์ Knowledge ไม่ใช่แชร์ Credential:</strong> ทุกแถวที่ใช้หลาย Agent ให้แชร์เฉพาะ requirement, schema, test result, summary และ artifact ผ่านโฟลเดอร์โครงการ เช่น <code>knowledge/</code> ส่วน credential, config, session, history และ cache ของแต่ละบัญชียังแยกกัน 100%</div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>กติกาไม่ใช่ “สลับโมเดลแบบสุ่ม” แต่คือเลือกจากประเภทงาน ความเสี่ยง งบประมาณ และขอบเขตบัญชี แล้วให้ Agent ที่สองตรวจ</span></div>
+</section>
+
+<!-- ===================================================== 03 -->
+<section class="slide" id="multi-agent" aria-labelledby="h-multi">
+  <div class="slide-head"><span><span class="num">03</span>Multi-Agent · Load distribution</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-multi">หนึ่งสถานการณ์ กระจายงานให้หลาย Agent อย่างไร</h2>
+  <p class="goal">เข้าใจ 4 กลไก: แบ่งงาน กระจายโหลด ตรวจซึ่งกันและกัน และแชร์ project knowledge โดยไม่แชร์ credential</p>
+  <div class="grid">
+    <div class="card accent"><strong>1 · แบ่งงาน (split)</strong>Parent แยกโจทย์เป็นงานย่อยตามความถนัด เช่น Frontend ไป Qwen, Backend และ test ไป Codex, สถาปัตยกรรมไป Claude</div>
+    <div class="card accent codex"><strong>2 · กระจายโหลด (load)</strong>ทุกบัญชีมีโควตาและ rate limit ของตัวเอง งานปริมาณมากจึงแบ่งชุดไฟล์ไปหลายบัญชีพร้อมกัน แล้วตรวจโควตาก่อนงานหนัก</div>
+    <div class="card accent qwen"><strong>3 · ตรวจซึ่งกันและกัน (verify)</strong>Agent ต่างค่ายตรวจอิสระโดยไม่เห็นผลของกัน Parent เทียบด้วยสคริปต์หรือ hidden test ไม่เชื่อรายงานของ Agent โดยไม่ตรวจ</div>
+    <div class="card accent" style="border-top-color:var(--green)"><strong>4 · แชร์ knowledge ไม่แชร์ credential</strong>ทุก Agent อ่าน requirement เดียวกันจากโฟลเดอร์โครงการ แต่ใช้ credential และ session ของบัญชีตัวเอง</div>
+  </div>
+
+  <h3 class="sub">ตัวอย่าง: สร้างระบบหนึ่งชุดด้วย 4 Agent</h3>
+  <div class="orchestra" aria-label="ผังการกระจายงาน">
+    <div class="col"><div class="box parent">Parent (เช่น yolo1)<small>รับโจทย์ · แยกงานย่อย · ส่ง path ไม่ส่งข้อมูล</small></div></div>
+    <div class="col">
+      <div class="workers">
+        <div class="box qwen">qyolo1<small>สร้าง Frontend</small></div>
+        <div class="box codex">cyolo1<small>Backend + test</small></div>
+        <div class="box claude">yolo2<small>วิเคราะห์ architecture</small></div>
+        <div class="box qwen">qyolo2<small>ประมวลผลข้อมูลจำนวนมาก</small></div>
+      </div>
+      <div class="box know">knowledge/ ของโปรเจกต์<small>requirement · schema · test result · summary (ไม่มี secret)</small></div>
+    </div>
+    <div class="col"><div class="box parent">Parent รวมผล<small>เทียบผล · แก้ conflict · ขอคนอนุมัติเมื่อเสี่ยงสูง</small></div></div>
+  </div>
+  <div class="pipeline">
+    <div>Parent รับโจทย์</div><div>แยกงานย่อย</div><div>ส่ง yolo / cyolo / qyolo</div><div>เขียน artifact ลง knowledge/</div><div>รวมและตรวจผล</div>
+  </div>
+
+  <figure>
+    <img src="img/d5-patterns.png" alt="ผัง 4 รูปแบบการใช้หลายโมเดลร่วมกัน: Matrix, Fan-out, Relay, Verify" loading="lazy" onerror="this.closest('figure').hidden=true">
+    <figcaption>4 รูปแบบที่ใช้จริงในแล็บ: Matrix (งานเดียวหลายโมเดล), Fan-out (แบ่งงานขนาน), Relay (ส่งค่าต่อกันข้ามค่าย), Verify (สร้าง → ตรวจ → ตัดสิน) ตัวเลขในภาพมาจากการรันวันที่ 2026-09-03 ดูรายละเอียดใน <code>labs/labC-multimodel/results/summary.md</code></figcaption>
+  </figure>
+
+  <div class="share">
+    <div class="card ok"><strong>แชร์ได้ (project knowledge)</strong><ul><li>requirement, user story, acceptance criteria</li><li>schema, API contract, ตัวอย่างข้อมูลที่ไม่ลับ</li><li>ผล test, summary, รายงานพร้อมแหล่งที่มา</li><li>Skills และ MCP config จาก <code>&lt;tool&gt;/shared</code></li></ul></div>
+    <div class="card no"><strong>ห้ามแชร์ (ของแต่ละบัญชี)</strong><ul><li>credential, API key, token, cookie</li><li>config root, session, history, cache</li><li>ข้อมูลลูกค้าข้ามบัญชีเพื่อหลบโควตา</li><li>key เดียวใช้หลายบัญชีโดยเจ้าของไม่รู้</li></ul></div>
+  </div>
+  <div class="callout"><strong>ต้องแยกให้ครบ 5 ส่วนต่อบัญชี:</strong> credential, config, session, history และ cache เปิดหลายบัญชีพร้อมกันแล้วต้องไม่ชนกัน วิธีทำอยู่ใน Setup Prompt สไลด์ถัดไป</div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>หลักร่วมทุกรูปแบบ: parent ตรวจเสมอ · worker ตอบค่าล้วน · ส่ง path ไม่ส่งข้อมูล · เช็คโควตาก่อนงานหนัก · งานลูกค้าใช้บัญชีลูกค้าเท่านั้น</span></div>
+</section>
+
+<!-- ===================================================== 04 -->
+<section class="slide" id="setup-prompt" aria-labelledby="h-setup">
+  <div class="slide-head"><span><span class="num">04</span>Setup Prompt · ฉบับเต็ม</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-setup">Setup Prompt: สร้างระบบหลายบัญชีที่แยก credential 100%</h2>
+  <p class="goal">มี wrapper ต่อบัญชีที่รันพร้อมกันได้ไม่ชน แชร์ Skills/MCP ได้ และรายงานผลทดสอบตามจริง</p>
+  <p>นำพรอมป์ด้านล่างจากไฟล์ <code>prompt_multi_account_cli.md</code> ส่งให้ AI coding agent เพื่อสร้างโครงสร้าง บัญชี และ wrapper commands ทั้งหมด พรอมป์กำหนดให้ agent ตรวจ docs และ <code>--help</code> ของเวอร์ชันจริงก่อนทำ และรายงาน PASS / FAIL / SKIP ตามจริง</p>
+  <div class="pipeline">
+    <div>ส่ง Setup Prompt</div><div>ตรวจเครื่องและ CLI จริง</div><div>แสดง Dry-run</div><div>สร้างโครงสร้าง + wrapper</div><div>ทดสอบ PASS / FAIL / SKIP</div>
+  </div>
+  <div class="grid">
+    <div class="card accent"><strong>Claude Code</strong><code>yolo1..yolo5</code><br>แยกด้วย <code>CLAUDE_CONFIG_DIR</code></div>
+    <div class="card accent codex"><strong>Codex CLI</strong><code>cyolo1..cyolo5</code><br>แยกด้วย <code>CODEX_HOME</code></div>
+    <div class="card accent qwen"><strong>Qwen Code</strong><code>qyolo1..qyolo3</code><br>config root ตาม docs ของรุ่นจริง + API key สิทธิ์ 600</div>
+  </div>
+  <div class="callout warning"><strong>ชื่อ wrapper และจำนวนบัญชีเป็นตัวอย่าง:</strong> ห้องเรียนหรือทีมของคุณอาจตั้งชื่ออื่นหรือมีจำนวนบัญชีต่างกัน สิ่งที่ต้องตรวจจริงทุกครั้งคือโมเดลที่บัญชีนั้นเรียกได้ ราคาหรือโควตาของ plan และสิทธิ์ที่เจ้าของ credential อนุญาต</div>
+
+  <div class="two">
+    <figure>
+      <img src="img/d1-structure.png" alt="ผังโครงสร้างโฟลเดอร์ Multi-Account AI CLI ใต้ BASE_PATH แยกบัญชีแต่แชร์ Skills/MCP" loading="lazy" onerror="this.closest('figure').hidden=true">
+      <figcaption>โครงสร้างที่พรอมป์ต้องสร้าง: <code>&lt;tool&gt;/&lt;account&gt;</code> ของใครของมัน · <code>&lt;tool&gt;/shared</code> แก้ครั้งเดียวทุกบัญชีเห็น · <code>.mcp/</code> แชร์ข้ามทุก CLI</figcaption>
+    </figure>
+    <figure>
+      <img src="img/d2-wrapper-flow.png" alt="ผังเส้นทางคำสั่ง: พิมพ์ yolo1 ผ่าน symlink ไป wrapper ตั้ง env เฉพาะ process แล้ว exec CLI จริง" loading="lazy" onerror="this.closest('figure').hidden=true">
+      <figcaption>เส้นทางคำสั่ง: พิมพ์ <code>yolo1</code> → symlink → wrapper ตั้ง env เฉพาะ process → exec CLI จริงพร้อม <code>"$@"</code> → อ่านเขียนเฉพาะโฟลเดอร์ของบัญชีนั้น</figcaption>
+    </figure>
+  </div>
+
+  <h3 class="sub">Setup Prompt ฉบับเต็ม (คัดลอกจาก prompt_multi_account_cli.md ทั้งฉบับ ไม่ตัดทอน)</h3>
+  <div class="prompt-full">
+    <div class="bar"><span><b>prompt_multi_account_cli.md</b> · <span class="stat" id="promptStat"></span></span><button type="button" id="copyPrompt">คัดลอก Prompt ทั้งหมด</button></div>
+<pre id="setupPrompt">สร้าง CLI บน Ubuntu สำหรับรัน Claude Code, Codex CLI และ Qwen Code หลาย account
+แยก credential/config กัน 100%
+
+## ตัวแปรตั้งค่า (แก้ที่นี่ที่เดียว ที่อื่นต้องอ้างอิงตัวแปรนี้)
+BASE_PATH="/root/workspace"
+
+## คำสั่ง
+- yolo1..yolo5   → Claude Code + Anthropic account
+- cyolo1..cyolo5 → Codex CLI + OpenAI account
+- qyolo1..qyolo3 → Qwen Code + QwenCloud account (ใช้ Qwen Code โดยตรง ห้ามผ่าน Claude Code/Codex)
+
+## โครงสร้าง
+$BASE_PATH/
+├── .Claude/                      # Claude Code
+│   ├── yolo1/ … yolo5/           # config root ต่อ account (CLAUDE_CONFIG_DIR) — credential/session/history/cache แยกกัน
+│   └── shared/
+│       ├── skills/               # skill ใช้ร่วมทุก yoloN (symlink / discovery)
+│       └── mcp/                  # MCP config ใช้ร่วมทุก yoloN
+├── .Codex/                       # Codex CLI
+│   ├── cyolo1/ … cyolo5/         # config root ต่อ account (CODEX_HOME)
+│   └── shared/
+│       ├── skills/
+│       └── mcp/
+├── .Qwen/                        # Qwen Code
+│   ├── qyolo1/ … qyolo3/         # config root ต่อ account (ตาม docs) + API key permission 600
+│   └── shared/
+│       ├── skills/
+│       └── mcp/
+└── .mcp/                         # (สร้างโฟลเดอร์ว่างไว้) state ของ MCP server ที่ทุก CLI ทุก account จะใช้ร่วมกัน — ติดตั้งภายหลัง
+
+หลักการ: &lt;tool&gt;/&lt;account&gt;/ = ของใครของมัน, &lt;tool&gt;/shared/ = แก้ครั้งเดียวทุก account ของ CLI นั้นเห็น,
+.mcp/ = ที่เก็บ MCP ตัวเดียวกันแชร์ข้ามทุก CLI
+
+## Isolation
+1. ทุก account แยก credential/config/session/history/cache สมบูรณ์ เปิดพร้อมกันได้ไม่ชน
+2. ห้ามเปลี่ยน $HOME — ใช้กลไก official กำหนด config root ต่อ CLI
+   (Claude: CLAUDE_CONFIG_DIR, Codex: CODEX_HOME, Qwen: ตาม docs ล่าสุด)
+   ถ้า CLI ใดไม่มีกลไก official ให้ระบุข้อจำกัดชัดและใช้เฉพาะวิธีที่รองรับจริง
+3. ห้ามแก้ .bashrc, Git config, SSH config หรือ project environment เดิมโดยไม่จำเป็น
+
+## Wrapper
+4. ทุกคำสั่งส่งต่อ "$@" และรันแบบ skip permissions ด้วย flag ล่าสุดของแต่ละ CLI
+   - yoloN  → claude --dangerously-skip-permissions
+   - cyoloN → codex + bypass approval/sandbox
+   - qyoloN → qwen + permission/approval flag ที่รองรับ
+
+## Qwen credential
+5. qyoloN ครั้งแรก: ให้ผู้ใช้เลือก plan (Token Plan Personal / Token Plan Team / Coding Plan /
+   Pay-as-you-go) และกรอก API key แบบซ่อนตัวอักษร
+   endpoint, credential variable, default model ต้องตรงกับ plan ตาม docs ห้ามเดาหรือใช้ข้าม plan
+6. เก็บ key แยกใน .Qwen/qyoloN permission 600 — ห้ามฝังใน source/template/ไฟล์แจกจ่าย,
+   ห้ามส่งผ่าน argument, ห้ามโชว์ใน terminal / process list / log
+7. ห้ามใช้ key เดียวข้ามหลาย account โดยไม่แจ้งเจ้าของ credential (ห้ามเปิดเผย credential)
+
+## Skills / MCP
+8. แต่ละ CLI ใช้ &lt;tool&gt;/shared เป็น source เดียว — แก้ครั้งเดียวทุก account ของ CLI นั้นเห็น
+   - Skills: symlink หรือ official discovery mechanism
+   - MCP: ถ้า CLI ไม่มี config include ให้ sync ด้วยคำสั่ง official ของ CLI นั้น
+   - CLI ใดไม่รองรับส่วนใด ให้ระบุชัดและทำเท่าที่รองรับ
+
+## Installer
+9. รันได้โดยไม่ลบ/เขียนทับ credential-config เดิม
+10. วิธีติดตั้งและจัดวางไฟล์ให้เลือกเอง พร้อมอธิบายเหตุผลสั้นๆ
+
+## Docs
+11. ตรวจสอบ official docs และ --help ของเวอร์ชันที่ติดตั้งจริงก่อน implement
+    ห้ามเดา env/path/endpoint/model/flag — ถ้า docs กับ CLI ไม่ตรงกัน ให้รายงานและใช้ค่าที่ยืนยันจากเวอร์ชันจริง
+    - https://code.claude.com/docs/
+    - https://github.com/openai/codex
+    - https://docs.qwencloud.com/developer-guides/clients-and-developer-tools/qwen-code
+
+## ทดสอบ (รายงานตามจริง PASS / FAIL / SKIP)
+- yolo1/yolo2, cyolo1/cyolo2 login คนละ account + qyolo1/qyolo2 ใส่ key ต่างกัน → เปิดพร้อมกัน ไม่ชน
+- Qwen key ไม่ปรากฏใน argument / process list / log
+- เพิ่ม Skill และ MCP อย่างละ 1 ใน shared ของแต่ละ CLI → ทุก account ที่เกี่ยวข้องเห็น
+- installer รอบ 2 ไม่ทำลายของเดิม
+- Git/SSH ทำงานปกติ
+- test ที่ต้องใช้ credential จริง ให้เจ้าของ credential เป็นผู้รัน (มิฉะนั้นรายงาน SKIP)
+
+## รายงาน
+- config root ของแต่ละ CLI, credential location, shared source และข้อจำกัดของแต่ละ CLI
+
+## หมายเหตุจากการทดลองจริง (2026-09-03, Ubuntu 24.04 container · claude 2.1.258 · codex 0.152.1 · qwen 0.22.3)
+ดูหลักฐานเต็มใน labs/labA-fresh-install/report.md และ labs/labB-collision/report.md
+- npm ≥ 11/12 บล็อก postinstall → `claude --version` ได้ `Error: claude native binary not installed.`
+  ติดตั้งด้วย `npm install -g --allow-scripts=@anthropic-ai/claude-code,@qwen-code/audio-capture &lt;pkg&gt;@&lt;ver&gt; ...`
+- รันเป็น root: ต้องตั้ง `IS_SANDBOX=1` ไม่งั้น `--dangerously-skip-permissions cannot be used with root/sudo privileges`
+- `CODEX_HOME` ต้อง `mkdir -p` ก่อน (codex ไม่สร้างให้: `CODEX_HOME points to "...", but that path does not exist`)
+  และ `codex login status` ไม่ validate token — ยืนยันการ login ด้วย `codex exec` เท่านั้น
+- Qwen: `-y/--yolo/--approval-mode` ไม่โชว์ใน `--help` แต่ใช้ได้; sub-command (mcp, extensions, ...) ห้ามใส่ `-y`;
+  OAuth ฟรียกเลิกแล้ว (2026-04-15) เหลือ API key ตาม plan + `security.auth.selectedType: "openai"`; CLI เขียน settings.json ทับเป็น 644 → installer บังคับ 600
+- Claude เขียน MCP log ลง `~/.cache/claude-cli-nodejs/` แม้ตั้ง `CLAUDE_CONFIG_DIR` → ตั้ง `XDG_CACHE_HOME=&lt;account&gt;/.cache` ถ้าต้องการแยกให้ครบ
+- ไม่มี CLI ใด include ไฟล์ MCP ภายนอก → ใช้ `claude mcp add-json -s user` / `codex mcp add` / `qwen mcp add -s user` sync ลงทุก account (เกณฑ์ผ่าน: `mcp list` ทุก account เห็น)
+- เชลล์: `VAR=x; claude` (มี ;) ไม่ export → ใช้ default เงียบ ๆ ต้องเขียน `VAR=x claude` หรือ export ก่อน แล้วตรวจด้วย `find &lt;root&gt;`
+</pre>
+  </div>
+
+  <h3 class="sub">สิ่งที่ต้องได้จาก Setup Prompt</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>สิ่งส่งมอบ</th><th>หลักฐาน</th><th>เกณฑ์ผ่าน</th></tr></thead>
+    <tbody>
+      <tr><td>Environment report</td><td>OS และเวอร์ชัน CLI จริงจาก <code>--version</code> / <code>--help</code></td><td>ไม่เดา env, path, flag หรือ model</td></tr>
+      <tr><td>Wrapper commands</td><td><code>yolo1 --version</code>, <code>cyolo1 --version</code>, <code>qyolo1 --version</code> ทำงาน</td><td>argument ส่งต่อครบด้วย <code>"$@"</code></td></tr>
+      <tr><td>Account isolation</td><td>config root แยกทุกบัญชี ตรวจด้วย <code>find &lt;root&gt;</code></td><td>credential/config/session/history/cache ไม่ชน</td></tr>
+      <tr><td>Shared layer</td><td>เพิ่ม Skill และ MCP ใน shared แล้วทุกบัญชีเห็น</td><td><code>mcp list</code> ทุกบัญชีแสดงรายการเดียวกัน</td></tr>
+      <tr><td>Test report</td><td>ตาราง PASS / FAIL / SKIP</td><td>ไม่มี secret จริงในรายงาน และ installer รอบ 2 ไม่ทำลายของเดิม</td></tr>
+    </tbody>
+  </table></div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>Setup ที่ผ่านแล้วคือฐานของทุก use case: เรียกหลายบัญชีพร้อมกันได้ ไม่ชน และรู้ว่า credential ของใครอยู่ที่ไหน</span></div>
+</section>
+
+<!-- ===================================================== 05 -->
+<section class="slide" id="routing-steps" aria-labelledby="h-steps">
+  <div class="slide-head"><span><span class="num">05</span>Student decision method</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-steps">นักศึกษาเลือก Agent อย่างไร: 7 ขั้นตอน</h2>
+  <p class="goal">ได้วิธีคิดที่ทำซ้ำได้ และจบด้วย Routing Card ที่ระบุ Agent บัญชี หลักฐาน และวิธีตรวจ</p>
+  <div class="steps">
+    <article class="step"><span class="badge">ขั้นที่ 1</span><h3>จำแนกงาน</h3><p>เลือก FRONTEND, ARCHITECTURE, BATCH, CLIENT_CODE, SECURITY, DOCS หรือ GENERAL ให้ตรงกับสิ่งที่จะทำ</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 2</span><h3>ประเมินข้อจำกัด</h3><p>ให้ระดับ ต่ำ/กลาง/สูง แก่ความเสี่ยง ปริมาณงาน ความเร็ว งบประมาณ ความลับ และความยาว context</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 3</span><h3>อ่านข้อมูลปัจจุบัน</h3><p>บันทึกหมวด วันที่ คะแนน ช่วงอันดับ จำนวนโหวต ราคา context และสถานะ preliminary จาก Leaderboard จริง</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 4</span><h3>เลือก Primary + Verifier</h3><p>เลือก Agent หลักจากงานและต้นทุน เพิ่ม Agent ตรวจต่างค่ายเมื่อความเสี่ยงหรือผลกระทบสูง</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 5</span><h3>เลือกบัญชีและ wrapper</h3><p>ส่วนตัวใช้บัญชีส่วนตัว ทีมใช้บัญชีทีม ลูกค้าใช้บัญชีลูกค้าเท่านั้น ห้ามย้ายข้อมูลเพื่อหลบโควตา</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 6</span><h3>กำหนดการตรวจผล</h3><p>เลือก human review, second-agent review หรือ sampling พร้อมเกณฑ์ผ่านและ error rate ที่ยอมรับได้</p></article>
+    <article class="step"><span class="badge">ขั้นที่ 7</span><h3>ออก Routing Card</h3><p>สรุป Agent, account, หลักฐาน, เหตุผลด้านคุณภาพ/ราคา, ข้อจำกัด และวิธีทดสอบในพื้นที่แยก</p></article>
+  </div>
+  <h3 class="sub">แต่ละขั้นเชื่อมกับ Setup Prompt ส่วนใด</h3>
+  <div class="match"><div><strong>ขั้นที่ 1–4</strong><br>จำแนกงานและเลือก Agent</div><div class="join">→</div><div><strong>Setup Prompt · คำสั่ง</strong><br>yoloN / cyoloN / qyoloN คือ Agent ที่เลือกได้</div></div>
+  <div class="match"><div><strong>ขั้นที่ 5</strong><br>เลือกบัญชีและ wrapper</div><div class="join">→</div><div><strong>Setup Prompt · โครงสร้าง + Isolation ข้อ 1–3</strong><br>config root ต่อบัญชี ห้ามเปลี่ยน $HOME</div></div>
+  <div class="match"><div><strong>ขั้นที่ 6–7</strong><br>ตรวจผลและออก Routing Card</div><div class="join">→</div><div><strong>Setup Prompt · ทดสอบ + รายงาน</strong><br>PASS / FAIL / SKIP และ credential location</div></div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>ถ้าข้อมูลไม่พอหรือสิทธิ์บัญชีไม่ชัด คำตอบที่ถูกคือ NEED_MORE_DATA หรือ REJECT ไม่ใช่เดา</span></div>
+</section>
+
+<!-- ===================================================== 06 -->
+<section class="slide" id="simulator" aria-labelledby="h-sim">
+  <div class="slide-head"><span><span class="num">06</span>Interactive agent network</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-sim">ลองส่งงาน แล้วดูระบบเลือก Agent</h2>
+  <p class="goal">เห็นว่าเมื่อเปลี่ยนประเภทงาน ความเสี่ยง หรือขอบเขตข้อมูล Agent ที่สว่างขึ้นและลำดับงานเปลี่ยนตาม</p>
+  <p>เลือกโจทย์จาก 15 use cases ระบบจะจำลอง policy routing ในเบราว์เซอร์ (ไม่เรียก API จริง) เพื่อแสดงว่า agent แต่ละตัวรับบทบาทใด ตัวอย่างนี้เป็นแนวคิดสำหรับการสอน ไม่ใช่ benchmark แบบเรียลไทม์</p>
+  <div class="router">
+    <div class="control-panel">
+      <label for="task">ประเภทงาน</label>
+      <select id="task">
+<option value="frontend">01 · สร้าง Frontend หรือต้นแบบหน้าเว็บ</option>
+<option value="architecture">02 · วิเคราะห์สถาปัตยกรรมหรือรีวิวงานซับซ้อน</option>
+<option value="batch">03 · ประมวลผลไฟล์จำนวนมาก (batch)</option>
+<option value="client">04 · แก้โค้ดในโปรเจกต์ลูกค้า</option>
+<option value="backend">05 · สร้าง Backend หรือเชื่อม API</option>
+<option value="debug">06 · Debug ปัญหาที่หาสาเหตุยาก</option>
+<option value="testing">07 · สร้างชุดทดสอบและตรวจ regression</option>
+<option value="docs">08 · สรุปเอกสารหรือ codebase ขนาดใหญ่</option>
+<option value="security">09 · ตรวจ Security หรือ configuration สำคัญ</option>
+<option value="research">10 · Research หรือวิเคราะห์ข้อมูลหลายแหล่ง</option>
+<option value="stt">11 · ถอดเสียงประชุมเป็นข้อความ (Speech-to-Text)</option>
+<option value="tts">12 · สร้างเสียงบรรยายบทเรียน (Text-to-Speech)</option>
+<option value="fallback">13 · สลับ API เมื่อบริการหลักล่มหรือติดโควตา</option>
+<option value="same-vendor">14 · ใช้หลายโมเดลของผู้ให้บริการเดียวกัน</option>
+<option value="knowledge">15 · หลาย Agent แชร์ Knowledge แล้วรวมคำตอบ</option>
+      </select>
+      <label id="risk-label">ระดับความเสี่ยงหากผลผิด</label>
+      <div class="seg" role="radiogroup" aria-labelledby="risk-label">
+        <label><input type="radio" name="risk" value="low"><span>ต่ำ</span></label>
+        <label><input type="radio" name="risk" value="mid" checked><span>กลาง</span></label>
+        <label><input type="radio" name="risk" value="high"><span>สูง</span></label>
+      </div>
+      <label id="scope-label">ขอบเขตข้อมูล / บัญชี</label>
+      <div class="seg" role="radiogroup" aria-labelledby="scope-label">
+        <label><input type="radio" name="scope" value="personal"><span>ส่วนตัว</span></label>
+        <label><input type="radio" name="scope" value="team" checked><span>ทีม</span></label>
+        <label><input type="radio" name="scope" value="client"><span>ลูกค้า</span></label>
+      </div>
+      <button class="run" id="run" type="button">ประมวลผลตัวอย่าง</button>
+      <div class="callout warning" style="margin-bottom:0"><strong>กติกา:</strong> เลือกจากประเภทงาน คุณภาพ ราคา โควตา และขอบเขตบัญชี ไม่เลือกจากชื่อแบรนด์เพียงอย่างเดียว</div>
+    </div>
+    <div class="network-panel">
+      <div class="network" aria-label="เครือข่าย AI agents">
+        <div class="node" id="inputNode"><b>งานเข้า</b><small>Task + ความเสี่ยง + ขอบเขตบัญชี</small></div>
+        <div class="wires"><div class="wire"></div><div class="node router-node">Router<small>policy ของทีม</small></div><div class="wire"></div></div>
+        <div class="agents">
+<div class="node agent claude" data-agent="yolo1"><b>yolo1</b><small>Claude Code · ตัวอย่าง: Claude Fable</small><span class="tag"></span></div>
+<div class="node agent claude" data-agent="yolo2"><b>yolo2</b><small>Claude Code · ตัวอย่าง: Claude Opus</small><span class="tag"></span></div>
+<div class="node agent codex" data-agent="cyolo1"><b>cyolo1</b><small>Codex CLI · ตัวอย่าง: GPT ตระกูล Sol</small><span class="tag"></span></div>
+<div class="node agent qwen" data-agent="qyolo1"><b>qyolo1</b><small>Qwen Code · ตัวอย่าง: Qwen รุ่นคุณภาพสูง</small><span class="tag"></span></div>
+<div class="node agent qwen" data-agent="qyolo2"><b>qyolo2</b><small>Qwen Code · ตัวอย่าง: Qwen รุ่นเร็ว/ประหยัด</small><span class="tag"></span></div>
+<div class="node agent voice" data-agent="voice"><b>Voice / External API</b><small>STT · TTS · Backup API · บริการภายนอกที่ได้รับอนุญาต</small><span class="tag"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="output" id="output" aria-live="polite"><strong>Output:</strong> เลือกประเภทงานแล้วกด “ประมวลผลตัวอย่าง” ระบบจะแสดง Routing Card และไฮไลต์ Agent ที่ถูกเลือก</div>
+  </div>
+  <h3 class="sub">จาก Prompt สู่คำสั่งที่ทดสอบได้</h3>
+  <div class="pipeline">
+    <div>วาง Setup Prompt</div><div>ตรวจ CLI รุ่นจริง</div><div>สร้าง Dry-run</div><div>ทดสอบใน Container / Sandbox</div><div>ขออนุมัติก่อนใช้จริง</div>
+  </div>
+  <p>พรอมป์สร้างระบบอยู่ในสไลด์ที่ 4 ส่วนไฟล์ <code>agent-routing-prompt.md</code> สอนวิธีจำแนกงาน ประเมินข้อจำกัด เลือก Primary/Verifier เลือกบัญชี และสร้าง Routing Card ก่อนนำผลไปรันผ่าน wrapper จริง</p>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>ความเสี่ยงสูงต้องมี Agent ที่สองและคนอนุมัติ งานลูกค้าต้องรันผ่านบัญชีลูกค้าทุก Agent</span></div>
+</section>
+
+<!-- ===================================================== 07 -->
+<section class="slide" id="prompt-lab" aria-labelledby="h-lab">
+  <div class="slide-head"><span><span class="num">07</span>Prompt → Route → Output</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-lab">Prompt Lab: พรอมป์ที่นักศึกษาใช้ทดลองได้ทันที</h2>
+  <p class="goal">ส่งพรอมป์นี้ให้ Agent แล้วได้ Routing Card ที่มีอย่างน้อย 2 Agent พร้อมบทบาท ไม่ใช่แค่ชื่อโมเดล</p>
+  <p>กรอกข้อมูลโดยไม่ใส่ secret แล้วส่งให้ AI agent ที่มีอยู่ (เช่น <code>yolo1 -p "..."</code>) คำตอบต้องเป็น Routing Card ตามรูปแบบด้านล่าง</p>
+<pre>คุณเป็น AI Agent Router สำหรับชั้นเรียน Multi-Account AI CLI
+
+ข้อมูลงาน:
+- ชื่องาน: [ใส่ชื่องาน]
+- รายละเอียด: [ไม่ใส่ข้อมูลลับ]
+- ระบบปฏิบัติการ: [Ubuntu หรือ Windows]
+- จำนวนไฟล์/ปริมาณงาน: [ระบุ]
+- ระดับความเสี่ยง: [ต่ำ/กลาง/สูง]
+- งบประมาณ: [ต่ำ/กลาง/สูง]
+- ประเภทข้อมูล: [ส่วนตัว/ทีม/ลูกค้า/สาธารณะ]
+- บัญชีที่ได้รับอนุญาต: [บทบาทบัญชี ห้ามใส่ credential]
+- Agent ที่มีในเครื่อง: [เช่น yolo1, yolo2, cyolo1, qyolo1, qyolo2 — ระบุโมเดลจริงของแต่ละตัว]
+
+งานของคุณ:
+1. จำแนกเป็น FRONTEND, ARCHITECTURE, BATCH, CLIENT_CODE, SECURITY, DOCS หรือ GENERAL
+2. เลือก Primary Agent และ Verification Agent จากหลักฐาน (ต้องเสนออย่างน้อย 2 Agent พร้อมบทบาท)
+3. บันทึกวันที่ คะแนน ช่วงอันดับ ราคา และจำนวนโหวต ถ้ามีข้อมูลปัจจุบัน
+4. ถ้าข้อมูลไม่พอให้ตอบ NEED_MORE_DATA
+5. งานลูกค้าต้องใช้บัญชีลูกค้า; งานความเสี่ยงสูงต้องมี Agent ที่สองและคนอนุมัติ
+6. ระบุว่าจะแชร์ artifact ใดผ่าน project knowledge และยืนยันว่าไม่แชร์ credential
+7. เสนอการทดสอบด้วย fake credential ใน container/sandbox/VM
+8. ตอบเป็น Routing Card และ workflow 1 → 2 → 3</pre>
+
+  <h3 class="sub">Output ที่คาดหวัง: ตัวอย่าง Frontend</h3>
+  <dl class="routing-card">
+    <dt>ประเภทงาน</dt><dd>FRONTEND</dd>
+    <dt>Primary Agent</dt><dd>Qwen Code ผ่าน qyolo1 (ตรวจโมเดลจริงของบัญชีก่อน)</dd>
+    <dt>Verification Agent</dt><dd>ผู้ใช้ตรวจ UI; เพิ่ม Codex CLI ผ่าน cyolo1 เมื่อเป็น production หรือความเสี่ยงสูง</dd>
+    <dt>Account / Wrapper</dt><dd>บัญชีทีม</dd>
+    <dt>Shared knowledge</dt><dd>requirement และ design token ใน knowledge/ ไม่มี credential</dd>
+    <dt>เหตุผล</dt><dd>เลือกจากหมวด WebDev ที่ตรงกับงานและต้นทุนต่อการวนแก้หลายรอบ</dd>
+    <dt>การทดสอบ</dt><dd>เปิด preview ใน test workspace ตรวจ responsive, interaction และ accessibility</dd>
+    <dt>ผลลัพธ์</dt><dd>ROUTE — Qwen สร้าง → ผู้ใช้ตรวจหน้าเว็บ → Codex ตรวจเพิ่มเมื่อความเสี่ยงสูง</dd>
+  </dl>
+
+  <h3 class="sub">Output ที่คาดหวัง: ตัวอย่างงานไฟล์จำนวนมาก</h3>
+  <dl class="routing-card">
+    <dt>ประเภทงาน</dt><dd>BATCH</dd>
+    <dt>Primary Agent</dt><dd>Qwen Code ผ่าน qyolo1 + qyolo2 (แบ่งชุดไฟล์ กระจายโหลดสองบัญชี)</dd>
+    <dt>Verification Agent</dt><dd>Codex CLI ผ่าน cyolo1 สุ่มตรวจ; parent เทียบผลรวมด้วยสคริปต์</dd>
+    <dt>Account / Wrapper</dt><dd>บัญชีทีม</dd>
+    <dt>Shared knowledge</dt><dd>รายชื่อไฟล์ schema ผลลัพธ์ และเกณฑ์ตรวจใน knowledge/</dd>
+    <dt>เหตุผล</dt><dd>ใช้ Agent ต้นทุนต่ำหลายบัญชีกับงานหลัก และ Agent ต่างค่ายสุ่มตรวจคุณภาพ</dd>
+    <dt>การทดสอบ</dt><dd>รัน sample data ใน disposable container ปิด network และใช้ fake credential</dd>
+    <dt>ผลลัพธ์</dt><dd>ROUTE — Qwen ประมวลผลขนาน → Codex สุ่มตรวจ → คนอนุมัติก่อน full run</dd>
+  </dl>
+
+  <div class="examples">
+    <div class="card"><strong>ตัวอย่างงานสถาปัตยกรรม</strong>Claude Code (yolo2) วิเคราะห์บริบทและ trade-off → Codex CLI (cyolo1) ตรวจข้อสมมติกับโค้ด → คนตัดสินใจจากหลักฐานที่ตรงกัน</div>
+    <div class="card"><strong>ตัวอย่างโปรเจกต์ลูกค้า</strong>Codex CLI ผ่านบัญชีลูกค้าเท่านั้น → แยก credential/config/session/history/cache → ทดสอบใน workspace ของลูกค้า → ขออนุมัติก่อน merge</div>
+    <div class="card"><strong>ตัวอย่างงาน Security</strong>Codex (cyolo1) และ Claude (yolo2) ตรวจอิสระโดยไม่เห็นผลของกัน → Claude (yolo1) ตัดสินจุดที่ต่าง → คนอนุมัติทุกการแก้</div>
+  </div>
+  <div class="callout warning"><strong>สอนให้นักศึกษาจำ:</strong> ถ้าไม่มีข้อมูลล่าสุดหรือสิทธิ์บัญชีไม่ชัด ให้ตอบ NEED_MORE_DATA หรือ REJECT ไม่เดาและไม่ฝืน route</div>
+  <div class="takeaway"><b>สรุปสไลด์</b><span>Routing Card ที่ดีตอบครบ: Agent + บทบาท, บัญชี, หลักฐานพร้อมวันที่, สิ่งที่แชร์, วิธีทดสอบ</span></div>
+</section>
+
+<!-- ===================================================== 08 -->
+<section class="slide" id="activity" aria-labelledby="h-act">
+  <div class="slide-head"><span><span class="num">08</span>กิจกรรมสรุป · 20 นาที</span><span class="deck">Multi-Account AI CLI</span></div>
+  <h2 id="h-act">กิจกรรม: ออกแบบ AI workflow ของทีม</h2>
+  <p class="goal">แต่ละทีมส่ง Routing Card 3 ใบ ที่ใช้ Agent อย่างน้อย 2 ตัวต่อใบ และระบุสิ่งที่แชร์กับสิ่งที่ห้ามแชร์</p>
+  <div class="two">
+    <div>
+      <ol>
+        <li>เลือกงานจริง 3 ประเภทของทีม จากตาราง 15 use cases หรือคิดใหม่</li>
+        <li>เปิด LMArena แล้วเลือกหมวดที่ใกล้เคียงที่สุด บันทึกวันที่</li>
+        <li>บันทึกโมเดลที่น่าสนใจ คะแนน ช่วงอันดับ ราคา และโควตาของบัญชีที่มี</li>
+        <li>กำหนดว่าแต่ละงานจะใช้ Agent ตัวใดเป็น Primary ตัวใดเป็น Verifier และผ่านบัญชีใด</li>
+        <li>ระบุ artifact ที่จะแชร์ผ่าน knowledge/ และยืนยันว่าไม่มี credential</li>
+        <li>ระบุขั้นตอนที่ควรใช้โมเดลราคาสูง และขั้นตอนที่ลดต้นทุนได้</li>
+      </ol>
+    </div>
+    <div class="card">
+      <strong>เกณฑ์ผ่าน</strong>
+      <ul>
+        <li>ทุกใบมี Agent ≥ 2 ตัว พร้อมบทบาทชัดเจน</li>
+        <li>ระบุบัญชี/wrapper และเหตุผลว่าทำไมไม่ใช้บัญชีอื่น</li>
+        <li>มีหลักฐานจาก Leaderboard พร้อมวันที่</li>
+        <li>มีวิธีตรวจผลและเกณฑ์ผ่านที่วัดได้</li>
+        <li>ไม่มี credential หรือข้อมูลลับในเอกสาร</li>
+      </ul>
+    </div>
+  </div>
+  <div class="table-wrap"><table class="form">
+    <thead><tr><th>งาน</th><th>Primary Agent / บัญชี</th><th>Verifier / บัญชี</th><th>สิ่งที่แชร์ผ่าน knowledge/</th><th>เหตุผลด้านคุณภาพ</th><th>เหตุผลด้านต้นทุน</th></tr></thead>
+    <tbody><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
+  </table></div>
+  <div class="takeaway"><b>สรุปบทเรียน</b><span>ไม่มีโมเดลเดียวชนะทุกงาน จึงเลือก Agent ต่องาน ให้หลายตัวช่วยกันและตรวจกัน แชร์ความรู้ของโปรเจกต์ แต่แยก credential ของทุกบัญชี</span></div>
+</section>
+
+</main>
+
+<footer>Multi-Account AI CLI บน Ubuntu · Claude Code, Codex CLI, Qwen Code · ใช้ข้อมูลปัจจุบันประกอบการตัดสินใจ ไม่ยึดอันดับเป็นข้อเท็จจริงถาวร · ไม่มี credential จริงในหน้านี้</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="ภาพขยาย"><img alt=""></div>
+
+<script>
+(function () {
+  "use strict";
+  var AGENTS = {"yolo1": {"label": "yolo1", "vendor": "claude"}, "yolo2": {"label": "yolo2", "vendor": "claude"}, "cyolo1": {"label": "cyolo1", "vendor": "codex"}, "qyolo1": {"label": "qyolo1", "vendor": "qwen"}, "qyolo2": {"label": "qyolo2", "vendor": "qwen"}, "voice": {"label": "Voice / External API", "vendor": "voice"}};
+  var POLICIES = {
+  "frontend": {
+    "primary": [
+      "qyolo1"
+    ],
+    "verifier": [
+      "cyolo1"
+    ],
+    "pattern": "สร้าง → ตรวจ (verify)",
+    "steps": [
+      "qyolo1 สร้าง Frontend prototype ใน test workspace",
+      "ผู้ใช้ตรวจหน้าจอ responsive และ interaction",
+      "cyolo1 ตรวจโค้ดเพิ่มเมื่อเป็น production"
+    ],
+    "label": "สร้าง Frontend หรือต้นแบบหน้าเว็บ"
+  },
+  "architecture": {
+    "primary": [
+      "yolo2"
+    ],
+    "verifier": [
+      "cyolo1"
+    ],
+    "pattern": "วิเคราะห์ → ตรวจยืนยัน (verify)",
+    "steps": [
+      "yolo2 วิเคราะห์บริบท trade-off และความเสี่ยง",
+      "cyolo1 ตรวจสมมติฐานกับโค้ดจริง",
+      "รวมเฉพาะข้อเสนอที่หลักฐานตรงกัน"
+    ],
+    "label": "วิเคราะห์สถาปัตยกรรมหรือรีวิวงานซับซ้อน"
+  },
+  "batch": {
+    "primary": [
+      "qyolo2",
+      "qyolo1"
+    ],
+    "verifier": [
+      "cyolo1"
+    ],
+    "pattern": "แบ่งงานขนาน (fan-out) → สุ่มตรวจ",
+    "steps": [
+      "parent แบ่งไฟล์เป็นชุด ส่ง path ให้ qyolo1/qyolo2 ทำขนาน",
+      "cyolo1 สุ่มตรวจตัวอย่างที่เสี่ยงสูง",
+      "parent เทียบผลรวมด้วยสคริปต์ รายงาน throughput ค่าใช้จ่าย และ error rate"
+    ],
+    "label": "ประมวลผลไฟล์จำนวนมาก (batch)"
+  },
+  "client": {
+    "primary": [
+      "cyolo1"
+    ],
+    "verifier": [],
+    "pattern": "บัญชีลูกค้าเท่านั้น → คนอนุมัติ",
+    "steps": [
+      "เลือก wrapper ที่ผูกกับบัญชีของลูกค้า",
+      "แยก credential/config/session/history/cache จากบัญชีส่วนตัว",
+      "ทดสอบใน workspace ของลูกค้า และขออนุมัติก่อน merge"
+    ],
+    "label": "แก้โค้ดในโปรเจกต์ลูกค้า"
+  },
+  "backend": {
+    "primary": [
+      "cyolo1"
+    ],
+    "verifier": [
+      "yolo1"
+    ],
+    "pattern": "implement + test → ตรวจ contract",
+    "steps": [
+      "cyolo1 เขียน implementation พร้อม unit test",
+      "yolo1 ตรวจ API contract และ error handling",
+      "รัน test ใน sandbox ก่อนส่งมอบ"
+    ],
+    "label": "สร้าง Backend หรือเชื่อม API"
+  },
+  "debug": {
+    "primary": [
+      "cyolo1"
+    ],
+    "verifier": [
+      "yolo1"
+    ],
+    "pattern": "reproduce → ท้าทายสมมติฐาน",
+    "steps": [
+      "cyolo1 ทำให้ bug เกิดซ้ำได้จาก log",
+      "yolo1 ตั้งคำถามกับสมมติฐานและเสนอทางเลือก",
+      "สรุปเฉพาะสาเหตุที่พิสูจน์ด้วยการรันจริง"
+    ],
+    "label": "Debug ปัญหาที่หาสาเหตุยาก"
+  },
+  "testing": {
+    "primary": [
+      "cyolo1"
+    ],
+    "verifier": [
+      "qyolo2"
+    ],
+    "pattern": "เขียน test → เสริม edge cases",
+    "steps": [
+      "cyolo1 เขียนและรันชุดทดสอบ",
+      "qyolo2 เสนอ edge cases เพิ่มด้วยต้นทุนต่ำ",
+      "รายงานเฉพาะผลที่รันผ่านจริงใน CI"
+    ],
+    "label": "สร้างชุดทดสอบและตรวจ regression"
+  },
+  "docs": {
+    "primary": [
+      "yolo2"
+    ],
+    "verifier": [
+      "cyolo1",
+      "qyolo2"
+    ],
+    "pattern": "อ่านภาพรวม → ตรวจอ้างอิง → จัดรูป (relay)",
+    "steps": [
+      "yolo2 อ่านเอกสาร/codebase ทั้งชุดด้วย context ยาว",
+      "cyolo1 ตรวจว่าจุดที่อ้างถึงโค้ดมีอยู่จริง",
+      "qyolo2 จัดรูปแบบเอกสารสุดท้าย"
+    ],
+    "label": "สรุปเอกสารหรือ codebase ขนาดใหญ่"
+  },
+  "security": {
+    "primary": [
+      "cyolo1",
+      "yolo2"
+    ],
+    "verifier": [
+      "yolo1"
+    ],
+    "pattern": "ตรวจอิสระ 2 รอบ → ตัดสิน → คนอนุมัติ",
+    "steps": [
+      "cyolo1 และ yolo2 ตรวจอิสระโดยไม่เห็นผลของกัน",
+      "yolo1 ตัดสินเฉพาะจุดที่เห็นไม่ตรงกัน",
+      "คนอนุมัติทุกการแก้ก่อนใช้จริง"
+    ],
+    "label": "ตรวจ Security หรือ configuration สำคัญ"
+  },
+  "research": {
+    "primary": [
+      "qyolo1"
+    ],
+    "verifier": [
+      "yolo1"
+    ],
+    "pattern": "รวบรวม → ตรวจข้อสรุป",
+    "steps": [
+      "qyolo1 รวบรวมและจัดตารางข้อมูลพร้อมแหล่งที่มา",
+      "yolo1 ตรวจข้อสรุปสำคัญและจุดที่หลักฐานไม่พอ",
+      "บันทึกวันที่และแหล่งที่มาทุกตัวเลข"
+    ],
+    "label": "Research หรือวิเคราะห์ข้อมูลหลายแหล่ง"
+  },
+  "stt": {
+    "primary": [
+      "voice"
+    ],
+    "verifier": [
+      "yolo1",
+      "cyolo1"
+    ],
+    "pattern": "Voice pipeline (relay)",
+    "steps": [
+      "Speech-to-Text API ถอดเสียงจากไฟล์ที่ได้รับอนุญาต",
+      "yolo1 สรุปประเด็นและบริบท",
+      "cyolo1 ตรวจ action items กับ transcript ต้นฉบับ"
+    ],
+    "label": "ถอดเสียงประชุมเป็นข้อความ (Speech-to-Text)"
+  },
+  "tts": {
+    "primary": [
+      "qyolo2"
+    ],
+    "verifier": [
+      "yolo1",
+      "voice"
+    ],
+    "pattern": "ร่าง → ตรวจ → สังเคราะห์ (relay)",
+    "steps": [
+      "qyolo2 ร่างสคริปต์ด้วยต้นทุนต่ำ",
+      "yolo1 หรือผู้สอนตรวจภาษาและความหมาย",
+      "Text-to-Speech API สร้างไฟล์เสียงหลังอนุมัติ"
+    ],
+    "label": "สร้างเสียงบรรยายบทเรียน (Text-to-Speech)"
+  },
+  "fallback": {
+    "primary": [
+      "cyolo1"
+    ],
+    "verifier": [
+      "qyolo2"
+    ],
+    "pattern": "Primary / Backup ผ่าน interface กลาง",
+    "steps": [
+      "cyolo1 เขียน adapter กลางและตรวจสถานะ endpoint หลัก",
+      "ยืนยันว่า backup (เช่น qyolo2) รองรับ schema และ model policy",
+      "สลับเฉพาะข้อมูลที่ปลายทางสำรองได้รับอนุญาต"
+    ],
+    "label": "สลับ API เมื่อบริการหลักล่มหรือติดโควตา"
+  },
+  "same-vendor": {
+    "primary": [
+      "qyolo1"
+    ],
+    "verifier": [
+      "qyolo2"
+    ],
+    "pattern": "quality tier + fast tier ค่ายเดียวกัน",
+    "steps": [
+      "qyolo1 รับงานยากที่ต้องการคุณภาพ",
+      "qyolo2 รับงานเร็วหรือจำนวนมาก",
+      "แยก account/config และเทียบผลระหว่างสองรุ่น"
+    ],
+    "label": "ใช้หลายโมเดลของผู้ให้บริการเดียวกัน"
+  },
+  "knowledge": {
+    "primary": [
+      "cyolo1",
+      "qyolo1"
+    ],
+    "verifier": [
+      "yolo1"
+    ],
+    "pattern": "shared knowledge → parent รวม",
+    "steps": [
+      "ทุก Agent อ่าน requirement/schema จากโฟลเดอร์ knowledge เดียวกัน",
+      "แต่ละ Agent เขียนผลพร้อม source และข้อจำกัด",
+      "yolo1 (parent) รวมผลและแก้ conflict โดยไม่แชร์ credential"
+    ],
+    "label": "หลาย Agent แชร์ Knowledge แล้วรวมคำตอบ"
+  }
+};
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- simulator ---------- */
+  var taskSel = $("#task"), runBtn = $("#run"), out = $("#output");
+  function checked(name) { var el = $('input[name="' + name + '"]:checked'); return el ? el.value : ""; }
+  function chipsText(list) { return list.map(function (a) { return AGENTS[a].label; }).join(" + "); }
+  function wrapperText(list, scope) {
+    var names = list.filter(function (a) { return a !== "voice"; }).map(function (a) { return AGENTS[a].label; });
+    if (!names.length) return "บริการภายนอกตาม policy";
+    var who = scope === "client" ? "บัญชีลูกค้า" : scope === "team" ? "บัญชีทีม" : "บัญชีส่วนตัว";
+    return who + " ผ่าน " + names.join(", ") + " (ชื่อ wrapper เป็นตัวอย่าง ต้องตรวจ model/ราคา/สิทธิ์จริง)";
+  }
+  function route() {
+    var id = taskSel.value, p = POLICIES[id];
+    if (!p) return;
+    var risk = checked("risk") || "low", scope = checked("scope") || "team";
+    var primary = p.primary.slice(), verifier = p.verifier.slice();
+    var notes = [];
+    if (risk === "high" && !verifier.length) {
+      verifier.push(primary.indexOf("cyolo1") >= 0 ? "yolo2" : "cyolo1");
+      notes.push("ความเสี่ยงสูง: เพิ่ม Agent ที่สองเพื่อตรวจอิสระ");
+    }
+    var steps = p.steps.slice();
+    if (risk === "high" && !steps.some(function (s) { return s.indexOf("อนุมัติ") >= 0; })) steps.push("คนอนุมัติผลก่อนใช้จริง (human approval)");
+    if (risk === "low" && verifier.length > 1) notes.push("ความเสี่ยงต่ำ: อาจลดขั้นตรวจเหลือ Agent เดียวเพื่อประหยัดโควตา");
+    var clientWarn = scope === "client";
+    var mixWarn = scope === "client" && id !== "client";
+
+    $$(".node.agent").forEach(function (n) {
+      var a = n.getAttribute("data-agent");
+      n.classList.remove("primary", "verifier");
+      var tag = $(".tag", n); tag.textContent = "";
+      if (primary.indexOf(a) >= 0) { n.classList.add("primary"); tag.textContent = "PRIMARY"; }
+      else if (verifier.indexOf(a) >= 0) { n.classList.add("verifier"); tag.textContent = "VERIFIER"; }
+    });
+
+    var h = "";
+    h += "<h4>Routing Card · " + esc(p.label) + "</h4>";
+    h += "<dl>";
+    h += "<dt>Primary</dt><dd>" + esc(chipsText(primary)) + "</dd>";
+    h += "<dt>Verifier</dt><dd>" + esc(verifier.length ? chipsText(verifier) : "ผู้ใช้ตรวจเอง / ตาม policy") + "</dd>";
+    h += "<dt>รูปแบบ</dt><dd>" + esc(p.pattern) + "</dd>";
+    h += "<dt>บัญชี / wrapper</dt><dd>" + esc(wrapperText(primary.concat(verifier), scope)) + "</dd>";
+    h += "<dt>ความเสี่ยง</dt><dd>" + esc(risk === "high" ? "สูง — ต้องมี Agent ที่สองและคนอนุมัติ" : risk === "mid" ? "กลาง — มี Agent ตรวจอย่างน้อยหนึ่งตัว" : "ต่ำ — ตรวจแบบ sampling ได้") + "</dd>";
+    h += "</dl>";
+    h += "<strong>ลำดับงาน</strong><ol>" + steps.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>";
+    notes.forEach(function (n) { h += '<span class="warn">' + esc(n) + "</span> "; });
+    if (clientWarn) h += '<span class="alert">งานลูกค้า: ทุก Agent ต้องรันผ่านบัญชีของลูกค้าเท่านั้น ห้ามย้ายข้อมูลไปบัญชีส่วนตัวหรือทีม' + (mixWarn ? " (เปลี่ยนชื่อ wrapper เป็นชุดของลูกค้าก่อนรัน)" : "") + "</span>";
+    out.innerHTML = h;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  if (runBtn) {
+    runBtn.addEventListener("click", route);
+    taskSel.addEventListener("change", route);
+    $$('input[name="risk"], input[name="scope"]').forEach(function (i) { i.addEventListener("change", route); });
+  }
+
+  /* ---------- copy setup prompt ---------- */
+  var copyBtn = $("#copyPrompt"), promptPre = $("#setupPrompt");
+  if (copyBtn && promptPre) {
+    var lines = promptPre.textContent.split("\n").length;
+    var stat = $("#promptStat"); if (stat) stat.textContent = lines + " บรรทัด · " + promptPre.textContent.length + " ตัวอักษร";
+    copyBtn.addEventListener("click", function () {
+      var text = promptPre.textContent;
+      var done = function () { copyBtn.textContent = "คัดลอกแล้ว ✓"; setTimeout(function () { copyBtn.textContent = "คัดลอก Prompt ทั้งหมด"; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { selectPre(); });
+      } else { selectPre(); }
+    });
+  }
+  function selectPre() {
+    var r = document.createRange(); r.selectNodeContents(promptPre);
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    copyBtn.textContent = "เลือกข้อความแล้ว กด Ctrl+C";
+  }
+
+  /* ---------- lightbox ---------- */
+  var lb = $("#lightbox"), lbImg = $("#lightbox img");
+  $$("figure img").forEach(function (img) {
+    img.addEventListener("click", function () { lbImg.src = img.src; lbImg.alt = img.alt; lb.classList.add("open"); });
+  });
+  if (lb) {
+    lb.addEventListener("click", function () { lb.classList.remove("open"); lbImg.removeAttribute("src"); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") lb.classList.remove("open"); });
+  }
+
+  /* ---------- nav highlight + print ---------- */
+  var links = $$("nav.deck-nav a[href^='#']");
+  if ("IntersectionObserver" in window && links.length) {
+    var map = {};
+    links.forEach(function (l) { map[l.getAttribute("href").slice(1)] = l; });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { links.forEach(function (l) { l.classList.remove("current"); }); var l = map[en.target.id]; if (l) l.classList.add("current"); }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    $$("main .slide").forEach(function (s) { io.observe(s); });
+  }
+  var printBtn = $("#printBtn"); if (printBtn) printBtn.addEventListener("click", function () { window.print(); });
+})();
+</script>
+</body>
+</html>
