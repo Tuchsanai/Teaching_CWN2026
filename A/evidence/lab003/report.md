@@ -51,6 +51,10 @@
 
 CLI ที่ใช้: Claude Code 2.1.258 ผ่าน `yolo1`; Codex CLI 0.153.4 ผ่าน `cyolo1` พร้อมโมเดล `gpt-5.6-sol` และ effort `medium`; Qwen Code 0.23.0 ผ่าน `qyolo1` โดยไม่เพิ่มตัวเลือกโมเดลนอกคำสั่งที่กำหนด
 
+คำสั่ง live เป็นรูปแบบที่ผู้ใช้กำหนดทุกตัวอักษร: `yolo1 -p "$(cat …/step-01.md)" --output-format text`, `cyolo1 exec --skip-git-repo-check -m gpt-5.6-sol -c model_reasoning_effort="medium" -o … "$(cat …/step-02.md)" < /dev/null` และ `qyolo1 -p "$(cat …/step-03.md)"` โดยรันจากโฟลเดอร์งานและส่งผลเข้าไฟล์ evidence ตามชื่อรอบ สำหรับ `yolo1` และ `qyolo1` รุ่นโมเดลไม่ปรากฏในคำสั่งหรือ transcript จึงบันทึกว่า “ค่าจาก profile—ไม่ยืนยันรุ่น” แทนการเดา
+
+ทุกรอบของขั้น 1 ใช้ SHA `3d8c4390c1ad9957a6f4cb491a5c65cea870d596cbaa081731d4a179fe328ec1`; ขั้น 2 หลังแก้ A02 และรอบกู้รวม negative test ใช้ `caa36f4f2932a61dcda80248781402cd9589faf7cc3b183889a46640e55e4cea`; ทุกรอบขั้น 3 ใช้ `73f6bc1308d41cc7f64c9ba39e428ba0497fbd5db1c7ec77b4ea255e5ffe6ef0` ส่วน SHA ของขั้น 2 รอบก่อนแก้หายไปพร้อม transcript ชุดแรก จึงไม่สร้างค่าขึ้นแทน
+
 | รอบ | เริ่ม–จบ UTC | wrapper | exit | ผลเทียบ Expected Output |
 |---|---|---|---:|---|
 | ขั้น 1 รอบแรก | 11:27:19–11:28:57 | `yolo1` | 0 | PASS: สร้างเฉพาะ `01-stories.md`, 5 Story/3 บทบาท, แสดงเนื้อหาแล้วหยุด |

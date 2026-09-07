@@ -83,6 +83,8 @@
 
 ไฟล์หลักฐานเดิมถูกย้ายเข้า `previous/` ก่อนเริ่มตามสเปก แต่โฟลเดอร์ evidence ถูกลบจากภายนอกระหว่าง live test จึงกู้ได้เฉพาะ transcript จาก session ของ wrapper และสร้างหลักฐาน browser ใหม่ รายการที่สูญหายบันทึกอย่างตรงไปตรงมาใน [previous/README.md](previous/README.md)
 
+autosave `.ipynb_checkpoints` เก่าที่ปรากฏใหม่ใต้ LAB ถูกย้ายแบบไม่แก้เนื้อหาไป `previous/lab-checkpoints/` เพื่อไม่ให้ปะปนกับไฟล์ฉบับส่ง
+
 ## 8. ตารางตรวจรับตามสเปกข้อ 8
 
 | ข้อ | เกณฑ์ที่ตรวจ | ผล | หลักฐาน |
