@@ -1,0 +1,68 @@
+[
+  {
+    "file": "plan-v3.md",
+    "vendor": "Fable",
+    "requested_model": "fable",
+    "effort": "high",
+    "reported_models": [
+      "claude-haiku-4-5-20251001",
+      "claude-fable-5-1"
+    ],
+    "inputs": [
+      "baseline-case.txt",
+      "baseline-plan-v2.md",
+      "baseline-review-final.md"
+    ],
+    "prompt_file": "plan-v3-input.txt",
+    "exit_code": 0
+  },
+  {
+    "file": "review-high-1.md",
+    "vendor": "Astra",
+    "requested_model": "gpt-6-astra",
+    "effort": "high",
+    "reported_models": [
+      "gpt-6-astra"
+    ],
+    "inputs": [
+      "baseline-case.txt",
+      "baseline-review-final.md",
+      "plan-v3.md"
+    ],
+    "prompt_file": "review-high-1-input.txt",
+    "exit_code": 0
+  },
+  {
+    "file": "plan-v4.md",
+    "vendor": "Fable",
+    "requested_model": "fable",
+    "effort": "high",
+    "reported_models": [
+      "claude-haiku-4-5-20251001",
+      "claude-fable-5-1"
+    ],
+    "inputs": [
+      "baseline-case.txt",
+      "plan-v3.md",
+      "review-high-1.md"
+    ],
+    "prompt_file": "plan-v4-input.txt",
+    "exit_code": 0
+  },
+  {
+    "file": "review-high-2.md",
+    "vendor": "Astra",
+    "requested_model": "gpt-6-astra",
+    "effort": "high",
+    "reported_models": [
+      "gpt-6-astra"
+    ],
+    "inputs": [
+      "baseline-case.txt",
+      "review-high-1.md",
+      "plan-v4.md"
+    ],
+    "prompt_file": "review-high-2-input.txt",
+    "exit_code": 0
+  }
+]
