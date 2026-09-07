@@ -1,0 +1,70 @@
+สร้าง CLI บน Ubuntu สำหรับรัน Claude Code และ Codex CLI หลายบัญชี
+ตรวจเครื่องมือที่มีอยู่ก่อน และติดตั้งเครื่องมือที่ยังขาด รวมถึง Codex CLI ก่อนตั้งค่าหลายบัญชี
+แยก credential/config กัน 100% ห้ามอ่านไฟล์ README ของ LAB เพื่อหาเฉลย
+
+## ตัวแปรตั้งค่า (แก้ที่นี่ที่เดียว ที่อื่นต้องอ้างอิงตัวแปรนี้)
+BASE_PATH="$HOME/ai-accounts"
+
+## คำสั่งที่ต้องได้
+- yolo1..yolo5   → Claude Code + บัญชี Anthropic คนละบัญชี
+- cyolo1..cyolo5 → Codex CLI + บัญชี OpenAI/ChatGPT คนละบัญชี
+
+## โครงสร้าง
+$BASE_PATH/
+├── .Claude/
+│   ├── yolo1/ … yolo5/     # config root ต่อบัญชี (CLAUDE_CONFIG_DIR) credential/session/history/cache แยกกัน
+│   └── shared/
+│       ├── skills/         # skill ใช้ร่วมทุก yoloN
+│       └── mcp/            # MCP config ใช้ร่วมทุก yoloN
+└── .Codex/
+    ├── cyolo1/ … cyolo5/   # config root ต่อบัญชี (CODEX_HOME)
+    └── shared/
+        ├── skills/
+        └── mcp/
+
+หลักการ: <tool>/<account>/ = ของใครของมัน, <tool>/shared/ = แก้ครั้งเดียวทุกบัญชีของ CLI นั้นเห็น
+
+## Isolation
+1. ทุกบัญชีแยก credential/config/session/history/cache สมบูรณ์ เปิดพร้อมกันได้ไม่ชน
+2. ห้ามเปลี่ยน $HOME ใช้กลไก official ของแต่ละ CLI เท่านั้น
+   (Claude Code: CLAUDE_CONFIG_DIR, Codex CLI: CODEX_HOME)
+3. ห้ามแก้ .bashrc, Git config, SSH config หรือ environment เดิมโดยไม่จำเป็น
+   ถ้าต้องเพิ่ม PATH ให้บอกบรรทัดที่เพิ่มและขอยืนยันก่อน
+
+## Wrapper
+4. ทุกคำสั่งส่งต่อ "$@" ครบ และรันแบบข้ามการขออนุญาตด้วย flag ล่าสุดของแต่ละ CLI
+   - yoloN  → claude --dangerously-skip-permissions
+   - cyoloN → codex --dangerously-bypass-approvals-and-sandbox
+   ตรวจชื่อ flag จาก --help ของเวอร์ชันที่ติดตั้งจริงก่อนใช้
+5. wrapper ต้องแสดงข้อความชัดเจนถ้าโฟลเดอร์บัญชียังไม่มี และต้องไม่พิมพ์ข้อมูลลับใด ๆ ออกหน้าจอ
+
+## Shared
+6. Skills/MCP ใน <tool>/shared เป็น source เดียว ถ้า CLI ใดไม่รองรับส่วนใด ให้ระบุชัดและทำเท่าที่รองรับ
+
+## Installer
+7. รันซ้ำได้โดยไม่ลบหรือเขียนทับ credential/config เดิม
+8. วิธีติดตั้งและตำแหน่งวางไฟล์ให้เลือกเอง พร้อมอธิบายเหตุผลสั้น ๆ
+
+## Docs
+9. ตรวจ official docs และ --help ของเวอร์ชันจริงก่อน implement ห้ามเดา env/path/flag
+   - https://code.claude.com/docs/
+   - https://github.com/openai/codex
+
+## หมายเหตุจากการทดลองจริง (ตรวจว่ายังจริงกับเวอร์ชันบนเครื่องนี้หรือไม่)
+- ถ้ารันเป็น root ต้องตั้ง IS_SANDBOX=1 ไม่งั้น claude ปฏิเสธ --dangerously-skip-permissions
+- CODEX_HOME ต้อง mkdir -p ก่อน codex ไม่สร้างโฟลเดอร์ให้เอง
+- codex login status ไม่ตรวจว่า token ยังใช้ได้ ให้ยืนยันด้วย codex exec เท่านั้น
+
+## ทดสอบ (รายงานตามจริง PASS / FAIL / SKIP)
+- yolo1..yolo5 --version และ cyolo1..cyolo5 --version ทำงานครบ 10 ตัว
+- แต่ละคำสั่งชี้ config root คนละโฟลเดอร์ ตรวจด้วย find <root>
+- installer รอบ 2 ไม่ทำลายของเดิม
+- Git/SSH ทำงานปกติ
+- ทุกอย่างที่ต้องล็อกอินหรือใช้ credential จริง รอบนี้เป็น SKIP เจ้าของบัญชีจะทำเองภายหลัง
+
+## รายงาน
+เขียน 3 ไฟล์ในโฟลเดอร์ปัจจุบัน: setup-report.md (โครงสร้าง config root ตำแหน่ง credential ข้อจำกัด),
+login-guide.md (ขั้นตอนล็อกอินทีละบัญชีที่ผู้ใช้ทำเองใน Terminal), checklist.md (ตาราง รายการ | หลักฐาน | PASS/FAIL/SKIP | เหตุผล)
+ห้ามใส่ข้อมูลลับในไฟล์ใด ๆ
+
+ทำเฉพาะขั้นนี้ เมื่อเสร็จให้แสดงเนื้อหาสำคัญของไฟล์ที่สร้าง (ไม่ใช่แค่ชื่อไฟล์) เป็นตารางที่ฉันอ่านตรวจได้ แล้วหยุดรอ ห้ามล็อกอินแทนฉัน ห้ามทำขั้นถัดไปเอง
