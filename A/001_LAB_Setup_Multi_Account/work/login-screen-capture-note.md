@@ -1,0 +1,1 @@
+Captured real first-run screens for yolo1 and cyolo1. No credentials were copied for this run. Container cleanup verified by capture script. Images visually inspected and linked under section 3.1 commands.
