@@ -14,7 +14,7 @@
 | ระยะเวลา | 6.5 ชั่วโมง (กรณีศึกษา 0.5 ชม. + บรรยาย 2 ชม. + Lab 3.5 ชม. + ตรวจรับ 0.5 ชม.) |
 | รูปแบบ | สอนแบบ **ปัญหานำ → แนวคิด → สาธิต → Lab → จุดตรวจ** |
 | ผลลัพธ์ | ผู้เรียนได้ installer ที่รันซ้ำได้ + คำสั่ง `yolo1..5`, `cyolo1..5`, `qyolo1..3` ใช้งานจริง |
-| หลักฐานจริง | ทุก Module อ้างอิงแล็บที่รันจริงวันที่ 2026-09-03 ใน `labs/` (Lab A/B/C) ผัง `img/d1–d6` และบทเรียนเว็บ `lesson.html` |
+| หลักฐานจริง | ทุก Module อ้างอิงแล็บที่รันจริงวันที่ 2026-09-03 ใน `labs/` (Lab A/B/C) ผัง `img/d1–d6` และบทเรียนเว็บ `ai-agent-routing.html` |
 
 ### ผลลัพธ์การเรียนรู้ (Learning Outcomes)
 
@@ -64,17 +64,23 @@ M8  ทดสอบ + ตรวจรับ + รายงาน                
 
 ---
 
-## ผลการทดลองจริง (2026-09-03) — อ่านก่อนสอน
+## ผลการทดลองจริง (2026-09-03 / 2026-09-04) — อ่านก่อนสอน
 
-สื่อชุดนี้ถูกปรับจากการรันจริง 3 แล็บ (รายละเอียดเต็มใน `lesson.html` และโฟลเดอร์ `labs/`):
+สื่อชุดนี้ถูกปรับจากการรันจริง 8 แล็บ (A–H) (รายละเอียดเต็มใน `ai-agent-routing.html` และโฟลเดอร์ `labs/`):
 
 | แล็บ | ทำอะไร | ที่ไหน | ผลสำคัญ |
 |---|---|---|---|
 | Lab A fresh-install | container Ubuntu 24.04 เปล่า → ติดตั้ง claude 2.1.258 / codex 0.152.1 / qwen 0.22.3 → ทำตาม `prompt_multi_account_cli.md` → ทดสอบ | `labs/labA-fresh-install/` | PASS 14 · FAIL 0 · SKIP 4 (ข้อที่ต้อง login จริง); container เปล่า → wrapper ใช้ได้ ≈ 16 s ของคำสั่ง; gotcha 12 ข้อใน report §2 |
 | Lab B collision | พิสูจน์ path ชนกัน / `$HOME` switch พัง / config root แก้ได้ (strace + md5) | `labs/labB-collision/` | `{"fake":"A"}` → `{"fake":"B"}` ทับทันที; HOME switch ทำ git identity หายแต่ ssh ไม่ย้าย; `CLAUDE_CONFIG_DIR` / `CODEX_HOME` / `QWEN_HOME` แยกครบ 5 อย่าง |
-| Lab C multimodel | เรียก 7 โมเดลผ่าน yolo1–3 + cyolo1: matrix / tool / effort / fan-out / relay / verify + โควตา | `labs/labC-multimodel/` (`bash run_all.sh`) | 29 การเรียกใน 306 s; UC1 6/7 ถูก (gpt-5.3-codex-spark เร็วสุดแต่ผิด); สั่งใช้เชลล์แล้วโมเดลเล็กถูกหมด; relay 4 hop ถูก; fan-out 5/6 ถูกและ parent จับตัวผิดได้; verify พบช่องโหว่สเปกที่ hidden test ไม่ครอบคลุม |
+| Lab C multimodel | เรียก 7 โมเดลผ่าน yolo1–3 + cyolo1: matrix / tool / effort / fan-out / relay / verify / visual QA + โควตา | `labs/labC-multimodel/` (`bash run_all.sh`) | 29 การเรียกใน 306 s; UC1 6/7 ถูก (gpt-5.3-codex-spark เร็วสุดแต่ผิด); สั่งใช้เชลล์แล้วโมเดลเล็กถูกหมด; relay 4 hop ถูก; fan-out 5/6 ถูกและ parent จับตัวผิดได้; verify พบช่องโหว่สเปกที่ hidden test ไม่ครอบคลุม |
+| Lab C **UC8 frontend-split** (เพิ่ม 2026-09-03 บ่าย) | สเปกหน้า Landing เดียวกัน → 4 pipeline: premium-all (fable) / split (gpt-5.6-sol สร้าง → haiku polish) / cheap-all (haiku) / fast-split (codex-spark → gpt-5.4-mini) → checker 16 ข้อ + Sonnet ตัดสินภาพแบบ blind | `labs/labC-multimodel/uc8_frontend_split.sh`, `check_uc8.py`, `results/uc8_summary.json`, `results/uc8_shots/` | ทุก pipeline ผ่าน checker 16/16 หลัง polish (โมเดลถูกยก 11→16, 10→16); คะแนนภาพ p2 9 > p1 8 > p4 7 = p3 7; list cost ฝั่ง Claude p1 $0.689 vs p2 $0.08 vs p3 $0.065; cheap-all เร็วสุด 57.8 s แต่ภาพต่ำสุด |
+| Lab D leaderboard capture | Playwright เข้า HF Space `lmarena-ai/arena-leaderboard` → ตาม iframe → `lmarena.ai` → redirect `arena.ai/leaderboard` จับภาพ 24 ไฟล์ + อ่านข้อมูลจาก DOM → Codex (cyolo1) ตรวจภาพต่างค่าย 2 รอบ (รอบ 1 FAIL: จับตารางผิดไฟล์/กราฟหาย → แก้สคริปต์ → รอบ 2 PASS 8/8 ภาพ, 3/3 ข้อกล่าวอ้าง) | `labs/labD-leaderboard/` (`capture_leaderboard.py`, `verify_with_cyolo1.sh`, `report.md`), `img/leaderboard/` | ผู้นำอันดับ 1 ต่างกันทุกหมวด (Text claude-fable-5 · WebDev claude-fable-5.1-max · Agent Claude Opus 5 (High) · Search gpt-5.6-sol-xhigh · Text-to-Image gpt-image-2); WebDev #2 qwen3.8-max-0902 $2/$6 vs #1 $10/$50; การ์ดเดี่ยว 12 ใบ `img/leaderboard/leader-tile-*.png` + ภาพรวม `img/leaderboard-leaders-montage.png` (สร้างด้วย `labs/labD-leaderboard/make_leaders_montage.py`; ในสไลด์แสดงเป็นกริด 3 คอลัมน์แยกตามค่าย คลิกขยายทีละใบ): ผู้นำอันดับ 1 ของ 12 หมวดกระจาย 5 ค่าย Anthropic 6 · OpenAI 3 · Google 1 · MiniMax 1 · Alibaba 1 — ใช้เป็นเหตุผลว่าต้องมีบัญชีหลายค่าย; โมเดลเดียวกันอันดับต่างกันตามหมวด (claude-fable-5.1-max Overall 3 / Coding 34) |
+| Lab E **account-code** (เพิ่ม 2026-09-03 ~14:00 UTC) | พิสูจน์รหัสบัญชี Yellow/C-Yellow/Q-Yellow = yolo/cyolo/qyolo: จับหน้าจอจริงเมื่อพิมพ์ `yolo1` `cyolo1` `qyolo1` (TUI + `-p`) และรวบรวม "โจทย์ → คำสั่ง → ผลลัพธ์จริง" 13 เฟรม (flag โมเดล / JSON / stdin / ไฟล์ / relay 3 ค่าย / fan-out 4 บัญชี / `/usage` / ข้อผิดพลาด) | `labs/labE-account-code/` (`run_all.sh`, `tui_capture.py`, `render_terminal.py`, `report.md`, `results/transcript.md`), `img/terminal/` (16 ภาพ) | ทุกรหัสเป็น symlink ไป `agent-yolo` ตัวเดียว; yolo1/2/3 ให้ HOME=/root เท่ากันแต่ CONFIG ต่างกัน; relay Codex→Claude→Qwen ได้ 4173 ตรงเฉลย; fan-out 4 บัญชี 15.7 s; รหัสบัญชี ≠ โมเดล (yolo2 รัน sonnet, yolo3 รัน haiku) |
+| Lab F **terminal-first** (เพิ่ม 2026-09-04) | container Ubuntu 24.04 เปล่า: พิมพ์ `yolo1`/`cyolo1`/`qyolo1` ก่อนติดตั้ง → `command not found` → ติดตั้ง claude 2.1.260 / codex-cli 0.153.2 / qwen 0.23.0 (13.6 s) → พิมพ์รหัสอีกครั้ง **ยัง** not found → รัน installer ที่ AI สร้างจาก Setup Prompt → 13 symlink + config root ครบ → เรียกครั้งแรกได้ข้อความ "ยังไม่ล็อกอิน" ของแต่ละค่าย | `labs/labF-terminal-first/` (`run_all.sh`, `facts.md`, `results/transcript.md`), `img/terminal/f1–f6` | จุดสอนสไลด์ 04: ติดตั้งเครื่องมือ ≠ สอนระบบให้รู้จัก Account Code; `yolo1` → `Not logged in · Please run /login`, `cyolo3` → `401 Unauthorized`, `qyolo3` → `no API key in …/.Qwen/qyolo3/.env` |
+| Lab G **router-lab** (เพิ่ม 2026-09-04) | โจทย์จริง "เว็บแอปลงทะเบียน Open House" → Router (`yolo1`, default `claude-opus-5[1m]`, effort medium) วิเคราะห์และเลือก 5 บทบาท / 4 บัญชี / 2 ค่าย ในรอบเดียว → รันจริงตามแผน (haiku-4-5 ×3 บัญชี + gpt-5.4-mini ผู้ออกแบบ/ผู้ตรวจ) ส่งงานต่อกันเป็นไฟล์ → QA ด้วย Playwright 8 ข้อ → สรุป | `labs/labG-router-lab/` (`run_router_lab.py`, `qa_check.py`, `results/summary.md`, `results/pipeline.json`), `img/terminal/g0–g6`, `img/router-lab/` | pipeline 516 s, list cost ฝั่ง Claude $0.597 (Router คนเดียว 42%); checker v1 นับแถวผิด → ผู้ตรวจต่างค่ายเชื่อ checker → haiku แก้บั๊กที่ไม่มี ($0.145 / 145 s) → checker v2 = 8/8 — บทเรียน: เครื่องมือตรวจก็ต้องถูกตรวจ |
+| Lab H **adaptive-router** (เพิ่ม 2026-09-04 02:53–05:13 UTC) | โจทย์ System Analysis 3 ธุรกิจ (ร้านอาหาร ครัวคุณยาย · คลินิกทันตกรรม ยิ้มสวย · ร้านค้าปลีก บ้านสวนออร์แกนิก) รันขนาน 3 process: Router (`yolo1`, default `claude-opus-5[1m]`) วางแผน 5 ขั้น (User Story → FR/NFR → Flow/โครงสร้าง → UI → สรุป) + ผู้ตรวจต่างค่ายทุกขั้น + Controller → ทุกรอบ checker (objective) + critic (LLM ต่างค่าย) แล้ว Controller ตัดสิน PASS / REVISE / REROUTE / ESCALATE (เพดาน 3 รอบ/ขั้น) | `labs/labH-adaptive-router/` (`spec.md`, `run_adaptive_lab.py`, `check_artifacts.py` v2, `qa_ui.py` v2, `summarize_h.py`, `results/all/{summary.md,observations.md,checker-v2-note.md}`, `results/<case>/loop-log.json`, `cases/<case>/work/`), `img/terminal/h-*`, `img/adaptive-lab/` | US 26/18/26 · FR 20/19/29 · NFR 8/14/8 · หน้าจอ 14/18/27 (food/clinic/shop) · Controller ตัดสิน 34 ครั้ง: REVISE 19 · PASS 5 · REROUTE 7 · ESCALATE 3 · FORCED_NEXT 6 (stage 3–4 ไม่เคย PASS ทั้ง 3 กรณี) · backtrack 0 · critic FIX 31/34 แม้ checker ผ่าน 26 รอบ · producer โดน `timeout 600` 6/38 ครั้ง (REROUTE ไป sonnet-5 high ได้ไฟล์เดิม 2 ครั้ง) · ราคา list ฝั่ง Claude $21.01 / $19.75 / $15.49 เพราะ Router อ่านค่า pong probe ($0.0058) เป็นราคาโมเดลแล้วเลือก claude-fable-5-1 ทุกขั้น (Lab G ทั้ง pipeline $0.597) · qa_ui สุดท้าย 8/9 · 8/9 · 9/9 · checker ผิด 2 จุดระหว่างรัน (regex หัวข้อ, scrollbar 15 px) critic จับได้ → แก้เป็น v2 |
 
-ผัง Excalidraw 6 ภาพอยู่ใน `img/` (ไฟล์แก้ไขได้ใน `img/src/*.excalidraw`): d1 โครงสร้าง BASE_PATH · d2 เส้นทางคำสั่ง wrapper · d3 ไม่แยก/HOME switch/config root · d4 4 บัญชี → 7 โมเดล · d5 4 รูปแบบ multi-model · d6 สถาปัตยกรรมการทดลอง
+ผัง Excalidraw 11 ภาพอยู่ใน `img/` (ไฟล์แก้ไขได้ใน `img/src/*.excalidraw`): d0 ทำไมต้องมี AI หลายตัว (แบบเดิม vs เลือกโมเดลต่อขั้น + หลักฐาน Leaderboard) · d1 โครงสร้าง BASE_PATH · d2 เส้นทางคำสั่ง wrapper · d3 ไม่แยก/HOME switch/config root · d4 4 บัญชี → 7 โมเดล · d5 4 รูปแบบ multi-model · d6 สถาปัตยกรรมการทดลอง · d7 อ่านรหัสบัญชี (Account Code: คำสั่ง → agent-yolo → CLI + config root) · d8 จาก Terminal เปล่าสู่ Account Code 5 ขั้น (สไลด์ 04) · d9 Router Lab: Router → 5 บทบาท 4 บัญชี 2 ค่าย (สไลด์ 07) · d10 วงจร Feedback ของ Adaptive Router: ผู้ผลิต → Checker → Critic → Controller → PASS / REVISE / REROUTE / ESCALATE / ย้อนกลับ (สไลด์ 07 หัวข้อ 7.2)
 
 กับดักที่ต้องบอกนักศึกษาตั้งแต่ต้น (ยืนยันแล้วในแล็บ):
 
@@ -83,9 +89,15 @@ M8  ทดสอบ + ตรวจรับ + รายงาน                
 3. `CODEX_HOME` ต้อง `mkdir -p` ก่อน และ `codex login status` เชื่อไม่ได้ (ตอบ "Logged in" ให้ `auth.json` ปลอม) → ยืนยันด้วย `codex exec`
 4. Qwen: `-y` ซ่อนจาก `--help`, sub-command ห้ามใส่ `-y`, OAuth ฟรียกเลิกแล้ว (2026-04-15) → API key ตาม plan
 5. `VAR=x; claude` (มี `;`) ไม่ export → CLI ใช้ default เงียบ ๆ ต้องเขียน `VAR=x claude` หรือ export แล้วตรวจด้วย `find <root>`
-6. บน WSL2 + Docker Desktop port 2222–2280 bind ไม่ได้ → เลือก port ถัดไป และตรวจ container ด้วย `docker exec` แทน localhost
+6. บน WSL2 + Docker Desktop port 2222–2279 bind ไม่ได้ (Lab F 2026-09-04 ยืนยัน: 2280 bind ได้) → เลือก port ว่างถัดไป และตรวจ container ด้วย `docker exec` แทน localhost
 
-use case ทุกข้อในบทเรียนใหม่ใช้โมเดลต่างกันอย่างน้อย 3 ตัว (สูงสุด 7) — ดูตาราง S7 ใน `lesson.html`
+**บันทึกภายในสำหรับผู้สอน (ไม่แสดงในสไลด์) — session limit และการสลับบัญชีระหว่าง Lab H (2026-09-04):**
+- 03:35 UTC บัญชี `yolo2` ติด `You've hit your session limit · resets 6:10am (UTC)` (HTTP 429) ระหว่างรันรอบแรก → controller ทุกครั้งหลังนั้นตกเป็น fallback-rule และ process ถูกหยุด 03:46 UTC (ผล/ไฟล์งานสำรองไว้ที่ `results.snapshot-interrupted/`, `cases.snapshot-interrupted/`)
+- 04:00 UTC resume จาก stage 3 ทั้ง 3 กรณีด้วย `resume_all.sh` (`--resume-from 3 --budget-min 90 --claude-account yolo1 --override-reason …`): งานฝั่ง Claude ที่แผนระบุ `yolo2`/`yolo3` ถูกเรียกผ่าน `yolo1` (บัญชีจ่ายเงิน) แต่ในสไลด์/summary/ภาพ terminal พิมพ์ชื่อบัญชีตามแผนเดิมตามคำสั่งผู้สอน · ความจริงอยู่ในฟิลด์ `agent_actual` + `account_override_reason` ของทุก event ที่ถูกแทน (10 event/กรณี) และ `pipeline.json["claude_account_override"]` · โมเดล/โทเคน/ราคาที่รายงานยังเป็นค่าจริงจาก JSON ของ CLI
+- event ของ stage 3 รอบแรก (food 1 รอบ, shop 2 รอบ) อยู่ใน `results/<case>/loop-log.interrupted.json` ไม่นับในตาราง · `pipeline.json` ของช่วงแรกสร้างย้อนหลังด้วย `reconstruct_pipeline.py` (flag `reconstructed`)
+- ถ้าจะรันซ้ำให้ครบในรอบเดียว: ใช้ `--budget-min 120` และตรวจโควตาทุกบัญชีก่อน (`yoloN -p pong --output-format json`) · session limit ของ Claude รีเซ็ตทุก 5 ชั่วโมงโดยประมาณ
+
+use case ทุกข้อในบทเรียนใหม่ใช้โมเดลต่างกันอย่างน้อย 3 ตัว (สูงสุด 7) — ดูตาราง S7 ใน `ai-agent-routing.html`
 
 ---
 
@@ -104,6 +116,11 @@ use case ทุกข้อในบทเรียนใหม่ใช้โ�
 
 เปิด [LMArena Leaderboard](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard) แล้วให้ผู้เรียนเลือกอย่างน้อย
 3 หมวดงาน เช่น Coding, งานที่ใช้บริบทยาว และงานทั่วไป จากนั้นบันทึกผลที่เห็น ณ วันสอน
+
+> **หมายเหตุจากการจับภาพจริง (Lab D, 2026-09-03):** Space นี้เป็นเพียง iframe ครอบ `lmarena.ai/leaderboard` ซึ่ง redirect ไป `arena.ai/leaderboard`
+> — ชื่อเว็บและ URL เปลี่ยนได้ จึงต้องบันทึก "เส้นทาง + วันที่" ทุกครั้ง ภาพและข้อมูลที่อ่านจาก DOM อยู่ใน `img/leaderboard/` (`leaderboard-data.json`)
+> และผลตรวจภาพโดย Codex ต่างค่ายอยู่ใน `labs/labD-leaderboard/verify-by-cyolo1.json`
+> ประเด็นสอนหลักที่เห็นจากภาพ: ผู้นำอันดับ 1 ของ Text / WebDev / Agent / Search / Text-to-Image เป็นโมเดลต่างกัน และในตาราง Text Arena Overview โมเดลเดียวกันได้อันดับต่างกันมากตามหมวด (เช่น Overall 3 แต่ Coding 34)
 
 > **ข้อควรระวัง:** Leaderboard เปลี่ยนแปลงได้ตามรุ่นโมเดลและข้อมูลโหวต จึงไม่ควรเขียนชื่อโมเดลหรืออันดับ
 > แบบตายตัวลงในสื่อ ให้ผู้เรียนอ่านค่าปัจจุบันจากหน้าเว็บและบันทึกวันที่ทุกครั้ง
@@ -139,6 +156,11 @@ use case ทุกข้อในบทเรียนใหม่ใช้โ�
 ใช้สถานการณ์ตัวอย่าง: โมเดลหนึ่งอาจเหมาะกับการสร้าง Frontend หรือต้นแบบและมีต้นทุนต่ำกว่า
 ขณะที่อีกโมเดลเหมาะกับการวิเคราะห์หรือรีวิวโค้ดที่ซับซ้อน แม้มีราคาสูงกว่า จึงควรใช้โมเดลราคาแพง
 เฉพาะขั้นตอนที่สร้างคุณค่าเพิ่มจริง
+
+หลักฐานจากแล็บ (UC8, `labs/labC-multimodel/results/uc8_summary.json`): สเปกหน้า Landing เดียวกัน 4 pipeline ผ่าน checker 16/16 ทุกตัวหลังขั้น polish
+— งาน "production checklist" เป็นงานง่ายที่โมเดลราคาถูก (haiku low, gpt-5.4-mini low) ทำครบได้ ส่วนความสวยงามต่างกันที่ขั้น "สร้างโครง"
+(Sonnet ให้ split ที่ gpt-5.6-sol สร้างโครง 9/10 สูงกว่า fable ทำทั้งหมด 8/10) และ list cost ฝั่ง Claude ต่างกัน ~8 เท่า ($0.689 vs $0.08)
+ผัง `img/d0-why-multi-model.png` สรุปแนวคิดนี้ — ผู้สอนยกตัวอย่าง Qwen เป็นตัวสร้างโครง แต่แล็บนี้ยังไม่ได้ทดลอง qyolo (ให้เป็นกิจกรรมผู้เรียน)
 
 การติดตั้ง Claude Code, Codex CLI และ Qwen Code ร่วมกันช่วยให้:
 
@@ -541,14 +563,26 @@ done
 
 | ไฟล์ / โฟลเดอร์ | ใช้ทำอะไร |
 |---|---|
-| `lesson.html` | บทเรียนเว็บฉบับปรับปรุง (ออกแบบโดย Claude Fable ตาม `labs/lesson-design-spec.md`, เขียนโดย Codex, ตรวจด้วย Playwright) · ฉบับเดิม `lesson.original.html` |
+| `ai-agent-routing.html` | บทเรียนเว็บ “AI Agent Routing และ Multi-Agent Workflow” 8 สไลด์ (สไลด์ 01 ปรับตาม `labs/topic1-design-spec.md`: Fable ออกแบบ → Codex เขียน → Playwright/Codex ตรวจ) |
 | `labs/labA-fresh-install/` | transcript, report (PASS/FAIL/SKIP), help-excerpts, `install-cli-accounts.sh`, `agent-yolo` ที่ทดสอบใน container |
 | `labs/labB-collision/` | transcript 27 ขั้น + strace, report E1–E5 |
-| `labs/labC-multimodel/` | `run_all.sh`, `uc1_matrix.sh` … `uc7_quota.sh`, `lib.sh`, `parse.py`, `answers.py`, `results/summary.md`, `results/results.json` |
-| `labs/capture_screenshots.py` | จับภาพ `lesson.html` ด้วย Playwright (desktop/mobile/full page) + รายงาน console error และรูปที่โหลดไม่ได้ |
-| `img/d1..d6-*.png` + `img/src/*.excalidraw` | ผัง 6 ภาพ (Excalidraw MCP) แก้ไขต่อได้ |
+| `labs/labC-multimodel/` | `run_all.sh`, `uc1_matrix.sh` … `uc7_quota.sh`, `uc8_frontend_split.sh` + `check_uc8.py`, `lib.sh`, `parse.py`, `answers.py`, `results/summary.md`, `results/results.json`, `results/uc8_summary.json`, `results/uc8_shots/` |
+| `labs/labD-leaderboard/` | `capture_leaderboard.py` (Playwright: HF Space → arena.ai, 24 ภาพ + `leaderboard-data.json`), `verify_with_cyolo1.sh` → `verify-by-cyolo1.json` (Codex ตรวจภาพ), `report.md` |
+| `img/leaderboard/` | ภาพ Leaderboard จริง 2026-09-03 (`01-hf-space-wrapper`, `03-overview-cards`, `04-card-*`, `05-text-arena-overview-table`, `06/07-<arena>`) + `capture-report.json` |
+| `labs/topic1-design-spec.md` | สเปกออกแบบสไลด์ 01 "ทำไมต้องมี AI หลายตัว" (Fable ออกแบบ → Codex เขียน) |
+| `labs/codex-build/build_topic1*.sh`, `qa_topic1_sonnet.sh` | สคริปต์สั่ง Codex (cyolo1) เขียน/แก้สไลด์ 01 ตามสเปก + Sonnet (yolo3) ตรวจภาพ render (`qa-topic1-sonnet.out`) — 3 โมเดล 3 บทบาท: ออกแบบ / เขียน / ตรวจ |
+| `labs/codex-build/ai-agent-routing.src.html` | **ไฟล์ต้นฉบับที่แก้ได้** ของบทเรียน — build เป็นไฟล์เดียวด้วย `/opt/venv/bin/python labs/make_single_html.py labs/codex-build/ai-agent-routing.src.html ai-agent-routing.html` (ฝังรูปเป็น data URI — รูปซ้ำฝังครั้งเดียวแล้วอ้างอิงด้วย `data-src-ref`, ภาพ palette ใช้ WebP lossless, ไม่ฝัง `data-full` เพราะ lightbox อ่าน `img.src` — และฝัง `<iframe data-inline-src="…html">` เป็น `srcdoc` สำหรับ UI mock-up ที่เล่นได้; ผล 2026-09-04: 13.6 MB, รายงาน `.report.json`) |
+| `labs/labF-terminal-first/` | Lab F: `spec.md`, `run_all.sh`, `facts.md`, `results/transcript.md`, `results/frames.json`, `container.txt` — หลักฐานสไลด์ 04 (Terminal เปล่า → Account Code) · ภาพ `img/terminal/f1–f6` |
+| `labs/labG-router-lab/` | Lab G: `spec.md`, `run_router_lab.py`, `qa_check.py` (v2), `results/{router.card.md, router.plan.json, pipeline.json, summary.md, transcript.md}`, `work/` (topic → requirements → design → index.html → qa → summary), `observations.md` — หลักฐานสไลด์ 07 Router Lab · ภาพ `img/terminal/g0–g6`, `img/router-lab/` |
+| `labs/labH-adaptive-router/` | Lab H: `spec.md`, `run_adaptive_lab.py` (`--case`, `--dry-run`, `--budget-min`, `--resume-from`, `--claude-account`), `check_artifacts.py`/`qa_ui.py` (v2 + สำเนา v1), `summarize_h.py`, `finish.sh`, `compress_terminal_h.py`, `resume_all.sh`, `reconstruct_pipeline.py`, `results/{food,clinic,shop}/{router.card.md,router.plan.json,loop-log.json,pipeline.json,raw/}`, `results/all/{summary.md,observations.md,checker-v2-note.md}`, `cases/<case>/work/` (brief → user-stories → requirements → design → ui.html → final-summary + review/decision/check ทุกรอบ) — หลักฐานสไลด์ 07 หัวข้อ 7.2–7.3 · ภาพ `img/terminal/h-*` (19 ภาพ, 1x 64 สี; ต้นฉบับ 2x ใน `results/shots/`), `img/adaptive-lab/` (UI 3 กรณี × desktop/mobile/role-1..3) |
+| `labs/topic7-adaptive-spec.md`, `labs/codex-build/build_topic7.sh` | สเปกออกแบบสไลด์ 07 ใหม่ "AI Agent Router and Adaptive Workflow" (7.1 Router · 7.2 Adaptive + Feedback Loop · 7.3 Case Studies พร้อม UI mock-up เล่นได้จริงผ่าน iframe srcdoc · 7.4 Routing Card เดิม) และสคริปต์สั่ง Codex เขียน · log/out ใน `labs/codex-build/codex-topic7.*` |
+| `labs/HANDOFF-topic7-labH.txt` | บันทึกส่งต่องานระหว่าง session (yolo3 → yolo1, 2026-09-04) — สถานะ กติกา และขั้นตอนที่เหลือของหัวข้อ 7 |
+| `labs/topic4-7-design-spec.md`, `labs/codex-build/build_topic47.sh` | สเปกออกแบบสไลด์ 04 + 07 (Fable) และสคริปต์สั่ง Codex (cyolo1) เขียนตามสเปก · log/out ใน `labs/codex-build/codex-topic47.*` |
+| `labs/capture_screenshots.py` | จับภาพ `ai-agent-routing.html` ด้วย Playwright (desktop/mobile/full page) + รายงาน console error และรูปที่โหลดไม่ได้ |
+| `labs/capture_topic7.py`, `labs/verify_topic7.py` | จับภาพสไลด์ 07 ใหม่ (Codex) และสคริปต์ตรวจซ้ำอิสระของ Fable: 8 section, หัวข้อ 7.1–7.4, Router Lab เดิม, แท็บ 3 กรณี, iframe เล่นได้ (คลิกบทบาทใน frame), ปุ่มมือถือ/เต็มหน้าต่าง, step player, คีย์บอร์ด, console error, มือถือ ≤ 375 → `img/screenshots/verify-topic7.json` |
+| `labs/make_pdf.py` | สร้าง `ai-agent-routing.pdf` จากไฟล์ build ด้วย Chromium (CDP) โหมด print — iframe ถูกซ่อนและแสดงภาพ UI แทนตาม `@media print` |
+| `img/d0..d10-*.png` + `img/src/*.excalidraw` | ผัง 11 ภาพ (Excalidraw MCP) แก้ไขต่อได้ (d0 มี `.svg` ด้วย) · `img/uc8-montage-vertical.png` (แนวยาว 1 pipeline/แถว, สร้างด้วย `labs/labC-multimodel/make_uc8_montage.py`) และ `img/uc8-montage-desktop.png` (2×2) ภาพ 4 หน้าเว็บจาก UC8 |
 | `img/screenshots/` | ภาพจากการตรวจหน้าเว็บจริงด้วย Playwright |
 | `prompt_multi_account_cli.md` | setup prompt (แก้ตัวอักษรเพี้ยนแล้ว + หมายเหตุจากการทดลอง) |
-| `agent-routing-prompt.md` | ขั้นตอนเลือก Agent + Routing Card |
 
 ทำแล็บซ้ำ: `docker run -dit --name devtools-<lab>-<hash> --privileged -p <port>:22 tuchsanai/devtools:2569_1` → `docker exec -i … bash -lc '…'` → `docker rm -f` เมื่อจบ · Lab C: `bash labs/labC-multimodel/run_all.sh` (ต้อง login yolo1–3 และ cyolo1 บน host ก่อน) · Playwright/Excalidraw: `pw-up`, `ex-up`
