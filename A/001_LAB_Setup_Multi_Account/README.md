@@ -11,19 +11,16 @@
 ## ขั้นที่ 1 · เตรียมเครื่องมือ (🖥️ Terminal + 💬 AI | ~15 นาที)
 
 ### 🎯 เป้าหมายของขั้นนี้
-มี “AI ตัวช่วยตั้งค่า” 1 ตัว และมีคำสั่ง `claude` กับ `codex` อยู่บนเครื่อง Ubuntu
+มี Claude Code เป็น “AI ตัวช่วยตั้งค่า” บนเครื่อง Ubuntu โดยเริ่มจากติดตั้ง Claude Code เพียงตัวเดียว
 
-### 1.1 ตรวจว่ามีอะไรอยู่แล้ว (🖥️ Terminal)
+### 1.1 ตรวจว่ามี Claude Code อยู่แล้วหรือไม่ (🖥️ Terminal)
 
 ```bash
 claude --version
-codex --version
-node --version
 ```
 
-- ได้ตัวเลขเวอร์ชันทั้งสองบรรทัดแรก → ข้ามไป 1.4
-- ได้ `command not found` → ทำ 1.2–1.3
-- `node --version` ไม่มี → ติดตั้ง Node.js ก่อน (Codex CLI ผ่าน npm ต้องใช้ ส่วน Claude Code ใช้ตัวติดตั้ง native ได้โดยไม่ต้องมี Node)
+- ได้ตัวเลขเวอร์ชัน → ข้ามไป 1.4
+- ได้ `command not found` → ทำ 1.2
 
 ### 1.2 ติดตั้ง Claude Code (🖥️ Terminal)
 
@@ -42,17 +39,6 @@ npm install -g @anthropic-ai/claude-code
 
 Claude Code ต้องใช้บัญชี Pro / Max / Team / Enterprise หรือ Console แผนฟรีใช้ไม่ได้
 
-### 1.3 ติดตั้ง Codex CLI (🖥️ Terminal)
-
-ตรวจกับเอกสารทางการแล้ว ([github.com/openai/codex](https://github.com/openai/codex))
-
-```bash
-npm install -g @openai/codex
-codex --version
-```
-
-Codex CLI ล็อกอินด้วยบัญชี ChatGPT (Plus / Pro / Business / Edu / Enterprise) หรือ API key
-
 ### 1.4 เลือก “AI ตัวช่วยตั้งค่า” สำหรับขั้นที่ 2
 
 | ทางเลือก | ที่ใช้ | วิธีเปิด | สิ่งที่ต้องทำเอง |
@@ -67,13 +53,12 @@ Codex CLI ล็อกอินด้วยบัญชี ChatGPT (Plus / Pro /
 | CHECK | ACTUAL EXAMPLE |
 |---|---|
 | `claude --version` | `2.1.258 (Claude Code)` |
-| `codex --version` | `codex-cli 0.153.4` |
 | AI ตัวช่วยตั้งค่า | เปิดได้ 1 ตัว (A/B/C) |
-- **ต้องตรง:** (1) มีเวอร์ชันทั้ง 2 CLI (2) เปิด AI ตัวช่วยได้
+- **ต้องตรง:** (1) มีเวอร์ชัน Claude Code (2) เปิด AI ตัวช่วยได้
 - **ต่างได้:** (1) ตัวเลขเวอร์ชัน (2) ทางเลือก A/B/C
 
 ### 🔍 จุดที่ผู้เรียนต้องตรวจ
-- [ ] `claude --version` และ `codex --version` ได้ตัวเลข ไม่ใช่ `command not found`
+- [ ] `claude --version` ได้ตัวเลข ไม่ใช่ `command not found`
 - [ ] รู้ว่าตัวเองอยู่ทางเลือก A, B หรือ C
 - [ ] ยังไม่พิมพ์ `yolo1`/`cyolo1` (ตอนนี้ต้องยังไม่มี เป็นเรื่องปกติ ดูบทเรียน 4.0)
 
@@ -82,7 +67,7 @@ Codex CLI ล็อกอินด้วยบัญชี ChatGPT (Plus / Pro /
 |---|---|
 | `claude --version` ได้ `native binary not installed` | npm รุ่นใหม่บล็อก postinstall ให้ใช้ตัวติดตั้ง `curl … install.sh` แทน หรือ `npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code` |
 | `npm install -g` ขึ้น permission denied | อย่าใช้ `sudo` ให้ตั้ง npm prefix เป็นโฟลเดอร์ในบ้านผู้ใช้ตามคู่มือ npm |
-| ไม่มี Node.js | ติดตั้ง Node.js 22 ขึ้นไปจาก nodejs.org หรือ nvm แล้วกลับมาทำ 1.3 |
+| ไม่มี Node.js | ใช้ตัวติดตั้ง native ในหัวข้อ 1.2 ได้โดยไม่ต้องติดตั้ง Node.js |
 
 ## ขั้นที่ 2 · คัดลอกพรอมต์ตั้งค่า CLI (💬 AI ตัวช่วยตั้งค่า | ~20 นาที)
 
