@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:," />
+<title>ระบบจองที่นั่งเวิร์กช็อป ออกแบบบริการด้วย AI (SIMULATION)</title>
+<style>
+  :root { color-scheme: light; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans Thai", "Sarabun", "Leelawadee UI", Tahoma, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #14181f;
+    background: #eef1f8;
+    -webkit-text-size-adjust: 100%;
+    overflow-wrap: break-word;
+  }
+  [hidden] { display: none !important; }
+
+  .wrap {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .wrap > * { min-width: 0; }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #d5dce9;
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .h {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1b2430;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fde9b8;
+    border: 1px solid #a9791c;
+    color: #4a3208;
+  }
+  h1 {
+    margin: 8px 0 4px;
+    font-size: 1.4rem;
+    line-height: 1.35;
+    color: #10151d;
+    overflow-wrap: anywhere;
+  }
+  .sub { margin: 0; font-size: 0.85rem; color: #4d5867; }
+
+  .nums {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .num {
+    min-width: 0;
+    padding: 8px 6px;
+    text-align: center;
+    background: #f6f8fd;
+    border: 1px solid #dde4f0;
+    border-radius: 10px;
+  }
+  .num b { display: block; font-size: 1.6rem; line-height: 1.2; }
+  .num span { display: block; font-size: 0.72rem; color: #4d5867; overflow-wrap: anywhere; }
+
+  .state-line {
+    margin: 10px 0 0;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 0.85rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .state-line[data-full="yes"] { border-color: #9b1c1c; background: #fdf2f2; }
+
+  .seats {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 8px;
+  }
+  .seat {
+    min-width: 0;
+    padding: 8px;
+    border-radius: 10px;
+    border: 2px solid #94a3b8;
+    background: #ffffff;
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+  }
+  .seat b { display: block; font-size: 0.85rem; }
+  .seat[data-taken="yes"] { border-style: solid; border-color: #9b1c1c; background: #fdf2f2; }
+  .seat[data-taken="no"] { border-style: dashed; border-color: #166534; background: #f2fbf4; }
+
+  form { display: grid; gap: 8px; margin: 0; }
+  .label { font-weight: 700; font-size: 0.95rem; }
+  input[type="text"] {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    font: inherit;
+    color: inherit;
+    background: #ffffff;
+    border: 2px solid #7c8798;
+    border-radius: 10px;
+  }
+  .hint { margin: 0; font-size: 0.78rem; color: #4d5867; overflow-wrap: anywhere; }
+  .hint code {
+    font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    background: #f1f4fa;
+    border: 1px solid #dde4f0;
+    border-radius: 4px;
+    padding: 0 3px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 14px;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary { background: #1d4ed8; border-color: #1e40af; color: #ffffff; }
+  .btn-primary:hover { background: #1a44bd; }
+  .btn-ghost { background: #ffffff; border-color: #7c8798; color: #1b2430; }
+  .btn-ghost:hover { background: #f1f4fa; }
+  .btn-danger { background: #ffffff; border-color: #9b1c1c; color: #8a1a1a; }
+  .btn-danger:hover { background: #fdf2f2; }
+  .btn-small { width: auto; min-height: 40px; padding: 8px 14px; font-size: 0.88rem; }
+
+  :focus { outline: 3px solid #0b4ea2; outline-offset: 2px; }
+  :focus:not(:focus-visible) { outline: 3px solid #0b4ea2; outline-offset: 2px; }
+  :focus-visible { outline: 3px solid #0b4ea2; outline-offset: 2px; }
+
+  .status {
+    min-height: 46px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    border-left: 6px solid #64748b;
+    background: #ffffff;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+  .status[data-kind="ok"] { border-left-color: #166534; }
+  .status[data-kind="reject"] { border-left-color: #9b1c1c; }
+  .status[data-kind="info"] { border-left-color: #1d4ed8; }
+  .status[data-kind="warn"] { border-left-color: #a9791c; }
+
+  .warn-banner {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 2px solid #a9791c;
+    background: #fde9b8;
+    color: #4a3208;
+    font-size: 0.85rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #d5dce9;
+    border-radius: 10px;
+    background: #fbfcfe;
+  }
+  .row-main { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
+  .row-order { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #4d5867; }
+  .row-code {
+    display: inline-block;
+    font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+  .row-meta { display: block; font-size: 0.78rem; color: #4d5867; }
+  .empty { margin: 0; font-size: 0.85rem; color: #4d5867; }
+  .count { font-weight: 600; color: #4d5867; font-size: 0.85rem; }
+  .foot { margin: 0; font-size: 0.75rem; color: #5b6675; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header>
+    <p class="badge">SIMULATION — ข้อมูลจำลอง ไม่ใช่ข้อมูลจริง</p>
+    <h1 id="workshop-title">ออกแบบบริการด้วย AI</h1>
+    <p class="sub">ระบบจองที่นั่งเวิร์กช็อป · ทำงานใน browser เดียว · บันทึกสถานะด้วย localStorage</p>
+  </header>
+
+  <div id="storage-warn" class="warn-banner" role="alert" hidden></div>
+
+  <section class="card" aria-labelledby="summary-heading">
+    <h2 id="summary-heading" class="h">สรุปที่นั่งเวิร์กช็อป</h2>
+    <ul class="nums">
+      <li class="num"><b id="seat-total">3</b><span>ที่นั่งทั้งหมด</span></li>
+      <li class="num"><b id="seat-booked">0</b><span>จองแล้ว (รายการ)</span></li>
+      <li class="num"><b id="seat-left">3</b><span>ที่นั่งเหลือ</span></li>
+    </ul>
+    <p id="state-line" class="state-line" data-full="no"></p>
+    <div id="seats" class="seats" role="list" aria-label="สถานะที่นั่งทั้ง 3 ที่นั่ง"></div>
+  </section>
+
+  <section class="card" aria-labelledby="form-heading">
+    <h2 id="form-heading" class="h">จองที่นั่ง</h2>
+    <form id="booking-form" novalidate>
+      <label class="label" for="learner-code">รหัสผู้เรียน</label>
+      <input id="learner-code" name="learner-code" type="text" inputmode="text"
+             autocomplete="off" spellcheck="false" placeholder="เช่น &lt;LEARNER_A&gt;"
+             aria-describedby="code-hint" data-key="code-input" />
+      <p id="code-hint" class="hint">
+        รหัสจำลองที่ใช้ได้ 4 รหัส:
+        <code>&lt;LEARNER_A&gt;</code> <code>&lt;LEARNER_B&gt;</code>
+        <code>&lt;LEARNER_C&gt;</code> <code>&lt;LEARNER_D&gt;</code>
+        (กด Enter เพื่อจองได้ทันที)
+      </p>
+      <button id="book-btn" class="btn btn-primary" type="submit" data-key="book-btn">จองที่นั่ง</button>
+    </form>
+  </section>
+
+  <p id="status" class="status" data-kind="info" role="status" aria-live="polite" aria-atomic="true"></p>
+
+  <section class="card" aria-labelledby="list-heading">
+    <h2 id="list-heading" class="h">รายการจอง <span id="list-count" class="count"></span></h2>
+    <ul id="booking-list" class="list"></ul>
+    <p id="empty-note" class="empty"></p>
+  </section>
+
+  <button id="reset-btn" class="btn btn-ghost" type="button" data-key="reset-btn">เริ่มใหม่ (ล้างข้อมูลจำลอง)</button>
+
+  <p class="foot">
+    ขอบเขต: browser เดียว · ไม่มี backend / login / การแจ้งเตือน / การชำระเงิน ·
+    รหัสผู้เรียนเป็นข้อมูลจำลอง <span aria-hidden="true">&lt;LEARNER_A&gt;–&lt;LEARNER_D&gt;</span> ·
+    ทุกผลลัพธ์แจ้งเป็นข้อความภาษาไทย ไม่ใช้สีเพียงอย่างเดียว
+  </p>
+
+  <noscript>
+    <p class="warn-banner">เบราว์เซอร์นี้ปิดการใช้งาน JavaScript ไว้ จึงไม่สามารถจองที่นั่งได้ กรุณาเปิด JavaScript แล้วโหลดหน้าใหม่อีกครั้ง</p>
+  </noscript>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var WORKSHOP_NAME = "ออกแบบบริการด้วย AI";
+  var TOTAL_SEATS = 3;
+  var STORAGE_KEY = "aiDesignWorkshop.bookings.v1";
+  var ALLOWED_CODES = ["<LEARNER_A>", "<LEARNER_B>", "<LEARNER_C>", "<LEARNER_D>"];
+
+  var els = {
+    title: document.getElementById("workshop-title"),
+    seatTotal: document.getElementById("seat-total"),
+    seatBooked: document.getElementById("seat-booked"),
+    seatLeft: document.getElementById("seat-left"),
+    stateLine: document.getElementById("state-line"),
+    seats: document.getElementById("seats"),
+    form: document.getElementById("booking-form"),
+    input: document.getElementById("learner-code"),
+    bookBtn: document.getElementById("book-btn"),
+    status: document.getElementById("status"),
+    list: document.getElementById("booking-list"),
+    listCount: document.getElementById("list-count"),
+    emptyNote: document.getElementById("empty-note"),
+    resetBtn: document.getElementById("reset-btn"),
+    storageWarn: document.getElementById("storage-warn")
+  };
+
+  var state = { bookings: [] };
+  var storageAvailable = true;
+
+  function remainingSeats() {
+    return TOTAL_SEATS - state.bookings.length;
+  }
+
+  function normalizeCode(raw) {
+    return String(raw == null ? "" : raw).replace(/\s+/g, " ").trim();
+  }
+
+  function sameCode(a, b) {
+    return normalizeCode(a).toLowerCase() === normalizeCode(b).toLowerCase();
+  }
+
+  function isAllowedCode(code) {
+    for (var i = 0; i < ALLOWED_CODES.length; i++) {
+      if (sameCode(ALLOWED_CODES[i], code)) return true;
+    }
+    return false;
+  }
+
+  function indexOfCode(code) {
+    for (var i = 0; i < state.bookings.length; i++) {
+      if (sameCode(state.bookings[i].code, code)) return i;
+    }
+    return -1;
+  }
+
+  function findBySeat(seat) {
+    for (var i = 0; i < state.bookings.length; i++) {
+      if (state.bookings[i].seat === seat) return state.bookings[i];
+    }
+    return null;
+  }
+
+  function lowestFreeSeat() {
+    for (var seat = 1; seat <= TOTAL_SEATS; seat++) {
+      if (!findBySeat(seat)) return seat;
+    }
+    return 0;
+  }
+
+  function probeStorage() {
+    try {
+      var probeKey = STORAGE_KEY + ".probe";
+      window.localStorage.setItem(probeKey, "1");
+      window.localStorage.removeItem(probeKey);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function showStorageWarning() {
+    var text = "แจ้งเตือน — ไม่สามารถใช้งาน localStorage ในเบราว์เซอร์นี้ได้ ระบบจะทำงานต่อในหน่วยความจำชั่วคราว และข้อมูลการจองจะหายไปเมื่อรีเฟรชหน้า";
+    els.storageWarn.textContent = text;
+    els.storageWarn.hidden = false;
+  }
+
+  function save() {
+    if (!storageAvailable) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.bookings));
+    } catch (err) {
+      storageAvailable = false;
+      showStorageWarning();
+      setStatus("warn", "แจ้งเตือน — บันทึกข้อมูลลง localStorage ไม่สำเร็จ (" + err.name + ") ข้อมูลจะหายไปเมื่อรีเฟรชหน้า");
+    }
+  }
+
+  function load() {
+    storageAvailable = probeStorage();
+    if (!storageAvailable) {
+      showStorageWarning();
+      return;
+    }
+    var raw = null;
+    try {
+      raw = window.localStorage.getItem(STORAGE_KEY);
+    } catch (err) {
+      storageAvailable = false;
+      showStorageWarning();
+      return;
+    }
+    if (!raw) return;
+    var parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      parsed = null;
+    }
+    if (!Array.isArray(parsed)) return;
+    var clean = [];
+    for (var i = 0; i < parsed.length && clean.length < TOTAL_SEATS; i++) {
+      var item = parsed[i];
+      if (!item || typeof item.code !== "string") continue;
+      var code = normalizeCode(item.code);
+      if (!code || indexOfIn(code, clean) >= 0) continue;
+      var seat = Number(item.seat);
+      if (!(seat >= 1 && seat <= TOTAL_SEATS) || findBySeatIn(seat, clean)) seat = lowestFreeSeatIn(clean);
+      if (!seat) continue;
+      clean.push({ code: code, seat: seat });
+    }
+    state.bookings = clean;
+  }
+
+  function indexOfIn(code, list) {
+    for (var i = 0; i < list.length; i++) {
+      if (sameCode(list[i].code, code)) return i;
+    }
+    return -1;
+  }
+
+  function findBySeatIn(seat, list) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].seat === seat) return list[i];
+    }
+    return null;
+  }
+
+  function lowestFreeSeatIn(list) {
+    for (var seat = 1; seat <= TOTAL_SEATS; seat++) {
+      if (!findBySeatIn(seat, list)) return seat;
+    }
+    return 0;
+  }
+
+  function setStatus(kind, text) {
+    els.status.setAttribute("data-kind", kind);
+    els.status.textContent = text;
+  }
+
+  function renderSeats() {
+    els.seats.textContent = "";
+    for (var seat = 1; seat <= TOTAL_SEATS; seat++) {
+      var booking = findBySeat(seat);
+      var chip = document.createElement("div");
+      chip.className = "seat";
+      chip.setAttribute("role", "listitem");
+      chip.setAttribute("data-taken", booking ? "yes" : "no");
+      var no = document.createElement("b");
+      no.textContent = "ที่นั่งหมายเลข " + seat;
+      var status = document.createElement("span");
+      status.textContent = booking ? "สถานะ: ถูกจองแล้ว โดย " + booking.code : "สถานะ: ว่าง (ยังจองได้)";
+      chip.appendChild(no);
+      chip.appendChild(status);
+      els.seats.appendChild(chip);
+    }
+  }
+
+  function renderList() {
+    els.list.textContent = "";
+    for (var i = 0; i < state.bookings.length; i++) {
+      var booking = state.bookings[i];
+      var row = document.createElement("li");
+      row.className = "row";
+
+      var main = document.createElement("span");
+      main.className = "row-main";
+      var order = document.createElement("span");
+      order.className = "row-order";
+      order.textContent = "ลำดับที่ " + (i + 1);
+      var code = document.createElement("span");
+      code.className = "row-code";
+      code.textContent = " " + booking.code + " ";
+      var meta = document.createElement("span");
+      meta.className = "row-meta";
+      meta.textContent = "ที่นั่งหมายเลข " + booking.seat + " · สถานะ: จองแล้ว";
+      main.appendChild(order);
+      main.appendChild(code);
+      main.appendChild(meta);
+
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-small btn-danger";
+      btn.textContent = "ยกเลิก";
+      btn.setAttribute("data-cancel", booking.code);
+      btn.setAttribute("data-key", "cancel:" + booking.code);
+      btn.setAttribute("aria-label", "ยกเลิกการจองของ " + booking.code + " (ที่นั่งหมายเลข " + booking.seat + ")");
+
+      row.appendChild(main);
+      row.appendChild(btn);
+      els.list.appendChild(row);
+    }
+  }
+
+  function render() {
+    var left = remainingSeats();
+    var booked = state.bookings.length;
+
+    els.title.textContent = WORKSHOP_NAME;
+    els.seatTotal.textContent = String(TOTAL_SEATS);
+    els.seatBooked.textContent = String(booked);
+    els.seatLeft.textContent = String(left);
+
+    els.stateLine.setAttribute("data-full", left === 0 ? "yes" : "no");
+    els.stateLine.textContent = left === 0
+      ? "สถานะปัจจุบัน: ที่นั่งเต็ม — จองแล้ว " + booked + " รายการ จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง คงเหลือ 0 ที่นั่ง"
+      : "สถานะปัจจุบัน: เปิดรับจอง — จองแล้ว " + booked + " รายการ จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง คงเหลือ " + left + " ที่นั่ง";
+
+    els.listCount.textContent = "(" + booked + " รายการ · ที่นั่งเหลือ " + left + " จาก " + TOTAL_SEATS + ")";
+    els.emptyNote.textContent = "ยังไม่มีการจอง — คงเหลือ " + left + " ที่นั่ง จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง";
+    els.emptyNote.hidden = booked > 0;
+
+    renderSeats();
+    renderList();
+  }
+
+  function findByKey(key) {
+    var nodes = document.querySelectorAll("[data-key]");
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].getAttribute("data-key") === key) return nodes[i];
+    }
+    return null;
+  }
+
+  function keepFocus(mutate, fallbackKey) {
+    var active = document.activeElement;
+    var key = active && active.getAttribute ? active.getAttribute("data-key") : null;
+    mutate();
+    if (!key) return;
+    var target = findByKey(key) || findByKey(fallbackKey);
+    if (target && target !== document.activeElement) target.focus();
+  }
+
+  function book() {
+    var code = normalizeCode(els.input.value);
+    var left = remainingSeats();
+
+    if (!code) {
+      setStatus("reject", "ไม่ผ่าน — ยังไม่ได้กรอกรหัสผู้เรียน (ช่องกรอกว่าง หรือมีเพียงเว้นวรรค) กรุณากรอกรหัสผู้เรียน เช่น <LEARNER_A> แล้วกดปุ่มจองอีกครั้ง ตอนนี้จองแล้ว " + state.bookings.length + " รายการ คงเหลือ " + left + " ที่นั่ง");
+      els.input.focus();
+      return false;
+    }
+
+    if (!isAllowedCode(code)) {
+      setStatus("reject", "ไม่ผ่าน — รหัส " + code + " ไม่อยู่ในชุดรหัสผู้เรียนจำลองที่รับได้ ซึ่งรับเฉพาะ " + ALLOWED_CODES.join(", ") + " เท่านั้น จึงยังไม่เพิ่มรายการและไม่หักที่นั่ง กรุณากรอกรหัสใหม่ที่ถูกต้องแล้วกดปุ่มจองอีกครั้ง ตอนนี้จองแล้ว " + state.bookings.length + " รายการ คงเหลือ " + left + " ที่นั่ง");
+      els.input.focus();
+      return false;
+    }
+
+    var dupIndex = indexOfCode(code);
+    if (dupIndex >= 0) {
+      var dup = state.bookings[dupIndex];
+      setStatus("reject", "ไม่ผ่าน — รหัส " + code + " จองไว้แล้วในลำดับที่ " + (dupIndex + 1) + " (ที่นั่งหมายเลข " + dup.seat + ") จึงไม่เพิ่มรายการซ้ำ ตอนนี้คงมี " + state.bookings.length + " รายการ คงเหลือ " + left + " ที่นั่ง");
+      return false;
+    }
+
+    if (left <= 0) {
+      setStatus("reject", "ไม่ผ่าน — ที่นั่งเต็มแล้ว คงเหลือ 0 ที่นั่ง (จองแล้ว " + state.bookings.length + " รายการ จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง) จึงไม่สามารถรับ " + code + " ได้ หากต้องการจองโปรดยกเลิกรายการเดิมก่อน");
+      return false;
+    }
+
+    var seat = lowestFreeSeat();
+    state.bookings.push({ code: code, seat: seat });
+    save();
+    keepFocus(function () {
+      render();
+    }, "book-btn");
+    els.input.value = "";
+    setStatus("ok", "สำเร็จ — " + code + " จองที่นั่งหมายเลข " + seat + " แล้ว (ลำดับที่ " + state.bookings.length + ") ตอนนี้จองแล้ว " + state.bookings.length + " รายการ จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง คงเหลือ " + remainingSeats() + " ที่นั่ง");
+    return true;
+  }
+
+  function cancel(code) {
+    var index = indexOfCode(code);
+    if (index < 0) {
+      setStatus("info", "แจ้งเตือน — ไม่พบรายการจองของ " + code + " ในระบบ จึงยังไม่มีการเปลี่ยนแปลง ตอนนี้จองแล้ว " + state.bookings.length + " รายการ คงเหลือ " + remainingSeats() + " ที่นั่ง");
+      return;
+    }
+    var removed = state.bookings.splice(index, 1)[0];
+    save();
+    keepFocus(function () {
+      render();
+    }, "book-btn");
+    setStatus("ok", "สำเร็จ — ยกเลิกการจองของ " + removed.code + " แล้ว คืนที่นั่งหมายเลข " + removed.seat + " ทันที ตอนนี้จองแล้ว " + state.bookings.length + " รายการ จากทั้งหมด " + TOTAL_SEATS + " ที่นั่ง คงเหลือ " + remainingSeats() + " ที่นั่ง");
+  }
+
+  function resetAll() {
+    state.bookings = [];
+    if (storageAvailable) {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch (err) {
+        storageAvailable = false;
+        showStorageWarning();
+      }
+    }
+    els.input.value = "";
+    keepFocus(function () {
+      render();
+    }, "reset-btn");
+    setStatus("info", "แจ้งเตือน — เริ่มใหม่แล้ว ระบบล้างข้อมูลจำลองในเบราว์เซอร์นี้ทั้งหมด ตอนนี้จองแล้ว 0 รายการ คงเหลือ " + TOTAL_SEATS + " ที่นั่ง");
+  }
+
+  els.form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    book();
+  });
+
+  els.list.addEventListener("click", function (event) {
+    var node = event.target;
+    while (node && node !== els.list) {
+      if (node.tagName === "BUTTON" && node.hasAttribute("data-cancel")) {
+        cancel(node.getAttribute("data-cancel"));
+        return;
+      }
+      node = node.parentNode;
+    }
+  });
+
+  els.resetBtn.addEventListener("click", function () {
+    resetAll();
+  });
+
+  load();
+  render();
+  setStatus("info", "พร้อมใช้งาน — เวิร์กช็อป “" + WORKSHOP_NAME + "” มีที่นั่งทั้งหมด " + TOTAL_SEATS + " ที่นั่ง ตอนนี้จองแล้ว " + state.bookings.length + " รายการ คงเหลือ " + remainingSeats() + " ที่นั่ง กรุณากรอกรหัสผู้เรียนแล้วกดปุ่มจอง" + (storageAvailable ? "" : " (ขณะนี้ localStorage ใช้งานไม่ได้ ข้อมูลจะหายเมื่อรีเฟรช)"));
+})();
+</script>
+</body>
+</html>

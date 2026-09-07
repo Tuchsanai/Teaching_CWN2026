@@ -1,0 +1,46 @@
+{
+  "pre_create_check": {
+    "command_scope": "docker ps -a --filter name=^devtools-",
+    "other_container_seen_and_untouched": "devtools-lab001-896d5c"
+  },
+  "container": {
+    "name": "devtools-lab006-38ddc3",
+    "id_before_cleanup": "9bc9875bdcf6",
+    "image": "tuchsanai/devtools:2569_1",
+    "privileged": true,
+    "ports": ["2286:22", "8086:8080"],
+    "ip": "172.17.0.3"
+  },
+  "access": {
+    "method": "docker exec -i ... bash -lc",
+    "reason": "sshpass ไม่มีบน host",
+    "credentials_written_to_learner_docs": false
+  },
+  "lab_copy": {
+    "destination": "/root/workspace/sa-labs/006_LAB_Prototype_and_UAT/",
+    "paths_checked_one_by_one": [
+      "README.md",
+      "prompts/step-01.md",
+      "prompts/step-02.md",
+      "prompts/step-03.md",
+      "prompts/step-04.md"
+    ],
+    "all_paths_exist": true,
+    "host_container_prompt_hashes_match": true
+  },
+  "preview": {
+    "container_path": "/root/workspace/sa-work/006/index.html",
+    "sha256_host_and_container": "7c69727156a903c89edc23dfe55d01612583253edb0b8ecc47e1a41c14988b03",
+    "server": "HTTP server bound to 0.0.0.0:8080 inside container",
+    "browser_url": "http://172.17.0.3:8080/",
+    "http_status": 200,
+    "note": "published 127.0.0.1:8086 เข้าไม่ถึงใน nested Docker environment จึงใช้ IP container โดยตรง"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "removed_exact_name": "devtools-lab006-38ddc3",
+    "verified_filter": "docker ps -a --filter name=devtools-lab006",
+    "remaining_lab006_containers": 0,
+    "note": "container LAB 001 ที่เคยเห็นตอน pre-check ไม่อยู่แล้วใน final listing; กระบวนการนี้ไม่ได้สั่งลบหรือแก้ container ดังกล่าว"
+  }
+}
