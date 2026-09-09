@@ -1,0 +1,20 @@
+USER: เรียก yolo2 ให้คิดว่าซื้อของ 1000 บาท ลด 10% ต้องจ่ายกี่บาท แล้วส่งทั้งโจทย์และคำตอบนั้นให้ cyolo1 ตรวจ นำผลกลับมาสรุปสั้น ๆ ในหน้านี้ ถ้าเรียกไม่ได้ให้บอกตามจริง
+TOOL 1 Bash: {"command": "cat /root/.claude/skills/yolo/SKILL.md 2>/dev/null || find / -name SKILL.md -path '*yolo*' 2>/dev/null | head -20", "description": "Read yolo skill definition"}
+  RESULT: /root/ai-accounts/.Codex/shared/skills/yolo/SKILL.md | /root/ai-accounts/.Codex/shared/skills/cyolo/SKILL.md | /root/ai-accounts/.Claude/shared/skills/yolo/SKILL.md | /root/ai-accounts/.Claude/shared/skills/cyolo/SKILL.md | /root/ai-accounts/.Claude/yolo1/plugins/marketplaces/claude-plugins-official/external_plugins/discord/skills/access/SKILL.md | /root/ai-accounts/.Claude/yolo1/plugins/marketplaces/claude-plugins-official/external_plugins/discord/skills/configure/SKILL.md | /root/ai-accounts/.Claude/yolo1/plugins/marketplaces/claude-plugins-official/plugins/hookify/skills/writing-rules/SKILL.md | /root/ai
+TOOL 2 Bash: {"command": "cat /root/ai-accounts/.Claude/shared/skills/yolo/SKILL.md; echo \"=====CYOLO=====\"; cat /root/ai-accounts/.Claude/shared/skills/cyolo/SKILL.md", "description": "Read yolo and cyolo skill files"}
+  RESULT: --- | name: yolo | description: เรียกใช้ Claude Code บัญชีอื่นบนเครื่องนี้ผ่านคำสั่ง yolo1..yolo5 แบบ non-interactive ใช้เมื่อผู้ใช้พูดว่า "เรียก yoloN", "ให้ Claude อีกบัญชีทำ...", "ให้บัญชี N ช่วยตรวจ/ช่วยคิด", "บัญชี Claude ไหนล็อกอินอยู่", หรือเมื่อต้องกระจายงานไปหลายบัญชี Claude แล้วรวมผลลัพธ์ ไม่ใช้เมื่องานนั้นทำเองในเซสชันปัจจุบันได้อยู่แล้ว | --- |  | # yolo — เรียก Claude Code หลายบัญชี |  | `yolo1`..`yolo5` คือ Claude Code คนละบัญชี แต่ละคำสั่งตั้ง `CLAUDE_CONFIG_DIR` ไปยังโฟลเดอร์บัญชีของตัวเอง โดยไม่แตะ `$HOME` |  | ตัวแปรฐาน: `BASE_PATH="$HOME/ai-accounts"` (แก้ที่เดียว ที่อื่นอ้างอิงตัวแปรนี้) |  | ##
+TOOL 3 Bash: {"command": "echo \"== yolo2 ==\"; yolo2 auth status < /dev/null 2>&1 | tail -20; echo \"== cyolo1 ==\"; cyolo1 login status < /dev/null 2>&1 | tail -5", "description": "Check login status of yolo2 and cyolo1", "timeout": 180000}
+  RESULT: == yolo2 == | { |   "loggedIn": true, |   "authMethod": "claude.ai", |   "apiProvider": "firstParty", |   "analyticsDisabled": false, |   "projectsDirectory": "/root/ai-accounts/.Claude/yolo2/projects", |   "email": "<email>", |   "orgId": "f81869e1-255d-4bea-b188-8ae8b26cf7c3", |   "orgName": "<ORG>", |   "subscriptionType": "team" | } | == cyolo1 == | Logged in using ChatGPT
+ASSISTANT: Ready — ทั้ง yolo2 และ cyolo1 ล็อกอินอยู่
+TOOL 4 Bash: {"command": "A=$(yolo2 -p --model opus --effort high \"ซื้อของ 1000 บาท ลด 10% ต้องจ่ายกี่บาท ตอบสั้น ๆ พร้อมวิธีคิด 1 บรรทัด\" < /dev/null 2>&1)\necho \"----- yolo2 answer -----\"; echo \"$A\"\nprintf '%s' \"$A\" > /tmp/yolo2_ans.txt", "description": "Ask yolo2 the discount question", "timeout": 300000}
+  RESULT: ----- yolo2 answer ----- | **900 บาท** |  | วิธีคิด: 1000 × (100−10)/100 = 1000 × 0.9 = 900 บาท
+TOOL 5 Bash: {"command": "cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=medium -o /tmp/cyolo1_review.txt \"โจทย์: ซื้อของ 1000 บาท ลด 10% ต้องจ่ายกี่บาท\nคำตอบจาก Claude (yolo2): $(cat /tmp/yolo2_ans.txt)\nงานของคุณ: ตรวจว่าถูกหรือผิด ตอบสั้น ๆ ไม่เกิน 3 บรรทัด ระบุคำว่า ถูก หรือ ผิด ให้ชัด และถ้ามีข้อสังเกตให้บอกสั้น ๆ ห้ามแก้ไฟล์ใด ๆ\" < /dev/null > /tmp/cyolo1_stdout.log 2>&1\necho \"exit=$?\"; echo \"----- cyolo1 review -----\"; cat /tmp/cyolo1_review.txt", "description": "Send problem and answer to cyolo1 for review", "timeout": 300000}
+  RESULT: exit=0 | ----- cyolo1 review ----- | ถูก — ลด 10% ของ 1,000 บาท คือ 100 บาท จึงต้องจ่าย 900 บาท
+ASSISTANT: สรุปสั้น ๆ
+
+| ขั้น | ใครทำ | model / effort | ผล |
+|---|---|---|---|
+| คิดโจทย์ | `yolo2` (Claude, team, <email>) | opus / high | **900 บาท** — 1000 × 0.9 = 900 |
+| ตรวจคำตอบ | `cyolo1` (Codex, ChatGPT) | gpt-6-astra / medium | **ถูก** — ลด 10% = 100 บาท จ่าย 900 บาท |
+
+ทั้งสองบัญชีล็อกอินอยู่ เรียกได้จริง ไม่มีบัญชีที่ต้องข้าม — คำตอบสุดท้าย: **จ่าย 900 บาท** (ผู้ตรวจคนละค่ายยืนยันตรงกัน)

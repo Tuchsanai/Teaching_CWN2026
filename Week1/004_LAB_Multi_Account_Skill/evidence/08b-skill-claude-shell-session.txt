@@ -1,0 +1,21 @@
+USER: เรียก yolo2 ให้คิดว่าซื้อของ 1000 บาท ลด 10% ต้องจ่ายกี่บาท แล้วส่งทั้งโจทย์และคำตอบนั้นให้ cyolo1 ตรวจ นำผลกลับมาสรุปสั้น ๆ ถ้าเรียกไม่ได้ให้บอกตามจริง
+TOOL 1 Skill: {"skill": "yolo", "args": "yolo2 คิดโจทย์: ซื้อของ 1000 บาท ลด 10% ต้องจ่ายกี่บาท"}
+  RESULT: Launching skill: yolo
+TOOL 2 Bash: {"command": "yolo2 auth status < /dev/null 2>&1 | head -20", "description": "Check yolo2 login status"}
+  RESULT: { |   "loggedIn": true, |   "authMethod": "claude.ai", |   "apiProvider": "firstParty", |   "analyticsDisabled": false, |   "projectsDirectory": "/root/ai-accounts/.Claude/yolo2/projects", |   "email": "<email>", |   "orgId": "f81869e1-255d-4bea-b188-8ae8b26cf7c3", |   "orgName": "<ORG>", |   "subscriptionType": "team" | }
+TOOL 3 Bash: {"command": "cat /root/ai-accounts/.Claude/yolo1/skills/cyolo/SKILL.md 2>/dev/null | head -80", "description": "Read cyolo skill doc"}
+  RESULT: --- | name: cyolo | description: เรียกใช้ Codex CLI บัญชีอื่นบนเครื่องนี้ผ่านคำสั่ง cyolo1..cyolo5 แบบ non-interactive ใช้เมื่อผู้ใช้พูดว่า "เรียก cyoloN", "ให้ Codex ตรวจ...", "ให้ Codex ช่วยรีวิว/ช่วยคิด", "บัญชี Codex ไหนล็อกอินอยู่", หรือเมื่อต้องการความเห็นที่สองจากโมเดลคนละค่าย ไม่ใช้เมื่องานนั้นทำเองในเซสชันปัจจุบันได้อยู่แล้ว | --- |  | # cyolo — เรียก Codex CLI หลายบัญชี |  | `cyolo1`..`cyolo5` คือ Codex CLI คนละบัญชี แต่ละคำสั่งตั้ง `CODEX_HOME` ไปยังโฟลเดอร์บัญชีของตัวเอง โดยไม่แตะ `$HOME` |  | ตัวแปรฐาน: `BASE_PATH="$HOME/ai-accounts"` (แก้ที่เดียว ที่อื่นอ้างอิงตัวแปรนี้) |  | ## ตารางบัญชี |  | สถานะล็อกอ
+TOOL 4 Bash: {"command": "cyolo1 login status < /dev/null 2>&1 | head -5", "description": "Check cyolo1 login status"}
+  RESULT: Logged in using ChatGPT
+TOOL 5 Bash: {"command": "yolo2 -p --model opus --effort high \"ซื้อของราคา 1000 บาท ลด 10% ต้องจ่ายกี่บาท ตอบสั้น ๆ พร้อมวิธีคิดหนึ่งบรรทัด\" < /dev/null 2>&1 | tee /tmp/yolo2_ans.txt", "description": "Ask yolo2 the discount question", "timeout": 180000}
+  RESULT: 900 บาท |  | วิธีคิด: 1000 × (1 − 0.10) = 1000 × 0.9 = 900
+TOOL 6 Bash: {"command": "A=$(cat /tmp/yolo2_ans.txt); cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=medium -o /tmp/cyolo1_check.txt \"โจทย์: ซื้อของราคา 1000 บาท ลด 10% ต้องจ่ายกี่บาท\nคำตอบจาก Claude (yolo2): $A\nช่วยตรวจว่าถูกหรือผิด ตอบสั้น ๆ ภาษาไทย ระบุ ถูก/ผิด และเหตุผลสั้น ๆ\" < /dev/null > /dev/null 2>&1; cat /tmp/cyolo1_check.txt", "description": "Send problem and answer to cyolo1 for checking", "timeout": 240000}
+  RESULT: ถูก เพราะส่วนลด 10% ของ 1,000 บาท คือ 100 บาท จึงต้องจ่าย 900 บาท
+ASSISTANT: เรียกได้ทั้งสองบัญชี ผลสรุป:
+
+| ขั้น | บัญชี | model / effort | ผล |
+|---|---|---|---|
+| คิดโจทย์ | `yolo2` (claude.ai, team) | opus / high | **900 บาท** — 1000 × 0.9 = 900 |
+| ตรวจคำตอบ | `cyolo1` (Codex, ChatGPT) | gpt-6-astra / medium | **ถูกต้อง** — ลด 10% = 100 บาท เหลือจ่าย 900 บาท |
+
+ทั้งสองฝั่งตรงกัน: ต้องจ่าย **900 บาท** ไม่มีบัญชีไหนถูกข้ามเพราะยังไม่ล็อกอิน

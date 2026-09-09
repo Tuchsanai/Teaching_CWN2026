@@ -1,0 +1,28 @@
+ 1 Bash       echo "HOME=$HOME"; ls -la "$HOME/ai-accounts" 2>&1 | head -20
+ 2 Bash       type yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5 2>&1
+ 3 Bash       cat /usr/local/bin/yolo1; echo "=== cyolo1 ==="; cat /usr/local/bin/cyolo1
+ 4 Bash       ls -la "$HOME/ai-accounts/.Claude/" "$HOME/ai-accounts/.Codex/"; echo "=== shared ==="; ls -la "$HOME/ai-accounts/.Claud
+ 5 Bash       for n in 1 2 3 4 5; do echo "--- yolo$n ---"; ls -la "$HOME/ai-accounts/.Claude/yolo$n" | grep -E 'skills|total|^d.*\.' 
+ 6 Bash       export PATH="$HOME/.local/bin:$PATH"; claude --version 2>&1; codex --version 2>&1; ls "$HOME/ai-accounts/.Claude/shared/
+ 7 Bash       export PATH="$HOME/.local/bin:$PATH"; ls -la "$HOME/ai-accounts/.Codex/shared/skills/"; echo "=== claude --help ==="; cl
+ 8 Bash       export PATH="$HOME/.local/bin:$PATH"; echo "=== codex --help ==="; codex --help 2>&1 | head -60; echo "=== codex exec --
+ 9 Bash       export PATH="$HOME/.local/bin:$PATH"; codex exec --help 2>&1 | sed -n '80,200p'
+10 Bash       export PATH="$HOME/.local/bin:$PATH"; claude --help 2>&1 | sed -n '80,250p'; echo "=== auth ==="; claude auth --help 2>&
+11 Bash       for n in 1 2 3 4 5; do echo "===== yolo$n ====="; timeout 60 yolo$n auth status 2>&1 </dev/null | tail -12; echo "(exit=
+12 ToolSearch {'query': 'select:WebFetch', 'max_results': 2}
+13 Bash       for n in 1 2 3 4 5; do echo "===== cyolo$n ====="; timeout 60 cyolo$n login status 2>&1 </dev/null | tail -8; echo "(exi
+14 WebFetch   https://code.claude.com/docs/en/skills
+15 WebFetch   https://developers.openai.com/codex/skills
+16 Bash       export PATH="$HOME/.local/bin:$PATH"; ls -la "$HOME/ai-accounts/.Codex/shared/skills/.system/" 2>&1 | head; echo "=== co
+17 WebFetch   https://learn.chatgpt.com/docs/build-skills
+18 Bash       head -20 "$HOME/ai-accounts/.Codex/shared/skills/.system/skill-creator/SKILL.md" 2>&1; echo "=== imagegen ==="; head -12
+19 Bash       time yolo1 -p --model opus --effort high "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12" < /dev/null 2>&1 | tail -5
+20 Bash       mkdir -p /tmp/skilltest && time cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=medium -o /tm
+21 Bash       time yolo2 -p --model opus --effort high "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12" < /dev/null 2>&1 | tail -5
+22 Bash       mkdir -p "$HOME/ai-accounts/.Claude/shared/skills/yolo" "$HOME/ai-accounts/.Claude/shared/skills/cyolo" "$HOME/ai-accoun
+23 Bash       cat > "$HOME/ai-accounts/.Claude/shared/skills/yolo/SKILL.md" <<'SKILLEOF' --- name: yolo description: เรียกใช้ Claude C
+24 Bash       cat > "$HOME/ai-accounts/.Claude/shared/skills/cyolo/SKILL.md" <<'SKILLEOF' --- name: cyolo description: เรียกใช้ Codex 
+25 Bash       for n in 1 2 3 4 5; do for s in yolo cyolo; do p="$HOME/ai-accounts/.Claude/yolo$n/skills/$s/SKILL.md"; [ -f "$p" ] && e
+26 Bash       cd /root/lab004 A=$(yolo1 -p --model opus --effort high "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12" < /dev/null) echo "yolo1 an
+27 Bash       cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=low -o /tmp/skilltest/discover.txt "มี skill 
+28 Bash       cat > /root/lab004/skill-report.md <<'EOF' # Skill Report — yolo / cyolo multi-account skills  วันที่ทดสอบ: 2026-09-09 เ

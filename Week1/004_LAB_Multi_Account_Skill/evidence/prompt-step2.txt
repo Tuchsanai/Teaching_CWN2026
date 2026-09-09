@@ -1,0 +1,43 @@
+สร้าง Skill ให้ Claude Code และ Codex CLI รู้จักบัญชีหลายบัญชีที่ตั้งค่าไว้แล้วบนเครื่องนี้
+ห้ามอ่านไฟล์ README ของ LAB เพื่อหาเฉลย ห้ามล็อกอินแทนฉัน ห้ามอ่าน คัดลอก หรือแสดงไฟล์ credential ใด ๆ
+
+## ตัวแปรตั้งค่า (แก้ที่นี่ที่เดียว ที่อื่นต้องอ้างอิงตัวแปรนี้)
+BASE_PATH="$HOME/ai-accounts"
+
+## สิ่งที่มีอยู่แล้ว (ตรวจจริงก่อน ห้ามเดา)
+- คำสั่ง yolo1..yolo5 = Claude Code คนละบัญชี (CLAUDE_CONFIG_DIR=$BASE_PATH/.Claude/yoloN)
+- คำสั่ง cyolo1..cyolo5 = Codex CLI คนละบัญชี (CODEX_HOME=$BASE_PATH/.Codex/cyoloN)
+- $BASE_PATH/.Claude/shared/skills และ $BASE_PATH/.Codex/shared/skills คือโฟลเดอร์ skill ที่ทุกบัญชีของ CLI นั้นมองเห็นผ่าน symlink <account>/skills
+- ตรวจว่าบัญชีไหนล็อกอินแล้วด้วย yoloN auth status และ cyoloN login status ครบทั้ง 10 ตัว บัญชีที่ยังไม่ล็อกอินให้บันทึกว่า "ยังไม่ล็อกอิน" เท่านั้น
+
+## Skill ที่ต้องได้ (2 skill × 2 CLI = 4 ไฟล์ SKILL.md)
+1. skill ชื่อ yolo  — ใช้เมื่อผู้ใช้พูดว่า "เรียก yoloN", "ให้ Claude อีกบัญชีทำ...", "บัญชี Claude ไหนล็อกอินอยู่"
+2. skill ชื่อ cyolo — ใช้เมื่อผู้ใช้พูดว่า "เรียก cyoloN", "ให้ Codex ตรวจ...", "บัญชี Codex ไหนล็อกอินอยู่"
+วางที่ $BASE_PATH/.Claude/shared/skills/<ชื่อ>/SKILL.md และสำเนาเนื้อหาเดียวกันที่ $BASE_PATH/.Codex/shared/skills/<ชื่อ>/SKILL.md
+
+## เนื้อหาที่แต่ละ SKILL.md ต้องมี
+- frontmatter name และ description ภาษาไทยที่บอกว่าใช้เมื่อไร ตามรูปแบบใน official docs ของแต่ละ CLI
+- ตารางบัญชี: คำสั่ง | CLI | config root | สถานะล็อกอินที่ตรวจได้ตอนนี้
+- วิธีเรียกแบบไม่เปิดหน้าจอ (non-interactive) ที่ทดสอบแล้วว่าใช้ได้จริงกับเวอร์ชันที่ติดตั้ง:
+  Claude: yoloN -p --model <model> --effort <effort> "<prompt>" < /dev/null
+  Codex:  cyoloN exec --skip-git-repo-check -m <model> -c model_reasoning_effort=<effort> -o <ไฟล์ผลลัพธ์> "<prompt>" < /dev/null
+  ตรวจชื่อ flag จาก --help ของเวอร์ชันจริงก่อนเขียนลงสกิล
+- ค่าเริ่มต้นเมื่อผู้ใช้ไม่ระบุ: บัญชี 1, Claude = opus + high, Codex = gpt-6-astra + medium ผู้ใช้ระบุเองได้เสมอ
+- กฎ: บัญชีที่ผู้ใช้ระบุยังไม่ล็อกอิน → แจ้งผู้ใช้ ห้ามสลับบัญชีเอง ห้ามล็อกอินแทน ห้ามอ่านหรือส่งต่อไฟล์ credential
+- วิธีส่งค่าต่อ (relay): อ่านผลจากคำสั่งแรกแล้วใส่ใน prompt ของคำสั่งถัดไป ทำได้ทั้งข้ามบัญชีและข้าม CLI
+
+## Docs
+ตรวจ official docs และ --help ของเวอร์ชันจริงก่อน implement ห้ามเดาตำแหน่งไฟล์ รูปแบบ frontmatter หรือ flag
+- https://code.claude.com/docs/en/skills
+- https://developers.openai.com/codex/skills
+
+## ทดสอบ (รายงานตามจริง PASS / FAIL / SKIP)
+- ไฟล์ SKILL.md ครบ 4 ไฟล์ และมองเห็นจากทุกบัญชีผ่าน <account>/skills
+- เรียกจริง 1 ครั้งต่อบัญชีที่ล็อกอินแล้ว ด้วยโจทย์ "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12" ผ่านวิธีในสกิล ได้ 144 = PASS
+- ส่งค่าต่อ 1 ครั้ง: ให้ yolo1 ตอบ แล้วส่งโจทย์กับคำตอบให้ cyolo1 ตรวจ
+- บัญชีที่ยังไม่ล็อกอิน = SKIP พร้อมเหตุผล
+
+## รายงาน
+เขียน skill-report.md ในโฟลเดอร์ปัจจุบัน: ตำแหน่งไฟล์ทั้ง 4, ตาราง รายการ | หลักฐาน | PASS/FAIL/SKIP | เหตุผล, ข้อจำกัดที่พบ ห้ามใส่ข้อมูลลับ
+
+ทำเฉพาะขั้นนี้ เมื่อเสร็จให้แสดงเนื้อหา SKILL.md ของ yolo ฉบับ Claude และตารางทดสอบบนหน้าจอ แล้วหยุดรอ ห้ามทำขั้นถัดไปเอง
