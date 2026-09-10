@@ -1,0 +1,37 @@
+สร้างแล้วที่ [second-opinion-ai](/root/ai-accounts/.Codex/cyolo1/skills/second-opinion-ai) ตาม `CODEX_HOME` จริง พร้อม `scripts/ask-both.sh`
+
+เนื้อหา `SKILL.md`:
+
+````markdown
+---
+name: second-opinion-ai
+description: ขอความเห็นจาก Claude และ Codex เพื่อเปรียบเทียบ เมื่อผู้ใช้พูดว่า "ขอความเห็นที่สอง", "ให้ทั้ง Claude และ Codex ตอบ" หรือ "เทียบคำตอบสองค่าย"
+---
+
+# Second Opinion AI
+
+ส่งคำถามเดียวกันให้ Claude ผ่าน `yolo2` และ Codex ผ่าน `cyolo1` แบบขนาน โดยใช้ [scripts/ask-both.sh](scripts/ask-both.sh):
+
+```bash
+bash "<skill-directory>/scripts/ask-both.sh" "$question"
+```
+
+แทน `<skill-directory>` ด้วยตำแหน่ง skill นี้จริง และส่งคำถามเป็น argument เดียวโดยไม่ใช้ `eval` ค่าเริ่มต้นคือ Claude `opus` / `high` และ Codex `gpt-6-astra` / `medium` หากผู้ใช้ระบุค่าอื่น ให้ส่ง argument ต่อท้ายตามลำดับ `claude_model claude_effort codex_model codex_effort`
+
+สคริปต์ตรวจ `yolo2 auth status --text` (exit 0) และ `cyolo1 login status` (มีข้อความ `Logged in`) ก่อนเรียกแต่ละฝั่ง และอ่านคำตอบ Codex จากไฟล์ `-o` ผลลัพธ์เป็น JSON; exit 0 ไม่ได้หมายความว่าทั้งสองฝั่งสำเร็จ ให้ตรวจ `status` และ `answer` ด้วย
+
+ห้ามล็อกอินหรือสลับบัญชีเอง ห้ามอ่าน คัดลอก หรือแสดงไฟล์ credential และห้ามอ่าน README ของ LAB ส่งเฉพาะคำถามและบริบทที่ผู้ใช้อนุญาต ไม่ส่งข้อมูลลับ ไม่ขอให้ CLI สำรวจไฟล์หรือลงมือแก้ไขงาน การเรียกแต่ละฝั่งจำกัดเวลา 300 วินาทีและไม่ retry อัตโนมัติ
+
+รายงานเป็นตาราง `โมเดล/effort | คำตอบแต่ละฝั่ง | ตรงกันหรือไม่` จำนวนสองแถว เปรียบเทียบสาระของคำตอบจริง หากยังไม่ล็อกอิน ให้แสดง `ข้าม (ยังไม่ล็อกอิน)` หากผิดพลาดให้รายงานตามสถานะ ห้ามแต่งคำตอบแทนฝั่งที่ขาด และระบุ `ประเมินไม่ได้` เมื่อมีคำตอบไม่ครบ ปิดท้ายด้วยสรุปหนึ่งบรรทัด
+````
+
+ทดสอบจริงหนึ่งครั้งด้วย `ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12`:
+
+| โมเดล/effort | คำตอบแต่ละฝั่ง | ตรงกันหรือไม่ |
+|---|---|---|
+| Claude opus / high | 144 | ตรงกัน |
+| Codex gpt-6-astra / medium | 144 | ตรงกัน |
+
+ตรวจ syntax สคริปต์ผ่าน แต่ `quick_validate.py` รันไม่ได้เนื่องจากไม่มีโมดูล `yaml`
+
+**PASS — ทั้งสองฝั่งตอบ `144` จากการเรียกขนานจริง และสคริปต์ exit 0**

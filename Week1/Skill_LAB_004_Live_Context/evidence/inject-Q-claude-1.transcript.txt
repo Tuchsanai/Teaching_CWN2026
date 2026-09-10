@@ -1,0 +1,43 @@
+USER: บัญชีไหนล็อกอินอยู่บ้างตอนนี้ ตอบเป็นตาราง
+TOOL 1 Skill: {"skill": "accounts"}
+  RESULT: Launching skill: accounts
+USER: Base directory for this skill: /root/ai-accounts/.Claude/yolo1/skills/accounts
+
+# สถานะบัญชี ณ ตอนนี้ (ตรวจสดตอนโหลด skill)
+
+| บัญชี | CLI | สถานะ |
+|---|---|---|
+| yolo1 | Claude Code | ล็อกอินแล้ว |
+| yolo2 | Claude Code | ล็อกอินแล้ว |
+| yolo3 | Claude Code | ยังไม่ล็อกอิน |
+| yolo4 | Claude Code | ยังไม่ล็อกอิน |
+| yolo5 | Claude Code | ยังไม่ล็อกอิน |
+| cyolo1 | Codex CLI | ล็อกอินแล้ว |
+| cyolo2 | Codex CLI | ยังไม่ล็อกอิน |
+| cyolo3 | Codex CLI | ยังไม่ล็อกอิน |
+| cyolo4 | Codex CLI | ยังไม่ล็อกอิน |
+| cyolo5 | Codex CLI | ยังไม่ล็อกอิน |
+
+## วิธีตอบ
+
+ข้อมูลด้านบนถูกตรวจสดแล้วตอนโหลด skill นี้ ให้สรุปเป็นตารางเดิมและบอกจำนวนบัญชีที่พร้อมใช้ของแต่ละ CLI
+ไม่ต้องรันคำสั่งตรวจซ้ำ ห้ามอ่านไฟล์ credential ใด ๆ และห้ามล็อกอินแทนผู้ใช้
+
+ASSISTANT: ## สถานะบัญชีที่ล็อกอินอยู่ตอนนี้
+
+| บัญชี | CLI | สถานะ |
+|---|---|---|
+| yolo1 | Claude Code | ✅ ล็อกอินแล้ว |
+| yolo2 | Claude Code | ✅ ล็อกอินแล้ว |
+| yolo3 | Claude Code | ❌ ยังไม่ล็อกอิน |
+| yolo4 | Claude Code | ❌ ยังไม่ล็อกอิน |
+| yolo5 | Claude Code | ❌ ยังไม่ล็อกอิน |
+| cyolo1 | Codex CLI | ✅ ล็อกอินแล้ว |
+| cyolo2 | Codex CLI | ❌ ยังไม่ล็อกอิน |
+| cyolo3 | Codex CLI | ❌ ยังไม่ล็อกอิน |
+| cyolo4 | Codex CLI | ❌ ยังไม่ล็อกอิน |
+| cyolo5 | Codex CLI | ❌ ยังไม่ล็อกอิน |
+
+**สรุปจำนวนที่พร้อมใช้งาน**
+- Claude Code: 2 จาก 5 บัญชี (yolo1, yolo2)
+- Codex CLI: 1 จาก 5 บัญชี (cyolo1)

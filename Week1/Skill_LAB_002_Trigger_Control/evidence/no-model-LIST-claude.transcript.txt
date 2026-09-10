@@ -1,0 +1,33 @@
+USER: มี skill อะไรให้ใช้บ้างในเซสชันนี้ ตอบเป็นรายการชื่อ skill กับคำอธิบายสั้น ๆ ไม่ต้องรันคำสั่ง
+ASSISTANT: เซสชันนี้มี skill ให้ใช้ 14 ตัว:
+
+**สร้าง/ตรวจโค้ด**
+| Skill | คำอธิบาย |
+|---|---|
+| `code-review` | รีวิว diff / PR / branch หา bug และจุดที่ลดความซับซ้อนได้ ปรับระดับความละเอียดได้ (low → ultra) |
+| `simplify` | รีวิวโค้ดที่แก้ไปเน้นความสะอาด/reuse/ประสิทธิภาพ แล้วแก้ให้เลย (ไม่หา bug) |
+| `security-review` | ตรวจความปลอดภัยของการเปลี่ยนแปลงบน branch ปัจจุบัน |
+| `init` | สร้างไฟล์ CLAUDE.md เอกสารประกอบ codebase |
+| `run` | รัน/เปิดแอปของโปรเจกต์เพื่อดูว่าการแก้ทำงานจริง รวมถึงถ่าย screenshot |
+
+**ตั้งค่า Claude Code**
+| Skill | คำอธิบาย |
+|---|---|
+| `update-config` | แก้ settings.json — permissions, env vars, hooks (พฤติกรรมอัตโนมัติแบบ "ทุกครั้งที่...") |
+| `keybindings-help` | ปรับแต่ง keyboard shortcut ใน ~/.claude/keybindings.json |
+| `fewer-permission-prompts` | สแกน transcript แล้วเพิ่ม allowlist เพื่อลดการถูกถามขออนุญาต |
+
+**งานตามเวลา / อัตโนมัติ**
+| Skill | คำอธิบาย |
+|---|---|
+| `loop` | รัน prompt หรือ slash command ซ้ำเป็นรอบ ๆ (เช่น `/loop 5m /foo`) |
+| `schedule` | สร้าง/จัดการ cloud agent ที่รันตาม cron หรือรันครั้งเดียวตามเวลาที่นัด |
+
+**อ้างอิง / ออกแบบ**
+| Skill | คำอธิบาย |
+|---|---|
+| `dataviz` | มาตรฐานการทำกราฟ/ชาร์ต/dashboard — palette, สี, layout, interaction (อ่านก่อนเขียนโค้ดชาร์ต) |
+| `claude-api` | อ้างอิง Claude API / Anthropic SDK — model id, ราคา, streaming, tool use, MCP, caching |
+| `workflow-authoring` | คู่มือเขียน script สำหรับ Workflow tool (multi-agent orchestration) |
+
+เรียกใช้ด้วยการพิมพ์ `/<ชื่อ skill>` เช่น `/code-review` ได้เลย

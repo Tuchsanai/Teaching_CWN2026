@@ -1,0 +1,57 @@
+USER: ขอความเห็นที่สองว่าซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร
+TOOL 1 Skill: {"skill": "second-opinion-ai", "args": "ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร"}
+  RESULT: Launching skill: second-opinion-ai
+USER: Base directory for this skill: /root/ai-accounts/.Claude/yolo1/skills/second-opinion-ai
+
+# Second Opinion AI
+
+ขอความเห็นที่สองโดยส่งคำถามเดียวกันไปยังสองบัญชี/สองค่ายพร้อมกัน แล้วสรุปว่าตรงกันหรือไม่
+
+## ขั้นตอน
+
+1. เรียกสคริปต์ครั้งเดียว (สคริปต์จัดการทั้งการตรวจล็อกอินและการเรียกแบบขนานให้แล้ว):
+
+   ```bash
+   ~/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh "<คำถามของผู้ใช้>"
+   ```
+
+   ปรับโมเดล/effort ได้เมื่อผู้ใช้ระบุ (ค่าเริ่มต้น Claude = opus/high, Codex = gpt-6-astra/medium):
+
+   ```bash
+   ask-both.sh "<คำถาม>" --claude-model sonnet --claude-effort medium \
+                         --codex-model gpt-6-astra --codex-effort high
+   ```
+
+   สคริปต์ exit 0 เสมอ — ให้ดูค่า `status:` ของแต่ละบล็อกเพื่อรู้ผลจริง
+
+2. อ่านผลลัพธ์ที่แบ่งเป็นบล็อก `=== CLAUDE (yolo2) ===` และ `=== CODEX (cyolo1) ===`
+   แต่ละบล็อกมี `model:`, `effort:`, `status:` (`ok` / `skipped` / `error`) และ `answer:`
+
+3. รายงานผู้ใช้เป็นตารางเสมอ:
+
+   | ฝั่ง | โมเดล / effort | คำตอบ | ตรงกันหรือไม่ |
+   |---|---|---|---|
+   | Claude (yolo2) | opus / high | ... | ✅ ตรงกัน |
+   | Codex (cyolo1) | gpt-6-astra / medium | ... | ✅ ตรงกัน |
+
+   แล้วปิดท้ายด้วย **สรุป 1 บรรทัด** ว่าทั้งสองฝั่งเห็นตรงกันไหม และคำตอบที่ควรใช้คืออะไร
+
+## กติกา
+
+- `status: skipped` ให้ลงในตารางว่า **ข้าม (ยังไม่ล็อกอิน)** และห้ามสลับบัญชี/ล็อกอินแทนผู้ใช้เอง
+  ให้บอกผู้ใช้ไปตรง ๆ ว่าต้องล็อกอินบัญชีนั้นเองก่อน
+- `status: error` ให้ลงว่า **ผิดพลาด** พร้อมเหตุผลสั้น ๆ จากบรรทัด `reason:`
+- ถ้าเหลือฝั่งเดียวที่ตอบได้ ยังต้องแสดงตาราง แต่ระบุชัดว่าเทียบไม่ได้เพราะมีคำตอบฝั่งเดียว
+- ห้ามอ่าน คัดลอก หรือแสดงไฟล์ credential ของบัญชีใด ๆ
+- อย่าตอบคำถามเองแทนสองฝั่งนั้น — หน้าที่ของ skill นี้คือรายงานสิ่งที่ทั้งสองฝั่งตอบจริง
+
+
+ARGUMENTS: ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร
+TOOL 2 Bash: {"command": "~/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh \"ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร\" 2>&1", "description": "Ask both AI accounts the same question", "timeout": 600000}
+  RESULT: === CLAUDE (yolo2) === | model: opus | effort: high | status: ok | answer: | ลด 10% ของ 1000 บาท = 100 บาท |  | **ต้องจ่าย 900 บาท** |  | === CODEX (cyolo1) === | model: gpt-6-astra | effort: medium | status: ok | answer: | ลด 10% = 100 บาท จึงต้องจ่าย **900 บาท**
+ASSISTANT: | ฝั่ง | โมเดล / effort | คำตอบ | ตรงกันหรือไม่ |
+|---|---|---|---|
+| Claude (yolo2) | opus / high | ลด 10% ของ 1000 = 100 บาท → จ่าย **900 บาท** | ✅ ตรงกัน |
+| Codex (cyolo1) | gpt-6-astra / medium | ลด 10% = 100 บาท → จ่าย **900 บาท** | ✅ ตรงกัน |
+
+**สรุป:** ทั้งสองฝั่งเห็นตรงกัน — ต้องจ่าย **900 บาท**

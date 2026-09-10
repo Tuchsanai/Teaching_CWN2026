@@ -1,0 +1,28 @@
+USER: ขอความเห็นที่สองว่าซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร
+TOOL 1 Skill: {"skill": "second-opinion", "args": "ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร"}
+  RESULT: Launching skill: second-opinion
+USER: Base directory for this skill: /root/ai-accounts/.Claude/yolo1/skills/second-opinion
+
+# ความเห็นที่สองจากสองค่าย
+
+คำถาม: ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร (ถ้าว่าง ให้ใช้คำถามล่าสุดของผู้ใช้ในบทสนทนา)
+
+## ขั้นตอน
+
+1. รันหนึ่งครั้ง: `/root/ai-accounts/.Claude/yolo1/skills/second-opinion/scripts/ask-both.sh "<คำถาม>"` (สคริปต์ตรวจล็อกอินเอง เรียกสองบัญชีขนานกัน และพิมพ์คำตอบทั้งสองฝั่ง; ตั้งค่า `CLAUDE_MODEL`, `CLAUDE_EFFORT`, `CODEX_MODEL`, `CODEX_EFFORT` ได้ถ้าผู้ใช้ระบุ ค่าเริ่มต้น opus/high และ gpt-6-astra/medium)
+2. อ่านผลทั้งสองฝั่ง แล้วเขียนรายงานตามรูปแบบใน [references/report.md](references/report.md)
+3. ห้ามเรียก yolo2 หรือ cyolo1 เองซ้ำนอกสคริปต์ ห้ามอ่านไฟล์ credential ห้ามล็อกอินแทนผู้ใช้ และไม่ต้องคำนวณคำตอบเอง หน้าที่ของคุณคือเทียบและสรุป
+
+TOOL 2 Bash: {"command": "cat /root/ai-accounts/.Claude/yolo1/skills/second-opinion/references/report.md", "description": "Read report format reference"}
+  RESULT: # รูปแบบรายงานความเห็นที่สอง |  | | หัวข้อ | Claude (yolo2) | Codex (cyolo1) | | |---|---|---| | | โมเดล / effort | … | … | | | คำตอบ | … | … | | | ตรงกันหรือไม่ | ✅ ตรงกัน / ❌ ต่างกัน (ระบุจุดต่าง) | | |  | ปิดท้าย 1 บรรทัด: สรุปคำตอบที่ควรใช้ และถ้าสองฝั่งต่างกันให้บอกว่าต้องตรวจอะไรต่อ ไม่ตัดสินเองว่าฝั่งไหนถูกโดยไม่มีเหตุผล | บัญชีที่ยังไม่ล็อกอินให้ระบุว่า "ข้าม (ยังไม่ล็อกอิน)" ห้ามสลับไปบัญชีอื่นเองและห้ามล็อกอินแทน
+TOOL 3 Bash: {"command": "/root/ai-accounts/.Claude/yolo1/skills/second-opinion/scripts/ask-both.sh \"ซื้อของ 1000 บาท ลด 10% ต้องจ่ายเท่าไร\" 2>&1", "description": "Ask both accounts for second opinion", "timeout": 600000}
+  RESULT: === Claude (yolo2, opus/high) === | 900 บาท (ลด 100 บาท) | __COST__ 0.0104995 | === Codex (cyolo1, gpt-6-astra/medium) === | ต้องจ่าย 900 บาท
+ASSISTANT: # ความเห็นที่สองจากสองค่าย
+
+| หัวข้อ | Claude (yolo2) | Codex (cyolo1) |
+|---|---|---|
+| โมเดล / effort | opus / high | gpt-6-astra / medium |
+| คำตอบ | 900 บาท (ลด 100 บาท) | ต้องจ่าย 900 บาท |
+| ตรงกันหรือไม่ | ✅ ตรงกัน — ทั้งสองฝั่งได้ 900 บาท | |
+
+สรุป: จ่าย **900 บาท** (ส่วนลด 100 บาท) — สองฝั่งตรงกัน ไม่มีจุดที่ต้องตรวจเพิ่ม (ค่าใช้จ่ายฝั่ง Claude ครั้งนี้ ~$0.0105)

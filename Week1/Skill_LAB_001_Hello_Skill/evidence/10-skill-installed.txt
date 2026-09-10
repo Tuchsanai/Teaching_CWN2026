@@ -1,0 +1,18 @@
+$ find /root/ai-accounts -path "*/shared/skills/*" -name SKILL.md -not -path "*/.system/*"
+/root/ai-accounts/.Codex/shared/skills/discount/SKILL.md
+/root/ai-accounts/.Claude/shared/skills/discount/SKILL.md
+$ ls -la /root/ai-accounts/.Claude/yolo2/skills/ /root/ai-accounts/.Codex/cyolo2/skills/
+/root/ai-accounts/.Claude/yolo2/skills/:
+total 12
+drwxr-xr-x 3 root root 4096 Sep 10 08:39 .
+drwxr-xr-x 4 root root 4096 Sep 10 08:33 ..
+drwxr-xr-x 2 root root 4096 Sep 10 08:39 discount
+
+/root/ai-accounts/.Codex/cyolo2/skills/:
+total 16
+drwxr-xr-x 4 root root 4096 Sep 10 08:39 .
+drwxr-xr-x 4 root root 4096 Sep 10 08:33 ..
+drwxr-xr-x 8 root root 4096 Sep 10 08:33 .system
+drwxr-xr-x 2 root root 4096 Sep 10 08:39 discount
+$ diff .Claude/shared/skills/discount/SKILL.md .Codex/shared/skills/discount/SKILL.md && echo SAME
+SAME

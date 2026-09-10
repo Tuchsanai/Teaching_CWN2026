@@ -1,0 +1,28 @@
+USER: มี skill อะไรให้ใช้บ้างในเซสชันนี้ ตอบเป็นรายการชื่อ skill กับคำอธิบายสั้น ๆ ไม่ต้องรันคำสั่ง
+ASSISTANT: นี่คือ skill ที่ใช้ได้ในเซสชันนี้ครับ
+
+**เฉพาะโปรเจกต์**
+- **discount** — กฎส่วนลด
+
+**การเขียนโค้ด / รีวิว**
+- **code-review** — รีวิว diff, PR, branch หรือ path หาบั๊กและจุดที่ควรทำให้ง่ายขึ้น ปรับระดับความลึกได้ (low → ultra)
+- **security-review** — ตรวจความปลอดภัยของการเปลี่ยนแปลงบน branch ปัจจุบัน
+- **simplify** — หาจุดที่ซ้ำซ้อน/ซับซ้อนเกินในโค้ดที่แก้ไป แล้วแก้ให้เลย (ไม่หาบั๊ก)
+- **init** — สร้างไฟล์ CLAUDE.md เอกสารประจำ codebase
+- **run** — รัน/เปิดแอปของโปรเจกต์เพื่อดูว่าการแก้ไขทำงานจริง
+
+**ตั้งค่า Claude Code**
+- **update-config** — แก้ settings.json: permissions, env vars, hooks (พฤติกรรมอัตโนมัติแบบ "ทุกครั้งที่...")
+- **keybindings-help** — ปรับแต่งคีย์ลัดใน ~/.claude/keybindings.json
+- **fewer-permission-prompts** — สแกน transcript แล้วสร้าง allowlist ลด prompt ขออนุญาต
+
+**งานอัตโนมัติ / ตามเวลา**
+- **loop** — รัน prompt หรือ slash command ซ้ำตามรอบเวลา
+- **schedule** — สร้าง/จัดการ cloud agent ที่รันตาม cron (หรือรันครั้งเดียวตามเวลาที่กำหนด)
+
+**อ้างอิง / เฉพาะทาง**
+- **claude-api** — ข้อมูลอ้างอิง Claude API / Anthropic SDK: model id, ราคา, streaming, tool use, caching
+- **dataviz** — แนวทางออกแบบกราฟ/แดชบอร์ด สี พาเลต และ layout อ่านก่อนเขียนโค้ดชาร์ตทุกครั้ง
+- **workflow-authoring** — คู่มือเขียนสคริปต์สำหรับ Workflow tool (multi-agent orchestration)
+
+เรียกใช้ได้โดยพิมพ์ `/<ชื่อ skill>` ครับ

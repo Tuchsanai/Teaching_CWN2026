@@ -1,0 +1,27 @@
+USER: คืนสินค้าได้ภายในกี่วัน มีเงื่อนไขอะไร ตอบสั้น ๆ ไม่ต้องสร้างไฟล์
+TOOL 1 Skill: {"skill": "shop-rules", "args": "คืนสินค้าได้ภายในกี่วัน เงื่อนไข"}
+  RESULT: Launching skill: shop-rules
+USER: Base directory for this skill: /root/ai-accounts/.Claude/yolo1/skills/shop-rules
+
+# กฎของร้าน (ตัวชี้ทาง)
+
+อ่านเฉพาะไฟล์ที่ตรงกับคำถาม ไม่ต้องอ่านทุกไฟล์
+
+- ราคา ส่วนลด สมาชิก → อ่าน [references/pricing.md](references/pricing.md)
+- ค่าส่ง ส่งฟรี ระยะเวลาส่ง → อ่าน [references/shipping.md](references/shipping.md)
+- คืนสินค้า เปลี่ยนสินค้า คืนเงิน → อ่าน [references/returns.md](references/returns.md)
+
+ตอบสั้น ๆ พร้อมอ้างชื่อไฟล์กฎที่ใช้ ไม่ต้องสร้างไฟล์หรือรันคำสั่ง
+
+
+ARGUMENTS: คืนสินค้าได้ภายในกี่วัน เงื่อนไข
+TOOL 2 Bash: {"command": "cat /root/ai-accounts/.Claude/yolo1/skills/shop-rules/references/returns.md", "description": "Read returns policy file"}
+  RESULT: # การคืนสินค้า |  | - คืนได้ภายใน 7 วันนับจากวันที่ได้รับสินค้า | - สินค้าต้องอยู่ในสภาพเดิม ไม่แกะซีล พร้อมใบเสร็จ | - คืนเงินเต็มจำนวนของราคาสินค้า ไม่คืนค่าส่ง | - สินค้าลดล้างสต็อก (ป้ายแดง) ไม่รับคืน
+ASSISTANT: **คืนได้ภายใน 7 วัน** นับจากวันที่ได้รับสินค้า
+
+เงื่อนไข:
+- สินค้าอยู่ในสภาพเดิม ไม่แกะซีล พร้อมใบเสร็จ
+- คืนเงินเต็มจำนวนเฉพาะราคาสินค้า **ไม่คืนค่าส่ง**
+- สินค้าลดล้างสต็อก (ป้ายแดง) ไม่รับคืน
+
+อ้างอิง: `references/returns.md`

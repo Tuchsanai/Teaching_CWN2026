@@ -1,0 +1,28 @@
+USER: มี skill อะไรให้ใช้บ้างในเซสชันนี้ ตอบเป็นรายการชื่อ skill กับคำอธิบายสั้น ๆ ไม่ต้องรันคำสั่ง
+ASSISTANT: นี่คือ skill ที่ใช้ได้ในเซสชันนี้ครับ
+
+**เฉพาะโปรเจกต์นี้**
+- **discount** — คำนวณยอดจ่ายตามกฎส่วนลดของร้าน (ซื้อ X บาทจ่ายเท่าไร, ได้ลดไหม, ขอตารางยอดจ่าย)
+
+**งานโค้ด / รีวิว**
+- **code-review** — รีวิว diff, PR, branch หรือ path หาบั๊กและจุดที่ลดความซับซ้อนได้ ปรับระดับความละเอียดได้ (low → ultra)
+- **security-review** — ตรวจความปลอดภัยของการเปลี่ยนแปลงบน branch ปัจจุบัน
+- **simplify** — รีวิวโค้ดที่แก้ไปแล้วเพื่อลดความซ้ำซ้อน/ซับซ้อน แล้วแก้ให้เลย (ไม่หาบั๊ก)
+- **init** — สร้างไฟล์ CLAUDE.md ใหม่พร้อมเอกสารของ codebase
+- **run** — สั่งรัน/สตาร์ตแอปของโปรเจกต์เพื่อดูว่าการแก้ไขทำงานจริง
+
+**ตั้งค่า Claude Code**
+- **update-config** — แก้ settings.json: permissions, env vars, hooks (พฤติกรรมอัตโนมัติแบบ "ทุกครั้งที่...")
+- **keybindings-help** — ปรับแต่งคีย์ลัดใน ~/.claude/keybindings.json
+- **fewer-permission-prompts** — สแกน transcript แล้วสร้าง allowlist เพื่อลดการถาม permission
+
+**งานอัตโนมัติ / ตารางเวลา**
+- **loop** — รัน prompt หรือ slash command ซ้ำตามช่วงเวลา (เช่น `/loop 5m /foo`)
+- **schedule** — สร้าง/จัดการ cloud agent ที่รันตาม cron หรือรันครั้งเดียวตามเวลาที่กำหนด
+
+**อ้างอิง / งานสร้างสรรค์**
+- **dataviz** — แนวทางออกแบบกราฟ ชาร์ต แดชบอร์ด (อ่านก่อนเขียนโค้ดชาร์ตทุกครั้ง)
+- **claude-api** — เอกสารอ้างอิง Claude API: model id, ราคา, streaming, tool use, caching
+- **workflow-authoring** — คู่มือเขียนสคริปต์สำหรับ Workflow tool (multi-agent orchestration)
+
+หมายเหตุ: มี MCP connector บางตัวที่ยังใช้ไม่ได้ — **Google Calendar** ต้องอนุญาตสิทธิ์ก่อน (ทำได้ที่หน้า con

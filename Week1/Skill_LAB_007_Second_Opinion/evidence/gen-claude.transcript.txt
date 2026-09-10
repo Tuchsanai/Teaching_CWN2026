@@ -1,0 +1,150 @@
+USER: วาง skill ที่ $HOME/ai-accounts/.Claude/shared/skills/second-opinion-ai/ (โฟลเดอร์นี้คือ <CLAUDE_CONFIG_DIR>/skills ของทุกบัญชี Claude ผ่าน symlink) ตรวจ official docs https://code.claude.com/docs/en/skills ก่อนเขียน frontmatter
+
+สร้าง skill ชื่อ second-opinion-ai สำหรับใช้บนเครื่องนี้ ห้ามอ่านไฟล์ README ของ LAB ห้ามล็อกอินแทนฉัน ห้ามอ่าน คัดลอก หรือแสดงไฟล์ credential ใด ๆ
+
+## สิ่งที่มีอยู่แล้ว (ตรวจจริงก่อน ห้ามเดา)
+- คำสั่ง yolo2 = Claude Code อีกบัญชี เรียกแบบไม่เปิดหน้าจอด้วย: yolo2 -p --model <model> --effort <effort> "<prompt>" < /dev/null (ค่าเริ่มต้น opus, high)
+- คำสั่ง cyolo1 = Codex CLI เรียกแบบไม่เปิดหน้าจอด้วย: cyolo1 exec --skip-git-repo-check -m <model> -c model_reasoning_effort=<effort> -o <ไฟล์ผลลัพธ์> "<prompt>" < /dev/null (ค่าเริ่มต้น gpt-6-astra, medium) อ่านคำตอบจากไฟล์ -o
+- ตรวจล็อกอินด้วย yolo2 auth status --text (exit 0 = ล็อกอินแล้ว) และ cyolo1 login status (ข้อความ Logged in)
+
+## สิ่งที่ skill ต้องทำ
+- ใช้เมื่อผู้ใช้พูดว่า "ขอความเห็นที่สอง", "ให้ทั้ง Claude และ Codex ตอบ", "เทียบคำตอบสองค่าย"
+- ส่งคำถามเดียวกันให้ yolo2 และ cyolo1 พร้อมกัน (ขนาน) แล้วรายงานเป็นตาราง: โมเดล/effort | คำตอบแต่ละฝั่ง | ตรงกันหรือไม่ และสรุป 1 บรรทัด
+- ตรวจล็อกอินก่อนเรียก บัญชีที่ยังไม่ล็อกอินให้ระบุว่า "ข้าม (ยังไม่ล็อกอิน)" ห้ามสลับบัญชีเอง
+- ใส่ลอจิกการเรียกขนานไว้ในสคริปต์ scripts/ask-both.sh ที่ exit 0 เสมอ ไม่พิมพ์ข้อมูลลับ
+- description ต้องบอกว่าใช้เมื่อไร ห้ามยาวเกิน 3 บรรทัด และห้ามใส่ขั้นตอนทั้งหมดไว้ใน description
+
+## ทดสอบ
+เรียก skill จริง 1 ครั้งด้วยคำถาม "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12" ต้องได้ 144 จากทั้งสองฝั่ง รายงานผล PASS/FAIL ตามจริง
+
+ทำเฉพาะขั้นนี้ ไม่ต้องสร้าง README เมื่อเสร็จให้แสดงเนื้อหา SKILL.md และผลทดสอบ แล้วหยุด
+ASSISTANT: I'll start by checking the official docs and verifying the environment.
+TOOL 1 ToolSearch: {"query": "select:WebFetch", "max_results": 3}
+  RESULT: 
+TOOL 2 Bash: {"command": "echo \"HOME=$HOME\"; ls -la \"$HOME/ai-accounts/.Claude/shared/skills/\" 2>&1 | head -30; echo \"---which---\"; which yolo2 cyolo1 2>&1", "description": "Check skills dir and commands"}
+  RESULT: HOME=/root | total 8 | drwxr-xr-x 2 root root 4096 Sep 10 09:11 . | drwxr-xr-x 4 root root 4096 Sep 10 08:33 .. | ---which--- | /usr/local/bin/yolo2 | /usr/local/bin/cyolo1
+TOOL 3 WebFetch: {"url": "https://code.claude.com/docs/en/skills", "prompt": "What are the exact required and optional YAML frontmatter fields for a SKILL.md file? Include field names, constraints (e.g. max length of name and description), naming rules, and the directory layout conventions (scripts/, references/). Quote the frontmatter example."}
+TOOL 4 Bash: {"command": "ls -la /root/ai-accounts/.Claude/ 2>&1; echo \"=== symlinks ===\"; for d in /root/ai-accounts/.Claude/*/; do echo \"-- $d\"; ls -la \"$d\" 2>/dev/null | grep -i skill; done", "description": "Inspect config dirs and skill symlinks"}
+  RESULT: # SKILL.md Frontmatter Reference |  | ## Required and Optional Fields |  | All frontmatter fields are **optional**. However, `description` is **recommended** so Claude knows when to use the skill. |  | ### Field Specifications |  | | Field | Type | Constraints | Purpose | | |-------|------|-----------|---------| | | `name` | string | No length limit specified | Display name in skill listings. Defaults to directory name. For plugin skills, sets the last segment of the command. | | | `description` | string | 1,536 character cap (combined with `when_to_use`) | What the skill does and when to use 
+  RESULT: total 32 | drwxr-xr-x 8 root root 4096 Sep 10 08:33 . | drwxr-xr-x 4 root root 4096 Sep 10 08:33 .. | drwxr-xr-x 4 root root 4096 Sep 10 08:33 shared | drwx------ 7 root root 4096 Sep 10 09:11 yolo1 | drwx------ 5 root root 4096 Sep 10 09:11 yolo2 | drwx------ 4 root root 4096 Sep 10 08:33 yolo3 | drwx------ 4 root root 4096 Sep 10 08:52 yolo4 | drwx------ 4 root root 4096 Sep 10 08:52 yolo5 | === symlinks === | -- /root/ai-accounts/.Claude/shared/ | drwxr-xr-x 2 root root 4096 Sep 10 09:11 skills | -- /root/ai-accounts/.Claude/yolo1/ | lrwxrwxrwx  1 root root    39 Sep 10 08:33 skills -> /roo
+ASSISTANT: Docs checked. Now verifying the actual commands and their real flags before writing anything.
+TOOL 5 Bash: {"command": "echo \"=== yolo2 wrapper ===\"; cat /usr/local/bin/yolo2; echo; echo \"=== cyolo1 wrapper ===\"; cat /usr/local/bin/cyolo1", "description": "Inspect wrapper scripts"}
+  RESULT: === yolo2 wrapper === | #!/bin/bash | # Multi-account launcher from LAB 001. Called through symlinks yolo1..yolo5 / cyolo1..cyolo5. | #   yoloN  -> CLAUDE_CONFIG_DIR=$BASE_PATH/.Claude/yoloN  claude --dangerously-skip-permissions | #   cyoloN -> CODEX_HOME=$BASE_PATH/.Codex/cyoloN         codex  --dangerously-bypass-approvals-and-sandbox | # $HOME is never changed. IS_SANDBOX=1 is required to run claude --dangerously-skip-permissions as root. | set -eu | export PATH="$HOME/.local/bin:$PATH" | : "${BASE_PATH:=$HOME/ai-accounts}" | name="$(basename "$0")" | need() { [ -d "$1" ] || { echo "$name:
+TOOL 6 Bash: {"command": "echo \"=== yolo2 auth ===\"; yolo2 auth status --text </dev/null 2>&1; echo \"exit=$?\"; echo \"=== cyolo1 login ===\"; cyolo1 login status </dev/null 2>&1; echo \"exit=$?\"", "description": "Check login status of both accounts", "timeout": 120000}
+  RESULT: === yolo2 auth === | Login method: Claude Max account | Organization: <email>'s Organization | Email: <email> | exit=0 | === cyolo1 login === | Logged in using ChatGPT | exit=0
+ASSISTANT: Both logged in. Quick smoke test of the invocation forms before writing the script.
+TOOL 7 Bash: {"command": "cd /tmp && time yolo2 -p --model opus --effort high \"ตอบเป็นตัวเลขล้วนอย่างเดียว: 2+2\" < /dev/null 2>&1; echo \"exit=$?\"", "description": "Smoke test yolo2 headless call", "timeout": 300000}
+TOOL 8 Bash: {"command": "cd /tmp && rm -f cx.txt && time cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=medium -o /tmp/cx.txt \"ตอบเป็นตัวเลขล้วนอย่างเดียว: 2+2\" < /dev/null >/tmp/cx.log 2>&1; echo \"exit=$?\"; echo \"--- -o file ---\"; cat /tmp/cx.txt 2>&1", "description": "Smoke test cyolo1 headless call", "timeout": 300000}
+  RESULT: 4 |  | real	0m4.694s | user	0m0.642s | sys	0m0.248s | exit=0 | Shell cwd was reset to /root/skilllab/work
+  RESULT: real	0m6.172s | user	0m0.485s | sys	0m0.428s | exit=0 | --- -o file --- | 4 | Shell cwd was reset to /root/skilllab/work
+ASSISTANT: Both invocation forms verified working. Writing the skill.
+TOOL 9 Bash: {"command": "mkdir -p /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts && cat > /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh <<'EOS'\n#!/usr/bin/env bash\n# ask-both.sh — ส่งคำถามเดียวกันให้ Claude (yolo2) และ Codex (cyolo1) พร้อมกันแบบขนาน\n#\n# ใช้งาน:\n#   ask-both.sh \"<คำถาม>\" [--claude-model M] [--claude-effort E]\n#                         [--codex-model M]  [--codex-effort E] [--timeout SEC]\n#\n# ออกแบบให้ exit 0 เสมอ ฝั่งที่ล้มเหลว/ยังไม่ล็อกอินจะรายงานเป็น status ในผลลัพธ์\n# ไม่พิมพ์ token, credential หรือ output ของคำสั่งตรวจล็อกอินออกมา\n\nset -u\n\nPROMPT=\"\"\nCLAUDE_MODEL=\"opus\"\nCLAUDE_EFFORT=\"high\"\nCODEX_MODEL=\"gpt-6
+  RESULT: syntax OK
+TOOL 10 Bash: {"command": "cat > /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/SKILL.md <<'EOS'\n---\nname: second-opinion-ai\ndescription: |\n  ถามคำถามเดียวกันกับ Claude (yolo2) และ Codex (cyolo1) พร้อมกัน แล้วเทียบคำตอบเป็นตาราง\n  ใช้เมื่อผู้ใช้ขอ \"ความเห็นที่สอง\", \"ให้ทั้ง Claude และ Codex ตอบ\", \"เทียบคำตอบสองค่าย\",\n  หรือขอ cross-check คำตอบจาก AI มากกว่าหนึ่งเจ้า\nallowed-tools: Bash(*ask-both.sh*)\n---\n\n# Second Opinion AI\n\nขอความเห็นที่สองโดยส่งคำถามเดียวกันไปยังสองบัญชี/สองค่ายพร้อมกัน แล้วสรุปว่าตรงกันหรือไม่\n\n## ขั้นตอน\n\n1. เรียกสคริปต์ครั้งเดียว (สคริปต์จัดการทั้งการตรวจล็อกอินและการเรียกแบบขนานให้แล้ว):\n\n   ```bash\n   ~/ai-accounts/.Claude/shared/skills/second-o
+  RESULT: --- tree --- | /root/ai-accounts/.Claude/shared/skills/second-opinion-ai | /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/SKILL.md | /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts | /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh
+ASSISTANT: Now running the real test through the skill's script.
+TOOL 11 Bash: {"command": "time ~/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh \"ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12\" < /dev/null; echo \"SCRIPT_EXIT=$?\"", "description": "Run the skill test with 12*12", "timeout": 400000}
+  RESULT: === CLAUDE (yolo2) === | model: opus | effort: high | status: ok | answer: | 144 |  | === CODEX (cyolo1) === | model: gpt-6-astra | effort: medium | status: skipped | reason: ข้าม (ยังไม่ล็อกอิน) | answer: | (ไม่มีคำตอบ) |  | real	0m3.715s | user	0m0.734s | sys	0m0.304s | SCRIPT_EXIT=0
+ASSISTANT: Codex was detected as not-logged-in, but the earlier check said it was. My login-detection is reading the wrong stream — debugging.
+TOOL 12 Bash: {"command": "cd /tmp; echo \"--- stdout only ---\"; cyolo1 login status </dev/null 2>/dev/null; echo \"[rc=$?]\"; echo \"--- stderr only ---\"; cyolo1 login status </dev/null 2>&1 >/dev/null; echo \"[rc=$?]\"; echo \"--- under timeout, merged ---\"; timeout 60 cyolo1 login status </dev/null 2>&1; echo \"[rc=$?]\"", "description": "Determine which stream codex login status writes to", "timeout": 120000}
+  RESULT: --- stdout only --- | [rc=0] | --- stderr only --- | Logged in using ChatGPT | [rc=0] | --- under timeout, merged --- | Logged in using ChatGPT | [rc=0] | Shell cwd was reset to /root/skilllab/work
+ASSISTANT: Confirmed: `cyolo1 login status` writes to stderr, so my stdout-only grep missed it. Fixing.
+TOOL 13 Edit: {"replace_all": false, "file_path": "/root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh", "old_string": "  timeout 60 cyolo1 login status </dev/null 2>/dev/null | grep -qi \"logged in\" || codex_logged_in=0", "new_string": "  # หมายเหตุ: cyolo1 login status พิมพ์ข้อความลง stderr จึงต้อง merge 2>&1 ก่อน grep\n  timeout 60 cyolo1 login status </dev/null 2>&1 | grep -qi \"logged in\" || codex_logged_in=0"}
+  RESULT: The file /root/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+ASSISTANT: The skill is now registered. Invoking it for real with the test question.
+TOOL 14 Skill: {"skill": "second-opinion-ai", "args": "ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12"}
+  RESULT: Launching skill: second-opinion-ai
+USER: Base directory for this skill: /root/ai-accounts/.Claude/yolo1/skills/second-opinion-ai
+
+# Second Opinion AI
+
+ขอความเห็นที่สองโดยส่งคำถามเดียวกันไปยังสองบัญชี/สองค่ายพร้อมกัน แล้วสรุปว่าตรงกันหรือไม่
+
+## ขั้นตอน
+
+1. เรียกสคริปต์ครั้งเดียว (สคริปต์จัดการทั้งการตรวจล็อกอินและการเรียกแบบขนานให้แล้ว):
+
+   ```bash
+   ~/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh "<คำถามของผู้ใช้>"
+   ```
+
+   ปรับโมเดล/effort ได้เมื่อผู้ใช้ระบุ (ค่าเริ่มต้น Claude = opus/high, Codex = gpt-6-astra/medium):
+
+   ```bash
+   ask-both.sh "<คำถาม>" --claude-model sonnet --claude-effort medium \
+                         --codex-model gpt-6-astra --codex-effort high
+   ```
+
+   สคริปต์ exit 0 เสมอ — ให้ดูค่า `status:` ของแต่ละบล็อกเพื่อรู้ผลจริง
+
+2. อ่านผลลัพธ์ที่แบ่งเป็นบล็อก `=== CLAUDE (yolo2) ===` และ `=== CODEX (cyolo1) ===`
+   แต่ละบล็อกมี `model:`, `effort:`, `status:` (`ok` / `skipped` / `error`) และ `answer:`
+
+3. รายงานผู้ใช้เป็นตารางเสมอ:
+
+   | ฝั่ง | โมเดล / effort | คำตอบ | ตรงกันหรือไม่ |
+   |---|---|---|---|
+   | Claude (yolo2) | opus / high | ... | ✅ ตรงกัน |
+   | Codex (cyolo1) | gpt-6-astra / medium | ... | ✅ ตรงกัน |
+
+   แล้วปิดท้ายด้วย **สรุป 1 บรรทัด** ว่าทั้งสองฝั่งเห็นตรงกันไหม และคำตอบที่ควรใช้คืออะไร
+
+## กติกา
+
+- `status: skipped` ให้ลงในตารางว่า **ข้าม (ยังไม่ล็อกอิน)** และห้ามสลับบัญชี/ล็อกอินแทนผู้ใช้เอง
+  ให้บอกผู้ใช้ไปตรง ๆ ว่าต้องล็อกอินบัญชีนั้นเองก่อน
+- `status: error` ให้ลงว่า **ผิดพลาด** พร้อมเหตุผลสั้น ๆ จากบรรทัด `reason:`
+- ถ้าเหลือฝั่งเดียวที่ตอบได้ ยังต้องแสดงตาราง แต่ระบุชัดว่าเทียบไม่ได้เพราะมีคำตอบฝั่งเดียว
+- ห้ามอ่าน คัดลอก หรือแสดงไฟล์ credential ของบัญชีใด ๆ
+- อย่าตอบคำถามเองแทนสองฝั่งนั้น — หน้าที่ของ skill นี้คือรายงานสิ่งที่ทั้งสองฝั่งตอบจริง
+
+
+ARGUMENTS: ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12
+TOOL 15 Bash: {"command": "~/ai-accounts/.Claude/shared/skills/second-opinion-ai/scripts/ask-both.sh \"ตอบเป็นตัวเลขล้วนอย่างเดียว: 12*12\" < /dev/null; echo \"SCRIPT_EXIT=$?\"", "description": "Run second-opinion script for 12*12", "timeout": 400000}
+  RESULT: === CLAUDE (yolo2) === | model: opus | effort: high | status: ok | answer: | 144 |  | === CODEX (cyolo1) === | model: gpt-6-astra | effort: medium | status: ok | answer: | 144 | SCRIPT_EXIT=0
+ASSISTANT: ทั้งสองฝั่งตอบ `144`
+
+| ฝั่ง | โมเดล / effort | คำตอบ | ตรงกันหรือไม่ |
+|---|---|---|---|
+| Claude (yolo2) | opus / high | `144` | ✅ ตรงกัน |
+| Codex (cyolo1) | gpt-6-astra / medium | `144` | ✅ ตรงกัน |
+
+**สรุป:** ทั้งสองค่ายเห็นตรงกัน คำตอบคือ **144**
+
+---
+
+## ผลทดสอบ: **PASS**
+
+ทดสอบผ่านการเรียก skill จริงด้วย Skill tool ครั้งเดียว → ทั้ง yolo2 และ cyolo1 ตอบ `144`, script exit 0
+
+หมายเหตุตามจริง: การรันรอบแรกก่อนหน้านี้ Codex ขึ้น `skipped (ยังไม่ล็อกอิน)` ทั้งที่ล็อกอินอยู่ — สาเหตุคือ `cyolo1 login status` พิมพ์ข้อความลง **stderr** ไม่ใช่ stdout ผมแก้ให้ merge `2>&1` ก่อน grep แล้วรอบที่รายงานข้างบนคือหลังแก้
+
+## โครงสร้างที่วาง
+
+```
+/root/ai-accounts/.Claude/shared/skills/second-opinion-ai/
+├── SKILL.md
+└── scripts/ask-both.sh   (chmod +x)
+```
+
+ยืนยันว่า `shared/skills` ถูก symlink จาก yolo1–yolo5 ทุกบัญชีจริง — skill จึงถูกโหลดขึ้นมาใช้ได้ทันทีในเซสชันนี้ (base dir ที่ harness รายงานคือ `/root/ai-accounts/.Claude/yolo1/skills/second-opinion-ai` ซึ่งชี้กลับมาที่ shared)
+
+## เนื้อหา SKILL.md
+
+````markdown
+---
+name: second-opinion-ai
+description: |
+  ถามคำถามเดียวกันกับ Claude (yolo2) และ Codex (cyolo1) พร้อมกัน แล้วเทียบคำตอบเป็นตาราง
+  ใช้เมื่อผู้ใช้ขอ "ความเห็นที่สอง", "ให้ทั้ง Claude และ Codex ตอบ", "เทียบคำตอบสองค่าย",
+  หรือขอ cross-check คำตอบจาก AI มากกว่าหนึ่งเจ้า
+allowed-tools: Bash(*ask-both.sh*)
+---
+
+# Second Opinion AI
+
+ขอความเห็นที่สองโดยส่งคำถามเดียวกันไปยังสองบัญชี/สองค่ายพร้อมกัน แล้วสรุปว่าตรงกันหรือไม่
+
+## ขั้นตอน
+
+1. เรียกสคริปต์ครั้งเดียว (สคริปต์จัดก
