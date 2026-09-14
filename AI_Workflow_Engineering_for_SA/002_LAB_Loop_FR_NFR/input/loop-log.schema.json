@@ -1,0 +1,230 @@
+{
+  "type": "object",
+  "properties": {
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "started_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finished_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "wall_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "ai_cmd": {
+      "enum": [
+        "codex exec",
+        "claude -p"
+      ]
+    },
+    "baseline_source": {
+      "type": "string"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "max_rounds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "max_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_tokens": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "max_rounds",
+        "max_seconds",
+        "max_tokens"
+      ],
+      "additionalProperties": false
+    },
+    "stop_reason": {
+      "enum": [
+        null,
+        "pass",
+        "no_improvement",
+        "max_rounds",
+        "time_limit",
+        "token_limit",
+        "token_usage_unknown",
+        "ai_error",
+        "input_error",
+        "checker_invalid",
+        "log_error",
+        "interrupted"
+      ]
+    },
+    "total_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "calls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "enum": [
+              "generator",
+              "checker",
+              "fixer"
+            ]
+          },
+          "round": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "wall_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exit_code": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "log": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "phase",
+          "round",
+          "started_at",
+          "finished_at",
+          "wall_seconds",
+          "exit_code",
+          "log",
+          "output",
+          "tokens",
+          "success"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "rounds": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "document": {
+            "type": "string"
+          },
+          "check": {
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "PASS",
+              "FAIL"
+            ]
+          },
+          "score": {
+            "type": "object",
+            "properties": {
+              "earned": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "possible": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "earned",
+              "possible"
+            ],
+            "additionalProperties": false
+          },
+          "regressions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "no_improvement_streak": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "round",
+          "document",
+          "check",
+          "result",
+          "score",
+          "regressions",
+          "no_improvement_streak"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "started_at",
+    "started_epoch",
+    "finished_at",
+    "wall_seconds",
+    "ai_cmd",
+    "baseline_source",
+    "limits",
+    "stop_reason",
+    "total_tokens",
+    "calls",
+    "rounds"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LAB 002 loop execution log",
+  "description": "Runtime evidence only. Null means unavailable, never zero as a substitute. A round is a completed validated checker report."
+}

@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'">
+<title>ครัวคุณยาย • ห้องทดลองสั่งอาหาร</title>
+<style>
+:root{color-scheme:light;--ink:#24362d;--muted:#56675c;--paper:#f5f3e9;--card:#fffef9;--green:#24573d;--line:#d3dacd;--amber:#fff0cf;--red:#9a3028}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,sans-serif;line-height:1.65}button,input,select{font:inherit}button,input,select{min-height:44px;border:1px solid #8c9e8c;border-radius:9px;padding:9px 13px}input,select{background:white;color:var(--ink);max-width:100%;width:100%}input[type=checkbox]{width:21px;min-height:21px;accent-color:var(--green)}input[type=file]{font-size:.9rem}button{cursor:pointer;background:var(--card);color:var(--green);font-weight:650}button:hover:not(:disabled){background:#e9f0e4}button.primary,button[aria-pressed=true]{background:var(--green);color:white;border-color:var(--green)}button.danger{color:var(--red);border-color:#bc7b70}button:disabled{cursor:not-allowed;opacity:.6;background:#eee9e2;color:#655f58}a{color:var(--green)}:focus-visible{outline:3px solid #ad6515;outline-offset:3px}[hidden]{display:none!important}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(1.6rem,4vw,2.3rem);margin-bottom:3px}h2{font-size:1.4rem}h3{font-size:1.1rem}small,.muted{color:var(--muted)}header{background:#e6ecdf;border-bottom:1px solid var(--line)}.wrap{max-width:1180px;margin:auto;padding:22px}.brand{display:flex;align-items:center;gap:16px}.seal{font-size:30px;border:2px solid var(--green);border-radius:50%;width:58px;height:58px;display:grid;place-items:center;flex-shrink:0}.tag{display:inline-block;padding:2px 9px;background:var(--amber);color:#6e4809;border:1px solid #d6b574;border-radius:20px;font-size:.8rem;font-weight:700}.toolbar,.row,.subnav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar{justify-content:space-between;margin:18px 0}.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.roles button{padding:13px}.clock{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.panel{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:22px;margin-bottom:18px}.notice{background:var(--amber);border-left:4px solid #b0791f;padding:10px 14px;border-radius:6px}.message{margin:10px 0;white-space:pre-line;overflow-wrap:anywhere}.message:empty{display:none}.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:20px;align-items:start}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:14px 0}label{display:block;font-weight:600}label input,label select{margin-top:5px}.check{display:flex;gap:10px;align-items:center;font-weight:500}.check input{margin:0;flex-shrink:0}.menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.food{display:flex;flex-direction:column;align-items:stretch;text-align:left;padding:0;overflow:hidden}.food-art{height:100px;display:grid;place-items:center;background:linear-gradient(130deg,#e1e9d4,#f5e5c5);font-size:32px}.food-art img{width:100%;height:100%;object-fit:cover}.food-text{padding:12px}.food-text strong{display:block}.food-text span{font-weight:450}.split{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}.amount{font-size:1.35rem;font-weight:750}.list{padding-left:22px}.list li{margin:8px 0}.ticket{border:1px solid var(--line);border-left:5px solid #8aab78;border-radius:10px;padding:16px;margin:12px 0;overflow-wrap:anywhere}.ticket time{font-size:.8rem;color:var(--muted)}.status{border-radius:20px;background:#e8efe1;padding:4px 10px;display:inline-block}.subnav{margin:16px 0}.option-row{display:grid;grid-template-columns:minmax(0,1fr) 115px auto;gap:8px;align-items:end;margin:10px 0}.qr{width:170px;height:170px;border:8px solid var(--green);background:repeating-conic-gradient(#dce6d6 0% 25%,white 0% 50%) 0/24px 24px;display:grid;place-items:center;margin:14px 0}.qr span{background:var(--card);padding:8px;font-weight:bold;text-align:center;border:2px solid var(--green)}details summary{cursor:pointer;min-height:44px;padding:8px 0;font-weight:650}code{overflow-wrap:anywhere}footer{color:var(--muted);font-size:.85rem;padding:10px 0 25px}.empty{padding:24px 10px;text-align:center;color:var(--muted)}.skip{position:absolute;left:-9999px}.skip:focus{left:10px;top:10px;background:white;padding:15px;z-index:5}
+@media(max-width:760px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.panel{padding:16px}.roles{gap:5px}.roles button{padding:10px 5px;font-size:.9rem}.brand{gap:10px}.seal{width:46px;height:46px}.toolbar{align-items:flex-start}.option-row{grid-template-columns:1fr 90px}.option-row button{grid-column:1/-1}.fields{grid-template-columns:1fr}.menu-grid{gap:8px}.food-art{height:80px}.food-text{padding:10px}}
+@media(prefers-reduced-motion:no-preference){button{transition:background .12s}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<header><div class="wrap"><div class="brand"><div class="seal" aria-hidden="true">ย</div><div><small>ห้องทดลอง UI • LAB 004</small><h1>ครัวคุณยาย</h1><span class="tag">จำลอง • ไม่มีการสั่งหรือโอนเงินจริง</span></div></div>
+<div class="toolbar"><div><strong>นาฬิกาจำลอง</strong><div data-testid="sim-clock" class="clock"></div><small>เวลา +07:00 เดินเมื่อกดปุ่มเท่านั้น</small></div><div class="row"><button data-action="advance" data-minutes="1">+1 นาที</button><button data-action="advance" data-minutes="5">+5 นาที</button><button data-testid="btn-advance-10m" data-action="advance" data-minutes="10">+10 นาที จำลอง</button><button data-action="advance" data-minutes="1440">+1 วัน</button><button data-testid="btn-reset" data-action="reset" class="danger">รีเซ็ตทั้งหมด / ออกจากระบบ</button></div></div>
+<p class="muted">สลับบทบาท <span class="tag">จำลอง</span> ข้อมูลร่วมกันเฉพาะในแท็บนี้ • เข้าแท็บพนักงานหรือผู้จัดการใหม่ต้องล็อกอินทุกครั้ง</p>
+<nav class="roles" aria-label="สลับบทบาทจำลอง"><button data-testid="role-customer" data-action="role" data-role="customer">ลูกค้า</button><button data-testid="role-staff" data-action="role" data-role="staff">ครัวและหน้าร้าน</button><button data-testid="role-manager" data-action="role" data-role="manager">ผู้จัดการ</button></nav></div></header>
+<main id="main" class="wrap" tabindex="-1">
+<details class="panel"><summary>วิธีเล่นและข้อค้างที่ต้องทบทวน</summary><ol><li>ลูกค้าเลือกโต๊ะ (แทน QR โต๊ะจำลอง) หรือสั่งกลับบ้าน เลือกช่วงรับ แล้วเปิดเมนู เพิ่มอาหารและส่งออเดอร์</li><li>เลือกครัวและหน้าร้าน ใช้ demokitchen / PIN 0000 เพื่อเปลี่ยนสถานะหรือกดวัตถุดิบหมด ใช้ demofront / PIN 0000 เพื่อยืนยันเงินและปิดโต๊ะ</li><li>ผู้จัดการใช้ demomanager / PIN 0000 จัดการเมนู แมป บัญชี และเปิด/ปิด PromptPay ทั้งหมดเป็นบัญชีและสิทธิ์จำลอง</li><li>ลองเพิ่มไข่ในตะกร้า แล้วไปครัวกดไข่หมด กลับมากดส่งเพื่อดูการปฏิเสธ หรือเลือก PromptPay แล้วกด +10 นาทีเพื่อดูทางออกเงินสด</li><li>ใช้ Tab / Shift+Tab เดินฟอร์ม, Enter กดปุ่ม, Space เลือก checkbox รีเซ็ตคืน seed เวลา บัญชี แมป และคิวทั้งหมด การรีเฟรชไฟล์ก็เริ่มใหม่</li></ol><p class="notice">READY เฉพาะ mock ตาม input-audit; handoff ธุรกิจยัง BLOCKED (MC-01–MC-03) • A-02: ยังไม่มีนิยามหมายเหตุ ก./ค./ช. • DI-07/A-05: ยังไม่ยืนยันการแมป “เสร็จแล้ว” กับ “พร้อมเสิร์ฟ” • DI-04/A-03: US-20 ยังคงอ้าง “กฎปิด/เปิดเมนูอัตโนมัติ (US-14)” การเชื่อม US-12/US-13 เป็นข้อเสนอที่ยังไม่ยืนยัน</p><p>PromptPay, QR โต๊ะ, การแจ้งเตือน, เวลา, PIN/สิทธิ์ และการสลับบทบาทเป็นการจำลองทั้งหมด ไม่พิสูจน์ LAN, หลายเครื่อง, load, authentication, การติดตั้ง หรือจำนวนตัวอย่างจริงตาม US</p></details>
+<div data-testid="auth-message" class="notice message" role="status" aria-live="polite"></div>
+<div id="auth"></div><div id="screens"></div>
+<footer>ข้อมูลจำลองสำหรับการเรียน • ไม่มีบัญชีจริง อีเมล หรือข้อมูลลูกค้า • ใช้งานในหน่วยความจำ ไม่บันทึกถาวร</footer>
+</main>
+<script id="mock-seed" type="application/json">{
+  "notice": "ข้อมูลจำลองสำหรับการเรียน ไม่ใช่ราคา บัญชี หรือกฎเพิ่มเติมของร้านจริง",
+  "clock": {
+    "initial": "2026-01-01T12:00:00+07:00",
+    "simulated": true
+  },
+  "promptpay_enabled": true,
+  "demo_pin": "0000",
+  "pin_notice": "ค่า 0000 เป็น placeholder จำลองของทุกบัญชี ห้ามใช้กับระบบจริง",
+  "menus": [
+    {
+      "id": "m01",
+      "name": "กะเพราไก่",
+      "price": 50,
+      "image": null,
+      "available": true,
+      "options": [
+        {
+          "id": "extra-egg",
+          "name": "เพิ่มไข่ดาว",
+          "price": 10
+        }
+      ]
+    },
+    {
+      "id": "m02",
+      "name": "ข้าวหมูทอด",
+      "price": 55,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m03",
+      "name": "ข้าวไข่เจียว",
+      "price": 40,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m04",
+      "name": "ผัดเส้นไก่",
+      "price": 50,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m05",
+      "name": "กะเพราหมู",
+      "price": 55,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m06",
+      "name": "ข้าวไก่ทอด",
+      "price": 55,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m07",
+      "name": "เส้นผัดไข่",
+      "price": 45,
+      "image": null,
+      "available": true,
+      "options": []
+    },
+    {
+      "id": "m08",
+      "name": "นมเย็น",
+      "price": 30,
+      "image": null,
+      "available": true,
+      "options": []
+    }
+  ],
+  "tables": [
+    {
+      "table_id": "01",
+      "label": "โต๊ะ 01"
+    },
+    {
+      "table_id": "02",
+      "label": "โต๊ะ 02"
+    },
+    {
+      "table_id": "03",
+      "label": "โต๊ะ 03"
+    }
+  ],
+  "ingredients": [
+    {
+      "id": "rice",
+      "name": "ข้าว",
+      "available": true
+    },
+    {
+      "id": "chicken",
+      "name": "ไก่",
+      "available": true
+    },
+    {
+      "id": "pork",
+      "name": "หมู",
+      "available": true
+    },
+    {
+      "id": "egg",
+      "name": "ไข่",
+      "available": true
+    },
+    {
+      "id": "basil",
+      "name": "กะเพรา",
+      "available": true
+    },
+    {
+      "id": "noodle",
+      "name": "เส้น",
+      "available": true
+    },
+    {
+      "id": "milk",
+      "name": "นม",
+      "available": true
+    }
+  ],
+  "ingredient_mappings": [
+    {
+      "ingredient_id": "rice",
+      "menu_id": "m01",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "chicken",
+      "menu_id": "m01",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "basil",
+      "menu_id": "m01",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "rice",
+      "menu_id": "m02",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "pork",
+      "menu_id": "m02",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "rice",
+      "menu_id": "m03",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "egg",
+      "menu_id": "m03",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "noodle",
+      "menu_id": "m04",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "chicken",
+      "menu_id": "m04",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "rice",
+      "menu_id": "m05",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "pork",
+      "menu_id": "m05",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "basil",
+      "menu_id": "m05",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "rice",
+      "menu_id": "m06",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "chicken",
+      "menu_id": "m06",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "noodle",
+      "menu_id": "m07",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "egg",
+      "menu_id": "m07",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "milk",
+      "menu_id": "m08",
+      "scope": "whole",
+      "option_id": null
+    },
+    {
+      "ingredient_id": "egg",
+      "menu_id": "m01",
+      "scope": "option",
+      "option_id": "extra-egg"
+    }
+  ],
+  "staff": [
+    {
+      "id": "demokitchen",
+      "username": "demokitchen",
+      "role": "kitchen",
+      "pin": "<PIN_PLACEHOLDER>"
+    },
+    {
+      "id": "demofront",
+      "username": "demofront",
+      "role": "front",
+      "pin": "<PIN_PLACEHOLDER>"
+    },
+    {
+      "id": "demomanager",
+      "username": "demomanager",
+      "role": "manager",
+      "pin": "<PIN_PLACEHOLDER>"
+    }
+  ]
+}</script>
+<script>
+'use strict';
+(() => {
+const seed=JSON.parse(document.getElementById('mock-seed').textContent);
+const clone=x=>JSON.parse(JSON.stringify(x));
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tid=id=>document.querySelector(`[data-testid="${id}"]`);
+const val=id=>tid(id)?.value??'';
+const money=n=>`${Number(n).toLocaleString('th-TH',{maximumFractionDigits:2})} บาท`;
+const cents=n=>Math.round(Number(n)*100);
+const sum=items=>items.reduce((a,i)=>a+cents(i.total),0)/100;
+const statuses=['รับออเดอร์','กำลังทำ','เสร็จแล้ว'];
+let s,u,epoch=0;
+function iso(t=s.now){return new Date(t+7*3600000).toISOString().slice(0,19)+'+07:00';}
+function day(t=s.now){return iso(t).slice(0,10);}
+function reset(){
+ epoch++;
+ s={menus:clone(seed.menus),ingredients:clone(seed.ingredients),mappings:clone(seed.ingredient_mappings),accounts:seed.staff.map(a=>({...a,pin:seed.demo_pin,failures:0,lockedUntil:0})),tables:clone(seed.tables),sessions:[],orders:[],items:[],payments:[],paymentEvents:[],statusEvents:[],now:Date.parse(seed.clock.initial),promptpay:seed.promptpay_enabled,nextOrder:1,nextSession:1,nextMenu:9,nextOption:1,nextItem:1,takeawayDay:dayFromSeed(),takeawaySequence:0};
+ u={role:'customer',user:null,page:'',auth:'',loginUser:'demokitchen',mode:'dine-in',table:'01',session:null,takeawayCart:[],takeawayOpened:false,selectedMenu:null,selectedOptions:[],slot:null,orderMessage:'',frontTable:'01',ingredient:'rice',mappingMenu:'m01',mappingScope:'whole',mappingOption:'extra-egg',mappingIngredient:'rice',mappingMessage:'',adminId:'new',draft:null,adminMessage:'',accountMessage:'',frontMessage:''};
+ history.replaceState(null,'',location.pathname+location.search);render();
+}
+function dayFromSeed(){return seed.clock.initial.slice(0,10);}
+function can(area){return !!u.user&&(u.user.role==='manager'||u.user.role===area);}
+function deny(){u.auth='ปฏิเสธ: บัญชีนี้ไม่มีสิทธิ์เข้าหน้านี้ (PIN/สิทธิ์จำลอง)';render();}
+function session(){return s.sessions.find(x=>x.id===u.session);}
+function currentCart(){return u.mode==='takeaway'?u.takeawayCart:(session()?.cart??[]);}
+function sessionOrders(){return s.orders.filter(o=>u.mode==='takeaway'?o.channel==='takeaway':o.session_id===u.session&&session()?.state==='open');}
+function latest(){return sessionOrders().at(-1);}
+function payment(o){return s.payments.find(p=>p.order_id===o?.id);}
+function orderItems(o){return s.items.filter(i=>i.order_id===o.id);}
+function blocked(menuId,scope,optionId=null){return s.mappings.some(m=>m.menu_id===menuId&&m.scope===scope&&(scope==='whole'||m.option_id===optionId)&&!s.ingredients.find(i=>i.id===m.ingredient_id)?.available);}
+function menuAvailable(m){return !!m&&m.available&&!blocked(m.id,'whole');}
+function optionAvailable(m,o){return menuAvailable(m)&&!blocked(m.id,'option',o.id);}
+function choices(rows,selected,key='id',label='name'){return rows.map(r=>`<option value="${esc(r[key])}" ${r[key]===selected?'selected':''}>${esc(r[label])}</option>`).join('');}
+function button(testid,label,action,extra=''){return `<button ${testid?`data-testid="${testid}"`:''} data-action="${action}" ${extra}>${label}</button>`;}
+function slots(){const start=Math.ceil((s.now+20*60000)/(15*60000))*15*60000;return Array.from({length:8},(_,i)=>{const t=start+i*15*60000;return {t,value:iso(t).slice(11,16)+'-'+iso(t+15*60000).slice(11,16),date:day(t)};});}
+function ensureSlot(){const list=slots();if(!list.some(x=>x.t===u.slot))u.slot=list[0].t;return list;}
+function openTable(table){let x=s.sessions.find(x=>x.table_id===table&&x.state==='open');if(!x){x={id:'S-'+String(s.nextSession++).padStart(4,'0'),table_id:table,state:'open',opened_at:iso(),closed_at:null,cart:[]};s.sessions.push(x);}return x;}
+function openMenu(){if(u.mode==='dine-in'){const next=openTable(u.table);if(u.session!==next.id){u.selectedMenu=null;u.selectedOptions=[];u.orderMessage='';}u.session=next.id;}else{u.takeawayOpened=true;ensureSlot();}render();}
+function render(){
+ const focused=document.activeElement;const focusKey=focused?.getAttribute('data-testid');const focusAction=focused?.getAttribute('data-action');const focusId=focused?.getAttribute('data-id');
+ tid('sim-clock').textContent=iso();tid('auth-message').textContent=u.auth;
+ for(const role of ['customer','staff','manager'])tid('role-'+role).setAttribute('aria-pressed',String(u.role===role));
+ document.getElementById('auth').innerHTML=u.role!=='customer'&&!u.user?loginHTML():'';
+ let html='';if(u.role==='customer')html=customerHTML();else if(u.role==='manager'&&u.user?.role==='manager')html=managerHTML();else if(u.role==='staff')html=staffHTML();
+ document.getElementById('screens').innerHTML=html;
+ if(focusKey){const el=tid(focusKey);if(el&&!el.disabled)el.focus({preventScroll:true});}
+ else if(focusAction){const el=[...document.querySelectorAll('[data-action]')].find(e=>e.dataset.action===focusAction&&e.dataset.id===focusId);if(el&&!el.disabled)el.focus({preventScroll:true});}
+}
+function loginHTML(){return `<section class="panel"><h2>เข้าใช้${u.role==='manager'?'ผู้จัดการ':'ครัวและหน้าร้าน'} <span class="tag">PIN/สิทธิ์ จำลอง</span></h2><p>บัญชีเริ่มต้นทุกบัญชีใช้ PIN <strong>0000</strong> เป็น placeholder สาธารณะ</p><form id="login-form"><div class="fields"><label>ชื่อผู้ใช้จำลอง<select data-testid="staff-user">${choices(s.accounts,u.loginUser,'username','username')}</select></label><label>PIN จำลอง<input data-testid="staff-pin" type="password" inputmode="numeric" autocomplete="off" placeholder="0000"></label></div><button data-testid="btn-login" type="submit" class="primary">เข้าใช้</button></form><small>ผิด 5 ครั้งติดล็อกบัญชีนั้น 5 นาทีตามนาฬิกาจำลอง</small></section>`;}
+function customerHTML(){
+ const cart=currentCart(),open=u.mode==='takeaway'?u.takeawayOpened:!!session()&&session().state==='open',o=latest(),p=payment(o),list=ensureSlot();
+ const m=s.menus.find(m=>m.id===u.selectedMenu);const selected=m?.options.filter(x=>u.selectedOptions.includes(x.id))??[];
+ return `<section data-testid="screen-customer"><div class="panel"><div class="split"><h2>วันนี้รับอะไรดี</h2><span class="tag">QR โต๊ะ จำลอง</span></div><div class="fields"><label>รูปแบบการสั่ง<select data-testid="order-mode"><option value="dine-in" ${u.mode==='dine-in'?'selected':''}>ทานที่ร้าน</option><option value="takeaway" ${u.mode==='takeaway'?'selected':''}>สั่งกลับบ้าน</option></select></label><label ${u.mode==='takeaway'?'hidden':''}>เลือกโต๊ะ แทนสแกน QR ที่มี table_id<select data-testid="table-select">${choices(s.tables,u.table,'table_id','label')}</select></label><label ${u.mode!=='takeaway'?'hidden':''}>ช่วงรับอาหาร • เวลาจำลอง<select data-testid="pickup-slot">${list.map(x=>`<option value="${x.value}" ${u.slot===x.t?'selected':''}>${x.value} (${x.date})</option>`).join('')}</select></label></div>${button('btn-open-menu','เปิดเมนู / เริ่มรอบสั่ง','open-menu','class="primary"')}<div class="row" style="margin-top:12px"><strong data-testid="active-table">${open?(u.mode==='takeaway'?'สั่งกลับบ้าน':'โต๊ะ '+esc(session().table_id)):'ยังไม่เปิดรอบสั่ง'}</strong><span>Session: <span data-testid="session-id">${u.mode==='dine-in'&&open?esc(u.session):''}</span></span></div></div>
+ ${open?`<div class="grid"><div><section data-testid="menu-list" class="panel"><div class="split"><h2>เมนูจากครัว</h2><small>${s.menus.length} เมนู • ราคาจำลอง</small></div><div class="menu-grid">${s.menus.map((m,i)=>`<button data-testid="menu-item-${esc(m.id)}" data-action="select-menu" data-id="${esc(m.id)}" class="food" ${menuAvailable(m)?'':'disabled'}><span class="food-art">${m.image?`<img src="${esc(m.image)}" alt="${esc(m.name)}">`:`<span aria-hidden="true">${i===7?'◉':'♨'}</span>`}</span><span class="food-text"><strong>${esc(m.name)}</strong><span>${money(m.price)} · ${menuAvailable(m)?'สั่งได้':(!m.available?'ปิดขายโดยผู้จัดการ':'หมด')}</span></span></button>`).join('')||'<p>ยังไม่มีเมนู</p>'}</div></section>
+ <section class="panel" aria-label="รายละเอียดจานที่เลือก"><h2>${m?esc(m.name):'เลือกเมนูเพื่อดูตัวเลือก'}</h2>${m?`${m.options.map(x=>`<label class="check"><input type="checkbox" data-testid="option-${esc(x.id)}" data-option="${esc(x.id)}" ${u.selectedOptions.includes(x.id)?'checked':''} ${optionAvailable(m,x)?'':'disabled'}>${esc(x.name)} +${money(x.price)} ${optionAvailable(m,x)?'':'· หมด / ปิดขาย'}</label>`).join('')||'<p class="muted">ไม่มีตัวเลือกเพิ่ม</p>'}<div class="split" style="margin-top:14px"><strong data-testid="item-total" class="amount">${money(m.price)}</strong>${button('btn-add-item','เพิ่มลงตะกร้า','add-item',`class="primary" ${menuAvailable(m)?'':'disabled'}`)}</div>`:''}</section></div>
+ <aside><section class="panel"><div class="split"><h2>ตะกร้าของคุณ</h2><span><span data-testid="cart-count">${cart.length}</span> จาน</span></div>${cart.length?`<ul class="list">${cart.map((i,n)=>`<li>${esc(i.name)}${i.options.length?' · '+i.options.map(x=>esc(x.name)).join(', '):''}<div class="split"><span>${money(i.total)}</span>${button('','นำออก','remove-cart',`data-id="${n}" aria-label="นำ ${esc(i.name)} ออกจากตะกร้า"`)}</div></li>`).join('')}</ul>`:'<p class="empty">เลือกจานโปรดจากเมนูได้เลย</p>'}<div class="split"><strong>รวม</strong><strong class="amount" data-testid="cart-total">${money(sum(cart))}</strong></div><p class="notice">เวลารอ (US-07): ยังประมาณไม่ได้ — seed ไม่มีค่าเฉลี่ย 7 วันและต่อเมนู; DI-07/A-05 ยังไม่ยืนยัน “พร้อมเสิร์ฟ”</p>${button('btn-submit-order','ส่งออเดอร์เข้าครัว','submit-order','class="primary"')}<p class="message" role="status" data-testid="order-message">${esc(u.orderMessage)}</p></section>
+ <section class="panel"><h2>ติดตามออเดอร์ล่าสุด</h2><div class="row"><span>ออเดอร์ <strong data-testid="order-id">${o?.id??''}</strong></span><strong data-testid="takeaway-id">${esc(o?.takeaway_id??'')}</strong></div><p><span class="status" data-testid="customer-order-status">${o?statuses[o.status]:''}</span></p><p class="muted">การแจ้งเตือนสถานะ จำลอง • อัปเดตในแท็บเดียว<br>ชื่อสถานะตาม fixture; DI-07/A-05 ยังไม่ยืนยันการแมป</p>${o?`<p>ยอดออเดอร์ ${money(o.total)}</p>${itemsHTML(o)}`:''}<h3>การชำระเงิน <span class="tag">จำลอง</span></h3><p data-testid="payment-status">${p?.state??'ยังไม่จ่าย'}</p><div class="row">${button('pay-cash','เลือกเงินสด','cash',!o||p?.state==='จ่ายแล้ว'?'disabled':'')}${button('pay-promptpay','PromptPay จำลอง','promptpay',!o||p?.state==='จ่ายแล้ว'?'disabled':'')}</div><p class="message" data-testid="cash-message">${esc(cashMessage(p))}</p>${p?.method==='promptpay'&&p.state!=='จ่ายแล้ว'?'<div class="qr" role="img" aria-label="ภาพแทน QR PromptPay จำลอง สแกนชำระเงินจริงไม่ได้"><span>QR จำลอง<br>ห้ามโอนเงินจริง</span></div><p>ค้างจ่ายจนหน้าร้านยืนยันสลิปจำลอง</p>':''}<small>เลือกวิธีจ่ายยังไม่เท่ากับหน้าร้านรับเงิน</small></section>
+ <details class="panel"><summary>ออเดอร์ทั้งหมดในรอบนี้ (${sessionOrders().length})</summary>${sessionOrders().map(x=>`<article class="ticket">#${x.id} ${esc(x.takeaway_id||'โต๊ะ '+x.table_id)} · ${statuses[x.status]} · ${money(x.total)} · ${payment(x).state}${itemsHTML(x)}${x.id!==o?.id&&payment(x).state!=='จ่ายแล้ว'?`<div class="row">${button('','เลือกเงินสด #'+x.id,'cash',`data-id="${x.id}"`)}${button('','เลือก PromptPay จำลอง #'+x.id,'promptpay',`data-id="${x.id}"`)}</div><p>${esc(cashMessage(payment(x)))}</p>${payment(x).method==='promptpay'?'<p class="notice">QR PromptPay จำลอง — ค้างจ่าย โปรดให้หน้าร้านยืนยัน ไม่มีการโอนเงินจริง</p>':''}`:''}</article>`).join('')||'<p>ยังไม่มีออเดอร์</p>'}</details></aside></div>`:`<div class="panel empty">เปิดเมนูเพื่อเริ่มเลือกอาหาร${session()?.state==='closed'?' • รอบโต๊ะเดิมปิดแล้ว ต้องเริ่ม session ใหม่':''}</div>`}</section>`;
+}
+function cashMessage(p){if(p?.state==='จ่ายแล้ว')return '';if(!s.promptpay)return 'PromptPay จำลองปิดบริการ กรุณาชำระเงินสดที่หน้าร้าน';if(p?.requested_at!==null&&p?.requested_at!==undefined&&s.now-p.requested_at>=600000)return 'ยังไม่ยืนยันถึง 10 นาที กรุณาชำระเงินสดที่หน้าร้าน';if(p?.method==='cash')return 'เลือกเงินสดแล้ว กรุณาชำระที่หน้าร้านและรอพนักงานกดรับเงิน';return '';}
+function itemsHTML(o){return `<ul class="list">${orderItems(o).map(i=>`<li>${esc(i.name)}${i.options.length?' · '+i.options.map(x=>esc(x.name)).join(', '):''} — ${money(i.total)}</li>`).join('')}</ul>`;}
+function staffNav(){return `<div class="subnav">${can('kitchen')?button('nav-kitchen','คิวครัว','nav','data-page="kitchen"'):''}${can('front')?button('nav-front','หน้าร้าน','nav','data-page="front"'):''}${button('','ออกจากระบบจำลอง','logout')}</div>`;}
+function staffHTML(){return `<section data-testid="screen-staff">${u.user?`<p>ผู้ใช้จำลอง <strong>${esc(u.user.username)}</strong> · ${esc(u.user.role)}</p>${staffNav()}${u.page==='kitchen'&&can('kitchen')?kitchenHTML():u.page==='front'&&can('front')?frontHTML():''}`:'<p class="muted">กรุณาเข้าสู่ระบบจำลองเพื่อเปิดคิวครัวหรือหน้าร้าน</p>'}</section>`;}
+function kitchenHTML(){const i=s.ingredients.find(i=>i.id===u.ingredient);const queue=[...s.orders].sort((a,b)=>a.received_at.localeCompare(b.received_at)||a.id-b.id);return `<div class="grid"><section class="panel"><h2>คิวครัว</h2><p class="muted">เรียงเวลาจำลองระดับวินาที แล้วเลขออเดอร์ • กดหนึ่งครั้งเลื่อนหนึ่งขั้น</p><div data-testid="kitchen-queue">${queue.map(o=>`<article class="ticket" data-testid="kitchen-order" data-order-id="${o.id}" data-received-at="${o.received_at}"><div class="split"><h3>#${o.id} · ${o.channel==='takeaway'?'สั่งกลับบ้าน '+esc(o.takeaway_id):'โต๊ะ '+esc(o.table_id)}</h3><span class="status">${statuses[o.status]}</span></div><time>${o.received_at}</time>${o.channel==='takeaway'?`<p>รับ ${esc(o.pickup_date)} ${esc(o.pickup_slot)}</p>`:''}${itemsHTML(o)}${button('btn-status-next',o.status<2?'เปลี่ยนเป็น '+statuses[o.status+1]:'เสร็จแล้ว','next-status',`data-id="${o.id}" ${o.status===2?'disabled':''}`)}</article>`).join('')||'<p class="empty">ยังไม่มีออเดอร์ในคิว</p>'}</div></section><section class="panel"><h2>ความพร้อมวัตถุดิบ</h2><label>วัตถุดิบ<select data-testid="ingredient-select">${choices(s.ingredients,u.ingredient)}</select></label><p data-testid="ingredient-status">${esc(i?.name)} · ${i?.available?'มี':'หมด'}</p><div class="row">${button('btn-out-of-stock','วัตถุดิบหมด','stock','data-available="false" class="danger"')}${button('btn-restock','กลับมามี','stock','data-available="true"')}</div><p class="muted">ผลจำลองตามแมป whole / option • เปิดคืนเมื่อไม่มีวัตถุดิบอื่นหมดค้าง และผู้จัดการไม่ได้ปิดขาย</p><p class="notice">DI-04/A-03 ยังไม่ยืนยันการเชื่อม US-20 กับ US-12/US-13</p></section></div>`;}
+function frontHTML(){return `<section class="panel"><h2>หน้าร้าน • ออเดอร์และการรับเงิน</h2><p>ยอดแต่ละออเดอร์คงตามข้อมูลขณะส่ง • สลิปและการรับเงิน <span class="tag">จำลอง</span></p><div data-testid="front-orders">${s.orders.map(o=>{const p=payment(o),old=o.session_id&&s.sessions.find(x=>x.id===o.session_id)?.state==='closed';return `<article data-testid="front-order" data-order-id="${o.id}" data-table-id="${esc(o.table_id)}" class="ticket"><div class="split"><h3>#${o.id} · ${o.channel==='takeaway'?'สั่งกลับบ้าน '+esc(o.takeaway_id):'โต๊ะ '+esc(o.table_id)}</h3><span class="status">${statuses[o.status]}</span></div><small>${o.received_at} · ${esc(o.session_id||o.pickup_date+' '+o.pickup_slot)} ${old?'· ประวัติรอบที่ปิดแล้ว':''}</small>${itemsHTML(o)}<div class="split"><strong data-testid="front-total" class="amount">${money(o.total)}</strong><strong data-testid="front-payment-status">${p.state}</strong></div><p>วิธีที่เลือก: ${p.method==='cash'?'เงินสด':p.method==='promptpay'?'PromptPay จำลอง':'ยังไม่เลือก'}</p><div class="row">${button('btn-confirm-slip','ยืนยันสลิปจำลอง','confirm-slip',`data-id="${o.id}" ${'disabled'}`)}${button('btn-receive-cash','รับเงินสดจำลอง','receive-cash',`data-id="${o.id}" ${p.state==='จ่ายแล้ว'?'disabled':''}`)}</div></article>`;}).join('')||'<p class="empty">ยังไม่มีออเดอร์</p>'}</div></section><section class="panel"><h2>รอบโต๊ะ</h2><label>เลือกโต๊ะ<select data-testid="front-table-select">${choices(s.tables,u.frontTable,'table_id','label')}</select></label><p>${s.sessions.filter(x=>x.table_id===u.frontTable&&x.state==='open').map(x=>esc(x.id)+' · เปิดรอบ').join('')||'ไม่มีรอบที่เปิดอยู่'}</p><div class="row">${button('','เปิดรอบโต๊ะจำลอง','front-open')}${button('btn-close-table','ปิดรอบโต๊ะที่เลือก','close-table','class="danger"')}</div><p class="muted">ปิดแล้วสั่งต่อรอบเดิมไม่ได้ เก็บออเดอร์เก่าในประวัติ • mock ไม่บังคับจ่ายครบก่อนปิด เพราะ Q-16 ยังไม่ยืนยัน</p><p class="message" role="status">${esc(u.frontMessage)}</p></section><section class="panel"><h2>บันทึกเหตุการณ์ชำระเงิน <span class="tag">จำลอง</span></h2><div data-testid="payment-log">${s.paymentEvents.map(e=>`<p>#${e.order_id} · ${esc(e.actor)} · ${e.at} · ${esc(e.action)}</p>`).join('')||'ยังไม่มีเหตุการณ์'}</div></section>`;}
+function managerHTML(){return `<section data-testid="screen-manager"><p>ผู้จัดการจำลอง <strong>${esc(u.user.username)}</strong></p><div class="panel"><label class="check"><input data-testid="toggle-promptpay" type="checkbox" ${s.promptpay?'checked':''}>เปิดบริการ PromptPay จำลอง</label><small>ไม่ตั้งบัญชีธนาคารจริง ไม่มีการสร้าง QR สำหรับโอนเงินจริง</small></div><nav class="subnav" aria-label="งานผู้จัดการ">${button('nav-menu-admin','จัดการเมนู','nav','data-page="menu"')}${button('nav-mapping','แมปวัตถุดิบ','nav','data-page="mapping"')}${button('nav-accounts','บัญชีและ PIN','nav','data-page="accounts"')}${button('','รายงาน (ตรวจสิทธิ์)','nav','data-page="reports"')}</nav>${staffNav()}${u.page==='menu'?adminHTML():u.page==='mapping'?mappingHTML():u.page==='accounts'?accountsHTML():u.page==='reports'?'<section data-testid="report-screen" class="panel"><h2>รายงาน • Placeholder</h2><p>หน้านี้ใช้ตรวจสิทธิ์ US-25 เท่านั้น ไม่สร้างรายงาน US-23 นอกขอบเขต</p></section>':u.page==='kitchen'?kitchenHTML():u.page==='front'?frontHTML():'<div class="panel">เลือกงานจากเมนูด้านบน</div>'}</section>`;}
+function loadDraft(id){u.adminId=id;const m=s.menus.find(m=>m.id===id);u.draft=m?clone(m):{name:'',price:0,image:null,available:true,options:[]};u.draft.pendingName='';u.draft.pendingPrice='0';u.draft.imageError='';u.draft.imageLoading=false;}
+function adminHTML(){if(!u.draft)loadDraft(u.adminId);const d=u.draft;return `<section data-testid="menu-admin" class="panel"><h2>จัดการเมนู</h2><p class="muted">เพิ่ม/แก้เมนูและตัวเลือก 0–10 รายการ • เมนูที่ส่งแล้วเก็บชื่อและราคาเดิม</p><label>เลือกเมนู<select data-testid="admin-menu-select"><option value="new" ${u.adminId==='new'?'selected':''}>+ สร้างเมนูใหม่</option>${choices(s.menus,u.adminId)}</select></label><div class="fields"><label>ชื่อเมนู<input data-testid="admin-menu-name" value="${esc(d.name)}"></label><label>ราคา (บาท ≥ 0)<input data-testid="admin-menu-price" type="number" min="0" step="0.01" value="${esc(d.price)}"></label><label>รูป jpg/png ≤ 2 MB<input data-testid="admin-menu-image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png"></label></div><label class="check"><input id="admin-available" type="checkbox" ${d.available?'checked':''}>เปิดขายโดยผู้จัดการ (แยกจากวัตถุดิบ)</label>${d.image?`<div class="row"><img alt="รูปเมนูที่เลือก" src="${esc(d.image)}" width="100" height="80" style="object-fit:cover">${button('','นำรูปออก','remove-image')}</div>`:''}<p class="message" role="status">${esc(d.imageError|| (d.imageLoading?'กำลังอ่านรูปในเครื่อง…':''))}</p><h3>ตัวเลือกเพิ่ม (${d.options.length}/10)</h3>${d.options.map((x,i)=>`<div class="option-row"><label>ชื่อตัวเลือก ${i+1}<input data-draft-option="${i}" data-field="name" value="${esc(x.name)}"></label><label>ราคาเพิ่ม<input type="number" min="0" step="0.01" data-draft-option="${i}" data-field="price" value="${esc(x.price)}"></label>${button('','ลบตัวเลือก','remove-option',`data-id="${i}"`)}</div>`).join('')}<div class="fields"><label>ชื่อตัวเลือกใหม่<input data-testid="admin-option-name" value="${esc(d.pendingName)}"></label><label>ราคาเพิ่ม (บาท ≥ 0)<input data-testid="admin-option-price" type="number" min="0" step="0.01" value="${esc(d.pendingPrice)}"></label></div>${button('','เพิ่มตัวเลือกในแบบร่าง','add-option')}<p class="muted">ปุ่มบันทึกเมนูจะรวมตัวเลือกใหม่ที่กรอกค้างไว้ด้วย</p><div class="row">${button('btn-save-menu','บันทึกเมนู','save-menu','class="primary"')}${button('btn-delete-menu','ลบเมนู','delete-menu',`class="danger" ${u.adminId==='new'?'disabled':''}`)}</div><p data-testid="admin-message" class="message" role="status">${esc(u.adminMessage)}</p></section>`;}
+function mappingHTML(){if(!s.menus.some(m=>m.id===u.mappingMenu))u.mappingMenu=s.menus[0]?.id??'';const m=s.menus.find(m=>m.id===u.mappingMenu);if(!m?.options.some(x=>x.id===u.mappingOption))u.mappingOption=m?.options[0]?.id??'';return `<section class="panel"><h2>แมปวัตถุดิบ</h2><p>เลือกได้เฉพาะเมนูและตัวเลือกที่บันทึกแล้วในหน้าจัดการเมนู</p><p class="notice">US-20 ต้นฉบับ: “กฎปิด/เปิดเมนูอัตโนมัติ (US-14)” • DI-04/A-03 ยังไม่ยืนยันการเชื่อม US-12/US-13 • A-02: หมายเหตุ ค. ไม่มีนิยาม</p><div class="fields"><label>เมนู<select data-testid="mapping-menu">${choices(s.menus,u.mappingMenu)}</select></label><label>ขอบเขต<select data-testid="mapping-scope"><option value="whole" ${u.mappingScope==='whole'?'selected':''}>ทั้งจาน (whole)</option><option value="option" ${u.mappingScope==='option'?'selected':''}>เฉพาะตัวเลือก (option)</option></select></label><label>ตัวเลือกของเมนู<select data-testid="mapping-option" ${u.mappingScope==='whole'?'disabled':''}>${choices(m?.options??[],u.mappingOption)}</select></label><label>วัตถุดิบ<select data-testid="mapping-ingredient">${choices(s.ingredients,u.mappingIngredient)}</select></label></div>${button('btn-save-mapping','เพิ่มความสัมพันธ์','save-mapping','class="primary"')}<p class="message" role="status">${esc(u.mappingMessage)}</p><div data-testid="mapping-list">${s.mappings.map(m=>`<p><code>${esc(m.menu_id)} → ${esc(m.ingredient_id)} · ${esc(m.scope)} · ${esc(m.option_id??'—')}</code></p>`).join('')||'ยังไม่มีแมป'}</div></section>`;}
+function accountsHTML(){return `<section class="panel"><h2>บัญชีและสิทธิ์ <span class="tag">จำลอง</span></h2><p>ชื่อผู้ใช้ตัวอักษร/ตัวเลข 3–20 ตัว • PIN ตัวเลข 4–6 หลัก • ไม่ใช้บัญชีจริง</p><div class="fields"><label>ชื่อผู้ใช้ใหม่<input data-testid="account-username" autocomplete="off"></label><label>PIN ใหม่ จำลอง<input data-testid="account-pin" type="password" inputmode="numeric" autocomplete="off"></label><label>บทบาท<select data-testid="account-role"><option value="kitchen">ครัว</option><option value="front">หน้าร้าน</option><option value="manager">ผู้จัดการ</option></select></label></div>${button('btn-save-account','สร้างบัญชีจำลอง','save-account','class="primary"')}<p data-testid="account-message" role="status" class="message">${esc(u.accountMessage)}</p><ul>${s.accounts.map(a=>`<li>${esc(a.username)} · ${esc(a.role)} ${a.lockedUntil>s.now?'· ล็อกถึง '+iso(a.lockedUntil):''}</li>`).join('')}</ul></section>`;}
+function login(){const a=s.accounts.find(a=>a.username===val('staff-user')),pin=val('staff-pin');u.loginUser=val('staff-user');u.user=null;if(!a){u.auth='ปฏิเสธ: ไม่พบบัญชีจำลอง';return render();}if(a.lockedUntil>s.now){u.auth='ปฏิเสธ: บัญชีถูกล็อก 5 นาที ถึง '+iso(a.lockedUntil);return render();}if(a.lockedUntil){a.failures=0;a.lockedUntil=0;}if(a.pin!==pin){a.failures++;if(a.failures>=5){a.lockedUntil=s.now+300000;u.auth='ปฏิเสธ: PIN ผิด 5 ครั้ง บัญชีถูกล็อก 5 นาที ถึง '+iso(a.lockedUntil);}else u.auth=`ปฏิเสธ: PIN ไม่ถูกต้อง (${a.failures}/5)`;return render();}a.failures=0;if(u.role==='manager'&&a.role!=='manager'){u.auth='ปฏิเสธ: ต้องใช้บัญชีผู้จัดการจำลอง';return render();}u.user={username:a.username,role:a.role};u.auth='เข้าใช้สำเร็จ: '+a.username+' · PIN/สิทธิ์จำลอง';if(u.role==='manager'){navigate('menu');}else{u.page=a.role==='front'?'front':'kitchen';render();}}
+function navigate(page){if(['menu','mapping','accounts','reports'].includes(page)){if(!can('manager'))return deny();u.role='manager';u.page=page;history.pushState(null,'','#/manager/'+page);}else{if(!can(page))return deny();u.page=page;history.replaceState(null,'','#/'+(u.role==='manager'?'manager':'staff')+'/'+page);}render();}
+function handleRoute(){const route=location.hash.slice(1);if(route.startsWith('/manager/')){if(!can('manager')){u.auth='ปฏิเสธ: ไม่มีสิทธิ์เข้าหน้าผู้จัดการผ่าน URL (จำลอง)';if(u.role!=='customer')u.page='';return render();}const page=route.split('/')[2];u.role='manager';u.page=['menu','mapping','accounts','reports','kitchen','front'].includes(page)?page:'';render();}else if(route.startsWith('/staff/')){const page=route.split('/')[2];if(!['kitchen','front'].includes(page)||!can(page)){u.page='';return deny();}u.page=page;render();}}
+function selectRole(role){epoch++;u.user=null;u.role=role;u.page='';u.auth='';u.draft=null;u.adminMessage='';u.loginUser=role==='manager'?'demomanager':'demokitchen';history.replaceState(null,'',location.pathname+location.search);render();}
+function addItem(){const m=s.menus.find(x=>x.id===u.selectedMenu);if(!menuAvailable(m)||m.options.some(o=>u.selectedOptions.includes(o.id)&&!optionAvailable(m,o))){u.orderMessage='ปฏิเสธ: เมนูหรือตัวเลือกหมด / ปิดขาย';return render();}const options=m.options.filter(x=>u.selectedOptions.includes(x.id)).map(clone);const item={menu_id:m.id,name:m.name,price:m.price,options,total:(cents(m.price)+options.reduce((n,x)=>n+cents(x.price),0))/100};currentCart().push(item);u.orderMessage='เพิ่มลงตะกร้าแล้ว';render();}
+function submitOrder(){const cart=currentCart();if(u.mode==='dine-in'&&session()?.state!=='open'){u.orderMessage='ปฏิเสธ: session โต๊ะปิดแล้ว กรุณาเปิดเมนูใหม่';return render();}if(!cart.length){u.orderMessage='กรุณาเพิ่มอาหารลงตะกร้า';return render();}
+ // Validate the entire basket before issuing any order, item, payment or queue entry.
+ const invalid=cart.find(i=>{const m=s.menus.find(m=>m.id===i.menu_id);return !menuAvailable(m)||i.options.some(o=>!m.options.some(x=>x.id===o.id)||!optionAvailable(m,o));});
+ if(invalid){u.orderMessage='ปฏิเสธ: '+invalid.name+' หรือวัตถุดิบ/ตัวเลือกหมด ถูกปิดขาย หรือถูกลบ กรุณานำรายการออกแล้วเลือกใหม่';return render();}
+ // Mock policy: refresh a stale catalog price for review, requiring another submit.
+ let changed=false;for(const i of cart){const m=s.menus.find(m=>m.id===i.menu_id),options=i.options.map(o=>clone(m.options.find(x=>x.id===o.id)));const total=(cents(m.price)+options.reduce((n,x)=>n+cents(x.price),0))/100;if(i.price!==m.price||i.name!==m.name||JSON.stringify(i.options)!==JSON.stringify(options)){Object.assign(i,{name:m.name,price:m.price,options,total});changed=true;}}
+ if(changed){u.orderMessage='ราคา/รายละเอียดเปลี่ยนแล้ว กรุณาตรวจตะกร้าและกดส่งอีกครั้ง (นโยบายจำลอง)';return render();}
+ const slot=u.mode==='takeaway'?slots().find(x=>x.t===u.slot):null;if(u.mode==='takeaway'&&!slot){u.orderMessage='ช่วงรับเดิมผ่านเวลาแล้ว กรุณาเลือกช่วงรับใหม่อย่างน้อย 20 นาที';ensureSlot();return render();}
+ let takeaway_id=null;if(u.mode==='takeaway'){if(s.takeawayDay!==day()){s.takeawayDay=day();s.takeawaySequence=0;}takeaway_id='T-'+String(++s.takeawaySequence).padStart(3,'0');}
+ const o={id:s.nextOrder++,channel:u.mode,table_id:u.mode==='dine-in'?session().table_id:'takeaway',session_id:u.mode==='dine-in'?u.session:null,received_at:iso(Math.floor(s.now/1000)*1000),confirmed_at:iso(),status:0,total:sum(cart),takeaway_id,pickup_slot:slot?.value??null,pickup_date:slot?.date??null};
+ s.orders.push(o);for(const i of cart)s.items.push({...clone(i),id:s.nextItem++,order_id:o.id});s.payments.push({order_id:o.id,total:o.total,state:'ยังไม่จ่าย',method:null,requested_at:null});s.paymentEvents.push({order_id:o.id,actor:'ลูกค้าจำลอง',at:iso(),action:'ออเดอร์ใหม่ · ยังไม่จ่าย'});cart.splice(0);u.orderMessage='ส่งออเดอร์ #'+o.id+' แล้ว • แจ้งครัวจำลอง';render();
+}
+function choosePayment(method,id){const o=id?s.orders.find(o=>o.id===Number(id)):latest();if(!o||!sessionOrders().includes(o))return;const p=payment(o);if(p.state==='จ่ายแล้ว')return;if(method==='promptpay'&&!s.promptpay)return render();p.method=method;if(method==='promptpay'){p.state='ค้างจ่าย';if(p.requested_at===null)p.requested_at=s.now;}else p.state='ยังไม่จ่าย';s.paymentEvents.push({order_id:o.id,actor:'ลูกค้าจำลอง',at:iso(),action:'เลือก '+(method==='cash'?'เงินสด (ยังไม่รับเงิน)':'PromptPay จำลอง · ค้างจ่าย')});render();}
+function confirmPayment(id,method){if(!can('front'))return deny();const p=s.payments.find(p=>p.order_id===Number(id));if(!p||p.state==='จ่ายแล้ว'||(method==='slip'&&p.requested_at===null))return;p.state='จ่ายแล้ว';p.method=method==='slip'?'promptpay':'cash';s.paymentEvents.push({order_id:p.order_id,actor:u.user.username,at:iso(),action:method==='slip'?'ยืนยันสลิปจำลอง · จ่ายแล้ว':'รับเงินสดจำลอง · จ่ายแล้ว'});render();}
+function validPrice(v){return String(v).trim()!==''&&Number.isFinite(Number(v))&&Number(v)>=0&&Number(v)<=Number.MAX_SAFE_INTEGER/100&&Number.isSafeInteger(Math.round(Number(v)*100));}
+function addOption(){const d=u.draft;if(!d.pendingName.trim()||!validPrice(d.pendingPrice)){u.adminMessage='ปฏิเสธ: กรุณาระบุชื่อตัวเลือกและราคาเพิ่ม ≥ 0';return false;}if(d.options.length>=10){u.adminMessage='ปฏิเสธ: ตัวเลือกได้ไม่เกิน 10 รายการ';return false;}d.options.push({id:'opt-'+s.nextOption++,name:d.pendingName.trim(),price:cents(d.pendingPrice)/100});d.pendingName='';d.pendingPrice='0';return true;}
+function saveMenu(){if(!can('manager'))return deny();const d=u.draft;if(d.imageLoading||d.imageError){u.adminMessage='ปฏิเสธ: รอรูปอ่านเสร็จหรือเลือกรูปใหม่ที่ถูกต้อง';return render();}if(!d.name.trim()||!validPrice(d.price)||d.options.some(o=>!o.name.trim()||!validPrice(o.price))){u.adminMessage='ปฏิเสธ: ชื่อห้ามว่าง ราคาเมนูและตัวเลือกต้อง ≥ 0';return render();}if(d.pendingName.trim()&&!addOption())return render();if(d.options.length>10){u.adminMessage='ปฏิเสธ: ตัวเลือกได้ 0–10 รายการ';return render();}
+ const id=u.adminId==='new'?'m'+String(s.nextMenu).padStart(2,'0'):u.adminId;const removed=s.mappings.filter(m=>m.menu_id===id&&m.scope==='option'&&!d.options.some(o=>o.id===m.option_id));if(removed.length&&!confirm('ตัวเลือกที่นำออกมีแมปวัตถุดิบ บันทึกแล้วจะลบแมปของตัวเลือกเหล่านี้ ยืนยันหรือไม่?')){u.adminMessage='ยกเลิกบันทึก';return render();}
+ const m={id,name:d.name.trim(),price:cents(d.price)/100,image:d.image,available:d.available,options:d.options.map(o=>({id:o.id,name:o.name.trim(),price:cents(o.price)/100}))};if(u.adminId==='new'){s.nextMenu++;s.menus.push(m);}else{s.menus[s.menus.findIndex(x=>x.id===id)]=m;}s.mappings=s.mappings.filter(x=>!removed.includes(x));u.adminMessage='บันทึก '+m.name+' ('+id+') แล้ว ยอดออเดอร์เดิมคงเดิม';loadDraft(id);render();}
+function deleteMenu(){if(!can('manager'))return deny();const m=s.menus.find(m=>m.id===u.adminId);if(!m)return;const mapped=s.mappings.some(x=>x.menu_id===m.id);if(!confirm(mapped?'เมนู '+m.name+' มีการแมปวัตถุดิบ: ลบเมนูแล้วจะลบแมปทั้งหมดของเมนูและตัวเลือกด้วย ยอดออเดอร์เก่าคงเดิม ยืนยันลบหรือไม่?':'ยืนยันลบเมนู '+m.name+' หรือไม่? ยอดออเดอร์เก่าคงเดิม')){u.adminMessage='ยกเลิกการลบเมนูและแมป';return render();}s.menus=s.menus.filter(x=>x.id!==m.id);s.mappings=s.mappings.filter(x=>x.menu_id!==m.id);u.adminMessage='ลบ '+m.name+' และแมปที่เกี่ยวข้องแล้ว';loadDraft('new');render();}
+function saveMapping(){if(!can('manager'))return deny();const m=s.menus.find(x=>x.id===u.mappingMenu),ingredient=s.ingredients.find(x=>x.id===u.mappingIngredient);if(!m||!ingredient||(u.mappingScope==='option'&&!m.options.some(x=>x.id===u.mappingOption))){u.mappingMessage='ปฏิเสธ: ต้องเลือกเมนู/ตัวเลือกที่บันทึกแล้วและวัตถุดิบที่มีอยู่';return render();}const map={menu_id:m.id,ingredient_id:ingredient.id,scope:u.mappingScope,option_id:u.mappingScope==='option'?u.mappingOption:null};if(!s.mappings.some(x=>x.menu_id===map.menu_id&&x.ingredient_id===map.ingredient_id&&x.scope===map.scope&&x.option_id===map.option_id))s.mappings.push(map);u.mappingMessage='บันทึกความสัมพันธ์แล้ว มีผลต่อการปิด/เปิดจำลองทันที';render();}
+function saveAccount(){if(!can('manager'))return deny();const name=val('account-username').trim(),pin=val('account-pin'),role=val('account-role');if(!/^[\p{L}\p{N}]{3,20}$/u.test(name)||!/^\d{4,6}$/.test(pin)||!['kitchen','front','manager'].includes(role)){u.accountMessage='ปฏิเสธ: ชื่อผู้ใช้ต้องเป็นตัวอักษร/ตัวเลข 3–20 ตัว และ PIN ตัวเลข 4–6 หลัก';tid('account-message').textContent=u.accountMessage;return;}if(s.accounts.some(a=>a.username.toLowerCase()===name.toLowerCase())){u.accountMessage='ปฏิเสธ: ชื่อผู้ใช้นี้มีอยู่แล้ว';tid('account-message').textContent=u.accountMessage;return;}s.accounts.push({id:name,username:name,pin,role,failures:0,lockedUntil:0});u.accountMessage='สร้างบัญชีจำลอง '+name+' แล้ว';render();}
+async function uploadImage(file){if(!can('manager')||!u.draft)return;const d=u.draft,version=epoch;d.imageError='';if(!file){d.imageLoading=false;return;}if(!/\.(jpe?g|png)$/i.test(file.name)||!['image/jpeg','image/png'].includes(file.type)||file.size>2000000){d.imageError='ปฏิเสธรูป: ต้องเป็น jpg/png ไม่เกิน 2 MB (2,000,000 ไบต์ใน mock)';return render();}d.imageLoading=true;render();try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('อ่านไฟล์ไม่สำเร็จ'));reader.readAsDataURL(file);});const bytes=new Uint8Array(await file.slice(0,8).arrayBuffer());const png=bytes.length===8&&[137,80,78,71,13,10,26,10].every((b,i)=>bytes[i]===b);const jpg=bytes[0]===255&&bytes[1]===216&&bytes[2]===255;if((file.type==='image/png'&&!png)||(file.type==='image/jpeg'&&!jpg))throw new Error('ข้อมูลไฟล์ไม่ตรง jpg/png');await new Promise((resolve,reject)=>{const img=new Image();img.onload=resolve;img.onerror=()=>reject(new Error('รูปเสียหรือเปิดไม่ได้'));img.src=data;});if(epoch!==version||u.draft!==d||!can('manager'))return;d.image=data;d.imageLoading=false;d.imageError='';render();}catch(e){if(epoch!==version||u.draft!==d)return;d.imageLoading=false;d.imageError='ปฏิเสธรูป: '+e.message;render();}}
+// Input events update only draft data; text fields retain caret and keyboard focus.
+document.addEventListener('input',e=>{if(!can('manager')||!u.draft)return;const fields={'admin-menu-name':'name','admin-menu-price':'price','admin-option-name':'pendingName','admin-option-price':'pendingPrice'};const key=fields[e.target.dataset.testid];if(key)u.draft[key]=e.target.value;if(e.target.dataset.draftOption!==undefined){const o=u.draft.options[Number(e.target.dataset.draftOption)];if(o)o[e.target.dataset.field]=e.target.value;}});
+document.addEventListener('change',e=>{const t=e.target,id=t.dataset.testid;if(id==='staff-user'){u.loginUser=t.value;return;}if(id==='order-mode'){u.mode=t.value;u.selectedMenu=null;u.selectedOptions=[];u.orderMessage='';if(u.mode==='takeaway'){u.takeawayOpened=true;ensureSlot();}render();}else if(id==='table-select'){u.table=t.value;}else if(id==='pickup-slot'){u.slot=slots().find(x=>x.value===t.value)?.t;}else if(t.dataset.option){const option=t.dataset.option;if(t.checked&&!u.selectedOptions.includes(option))u.selectedOptions.push(option);else if(!t.checked)u.selectedOptions=u.selectedOptions.filter(x=>x!==option);render();}else if(id==='ingredient-select'&&can('kitchen')){u.ingredient=t.value;render();}else if(id==='front-table-select'&&can('front')){u.frontTable=t.value;render();}else if(id==='toggle-promptpay'&&can('manager')){s.promptpay=t.checked;render();}else if(id==='admin-menu-select'&&can('manager')){loadDraft(t.value);u.adminMessage='';render();}else if(id==='admin-menu-image'){uploadImage(t.files[0]);}else if(t.id==='admin-available'&&can('manager')){u.draft.available=t.checked;}else if(id?.startsWith('mapping-')&&can('manager')){const fields={'mapping-menu':'mappingMenu','mapping-scope':'mappingScope','mapping-option':'mappingOption','mapping-ingredient':'mappingIngredient'};if(fields[id]){u[fields[id]]=t.value;render();}}});
+document.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='login-form')login();});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b||b.disabled)return;const a=b.dataset.action,id=b.dataset.id;
+ if(a==='reset')return reset();if(a==='role')return selectRole(b.dataset.role);if(a==='advance'){s.now+=Number(b.dataset.minutes)*60000;if(s.takeawayDay!==day()){s.takeawayDay=day();s.takeawaySequence=0;}render();return;}if(a==='logout'){epoch++;u.user=null;u.page='';u.auth='ออกจากระบบจำลองแล้ว';history.replaceState(null,'',location.pathname+location.search);return render();}if(a==='nav')return navigate(b.dataset.page);
+ if(['open-menu','select-menu','add-item','remove-cart','submit-order','cash','promptpay'].includes(a)&&u.role!=='customer')return;
+ if(a==='open-menu')return openMenu();if(a==='select-menu'){u.selectedMenu=id;u.selectedOptions=[];return render();}if(a==='add-item')return addItem();if(a==='remove-cart'){currentCart().splice(Number(id),1);return render();}if(a==='submit-order')return submitOrder();if(a==='cash'||a==='promptpay')return choosePayment(a,id);
+ if(a==='next-status'){if(!can('kitchen'))return deny();const o=s.orders.find(x=>x.id===Number(id));if(o&&o.status<2){o.status++;s.statusEvents.push({order_id:o.id,status:statuses[o.status],actor:u.user.username,at:iso()});}return render();}if(a==='stock'){if(!can('kitchen'))return deny();const i=s.ingredients.find(i=>i.id===u.ingredient);if(i)i.available=b.dataset.available==='true';return render();}
+ if(a==='confirm-slip'||a==='receive-cash')return confirmPayment(id,a==='confirm-slip'?'slip':'cash');if(a==='close-table'||a==='front-open'){if(!can('front'))return deny();if(a==='front-open'){const x=openTable(u.frontTable);u.frontMessage='เปิดโต๊ะ '+u.frontTable+' · '+x.id;}else{const x=s.sessions.find(x=>x.table_id===u.frontTable&&x.state==='open');if(x){x.state='closed';x.closed_at=iso();x.cart=[];u.frontMessage='ปิดโต๊ะ '+u.frontTable+' · เก็บ '+x.id+' ในประวัติแล้ว';}else u.frontMessage='โต๊ะนี้ไม่มีรอบที่เปิดอยู่';}return render();}
+ if(['add-option','remove-option','remove-image','save-menu','delete-menu','save-mapping','save-account'].includes(a)&&!can('manager'))return deny();
+ if(a==='add-option'){addOption();return render();}if(a==='remove-option'){u.draft.options.splice(Number(id),1);return render();}if(a==='remove-image'){u.draft.image=null;u.draft.imageError='';return render();}if(a==='save-menu')return saveMenu();if(a==='delete-menu')return deleteMenu();if(a==='save-mapping')return saveMapping();if(a==='save-account')return saveAccount();
+});
+window.addEventListener('hashchange',handleRoute);window.addEventListener('popstate',handleRoute);
+const initialHash=location.hash;reset();if(initialHash){history.replaceState(null,'',initialHash);handleRoute();}
+})();
+</script>
+</body>
+</html>

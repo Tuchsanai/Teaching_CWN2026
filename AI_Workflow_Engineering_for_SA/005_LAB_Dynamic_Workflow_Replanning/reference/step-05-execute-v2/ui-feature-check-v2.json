@@ -1,0 +1,312 @@
+{
+  "html": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html",
+  "url_scheme": "file://",
+  "html_sha256": "249b98c493f4c1347efe36f8be059095ede9d3b23b76ada3b022cfc416c2a1cc",
+  "html_unchanged": true,
+  "script_sha256": "85a3cf688083e56d0f601a52b3fe2f3a2081bdd1a6c63cae4b034a860e2c30f1",
+  "browser": "151.0.7922.34",
+  "checks": [
+    {
+      "id": "unavailable_customer_return",
+      "scenario": "return",
+      "started_at": "2026-09-14T13:50:41.171612Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "order_id": "1",
+        "original_snapshot": 50,
+        "adjusted_total": 0,
+        "order_state_preserved": "รับออเดอร์",
+        "payment_state_preserved": "ยังไม่จ่าย",
+        "repeat_return_control_absent": true,
+        "kitchen_active_item_removed": true
+      },
+      "ended_at": "2026-09-14T13:50:42.780519Z",
+      "duration_s": 1.608906,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "replacement_reaches_kitchen",
+      "scenario": "replacement",
+      "started_at": "2026-09-14T13:50:42.804915Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "order_id": "1",
+        "replacement_menu": "m02",
+        "original_snapshot": 50,
+        "adjusted_total": 55,
+        "kitchen_updated": true
+      },
+      "ended_at": "2026-09-14T13:50:43.760287Z",
+      "duration_s": 0.955375,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "return_uses_original_snapshot",
+      "scenario": "snapshot",
+      "started_at": "2026-09-14T13:50:43.782462Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "order_id": "1",
+        "catalog_price_after_edit": 99,
+        "preserved_order_snapshot": 50,
+        "adjusted_after_return": 0
+      },
+      "ended_at": "2026-09-14T13:50:44.693563Z",
+      "duration_s": 0.911102,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "paid_return_keeps_payment_state",
+      "scenario": "paid-return",
+      "started_at": "2026-09-14T13:50:44.716249Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "order_id": "1",
+        "mock_payment_state": "จ่ายแล้ว",
+        "adjusted_total": 0,
+        "real_refund_not_confirmed": true
+      },
+      "ended_at": "2026-09-14T13:50:45.613968Z",
+      "duration_s": 0.897722,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "capacity_n5_round_1",
+      "scenario": "capacity",
+      "started_at": "2026-09-14T13:50:45.636163Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "round": 1,
+        "N": 5,
+        "X_fixture_minutes": 10,
+        "confirmed_order_ids_at_threshold": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "warning_before_confirm": true,
+        "sixth_order_allowed_in_mock": true,
+        "observed_window_starts": [
+          "12:00",
+          "12:15",
+          "12:30",
+          "12:45"
+        ],
+        "counter_reset_at_next_window": true,
+        "timezone_fixture": "+07:00"
+      },
+      "ended_at": "2026-09-14T13:50:47.506067Z",
+      "duration_s": 1.869906,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "capacity_n5_round_2",
+      "scenario": "capacity",
+      "started_at": "2026-09-14T13:50:47.529355Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "round": 2,
+        "N": 5,
+        "X_fixture_minutes": 10,
+        "confirmed_order_ids_at_threshold": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "warning_before_confirm": true,
+        "sixth_order_allowed_in_mock": true,
+        "observed_window_starts": [
+          "12:00",
+          "12:15"
+        ],
+        "counter_reset_at_next_window": true,
+        "timezone_fixture": "+07:00"
+      },
+      "ended_at": "2026-09-14T13:50:48.806068Z",
+      "duration_s": 1.276714,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "capacity_n5_round_3",
+      "scenario": "capacity",
+      "started_at": "2026-09-14T13:50:48.828727Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "round": 3,
+        "N": 5,
+        "X_fixture_minutes": 10,
+        "confirmed_order_ids_at_threshold": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "warning_before_confirm": true,
+        "sixth_order_allowed_in_mock": true,
+        "observed_window_starts": [
+          "12:00",
+          "12:15"
+        ],
+        "counter_reset_at_next_window": true,
+        "timezone_fixture": "+07:00"
+      },
+      "ended_at": "2026-09-14T13:50:50.089873Z",
+      "duration_s": 1.261142,
+      "page_errors": [],
+      "network_attempts": []
+    },
+    {
+      "id": "mobile_pending_resolution",
+      "scenario": "mobile",
+      "started_at": "2026-09-14T13:50:50.113377Z",
+      "passed": true,
+      "scope": "offline mock assertions only",
+      "observed": {
+        "order_id": "1",
+        "viewport": {
+          "width": 375,
+          "height": 900
+        },
+        "horizontal_overflow": false,
+        "measured_widths": {
+          "scrollWidth": 375,
+          "innerWidth": 375
+        }
+      },
+      "ended_at": "2026-09-14T13:50:50.783920Z",
+      "duration_s": 0.670546,
+      "page_errors": [],
+      "network_attempts": []
+    }
+  ],
+  "passed": 8,
+  "failed": 0,
+  "expected_executions": 8,
+  "unique_scenarios": 6,
+  "capacity_rounds": 3,
+  "screenshots": [
+    {
+      "case": "unavailable_customer_return",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-kitchen-compare.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-kitchen-compare.png",
+      "bytes": 124899,
+      "sha256": "38b062b6249807baae413719b77fb6c73050d586a0695aca6cd73b5d43abe474",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": true,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html#/staff/kitchen"
+    },
+    {
+      "case": "unavailable_customer_return",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-kitchen-waiting.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-kitchen-waiting.png",
+      "bytes": 127349,
+      "sha256": "890372a948bd43cff25b5b67558954ccf1a2ecbdcef67d0de956600a6de344db",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": true,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html#/staff/kitchen"
+    },
+    {
+      "case": "unavailable_customer_return",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-customer-alert.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-customer-alert.png",
+      "bytes": 73855,
+      "sha256": "b01fd5a7702676bfaa0ddd5e67040e1269579bee373de6b9993fa358b024eaaf",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": false,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html"
+    },
+    {
+      "case": "unavailable_customer_return",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-front-returned.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-front-returned.png",
+      "bytes": 88333,
+      "sha256": "4d2cbb27b726a7a891eebf337b17107598c4ba29214763f9d80c11118686f9d4",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": false,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html#/staff/front"
+    },
+    {
+      "case": "replacement_reaches_kitchen",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-kitchen-replaced.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-kitchen-replaced.png",
+      "bytes": 126833,
+      "sha256": "70e8150b19029f711eac6d5c56150c4d5500956d98980f4758f76a582cdfd1bd",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": true,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html#/staff/kitchen"
+    },
+    {
+      "case": "capacity_n5_round_1",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-manager-capacity.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-manager-capacity.png",
+      "bytes": 114222,
+      "sha256": "339e58a5d2dea42fa5e5cf4a2b01896c6904064e95b6a0c2bcbdd93856b35916",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": false,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html#/manager/capacity"
+    },
+    {
+      "case": "capacity_n5_round_1",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-customer-capacity.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-customer-capacity.png",
+      "bytes": 232225,
+      "sha256": "369387fb3b3359f056f4605fe6986384d47996980954fb6189050a2c2f9255f0",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "full_page": false,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html"
+    },
+    {
+      "case": "mobile_pending_resolution",
+      "path": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/img/screen-v2-r2-mobile-customer-alert.png",
+      "capture_source": "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/ui-browser/round-2/screen-v2-r2-mobile-customer-alert.png",
+      "bytes": 54814,
+      "sha256": "4ed8d1b8a4d78c337a40b2fd1bffb44ada0182bb665173a9ea5d463e54d33e2e",
+      "viewport": {
+        "width": 375,
+        "height": 900
+      },
+      "full_page": false,
+      "url": "file:///root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html"
+    }
+  ],
+  "scope": "Offline mock: 6 scenarios, capacity repeated in 3 fresh contexts. No LAN timing, load, production security or real-money certification."
+}

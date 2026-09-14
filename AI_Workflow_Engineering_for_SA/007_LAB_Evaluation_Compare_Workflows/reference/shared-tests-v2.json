@@ -1,0 +1,1559 @@
+{
+  "scenarios": [
+    {
+      "id": "TS-US-01-101",
+      "us": "US-01",
+      "scenario": "เปิดเมนูโดยไม่ล็อกอิน; ไม่วัด QR/Wi-Fi",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "expect_visible",
+          "testid": "menu-list"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-02-101",
+      "us": "US-02",
+      "scenario": "ผูกโต๊ะ 02 ใน UI จำลอง",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "02"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demofront"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-front"
+        },
+        {
+          "action": "expect_text",
+          "testid": "front-orders",
+          "value": "02"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-03-101",
+      "us": "US-03",
+      "scenario": "กลับบ้านและช่วงรับจำลอง",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "fill",
+          "testid": "order-mode",
+          "value": "takeaway"
+        },
+        {
+          "action": "fill",
+          "testid": "pickup-slot",
+          "value": "12:30-12:45"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "expect_text",
+          "testid": "kitchen-queue",
+          "value": "สั่งกลับบ้าน"
+        },
+        {
+          "action": "expect_text",
+          "testid": "kitchen-queue",
+          "value": "12:30"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-04-101",
+      "us": "US-04",
+      "scenario": "ตัวเลือกไข่รวมราคาและส่งใบครัว",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "option-extra-egg"
+        },
+        {
+          "action": "expect_text",
+          "testid": "item-total",
+          "value": "60"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "expect_text",
+          "testid": "kitchen-queue",
+          "value": "ไข่"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-05-101",
+      "us": "US-05",
+      "scenario": "ลูกค้าเห็นสถานะใหม่ในแท็บเดียว",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "click",
+          "testid": "btn-status-next"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "expect_text",
+          "testid": "customer-order-status",
+          "value": "กำลังทำ"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-06-101",
+      "us": "US-06",
+      "scenario": "ตะกร้าเก่าถูกปฏิเสธหลัง chicken หมด",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "ingredient-select",
+          "value": "chicken"
+        },
+        {
+          "action": "click",
+          "testid": "btn-out-of-stock"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "expect_text",
+          "testid": "order-message",
+          "value": "หมด"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-08-101",
+      "us": "US-08",
+      "scenario": "PromptPay ค้างยืนยันและ fallback 10 นาทีจำลอง",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "pay-promptpay"
+        },
+        {
+          "action": "expect_text",
+          "testid": "payment-status",
+          "value": "ค้างจ่าย"
+        },
+        {
+          "action": "click",
+          "testid": "btn-advance-10m"
+        },
+        {
+          "action": "expect_text",
+          "testid": "cash-message",
+          "value": "เงินสด"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-08-102",
+      "us": "US-08",
+      "scenario": "เงินสดต้องให้หน้าร้านยืนยัน",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "pay-cash"
+        },
+        {
+          "action": "expect_text",
+          "testid": "payment-status",
+          "value": "ยังไม่จ่าย"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demofront"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-front"
+        },
+        {
+          "action": "click",
+          "testid": "btn-receive-cash"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "expect_text",
+          "testid": "payment-status",
+          "value": "จ่ายแล้ว"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-09-101",
+      "us": "US-09",
+      "scenario": "แจ้งทำไม่ได้และลูกค้าคืนรายการ; ไม่ใช่คืนเงินจริง",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "click",
+          "testid": "btn-item-unavailable"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "expect_text",
+          "testid": "item-resolution",
+          "value": "วัตถุดิบหมด"
+        },
+        {
+          "action": "expect_visible",
+          "testid": "btn-return-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-return-item"
+        },
+        {
+          "action": "expect_text",
+          "testid": "payment-summary-total",
+          "value": "0 บาท"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-11-101",
+      "us": "US-11",
+      "scenario": "ครัวหนึ่งแตะเปลี่ยนสถานะถึงหน้าร้าน",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "click",
+          "testid": "btn-status-next"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demofront"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-front"
+        },
+        {
+          "action": "expect_text",
+          "testid": "front-orders",
+          "value": "กำลังทำ"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-12-101",
+      "us": "US-12",
+      "scenario": "egg หมดปิดเฉพาะตัวเลือก m01 ยังสั่งได้",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "ingredient-select",
+          "value": "egg"
+        },
+        {
+          "action": "click",
+          "testid": "btn-out-of-stock"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "expect_text",
+          "testid": "customer-order-status",
+          "value": "รับออเดอร์"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-14-101",
+      "us": "US-14",
+      "scenario": "ทำไม่ได้ย้ายรายการไปรอลูกค้าตัดสินใจ",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "role-staff"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demokitchen"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-kitchen"
+        },
+        {
+          "action": "click",
+          "testid": "btn-item-unavailable"
+        },
+        {
+          "action": "expect_text",
+          "testid": "kitchen-queue",
+          "value": "รอลูกค้าตัดสินใจ"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-25-101",
+      "us": "US-25",
+      "scenario": "PIN ผิดปฏิเสธเข้า manager",
+      "automation": "auto",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "9999"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "expect_text",
+          "testid": "auth-message",
+          "value": "ปฏิเสธ"
+        },
+        {
+          "action": "expect_hidden",
+          "testid": "screen-manager"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-101",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 2 ใบ; รอบ 1",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_hidden",
+          "testid": "capacity-message"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-102",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 3 ใบ; รอบ 1",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "ครัวเต็ม"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "รอประมาณ"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-103",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 2 ใบ; รอบ 2",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_hidden",
+          "testid": "capacity-message"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-104",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 3 ใบ; รอบ 2",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "ครัวเต็ม"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "รอประมาณ"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-105",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 2 ใบ; รอบ 3",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_hidden",
+          "testid": "capacity-message"
+        }
+      ]
+    },
+    {
+      "id": "TS-US-21-106",
+      "us": "US-21",
+      "automation": "auto",
+      "scenario": "โจทย์สมมติ N=3; ยืนยันแล้ว 3 ใบ; รอบ 3",
+      "steps": [
+        {
+          "action": "click",
+          "testid": "btn-reset"
+        },
+        {
+          "action": "click",
+          "testid": "role-manager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-user",
+          "value": "demomanager"
+        },
+        {
+          "action": "fill",
+          "testid": "staff-pin",
+          "value": "0000"
+        },
+        {
+          "action": "click",
+          "testid": "btn-login"
+        },
+        {
+          "action": "click",
+          "testid": "nav-capacity"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-start",
+          "value": "11:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-end",
+          "value": "13:30"
+        },
+        {
+          "action": "fill",
+          "testid": "capacity-limit",
+          "value": "3"
+        },
+        {
+          "action": "click",
+          "testid": "btn-save-capacity"
+        },
+        {
+          "action": "click",
+          "testid": "role-customer"
+        },
+        {
+          "action": "fill",
+          "testid": "table-select",
+          "value": "01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-open-menu"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "click",
+          "testid": "btn-submit-order"
+        },
+        {
+          "action": "click",
+          "testid": "menu-item-m01"
+        },
+        {
+          "action": "click",
+          "testid": "btn-add-item"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "ครัวเต็ม"
+        },
+        {
+          "action": "expect_text",
+          "testid": "capacity-message",
+          "value": "รอประมาณ"
+        }
+      ]
+    }
+  ]
+}

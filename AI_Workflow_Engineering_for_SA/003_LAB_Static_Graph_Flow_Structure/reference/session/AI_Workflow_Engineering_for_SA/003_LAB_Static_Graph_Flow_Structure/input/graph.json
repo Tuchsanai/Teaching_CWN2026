@@ -1,0 +1,208 @@
+{
+  "description": "Static DAG; preparation and manual repair are outside the graph. Human review gates do not change its edges.",
+  "working_directory": "AI_Workflow_Engineering_for_SA/003_LAB_Static_Graph_Flow_Structure",
+  "nodes": [
+    {
+      "id": "customer",
+      "role": "customer",
+      "prompt": "prompts/01-node-customer.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md"
+      ],
+      "outputs": [
+        "work/flow-customer.md",
+        "work/flow-customer.json"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "kitchen-front",
+      "role": "kitchen-front",
+      "prompt": "prompts/02-node-kitchen-front.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md"
+      ],
+      "outputs": [
+        "work/flow-kitchen-front.md",
+        "work/flow-kitchen-front.json"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "manager",
+      "role": "manager",
+      "prompt": "prompts/03-node-manager.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md"
+      ],
+      "outputs": [
+        "work/flow-manager.md",
+        "work/flow-manager.json"
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "state-machine",
+      "role": "state-machine",
+      "prompt": "prompts/04-state-machine.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md",
+        "work/flow-customer.md",
+        "work/flow-customer.json",
+        "work/flow-kitchen-front.md",
+        "work/flow-kitchen-front.json",
+        "work/flow-manager.md",
+        "work/flow-manager.json"
+      ],
+      "outputs": [
+        "work/flow-state-machine.md",
+        "work/flow-state-machine.json",
+        "work/state-machine.md"
+      ],
+      "depends_on": [
+        "customer",
+        "kitchen-front",
+        "manager"
+      ]
+    },
+    {
+      "id": "structure",
+      "role": "structure",
+      "prompt": "prompts/05-structure.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md",
+        "work/flow-customer.md",
+        "work/flow-customer.json",
+        "work/flow-kitchen-front.md",
+        "work/flow-kitchen-front.json",
+        "work/flow-manager.md",
+        "work/flow-manager.json"
+      ],
+      "outputs": [
+        "work/flow-structure.md",
+        "work/flow-structure.json",
+        "work/structure.md"
+      ],
+      "depends_on": [
+        "customer",
+        "kitchen-front",
+        "manager"
+      ]
+    },
+    {
+      "id": "merge",
+      "role": "merge",
+      "prompt": "prompts/06-merge.md",
+      "inputs": [
+        "input/fr-nfr-input.md",
+        "input/us-by-role.md",
+        "work/input-source.md",
+        "work/input-audit.md",
+        "input/node-output.schema.json",
+        "../docs/case-study-source.md",
+        "../docs/data-issues.md",
+        "work/flow-customer.md",
+        "work/flow-customer.json",
+        "work/flow-kitchen-front.md",
+        "work/flow-kitchen-front.json",
+        "work/flow-manager.md",
+        "work/flow-manager.json",
+        "work/flow-state-machine.md",
+        "work/flow-state-machine.json",
+        "work/state-machine.md",
+        "work/flow-structure.md",
+        "work/flow-structure.json",
+        "work/structure.md"
+      ],
+      "outputs": [
+        "work/flow-merge.md",
+        "work/flow-merge.json",
+        "work/merge-report.md",
+        "work/lab004-handoff.md"
+      ],
+      "depends_on": [
+        "customer",
+        "kitchen-front",
+        "manager",
+        "state-machine",
+        "structure"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "customer",
+      "to": "state-machine"
+    },
+    {
+      "from": "kitchen-front",
+      "to": "state-machine"
+    },
+    {
+      "from": "manager",
+      "to": "state-machine"
+    },
+    {
+      "from": "customer",
+      "to": "structure"
+    },
+    {
+      "from": "kitchen-front",
+      "to": "structure"
+    },
+    {
+      "from": "manager",
+      "to": "structure"
+    },
+    {
+      "from": "customer",
+      "to": "merge"
+    },
+    {
+      "from": "kitchen-front",
+      "to": "merge"
+    },
+    {
+      "from": "manager",
+      "to": "merge"
+    },
+    {
+      "from": "state-machine",
+      "to": "merge"
+    },
+    {
+      "from": "structure",
+      "to": "merge"
+    }
+  ]
+}

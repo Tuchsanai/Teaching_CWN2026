@@ -1,0 +1,25 @@
+{
+  "started_at_utc": "2026-09-14T12:32:53.367543+00:00",
+  "finished_at_utc": "2026-09-14T12:34:19.202930+00:00",
+  "tool": "Codex CLI 0.154.0",
+  "account": "<บัญชี>",
+  "model": "gpt-6-astra (ตาม flag ที่สั่ง CLI ไม่ยืนยันกลับ)",
+  "effort": "high",
+  "wall_seconds": 85.839,
+  "timing_source": "execution-timing.jsonl: monotonic wall time measured around actual CLI process",
+  "usage_source": "log.jsonl: turn.completed.usage",
+  "usage": [
+    {
+      "input_tokens": 270348,
+      "cached_input_tokens": 225152,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3895,
+      "reasoning_output_tokens": 419
+    }
+  ],
+  "turn_completed": 1,
+  "turn_failed": 0,
+  "exit_code": 0,
+  "working_directory": "<PROJECT_ROOT>/AI_Workflow_Engineering_for_SA/004_LAB_Conditional_Graph_UI_Mockup",
+  "command": "codex exec --json -m gpt-6-astra -c model_reasoning_effort=\"high\" -o reference/demo-fix-path/round-2/response.md \"$(cat reference/demo-fix-path/round-2/prompt-used.md)\" < /dev/null > reference/demo-fix-path/round-2/log.jsonl 2> reference/demo-fix-path/round-2/stderr.txt"
+}

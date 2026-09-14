@@ -1,0 +1,67 @@
+{
+  "version": "plan-v0",
+  "trigger": "ตัวอย่างประกอบ — ยังไม่ได้รันจริง; แสดงรูปแบบเท่านั้น",
+  "created_at": "2026-09-14T00:00:00Z",
+  "tasks": [
+    {
+      "id": "audit-input",
+      "title": "ตรวจที่มา FR/NFR ตั้งต้น",
+      "kind": "verify",
+      "inputs": [
+        "work/baseline/fr-nfr.md"
+      ],
+      "outputs": [
+        "work/example/input-audit.md"
+      ],
+      "depends_on": [],
+      "status": "planned",
+      "reason": "ต้องทราบที่มาของข้อกำหนดก่อนตรวจ Flow",
+      "us_refs": [
+        "US-05"
+      ]
+    },
+    {
+      "id": "verify-flow",
+      "title": "ตรวจ Flow เทียบ FR ที่รับรองแล้ว",
+      "kind": "verify",
+      "inputs": [
+        "work/baseline/flow.md",
+        "work/example/input-audit.md"
+      ],
+      "outputs": [
+        "work/example/flow-check.md"
+      ],
+      "depends_on": [
+        "audit-input"
+      ],
+      "status": "planned",
+      "reason": "ผลตรวจ Flow ต้องอ้าง FR ฉบับเดียวกับ input audit",
+      "us_refs": [
+        "US-05"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "d-example",
+      "topic": "ขอบเขตตัวอย่าง",
+      "decision": "ตรวจเอกสารก่อนผลิตชิ้นงาน",
+      "authority": "ai",
+      "evidence": [
+        "input/README.md"
+      ]
+    }
+  ],
+  "reuse": [],
+  "limits": [
+    {
+      "id": "l-example",
+      "description": "วันเวลาเป็นค่าตัวอย่าง ไม่ใช่เวลารัน; ไฟล์ work/example/ ยังไม่มีจริง",
+      "blocking": false,
+      "affected_tasks": [
+        "audit-input",
+        "verify-flow"
+      ]
+    }
+  ]
+}

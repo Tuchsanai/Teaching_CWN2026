@@ -1,0 +1,23 @@
+# ข้อมูลการรันจริง
+
+- started_at: 2026-09-14T11:23:43.216104Z
+- finished_at: 2026-09-14T11:32:07.241585Z
+- tool: Codex CLI 0.154.0
+- model: gpt-6-astra (ตาม flag ที่สั่ง CLI ไม่ยืนยันกลับ)
+- effort: high
+- account: <บัญชี>
+- working_directory: AI_Workflow_Engineering_for_SA/002_LAB_Loop_FR_NFR
+- duration_s: 504.05
+- wall_seconds: 504.05
+- exit_code: 0
+- phase: fixer
+- round: 1
+- prompt: reference/e1-set/step-03/round-1/prompt-used.md
+- output: reference/e1-set/step-03/round-1/fr-nfr-v2-e1.md
+- log: reference/e1-set/step-03/round-1/log.jsonl
+- usage: {'input_tokens': 568817, 'cached_input_tokens': 510592, 'cache_write_input_tokens': 0, 'output_tokens': 29273, 'reasoning_output_tokens': 622}
+- usage_source: turn.completed.usage
+- turn_completed: 1
+- turn_failed: 0
+- command: codex exec --json -m gpt-6-astra -c model_reasoning_effort="high" -o <output> "$(cat <prompt-used.md>)" < /dev/null > <log.jsonl> 2> <stderr.txt>
+- output_sha256: 18482a7568339a4262ed982ba156ce52d329dc99ccff1af4ec4148a8c2cf2763

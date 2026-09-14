@@ -1,0 +1,100 @@
+# Impact analysis — plan-v2
+
+UTC: 2026-09-14T13:04:18.313976Z
+PREV_PLAN: /root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v1.json; CURRENT_PLAN: /root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v2.json (Markdown คู่กัน)
+REVEAL_FILE: /root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-03-reveal-1/reveal-1.md
+ตรวจความต่อเนื่อง v1→v2; trigger reveal-1 ครั้งแรกพร้อม F-01 ที่มีผลตรวจจริง; ไม่เปิด reveal-2.
+L/S/B/R ใช้ alias เดียวกับ plan-v2.md; Hxx คือ SHA-256 ในตารางท้าย จึงทุก locator ผูกกับ bytes ที่ตรวจจริง.
+ข้อมูลใหม่ด้านล่างคือเปิดเผยจากต้นฉบับ; ข้อเสนอด้านข้อมูล/การจัดวาง/วิธีตรวจติดป้ายอนุมานหรือสมมติฐาน ไม่เป็น AC.
+
+## ผลกระทบโดยตรง
+
+อ่าน reveal ทุกคอลัมน์ตรงตัว 3 แถว; สำเนาตารางเพื่อคงข้อความและตัวเลข (ไม่เติมเงื่อนไข):
+| ID | บทบาท | ในฐานะ | ฉันต้องการ | เพื่อ | เกณฑ์รับ |
+|---|---|---|---|---|---|
+| US-09 | ลูกค้า | ลูกค้าที่ออเดอร์ค้างในคิวครัวแล้ววัตถุดิบหมด | ได้รับแจ้งบนหน้าจอและเลือกทางออกได้ (เปลี่ยนเมนู หรือคืนรายการนั้น) | ไม่ต้องรอเปล่าและยอดจ่ายถูกปรับให้ตรง | เมื่อครัวกด “ทำไม่ได้-วัตถุดิบหมด” ที่รายการในคิว หน้าลูกค้าแสดงแจ้งเตือนภายใน 10 วินาทีบน LAN พร้อมปุ่ม “เปลี่ยนเมนู” และ “คืนรายการ” และยอดรวมปรับลดตามรายการที่คืน ทดสอบผ่าน 5 จาก 5 กรณี |
+| US-14 | พนักงานครัว/หน้าร้าน | พนักงานครัว | จัดการรายการในคิวที่ทำไม่ได้เพราะวัตถุดิบหมด (กด “ทำไม่ได้” แล้วส่งให้ลูกค้าเลือกทางออก) | ไม่มีออเดอร์ค้างคิวโดยไม่มีข้อสรุป | รายการที่กด “ทำไม่ได้” ย้ายไปสถานะ “รอลูกค้าตัดสินใจ” และเมื่อลูกค้าเปลี่ยนเมนูหรือคืนรายการ จอครัวอัปเดตรายการใหม่หรือลบรายการภายใน 10 วินาทีบน LAN ทดสอบผ่าน 5 จาก 5 กรณี |
+| US-21 | ผู้จัดการร้าน | ผู้จัดการร้าน | ตั้งช่วงเวลาเร่งด่วนและเพดานจำนวนออเดอร์ต่อ 15 นาที | ครัวไม่ล้นและลูกค้าในร้านได้อาหารทัน | ตั้งเวลาเริ่ม–สิ้นสุดช่วงเร่งด่วน (เช่น 11:30–13:30) และเพดาน N ออเดอร์ต่อหน้าต่างเวลา 15 นาทีที่นับจากนาทีที่ 00/15/30/45 เมื่อจำนวนออเดอร์ที่ยืนยันในหน้าต่างนั้นถึง N ลูกค้าใหม่เห็นข้อความ “ครัวเต็ม รอประมาณ X นาที” ก่อนยืนยัน ทดสอบด้วย N=5 ผ่าน 3 จาก 3 รอบ |
+
+| แผนเดิม | ข้อมูลใหม่ | งาน/dependency ที่เปลี่ยน | ชิ้นงานที่กระทบ | ใช้ซ้ำ/ตรวจใหม่ |
+|---|---|---|---|---|
+| US-09; B/us-initial.md:10,17 [H04]; v1 ไม่มี producer FR/UI ใหม่ | R:12 [H03] ยืนยันจากต้นฉบับ: ครัวทำไม่ได้-วัตถุดิบหมด → แจ้งลูกค้าภายใน 10 วินาทีบน LAN พร้อมเปลี่ยนเมนู/คืนรายการ ยอดรวมลดตามคืน ผ่าน 5 จาก 5 | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-refund | FR-09/NFR เวลาใหม่ (ID ให้ producer เลือกไม่ชน) → event รายการ/ยอด snapshot → จอลูกค้า-ครัว-หน้าร้าน; fr-nfr-v2/flow-v2/UI v2 | replace ส่วนเปลี่ยน; reuse ราคา snapshot เดิม B/ui-contract.md:102 [H10]; คืนเงินจริง/ส่วนต่างยังไม่ยืนยัน |
+| US-14; B/flow.md:74,312 [H06] ส่วนรายการปิด; verify-flow v1 FAIL คนละสาเหตุ | R:13 [H03] ยืนยัน: รายการทำไม่ได้ → รอลูกค้าตัดสินใจ → จอครัวอัปเดตรายการใหม่หรือลบภายใน 10 วินาทีบน LAN ผ่าน 5 จาก 5 | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; revise-flow แยกจาก verify-flow | FR-14/NFR เวลา → item state + data/module/screens → ครัว/ลูกค้า; state-machine-v2/structure-v2 รวมใน flow-v2 | replace ส่วนรายการ; recheck aggregate ออเดอร์/เงิน/โต๊ะ; ไม่ถือ AI planned เป็นสถานะอาหาร และไม่เดา terminal ชื่อใหม่ |
+| US-21; B/us-initial.md:9 [H04]; v1 มี ETA แต่ไม่มีเพดานตาม reveal | R:14 [H03] ยืนยัน: ช่วงเริ่ม–สิ้นสุด เช่น 11:30–13:30; N ต่อ 15 นาทีเริ่ม 00/15/30/45; ถึง N แสดง ครัวเต็ม รอประมาณ X นาที ก่อนยืนยัน; N=5 ผ่าน 3 จาก 3 รอบ | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-capacity | FR-21 → config/time-window/confirmed-count → ผู้จัดการ/ก่อนยืนยันลูกค้า → boundary/threshold tests; ไม่เพิ่ม SLA ใหม่ | replace ส่วน config/UI; reuse shell B/ui-mockup.html:343,356 [H09] ตาม hash; X/เขตเวลา/นับคืน/ห้ามยืนยันยังไม่ยืนยัน |
+| US-05; B/us-initial.md:7 [H04]; FR-05/NFR-02 B/fr-nfr.md:24,46 [H05] | R:12-13 [H03] เปลี่ยนสถานะระดับรายการส่งผลการแสดงออเดอร์โดยอนุมาน ไม่แก้ AC เดิม | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-status | item outcome → aggregate order status → customer-order-status; การตรวจจอลูกค้าแยก US-11 หน้าร้าน | reuse AC รับออเดอร์/กำลังทำ/เสร็จแล้ว; recheck mapping/ข้อมูล; คงภายใน 5 วินาทีบน LAN โดยไม่รีเฟรช อย่างน้อย 18 จาก 20 ครั้ง; aggregate ยังไม่ยืนยัน |
+| US-07; B/us-initial.md:9 [H04]; FR-07/NFR-04 B/fr-nfr.md:26,58 [H05] | R:13-14 [H03] การรอตัดสินใจ/เปลี่ยน/คืนอาจกระทบจำนวนค้าง; ช่วง US-21 และ X ไม่ได้ระบุว่าเท่ากับ ETA | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-eta/d-human-capacity | queue count/7-day averages → ETA ก่อนยืนยัน; รอ mapping พร้อมเสิร์ฟ; ไม่รวม config สองช่วงเอง | reuse สูตรเดิมเต็มตาม U:9; recheck inputs หลัง item outcome; คง 11:30–13:00 และ 17:30–19:30, คลาดเคลื่อนไม่เกิน 10 นาที อย่างน้อย 80% ใน 1 วัน; mock ยังไม่พิสูจน์ ETA |
+| US-08; B/us-initial.md:10 [H04]; FR-08/NFR-17 B/fr-nfr.md:27,67 [H05] | R:12 [H03] ยอดลดจากคืนรายการเป็นข้อเท็จจริง; คืนเงินหลังจ่าย/ส่วนต่างยังไม่ระบุ | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-payment/d-human-refund | item amount → order total/snapshot → ยอดลูกค้า/front-total/payment state → ตรวจ 19 จาก 20 ใบ และ 3 จาก 3 กรณีเดิม | reuse สองวิธีจ่าย/ค้างจ่ายจนยืนยัน/10 นาที fallback; recheck ยอดก่อน-หลังและผู้ยืนยัน; ไม่เปลี่ยนจ่ายแล้ว/ไม่โอนเงินเอง |
+| US-11; S/evaluations/flow-v1-check.md:35-40 [H15] F-01 FAIL และ S/evaluations/test-outline-v1-check.md:4,33-35 [H16] BLOCKED | B/us-initial.md:12 [H04] AC เดิม 1 แตะ/ภายใน 5 วินาทีบน LAN/อย่างน้อย 18 จาก 20 ครั้ง; ไม่ใช่ reveal ใหม่ | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; revise-flow → verify-flow ต้องปิด F-01 ก่อน outline/UI | FR-11/NFR-07/MRG-05 → MOD-06/SCR-08 (ข้อเสนอจัดวาง) → จอหน้าร้าน; coverage ทั้ง flow-v2/state-machine-v2/structure-v2 ให้สอดคล้อง | reuse AC B/fr-nfr.md:29,49 [H05]; replace mapping ขาดที่ B/flow.md:51,406,451 [H06] / B/structure.md:22,73,223 [H08]; ห้ามใช้สถานะเงินแทนสถานะอาหาร |
+| US-12; B/us-initial.md:13,18 [H04]; FR-12/20 และ US-13/06 เป็น upstream เมนู | R:12-13 [H03] ปิดขายเมนู/ตัวเลือกต่างจากรายการที่รับเข้าคิวแล้วทำไม่ได้ | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-mapping | ingredient→menu/option availability; accepted order item→decision; shared UI แต่แยก event/state/data และ regression US-06/13/20 | reuse ทั้งจาน/เฉพาะตัวเลือก 5 ชนิดผ่าน 5 จาก 5; recheck trigger ไม่ยกเลิกรายการคิวเอง; ช่องเพื่อยังปิด หมายเหตุ ค./US-20 อ้าง US-14 ยัง unresolved |
+| US-15; B/us-initial.md:15 [H04]; FR-15/NFR-19 B/fr-nfr.md:32,81 [H05] | R:12-13 [H03] ยอดและรายการหน้าร้านเปลี่ยน; ความหมายสถานะจ่ายแล้วไม่ได้ถูกกำหนดใหม่ | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-refund/d-human-operations | item adjustments→front order total + food status (F-01) + payment events/log; แยก table_id/T-001 และ session | reuse เลขรับรีเซ็ต 00:00/เหตุการณ์เงิน/ชื่อผู้ใช้จำลอง+เวลา log เกณฑ์เดิม 20 จาก 20; recheck ยอดแต่ไม่ reset payment/โต๊ะอัตโนมัติ |
+| US-19; B/us-initial.md:17 [H04]; FR-19/NFR-11 B/fr-nfr.md:34,51 [H05] | R:12 [H03] เปลี่ยน/คืนรายการใช้ข้อมูลเมนู-ตัวเลือกและราคา; นโยบายราคาของรายการแทนยังไม่มี | revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui; d-human-refund/d-human-environment | menu price now ≠ stored order price; item identity/quantity/options snapshot → amount adjustment → totals/payment/UI | reuse ราคาเดิม 5 ออเดอร์ผ่าน 5 จาก 5, jpg/png ไม่เกิน 2 MB, 0–10 ตัวเลือก, ภายใน 1 นาที; recheck คืน/เปลี่ยนหลังแก้ราคาและลบแมป; ห้ามคำนวณใหม่จาก catalog ทั้งออเดอร์ |
+| US-25 / ผลต่อรายงาน; B/input-audit.md:28 [H12] และ B/ui-contract.md:31,113 [H10] มีเพียง report placeholder/สิทธิ์ | R:12-14 [H03] ยอดปรับ/รายการคืน/ช่วง-N อาจส่งผลยอดรายงาน เป็นผลต่อเนื่องที่อนุมาน ไม่ใช่ AC รายงานใหม่ | revise-fr/revise-flow/revise-ui → verify-ui/evaluate-handoff; d-human-refund | เก็บข้อค้างวิธีนับยอด/เวลาลงรายงาน; shared data; report-screen ยังคง placeholder ตรวจสิทธิ์ | reuse role/route denial ตาม US-25; recheck regression สิทธิ์ (3 บัญชี × 2 หน้า ผ่าน 6 จาก 6 เป็นเกณฑ์เดิม ยังไม่รัน); ไม่มี producer รายงานจริงเพราะไม่เปิดข้อกำหนดนั้น |
+
+## ผลกระทบต่อเนื่อง
+
+ลำดับบังคับ: revise-fr → verify-fr → revise-flow → verify-flow → draft-test-outline → verify-test-outline → revise-ui → verify-ui → evaluate-handoff; verify-plan v2 ต้อง PASS ก่อน producer แรก.
+US-09/14 → FR และ NFR เวลา → item decision/state → stored item/amount → order totals → payment/front display → UI checks; US-21 → config/window/count → ก่อนยืนยัน → test boundary.
+การแก้ F-01 เป็น traceability อาหารถึงหน้าร้าน; ต้องตรวจ source coverage/module/screen ที่สอดคล้องกันทั้งชุด Flow v2 แล้วปลด gate ใหม่ ไม่ถือว่าร่าง outline ถูก AC แล้วแก้ Flow เสร็จ.
+แผนงาน AI ใช้ planned/needs_recheck/done; สถานะรอลูกค้าตัดสินใจเป็นระดับรายการ; ออเดอร์/การชำระเงิน/โต๊ะ/table session ไม่รวมเป็น state เดียว.
+การคืนรายการลดยอดรวมตามต้นฉบับ; แบบข้อมูลเสนอเก็บยอดเดิมกับเหตุการณ์ปรับเพื่อเปรียบเทียบก่อน-หลัง. โครง field/การกดซ้ำ/ส่วนต่าง/เงินคืนเงินจริงและสถานะจ่ายแล้วต้องรอยืนยัน.
+ไม่เพิ่มผลิตภัณฑ์รายงาน: วิเคราะห์ผลต่อข้อมูลยอดและคำถามการนับรายงานเท่านั้น; report-screen ของ baseline เป็น placeholder ตามสัญญาเดิม.
+
+## สถานะจากหลักฐานและขอบเขตใช้ซ้ำ
+
+verify-plan v1 PASS; audit-fr-baseline EXECUTED และ verify-fr PASS จึง audit เป็น done. verify-plan/verify-fr เปลี่ยน needs_recheck สำหรับ v2.
+verify-flow v1 FAIL F-01; draft-test-outline มี EXECUTED แต่ verify-test-outline BLOCKED จึงทั้งสอง needs_recheck ไม่ทำ done; verify-ui/evaluate-handoff ยังคง planned เพราะยังไม่รัน.
+เพิ่ม revise-fr จาก audit-fr-baseline; แยก revise-flow จาก verify-flow และ revise-ui จาก verify-ui; คง ID หน้าที่เดิมทั้งหมด. ไม่มี cancel เพราะหน้าที่ทุกงานยังจำเป็น; ไม่มีงาน create เพิ่มแยกต่างหาก เพราะปรับชิ้นงานเดิมเป็น v2.
+reuse แยกส่วน: ข้อความ 18 US/AC และ FR ที่ตรวจแล้ว, โครงออเดอร์/ชำระเงิน/โต๊ะ, shell/role/reset/selector และ audit v1 ใช้เป็นฐาน; ไม่เท่ากับ reuse ผล PASS ของเป้าหมาย v2.
+replace: FR/Flow/state/structure/UI ส่วนที่ upstream เปลี่ยน; needs_recheck: test-outline/contract และยอด/ราคา/สถานะ/คิว/เวลารอ/สิทธิ์; ขอบเขตและ hash ราย artifact ตรงตาราง reuse ใน plan-v2.md/JSON.
+
+## คำถามรอคำตอบ
+
+| decision / limit | คำถามและขอบเขต BLOCKED | งานที่เกี่ยวและวิธีตรวจหลังมีคำตอบ |
+|---|---|---|
+| d-human-status / l-q-status | ยังไม่มีคำยืนยันจากมนุษย์: เสร็จแล้วกับพร้อมเสิร์ฟสัมพันธ์กันอย่างไร จุดจบ ETA และ transition/การกดซ้ำ/ย้อนกลับใดได้รับอนุญาต? คงชื่อเดิมแยกกันและเพิ่มเฉพาะ transition รายการที่ reveal-1 ระบุตรงตัว. ผูกข้อค้าง l-q-status กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-eta / l-q-eta | ยังไม่มีคำยืนยันจากมนุษย์: ขอหมายเหตุ ช. นิยามค่าเฉลี่ยต่อออเดอร์/ต่อเมนู วิธีเลือกเมนูที่นานที่สุด การปัดเศษ กรณีไม่มีประวัติ และการนับประชากร/ใบยังไม่พร้อมเสิร์ฟเมื่อจบวันทดสอบ โดยคงสูตรและเกณฑ์เดิม. ไม่สร้างข้อมูล 7 วันหรือค่า ETA ขึ้นแทน. ผูกข้อค้าง l-q-eta กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-payment / l-q-payment | ยังไม่มีคำยืนยันจากมนุษย์: ขอหมายเหตุ ก. จุดเริ่มนับ 10 นาที วิธีส่ง/ตรวจสลิป ที่ตั้งค่าปิด PromptPay และเมื่อปิดแล้วการเลือกได้ 2 แบบทุกออเดอร์ต้องทำงานอย่างไร? fixture เดิมไม่ใช่คำตอบของธุรกิจ. ผูกข้อค้าง l-q-payment กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-mapping / l-q-mapping | ยังไม่มีคำยืนยันจากมนุษย์: ขอหมายเหตุ ค. กติกาวัตถุดิบหมดซ้อน/กดซ้ำ/แก้แมประหว่างปิด และยืนยันรหัสอ้างใน US-20 ว่าตั้งใจเช่นเดิมหรือควรแก้รหัสใด? คงข้อความ US-20 ที่อ้าง US-14; การเชื่อม US-12/US-13 ยังเป็นข้อเสนอและไม่ขยาย US อื่นที่ยังไม่เปิด. ผูกข้อค้าง l-q-mapping กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-operations / l-q-operations | ยังไม่มีคำยืนยันจากมนุษย์: ใครจัดการ QR/table_id ผิด; เวลาสั่งและช่วงรับยึดเหตุการณ์ใด; ตัวเลือกมีเงื่อนไขใด; คำสั่งชนหมด/ส่งซ้ำตัดสินอย่างไร; เลข monotonic มีขอบเขตข้ามวัน/รีสตาร์ตใด; เขตเวลาของเลขรับและนโยบาย log คืออะไร; เปิด/ปิดโต๊ะขณะค้างทำหรือค้างจ่ายและหน้าเดิมทำงานอย่างไร? ใช้รายละเอียดคำถามต้นทางแต่ละรหัส ไม่ตอบแทนและไม่รวมเลขออเดอร์กับเลขรับ. ผูกข้อค้าง l-q-operations กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-environment / l-q-environment | ยังไม่มีคำยืนยันจากมนุษย์: ขอสภาพชุดทดสอบมือถือ/เครือข่าย นิยาม MB/ราคา ผลลบเมนูที่ค้าง ขอบเขตบัญชี/ตัวนับล็อก/สิทธิ์ Unknown และสภาพ Ubuntu ก่อนติดตั้งตามคำถามต้นทาง. หน่วย 2 MB และเกณฑ์เดิมต้องคงไว้; ค่า byte/clock/permission ใน fixture เป็นสมมติฐาน. ไม่เพิ่ม SLA งบประมาณ การสำรอง/กู้คืน หรือสิทธิ์ที่ไม่มีคำยืนยัน. ผูกข้อค้าง l-q-environment กับ affected_tasks ตาม limits; เป็น blocker การยืนยันกฎ/ระบบจริงตาม l-real-scope แต่ไม่ขัดงานตรวจเอกสารและ offline mock ที่คงป้ายยังไม่ยืนยัน. ให้เจ้าของข้อกำหนดตอบพร้อมหลักฐานก่อนนำไปแก้ baseline ในแผนรุ่นถัดไป. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-refund / l-q-refund | US-09 ยืนยันลดยอดรวมตามรายการที่คืน แต่เมื่อจ่ายแล้วใครอนุมัติ/คืนเงินจริงทางใดและยอดสุทธิคิดจากราคา/ตัวเลือก/จำนวนใด? เปลี่ยนเมนูส่วนต่างใช้อัตราใด และคืนซ้ำ/ตัดสินใจชนกันจัดการอย่างไร? เก็บราคา ณ สั่งและ payment log เดิม; ไม่เปลี่ยนจ่ายแล้วเป็นค้างจ่ายเอง. รายงานจะนับยอด/รายการคืนวันใด? ยังไม่มี AC รายงานที่เปิดจึงคง placeholder; รอมนุษย์ก่อนรับรองนโยบาย. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+| d-human-capacity / l-q-capacity | สูตร X ใช้ข้อมูลใดและเกี่ยวกับ ETA US-07 หรือไม่? ช่วงตั้งค่า US-21 ตัวอย่าง 11:30–13:30 กับช่วงวัด US-07 11:30–13:00 และ 17:30–19:30 สัมพันธ์อย่างไร? หน้าต่างตรงขอบ/เขตเวลา/ออเดอร์ที่คืน/เปลี่ยนและการเปลี่ยน N ระหว่างช่วงนับอย่างไร? ข้อความเมื่อถึง N หมายถึงเตือนหรือห้ามยืนยัน? ไม่สรุป hard block เอง; รอคำตอบแล้วทำ boundary/threshold/regression ตามกฎที่ยืนยัน. | revise-fr/verify-fr → revise-flow/verify-flow → draft-test-outline/verify-test-outline → revise-ui/verify-ui → evaluate-handoff; บันทึกคำตอบและ source hash แล้วตรวจ traceability/expected outcome/regression ที่เปลี่ยนใหม่ |
+
+## ข้อจำกัด
+
+BLOCKED เฉพาะนโยบายจริง/คำยืนยันธุรกิจ/ระบบจริง และ downstream ที่ยังไม่ผ่าน gate; เอกสารและ offline mock ที่ติดป้ายสมมติฐานทำได้ตาม plan. ไม่ยกเวลา X เป็น ETA US-07 และไม่รวมช่วงเร่งด่วนสองเรื่องโดยไม่มีคำยืนยัน.
+หมายเหตุ ก./ค./ช. และช่องเพื่อ US-12 ยังไม่มีข้อมูล; US-20 อ้าง US-14 เดิมไม่ถูกแก้แม้เปิด US-14 แล้ว. เก็บ Q/MC/DI/A และสิทธิ์ Unknown ตาม snapshot/ต้นทาง ไม่สร้างคำตอบ.
+หลักฐาน upstream FR 108/108, Flow ก่อนกรอง, UI 19/19 เป็นประวัติ; รอบนี้ตรวจ manifest 10/10 และ hash bindings ผลตรวจ 55 รายการ ไม่ตรวจรายละเอียด baseline ทั้งหมดซ้ำ.
+NOT_TESTED: FR/Flow/UI v2 ยังไม่ผลิต; browser/DOM/click/responsive, LAN/Wi-Fi/QR/load/security/server log/ETA/ข้อมูล 7 วัน/สัดส่วน AC, Ubuntu/ติดตั้ง/ถอดอินเทอร์เน็ตและเงินจริง. ไม่มีผล Evaluator v2 ใน session นี้.
+
+## หลักฐานและ hash
+
+| รหัส | ไฟล์/รุ่นที่อ่านหรือ hash-checked จริง | SHA-256 |
+|---|---|---|
+| H01 | S/plan-v1.json | 4bd023624fb2cb5c1ec9975528e8ffbcb6ac830cd40f9b61c5db28523ae25cfe |
+| H02 | S/plan-v1.md | 10f2d1da058fafe1a6ed75047ad157ab0694cb7ee40ddd89c91874fa4d3310ae |
+| H03 | R | 1fde792db1fdcf211be4a171fd88c61184ce892720832023fcaefad6a67f8917 |
+| H04 | B/us-initial.md | 56a439f6e22f4a8d17f552b023c3c8fe61556f5bd31f1f1e9b70c1f9da6049d2 |
+| H05 | B/fr-nfr.md | da31640e540b825d4fec555627ea098f092daf4243d5d304fd4c32ae6db734cd |
+| H06 | B/flow.md | d0a5fcd029f4f315a02fcd2c057a44907bdf7362fbce17b8664a75b82773595d |
+| H07 | B/state-machine.md | b4bc79de9e95f1526ca05326211a6025981b0420f3681b574e37189319f35adf |
+| H08 | B/structure.md | fc8facf9088ad320d8dc3a7157edc14b337c1cb7081c3b098bcf91ceab08c560 |
+| H09 | B/ui-mockup.html | d2b7bfa0cff5700d3ca07f611c03cfa0304c54eafb51387f125e95edd11f7803 |
+| H10 | B/ui-contract.md | 294b660d2e39b3745344f225400eee57c02c25b6efb108a3a7ecce7cdd060e68 |
+| H11 | B/provenance.md | 8059b1b47647d690ed7a73e6b4b9751e209edb3905868a4729269fb79330739a |
+| H12 | B/input-audit.md | d4100680ed1f31ea3351144f202f85343fb47a23acfa0305116731ab8bb1bbd8 |
+| H13 | S/evaluations/plan-v1-review.md | f2facd03b3cd1f74969c110bfc336226b7d331f65042e51b036b5995166b3eb1 |
+| H14 | S/evaluations/fr-v1-check.md | b533a2d6b8618f590d3de91bdc4250172ad8d987df6060860f16e0a672403c5a |
+| H15 | S/evaluations/flow-v1-check.md | 43cd1d0cf505bb509d9453f060503c82ed300332324c9893168eb74f05a70141 |
+| H16 | S/evaluations/test-outline-v1-check.md | ea6c1f13c350bd5103493061d8b14fba8115cba46a8b900df42ec0445a1aa9a2 |
+| H17 | S/execution/fr-baseline-audit-v1.md | 78f8ce610526fdaa3e7911b3765fbff8246ea223d9772611e370bb42d5374175 |
+| H18 | S/test-outline-v1.md | 6bdeccb7cf14fcdf03f0fa56578e1595c1ec3ea2dda67c3f74d4bba4c07ae18c |
+| H19 | S/execution/plan-v1/test-outline-run/draft-test-outline.md | 6ac65ca1a2cd45d5034c299677eab8b8545dcb6ac2257aada1c27cc0643814f8 |
+| H20 | S/execution/plan-v1/audit-fr-baseline-run/audit-fr-baseline.md | 42318bb248f2a2e4b675cbdd5104f2bc70ea401ebd4d83aa29076b65113c77b8 |
+| CURRENT JSON | S/plan-v2.json | 8682dcba597fd36cadcf0a4724a9a75bd866f551b337281c663ee419c059c828 |
+| CURRENT MD | S/plan-v2.md | 75c5e9b06c7e26fbf7174295d165fbae64be57ea8ff807b4d96884898296ea2c |
+
+## งานถัดไป
+
+ส่ง plan-v2.json/md + impact-analysis-v2.md + evaluations/plan-v2-validation.json ให้ Evaluator ตรวจ verify-plan ก่อนเริ่มผลิต. รอบนี้ทำเฉพาะ Planner+impact ไม่เรียก agent/CLI/Evaluator เพิ่ม.
+หาก Evaluator พบตกหล่นให้ส่ง Planner สร้างรุ่นต่อจากสูงสุดจริงพร้อม trigger แก้; ห้ามแก้ plan-v1/v2 หรือ impact รุ่นนี้. F-01 ยัง OPEN จนผู้ตรวจ Flow v2 ยืนยันปิด.

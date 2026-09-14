@@ -1,0 +1,55 @@
+{
+  "started_at": "2026-09-14T11:01:00Z",
+  "started_epoch": 1789383660,
+  "finished_at": "2026-09-14T11:08:59Z",
+  "wall_seconds": 479,
+  "ai_cmd": "codex exec",
+  "baseline_source": "ใช้ผลอ้างอิงจาก LAB 001\nต้นทาง: ../001_LAB_Single_Prompt_Baseline/reference/step-02/round-1/fr-nfr-v0.md\nวันที่ผล: 2026-09-14 10:28:10–10:31:52 UTC\nSHA-256: 88d6f0ca6d91cbcddc48a24dbf3eb0c752e72430e57c4e20795d1157a03e9abc",
+  "limits": {
+    "max_rounds": 3,
+    "max_seconds": 1800,
+    "max_tokens": 0
+  },
+  "stop_reason": "pass",
+  "total_tokens": 723566,
+  "calls": [
+    {
+      "phase": "generator",
+      "round": 1,
+      "started_at": "2026-09-14T11:01:00Z",
+      "finished_at": "2026-09-14T11:05:57Z",
+      "wall_seconds": 297,
+      "exit_code": 0,
+      "log": "reference/step-01/round-1/log.jsonl",
+      "output": "reference/step-01/round-1/fr-nfr-v1.md",
+      "tokens": 337372,
+      "success": true
+    },
+    {
+      "phase": "checker",
+      "round": 1,
+      "started_at": "2026-09-14T11:06:06Z",
+      "finished_at": "2026-09-14T11:08:59Z",
+      "wall_seconds": 173,
+      "exit_code": 0,
+      "log": "reference/step-02/round-1/log.jsonl",
+      "output": "reference/step-02/round-1/feedback.md",
+      "tokens": 386194,
+      "success": true
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "document": "reference/step-01/round-1/fr-nfr-v1.md",
+      "check": "reference/step-02/round-1/feedback.md",
+      "result": "PASS",
+      "score": {
+        "earned": 90,
+        "possible": 90
+      },
+      "regressions": [],
+      "no_improvement_streak": 0
+    }
+  ]
+}

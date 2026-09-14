@@ -1,0 +1,633 @@
+{
+  "role": "Planner structural validation only; not Evaluator",
+  "version": "plan-v3",
+  "checked_at": "2026-09-14T14:08:04.950417Z",
+  "result": "PASS_STRUCTURAL",
+  "schema": "input/plan.schema.json",
+  "schema_draft": "draft-07",
+  "checks": {
+    "schema_draft7_format_utc": true,
+    "consecutive_version_and_reveal_trigger": true,
+    "unique_ids_dag": true,
+    "producer_in_ancestors": true,
+    "no_cancelled_dependency": true,
+    "external_inputs_exist_or_authorized_current_outputs": true,
+    "outputs_unique_and_no_overwrite": true,
+    "json_markdown_all_task_decision_reuse_limit_fields": true,
+    "all_previous_task_ids_retained": true,
+    "unchanged_audit_has_document_evidence": true,
+    "all_26_authority_rows_preserved": true,
+    "five_reveal2_us_in_all_affected_tasks": true,
+    "human_required_has_blocking_limits_and_targets": true,
+    "fr_check_before_flow_check_before_ui_check": true,
+    "data_producer_and_verifier_before_flow": true,
+    "current_v2_dependency_hash_bindings": 12,
+    "baseline_manifest_matches": 10
+  },
+  "task_count": 13,
+  "dependency_edges": 37,
+  "topological_order": [
+    "audit-fr-baseline",
+    "verify-plan",
+    "revise-fr",
+    "verify-fr",
+    "define-data-contract",
+    "verify-data-contract",
+    "revise-flow",
+    "verify-flow",
+    "draft-test-outline",
+    "verify-test-outline",
+    "revise-ui",
+    "verify-ui",
+    "evaluate-handoff"
+  ],
+  "producer_consumer_bindings": [
+    [
+      "audit-fr-baseline",
+      "revise-fr",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/fr-baseline-audit-v1.md"
+    ],
+    [
+      "verify-plan",
+      "revise-fr",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v3-review.md"
+    ],
+    [
+      "audit-fr-baseline",
+      "verify-fr",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/fr-baseline-audit-v1.md"
+    ],
+    [
+      "revise-fr",
+      "verify-fr",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-plan",
+      "verify-fr",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v3-review.md"
+    ],
+    [
+      "verify-plan",
+      "define-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v3-review.md"
+    ],
+    [
+      "revise-fr",
+      "define-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "define-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "revise-fr",
+      "verify-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "verify-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "verify-data-contract",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "revise-fr",
+      "revise-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "revise-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "revise-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "revise-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "revise-fr",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "revise-flow",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-flow",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "revise-fr",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "verify-flow",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v3-check.md"
+    ],
+    [
+      "revise-flow",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "draft-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "draft-test-outline",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v3.md"
+    ],
+    [
+      "revise-fr",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "verify-flow",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v3-check.md"
+    ],
+    [
+      "revise-flow",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-test-outline",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "revise-fr",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "verify-flow",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v3-check.md"
+    ],
+    [
+      "draft-test-outline",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v3.md"
+    ],
+    [
+      "verify-test-outline",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v3-check.md"
+    ],
+    [
+      "revise-flow",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "revise-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "revise-fr",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "verify-flow",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v3-check.md"
+    ],
+    [
+      "draft-test-outline",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v3.md"
+    ],
+    [
+      "verify-test-outline",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v3-check.md"
+    ],
+    [
+      "revise-flow",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "revise-ui",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v3.html"
+    ],
+    [
+      "revise-ui",
+      "verify-ui",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-contract-v3.md"
+    ],
+    [
+      "audit-fr-baseline",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/fr-baseline-audit-v1.md"
+    ],
+    [
+      "verify-plan",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v3-review.md"
+    ],
+    [
+      "revise-fr",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v3.md"
+    ],
+    [
+      "verify-fr",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v3-check.md"
+    ],
+    [
+      "define-data-contract",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/data-contract-v3.md"
+    ],
+    [
+      "verify-data-contract",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/data-v3-check.md"
+    ],
+    [
+      "verify-flow",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v3-check.md"
+    ],
+    [
+      "draft-test-outline",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v3.md"
+    ],
+    [
+      "verify-test-outline",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v3-check.md"
+    ],
+    [
+      "verify-ui",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/ui-v3-check.md"
+    ],
+    [
+      "verify-ui",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v3-observations.json"
+    ],
+    [
+      "verify-ui",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v3-evaluator-evidence.json"
+    ],
+    [
+      "revise-flow",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v3.md"
+    ],
+    [
+      "revise-flow",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v3.md"
+    ],
+    [
+      "revise-flow",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v3.md"
+    ],
+    [
+      "revise-ui",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v3.html"
+    ],
+    [
+      "revise-ui",
+      "evaluate-handoff",
+      "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-contract-v3.md"
+    ]
+  ],
+  "input_hashes_before": {
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/input/plan.schema.json": "cea51a142b808b2c3045994baa68a45d98d280f9d9c5a55962c2015de365431c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v1-check.md": "43cd1d0cf505bb509d9453f060503c82ed300332324c9893168eb74f05a70141",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v2-check.md": "8eb49dba6953c6d63a3eb833f54a67c74bad9b42978a83ea97408d21e18f8c1d",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v1-check.md": "b533a2d6b8618f590d3de91bdc4250172ad8d987df6060860f16e0a672403c5a",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v2-check.md": "b21ee2b862656cf871d69117c44d2d5168154360da088c929bf87e033151819b",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/handoff-v2.md": "649defa8112322d99eb7c30c986a6811c7d495236a17ec854e3ae5f6114a349a",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v1-review.md": "f2facd03b3cd1f74969c110bfc336226b7d331f65042e51b036b5995166b3eb1",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v2-review.md": "470d9248beca3760f63b1df7b54b5bcc24fc18cce5c1994ab3adebcf8403cd0e",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v2-validation.json": "a5b468a83cb2dde8ac5489f0c53214d28c68d41350cdd20e91e6a5c310bb25f3",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v1-check.md": "ea6c1f13c350bd5103493061d8b14fba8115cba46a8b900df42ec0445a1aa9a2",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v2-check.md": "0f982d0c0d6ee72264eca64f36bc6b0105edcaafab122f2d1654562d43cd3c2f",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/ui-v2-check.md": "295ecaad9d2b5673c8b2e585fba2c32ec877b1f98fa8e9e474d6c8deade463cd",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/fr-baseline-audit-v1.md": "78f8ce610526fdaa3e7911b3765fbff8246ea223d9772611e370bb42d5374175",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-checks-v2.spec.js": "5d3e348bda5e071cb35480afd30847ede3f7bb834130abff1b86a19d4d483934",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v2-evaluator-evidence.json": "fe9924ef5c94ca19994d45e78c18bbd436abb4fd934bce72361f32f74c06cb92",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v2-observations.json": "bf16ddef9c6ab46303702cbb18e5a3f0fe1bb1c0c969bc511b47fba825cec941",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v2.md": "8fe7983eb45a7222424c7fafe34adf78874da75e7e7cf3ab013d4955d1159f9c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v2.md": "2cbdde11bb3fd5e62f338a1ea74f65d11112f3ea56e8a10ed9d24b08a1dcf0bb",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/impact-analysis-v2.md": "b4b5dcfbe1d03d1e31d59758b2a9476cecf00b65b0226914ac29f199894ecfb3",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/impact-analysis.md": "f18b46dfd1dbcff987d82e7e691b5ff981c109d89abda162d509d176fbc7545b",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v1.json": "4bd023624fb2cb5c1ec9975528e8ffbcb6ac830cd40f9b61c5db28523ae25cfe",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v1.md": "10f2d1da058fafe1a6ed75047ad157ab0694cb7ee40ddd89c91874fa4d3310ae",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v2.json": "8682dcba597fd36cadcf0a4724a9a75bd866f551b337281c663ee419c059c828",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v2.md": "75c5e9b06c7e26fbf7174295d165fbae64be57ea8ff807b4d96884898296ea2c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v2.md": "efe13a4cbb843c056884478fa8e5a0ab201c9641a579ae355cedb07867218d0a",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v2.md": "f1a935fc0cf2779d225ce050a12b5df108c53a149fa0885ac7ce78828ae2290d",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v1.md": "6bdeccb7cf14fcdf03f0fa56578e1595c1ec3ea2dda67c3f74d4bba4c07ae18c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v2.md": "50b3c1a7e68a5ca3a56cff2939f55cd591ae2c60c63bd3577625bc442dd2b763",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-contract-v2.md": "40ad0ff84c423a225b1675bbc2a627390446b9ecfcbcbb4496a6f0605e675888",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html": "249b98c493f4c1347efe36f8be059095ede9d3b23b76ada3b022cfc416c2a1cc",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/flow-check.json": "3be4ccd3d045951e7c69e523e6ce2dfab052d45ece39d453741f310435d1c700",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/flow.md": "d0a5fcd029f4f315a02fcd2c057a44907bdf7362fbce17b8664a75b82773595d",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/fr-check.json": "1b0c604da9288ce926ba4c98eb258107b130f309f85b1ee96403e02ba0d0f98c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/fr-nfr.md": "da31640e540b825d4fec555627ea098f092daf4243d5d304fd4c32ae6db734cd",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/input-audit.md": "d4100680ed1f31ea3351144f202f85343fb47a23acfa0305116731ab8bb1bbd8",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/provenance.md": "8059b1b47647d690ed7a73e6b4b9751e209edb3905868a4729269fb79330739a",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/state-machine.md": "b4bc79de9e95f1526ca05326211a6025981b0420f3681b574e37189319f35adf",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/structure.md": "fc8facf9088ad320d8dc3a7157edc14b337c1cb7081c3b098bcf91ceab08c560",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-check.json": "c09bf23c92abf0cd9c570f71ff890c1b572f8846c4d2ff8f5d2c3323be448af7",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-contract.md": "294b660d2e39b3745344f225400eee57c02c25b6efb108a3a7ecce7cdd060e68",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-mockup.html": "d2b7bfa0cff5700d3ca07f611c03cfa0304c54eafb51387f125e95edd11f7803",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/us-initial.md": "56a439f6e22f4a8d17f552b023c3c8fe61556f5bd31f1f1e9b70c1f9da6049d2",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-03-reveal-1/reveal-1.md": "1fde792db1fdcf211be4a171fd88c61184ce892720832023fcaefad6a67f8917",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/evaluator.md": "cc408b5ebc6d61bdc10deaa8366b642baa7b85a380d28af74e35beb4b487507c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-06-reveal-2/reveal-2.md": "08fa0611441305ca4e85ad461a8fd68c580ec47c495957b5d10002333ef7c023"
+  },
+  "current_v2_dependency_bindings": [
+    {
+      "report": "plan-v2-review.md",
+      "target": "plan-v2.json",
+      "sha256": "8682dcba597fd36cadcf0a4724a9a75bd866f551b337281c663ee419c059c828",
+      "matched": true
+    },
+    {
+      "report": "plan-v2-review.md",
+      "target": "plan-v2.md",
+      "sha256": "75c5e9b06c7e26fbf7174295d165fbae64be57ea8ff807b4d96884898296ea2c",
+      "matched": true
+    },
+    {
+      "report": "plan-v2-review.md",
+      "target": "impact-analysis-v2.md",
+      "sha256": "b4b5dcfbe1d03d1e31d59758b2a9476cecf00b65b0226914ac29f199894ecfb3",
+      "matched": true
+    },
+    {
+      "report": "fr-v2-check.md",
+      "target": "fr-nfr-v2.md",
+      "sha256": "2cbdde11bb3fd5e62f338a1ea74f65d11112f3ea56e8a10ed9d24b08a1dcf0bb",
+      "matched": true
+    },
+    {
+      "report": "fr-v2-check.md",
+      "target": "execution/fr-baseline-audit-v1.md",
+      "sha256": "78f8ce610526fdaa3e7911b3765fbff8246ea223d9772611e370bb42d5374175",
+      "matched": true
+    },
+    {
+      "report": "flow-v2-check.md",
+      "target": "fr-nfr-v2.md",
+      "sha256": "2cbdde11bb3fd5e62f338a1ea74f65d11112f3ea56e8a10ed9d24b08a1dcf0bb",
+      "matched": true
+    },
+    {
+      "report": "flow-v2-check.md",
+      "target": "flow-v2.md",
+      "sha256": "8fe7983eb45a7222424c7fafe34adf78874da75e7e7cf3ab013d4955d1159f9c",
+      "matched": true
+    },
+    {
+      "report": "flow-v2-check.md",
+      "target": "state-machine-v2.md",
+      "sha256": "efe13a4cbb843c056884478fa8e5a0ab201c9641a579ae355cedb07867218d0a",
+      "matched": true
+    },
+    {
+      "report": "flow-v2-check.md",
+      "target": "structure-v2.md",
+      "sha256": "f1a935fc0cf2779d225ce050a12b5df108c53a149fa0885ac7ce78828ae2290d",
+      "matched": true
+    },
+    {
+      "report": "test-outline-v2-check.md",
+      "target": "fr-nfr-v2.md",
+      "sha256": "2cbdde11bb3fd5e62f338a1ea74f65d11112f3ea56e8a10ed9d24b08a1dcf0bb",
+      "matched": true
+    },
+    {
+      "report": "test-outline-v2-check.md",
+      "target": "flow-v2.md",
+      "sha256": "8fe7983eb45a7222424c7fafe34adf78874da75e7e7cf3ab013d4955d1159f9c",
+      "matched": true
+    },
+    {
+      "report": "test-outline-v2-check.md",
+      "target": "test-outline-v2.md",
+      "sha256": "50b3c1a7e68a5ca3a56cff2939f55cd591ae2c60c63bd3577625bc442dd2b763",
+      "matched": true
+    }
+  ],
+  "previous_plan_hash": "8682dcba597fd36cadcf0a4724a9a75bd866f551b337281c663ee419c059c828",
+  "previous_markdown_hash": "75c5e9b06c7e26fbf7174295d165fbae64be57ea8ff807b4d96884898296ea2c",
+  "previous_snapshot_preservation": "Original JSON/Markdown and all referenced artifacts/evaluations/execution kept byte-identical; full prior tasks/decisions/reuse/limits available at hash-bound plan-v2 snapshot.",
+  "artifact_hashes": {
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v3.json": "2cc75857183b0fefd5f2631638442494dce2ff63436b8fa768ad5c2c13420125",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v3.md": "a109d733c6d892c49397246f24928755f344d2fb92f181e141a444f5aa19e83c",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/impact-analysis-v3.md": "beae0c4a4a9263815132134f7d0a2930d6e784b6ea7d57e6419c8a7f6264467e",
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-07-plan-v3/impact-analysis-v3.md": "beae0c4a4a9263815132134f7d0a2930d6e784b6ea7d57e6419c8a7f6264467e"
+  },
+  "markdown_lines": 110,
+  "impact_lines": 97,
+  "history_before": {
+    "bytes": 35875,
+    "sha256": "f18b46dfd1dbcff987d82e7e691b5ff981c109d89abda162d509d176fbc7545b"
+  },
+  "evaluator_review": "NOT_RUN; send to new session verify-plan",
+  "execution_v3": "NOT_RUN",
+  "not_tested": [
+    "All v3 artifact/runtime/AC execution",
+    "v2 full outline and US-09/14 separate 5/5 acceptance suites",
+    "N=5 threshold contexts 12:15/12:30",
+    "LAN/real payment/refund/full ETA/7-day data/Ubuntu install/LibreOffice/system acceptance"
+  ],
+  "history_after": {
+    "bytes": 85326,
+    "sha256": "54284a61d7926e37757953d73a2a5472017a2a0b688874f3b57ef118dd3ba1dc",
+    "prior_prefix_sha256": "f18b46dfd1dbcff987d82e7e691b5ff981c109d89abda162d509d176fbc7545b",
+    "prior_bytes_preserved": true,
+    "v3_sections": 1
+  },
+  "input_hashes_unchanged_after": {
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/input/plan.schema.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v1-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/flow-v2-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v1-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/fr-v2-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/handoff-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v1-review.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v2-review.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/plan-v2-validation.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v1-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/test-outline-v2-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/evaluations/ui-v2-check.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/fr-baseline-audit-v1.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-checks-v2.spec.js": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v2-evaluator-evidence.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/execution/ui-v2-observations.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/flow-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/fr-nfr-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/impact-analysis-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v1.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v1.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v2.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/plan-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/state-machine-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/structure-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v1.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/test-outline-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-contract-v2.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/session/ui-mockup-v2.html": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/flow-check.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/flow.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/fr-check.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/fr-nfr.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/input-audit.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/provenance.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/state-machine.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/structure.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-check.json": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-contract.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/ui-mockup.html": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-00-input/baseline-filtered-v2/us-initial.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-03-reveal-1/reveal-1.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-05-execute-v2/evaluator.md": true,
+    "/root/workspace/CWN/Teaching/AI_Workflow_Engineering_for_SA/005_LAB_Dynamic_Workflow_Replanning/reference/step-06-reveal-2/reveal-2.md": true
+  }
+}
