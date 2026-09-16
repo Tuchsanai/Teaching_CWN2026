@@ -1,0 +1,151 @@
+<section class="slide section" data-chapter="1 Loop Engineering" data-title="Loop Engineering"><div class="body"><div class="num">1</div><h1>Loop Engineering</h1><p class="lead">ทำ → ตรวจ → แก้ วนจนผ่านเกณฑ์ (ระดับ: ง่าย) · ร่องรอยที่ได้: Iteration Log</p></div></section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="Loop คืออะไร: Generate → Evaluate → Improve">
+<header class="head"><span class="eye">Theory</span><h2 style="font-size:42px">Loop คืออะไร: Generate → Evaluate → Improve</h2></header>
+<div class="body"><div class="split"><div class="quote">นักเรียนส่งการบ้าน<br>ครูตรวจตามเกณฑ์<br>ไม่ผ่านก็แก้เฉพาะจุด<br>แล้วส่งใหม่ ไม่เกิน 3 ครั้ง</div><ol class="steps"><li><b>Generate</b> — สร้างผลงานตาม Requirement</li><li><b>Evaluate</b> — ตรวจทีละเกณฑ์ พร้อมหลักฐาน</li><li><b>Improve</b> — แก้เฉพาะข้อที่ FAIL แล้วตรวจซ้ำ</li></ol></div><p class="caption">Requirement → Generate → Evaluate → ผ่าน? ใช่→Result / ไม่→Improve→กลับไป Evaluate</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="Workflow Diagram: วงจร Loop">
+<header class="head"><span class="eye">Workflow Diagram</span><h2 style="font-size:42px">Workflow Diagram: วงจร Loop</h2></header>
+<div class="body"><figure class="figure" style="--h:440px"><img data-svg="img/02-loop-cycle.svg" alt="วงจร Loop แยก GENERATOR และ CRITIC พร้อมเงื่อนไขหยุด"></figure><p class="caption">เส้นย้อนกลับเข้า Evaluate: ทุกครั้งที่แก้ต้องตรวจใหม่ · คลิกขยายเพื่ออ่านรายละเอียด</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="ทำไมต้องแยก GENERATOR กับ CRITIC และเกณฑ์แบบ PASS/FAIL">
+<header class="head"><span class="eye">Theory</span><h2 style="font-size:34px">ทำไมต้องแยก GENERATOR กับ CRITIC และเกณฑ์แบบ PASS/FAIL</h2></header>
+<div class="body"><div class="grid2"><article class="card"><h3>GENERATOR</h3><p>สร้างหรือปรับปรุงผลงาน<br>รอบถัดไปแก้เฉพาะข้อที่ FAIL</p></article><article class="card a"><h3>CRITIC</h3><p>ตรวจทีละเกณฑ์: PASS/FAIL + หลักฐาน 1 บรรทัด<br>ตรวจอย่างเคร่งครัด ไม่ผ่อนปรน</p></article></div><div class="callout warn" style="margin:12px 0">ให้ AI ตรวจงานตัวเองมักตอบว่าดี — จึงต้องแยกบทบาทและระบุวิธีตรวจ</div><table class="table" style="font-size:18px"><thead><tr><th>เกณฑ์ไม่ดี</th><th>เกณฑ์ดี — ตอบ PASS/FAIL ได้</th></tr></thead><tbody><tr><td>UI ดีไหม</td><td>มีปุ่มยกเลิกหรือไม่</td></tr><tr><td>ครบถ้วน</td><td>มี 5 ฟีเจอร์ตามรายชื่อ</td></tr><tr><td>สวย</td><td>เข้าถึงทุกฟีเจอร์ภายใน 2 คลิก</td></tr></tbody></table><p class="caption">หลักออกแบบ Evaluation Criteria ตาม §7.1</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="Stop Condition และทางออกเมื่อวนแล้วไม่ดีขึ้น · เหมาะ/ไม่เหมาะ">
+<header class="head"><span class="eye">Theory</span><h2 style="font-size:34px">Stop Condition และทางออกเมื่อวนแล้วไม่ดีขึ้น · เหมาะ/ไม่เหมาะ</h2></header>
+<div class="body"><div class="grid2"><article class="card g"><h3>หยุดเมื่อ</h3><ol class="steps"><li>ทุกเกณฑ์เป็น PASS</li><li>ครบ 3 Iteration</li><li>เกณฑ์เดิม FAIL 2 ครั้งติดโดยไม่ดีขึ้น → รายงาน blocked</li></ol></article><article class="card r"><h3>ข้อจำกัด</h3><p>ไม่เห็นภาพรวม แก้ทีละจุด<br>ต้องมีเกณฑ์ที่ตรวจได้<br>เมื่อ blocked ให้ระบุข้อที่ยังติดขัด</p></article></div><article class="card" style="margin-top:16px"><h3>เหมาะเมื่อ</h3><p>งานชิ้นเดียว เกณฑ์ชัด ปรับปรุงซ้ำได้ — แนวเลือก Workflow จาก §6 บท 4</p></article></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="Loop Prompt Template (ฉบับไทย)">
+<header class="head"><span class="eye">Prompt Template</span><h2 style="font-size:42px">Loop Prompt Template (ฉบับไทย)</h2></header>
+<div class="body"><div class="copybox" style="--h:440px"><pre class="code">บรรทัดที่ขึ้นต้นด้วย &quot;//&quot; คือคำอธิบายสำหรับผู้เรียน ให้ AI ข้ามบรรทัดเหล่านี้
+
+# ROLE (บทบาท)
+คุณสวมบทบาทที่แยกจากกัน 2 บทบาท:
+- GENERATOR: สร้างหรือปรับปรุงผลงาน
+- CRITIC: ตรวจผลงานตามเกณฑ์อย่างเคร่งครัด ผู้ตรวจต้องไม่ผ่อนปรน
+
+# GOAL (เป้าหมาย)
+สร้างผลงานที่ผ่านเกณฑ์ทุกข้อด้านล่าง
+
+# INPUT (ข้อมูลนำเข้า)
+{{REQUIREMENT}}
+
+# CRITERIA (เกณฑ์ตรวจ — ทุกข้อต้องตอบได้ว่า PASS หรือ FAIL)
+C1. มีทุกฟีเจอร์ที่ระบุไว้ในโจทย์
+C2. {{CRITERION_2}}
+C3. {{CRITERION_3}}
+// ตัวอย่าง &quot;คำโปรยสินค้า&quot;: C1 มีชื่อสินค้า  C2 มีราคา  C3 ไม่เกิน 30 คำ — ทุกข้อตอบผ่าน/ไม่ผ่านได้
+
+# WORKFLOW (ลำดับการทำงาน)
+ทำซ้ำตามวงจรต่อไปนี้:
+1. GENERATOR: สร้างผลงาน (Iteration 1) หรือแก้เฉพาะเกณฑ์ที่ไม่ผ่านเท่านั้น (Iteration ถัดไป)
+2. CRITIC: ระบุผลแต่ละเกณฑ์เป็น PASS หรือ FAIL พร้อมหลักฐานข้อละหนึ่งบรรทัด
+3. หากทุกเกณฑ์เป็น PASS ให้หยุด
+4. หากยังไม่ผ่านครบ ให้ระบุเกณฑ์ที่ไม่ผ่านแล้วเริ่ม Iteration ถัดไป
+// รอบ 1: &quot;หูฟังเสียงใส ใส่สบาย&quot; → C2 ไม่ผ่าน (ไม่มีราคา)  รอบ 2: เติม &quot;ราคา 990 บาท&quot; → ผ่านครบ
+
+# CONSTRAINTS (ข้อห้าม)
+- ห้ามเปลี่ยนส่วนที่ผ่านแล้ว
+- ห้ามแต่งข้อมูลที่ไม่มีในข้อมูลนำเข้า ให้ระบุว่าเป็นสมมติฐานแทน
+
+# STOP CONDITION (เงื่อนไขหยุด)
+หยุดเมื่อ:
+- ทุกเกณฑ์เป็น PASS หรือ
+- ทำครบ 3 Iteration หรือ
+- เกณฑ์เดิมไม่ผ่าน 2 ครั้งติดต่อกันโดยไม่ดีขึ้น (รายงานว่าติดขัด โดยระบุสถานะ blocked)
+
+# OUTPUT FORMAT (รูปแบบผลลัพธ์)
+1. ตารางบันทึก Iteration: | Iteration | สิ่งที่เปลี่ยน | C1 | C2 | C3 |
+2. ผลงานสุดท้าย
+3. ประเด็นที่ยังเหลือหรือสมมติฐาน (ถ้ามี)</pre><button class="copy" type="button">Copy</button></div><p class="caption">คัดลอกทั้งก้อน · บรรทัด // เป็นคำอธิบายให้ผู้เรียน และสั่ง AI ให้ข้าม</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="จุดออกแบบของ Loop Template">
+<header class="head"><span class="eye">Prompt Template</span><h2 style="font-size:42px">จุดออกแบบของ Loop Template</h2></header>
+<div class="body"><div class="grid2"><ol class="steps"><li>แยกผู้สร้างกับผู้ตรวจ</li><li>เกณฑ์ตรวจได้ทีละข้อ</li><li>รอบถัดไปแก้เฉพาะข้อที่ไม่ผ่าน</li><li>มีทางออกเมื่อวนแล้วไม่ดีขึ้น</li></ol><div><h3 style="margin-bottom:12px">ส่วนที่ต่างจาก Template อื่น</h3><table class="table" style="font-size:18px"><thead><tr><th>ส่วน</th><th>Loop</th></tr></thead><tbody><tr><td>Role</td><td>Generator + Critic</td></tr><tr><td>Workflow</td><td>วงจรซ้ำ</td></tr><tr><td>ต้องกำหนดเพิ่ม</td><td>เกณฑ์ผ่าน, จำนวนรอบ</td></tr><tr><td>Output</td><td>Iteration Log</td></tr></tbody></table></div></div><div class="callout" style="margin-top:16px">ในการทดลองเสียบโจทย์ลงช่อง REQUIREMENT และเขียน C2/C3 ให้ตอบ PASS/FAIL ได้ (ดูใน prompt.md ของแต่ละโจทย์)<br>ท้าย prompt มี RUN HARNESS สั่งบันทึก output/trace ลงโฟลเดอร์</div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="ทดลองจริง — โจทย์ 1 จองห้องประชุม × Loop">
+<header class="head"><span class="eye">ทดลองจริง</span><h2 style="font-size:42px">ทดลองจริง — โจทย์ 1 จองห้องประชุม × Loop</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/1_meeting_room/loop/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><div data-md="experiments/1_meeting_room/loop/trace.md" style="--h:330px"></div></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div class="ui-frame" style="--h:290px"><iframe title="ผลงานโจทย์ 1 Loop" data-inline-src="experiments/1_meeting_room/loop/output.html"></iframe></div></div></div></div><p class="caption">เลื่อนอ่านแต่ละกล่องได้ · Prompt และร่องรอยเป็นไฟล์จริงฉบับเต็ม</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 1 × Loop — ผลงานจริง (คลิกทดลองได้)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงาน</span><h2 style="font-size:42px">โจทย์ 1 × Loop — ผลงานจริง (คลิกทดลองได้)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="pane0">เว็บจริง</button><button type="button" data-tab="pane1">response.md</button></nav><div class="tabpane" data-tab="pane0"><div class="ui-frame" style="--h:330px"><iframe title="ผลงานโจทย์ 1 Loop" data-inline-src="experiments/1_meeting_room/loop/output.html"></iframe></div></div><div class="tabpane" data-tab="pane1"><div data-md="experiments/1_meeting_room/loop/response.md" style="--h:365px"></div></div></div><p class="caption">เปิดเต็มหน้าต่างเพื่อทดลองเว็บได้สะดวกขึ้น</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 1 × Loop — Iteration Log">
+<header class="head"><span class="eye">ทดลองจริง · ร่องรอยกระบวนการ</span><h2 style="font-size:42px">โจทย์ 1 × Loop — Iteration Log</h2></header>
+<div class="body"><div class="grid2"><div><div class="trace" style="--h:420px"><table class="table" style="font-size:15px"><thead><tr><th>Iteration</th><th>สิ่งที่เปลี่ยน</th><th>C1</th><th>C2</th><th>C3</th></tr></thead><tbody><tr><td>1</td><td>สร้างเว็บไฟล์เดียว พร้อมจอง/ยกเลิกและสถานะ</td><td>PASS<br>ทดลองครบ 5 ฟีเจอร์</td><td>PASS<br>Playwright: errors=0 / requests=0</td><td>PASS<br>แต่ละฟีเจอร์ 1–2 คลิก</td></tr></tbody></table></div><p class="caption">CRITIC ใช้ Playwright จริง: critic_test.py, critic-results.json</p><p class="caption">สังเกต: trace.md จริงมีคำจีน 取消 (=ยกเลิก) หลุดมา 1 คำ — โมเดลสลับภาษาโดยไม่ตั้งใจ จึงแสดงหลักฐานดิบตามจริง</p></div><div data-md="experiments/1_meeting_room/loop/trace.md" style="--h:420px"></div></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 1 × Loop — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · หลักฐานจาก log</span><h2 style="font-size:42px">โจทย์ 1 × Loop — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><div class="grid4"><div class="metric"><strong style="font-size:38px">244,784</strong><span>input tokens</span></div><div class="metric"><strong style="font-size:38px">10,581</strong><span>output tokens</span></div><div class="metric"><strong style="font-size:38px">255,365</strong><span>total tokens</span></div><div class="metric"><strong style="font-size:38px">217.0</strong><span>เวลา (วินาที)</span></div></div><p class="caption">1 Iteration ในเฟส 1 · Tokens: events.md §Tokens · เวลา/รอบ: tests/experiments-results.json meta</p><div data-md="experiments/1_meeting_room/loop/events.md" style="--h:300px"></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="ทดลองจริง — โจทย์ 2 เบิกค่าใช้จ่าย × Loop">
+<header class="head"><span class="eye">ทดลองจริง</span><h2 style="font-size:42px">ทดลองจริง — โจทย์ 2 เบิกค่าใช้จ่าย × Loop</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/2_expense_claim/loop/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><div data-md="experiments/2_expense_claim/loop/trace.md" style="--h:330px"></div></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div data-md="experiments/2_expense_claim/loop/output.md" style="--h:330px;overflow-wrap:normal"></div></div></div></div><p class="caption">เลื่อนอ่านแต่ละกล่องได้ · Prompt และร่องรอยเป็นไฟล์จริงฉบับเต็ม</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 2 × Loop — เอกสารจริง (render)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงาน</span><h2 style="font-size:42px">โจทย์ 2 × Loop — เอกสารจริง (render)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="pane0">ผลงานจริง</button><button type="button" data-tab="pane1">response.md</button></nav><div class="tabpane" data-tab="pane0"><div data-md="experiments/2_expense_claim/loop/output.md" style="--h:365px;overflow-wrap:normal"></div></div><div class="tabpane" data-tab="pane1"><div data-md="experiments/2_expense_claim/loop/response.md" style="--h:365px"></div></div></div><p class="caption">Markdown ฉบับเต็ม · Mermaid render เป็น SVG ตอน build</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 2 × Loop — Iteration Log">
+<header class="head"><span class="eye">ทดลองจริง · ร่องรอยกระบวนการ</span><h2 style="font-size:42px">โจทย์ 2 × Loop — Iteration Log</h2></header>
+<div class="body"><div class="grid2"><div><div class="trace" style="--h:420px"><table class="table" style="font-size:15px"><thead><tr><th>Iteration</th><th>สิ่งที่เปลี่ยน</th><th>C1</th><th>C2</th><th>C3</th></tr></thead><tbody><tr><td>1</td><td>สร้างเอกสารครบ แยกสมมติฐานและ Open Issues</td><td>PASS<br>FR-01–FR-10 และหัวข้อครบ</td><td>PASS<br>trace ต้นทาง 9 บรรทัด</td><td>PASS<br>Mermaid 4 บล็อก ตรวจแบบสถิต</td></tr></tbody></table></div><p class="caption">CRITIC ตรวจ Mermaid แบบสถิต ไม่ได้ render จริงตาม trace.md</p></div><div data-md="experiments/2_expense_claim/loop/trace.md" style="--h:420px"></div></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 2 × Loop — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · หลักฐานจาก log</span><h2 style="font-size:42px">โจทย์ 2 × Loop — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><div class="grid4"><div class="metric"><strong style="font-size:38px">174,129</strong><span>input tokens</span></div><div class="metric"><strong style="font-size:38px">14,702</strong><span>output tokens</span></div><div class="metric"><strong style="font-size:38px">188,831</strong><span>total tokens</span></div><div class="metric"><strong style="font-size:38px">302.0</strong><span>เวลา (วินาที)</span></div></div><p class="caption">1 Iteration ในเฟส 1 · Tokens: events.md §Tokens · เวลา/รอบ: tests/experiments-results.json meta</p><div data-md="experiments/2_expense_claim/loop/events.md" style="--h:300px"></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="ทดลองจริง — โจทย์ 3 ย้ายระบบนัดหมาย × Loop">
+<header class="head"><span class="eye">ทดลองจริง · เฟส 1</span><h2 style="font-size:42px">ทดลองจริง — โจทย์ 3 ย้ายระบบนัดหมาย × Loop</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/3_clinic_migration/loop/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><div data-md="experiments/3_clinic_migration/loop/trace.md" style="--h:330px"></div></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div data-md="experiments/3_clinic_migration/loop/output.md" style="--h:330px;overflow-wrap:normal"></div></div></div></div><p class="caption">output.md เป็นฉบับหลังเฟส 2; response.md เป็นคำตอบเฟส 1 และ trace.md รวมทั้งสองเฟส</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 3 × Loop — เอกสารจริง (render)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงาน</span><h2 style="font-size:42px">โจทย์ 3 × Loop — เอกสารจริง (render)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="pane0">ผลงานจริง</button><button type="button" data-tab="pane1">response.md</button></nav><div class="tabpane" data-tab="pane0"><div data-md="experiments/3_clinic_migration/loop/output.md" style="--h:365px;overflow-wrap:normal"></div></div><div class="tabpane" data-tab="pane1"><div data-md="experiments/3_clinic_migration/loop/response.md" style="--h:365px"></div></div></div><p class="caption">output.md เป็นฉบับหลังเฟส 2; response.md เป็นคำตอบเฟส 1 และ trace.md รวมทั้งสองเฟส</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 3 × Loop — Iteration Log">
+<header class="head"><span class="eye">ทดลองจริง · ร่องรอยกระบวนการ</span><h2 style="font-size:42px">โจทย์ 3 × Loop — Iteration Log</h2></header>
+<div class="body"><div class="grid2"><div><div class="trace" style="--h:420px"><table class="table" style="font-size:15px"><thead><tr><th>Iteration</th><th>เฟส</th><th>สิ่งที่เปลี่ยน</th><th>C1</th><th>C2</th><th>C3</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>สร้างแผน v1.0 ครบทุกส่วน</td><td>PASS<br>§2.1–2.6 ครบ</td><td>PASS<br>Findings 10 ประเภท</td><td>PASS<br>normalization + syntax 3 บล็อก</td></tr><tr><td>2</td><td>2</td><td>ตรวจ v1.0 ตาม C1 ใหม่ ยังไม่แก้</td><td>FAIL<br>ขาด consent / จองเองผ่าน OA</td><td>PASS<br>Findings เดิม</td><td>PASS<br>ตรวจส่วนเดิมซ้ำ</td></tr><tr><td>3</td><td>2</td><td>เพิ่ม §2.8 และแก้จุดเชื่อมตาม C1</td><td>PASS<br>consent / OA พร้อมส่วนเชื่อม</td><td>PASS<br>§2.2 คงเดิม</td><td>PASS<br>§2.4 คงเดิม + syntax รวม 4 บล็อก</td></tr></tbody></table></div><p class="caption">เฟส 2: C1 FAIL → PASS หลังเพิ่ม §2.8; ดู “หลักฐานการคงส่วนที่ผ่าน” ใน trace.md</p></div><div data-md="experiments/3_clinic_migration/loop/trace.md" style="--h:420px"></div></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 3 × Loop — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · หลักฐานจาก log</span><h2 style="font-size:42px">โจทย์ 3 × Loop — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><p style="font-size:16px;font-weight:700">Phase 1 · Iteration 1</p><div class="grid4"><div class="metric"><strong style="font-size:28px">150,108</strong><span>input tokens</span></div><div class="metric"><strong style="font-size:28px">12,446</strong><span>output tokens</span></div><div class="metric"><strong style="font-size:28px">162,554</strong><span>total tokens</span></div><div class="metric"><strong style="font-size:28px">251.0</strong><span>เวลา (วินาที)</span></div></div><p style="font-size:16px;font-weight:700">Phase 2 · Iteration 2–3</p><div class="grid4"><div class="metric"><strong style="font-size:28px">490,035</strong><span>input tokens</span></div><div class="metric"><strong style="font-size:28px">26,413</strong><span>output tokens</span></div><div class="metric"><strong style="font-size:28px">516,448</strong><span>total tokens</span></div><div class="metric"><strong style="font-size:28px">297.0</strong><span>เวลา (วินาที)</span></div></div><p class="caption">3 Iteration รวมสองเฟส · Tokens: events.md §Tokens · เวลา/รอบ: tests/experiments-results.json meta</p><div data-md="experiments/3_clinic_migration/loop/events.md" style="--h:260px"></div></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="โจทย์ 3 × Loop — Change Request (เฟส 2)">
+<header class="head"><span class="eye">ทดลองจริง · เฟส 2</span><h2 style="font-size:42px">โจทย์ 3 × Loop — Change Request (เฟส 2)</h2></header>
+<div class="body"><div class="grid2"><pre data-file="experiments/3_clinic_migration/loop/prompt-phase2.md" style="--h:420px"></pre><div data-md="experiments/3_clinic_migration/loop/response-phase2.md" style="--h:420px;overflow-wrap:normal"></div></div><p class="caption">Loop รับมือข้อมูลใหม่โดย CRITIC ตรวจใหม่แล้ว GENERATOR แก้เฉพาะเกณฑ์ที่ FAIL<br>(ดู Iteration 2–3 ใน trace.md)</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="ผลตรวจตามเกณฑ์ §5 (จากสคริปต์ ไม่ใช่ความเห็น)">
+<header class="head"><span class="eye">สังเกตผล</span><h2 style="font-size:42px">ผลตรวจตามเกณฑ์ §5 (จากสคริปต์ ไม่ใช่ความเห็น)</h2></header>
+<div class="body"><div class="tabs" style="--h:380px"><nav class="tabbar"><button type="button" data-tab="pane0">โจทย์ 1</button><button type="button" data-tab="pane1">โจทย์ 2</button><button type="button" data-tab="pane2">โจทย์ 3</button></nav><div class="tabpane" data-tab="pane0"><table class="table" style="font-size:15px"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td><b style="overflow-wrap:anywhere">F1_features_present</b><br>พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก</td><td><b style="color:var(--green)">PASS</b></td><td>output.html: DOM file://, 1280×800, nav ชั้นแรก 14 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 0 คลิก: หน้าแรก; สถานะ: 0 คลิก: หน้าแรก</td></tr><tr><td><b style="overflow-wrap:anywhere">F2_opens_no_console_error</b><br>เปิด file:// โดยไม่มี console error/pageerror</td><td><b style="color:var(--green)">PASS</b></td><td>output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network</td></tr><tr><td><b style="overflow-wrap:anywhere">F3_two_clicks</b><br>เข้าถึง keyword ของทุก feature ภายใน 2 คลิก</td><td><b style="color:var(--green)">PASS</b></td><td>output.html: DOM file://, 1280×800, nav ชั้นแรก 14 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 0 คลิก: หน้าแรก; สถานะ: 0 คลิก: หน้าแรก</td></tr><tr><td><b style="overflow-wrap:anywhere">F4_no_cdn</b><br>ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก</td><td><b style="color:var(--green)">PASS</b></td><td>output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source</td></tr></tbody></table></div><div class="tabpane" data-tab="pane1"><table class="table" style="font-size:15px"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td><b style="overflow-wrap:anywhere">E1_trace_all_sentences</b><br>Traceability ครอบคลุม keyword ต้นทางทั้ง 9 กลุ่ม</td><td><b style="color:var(--green)">PASS</b></td><td>output.md: Traceability; กลุ่ม 1: 336; กลุ่ม 2: 337,342,343; กลุ่ม 3: 338; กลุ่ม 4: 339; กลุ่ม 5: 340; กลุ่ม 6: 341; กลุ่ม 7: 342; กลุ่ม 8: 343; กลุ่ม 9: 344</td></tr><tr><td><b style="overflow-wrap:anywhere">E2_conflict_open_issue</b><br>Open Issues มีเกณฑ์ 5,000 และ 10,000</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:368,368; Open Issues: พบทั้งสองค่า</td></tr><tr><td><b style="overflow-wrap:anywhere">E3_no_invented_amounts</b><br>ไม่พบตัวเลขวงเงินที่พักที่แต่งเพิ่มใน FR/BR</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:25; สแกนตัวเลข+บาท ห่างจาก ที่พัก/คืน/วงเงิน ไม่เกิน 100 ตัวอักษร; ไม่พบค่านอก 5,000/10,000</td></tr><tr><td><b style="overflow-wrap:anywhere">E4_entity_consistency</b><br>ชื่อ participant/entity ใน Sequence/State เทียบกับ ERD</td><td><b style="color:var(--red)">FAIL</b></td><td>output.md:101,227,303; ERD 13 entity; ชื่อไม่พบ: App (ระบบเบิกค่าใช้จ่าย); เทียบชื่อ literal (ตัด _/ไม่สนตัวพิมพ์); participant ที่เป็นระบบ/บทบาทอาจเป็น false positive; ไม่รับรอง attribute/ความหมาย</td></tr><tr><td><b style="overflow-wrap:anywhere">E5_state_holder</b><br>ชื่อ state หรือ note ระบุผู้ถือเรื่อง</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:306,307,308,309,310,311; ตรวจเฉพาะชื่อ state และ note</td></tr><tr><td><b style="overflow-wrap:anywhere">E6_mermaid_renders</b><br>Mermaid ทุกบล็อก render ได้</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:68,101,227,303; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render</td></tr></tbody></table></div><div class="tabpane" data-tab="pane2"><table class="table" style="font-size:15px"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td><b style="overflow-wrap:anywhere">M1_five_problem_types</b><br>ตาราง Data Quality Findings มีอย่างน้อย 5 แถวปัญหา</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:54,55,56,57,58,59,60,61,62,63; ตาราง Findings แรกมี 10 แถวข้อมูล (ไม่รับรองว่าทุกแถวเป็นคนละประเภท)</td></tr><tr><td><b style="overflow-wrap:anywhere">M2_ambiguous_date_flagged</b><br>แถววันที่เป้าหมายมีข้อความ flag ความกำกวม</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:23,54; พบ marker ในบรรทัดเดียวกับวันที่เป้าหมาย; ไม่ตัดสินการตีความวันที่</td></tr><tr><td><b style="overflow-wrap:anywhere">M3_identity_strategy</b><br>หัวข้อ mapping/migration/identity มี normalization และการยืนยัน</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:214,215,251; normalization marker; output.md:213,214,215; confirmation marker ในหัวข้อที่กำหนด</td></tr><tr><td><b style="overflow-wrap:anywhere">M4_plan_version_log</b><br>บันทึกเวอร์ชันแผนมี v1 และ v2</td><td><b style="color:var(--red)">FAIL</b></td><td>output.md:289,290; หัวข้อ Plan Version/ชื่อไทย/Plan vN: v1=True, v2=False; v1.1 ไม่นับเป็น v2</td></tr><tr><td><b style="overflow-wrap:anywhere">M5_impact_analysis</b><br>เฟส 2 มีคำ Impact และ Reuse หรือคงเดิม</td><td><b style="color:var(--red)">FAIL</b></td><td>Impact: ไม่พบใน output.md + response-phase2.md; Reuse/คงเดิม: output.md:7, output.md:360, output.md:445; ตรวจคำเท่านั้น</td></tr><tr><td><b style="overflow-wrap:anywhere">M6_mermaid_renders</b><br>Mermaid ทุกบล็อก render ได้</td><td><b style="color:var(--green)">PASS</b></td><td>output.md:29,69,92,327; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render</td></tr></tbody></table></div></div><p class="caption">ที่มา: tests/experiments-results.json → results[task].loop.criteria · แสดงผลและ evidence ตามไฟล์<br>เกณฑ์ §5 แยกจาก C1–C3 ของ CRITIC; วิธี heuristic มีขอบเขตตามหลักฐานในตาราง</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="prompt เดียวกัน คนละ CLI: Codex (loop) vs Claude Code (loop_claude)">
+<header class="head"><span class="eye">ทดลองจริง · เปรียบเทียบ CLI</span><h2 style="font-size:24px">prompt เดียวกัน คนละ CLI: Codex (loop) vs Claude Code (loop_claude)</h2></header>
+<div class="body"><div class="tabs" style="--h:280px"><nav class="tabbar"><button type="button" data-tab="pane0">Codex</button><button type="button" data-tab="pane1">Claude Code</button></nav><div class="tabpane" data-tab="pane0"><div class="grid2"><div class="ui-frame" style="--h:200px"><iframe title="ผลงานโจทย์ 1 Codex" data-inline-src="experiments/1_meeting_room/loop/output.html"></iframe></div><div data-md="experiments/1_meeting_room/loop/trace.md" style="--h:250px"></div></div></div><div class="tabpane" data-tab="pane1"><div class="grid2"><div class="ui-frame" style="--h:200px"><iframe title="ผลงานโจทย์ 1 Claude Code" data-inline-src="experiments/1_meeting_room/loop_claude/output.html"></iframe></div><div data-md="experiments/1_meeting_room/loop_claude/trace.md" style="--h:250px"></div></div></div></div><table class="table" style="font-size:16px"><thead><tr><th>CLI</th><th>Iteration</th><th>total tokens</th><th>เวลา (วินาที)</th></tr></thead><tbody><tr><td>Codex</td><td>1</td><td>255,365</td><td>217</td></tr><tr><td>Claude Code</td><td>1</td><td>128,963</td><td>145</td></tr></tbody></table><p class="caption">ที่มา: trace.md และ events.md ของทั้งสองชุด · Codex total = input + output (cached อยู่ใน input)<br>Claude total = input + cached + output ตาม events.md จึงต้องอ่านนิยามก่อนเทียบ</p></div>
+</section>
+
+<section class="slide" data-chapter="1 Loop Engineering" data-title="จุดสังเกต (ให้นักศึกษาตอบ)">
+<header class="head"><span class="eye">สังเกตผล · อภิปรายจากหลักฐาน</span><h2 style="font-size:42px">จุดสังเกต (ให้นักศึกษาตอบ)</h2></header>
+<div class="body"><ul class="look"><li>เทียบกับสั่ง “ช่วยทำให้ดีขึ้น” เฉย ๆ เกณฑ์ที่ตรวจได้ทำให้แต่ละรอบแก้ตรงจุดขึ้นอย่างไร?</li><li>ทั้ง 3 โจทย์ผ่าน C1–C3 ตั้งแต่ Iteration 1 ตาม trace.md — เป็นเพราะเกณฑ์หลวมหรือ GENERATOR เก่ง จะทดสอบอย่างไร?</li><li>Iteration 2–3 ของโจทย์ 3 แตะส่วนที่ผ่านแล้วหรือไม่? ดูบรรทัด “หลักฐานการคงส่วนที่ผ่าน” ใน experiments/3_clinic_migration/loop/trace.md</li><li>CRITIC ของโจทย์ 2 ตรวจ Mermaid แบบสถิตแทน render จริง เชื่อได้แค่ไหน? เทียบกับผล E6 ใน tests/experiments-results.json</li><li>ถ้าเปลี่ยน C2 เป็น “UI สวย” การตรวจและการตัดสินใจหยุดจะเปลี่ยนอย่างไร?</li><li>โทเคนและเวลาของแต่ละโจทย์ต่างกันอย่างไร? ใช้หน้าร่องรอยจริงและ events.md แยกเฟสประกอบคำอธิบาย</li></ul></div>
+</section>

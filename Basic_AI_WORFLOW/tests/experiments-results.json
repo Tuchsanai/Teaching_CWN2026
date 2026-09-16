@@ -1,0 +1,854 @@
+{
+  "generated_at": "2026-09-16T15:47:22+07:00",
+  "results": {
+    "1_meeting_room": {
+      "dynamic": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:50:53+07:00",
+            "end": "2026-09-16T14:57:33+07:00",
+            "duration_s": 400.0,
+            "tokens": {
+              "input": 365708,
+              "cached": 328320,
+              "output": 17927,
+              "total": 383635
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "plan_versions",
+            "count": 1,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ v1"
+          },
+          "files": {
+            "prompt": "experiments/1_meeting_room/dynamic/prompt.md",
+            "trace": "experiments/1_meeting_room/dynamic/trace.md",
+            "response": "experiments/1_meeting_room/dynamic/response.md",
+            "output": "experiments/1_meeting_room/dynamic/output.html",
+            "events": "experiments/1_meeting_room/dynamic/events.md",
+            "screens": [
+              "experiments/1_meeting_room/dynamic/output-1.png",
+              "experiments/1_meeting_room/dynamic/output-2.png",
+              "experiments/1_meeting_room/dynamic/output-3.png",
+              "experiments/1_meeting_room/dynamic/output-4.png",
+              "experiments/1_meeting_room/dynamic/output-5.png",
+              "experiments/1_meeting_room/dynamic/output.png",
+              "experiments/1_meeting_room/dynamic/preview-desktop.png",
+              "experiments/1_meeting_room/dynamic/preview-mobile.png",
+              "experiments/1_meeting_room/dynamic/test-failure.png"
+            ],
+            "log.jsonl": "experiments/1_meeting_room/dynamic/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/1_meeting_room/dynamic/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "F1_features_present",
+            "desc_th": "พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 8 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → การจองของฉัน; สถานะ: 1 คลิก: หน้าแรก → การจองของฉัน"
+          },
+          {
+            "id": "F2_opens_no_console_error",
+            "desc_th": "เปิด file:// โดยไม่มี console error/pageerror",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network"
+          },
+          {
+            "id": "F3_two_clicks",
+            "desc_th": "เข้าถึง keyword ของทุก feature ภายใน 2 คลิก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 8 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → การจองของฉัน; สถานะ: 1 คลิก: หน้าแรก → การจองของฉัน"
+          },
+          {
+            "id": "F4_no_cdn",
+            "desc_th": "ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; CDN/external resources: ไม่พบ"
+      },
+      "graph": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:41:13+07:00",
+            "end": "2026-09-16T14:47:45+07:00",
+            "duration_s": 392.0,
+            "tokens": {
+              "input": 590224,
+              "cached": 528000,
+              "output": 8665,
+              "total": 598889
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "nodes",
+            "count": 6,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ N1, N1b, N2, N4, N3, N5"
+          },
+          "files": {
+            "prompt": "experiments/1_meeting_room/graph/prompt.md",
+            "trace": "experiments/1_meeting_room/graph/trace.md",
+            "response": "experiments/1_meeting_room/graph/response.md",
+            "output": "experiments/1_meeting_room/graph/output.html",
+            "events": "experiments/1_meeting_room/graph/events.md",
+            "screens": [
+              "experiments/1_meeting_room/graph/artifacts/access-and-completion-final.png",
+              "experiments/1_meeting_room/graph/artifacts/adjacent-permitted-final.png",
+              "experiments/1_meeting_room/graph/artifacts/desktop-cancelled.png",
+              "experiments/1_meeting_room/graph/artifacts/desktop-home.png",
+              "experiments/1_meeting_room/graph/artifacts/empty-state-final.png",
+              "experiments/1_meeting_room/graph/artifacts/invalid-intervals-final.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-availability.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-book.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-bookings.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-cancelled.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-final.png",
+              "experiments/1_meeting_room/graph/artifacts/mobile-rooms.png",
+              "experiments/1_meeting_room/graph/artifacts/overlap-blocked-final.png",
+              "experiments/1_meeting_room/graph/artifacts/persistence-and-release-final.png",
+              "experiments/1_meeting_room/graph/artifacts/room-shortcuts-final.png",
+              "experiments/1_meeting_room/graph/output-1.png",
+              "experiments/1_meeting_room/graph/output-2.png",
+              "experiments/1_meeting_room/graph/output-3.png",
+              "experiments/1_meeting_room/graph/output-4.png",
+              "experiments/1_meeting_room/graph/output.png"
+            ],
+            "log.jsonl": "experiments/1_meeting_room/graph/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/1_meeting_room/graph/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "F1_features_present",
+            "desc_th": "พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 11 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → จองห้อง; สถานะ: 1 คลิก: หน้าแรก → จองห้อง; เส้นทางที่ตรวจไม่สำเร็จ 1, จำกัด candidate=False"
+          },
+          {
+            "id": "F2_opens_no_console_error",
+            "desc_th": "เปิด file:// โดยไม่มี console error/pageerror",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network"
+          },
+          {
+            "id": "F3_two_clicks",
+            "desc_th": "เข้าถึง keyword ของทุก feature ภายใน 2 คลิก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 11 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → จองห้อง; สถานะ: 1 คลิก: หน้าแรก → จองห้อง; เส้นทางที่ตรวจไม่สำเร็จ 1, จำกัด candidate=False"
+          },
+          {
+            "id": "F4_no_cdn",
+            "desc_th": "ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; CDN/external resources: ไม่พบ"
+      },
+      "loop": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:20:38+07:00",
+            "end": "2026-09-16T14:24:15+07:00",
+            "duration_s": 217.0,
+            "tokens": {
+              "input": 244784,
+              "cached": 212096,
+              "output": 10581,
+              "total": 255365
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "iterations",
+            "count": 1,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ 1"
+          },
+          "files": {
+            "prompt": "experiments/1_meeting_room/loop/prompt.md",
+            "trace": "experiments/1_meeting_room/loop/trace.md",
+            "response": "experiments/1_meeting_room/loop/response.md",
+            "output": "experiments/1_meeting_room/loop/output.html",
+            "events": "experiments/1_meeting_room/loop/events.md",
+            "screens": [
+              "experiments/1_meeting_room/loop/evidence-booked.png",
+              "experiments/1_meeting_room/loop/evidence-cancelled.png",
+              "experiments/1_meeting_room/loop/evidence-mobile.png",
+              "experiments/1_meeting_room/loop/output-1.png",
+              "experiments/1_meeting_room/loop/output-2.png",
+              "experiments/1_meeting_room/loop/output-3.png",
+              "experiments/1_meeting_room/loop/output-4.png",
+              "experiments/1_meeting_room/loop/output-5.png",
+              "experiments/1_meeting_room/loop/output-6.png",
+              "experiments/1_meeting_room/loop/output.png",
+              "experiments/1_meeting_room/loop/preview.png"
+            ],
+            "log.jsonl": "experiments/1_meeting_room/loop/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/1_meeting_room/loop/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "F1_features_present",
+            "desc_th": "พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 14 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 0 คลิก: หน้าแรก; สถานะ: 0 คลิก: หน้าแรก"
+          },
+          {
+            "id": "F2_opens_no_console_error",
+            "desc_th": "เปิด file:// โดยไม่มี console error/pageerror",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network"
+          },
+          {
+            "id": "F3_two_clicks",
+            "desc_th": "เข้าถึง keyword ของทุก feature ภายใน 2 คลิก",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 14 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 0 คลิก: หน้าแรก; สถานะ: 0 คลิก: หน้าแรก"
+          },
+          {
+            "id": "F4_no_cdn",
+            "desc_th": "ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; CDN/external resources: ไม่พบ"
+      },
+      "loop_claude": {
+        "meta": {
+          "engine": "claude",
+          "model": "claude-fable-5-1",
+          "phase1": {
+            "start": "2026-09-16T15:28:45+07:00",
+            "end": "2026-09-16T15:31:10+07:00",
+            "duration_s": 145.0,
+            "tokens": {
+              "input": 25501,
+              "cached": 91253,
+              "output": 12209,
+              "total": 128963
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "iterations",
+            "count": 1,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ 1"
+          },
+          "files": {
+            "prompt": "experiments/1_meeting_room/loop_claude/prompt.md",
+            "trace": "experiments/1_meeting_room/loop_claude/trace.md",
+            "response": "experiments/1_meeting_room/loop_claude/response.md",
+            "output": "experiments/1_meeting_room/loop_claude/output.html",
+            "events": "experiments/1_meeting_room/loop_claude/events.md",
+            "screens": [
+              "experiments/1_meeting_room/loop_claude/critic_final.png",
+              "experiments/1_meeting_room/loop_claude/output-1.png",
+              "experiments/1_meeting_room/loop_claude/output.png"
+            ],
+            "log.jsonl": "experiments/1_meeting_room/loop_claude/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/1_meeting_room/loop_claude/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "F1_features_present",
+            "desc_th": "พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก",
+            "pass": false,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 3 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: ไม่พบในเส้นทางที่ตรวจ; สถานะ: 0 คลิก: หน้าแรก"
+          },
+          {
+            "id": "F2_opens_no_console_error",
+            "desc_th": "เปิด file:// โดยไม่มี console error/pageerror",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network"
+          },
+          {
+            "id": "F3_two_clicks",
+            "desc_th": "เข้าถึง keyword ของทุก feature ภายใน 2 คลิก",
+            "pass": false,
+            "method": "heuristic",
+            "evidence": "output.html: DOM file://, 1280×800, nav ชั้นแรก 3 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: ไม่พบในเส้นทางที่ตรวจ; สถานะ: 0 คลิก: หน้าแรก"
+          },
+          {
+            "id": "F4_no_cdn",
+            "desc_th": "ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source"
+          }
+        ],
+        "notes": "ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; CDN/external resources: ไม่พบ; F1/F3 ของ loop_claude เป็น FAIL เพราะปุ่ม “ยกเลิก” ปรากฏหลังมีการจองเท่านั้น (state-dependent) เป็นข้อจำกัดของ heuristic ที่สำรวจจากสถานะเริ่มต้น ไม่ใช่ข้อสรุปว่าเว็บไม่มีฟีเจอร์ยกเลิก; คงผลตรวจเดิมไว้"
+      }
+    },
+    "2_expense_claim": {
+      "dynamic": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:59:24+07:00",
+            "end": "2026-09-16T15:06:48+07:00",
+            "duration_s": 444.0,
+            "tokens": {
+              "input": 212713,
+              "cached": 175232,
+              "output": 20666,
+              "total": 233379
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "plan_versions",
+            "count": 1,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ v1"
+          },
+          "files": {
+            "prompt": "experiments/2_expense_claim/dynamic/prompt.md",
+            "trace": "experiments/2_expense_claim/dynamic/trace.md",
+            "response": "experiments/2_expense_claim/dynamic/response.md",
+            "output": "experiments/2_expense_claim/dynamic/output.md",
+            "events": "experiments/2_expense_claim/dynamic/events.md",
+            "screens": [
+              "experiments/2_expense_claim/dynamic/output.png"
+            ],
+            "log.jsonl": "experiments/2_expense_claim/dynamic/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/2_expense_claim/dynamic/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "E1_trace_all_sentences",
+            "desc_th": "Traceability ครอบคลุม keyword ต้นทางทั้ง 9 กลุ่ม",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md: Traceability; กลุ่ม 1: 495; กลุ่ม 2: 496,503,504,508; กลุ่ม 3: 498; กลุ่ม 4: 499; กลุ่ม 5: 500; กลุ่ม 6: 501,502; กลุ่ม 7: 503; กลุ่ม 8: 504; กลุ่ม 9: 505"
+          },
+          {
+            "id": "E2_conflict_open_issue",
+            "desc_th": "Open Issues มีเกณฑ์ 5,000 และ 10,000",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:130,130; Open Issues: พบทั้งสองค่า"
+          },
+          {
+            "id": "E3_no_invented_amounts",
+            "desc_th": "ไม่พบตัวเลขวงเงินที่พักที่แต่งเพิ่มใน FR/BR",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:61; สแกนตัวเลข+บาท ห่างจาก ที่พัก/คืน/วงเงิน ไม่เกิน 100 ตัวอักษร; ไม่พบค่านอก 5,000/10,000"
+          },
+          {
+            "id": "E4_entity_consistency",
+            "desc_th": "ชื่อ participant/entity ใน Sequence/State เทียบกับ ERD",
+            "pass": false,
+            "method": "heuristic",
+            "evidence": "output.md:183,371,450; ERD 15 entity; ชื่อไม่พบ: D (ฐานข้อมูล), S (ระบบเบิกค่าใช้จ่าย); เทียบชื่อ literal (ตัด _/ไม่สนตัวพิมพ์); participant ที่เป็นระบบ/บทบาทอาจเป็น false positive; ไม่รับรอง attribute/ความหมาย"
+          },
+          {
+            "id": "E5_state_holder",
+            "desc_th": "ชื่อ state หรือ note ระบุผู้ถือเรื่อง",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:453,454,455; ตรวจเฉพาะชื่อ state และ note"
+          },
+          {
+            "id": "E6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:149,183,371,450; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; trace.md กล่าวถึงการ append/ต่อท้าย; ไม่ใช่หลักฐานยืนยันประวัติไฟล์ทุกช่วง"
+      },
+      "graph": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:41:29+07:00",
+            "end": "2026-09-16T14:50:10+07:00",
+            "duration_s": 521.0,
+            "tokens": {
+              "input": 832671,
+              "cached": 771840,
+              "output": 20154,
+              "total": 852825
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "nodes",
+            "count": 6,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ N1, N1b, N2, N3, N4, N5"
+          },
+          "files": {
+            "prompt": "experiments/2_expense_claim/graph/prompt.md",
+            "trace": "experiments/2_expense_claim/graph/trace.md",
+            "response": "experiments/2_expense_claim/graph/response.md",
+            "output": "experiments/2_expense_claim/graph/output.md",
+            "events": "experiments/2_expense_claim/graph/events.md",
+            "screens": [
+              "experiments/2_expense_claim/graph/output.png"
+            ],
+            "log.jsonl": "experiments/2_expense_claim/graph/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/2_expense_claim/graph/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "E1_trace_all_sentences",
+            "desc_th": "Traceability ครอบคลุม keyword ต้นทางทั้ง 9 กลุ่ม",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md: Traceability; กลุ่ม 1: 380; กลุ่ม 2: 381,388,389; กลุ่ม 3: 383; กลุ่ม 4: 384; กลุ่ม 5: 385; กลุ่ม 6: 386,387; กลุ่ม 7: 388; กลุ่ม 8: 389; กลุ่ม 9: 390"
+          },
+          {
+            "id": "E2_conflict_open_issue",
+            "desc_th": "Open Issues มีเกณฑ์ 5,000 และ 10,000",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:412,412; Open Issues: พบทั้งสองค่า"
+          },
+          {
+            "id": "E3_no_invented_amounts",
+            "desc_th": "ไม่พบตัวเลขวงเงินที่พักที่แต่งเพิ่มใน FR/BR",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:41; สแกนตัวเลข+บาท ห่างจาก ที่พัก/คืน/วงเงิน ไม่เกิน 100 ตัวอักษร; ไม่พบค่านอก 5,000/10,000"
+          },
+          {
+            "id": "E4_entity_consistency",
+            "desc_th": "ชื่อ participant/entity ใน Sequence/State เทียบกับ ERD",
+            "pass": false,
+            "method": "heuristic",
+            "evidence": "output.md:124,250,316; ERD 10 entity; ชื่อไม่พบ: A (ฝ่ายบัญชี), M (ผู้จัดการฝ่าย), T (หัวหน้าทีม); เทียบชื่อ literal (ตัด _/ไม่สนตัวพิมพ์); participant ที่เป็นระบบ/บทบาทอาจเป็น false positive; ไม่รับรอง attribute/ความหมาย"
+          },
+          {
+            "id": "E5_state_holder",
+            "desc_th": "ชื่อ state หรือ note ระบุผู้ถือเรื่อง",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:319,321,322,324,326,328; ตรวจเฉพาะชื่อ state และ note"
+          },
+          {
+            "id": "E6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:79,124,250,316; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; trace.md กล่าวถึงการ append/ต่อท้าย; ไม่ใช่หลักฐานยืนยันประวัติไฟล์ทุกช่วง"
+      },
+      "loop": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:26:30+07:00",
+            "end": "2026-09-16T14:31:32+07:00",
+            "duration_s": 302.0,
+            "tokens": {
+              "input": 174129,
+              "cached": 152576,
+              "output": 14702,
+              "total": 188831
+            }
+          },
+          "phase2": null,
+          "rounds": {
+            "kind": "iterations",
+            "count": 1,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ 1"
+          },
+          "files": {
+            "prompt": "experiments/2_expense_claim/loop/prompt.md",
+            "trace": "experiments/2_expense_claim/loop/trace.md",
+            "response": "experiments/2_expense_claim/loop/response.md",
+            "output": "experiments/2_expense_claim/loop/output.md",
+            "events": "experiments/2_expense_claim/loop/events.md",
+            "screens": [
+              "experiments/2_expense_claim/loop/output.png"
+            ],
+            "log.jsonl": "experiments/2_expense_claim/loop/log.jsonl",
+            "log-phase2.jsonl": null,
+            "prompt-phase2.md": null,
+            "response-phase2.md": null,
+            "shoot.json": "experiments/2_expense_claim/loop/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "E1_trace_all_sentences",
+            "desc_th": "Traceability ครอบคลุม keyword ต้นทางทั้ง 9 กลุ่ม",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md: Traceability; กลุ่ม 1: 336; กลุ่ม 2: 337,342,343; กลุ่ม 3: 338; กลุ่ม 4: 339; กลุ่ม 5: 340; กลุ่ม 6: 341; กลุ่ม 7: 342; กลุ่ม 8: 343; กลุ่ม 9: 344"
+          },
+          {
+            "id": "E2_conflict_open_issue",
+            "desc_th": "Open Issues มีเกณฑ์ 5,000 และ 10,000",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:368,368; Open Issues: พบทั้งสองค่า"
+          },
+          {
+            "id": "E3_no_invented_amounts",
+            "desc_th": "ไม่พบตัวเลขวงเงินที่พักที่แต่งเพิ่มใน FR/BR",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:25; สแกนตัวเลข+บาท ห่างจาก ที่พัก/คืน/วงเงิน ไม่เกิน 100 ตัวอักษร; ไม่พบค่านอก 5,000/10,000"
+          },
+          {
+            "id": "E4_entity_consistency",
+            "desc_th": "ชื่อ participant/entity ใน Sequence/State เทียบกับ ERD",
+            "pass": false,
+            "method": "heuristic",
+            "evidence": "output.md:101,227,303; ERD 13 entity; ชื่อไม่พบ: App (ระบบเบิกค่าใช้จ่าย); เทียบชื่อ literal (ตัด _/ไม่สนตัวพิมพ์); participant ที่เป็นระบบ/บทบาทอาจเป็น false positive; ไม่รับรอง attribute/ความหมาย"
+          },
+          {
+            "id": "E5_state_holder",
+            "desc_th": "ชื่อ state หรือ note ระบุผู้ถือเรื่อง",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:306,307,308,309,310,311; ตรวจเฉพาะชื่อ state และ note"
+          },
+          {
+            "id": "E6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:68,101,227,303; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only"
+      }
+    },
+    "3_clinic_migration": {
+      "dynamic": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T15:08:13+07:00",
+            "end": "2026-09-16T15:17:28+07:00",
+            "duration_s": 555.0,
+            "tokens": {
+              "input": 347232,
+              "cached": 305280,
+              "output": 24817,
+              "total": 372049
+            }
+          },
+          "phase2": {
+            "start": "2026-09-16T15:17:28+07:00",
+            "end": "2026-09-16T15:26:38+07:00",
+            "duration_s": 550.0,
+            "tokens": {
+              "input": 1168976,
+              "cached": 1085568,
+              "output": 50444,
+              "total": 1219420
+            }
+          },
+          "rounds": {
+            "kind": "plan_versions",
+            "count": 3,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ v1, v2, v3"
+          },
+          "files": {
+            "prompt": "experiments/3_clinic_migration/dynamic/prompt.md",
+            "trace": "experiments/3_clinic_migration/dynamic/trace.md",
+            "response": "experiments/3_clinic_migration/dynamic/response.md",
+            "output": "experiments/3_clinic_migration/dynamic/output.md",
+            "events": "experiments/3_clinic_migration/dynamic/events.md",
+            "screens": [
+              "experiments/3_clinic_migration/dynamic/output.png"
+            ],
+            "log.jsonl": "experiments/3_clinic_migration/dynamic/log.jsonl",
+            "log-phase2.jsonl": "experiments/3_clinic_migration/dynamic/log-phase2.jsonl",
+            "prompt-phase2.md": "experiments/3_clinic_migration/dynamic/prompt-phase2.md",
+            "response-phase2.md": "experiments/3_clinic_migration/dynamic/response-phase2.md",
+            "shoot.json": "experiments/3_clinic_migration/dynamic/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "M1_five_problem_types",
+            "desc_th": "ตาราง Data Quality Findings มีอย่างน้อย 5 แถวปัญหา",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:199,200,201,202,203,204,205,206,207,208,209,210; ตาราง Findings แรกมี 12 แถวข้อมูล (ไม่รับรองว่าทุกแถวเป็นคนละประเภท)"
+          },
+          {
+            "id": "M2_ambiguous_date_flagged",
+            "desc_th": "แถววันที่เป้าหมายมีข้อความ flag ความกำกวม",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:199; พบ marker ในบรรทัดเดียวกับวันที่เป้าหมาย; ไม่ตัดสินการตีความวันที่"
+          },
+          {
+            "id": "M3_identity_strategy",
+            "desc_th": "หัวข้อ mapping/migration/identity มี normalization และการยืนยัน",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:568,604,619; normalization marker; output.md:565,568,569; confirmation marker ในหัวข้อที่กำหนด"
+          },
+          {
+            "id": "M4_plan_version_log",
+            "desc_th": "บันทึกเวอร์ชันแผนมี v1 และ v2",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:5,42,22,40; หัวข้อ Plan Version/ชื่อไทย/Plan vN: v1=True, v2=True; v1.1 ไม่นับเป็น v2"
+          },
+          {
+            "id": "M5_impact_analysis",
+            "desc_th": "เฟส 2 มีคำ Impact และ Reuse หรือคงเดิม",
+            "pass": true,
+            "method": "script",
+            "evidence": "Impact: output.md:36, output.md:75, output.md:784; Reuse/คงเดิม: output.md:19, output.md:37, output.md:71; ตรวจคำเท่านั้น"
+          },
+          {
+            "id": "M6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:173,264,317,627; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; output คือฉบับหลังเฟส 2; เกณฑ์ตรวจฉบับปัจจุบัน; เวลา/โทเคนแยกตาม log ของแต่ละเฟส"
+      },
+      "graph": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:50:36+07:00",
+            "end": "2026-09-16T14:58:48+07:00",
+            "duration_s": 492.0,
+            "tokens": {
+              "input": 589489,
+              "cached": 552448,
+              "output": 16693,
+              "total": 606182
+            }
+          },
+          "phase2": {
+            "start": "2026-09-16T14:58:48+07:00",
+            "end": "2026-09-16T15:10:15+07:00",
+            "duration_s": 687.0,
+            "tokens": {
+              "input": 1819842,
+              "cached": 1749888,
+              "output": 35270,
+              "total": 1855112
+            }
+          },
+          "rounds": {
+            "kind": "nodes",
+            "count": 6,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ N1, N1b, N2, N3, N4, N5; รวมสองเฟส; จำนวน node ไม่ใช่จำนวนการเรียกซ้ำ"
+          },
+          "files": {
+            "prompt": "experiments/3_clinic_migration/graph/prompt.md",
+            "trace": "experiments/3_clinic_migration/graph/trace.md",
+            "response": "experiments/3_clinic_migration/graph/response.md",
+            "output": "experiments/3_clinic_migration/graph/output.md",
+            "events": "experiments/3_clinic_migration/graph/events.md",
+            "screens": [
+              "experiments/3_clinic_migration/graph/output.png"
+            ],
+            "log.jsonl": "experiments/3_clinic_migration/graph/log.jsonl",
+            "log-phase2.jsonl": "experiments/3_clinic_migration/graph/log-phase2.jsonl",
+            "prompt-phase2.md": "experiments/3_clinic_migration/graph/prompt-phase2.md",
+            "response-phase2.md": "experiments/3_clinic_migration/graph/response-phase2.md",
+            "shoot.json": "experiments/3_clinic_migration/graph/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "M1_five_problem_types",
+            "desc_th": "ตาราง Data Quality Findings มีอย่างน้อย 5 แถวปัญหา",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:59,60,61,62,63,64,65,66,67,68,69,70; ตาราง Findings แรกมี 12 แถวข้อมูล (ไม่รับรองว่าทุกแถวเป็นคนละประเภท)"
+          },
+          {
+            "id": "M2_ambiguous_date_flagged",
+            "desc_th": "แถววันที่เป้าหมายมีข้อความ flag ความกำกวม",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:41,68,105,159,1024; พบ marker ในบรรทัดเดียวกับวันที่เป้าหมาย; ไม่ตัดสินการตีความวันที่"
+          },
+          {
+            "id": "M3_identity_strategy",
+            "desc_th": "หัวข้อ mapping/migration/identity มี normalization และการยืนยัน",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:841,901,924; normalization marker; output.md:833,838,839; confirmation marker ในหัวข้อที่กำหนด"
+          },
+          {
+            "id": "M4_plan_version_log",
+            "desc_th": "บันทึกเวอร์ชันแผนมี v1 และ v2",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:993,994,995; หัวข้อ Plan Version/ชื่อไทย/Plan vN: v1=True, v2=True; v1.1 ไม่นับเป็น v2"
+          },
+          {
+            "id": "M5_impact_analysis",
+            "desc_th": "เฟส 2 มีคำ Impact และ Reuse หรือคงเดิม",
+            "pass": false,
+            "method": "script",
+            "evidence": "Impact: ไม่พบใน output.md + response-phase2.md; Reuse/คงเดิม: output.md:14, output.md:810, output.md:841; ตรวจคำเท่านั้น"
+          },
+          {
+            "id": "M6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:113,175,208,453,492; render_markdown ได้ SVG 5/5 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; trace.md กล่าวถึงการ append/ต่อท้าย; ไม่ใช่หลักฐานยืนยันประวัติไฟล์ทุกช่วง; output คือฉบับหลังเฟส 2; เกณฑ์ตรวจฉบับปัจจุบัน; เวลา/โทเคนแยกตาม log ของแต่ละเฟส"
+      },
+      "loop": {
+        "meta": {
+          "engine": "codex",
+          "model": null,
+          "phase1": {
+            "start": "2026-09-16T14:28:04+07:00",
+            "end": "2026-09-16T14:32:15+07:00",
+            "duration_s": 251.0,
+            "tokens": {
+              "input": 150108,
+              "cached": 121728,
+              "output": 12446,
+              "total": 162554
+            }
+          },
+          "phase2": {
+            "start": "2026-09-16T14:32:15+07:00",
+            "end": "2026-09-16T14:37:12+07:00",
+            "duration_s": 297.0,
+            "tokens": {
+              "input": 490035,
+              "cached": 433280,
+              "output": 26413,
+              "total": 516448
+            }
+          },
+          "rounds": {
+            "kind": "iterations",
+            "count": 3,
+            "detail": "trace.md: นับรหัสไม่ซ้ำ 1, 2, 3"
+          },
+          "files": {
+            "prompt": "experiments/3_clinic_migration/loop/prompt.md",
+            "trace": "experiments/3_clinic_migration/loop/trace.md",
+            "response": "experiments/3_clinic_migration/loop/response.md",
+            "output": "experiments/3_clinic_migration/loop/output.md",
+            "events": "experiments/3_clinic_migration/loop/events.md",
+            "screens": [
+              "experiments/3_clinic_migration/loop/output.png"
+            ],
+            "log.jsonl": "experiments/3_clinic_migration/loop/log.jsonl",
+            "log-phase2.jsonl": "experiments/3_clinic_migration/loop/log-phase2.jsonl",
+            "prompt-phase2.md": "experiments/3_clinic_migration/loop/prompt-phase2.md",
+            "response-phase2.md": "experiments/3_clinic_migration/loop/response-phase2.md",
+            "shoot.json": "experiments/3_clinic_migration/loop/shoot.json"
+          }
+        },
+        "criteria": [
+          {
+            "id": "M1_five_problem_types",
+            "desc_th": "ตาราง Data Quality Findings มีอย่างน้อย 5 แถวปัญหา",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:54,55,56,57,58,59,60,61,62,63; ตาราง Findings แรกมี 10 แถวข้อมูล (ไม่รับรองว่าทุกแถวเป็นคนละประเภท)"
+          },
+          {
+            "id": "M2_ambiguous_date_flagged",
+            "desc_th": "แถววันที่เป้าหมายมีข้อความ flag ความกำกวม",
+            "pass": true,
+            "method": "script",
+            "evidence": "output.md:23,54; พบ marker ในบรรทัดเดียวกับวันที่เป้าหมาย; ไม่ตัดสินการตีความวันที่"
+          },
+          {
+            "id": "M3_identity_strategy",
+            "desc_th": "หัวข้อ mapping/migration/identity มี normalization และการยืนยัน",
+            "pass": true,
+            "method": "heuristic",
+            "evidence": "output.md:214,215,251; normalization marker; output.md:213,214,215; confirmation marker ในหัวข้อที่กำหนด"
+          },
+          {
+            "id": "M4_plan_version_log",
+            "desc_th": "บันทึกเวอร์ชันแผนมี v1 และ v2",
+            "pass": false,
+            "method": "script",
+            "evidence": "output.md:289,290; หัวข้อ Plan Version/ชื่อไทย/Plan vN: v1=True, v2=False; v1.1 ไม่นับเป็น v2"
+          },
+          {
+            "id": "M5_impact_analysis",
+            "desc_th": "เฟส 2 มีคำ Impact และ Reuse หรือคงเดิม",
+            "pass": false,
+            "method": "script",
+            "evidence": "Impact: ไม่พบใน output.md + response-phase2.md; Reuse/คงเดิม: output.md:7, output.md:360, output.md:445; ตรวจคำเท่านั้น"
+          },
+          {
+            "id": "M6_mermaid_renders",
+            "desc_th": "Mermaid ทุกบล็อก render ได้",
+            "pass": true,
+            "method": "render",
+            "evidence": "output.md:29,69,92,327; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render"
+          }
+        ],
+        "notes": "ไม่มีชื่อ model ใน thread/init หรือ .engine; ไม่อนุมานจาก launcher หรือคำสั่งมาตรฐาน; ไม่มี snapshot trace ก่อนหน้าให้พิสูจน์ append-only; output คือฉบับหลังเฟส 2; เกณฑ์ตรวจฉบับปัจจุบัน; เวลา/โทเคนแยกตาม log ของแต่ละเฟส"
+      }
+    }
+  }
+}

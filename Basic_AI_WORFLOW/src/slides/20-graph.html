@@ -1,0 +1,179 @@
+<section class="slide section" data-chapter="2 Graph Engineering" data-title="Graph Engineering"><div class="body"><div class="num">2</div><h1>Graph Engineering</h1><p class="lead">แตกงานเป็นส่วน ทำขนานกัน แล้วรวมกลับ (ระดับ: ปานกลาง) · ร่องรอยที่ได้: Execution Trace</p></div></section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="Graph คืออะไร: Node · Edge · Dependency · State">
+<header class="head"><span class="eye">Graph Engineering</span><h2 style="font-size:34px">Graph คืออะไร: Node · Edge · Dependency · State</h2></header>
+<div class="body"><div class="split"><blockquote class="quote" style="font-size:29px">ทำข้าวแกง<br>หุงข้าวกับทำแกงพร้อมกันได้ (fan-out)<br>จัดจานต้องรอทั้งสองเสร็จ (fan-in)<br>แกงไหม้ ข้าวที่หุงแล้วยังใช้ได้</blockquote><div class="grid2"><article class="card "><h3>Node</h3><p>งานหนึ่งชิ้นที่มี Task และ Output ชัดเจน</p></article><article class="card "><h3>Edge</h3><p>เส้นทางส่งข้อมูลจาก Node หนึ่งไปอีก Node</p></article><article class="card "><h3>Dependency</h3><p>เริ่มได้เมื่อทุก Node ที่พึ่งพามีสถานะ DONE</p></article><article class="card "><h3>State</h3><p>สถานะของงาน: TODO → DONE หรือ FAILED</p></article></div></div><p class="caption">ลำดับสอน: Sequential → Fan-out/Fan-in → Conditional → Graph with Loop</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="แบบที่ 1 — Sequential">
+<header class="head"><span class="eye">Theory · รูปแบบกราฟ</span><h2 style="font-size:36px">แบบที่ 1 — Sequential</h2></header>
+<div class="body"><figure class="figure" style="--h:440px"><img data-svg="img/04-graph-sequential.svg" alt="แบบที่ 1 — Sequential"></figure><p class="caption">ตามรอยง่าย รู้ว่าพังที่ Node ไหน · ข้อจำกัด: ช้า ไม่ใช้ประโยชน์จากงานขนาน</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="แบบที่ 2 — Fan-out / Fan-in">
+<header class="head"><span class="eye">Theory · รูปแบบกราฟ</span><h2 style="font-size:36px">แบบที่ 2 — Fan-out / Fan-in</h2></header>
+<div class="body"><figure class="figure" style="--h:440px"><img data-svg="img/05-graph-fanout-fanin.svg" alt="แบบที่ 2 — Fan-out / Fan-in"></figure><p class="caption">N2–N4 ทำขนาน ต้องไม่เห็นผลของกัน · N5 รอ DONE ครบก่อนรวมผล</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="แบบที่ 3 — Conditional">
+<header class="head"><span class="eye">Theory · รูปแบบกราฟ</span><h2 style="font-size:36px">แบบที่ 3 — Conditional</h2></header>
+<div class="body"><figure class="figure" style="--h:440px"><img data-svg="img/06-graph-conditional.svg" alt="แบบที่ 3 — Conditional"></figure><p class="caption">N1 พบข้อขัดแย้ง → เปิด N1b ก่อน N5 · Static กำหนดงานไว้ล่วงหน้า; Conditional เปิดทางเมื่อเข้าเงื่อนไข</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="แบบที่ 4 — Graph with Loop">
+<header class="head"><span class="eye">Theory · รูปแบบกราฟ</span><h2 style="font-size:36px">แบบที่ 4 — Graph with Loop</h2></header>
+<div class="body"><figure class="figure" style="--h:440px"><img data-svg="img/07-graph-with-loop.svg" alt="แบบที่ 4 — Graph with Loop"></figure><p class="caption">ใส่วงจร Evaluate → แก้ ไว้ใน Node เดียวได้; ภาพนี้แสดง feedback จาก N5 กลับไปส่วนที่ FAIL<br>DAG ไม่มี cycle · Graph ที่มี cycle ต้องมี Stop Condition: เกณฑ์ผ่าน ขีดจำกัดรอบ และทางออกเมื่อไม่ดีขึ้น</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="data contract · Merge Rules · Failure Handling">
+<header class="head"><span class="eye">Theory · รับงาน รวมงาน และจัดการความล้มเหลว</span><h2 style="font-size:35px">data contract · Merge Rules · Failure Handling</h2></header>
+<div class="body"><div class="grid3"><article class="card"><h3>data contract ระหว่าง Node</h3><pre class="code sm">{
+  "node": "N2",
+  "status": "DONE | FAILED",
+  "output": "...",
+  "assumptions": []
+}</pre><p>ระบุผู้ส่ง สถานะ ผลงาน และสมมติฐานให้ผู้รับตรวจได้</p></article><article class="card a"><h3>Merge Rules (N5)</h3><p>รับเฉพาะ DONE ตาม contract<br><br>ขัดแย้งให้ตัดสินด้วยหลักฐานจาก INPUT และยกประโยคต้นทาง<br><br>หลักฐานไม่พอ → ระบุเป็นข้อขัดแย้งที่ยังหาข้อสรุปไม่ได้</p></article><article class="card r"><h3>Failure Handling</h3><p>ลองใหม่ 1 ครั้ง → ยังล้มเหลวให้ FAILED<br><br>ทำต่อ Node ที่ไม่พึ่งพางานนั้น พร้อมรายงานสิ่งที่ขาด<br><br>Node ที่ Dependency ยังไม่ DONE ต้องรอ; หยุดเมื่อไม่มีงานที่ทำต่อได้</p></article></div></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="Self-consistency ที่ไม่ใช่ Majority Vote · เหมาะ/ไม่เหมาะ">
+<header class="head"><span class="eye">Graph Engineering</span><h2 style="font-size:31px">Self-consistency ที่ไม่ใช่ Majority Vote · เหมาะ/ไม่เหมาะ</h2></header>
+<div class="body"><div class="grid2"><article class="card g"><h3>Self-consistency อิงหลักฐาน</h3><p>ตัวอย่างเพื่ออธิบายแนวคิดจาก §6:<br>Entity “Receipt” อยู่ใน Sequence แต่ไม่มีใน ERD<br><br>กลับไปอ้างประโยค “ต้องตรวจใบเสร็จซ้ำ” เพื่อแก้แบบจำลองให้สอดคล้องกัน<br><br>จำนวนคำตอบที่เห็นตรงกันไม่ได้แทนหลักฐานจาก INPUT</p></article><article class="card "><h3>เหมาะเมื่อ / จุดอ่อน</h3><p>เหมาะกับงานหลายส่วนที่แยกทำได้ แต่ต้องสอดคล้องกันเมื่อรวม<br><br>จุดอ่อน: ต้องรู้โครงสร้างงานล่วงหน้า และกำหนด Dependency ให้เหมาะสม<br><br>Execution Trace ช่วยติดตามว่าแต่ละ Node ส่งอะไรและอยู่ในสถานะใด</p></article></div></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="Graph Prompt Template (ฉบับไทย)">
+<header class="head"><span class="eye">Template · คำสั่งฉบับเต็ม</span><h2 style="font-size:36px">Graph Prompt Template (ฉบับไทย)</h2></header>
+<div class="body"><div class="copybox" style="--h:440px"><pre class="code">บรรทัดที่ขึ้นต้นด้วย &quot;//&quot; คือคำอธิบายสำหรับผู้เรียน ให้ AI ข้ามบรรทัดเหล่านี้
+
+# ROLE (บทบาท)
+คุณเป็นผู้ดำเนินงานตามกราฟ โดยทำงานของแต่ละ Node ในบทบาทผู้ทำงานที่เป็นอิสระจากกัน
+จากนั้นทำหน้าที่ MERGER รวมผลลัพธ์ของแต่ละ Node
+
+# GOAL (เป้าหมาย)
+สร้างผลงานส่งมอบสุดท้ายโดยทำงานตามกราฟงานด้านล่าง
+
+# INPUT (ข้อมูลนำเข้า)
+{{REQUIREMENT}}
+
+# TASK GRAPH (กราฟงาน)
+| Node | Task | Depends on | Output |
+|------|------|------------|--------|
+| N1 | สกัดข้อกำหนด (FR/BR) | - | รายการข้อกำหนด |
+| N2 | วาด Use Case Diagram | N1 | แผนภาพ Mermaid |
+| N3 | วาด ERD | N1 | แผนภาพ Mermaid |
+| N4 | วาด Sequence Diagram | N1 | แผนภาพ Mermaid |
+| N5 | ตรวจความสอดคล้องและรวมผล | N2, N3, N4 | เอกสารสุดท้าย |
+// N1 ก่อน → N2–N4 พร้อมกัน (fan-out) → N5 รวม (fan-in) — เทียบข้าวแกง: เตรียมวัตถุดิบ / หุงข้าว-ทำแกง-ทำไข่ / จัดจาน
+
+# EXECUTION RULES (กติกาการทำงาน)
+1. ทำงานของ Node ได้ก็ต่อเมื่อทุก Node ที่เป็น Dependency ของมันมีสถานะ DONE แล้ว
+2. Node ที่อยู่ระดับเดียวกัน (N2, N3, N4) ต้องทำงานเป็นอิสระจากกัน
+   ห้ามให้ Node เหล่านี้เห็นผลลัพธ์ของกันและกัน
+3. ทุก Node ต้องส่งผลลัพธ์ตาม data contract นี้:
+   { &quot;node&quot;: &quot;N2&quot;, &quot;status&quot;: &quot;DONE | FAILED&quot;, &quot;output&quot;: &quot;...&quot;, &quot;assumptions&quot;: [] }
+
+# CONDITIONAL EDGE (ทางเลือกตามเงื่อนไข — ไม่บังคับ)
+หาก N1 พบข้อกำหนดที่ขัดแย้งกัน ให้ทำงานของ Node N1b &quot;ระบุประเด็นที่ยังหาข้อสรุปไม่ได้&quot; ก่อน N5
+// เช่น เจอ 5,000 กับ 10,000 ขัดกัน ให้แตกไป N1b ก่อน
+
+# MERGE RULES (N5) (กติกาการรวมผล)
+- รับผลลัพธ์ของ Node เฉพาะเมื่อมีสถานะ DONE และเป็นไปตาม data contract
+- หากผลลัพธ์ของแต่ละ Node ขัดแย้งกัน (เช่น มี Entity ใน Sequence Diagram แต่ไม่มีใน ERD)
+  ให้ตัดสินโดยใช้หลักฐานจาก INPUT และยกประโยคต้นทางมาอ้างอิง
+- หากหลักฐานไม่เพียงพอให้ตัดสิน ห้ามเลือกข้าง ให้ระบุเป็นข้อขัดแย้งที่ยังหาข้อสรุปไม่ได้
+
+# FAILURE HANDLING (การจัดการเมื่องานล้มเหลว)
+- หาก Node ทำงานล้มเหลว ให้ลองทำใหม่อีก 1 ครั้ง
+- หากล้มเหลวอีก ให้ระบุสถานะ FAILED แล้วทำงานต่อใน Node ที่ไม่ได้ขึ้นกับ Node นั้น
+  พร้อมรายงานสิ่งที่ขาดหายไป
+
+# CONSTRAINTS (ข้อห้าม)
+- ห้ามแต่งตัวเลขหรือกติกาที่ไม่มีในข้อมูลนำเข้า
+
+# STOP CONDITION (เงื่อนไขหยุด)
+หยุดเมื่อ N5 มีสถานะ DONE หรือเมื่อไม่มี Node ที่เหลือสามารถทำงานต่อได้
+
+# OUTPUT FORMAT (รูปแบบผลลัพธ์)
+1. Execution trace: | Node | สถานะ | หมายเหตุ |
+2. ผลงานส่งมอบสุดท้ายที่รวมแล้ว
+3. ข้อขัดแย้งที่พบและวิธีหาข้อสรุปของแต่ละข้อ (พร้อมหลักฐาน)</pre><button class="copy" type="button">Copy</button></div><p class="caption">คัดลอกทั้งก้อน · บรรทัด // เป็นคำอธิบายสำหรับผู้เรียน · เลื่อนอ่านจนถึง OUTPUT FORMAT</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="จุดออกแบบของ Graph Template">
+<header class="head"><span class="eye">Template · วิธีคิดก่อนเขียน prompt</span><h2 style="font-size:36px">จุดออกแบบของ Graph Template</h2></header>
+<div class="body"><div class="grid2"><ol class="steps"><li>เขียน Node เป็นตารางพร้อม <b>Dependency</b></li><li>กำหนด <b>data contract</b> ระหว่าง Node</li><li>Node คู่ขนานต้อง<b>ไม่เห็นผลของกัน</b></li><li>Merge ตัดสินด้วย<b>หลักฐาน</b> ไม่ใช่เสียงข้างมาก</li></ol><table class="table"><thead><tr><th>ส่วน</th><th>Graph</th></tr></thead><tbody><tr><td>Role</td><td>ผู้ทำแต่ละ Node + Merger</td></tr><tr><td>Workflow</td><td>ตาราง Node + Dependency</td></tr><tr><td>ต้องกำหนดเพิ่ม</td><td>data contract, กติกา Merge</td></tr><tr><td>Output</td><td>Execution Trace</td></tr></tbody></table></div><p class="caption">ในการทดลอง TASK GRAPH ถูกออกแบบใหม่ต่อโจทย์ (ดูตาราง N1–N5 ใน prompt.md) โจทย์ 2 ใช้ตารางจากสเปกโดยตรง</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="ทดลองจริง — โจทย์ 1 จองห้องประชุม × Graph">
+<header class="head"><span class="eye">ทดลองจริง · PROMPT → PROCESS → OUTPUT</span><h2 style="font-size:33px">ทดลองจริง — โจทย์ 1 จองห้องประชุม × Graph</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/1_meeting_room/graph/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><pre data-file="experiments/1_meeting_room/graph/trace.md" style="--h:330px"></pre></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div class="ui-frame" style="--h:290px"><iframe title="เว็บจองห้องประชุมจาก Graph" data-inline-src="experiments/1_meeting_room/graph/output.html"></iframe></div></div></div></div><p class="caption">N1 วิเคราะห์ → N2 ตรรกะ JS / N3 HTML–CSS / N4 สคริปต์ทดสอบ → N5 รวมเว็บและทดสอบ<br>PROCESS เป็น JSON บรรทัดต่อบรรทัด; ตาราง TASK GRAPH และ CONDITIONAL EDGE อยู่ใน prompt.md</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 1 × Graph — ผลงานจริง (คลิกทดลองได้)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงานเต็ม</span><h2 style="font-size:36px">โจทย์ 1 × Graph — ผลงานจริง (คลิกทดลองได้)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="p0">เว็บจริง</button><button type="button" data-tab="p1">response.md</button><button type="button" data-tab="p2">test-report.md</button></nav><div class="tabpane" data-tab="p0"><div class="ui-frame" style="--h:320px"><iframe title="เว็บจองห้องประชุมจาก Graph" data-inline-src="experiments/1_meeting_room/graph/output.html"></iframe></div></div><div class="tabpane" data-tab="p1"><div data-md="experiments/1_meeting_room/graph/response.md" style="--h:380px"></div></div><div class="tabpane" data-tab="p2"><div data-md="experiments/1_meeting_room/graph/test-report.md" style="--h:380px"></div></div></div><p class="caption">ผล Playwright ของ N5 อยู่ใน test-report.md · เว็บเป็น mock-up เก็บข้อมูลในเบราว์เซอร์</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 1 × Graph — Execution Trace">
+<header class="head"><span class="eye">ทดลองจริง · สถานะและ Dependency</span><h2 style="font-size:36px">โจทย์ 1 × Graph — Execution Trace</h2></header>
+<div class="body"><div class="grid2"><div class="trace" style="--h:420px"><table class="table"><thead><tr><th>Node</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody><tr><td>N1</td><td>DONE</td><td>N1-contract.md: 5 ฟีเจอร์, 4 หน้าจอ, navigation และ DOM/JS contract; assumptions ว่าง</td></tr><tr><td>N1b</td><td>DONE</td><td>N1b-assumptions.md: ห้องตัวอย่าง, สถานะเริ่มต้น, local storage และนิยามคลิกเข้าถึง</td></tr><tr><td>N2</td><td>DONE</td><td>nodes/N2.js; assumptions ว่าง</td></tr><tr><td>N4</td><td>DONE</td><td>nodes/N4-test.py; บันทึกก่อน N3; assumptions ว่าง</td></tr><tr><td>N3</td><td>DONE</td><td>nodes/N3.html; assumptions ว่าง</td></tr><tr><td>N5_MERGE</td><td>MERGED</td><td>output.html: รับ N2/N3/N4; ไม่พบ structural conflict; ยังรอตรวจ runtime</td></tr><tr><td>N5</td><td>DONE</td><td>output.html + test-report.md + results.json + response.md; mock-up เก็บในเบราว์เซอร์; ยกเลิกต้องมีรายการก่อน</td></tr></tbody></table></div><pre data-file="experiments/1_meeting_room/graph/trace.md" style="--h:420px"></pre></div><p class="caption">ซ้ายย่อจาก status/output/assumptions ใน trace.md · ขวาหลักฐานเต็มตามลำดับที่บันทึก · N5_MERGE เป็น event ไม่ใช่ Node เพิ่ม</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 1 × Graph — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · เวลาและโทเคน</span><h2 style="font-size:36px">โจทย์ 1 × Graph — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><div class="grid4" style="margin-bottom:10px"><div class="metric"><strong style="font-size:30px">590,224</strong><span style="font-size:15px">Phase 1 · input tokens</span></div><div class="metric"><strong style="font-size:30px">8,665</strong><span style="font-size:15px">Phase 1 · output tokens</span></div><div class="metric"><strong style="font-size:30px">598,889</strong><span style="font-size:15px">Phase 1 · total tokens</span></div><div class="metric"><strong style="font-size:30px">392</strong><span style="font-size:15px">Phase 1 · วินาที</span></div></div><div data-md="experiments/1_meeting_room/graph/events.md" style="--h:300px"></div><p class="caption">จำนวน Node ไม่ซ้ำ 6 (N1, N1b, N2, N3, N4, N5)<br>ที่มา: events.md → Tokens; tests/experiments-results.json → meta · Codex total = input + output; cached รวมอยู่ใน input</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="ทดลองจริง — โจทย์ 2 เบิกค่าใช้จ่าย × Graph">
+<header class="head"><span class="eye">ทดลองจริง · PROMPT → PROCESS → OUTPUT</span><h2 style="font-size:33px">ทดลองจริง — โจทย์ 2 เบิกค่าใช้จ่าย × Graph</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/2_expense_claim/graph/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><div data-md="experiments/2_expense_claim/graph/trace.md" style="--h:330px"></div></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div data-md="experiments/2_expense_claim/graph/output.md" style="--h:330px;overflow-wrap:normal"></div></div></div></div><p class="caption">N1 สกัดข้อกำหนด → N2 Use Case / N3 ERD / N4 Sequence + State → N5 Traceability และรวม<br>เลื่อนอ่านไฟล์เต็มในแต่ละกล่อง · TASK GRAPH และ CONDITIONAL EDGE อยู่ใน prompt.md</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 2 × Graph — เอกสารจริง (render)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงานเต็ม</span><h2 style="font-size:36px">โจทย์ 2 × Graph — เอกสารจริง (render)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="p0">output.md</button><button type="button" data-tab="p1">response.md</button></nav><div class="tabpane" data-tab="p0"><div data-md="experiments/2_expense_claim/graph/output.md" style="--h:380px"></div></div><div class="tabpane" data-tab="p1"><div data-md="experiments/2_expense_claim/graph/response.md" style="--h:380px"></div></div></div><p class="caption">เอกสารและ Mermaid ฉบับเต็ม · เลื่อนอ่านต่อในกล่อง</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 2 × Graph — Execution Trace">
+<header class="head"><span class="eye">ทดลองจริง · สถานะและ Dependency</span><h2 style="font-size:36px">โจทย์ 2 × Graph — Execution Trace</h2></header>
+<div class="body"><div class="grid2"><div class="trace" style="--h:420px"><table class="table"><thead><tr><th>Node</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody><tr><td>N1</td><td>DONE</td><td>สกัด Actors, FR/NFR, BR และประโยคต้นทาง S01–S11</td></tr><tr><td>N1b</td><td>DONE</td><td>C-01: เกณฑ์ 5,000/10,000 ขัดกัน; ไม่เลือกข้าง; เสร็จก่อน N5</td></tr><tr><td>N2</td><td>DONE</td><td>Use Case จาก N1 เท่านั้น; ใช้ flowchart แทน UML Use Case</td></tr><tr><td>N3</td><td>DONE</td><td>ERD จาก N1; Entity/FK/cardinality เป็นข้อเสนอ</td></tr><tr><td>N4</td><td>DONE</td><td>Sequence + State จาก N1; บัญชีตรวจเอกสารก่อนอนุมัติเป็นสมมติฐาน</td></tr><tr><td>N5</td><td>DONE</td><td>รับ contract ที่ครบและ DONE; ตรวจสอดคล้อง รวม Matrix/Open Issues</td></tr></tbody></table></div><div data-md="experiments/2_expense_claim/graph/trace.md" style="--h:420px"></div></div><p class="caption">ซ้ายย่อจาก status/output/assumptions ใน trace.md · ขวาหลักฐานเต็มตามลำดับที่บันทึก</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 2 × Graph — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · เวลาและโทเคน</span><h2 style="font-size:36px">โจทย์ 2 × Graph — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><div class="grid4" style="margin-bottom:10px"><div class="metric"><strong style="font-size:30px">832,671</strong><span style="font-size:15px">Phase 1 · input tokens</span></div><div class="metric"><strong style="font-size:30px">20,154</strong><span style="font-size:15px">Phase 1 · output tokens</span></div><div class="metric"><strong style="font-size:30px">852,825</strong><span style="font-size:15px">Phase 1 · total tokens</span></div><div class="metric"><strong style="font-size:30px">521</strong><span style="font-size:15px">Phase 1 · วินาที</span></div></div><div data-md="experiments/2_expense_claim/graph/events.md" style="--h:300px"></div><p class="caption">จำนวน Node ไม่ซ้ำ 6 (N1, N1b, N2, N3, N4, N5)<br>ที่มา: events.md → Tokens; tests/experiments-results.json → meta · Codex total = input + output; cached รวมอยู่ใน input</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="ทดลองจริง — โจทย์ 3 ย้ายระบบนัดหมาย × Graph">
+<header class="head"><span class="eye">ทดลองจริง · PROMPT → PROCESS → OUTPUT</span><h2 style="font-size:33px">ทดลองจริง — โจทย์ 3 ย้ายระบบนัดหมาย × Graph</h2></header>
+<div class="body"><div class="threebox" style="--h:360px"><div><h3>① PROMPT</h3><div class="boxbody"><pre data-file="experiments/3_clinic_migration/graph/prompt.md" style="--h:330px"></pre></div></div><div><h3>② PROCESS</h3><div class="boxbody"><div data-md="experiments/3_clinic_migration/graph/trace.md" style="--h:330px"></div></div></div><div><h3>③ OUTPUT</h3><div class="boxbody"><div data-md="experiments/3_clinic_migration/graph/output.md" style="--h:330px;overflow-wrap:normal"></div></div></div></div><p class="caption">N1 สำรวจ CSV → N2 As-Is / N3 To-Be + Data Model / N4 Mapping + Migration → N5 Gap + Roll-out และรวม<br>เลื่อนอ่านไฟล์เต็มในแต่ละกล่อง · TASK GRAPH และ CONDITIONAL EDGE อยู่ใน prompt.md</p><p class="caption">เริ่มจาก prompt เฟส 1; trace.md เก็บทั้งสองเฟส และ output.md เป็นฉบับปัจจุบันหลัง Change Request</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 3 × Graph — เอกสารจริง (render)">
+<header class="head"><span class="eye">ทดลองจริง · ผลงานเต็ม</span><h2 style="font-size:36px">โจทย์ 3 × Graph — เอกสารจริง (render)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="p0">output.md</button><button type="button" data-tab="p1">response.md</button></nav><div class="tabpane" data-tab="p0"><div data-md="experiments/3_clinic_migration/graph/output.md" style="--h:380px"></div></div><div class="tabpane" data-tab="p1"><div data-md="experiments/3_clinic_migration/graph/response.md" style="--h:380px"></div></div></div><p class="caption">เอกสารและ Mermaid ฉบับเต็ม · เลื่อนอ่านต่อในกล่อง · output.md รวมการอัปเดตเฟส 2; response.md เป็นคำตอบเฟส 1</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 3 × Graph — Execution Trace">
+<header class="head"><span class="eye">ทดลองจริง · สถานะและ Dependency</span><h2 style="font-size:36px">โจทย์ 3 × Graph — Execution Trace</h2></header>
+<div class="body"><div class="grid2"><div class="trace" style="--h:420px"><table class="table"><thead><tr><th>เฟส</th><th>Node</th><th>สถานะ / รันซ้ำ</th><th>หมายเหตุ / เหตุผล</th></tr></thead><tbody><tr><td>1</td><td>N1</td><td>DONE</td><td>สำรวจ CSV และจัดทำ Data Quality Findings</td></tr><tr><td>1</td><td>N1b</td><td>DONE</td><td>ตรวจหลักฐาน ระบุประเด็นที่ต้องให้มนุษย์ยืนยัน</td></tr><tr><td>1</td><td>N2</td><td>DONE</td><td>As-Is; ทำอิสระจาก N3/N4</td></tr><tr><td>1</td><td>N3</td><td>DONE</td><td>To-Be + Data Model; ทำอิสระจาก N2/N4</td></tr><tr><td>1</td><td>N4</td><td>DONE</td><td>Data Mapping + Migration; ทำอิสระจาก N2/N3</td></tr><tr><td>1</td><td>N5</td><td>DONE</td><td>ตรวจสอดคล้อง รวม Gap, Roll-out และ Plan Version Log</td></tr><tr><td>2</td><td>N1</td><td>DONE / yes</td><td>INPUT เพิ่มข้อกำหนด consent และ LINE self-booking</td></tr><tr><td>2</td><td>N1b</td><td>DONE / yes</td><td>ผล N1 เปลี่ยน จึงตรวจข้อกำกวมอีกครั้ง</td></tr><tr><td>2</td><td>N2</td><td>DONE / yes</td><td>ผล N1 เปลี่ยน จึงประเมินผลต่อ As-Is</td></tr><tr><td>2</td><td>N3</td><td>DONE / yes</td><td>ผล N1 เปลี่ยน ต้องเพิ่มกระบวนการและ Data Model</td></tr><tr><td>2</td><td>N4</td><td>DONE / yes</td><td>ผล N1 เปลี่ยน ต้องเพิ่ม mapping และ migration</td></tr><tr><td>2</td><td>N5</td><td>DONE / yes</td><td>ผล N3/N4 เปลี่ยน ต้องรวมและตรวจความสอดคล้องใหม่</td></tr></tbody></table></div><div data-md="experiments/3_clinic_migration/graph/trace.md" style="--h:420px"></div></div><p class="caption">เฟส 1 ย่อจาก trace.md; เฟส 2 จากตารางใน response-phase2.md · เลื่อนตารางซ้ายเพื่อดูครบสองเฟส</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 3 × Graph — ร่องรอยจริงจาก log">
+<header class="head"><span class="eye">ทดลองจริง · เวลาและโทเคน</span><h2 style="font-size:36px">โจทย์ 3 × Graph — ร่องรอยจริงจาก log</h2></header>
+<div class="body"><div class="grid4" style="margin-bottom:10px"><div class="metric"><strong style="font-size:30px">589,489</strong><span style="font-size:15px">Phase 1 · input tokens</span></div><div class="metric"><strong style="font-size:30px">16,693</strong><span style="font-size:15px">Phase 1 · output tokens</span></div><div class="metric"><strong style="font-size:30px">606,182</strong><span style="font-size:15px">Phase 1 · total tokens</span></div><div class="metric"><strong style="font-size:30px">492</strong><span style="font-size:15px">Phase 1 · วินาที</span></div></div><div class="grid4" style="margin-bottom:10px"><div class="metric"><strong style="font-size:30px">1,819,842</strong><span style="font-size:15px">Phase 2 · input tokens</span></div><div class="metric"><strong style="font-size:30px">35,270</strong><span style="font-size:15px">Phase 2 · output tokens</span></div><div class="metric"><strong style="font-size:30px">1,855,112</strong><span style="font-size:15px">Phase 2 · total tokens</span></div><div class="metric"><strong style="font-size:30px">687</strong><span style="font-size:15px">Phase 2 · วินาที</span></div></div><div data-md="experiments/3_clinic_migration/graph/events.md" style="--h:300px"></div><p class="caption">จำนวน Node ไม่ซ้ำ 6 (N1, N1b, N2, N3, N4, N5) รวมสองเฟส; ไม่ใช่จำนวนการรันซ้ำ<br>ที่มา: events.md → Tokens; tests/experiments-results.json → meta · Codex total = input + output; cached รวมอยู่ใน input</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="โจทย์ 3 × Graph — Change Request (เฟส 2): Node ไหนต้องรันซ้ำ">
+<header class="head"><span class="eye">ทดลองจริง · เปลี่ยนข้อมูลนำเข้า</span><h2 style="font-size:27px">โจทย์ 3 × Graph — Change Request (เฟส 2): Node ไหนต้องรันซ้ำ</h2></header>
+<div class="body"><div class="grid2"><pre data-file="experiments/3_clinic_migration/graph/prompt-phase2.md" style="--h:420px"></pre><div data-md="experiments/3_clinic_migration/graph/response-phase2.md" style="--h:420px;overflow-wrap:normal"></div></div><p class="caption">Template สั่งให้ reuse ผล DONE ที่ input ไม่เปลี่ยน — ดูว่า AI เลือกรันซ้ำ Node ใดและอ้างเหตุผลอะไร</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="ผลตรวจตามเกณฑ์ §5 (จากสคริปต์)">
+<header class="head"><span class="eye">สังเกตผล · ตรวจตามเกณฑ์เดิม</span><h2 style="font-size:36px">ผลตรวจตามเกณฑ์ §5 (จากสคริปต์)</h2></header>
+<div class="body"><div class="tabs" style="--h:400px"><nav class="tabbar"><button type="button" data-tab="p0">โจทย์ 1</button><button type="button" data-tab="p1">โจทย์ 2</button><button type="button" data-tab="p2">โจทย์ 3</button></nav><div class="tabpane" data-tab="p0"><div class="trace" style="--h:375px"><table class="table"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td>พบข้อความสื่อ 5 feature ใน DOM หน้าแรกหรือ nav ชั้นแรก</td><td>PASS</td><td>output.html: DOM file://, 1280×800, nav ชั้นแรก 11 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → จองห้อง; สถานะ: 1 คลิก: หน้าแรก → จองห้อง; เส้นทางที่ตรวจไม่สำเร็จ 1, จำกัด candidate=False [วิธี: heuristic]</td></tr><tr><td>เปิด file:// โดยไม่มี console error/pageerror</td><td>PASS</td><td>output.html: Playwright เปิด file:// ใน context ใหม่; console/pageerror หน้าแรก=0; error รวมระหว่างสำรวจ=0; ปิด network [วิธี: script]</td></tr><tr><td>เข้าถึง keyword ของทุก feature ภายใน 2 คลิก</td><td>PASS</td><td>output.html: DOM file://, 1280×800, nav ชั้นแรก 11 ตัว; ห้อง: 0 คลิก: หน้าแรก; เวลาว่าง: 0 คลิก: หน้าแรก; จอง: 0 คลิก: หน้าแรก; ยกเลิก: 1 คลิก: หน้าแรก → จองห้อง; สถานะ: 1 คลิก: หน้าแรก → จองห้อง; เส้นทางที่ตรวจไม่สำเร็จ 1, จำกัด candidate=False [วิธี: heuristic]</td></tr><tr><td>ไม่มีการอ้างทรัพยากรเครือข่ายภายนอก</td><td>PASS</td><td>output.html: สแกน source ทั้งไฟล์; ไม่พบ src/href/CSS URL/import/fetch ภายนอกใน source [วิธี: script]</td></tr></tbody></table></div></div><div class="tabpane" data-tab="p1"><div class="trace" style="--h:375px"><table class="table"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td>Traceability ครอบคลุม keyword ต้นทางทั้ง 9 กลุ่ม</td><td>PASS</td><td>output.md: Traceability; กลุ่ม 1: 380; กลุ่ม 2: 381,388,389; กลุ่ม 3: 383; กลุ่ม 4: 384; กลุ่ม 5: 385; กลุ่ม 6: 386,387; กลุ่ม 7: 388; กลุ่ม 8: 389; กลุ่ม 9: 390 [วิธี: heuristic]</td></tr><tr><td>Open Issues มีเกณฑ์ 5,000 และ 10,000</td><td>PASS</td><td>output.md:412,412; Open Issues: พบทั้งสองค่า [วิธี: script]</td></tr><tr><td>ไม่พบตัวเลขวงเงินที่พักที่แต่งเพิ่มใน FR/BR</td><td>PASS</td><td>output.md:41; สแกนตัวเลข+บาท ห่างจาก ที่พัก/คืน/วงเงิน ไม่เกิน 100 ตัวอักษร; ไม่พบค่านอก 5,000/10,000 [วิธี: heuristic]</td></tr><tr><td>ชื่อ participant/entity ใน Sequence/State เทียบกับ ERD</td><td>FAIL</td><td>output.md:124,250,316; ERD 10 entity; ชื่อไม่พบ: A (ฝ่ายบัญชี), M (ผู้จัดการฝ่าย), T (หัวหน้าทีม); เทียบชื่อ literal (ตัด _/ไม่สนตัวพิมพ์); participant ที่เป็นระบบ/บทบาทอาจเป็น false positive; ไม่รับรอง attribute/ความหมาย [วิธี: heuristic]</td></tr><tr><td>ชื่อ state หรือ note ระบุผู้ถือเรื่อง</td><td>PASS</td><td>output.md:319,321,322,324,326,328; ตรวจเฉพาะชื่อ state และ note [วิธี: heuristic]</td></tr><tr><td>Mermaid ทุกบล็อก render ได้</td><td>PASS</td><td>output.md:79,124,250,316; render_markdown ได้ SVG 4/4 บล็อก; ไม่เขียนไฟล์ render [วิธี: render]</td></tr></tbody></table></div></div><div class="tabpane" data-tab="p2"><div class="trace" style="--h:375px"><table class="table"><thead><tr><th>เกณฑ์</th><th>ผล</th><th>หลักฐาน</th></tr></thead><tbody><tr><td>ตาราง Data Quality Findings มีอย่างน้อย 5 แถวปัญหา</td><td>PASS</td><td>output.md:59,60,61,62,63,64,65,66,67,68,69,70; ตาราง Findings แรกมี 12 แถวข้อมูล (ไม่รับรองว่าทุกแถวเป็นคนละประเภท) [วิธี: heuristic]</td></tr><tr><td>แถววันที่เป้าหมายมีข้อความ flag ความกำกวม</td><td>PASS</td><td>output.md:41,68,105,159,1024; พบ marker ในบรรทัดเดียวกับวันที่เป้าหมาย; ไม่ตัดสินการตีความวันที่ [วิธี: script]</td></tr><tr><td>หัวข้อ mapping/migration/identity มี normalization และการยืนยัน</td><td>PASS</td><td>output.md:841,901,924; normalization marker; output.md:833,838,839; confirmation marker ในหัวข้อที่กำหนด [วิธี: heuristic]</td></tr><tr><td>บันทึกเวอร์ชันแผนมี v1 และ v2</td><td>PASS</td><td>output.md:993,994,995; หัวข้อ Plan Version/ชื่อไทย/Plan vN: v1=True, v2=True; v1.1 ไม่นับเป็น v2 [วิธี: script]</td></tr><tr><td>เฟส 2 มีคำ Impact และ Reuse หรือคงเดิม</td><td>FAIL</td><td>Impact: ไม่พบใน output.md + response-phase2.md; Reuse/คงเดิม: output.md:14, output.md:810, output.md:841; ตรวจคำเท่านั้น [วิธี: script]</td></tr><tr><td>Mermaid ทุกบล็อก render ได้</td><td>PASS</td><td>output.md:113,175,208,453,492; render_markdown ได้ SVG 5/5 บล็อก; ไม่เขียนไฟล์ render [วิธี: render]</td></tr></tbody></table></div></div></div><p class="caption">คัดจาก tests/experiments-results.json → results[โจทย์].graph.criteria · คงผลตามสคริปต์ รวมข้อจำกัดของ heuristic<br>ผลตรวจอ้าง output ฉบับปัจจุบัน; เกณฑ์แบบค้นคำหรือเทียบชื่อไม่ได้รับรองความหมายทั้งหมด</p></div>
+</section>
+
+<section class="slide" data-chapter="2 Graph Engineering" data-title="จุดสังเกต (ให้นักศึกษาตอบ)">
+<header class="head"><span class="eye">สังเกตผล · อภิปรายจากหลักฐาน</span><h2 style="font-size:36px">จุดสังเกต (ให้นักศึกษาตอบ)</h2></header>
+<div class="body"><ul class="look"><li>ถ้าให้ N2–N4 เห็นผลของกัน จะเกิดอะไรกับความเป็นอิสระและความสอดคล้องของผลงาน?</li><li>ลองเพิ่ม/ลด Node หรือเปลี่ยน Dependency แล้วจุดที่พบความขัดแย้งเปลี่ยนอย่างไร?</li><li>N1b ถูกเปิดในทั้ง 3 โจทย์หรือไม่ ด้วยเหตุผลอะไร? เทียบ CONDITIONAL EDGE ใน prompt.md กับ trace.md ของแต่ละชุด</li><li>ในเฟส 2 ของโจทย์ 3 AI รันซ้ำทุก Node — สอดคล้องกับกติกา reuse หรือไม่? ควรออกแบบ Dependency อย่างไรให้ reuse ได้จริง?</li><li>Graph ใน CLI เดียวทำ “ขนาน” จริงหรือเป็นลำดับ? เวลา ลำดับ event และข้อความใน events.md รองรับข้อสรุปได้เพียงใด?</li><li>เมื่อเทียบโทเคนกับบท Loop ในโจทย์เดียวกัน โดยใช้ events.md ของทั้งสอง workflow และเฟสเดียวกัน ผลต่างสัมพันธ์กับงานที่ทำอย่างไร?</li><li>ผล FAIL ของสคริปต์บอกอะไร และยังบอกอะไรไม่ได้? ตรวจหลักฐาน วิธีตรวจ และผลงานจริงก่อนอธิบาย</li></ul><p class="caption">อ้างหลักฐาน: experiments/แต่ละโจทย์/graph/{prompt.md, trace.md, events.md} และชุด loop ของโจทย์เดียวกัน</p></div>
+</section>

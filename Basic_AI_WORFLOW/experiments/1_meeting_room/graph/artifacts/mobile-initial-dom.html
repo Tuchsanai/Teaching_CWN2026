@@ -1,0 +1,410 @@
+<body>
+<a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหา</a>
+<div class="app-shell">
+<aside class="sidebar" aria-label="เมนูหลัก">
+<div class="brand"><div class="brand-mark" aria-hidden="true"><svg width="22" height="25" viewBox="0 0 24 26" fill="none"><path d="M5 22V5L16 2v20M5 22h15M16 6h4v16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 13v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></div><div><div class="brand-name">พื้นที่พร้อม</div><div class="brand-caption">พื้นที่ดี ๆ สำหรับทุกการประชุม</div></div></div>
+<div class="nav-label">จัดการห้องประชุม</div>
+<nav class="navigation" aria-label="ส่วนต่าง ๆ ของระบบ">
+<button id="nav-rooms" class="nav-item" type="button" aria-current="page" aria-controls="screen-rooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span>ห้องประชุม</span></button>
+<button id="nav-availability" class="nav-item" type="button" aria-controls="screen-availability"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M7 3v5M17 3v5M3 11h18m-13 5 3 2 5-4" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>ดูเวลาว่าง</span></button>
+<button id="nav-book" class="nav-item" type="button" aria-controls="screen-book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8 3v3h8V3M8 13h8m-4-4v8" stroke-linecap="round"></path></svg><span>จองห้อง</span></button>
+<button id="nav-bookings" class="nav-item" type="button" aria-controls="screen-bookings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 4h12v16H8M4 6h1M4 12h1M4 18h1m7-10h4m-4 4h4m-4 4h4" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>รายการจอง</span></button>
+</nav>
+<div class="sidebar-bottom"><div class="local-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg><div><strong>พื้นที่ทดลองของคุณ</strong>รายการจองบันทึกไว้เฉพาะ<br>ในเบราว์เซอร์นี้</div></div></div>
+</aside>
+<div class="workspace">
+<header class="topbar"><div class="breadcrumb"><span>พื้นที่พร้อม</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m4 2 4 4-4 4" stroke="#a4aea0" stroke-width="1.3"></path></svg><span>ระบบจองห้องประชุม</span></div><div class="topbar-label"><span class="dot" aria-hidden="true"></span>ระบบสาธิต</div></header>
+<main id="main-content">
+<div id="app-notice" class="notice" role="status" aria-live="polite"></div>
+<section id="screen-rooms" aria-labelledby="rooms-heading">
+<div class="page-intro"><div><p class="eyebrow">เริ่มต้นการประชุมที่ดี</p><h1 id="rooms-heading" tabindex="-1">พื้นที่สำหรับไอเดียของคุณ</h1><p class="intro-copy">เลือกห้องที่เหมาะกับทีม ดูเวลาว่าง แล้วนัดหมายการประชุมครั้งต่อไป</p></div><span class="sample-tag">ข้อมูลห้องตัวอย่าง</span></div>
+<div class="welcome-panel"><div class="welcome-copy"><div class="welcome-kicker">พร้อมสำหรับบทสนทนาครั้งต่อไป</div><h2>รวมทีมให้พร้อม<br>แล้วปล่อยให้ไอเดียเริ่มต้น</h2><p>จากการพูดคุยกลุ่มเล็กถึงการประชุมทีม<br>ค้นหาพื้นที่ที่ลงตัวได้ในที่เดียว</p></div><div class="welcome-art" aria-hidden="true"><div class="arch"></div><div class="plant"></div><div class="art-table"></div></div></div>
+<div class="section-title"><h2>ห้องประชุมทั้งหมด</h2><span class="section-caption">เลือกพื้นที่ที่เหมาะกับการประชุม</span></div>
+<div id="room-list" class="room-grid"><article class="room-card" id="room-card-room-a"><div class="room-art" aria-hidden="true" data-room="room-a"><div class="room-window"></div><div class="room-table"></div><div class="room-chair room-chair-left"></div><div class="room-chair room-chair-right"></div><div class="room-plant"></div></div><div class="room-info"><span class="badge">ข้อมูลห้องตัวอย่าง</span><h3>ห้องอรุณ</h3><div class="room-meta"><p>รองรับ 6 คน</p><p>จอแสดงผล · ไวท์บอร์ด</p></div><div class="room-actions"><button class="button button-primary" id="room-book-room-a" type="button">จองห้องนี้</button><button class="button button-secondary" id="room-availability-room-a" type="button">ดูเวลาว่าง</button></div></div></article><article class="room-card" id="room-card-room-b"><div class="room-art" aria-hidden="true" data-room="room-b"><div class="room-window"></div><div class="room-table"></div><div class="room-chair room-chair-left"></div><div class="room-chair room-chair-right"></div><div class="room-plant"></div></div><div class="room-info"><span class="badge">ข้อมูลห้องตัวอย่าง</span><h3>ห้องนภา</h3><div class="room-meta"><p>รองรับ 10 คน</p><p>จอแสดงผล · วิดีโอคอล</p></div><div class="room-actions"><button class="button button-primary" id="room-book-room-b" type="button">จองห้องนี้</button><button class="button button-secondary" id="room-availability-room-b" type="button">ดูเวลาว่าง</button></div></div></article><article class="room-card" id="room-card-room-c"><div class="room-art" aria-hidden="true" data-room="room-c"><div class="room-window"></div><div class="room-table"></div><div class="room-chair room-chair-left"></div><div class="room-chair room-chair-right"></div><div class="room-plant"></div></div><div class="room-info"><span class="badge">ข้อมูลห้องตัวอย่าง</span><h3>ห้องพฤกษ์</h3><div class="room-meta"><p>รองรับ 4 คน</p><p>ไวท์บอร์ด</p></div><div class="room-actions"><button class="button button-primary" id="room-book-room-c" type="button">จองห้องนี้</button><button class="button button-secondary" id="room-availability-room-c" type="button">ดูเวลาว่าง</button></div></div></article></div>
+<p class="footnote"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="10" cy="10" r="7.5"></circle><path d="M10 9v5m0-8v1"></path></svg><span>ห้องและอุปกรณ์เป็นข้อมูลตัวอย่าง ตรวจเวลาว่างตามวันที่และช่วงเวลาที่ต้องการก่อนจอง</span></p>
+</section>
+<section id="screen-availability" aria-labelledby="availability-heading" hidden="">
+<div class="page-intro"><div><p class="eyebrow">จัดเวลาให้ลงตัว</p><h1 id="availability-heading">ดูเวลาว่างของห้อง</h1><p class="intro-copy">เลือกห้อง วันที่ และช่วงเวลา เพื่อตรวจสอบก่อนนัดหมายทีม</p></div><span class="sample-tag">ข้อมูลห้องตัวอย่าง</span></div>
+<div class="form-layout"><div><div class="panel"><div class="panel-heading"><div class="panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2" stroke-linecap="round"></path></svg></div><div><h2>ช่วงเวลาที่ต้องการ</h2><p>กรอกข้อมูลให้ครบทุกช่อง</p></div></div><form id="availability-form"><div class="fields"><div class="field field-full"><label for="availability-room">ห้องประชุม <span class="required">*</span></label><select id="availability-room" name="roomId" required=""><option value="room-a">ห้องอรุณ · 6 คน</option><option value="room-b">ห้องนภา · 10 คน</option><option value="room-c">ห้องพฤกษ์ · 4 คน</option></select></div><div class="field field-full"><label for="availability-date">วันที่ <span class="required">*</span></label><input id="availability-date" name="date" type="date" required=""></div><div class="field"><label for="availability-start">เวลาเริ่มต้น <span class="required">*</span></label><input id="availability-start" name="start" type="time" required=""></div><div class="field"><label for="availability-end">เวลาสิ้นสุด <span class="required">*</span></label><input id="availability-end" name="end" type="time" required=""></div></div><div class="form-actions"><p>เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่มต้น</p><button id="availability-submit" class="button button-primary" type="submit">ตรวจเวลาว่าง <span aria-hidden="true">→</span></button></div></form><div id="availability-result" class="result" role="status" aria-live="polite"></div></div><div class="panel schedule-panel"><h2>รายการจองในวันที่เลือก</h2><p>แสดงช่วงเวลาของรายการที่ยืนยันแล้วสำหรับห้องนี้</p><div id="availability-schedule" aria-live="polite"><h3>ตารางการจอง · ห้องอรุณ · 16 ก.ย. 2569</h3><p class="empty-state">ยังไม่มีการจอง เลือกช่วงเวลาที่ต้องการได้เลย</p></div></div></div><aside class="side-card"><h2>หาช่วงเวลาที่ใช่<br>สำหรับทุกคน</h2><p>ระบบจะตรวจสอบช่วงเวลาที่คุณเลือกกับรายการจองที่ยืนยันแล้วในเบราว์เซอร์นี้</p><div class="step"><span class="step-number">1</span><span>เลือกห้องที่ต้องการใช้งาน</span></div><div class="step"><span class="step-number">2</span><span>กำหนดวันที่และช่วงเวลา</span></div><div class="step"><span class="step-number">3</span><span>ตรวจเวลาว่าง แล้วไปที่เมนูจองห้อง</span></div></aside></div>
+</section>
+<section id="screen-book" aria-labelledby="book-heading" hidden="">
+<div class="page-intro"><div><p class="eyebrow">ให้ไอเดียมีพื้นที่</p><h1 id="book-heading">จองห้องประชุม</h1><p class="intro-copy">ระบุรายละเอียดการประชุม แล้วเตรียมพื้นที่สำหรับทีมของคุณ</p></div><span class="sample-tag">ข้อมูลห้องตัวอย่าง</span></div>
+<div class="form-layout"><div class="panel"><div class="panel-heading"><div class="panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="17" rx="3"></rect><path d="M8 2v5m8-5v5M8 13h8m-4-4v8" stroke-linecap="round"></path></svg></div><div><h2>รายละเอียดการจอง</h2><p>กรอกข้อมูลให้ครบทุกช่อง</p></div></div><form id="booking-form"><div class="fields"><div class="field field-full"><label for="booking-title">หัวข้อการประชุม <span class="required">*</span></label><input id="booking-title" name="title" type="text" placeholder="เช่น วางแผนงานร่วมกับทีม" required="" autocomplete="off"><p class="field-help">ใช้หัวข้อนี้เพื่อค้นหารายการจองของคุณ</p></div><div class="field field-full"><label for="booking-room">ห้องประชุม <span class="required">*</span></label><select id="booking-room" name="roomId" required=""><option value="room-a">ห้องอรุณ · 6 คน</option><option value="room-b">ห้องนภา · 10 คน</option><option value="room-c">ห้องพฤกษ์ · 4 คน</option></select></div><div class="field field-full"><label for="booking-date">วันที่ <span class="required">*</span></label><input id="booking-date" name="date" type="date" required=""></div><div class="field"><label for="booking-start">เวลาเริ่มต้น <span class="required">*</span></label><input id="booking-start" name="start" type="time" required=""></div><div class="field"><label for="booking-end">เวลาสิ้นสุด <span class="required">*</span></label><input id="booking-end" name="end" type="time" required=""></div></div><div class="form-actions"><p>รายการจองจะยืนยันทันทีเมื่อช่วงเวลานี้ว่าง</p><button id="booking-submit" class="button button-primary" type="submit">ยืนยันการจอง <span aria-hidden="true">→</span></button></div></form><div id="booking-result" class="result" role="status" aria-live="polite"></div></div><aside class="side-card"><h2>นัดหมายให้พร้อม<br>ก่อนเริ่มประชุม</h2><p>ตรวจชื่อห้อง วันที่ และเวลาให้เรียบร้อยก่อนยืนยันการจอง</p><div class="step"><span class="step-number">✓</span><span>ดูสถานะได้ที่เมนูรายการจอง</span></div><div class="step"><span class="step-number">↗</span><span>หากแผนเปลี่ยน สามารถยกเลิกจากรายการนั้นได้ทันที</span></div><p>ข้อมูลนี้เป็นการทดลองในเบราว์เซอร์ของคุณ ไม่ได้ใช้ร่วมกับผู้ใช้อื่น</p></aside></div>
+</section>
+<section id="screen-bookings" aria-labelledby="bookings-heading" hidden="">
+<div class="page-intro"><div><p class="eyebrow">ทุกนัดหมายในที่เดียว</p><h1 id="bookings-heading">รายการจองของคุณ</h1><p class="intro-copy">ตรวจสอบสถานะหรือยกเลิกการจอง เมื่อแผนการประชุมเปลี่ยนไป</p></div><span class="sample-tag">บันทึกในเบราว์เซอร์นี้</span></div>
+<div class="booking-legend"><span class="status-badge status-confirmed">ยืนยันแล้ว</span><span>ห้องถูกจองตามช่วงเวลา</span><span class="status-badge status-cancelled">ยกเลิกแล้ว</span><span>เก็บไว้เป็นประวัติ</span></div>
+<div id="booking-list" class="booking-list"><div class="empty-state"><h3>ยังไม่มีรายการจอง</h3><p>เลือกห้องและเวลาที่สะดวก แล้วเริ่มจองห้องประชุมของคุณได้เลย</p><button class="button button-primary" id="empty-book" type="button">จองห้องประชุม</button></div></div>
+<p class="footnote"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="10" cy="10" r="7.5"></circle><path d="M10 9v5m0-8v1"></path></svg><span>เมื่อยกเลิกการจอง ช่วงเวลานั้นจะว่างสำหรับการจองใหม่ทันที</span></p>
+</section>
+<footer class="site-footer"><strong>พื้นที่พร้อม · ระบบสาธิต</strong><span>ข้อมูลห้องตัวอย่าง · บันทึกเฉพาะในเบราว์เซอร์นี้</span></footer>
+</main>
+</div>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'meeting-room-demo-v1';
+  const rooms = [
+    { id: 'room-a', name: 'ห้องอรุณ', capacity: 6, equipment: ['จอแสดงผล', 'ไวท์บอร์ด'] },
+    { id: 'room-b', name: 'ห้องนภา', capacity: 10, equipment: ['จอแสดงผล', 'วิดีโอคอล'] },
+    { id: 'room-c', name: 'ห้องพฤกษ์', capacity: 4, equipment: ['ไวท์บอร์ด'] }
+  ];
+  const screenIds = ['screen-rooms', 'screen-availability', 'screen-book', 'screen-bookings'];
+  let bookings = [];
+  let initialized = false;
+  let storageUnavailable = false;
+  let ignoredStorage = false;
+  let sequence = 0;
+
+  const byId = id => document.getElementById(id);
+  const cloneBooking = booking => ({ ...booking });
+  const findRoom = id => rooms.find(room => room.id === id);
+  const overlaps = (left, right) => left.roomId === right.roomId && left.date === right.date &&
+    left.start < right.end && left.end > right.start;
+
+  function validDate(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const [year, month, day] = value.split('-').map(Number);
+    if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    return day <= [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  }
+
+  function validTime(value) {
+    return typeof value === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
+  }
+
+  function intervalError(roomId, date, start, end) {
+    if (!findRoom(roomId)) return 'กรุณาเลือกห้องประชุมที่มีอยู่ในรายการ';
+    if (!validDate(date)) return 'กรุณาระบุวันที่ให้ถูกต้อง';
+    if (!validTime(start) || !validTime(end)) return 'กรุณาระบุเวลาเริ่มต้นและเวลาสิ้นสุดให้ถูกต้อง';
+    if (start >= end) return 'เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่มต้น';
+    return null;
+  }
+
+  function restore() {
+    let raw;
+    try { raw = window.localStorage.getItem(STORAGE_KEY); }
+    catch (_) { storageUnavailable = true; return; }
+    if (raw === null) return;
+    let saved;
+    try { saved = JSON.parse(raw); }
+    catch (_) { ignoredStorage = true; return; }
+    if (!Array.isArray(saved)) { ignoredStorage = true; return; }
+    const ids = new Set();
+    for (const item of saved) {
+      if (!item || typeof item !== 'object' || Array.isArray(item) ||
+          typeof item.id !== 'string' || !/^booking-[A-Za-z0-9-]+$/.test(item.id) ||
+          ids.has(item.id) || intervalError(item.roomId, item.date, item.start, item.end) ||
+          typeof item.title !== 'string' || !item.title.trim() ||
+          !['confirmed', 'cancelled'].includes(item.status)) {
+        ignoredStorage = true;
+        continue;
+      }
+      const booking = {
+        id: item.id, roomId: item.roomId, date: item.date,
+        start: item.start, end: item.end, title: item.title.trim(), status: item.status
+      };
+      if (booking.status === 'confirmed' && bookings.some(existing =>
+        existing.status === 'confirmed' && overlaps(booking, existing))) {
+        ignoredStorage = true;
+        continue;
+      }
+      ids.add(booking.id);
+      bookings.push(booking);
+    }
+  }
+
+  function notice(message = '') {
+    const parts = [message];
+    if (storageUnavailable) parts.push('ไม่สามารถบันทึกในเบราว์เซอร์ได้ ข้อมูลยังใช้ได้ในครั้งนี้ แต่การโหลดหน้าใหม่อาจทำให้ข้อมูลสูญหาย');
+    if (ignoredStorage) parts.push('ข้ามข้อมูลที่บันทึกไว้ซึ่งไม่ถูกต้องแล้ว คุณสามารถใช้งานรายการที่ถูกต้องต่อได้');
+    const target = byId('app-notice');
+    if (target) target.textContent = parts.filter(Boolean).join(' · ');
+  }
+
+  function persist() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+      storageUnavailable = false;
+      ignoredStorage = false;
+    } catch (_) { storageUnavailable = true; }
+    notice();
+  }
+
+  function checkAvailability(roomId, date, start, end) {
+    const error = intervalError(roomId, date, start, end);
+    if (error) return { available: false, conflicts: [], error };
+    const requested = { roomId, date, start, end };
+    const conflicts = bookings.filter(booking => booking.status === 'confirmed' && overlaps(requested, booking));
+    return { available: conflicts.length === 0, conflicts: conflicts.map(cloneBooking) };
+  }
+
+  function nextId() {
+    let id;
+    do {
+      sequence += 1;
+      id = 'booking-' + Date.now().toString(36) + '-' + sequence.toString(36);
+    } while (bookings.some(booking => booking.id === id));
+    return id;
+  }
+
+  function createBooking(input) {
+    if (!input || typeof input !== 'object') return { ok: false, error: 'กรุณากรอกข้อมูลการจองให้ครบถ้วน' };
+    const { roomId, date, start, end, title } = input;
+    const availability = checkAvailability(roomId, date, start, end);
+    if (availability.error) return { ok: false, error: availability.error };
+    if (typeof title !== 'string' || !title.trim()) return { ok: false, error: 'กรุณาระบุหัวข้อการประชุม' };
+    if (!availability.available) return { ok: false, error: 'ช่วงเวลานี้ถูกจองแล้ว กรุณาเลือกเวลาอื่นหรือห้องประชุมอื่น' };
+    const booking = { id: nextId(), roomId, date, start, end, title: title.trim(), status: 'confirmed' };
+    bookings.push(booking);
+    persist();
+    if (initialized) { renderBookings(); renderSchedule(); }
+    return { ok: true, booking: cloneBooking(booking) };
+  }
+
+  function cancelBooking(bookingId) {
+    const booking = bookings.find(item => item.id === bookingId);
+    if (!booking) return { ok: false, error: 'ไม่พบรายการจองนี้' };
+    if (booking.status === 'cancelled') return { ok: false, error: 'รายการจองนี้ถูกยกเลิกแล้ว' };
+    booking.status = 'cancelled';
+    persist();
+    if (initialized) { renderBookings(); renderSchedule(); }
+    notice('ยกเลิกการจองแล้ว ช่วงเวลานี้เปิดให้จองได้อีกครั้ง');
+    return { ok: true, booking: cloneBooking(booking) };
+  }
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function button(id, text, className, handler) {
+    const node = element('button', 'button ' + className, text);
+    node.id = id;
+    node.type = 'button';
+    node.addEventListener('click', handler);
+    return node;
+  }
+
+  function prettyDate(date) {
+    const [year, month, day] = date.split('-').map(Number);
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    return day + ' ' + months[month - 1] + ' ' + (year + 543);
+  }
+
+  function navigate(screenId) {
+    if (!screenIds.includes(screenId)) return;
+    for (const id of screenIds) {
+      const screen = byId(id);
+      if (screen) screen.hidden = id !== screenId;
+      const nav = byId(id.replace('screen-', 'nav-'));
+      if (nav) {
+        if (id === screenId) nav.setAttribute('aria-current', 'page');
+        else nav.removeAttribute('aria-current');
+      }
+    }
+    if (screenId === 'screen-bookings') renderBookings();
+    if (screenId === 'screen-availability') renderSchedule();
+    const screen = byId(screenId);
+    const heading = screen && screen.querySelector('h1, h2');
+    if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true }); }
+  }
+
+  function renderRooms() {
+    const container = byId('room-list');
+    if (!container) return;
+    container.replaceChildren();
+    for (const room of rooms) {
+      const card = element('article', 'room-card');
+      card.id = 'room-card-' + room.id;
+      const art = element('div', 'room-art');
+      art.setAttribute('aria-hidden', 'true');
+      art.dataset.room = room.id;
+      art.append(element('div', 'room-window'), element('div', 'room-table'), element('div', 'room-chair room-chair-left'), element('div', 'room-chair room-chair-right'), element('div', 'room-plant'));
+      const info = element('div', 'room-info');
+      info.append(element('span', 'badge', 'ข้อมูลห้องตัวอย่าง'), element('h3', '', room.name));
+      const meta = element('div', 'room-meta');
+      meta.append(element('p', '', 'รองรับ ' + room.capacity + ' คน'), element('p', '', room.equipment.join(' · ')));
+      const actions = element('div', 'room-actions');
+      actions.append(
+        button('room-book-' + room.id, 'จองห้องนี้', 'button-primary', () => {
+          byId('booking-room').value = room.id;
+          setResult('booking-result', '');
+          navigate('screen-book');
+        }),
+        button('room-availability-' + room.id, 'ดูเวลาว่าง', 'button-secondary', () => {
+          byId('availability-room').value = room.id;
+          setResult('availability-result', '');
+          navigate('screen-availability');
+        })
+      );
+      info.append(meta, actions);
+      card.append(art, info);
+      container.append(card);
+    }
+  }
+
+  function renderBookings() {
+    const container = byId('booking-list');
+    if (!container) return;
+    container.replaceChildren();
+    if (!bookings.length) {
+      const empty = element('div', 'empty-state');
+      empty.append(element('h3', '', 'ยังไม่มีรายการจอง'), element('p', '', 'เลือกห้องและเวลาที่สะดวก แล้วเริ่มจองห้องประชุมของคุณได้เลย'));
+      empty.append(button('empty-book', 'จองห้องประชุม', 'button-primary', () => navigate('screen-book')));
+      container.append(empty);
+      return;
+    }
+    for (const booking of [...bookings].reverse()) {
+      const card = element('article', 'booking-card');
+      card.id = 'booking-card-' + booking.id;
+      card.dataset.bookingId = booking.id;
+      const info = element('div', 'booking-info');
+      info.append(element('h3', '', booking.title), element('p', 'booking-meta', findRoom(booking.roomId).name + ' · ' + prettyDate(booking.date)), element('p', 'booking-time', booking.start + '–' + booking.end + ' น.'));
+      const status = element('span', 'status-badge status-' + booking.status, booking.status === 'confirmed' ? 'ยืนยันแล้ว' : 'ยกเลิกแล้ว');
+      status.id = 'booking-status-' + booking.id;
+      const actions = element('div', 'booking-actions');
+      actions.append(status);
+      if (booking.status === 'confirmed') {
+        actions.append(button('cancel-booking-' + booking.id, 'ยกเลิกการจอง', 'button-secondary', () => {
+          const result = cancelBooking(booking.id);
+          if (!result.ok) notice(result.error);
+          else {
+            const updated = byId('booking-status-' + booking.id);
+            if (updated) { updated.tabIndex = -1; updated.focus({ preventScroll: true }); }
+          }
+        }));
+      }
+      card.append(info, actions);
+      container.append(card);
+    }
+  }
+
+  function renderSchedule() {
+    const container = byId('availability-schedule');
+    const roomInput = byId('availability-room');
+    const dateInput = byId('availability-date');
+    if (!container || !roomInput || !dateInput) return;
+    container.replaceChildren();
+    if (!findRoom(roomInput.value) || !validDate(dateInput.value)) {
+      container.append(element('p', 'empty-state', 'เลือกห้องประชุมและวันที่เพื่อดูตารางการจอง'));
+      return;
+    }
+    const matching = bookings.filter(booking => booking.status === 'confirmed' && booking.roomId === roomInput.value && booking.date === dateInput.value).sort((left, right) => left.start.localeCompare(right.start));
+    container.append(element('h3', '', 'ตารางการจอง · ' + findRoom(roomInput.value).name + ' · ' + prettyDate(dateInput.value)));
+    if (!matching.length) {
+      container.append(element('p', 'empty-state', 'ยังไม่มีการจอง เลือกช่วงเวลาที่ต้องการได้เลย'));
+      return;
+    }
+    const list = element('ul', 'schedule-list');
+    for (const booking of matching) {
+      const item = element('li', 'schedule-item');
+      item.append(element('strong', 'schedule-time', booking.start + '–' + booking.end + ' น.'), element('span', 'schedule-title', ' · ' + booking.title), element('span', 'status-badge status-confirmed', 'ยืนยันแล้ว'));
+      list.append(item);
+    }
+    container.append(list);
+  }
+
+  function setResult(id, message, kind) {
+    const target = byId(id);
+    if (!target) return;
+    target.textContent = message;
+    if (kind) target.dataset.state = kind;
+    else delete target.dataset.state;
+  }
+
+  function currentDate() {
+    const now = new Date();
+    return String(now.getFullYear()).padStart(4, '0') + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  }
+
+  function init() {
+    if (initialized) return;
+    initialized = true;
+    for (const prefix of ['availability', 'booking']) {
+      const select = byId(prefix + '-room');
+      if (select) {
+        select.replaceChildren();
+        for (const room of rooms) {
+          const option = element('option', '', room.name + ' · ' + room.capacity + ' คน');
+          option.value = room.id;
+          select.append(option);
+        }
+      }
+      const defaults = { date: currentDate(), start: '09:00', end: '10:00' };
+      for (const [field, value] of Object.entries(defaults)) {
+        const input = byId(prefix + '-' + field);
+        if (input) input.value = value;
+      }
+      for (const field of ['room', 'date', 'start', 'end', ...(prefix === 'booking' ? ['title'] : [])]) {
+        const input = byId(prefix + '-' + field);
+        if (input) input.addEventListener('input', () => {
+          setResult(prefix + '-result', '');
+          if (prefix === 'availability') renderSchedule();
+        });
+      }
+    }
+    for (const screenId of screenIds) {
+      const nav = byId(screenId.replace('screen-', 'nav-'));
+      if (nav) nav.addEventListener('click', event => { event.preventDefault(); navigate(screenId); });
+    }
+    const availabilityForm = byId('availability-form');
+    if (availabilityForm) availabilityForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const roomId = byId('availability-room').value;
+      const date = byId('availability-date').value;
+      const start = byId('availability-start').value;
+      const end = byId('availability-end').value;
+      const result = checkAvailability(roomId, date, start, end);
+      const message = result.error || (result.available
+        ? 'ว่าง · ' + findRoom(roomId).name + ' วันที่ ' + prettyDate(date) + ' เวลา ' + start + '–' + end + ' น. สามารถจองได้'
+        : 'ไม่ว่าง · ช่วงเวลานี้มีการจองแล้ว ' + result.conflicts.map(booking => booking.start + '–' + booking.end + ' น.').join(', ') + ' กรุณาเลือกช่วงเวลาอื่น');
+      setResult('availability-result', message, result.error ? 'error' : result.available ? 'success' : 'error');
+      renderSchedule();
+    });
+    const bookingForm = byId('booking-form');
+    if (bookingForm) bookingForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const result = createBooking({
+        roomId: byId('booking-room').value, date: byId('booking-date').value,
+        start: byId('booking-start').value, end: byId('booking-end').value,
+        title: byId('booking-title').value
+      });
+      if (result.ok) {
+        const booking = result.booking;
+        setResult('booking-result', 'จองสำเร็จ · ' + findRoom(booking.roomId).name + ' วันที่ ' + prettyDate(booking.date) + ' เวลา ' + booking.start + '–' + booking.end + ' น. ยืนยันแล้ว ดูรายการได้ที่สถานะและยกเลิกการจอง', 'success');
+      } else setResult('booking-result', result.error, 'error');
+    });
+    renderRooms();
+    renderBookings();
+    renderSchedule();
+    navigate('screen-rooms');
+    notice();
+  }
+
+  restore();
+  window.MeetingApp = {
+    listRooms: () => rooms.map(room => ({ ...room, equipment: [...room.equipment] })),
+    checkAvailability,
+    createBooking,
+    cancelBooking,
+    getBookingStatus: bookingId => {
+      const booking = bookings.find(item => item.id === bookingId);
+      return booking ? booking.status : null;
+    },
+    listBookings: () => bookings.map(cloneBooking),
+    navigate,
+    init
+  };
+  init();
+})();
+
+</script>
+
+
+</body>

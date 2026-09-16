@@ -1,0 +1,217 @@
+{
+  "node": "N4",
+  "status": "PASS",
+  "target": "file:///root/workspace/CWN/Teaching/Basic_AI_WORFLOW/experiments/1_meeting_room/graph/output.html",
+  "test_date": "2030-06-18",
+  "cases": [
+    {
+      "name": "empty-state",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/empty-state-initial-dom.html"
+    },
+    {
+      "name": "access-and-completion",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/access-and-completion-initial-dom.html"
+    },
+    {
+      "name": "overlap-blocked",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/overlap-blocked-initial-dom.html"
+    },
+    {
+      "name": "adjacent-permitted",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/adjacent-permitted-initial-dom.html"
+    },
+    {
+      "name": "invalid-intervals",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/invalid-intervals-initial-dom.html"
+    },
+    {
+      "name": "persistence-and-release",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/persistence-and-release-initial-dom.html"
+    },
+    {
+      "name": "room-shortcuts",
+      "status": "PASS",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/room-shortcuts-initial-dom.html"
+    },
+    {
+      "name": "mobile",
+      "status": "PASS",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "js_errors": [],
+      "network_requests": [],
+      "initial_dom": "artifacts/mobile-initial-dom.html"
+    }
+  ],
+  "access_clicks": {
+    "rooms": {
+      "count": 0,
+      "events": []
+    },
+    "availability": {
+      "count": 1,
+      "events": [
+        {
+          "id": "nav-availability",
+          "text": "ดูเวลาว่าง"
+        }
+      ]
+    },
+    "booking": {
+      "count": 1,
+      "events": [
+        {
+          "id": "nav-book",
+          "text": "จองห้อง"
+        }
+      ]
+    },
+    "status": {
+      "count": 1,
+      "events": [
+        {
+          "id": "nav-bookings",
+          "text": "รายการจอง"
+        }
+      ]
+    },
+    "cancellation": {
+      "count": 2,
+      "events": [
+        {
+          "id": "nav-bookings",
+          "text": "รายการจอง"
+        },
+        {
+          "id": "cancel-booking-booking-mu3srf12-1",
+          "text": "ยกเลิกการจอง"
+        }
+      ]
+    }
+  },
+  "completion_clicks": {
+    "rooms": {
+      "count": 0,
+      "events": [],
+      "data_entry_operations": 0
+    },
+    "availability": {
+      "count": 2,
+      "events": [
+        {
+          "id": "nav-availability",
+          "text": "ดูเวลาว่าง"
+        },
+        {
+          "id": "availability-submit",
+          "text": "ตรวจเวลาว่าง →"
+        }
+      ],
+      "data_entry_operations": 4
+    },
+    "booking": {
+      "count": 2,
+      "events": [
+        {
+          "id": "nav-book",
+          "text": "จองห้อง"
+        },
+        {
+          "id": "booking-submit",
+          "text": "ยืนยันการจอง →"
+        }
+      ],
+      "data_entry_operations": 5
+    },
+    "status": {
+      "count": 1,
+      "events": [
+        {
+          "id": "nav-bookings",
+          "text": "รายการจอง"
+        }
+      ],
+      "data_entry_operations": 0
+    },
+    "cancellation": {
+      "count": 2,
+      "events": [
+        {
+          "id": "nav-bookings",
+          "text": "รายการจอง"
+        },
+        {
+          "id": "cancel-booking-booking-mu3srf12-1",
+          "text": "ยกเลิกการจอง"
+        }
+      ],
+      "data_entry_operations": 0
+    }
+  },
+  "js_errors": [],
+  "network_requests": [],
+  "measurement": {
+    "access": "Trusted DOM click events; reset at home before each feature route.",
+    "completion": "Includes navigation and submit/cancel clicks, excludes precondition setup.",
+    "data_entry": "Native fill/select_option changes are counted separately as field operations; picker/focus gestures vary by device and are not claimed as clicks.",
+    "cancel_precondition": "An existing confirmed booking created through the UI before the home/counter reset.",
+    "mobile": "360x800 viewport emulation; desktop 1280x900; not a physical device test."
+  },
+  "browser": {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "executable": "/opt/ms-playwright/chromium-1234/chrome-linux64/chrome"
+  },
+  "passed": 8,
+  "failed": 0
+}
