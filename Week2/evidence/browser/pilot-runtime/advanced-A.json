@@ -1,0 +1,114 @@
+{
+  "scenario": "advanced-A",
+  "utc": "2026-09-12T13:34:41.158Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "before": [
+    {
+      "utc": "2026-09-12T13:34:41.510Z",
+      "command": "./shop reset advanced-A",
+      "exit": 0,
+      "stdout": "RESET advanced-A RUNNING version=v2",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:41.696Z",
+      "command": "./shop preflight",
+      "exit": 0,
+      "stdout": "PREFLIGHT OK Python=3.12.3 http://127.0.0.1:18762",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:41.881Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "RUNNING version=v2 bookings=0",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:42.060Z",
+      "command": "./shop check",
+      "exit": 1,
+      "stdout": "CHECK FAIL HTTPError",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:42.227Z",
+      "command": "./shop logs",
+      "exit": 0,
+      "stdout": "{\"utc\": \"2026-09-12T13:34:41.332849+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"RESET\"}\n{\"utc\": \"2026-09-12T13:34:41.471419+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"STARTED\"}\n{\"utc\": \"2026-09-12T13:34:41.502931+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"UPDATE_APPLIED\", \"cause\": \"UPDATE_V2_BOOKING_BROKEN\"}\n{\"utc\": \"2026-09-12T13:34:42.053803+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"BOOKING_ERROR\", \"cause\": \"UPDATE_V2_BOOKING_BROKEN\"}",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:42.835Z",
+      "command": "./shop start",
+      "exit": 0,
+      "stdout": "ALREADY RUNNING version=v2",
+      "stderr": ""
+    }
+  ],
+  "after": [
+    {
+      "utc": "2026-09-12T13:34:43.186Z",
+      "command": "./shop rollback",
+      "exit": 0,
+      "stdout": "ROLLED BACK version=v1",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:43.376Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "RUNNING version=v1 bookings=0",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:43.562Z",
+      "command": "./shop check",
+      "exit": 0,
+      "stdout": "CHECK PASS booking=W2-87CE70F4 version=v1 (endpoint; ต้องตรวจ browser เพิ่ม)",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:43.946Z",
+      "command": "./shop logs",
+      "exit": 0,
+      "stdout": "{\"utc\": \"2026-09-12T13:34:41.332849+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"RESET\"}\n{\"utc\": \"2026-09-12T13:34:41.471419+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"STARTED\"}\n{\"utc\": \"2026-09-12T13:34:41.502931+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"UPDATE_APPLIED\", \"cause\": \"UPDATE_V2_BOOKING_BROKEN\"}\n{\"utc\": \"2026-09-12T13:34:42.053803+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"BOOKING_ERROR\", \"cause\": \"UPDATE_V2_BOOKING_BROKEN\"}\n{\"utc\": \"2026-09-12T13:34:42.406135+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"PAGE_OPEN\"}\n{\"utc\": \"2026-09-12T13:34:42.468342+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-A\", \"event\": \"BOOKING_ERROR\", \"cause\": \"UPDATE_V2_BOOKING_BROKEN\"}\n{\"utc\": \"2026-09-12T13:34:43.141563+00:00\", \"version\": \"v1\", \"scenario\": \"advanced-A\", \"event\": \"STARTED\"}\n{\"utc\": \"2026-09-12T13:34:43.179214+00:00\", \"version\": \"v1\", \"scenario\": \"advanced-A\", \"event\": \"ROLLED_BACK\"}\n{\"utc\": \"2026-09-12T13:34:43.556100+00:00\", \"version\": \"v1\", \"scenario\": \"advanced-A\", \"event\": \"BOOKED\", \"booking\": \"W2-87CE70F4\"}\n{\"utc\": \"2026-09-12T13:34:43.566779+00:00\", \"version\": \"v1\", \"scenario\": \"advanced-A\", \"event\": \"PAGE_OPEN\"}\n{\"utc\": \"2026-09-12T13:34:43.616216+00:00\", \"version\": \"v1\", \"scenario\": \"advanced-A\", \"event\": \"BOOKED\", \"booking\": \"W2-9E6DD350\"}",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:44.123Z",
+      "command": "./shop rollback",
+      "exit": 0,
+      "stdout": "ALREADY v1; หาก STOPPED ให้ใช้ start",
+      "stderr": ""
+    }
+  ],
+  "console": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  ],
+  "pageErrors": [],
+  "url": "http://127.0.0.1:18762",
+  "browser_before": "จองไม่สำเร็จ: รุ่น v2 จองสินค้าไม่ได้ (UPDATE_V2_BOOKING_BROKEN)",
+  "browser_after": "จองสำเร็จ เลข W2-9E6DD350 • รุ่น v1",
+  "persisted_booking_verified": true,
+  "result": "PASS",
+  "cleanup": [
+    {
+      "utc": "2026-09-12T13:34:44.311Z",
+      "command": "./shop stop",
+      "exit": 0,
+      "stdout": "STOPPED",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:44.492Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "STOPPED version=v1",
+      "stderr": ""
+    }
+  ]
+}

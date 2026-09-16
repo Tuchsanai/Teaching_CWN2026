@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+SHOP_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+exec python3 "$SHOP_ROOT/instructor/runtime/shop_runtime.py" "$@"

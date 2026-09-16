@@ -1,0 +1,91 @@
+{
+  "label": "lab2-B-P",
+  "utc_review": "2026-09-12T13:53:29.665360+00:00",
+  "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+  "answer_sha256": "62a389b501336329a555820f85690c4b60e56183eb96cecb0d5b5464dca46c67",
+  "rubric_version": "original 12-item strict; source ambiguity noted separately",
+  "items": [
+    {
+      "item": 1,
+      "criterion": "หลักฐานรอบหยุด",
+      "key_evidence": "S1 status STOPPED, S2 browser ERR_CONNECTION_REFUSED อ้าง ID",
+      "score": 1
+    },
+    {
+      "item": 2,
+      "criterion": "สาเหตุรอบหยุด",
+      "key_evidence": "S3 SERVICE_NOT_STARTED ไม่เดาปัญหา network/ฐานข้อมูลเพิ่ม",
+      "score": 1
+    },
+    {
+      "item": 3,
+      "criterion": "คำสั่งรอบหยุด",
+      "key_evidence": "เลือก ./shop start ตาม manual สำหรับ basic; ไม่ใช้ rollback แทน",
+      "score": 1
+    },
+    {
+      "item": 4,
+      "criterion": "หลักฐานรุ่นเสีย",
+      "key_evidence": "U1 RUNNING v2 และ U2 การจองไม่สำเร็จ แยกหน้าเปิดได้จากธุรกรรม",
+      "score": 1
+    },
+    {
+      "item": 5,
+      "criterion": "สาเหตุรุ่นเสีย",
+      "key_evidence": "U3 UPDATE_V2_BOOKING_BROKEN เพียงหนึ่งสาเหตุใน advanced",
+      "score": 1
+    },
+    {
+      "item": 6,
+      "criterion": "คำสั่งรุ่นเสีย",
+      "key_evidence": "เลือก ./shop rollback ให้กลับ v1 ตาม manual ไม่คิดว่า start แก้ v2",
+      "score": 1
+    },
+    {
+      "item": 7,
+      "criterion": "ขอบเขตคำสั่ง",
+      "key_evidence": "ไม่มีการแก้ internals/config/ติดตั้ง/คำสั่งนอกคู่มือ และไม่ reset กลางกู้",
+      "score": 1
+    },
+    {
+      "item": 8,
+      "criterion": "ตรวจบริการ",
+      "key_evidence": "แผน status และ check หลังการเปลี่ยนแปลง พร้อมผลคาดหวัง",
+      "score": 1
+    },
+    {
+      "item": 9,
+      "criterion": "ตรวจธุรกรรม",
+      "key_evidence": "แผน browser เปิด URL กดจองและเก็บเลขจริงทั้งสองรอบ",
+      "score": 1
+    },
+    {
+      "item": 10,
+      "criterion": "ไม่แต่งผล",
+      "key_evidence": "บอกว่ายังรอคนทำ/รอหลักฐานหลัง ไม่อ้างว่างานกู้เสร็จแล้ว",
+      "score": 1
+    },
+    {
+      "item": 11,
+      "criterion": "เมื่อไม่ผ่าน",
+      "key_evidence": "เก็บ logs หยุดและส่งผู้สอน ไม่ลองเปลี่ยนหลายอย่าง",
+      "score": 1
+    },
+    {
+      "item": 12,
+      "criterion": "รายงานกู้ครบ",
+      "key_evidence": "มีที่เก็บเหตุ หลักฐาน คำสั่งคนทำ รุ่นก่อน/หลัง เลขจอง และผลผ่าน/ไม่ผ่าน",
+      "score": 1
+    }
+  ],
+  "raw_answer_assessed_score": 12,
+  "sensitivity_score": 12,
+  "sensitivity_items": [],
+  "required_edits": [
+    "แผน rollback มีเงื่อนไขยืนยัน v1 ที่ดี ต้องให้ครูแสดงหลักฐานก่อนลงมือ ไม่ใช่ความผิดของ AI หรือผลกู้จริง"
+  ],
+  "assisted_revised_score": "not-measured",
+  "factual_claim_accuracy": "not-measured",
+  "human_corrections": "not-measured",
+  "human_hints": "not-measured"
+}

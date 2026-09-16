@@ -8,6 +8,9 @@
 ใช้กรณีร้านอาหารเดียวกันเพื่อเห็นความต่างของ Single Prompt, Loop, Static Graph,
 Conditional Graph และ Dynamic Workflow ที่ปรับแผนเมื่อมีข้อกำหนดเพิ่ม
 
+บท **ทฤษฎี** (หน้า 15–59) ปูพื้นฐาน Loop, Graph, Conditional Graph,
+Dynamic Workflow และ Re-planning ก่อนเข้าสู่ LAB 001–007
+
 ผู้เรียนเหมาะกับนักศึกษาที่อ่าน User Story และใช้ Terminal เบื้องต้นได้
 ไม่จำเป็นต้องมีระบบร้านอาหารจริง แต่ต้องแยกข้อเท็จจริง สมมติฐาน และข้อมูลจำลองให้ชัด
 
@@ -42,14 +45,14 @@ claude --version
 ```text
 AI_Workflow_Engineering_for_SA/
 ├── README.md
-├── AI_Workflow_Engineering_SA.html
+├── AI_Workflow_Engineering_SA.html # รวมบททฤษฎี หน้า 15–59
 ├── docs/
 │   ├── case-study-source.md
 │   ├── data-issues.md
 │   ├── us-coverage.md
 │   ├── rubric.md
 │   └── test-report.md
-├── img/                         # แผนภาพ PNG, SVG และ Excalidraw
+├── img/                         # แผนภาพ PNG, SVG และ Excalidraw รวมภาพทฤษฎี 11–16
 ├── 001_LAB_Single_Prompt_Baseline/
 ├── 002_LAB_Loop_FR_NFR/
 ├── 003_LAB_Static_Graph_Flow_Structure/
@@ -211,10 +214,10 @@ bash tests/run_all.sh
 สคริปต์บันทึก [results.json](tests/results.json), [link-report.json](tests/link-report.json)
 และภาพใน [screenshots/](tests/screenshots/)
 
-สรุปผลรอบนี้: สไลด์ 143 หน้าและ 143 ภาพผ่าน ไม่พบ console error หรือล้นตามเกณฑ์
+สรุปผลรอบนี้ (2026-09-15T07:23:46.843268+07:00 เวลาไทย UTC+7): สไลด์ 188 หน้าและ 188 ภาพผ่าน ไม่พบ console error หรือล้นตามเกณฑ์
 UI v1 ผ่าน 11 ตก 3 ข้าม 0; UI v2 ผ่าน 12 ตก 2 ข้าม 0
 เคสที่ตกยังอยู่ในผล JSON และมีเหตุผล ไม่ถูกเปลี่ยนเป็นข้ามเพื่อให้ผลผ่าน
-ลิงก์ในไฟล์ที่นักศึกษาใช้เสีย 0; ลิงก์ในหลักฐานดิบ 121 จุดเป็น known issue ดูรายการใน [รายงานทดสอบ](docs/test-report.md)
+ลิงก์ในขอบเขตตรวจไฟล์นักศึกษาตรวจ 2857 จุด เสีย 0 จุด; ลิงก์ในหลักฐานดิบ 121 จุดเป็น known issue ดูรายการใน [รายงานทดสอบ](docs/test-report.md)
 รายละเอียดและตัวเลขล่าสุดอยู่ใน [test-report.md](docs/test-report.md)
 
 ## ข้อจำกัดในการตีความ

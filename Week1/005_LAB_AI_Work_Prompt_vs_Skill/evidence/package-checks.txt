@@ -1,0 +1,67 @@
+UTC 2026-09-12T13:34:47.499768+00:00 Python 3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]
+Local links checked: 66
+PASS lab1 skill YAML fields, 8 sections, exact canonical SHA256 d150c2a37d00ecb5a040170d07ecf6e08ed3ad4189c09506fdeaa9586c9cddf6
+PASS lab2 skill YAML fields, 8 sections, exact canonical SHA256 f0437650c3d71b4e723cfa0b128252cb13818d3294727342d3c41df01be3ffce
+PASS lab3 skill YAML fields, 8 sections, exact canonical SHA256 9c54c9c54c2709c046b1ca533492e85b3ed1b4e096e242351bac1832a44d675c
+PASS data-only bundles and complaint cardinality/date arithmetic A
+PASS data-only bundles and complaint cardinality/date arithmetic B
+PASS data-only bundles and complaint cardinality/date arithmetic C
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab1 A P --label audit-lab1-P-2cd391c5
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab1-P-2cd391c5
+No model launched; no answers copied.
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab1 A S --label audit-lab1-S-78b9dad1
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab1-S-78b9dad1
+No model launched; no answers copied.
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+PASS matched P/S data, refs, templates; isolated native placement; no keys lab1
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab3 B P --label audit-lab3-P-c969992e
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab3-P-c969992e
+No model launched; no answers copied.
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab3 B S --label audit-lab3-S-d1b9de33
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab3-S-d1b9de33
+No model launched; no answers copied.
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+PASS matched P/S data, refs, templates; isolated native placement; no keys lab3
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab2 rollback-A P --label audit-lab2-P-d08d1666
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab2-P-d08d1666
+No model launched; no answers copied.
+BEFORE timing, in that workspace: ./labctl setup rollback-A
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+$ /opt/venv/bin/python3 /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/instructor/runtime/prepare_experiment.py lab2 rollback-A S --label audit-lab2-S-ce91c1cb
+WORKSPACE /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab2-S-ce91c1cb
+No model launched; no answers copied.
+BEFORE timing, in that workspace: ./labctl setup rollback-A
+Model command advice: cyolo1 exec --skip-git-repo-check -m gpt-6-astra -c model_reasoning_effort=high --json -o answer.md - < prompt.txt > run.jsonl 2> run.stderr
+PASS matched P/S data, refs, templates; isolated native placement; no keys lab2
+$ ./labctl setup rollback-A
+RUNNING v2-bad
+READY rollback-A ร้านใบชา A
+Runtime: /root/workspace/CWN/Teaching/Week1/005_LAB_AI_Work_Prompt_vs_Skill/experiments/workspaces/audit-lab2-S-ce91c1cb/.lab-runtime/learner
+URL: http://127.0.0.1:46007/
+$ ./labctl verify
+FAIL / HTTP Error 503: Service Unavailable
+FAIL /api/products HTTP Error 503: Service Unavailable
+FAIL /api/order-smoke HTTP Error 503: Service Unavailable
+NOT RECOVERED
+$ ./labctl start
+RUNNING already; release unchanged: v2-bad
+URL: http://127.0.0.1:46007/
+$ ./labctl verify
+FAIL / HTTP Error 503: Service Unavailable
+FAIL /api/products HTTP Error 503: Service Unavailable
+FAIL /api/order-smoke HTTP Error 503: Service Unavailable
+NOT RECOVERED
+$ ./labctl rollback
+RUNNING v1-good
+URL: http://127.0.0.1:40617/
+$ ./labctl verify
+PASS HTTP 200 / content valid
+PASS HTTP 200 /api/products content valid
+PASS HTTP 200 /api/order-smoke content valid
+VERIFIED healthy shop + products + simulated order
+STOPPED only this lab instance
+PASS generated experiment runtime functional and stopped
+PASS fillable CSV remains blank
+ALL PACKAGE CHECKS PASSED

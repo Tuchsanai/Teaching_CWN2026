@@ -1,0 +1,71 @@
+
+Running 4 tests using 1 worker
+
+(node:59774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides desktop navigation, copy, overflow and links (1.1s)
+(node:59940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides mobile navigation, copy, overflow and links (968ms)
+(node:60106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:16:1 › scorecard persists and downloads real CSV (368ms)
+  ✓  4 ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:22:1 › print layout and offline slides have no remote assets (340ms)
+
+
+  1) ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides desktop navigation, copy, overflow and links 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 3[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "Failed to load resource: the server responded with a status of 404 (File not found)",[39m
+    [31m+ ][39m
+
+      12 |  await page.locator('body').click({position:{x:5,y:500}});await page.keyboard.press('ArrowRight');await expect(page.locator('#sections')).toHaveValue('native');
+      13 |  const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.getAttribute('href')));const checks=[];for(const href of [...new Set(links)]){if(href.startsWith('http'))continue;if(href.startsWith('#')){expect(await page.locator(href).count()).toBe(1);continue}const r=await page.request.get(new URL(href,BASE+'/index.html').href);checks.push({href,status:r.status()});expect(r.ok(),href).toBeTruthy()}
+    > 14 |  expect(errors).toEqual([]);fs.writeFileSync(path.join(E,`slides-${label}.json`),JSON.stringify({utc:new Date().toISOString(),url:BASE+'/index.html',viewport,overflow,errors,linkChecks:checks,nav:true,copy:true},null,2));
+         |                 ^
+      15 | });
+      16 | test('scorecard persists and downloads real CSV',async({page})=>{
+      17 |  await page.goto(BASE+'/scorecard.html');await page.getByLabel('group row 1',{exact:true}).fill('ทีมทดสอบ');await page.getByLabel('lab row 1',{exact:true}).fill('lab1');await page.getByLabel('raw_12 row 1',{exact:true}).fill('9');await page.reload();await expect(page.getByLabel('group row 1',{exact:true})).toHaveValue('ทีมทดสอบ');
+        at /root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:14:17
+
+    Error Context: ../../root/workspace/CWN/Teaching/Week2/evidence/browser/test-results/slides-slides-desktop-navigation-copy-overflow-and-links/error-context.md
+
+  2) ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides mobile navigation, copy, overflow and links 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 3[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "Failed to load resource: the server responded with a status of 404 (File not found)",[39m
+    [31m+ ][39m
+
+      12 |  await page.locator('body').click({position:{x:5,y:500}});await page.keyboard.press('ArrowRight');await expect(page.locator('#sections')).toHaveValue('native');
+      13 |  const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.getAttribute('href')));const checks=[];for(const href of [...new Set(links)]){if(href.startsWith('http'))continue;if(href.startsWith('#')){expect(await page.locator(href).count()).toBe(1);continue}const r=await page.request.get(new URL(href,BASE+'/index.html').href);checks.push({href,status:r.status()});expect(r.ok(),href).toBeTruthy()}
+    > 14 |  expect(errors).toEqual([]);fs.writeFileSync(path.join(E,`slides-${label}.json`),JSON.stringify({utc:new Date().toISOString(),url:BASE+'/index.html',viewport,overflow,errors,linkChecks:checks,nav:true,copy:true},null,2));
+         |                 ^
+      15 | });
+      16 | test('scorecard persists and downloads real CSV',async({page})=>{
+      17 |  await page.goto(BASE+'/scorecard.html');await page.getByLabel('group row 1',{exact:true}).fill('ทีมทดสอบ');await page.getByLabel('lab row 1',{exact:true}).fill('lab1');await page.getByLabel('raw_12 row 1',{exact:true}).fill('9');await page.reload();await expect(page.getByLabel('group row 1',{exact:true})).toHaveValue('ทีมทดสอบ');
+        at /root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:14:17
+
+    Error Context: ../../root/workspace/CWN/Teaching/Week2/evidence/browser/test-results/slides-slides-mobile-navigation-copy-overflow-and-links/error-context.md
+
+  2 failed
+    ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides desktop navigation, copy, overflow and links 
+    ../../root/workspace/CWN/Teaching/Week2/instructor/runtime/slides.spec.cjs:3:104 › slides mobile navigation, copy, overflow and links 
+  2 passed (5.4s)

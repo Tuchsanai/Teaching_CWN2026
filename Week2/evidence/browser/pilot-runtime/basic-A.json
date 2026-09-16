@@ -1,0 +1,105 @@
+{
+  "scenario": "basic-A",
+  "utc": "2026-09-12T13:34:38.244Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "before": [
+    {
+      "utc": "2026-09-12T13:34:38.449Z",
+      "command": "./shop reset basic-A",
+      "exit": 0,
+      "stdout": "RESET basic-A STOPPED version=v1",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:38.636Z",
+      "command": "./shop preflight",
+      "exit": 0,
+      "stdout": "PREFLIGHT OK Python=3.12.3 http://127.0.0.1:18762",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:38.809Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "STOPPED version=v1",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:38.990Z",
+      "command": "./shop check",
+      "exit": 1,
+      "stdout": "CHECK FAIL URLError",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:39.152Z",
+      "command": "./shop logs",
+      "exit": 0,
+      "stdout": "{\"utc\": \"2026-09-12T13:34:38.429496+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"RESET\"}\n{\"utc\": \"2026-09-12T13:34:38.429535+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"SERVICE_STOPPED\", \"cause\": \"SERVICE_NOT_STARTED\"}",
+      "stderr": ""
+    }
+  ],
+  "after": [
+    {
+      "utc": "2026-09-12T13:34:39.725Z",
+      "command": "./shop start",
+      "exit": 0,
+      "stdout": "STARTED version=v1",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:39.916Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "RUNNING version=v1 bookings=0",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:40.102Z",
+      "command": "./shop check",
+      "exit": 0,
+      "stdout": "CHECK PASS booking=W2-77A46023 version=v1 (endpoint; ต้องตรวจ browser เพิ่ม)",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:40.532Z",
+      "command": "./shop logs",
+      "exit": 0,
+      "stdout": "{\"utc\": \"2026-09-12T13:34:38.429496+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"RESET\"}\n{\"utc\": \"2026-09-12T13:34:38.429535+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"SERVICE_STOPPED\", \"cause\": \"SERVICE_NOT_STARTED\"}\n{\"utc\": \"2026-09-12T13:34:39.694838+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"STARTED\"}\n{\"utc\": \"2026-09-12T13:34:40.095674+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"BOOKED\", \"booking\": \"W2-77A46023\"}\n{\"utc\": \"2026-09-12T13:34:40.109939+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"PAGE_OPEN\"}\n{\"utc\": \"2026-09-12T13:34:40.217511+00:00\", \"version\": \"v1\", \"scenario\": \"basic-A\", \"event\": \"BOOKED\", \"booking\": \"W2-245C044F\"}",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:40.711Z",
+      "command": "./shop start",
+      "exit": 0,
+      "stdout": "ALREADY RUNNING version=v1",
+      "stderr": ""
+    }
+  ],
+  "console": [],
+  "pageErrors": [],
+  "url": "http://127.0.0.1:18762",
+  "browser_before": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:18762/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:18762/\", waiting until \"load\"\u001b[22m\n",
+  "browser_after": "จองสำเร็จ เลข W2-245C044F • รุ่น v1",
+  "persisted_booking_verified": true,
+  "result": "PASS",
+  "cleanup": [
+    {
+      "utc": "2026-09-12T13:34:40.897Z",
+      "command": "./shop stop",
+      "exit": 0,
+      "stdout": "STOPPED",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:41.082Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "STOPPED version=v1",
+      "stderr": ""
+    }
+  ]
+}

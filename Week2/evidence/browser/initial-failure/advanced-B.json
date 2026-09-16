@@ -1,0 +1,65 @@
+{
+  "scenario": "advanced-B",
+  "utc": "2026-09-12T13:34:18.558Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "before": [
+    {
+      "utc": "2026-09-12T13:34:18.756Z",
+      "command": "./shop reset advanced-B",
+      "exit": 2,
+      "stdout": "",
+      "stderr": "PORT BUSY: หยุดแล้วแจ้งผู้สอน ไม่หยุด process อื่น"
+    },
+    {
+      "utc": "2026-09-12T13:34:18.938Z",
+      "command": "./shop preflight",
+      "exit": 2,
+      "stdout": "",
+      "stderr": "PORT BUSY: แจ้งผู้สอน"
+    },
+    {
+      "utc": "2026-09-12T13:34:19.127Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "STOPPED version=v2",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:19.309Z",
+      "command": "./shop check",
+      "exit": 1,
+      "stdout": "CHECK FAIL URLError",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:19.480Z",
+      "command": "./shop logs",
+      "exit": 0,
+      "stdout": "{\"utc\": \"2026-09-12T13:34:18.737625+00:00\", \"version\": \"v2\", \"scenario\": \"advanced-B\", \"event\": \"RESET\"}",
+      "stderr": ""
+    }
+  ],
+  "after": [],
+  "console": [],
+  "pageErrors": [],
+  "url": "http://127.0.0.1:18762",
+  "cleanup": [
+    {
+      "utc": "2026-09-12T13:34:19.825Z",
+      "command": "./shop stop",
+      "exit": 0,
+      "stdout": "STOPPED",
+      "stderr": ""
+    },
+    {
+      "utc": "2026-09-12T13:34:20.004Z",
+      "command": "./shop status",
+      "exit": 0,
+      "stdout": "STOPPED version=v2",
+      "stderr": ""
+    }
+  ]
+}

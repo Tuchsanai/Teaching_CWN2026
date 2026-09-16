@@ -1,0 +1,1104 @@
+[
+  {
+    "label": "lab2-A-P",
+    "utc_review": "2026-09-12T13:53:29.652915+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "9a2920f362cae181b254c819f87c9c680d3782d312be80224e3859448d4cfb51",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "หลักฐานรอบหยุด",
+        "key_evidence": "S1 status STOPPED, S2 browser ERR_CONNECTION_REFUSED อ้าง ID",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "สาเหตุรอบหยุด",
+        "key_evidence": "S3 SERVICE_NOT_STARTED ไม่เดาปัญหา network/ฐานข้อมูลเพิ่ม",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "คำสั่งรอบหยุด",
+        "key_evidence": "เลือก ./shop start ตาม manual สำหรับ basic; ไม่ใช้ rollback แทน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "หลักฐานรุ่นเสีย",
+        "key_evidence": "U1 RUNNING v2 และ U2 การจองไม่สำเร็จ แยกหน้าเปิดได้จากธุรกรรม",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "สาเหตุรุ่นเสีย",
+        "key_evidence": "U3 UPDATE_V2_BOOKING_BROKEN เพียงหนึ่งสาเหตุใน advanced",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "คำสั่งรุ่นเสีย",
+        "key_evidence": "เลือก ./shop rollback ให้กลับ v1 ตาม manual ไม่คิดว่า start แก้ v2",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ขอบเขตคำสั่ง",
+        "key_evidence": "ไม่มีการแก้ internals/config/ติดตั้ง/คำสั่งนอกคู่มือ และไม่ reset กลางกู้",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "ตรวจบริการ",
+        "key_evidence": "แผน status และ check หลังการเปลี่ยนแปลง พร้อมผลคาดหวัง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ตรวจธุรกรรม",
+        "key_evidence": "แผน browser เปิด URL กดจองและเก็บเลขจริงทั้งสองรอบ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งผล",
+        "key_evidence": "บอกว่ายังรอคนทำ/รอหลักฐานหลัง ไม่อ้างว่างานกู้เสร็จแล้ว",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "เมื่อไม่ผ่าน",
+        "key_evidence": "เก็บ logs หยุดและส่งผู้สอน ไม่ลองเปลี่ยนหลายอย่าง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "รายงานกู้ครบ",
+        "key_evidence": "มีที่เก็บเหตุ หลักฐาน คำสั่งคนทำ รุ่นก่อน/หลัง เลขจอง และผลผ่าน/ไม่ผ่าน",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "การลงมือ rollback ยังมีเงื่อนไขขอหลักฐาน v1 ที่ดีจากผู้สอนอย่างเหมาะสม ไม่ถือเป็นกู้สำเร็จ; ต้องให้ครูแสดงหลักฐานจริงก่อนภารกิจ ไม่แก้ร่างย้อนหลัง"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab2-B-P",
+    "utc_review": "2026-09-12T13:53:29.665360+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "62a389b501336329a555820f85690c4b60e56183eb96cecb0d5b5464dca46c67",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "หลักฐานรอบหยุด",
+        "key_evidence": "S1 status STOPPED, S2 browser ERR_CONNECTION_REFUSED อ้าง ID",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "สาเหตุรอบหยุด",
+        "key_evidence": "S3 SERVICE_NOT_STARTED ไม่เดาปัญหา network/ฐานข้อมูลเพิ่ม",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "คำสั่งรอบหยุด",
+        "key_evidence": "เลือก ./shop start ตาม manual สำหรับ basic; ไม่ใช้ rollback แทน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "หลักฐานรุ่นเสีย",
+        "key_evidence": "U1 RUNNING v2 และ U2 การจองไม่สำเร็จ แยกหน้าเปิดได้จากธุรกรรม",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "สาเหตุรุ่นเสีย",
+        "key_evidence": "U3 UPDATE_V2_BOOKING_BROKEN เพียงหนึ่งสาเหตุใน advanced",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "คำสั่งรุ่นเสีย",
+        "key_evidence": "เลือก ./shop rollback ให้กลับ v1 ตาม manual ไม่คิดว่า start แก้ v2",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ขอบเขตคำสั่ง",
+        "key_evidence": "ไม่มีการแก้ internals/config/ติดตั้ง/คำสั่งนอกคู่มือ และไม่ reset กลางกู้",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "ตรวจบริการ",
+        "key_evidence": "แผน status และ check หลังการเปลี่ยนแปลง พร้อมผลคาดหวัง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ตรวจธุรกรรม",
+        "key_evidence": "แผน browser เปิด URL กดจองและเก็บเลขจริงทั้งสองรอบ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งผล",
+        "key_evidence": "บอกว่ายังรอคนทำ/รอหลักฐานหลัง ไม่อ้างว่างานกู้เสร็จแล้ว",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "เมื่อไม่ผ่าน",
+        "key_evidence": "เก็บ logs หยุดและส่งผู้สอน ไม่ลองเปลี่ยนหลายอย่าง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "รายงานกู้ครบ",
+        "key_evidence": "มีที่เก็บเหตุ หลักฐาน คำสั่งคนทำ รุ่นก่อน/หลัง เลขจอง และผลผ่าน/ไม่ผ่าน",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "แผน rollback มีเงื่อนไขยืนยัน v1 ที่ดี ต้องให้ครูแสดงหลักฐานก่อนลงมือ ไม่ใช่ความผิดของ AI หรือผลกู้จริง"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab2-A-S",
+    "utc_review": "2026-09-12T13:53:29.676323+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "02dbe3eaf0696a7f2624f2f90dcf23292863ee5d1a0fcc6fa6654de1cbd6e750",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "หลักฐานรอบหยุด",
+        "key_evidence": "S1 status STOPPED, S2 browser ERR_CONNECTION_REFUSED อ้าง ID",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "สาเหตุรอบหยุด",
+        "key_evidence": "S3 SERVICE_NOT_STARTED ไม่เดาปัญหา network/ฐานข้อมูลเพิ่ม",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "คำสั่งรอบหยุด",
+        "key_evidence": "เลือก ./shop start ตาม manual สำหรับ basic; ไม่ใช้ rollback แทน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "หลักฐานรุ่นเสีย",
+        "key_evidence": "U1 RUNNING v2 และ U2 การจองไม่สำเร็จ แยกหน้าเปิดได้จากธุรกรรม",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "สาเหตุรุ่นเสีย",
+        "key_evidence": "U3 UPDATE_V2_BOOKING_BROKEN เพียงหนึ่งสาเหตุใน advanced",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "คำสั่งรุ่นเสีย",
+        "key_evidence": "เลือก ./shop rollback ให้กลับ v1 ตาม manual ไม่คิดว่า start แก้ v2",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ขอบเขตคำสั่ง",
+        "key_evidence": "ไม่มีการแก้ internals/config/ติดตั้ง/คำสั่งนอกคู่มือ และไม่ reset กลางกู้",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "ตรวจบริการ",
+        "key_evidence": "แผน status และ check หลังการเปลี่ยนแปลง พร้อมผลคาดหวัง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ตรวจธุรกรรม",
+        "key_evidence": "แผน browser เปิด URL กดจองและเก็บเลขจริงทั้งสองรอบ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งผล",
+        "key_evidence": "บอกว่ายังรอคนทำ/รอหลักฐานหลัง ไม่อ้างว่างานกู้เสร็จแล้ว",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "เมื่อไม่ผ่าน",
+        "key_evidence": "เก็บ logs หยุดและส่งผู้สอน ไม่ลองเปลี่ยนหลายอย่าง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "รายงานกู้ครบ",
+        "key_evidence": "มีที่เก็บเหตุ หลักฐาน คำสั่งคนทำ รุ่นก่อน/หลัง เลขจอง และผลผ่าน/ไม่ผ่าน",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "แผน rollback มีเงื่อนไขขอหลักฐาน v1 ที่ดี ต้องยืนยันกับผู้สอนก่อนลงมือ ไม่อ้างผล runtime เป็นผลงาน AI"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab2-B-S",
+    "utc_review": "2026-09-12T13:53:29.689126+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "abc1cb2f85bd9039c22be6e143883a4f5b41d5878614c0f2a05fbee68204eeed",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "หลักฐานรอบหยุด",
+        "key_evidence": "S1 status STOPPED, S2 browser ERR_CONNECTION_REFUSED อ้าง ID",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "สาเหตุรอบหยุด",
+        "key_evidence": "S3 SERVICE_NOT_STARTED ไม่เดาปัญหา network/ฐานข้อมูลเพิ่ม",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "คำสั่งรอบหยุด",
+        "key_evidence": "เลือก ./shop start ตาม manual สำหรับ basic; ไม่ใช้ rollback แทน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "หลักฐานรุ่นเสีย",
+        "key_evidence": "U1 RUNNING v2 และ U2 การจองไม่สำเร็จ แยกหน้าเปิดได้จากธุรกรรม",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "สาเหตุรุ่นเสีย",
+        "key_evidence": "U3 UPDATE_V2_BOOKING_BROKEN เพียงหนึ่งสาเหตุใน advanced",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "คำสั่งรุ่นเสีย",
+        "key_evidence": "เลือก ./shop rollback ให้กลับ v1 ตาม manual ไม่คิดว่า start แก้ v2",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ขอบเขตคำสั่ง",
+        "key_evidence": "ไม่มีการแก้ internals/config/ติดตั้ง/คำสั่งนอกคู่มือ และไม่ reset กลางกู้",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "ตรวจบริการ",
+        "key_evidence": "แผน status และ check หลังการเปลี่ยนแปลง พร้อมผลคาดหวัง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ตรวจธุรกรรม",
+        "key_evidence": "แผน browser เปิด URL กดจองและเก็บเลขจริงทั้งสองรอบ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งผล",
+        "key_evidence": "บอกว่ายังรอคนทำ/รอหลักฐานหลัง ไม่อ้างว่างานกู้เสร็จแล้ว",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "เมื่อไม่ผ่าน",
+        "key_evidence": "เก็บ logs หยุดและส่งผู้สอน ไม่ลองเปลี่ยนหลายอย่าง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "รายงานกู้ครบ",
+        "key_evidence": "มีที่เก็บเหตุ หลักฐาน คำสั่งคนทำ รุ่นก่อน/หลัง เลขจอง และผลผ่าน/ไม่ผ่าน",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "แผน rollback มีเงื่อนไขขอหลักฐาน v1 ที่ดี ต้องยืนยันกับผู้สอนก่อนลงมือ ไม่อ้างผล runtime เป็นผลงาน AI"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab1-A-P",
+    "utc_review": "2026-09-12T13:53:29.703966+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "ff446b0df01bd22b6d80f365a88ff3c12edc7f84370a806d3cc7551d1d1e7560",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รวบรวมข้อยืนยัน",
+        "key_evidence": "M1: ชื่อผู้รับ เบอร์ติดต่อ รายการสินค้า ก่อนยืนยัน ครบสามอย่าง",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ส่วนลดขัดกัน",
+        "key_evidence": "C1 กับ P1: ใช้ร่วมคูปองได้/ไม่ได้ ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "ยกเลิกขัดกัน",
+        "key_evidence": "C2 กับ P2: หลังจ่ายก่อนแพ็ก/เฉพาะก่อนจ่าย ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "คืนขัดกัน",
+        "key_evidence": "M2 กับ P3: เปลี่ยนใจ/เฉพาะชำรุด ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "ค่าขนส่งขาด",
+        "key_evidence": "N1 และ M2: ยังไม่มีข้อตกลงค่าขนส่งคืน",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "สภาพสินค้าขาด",
+        "key_evidence": "M2: สภาพสำหรับคืนเมื่อเปลี่ยนใจยังไม่ระบุ ไม่กำหนดเอง",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ไม่แต่งลำดับอำนาจ",
+        "key_evidence": "N1: ไม่มี precedence และคำอนุมัติ ไม่ถือเอกสารกติกาชนะอัตโนมัติ",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "คำถามตัดสินได้",
+        "key_evidence": "มีคำถามส่วนลด ยกเลิก คืน และข้อมูลขาด พร้อม ID",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "กติกาแยกสถานะ",
+        "key_evidence": "M1 ยืนยัน; สามหมวดที่ขัดกันรอคำตอบ ข้อเสนอระบุเป็นข้อเสนอ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ตรวจรับข้อยืนยัน",
+        "key_evidence": "กรณีเก็บชื่อ/เบอร์/รายการก่อนยืนยัน ตาม M1 และไม่อ้างผลรันจริง",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ตรวจรับความไม่แน่นอน",
+        "key_evidence": "มีเหตุการณ์ส่วนลดร่วมคูปอง ยกเลิกหลังจ่าย คืนเปลี่ยนใจ พร้อมรอยืนยันและสอง ID",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "โครงสร้าง/ที่มาครบ",
+        "key_evidence": "ครบตารางความต้องการ คำถาม กติกา สถานการณ์ ทุกข้ออ้างมี ID ที่รองรับ",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab1-B-P",
+    "utc_review": "2026-09-12T13:53:29.717332+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "96106244cf0a998e472f767b493eacecdda436f5b344d9b28fc865800a63cfe7",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รวบรวมข้อยืนยัน",
+        "key_evidence": "M1: ชื่อผู้รับ เบอร์ติดต่อ รายการสินค้า ก่อนยืนยัน ครบสามอย่าง",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ส่วนลดขัดกัน",
+        "key_evidence": "C1 กับ P1: ใช้ร่วมคูปองได้/ไม่ได้ ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "ยกเลิกขัดกัน",
+        "key_evidence": "C2 กับ P2: หลังจ่ายก่อนแพ็ก/เฉพาะก่อนจ่าย ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "คืนขัดกัน",
+        "key_evidence": "M2 กับ P3: เปลี่ยนใจ/เฉพาะชำรุด ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "ค่าขนส่งขาด",
+        "key_evidence": "N1 และ M2: ยังไม่มีข้อตกลงค่าขนส่งคืน",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "สภาพสินค้าขาด",
+        "key_evidence": "M2: สภาพสำหรับคืนเมื่อเปลี่ยนใจยังไม่ระบุ ไม่กำหนดเอง",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ไม่แต่งลำดับอำนาจ",
+        "key_evidence": "N1: ไม่มี precedence และคำอนุมัติ ไม่ถือเอกสารกติกาชนะอัตโนมัติ",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "คำถามตัดสินได้",
+        "key_evidence": "มีคำถามส่วนลด ยกเลิก คืน และข้อมูลขาด พร้อม ID",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "กติกาแยกสถานะ",
+        "key_evidence": "M1 ยืนยัน; สามหมวดที่ขัดกันรอคำตอบ ข้อเสนอระบุเป็นข้อเสนอ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ตรวจรับข้อยืนยัน",
+        "key_evidence": "กรณีเก็บชื่อ/เบอร์/รายการก่อนยืนยัน ตาม M1 และไม่อ้างผลรันจริง",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ตรวจรับความไม่แน่นอน",
+        "key_evidence": "มีเหตุการณ์ส่วนลดร่วมคูปอง ยกเลิกหลังจ่าย คืนเปลี่ยนใจ พร้อมรอยืนยันและสอง ID",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "โครงสร้าง/ที่มาครบ",
+        "key_evidence": "ครบตารางความต้องการ คำถาม กติกา สถานการณ์ ทุกข้ออ้างมี ID ที่รองรับ",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab1-A-S-confirmed",
+    "utc_review": "2026-09-12T13:53:29.729710+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "852944f1f75ac0865e4acd577df70dfe4b292e172b64a71a77ae51f862151658",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รวบรวมข้อยืนยัน",
+        "key_evidence": "M1: ชื่อผู้รับ เบอร์ติดต่อ รายการสินค้า ก่อนยืนยัน ครบสามอย่าง",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ส่วนลดขัดกัน",
+        "key_evidence": "C1 กับ P1: ใช้ร่วมคูปองได้/ไม่ได้ ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "ยกเลิกขัดกัน",
+        "key_evidence": "C2 กับ P2: หลังจ่ายก่อนแพ็ก/เฉพาะก่อนจ่าย ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "คืนขัดกัน",
+        "key_evidence": "M2 กับ P3: เปลี่ยนใจ/เฉพาะชำรุด ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "ค่าขนส่งขาด",
+        "key_evidence": "N1 และ M2: ยังไม่มีข้อตกลงค่าขนส่งคืน",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "สภาพสินค้าขาด",
+        "key_evidence": "M2: สภาพสำหรับคืนเมื่อเปลี่ยนใจยังไม่ระบุ ไม่กำหนดเอง",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ไม่แต่งลำดับอำนาจ",
+        "key_evidence": "N1: ไม่มี precedence และคำอนุมัติ ไม่ถือเอกสารกติกาชนะอัตโนมัติ",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "คำถามตัดสินได้",
+        "key_evidence": "มีคำถามส่วนลด ยกเลิก คืน และข้อมูลขาด พร้อม ID",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "กติกาแยกสถานะ",
+        "key_evidence": "M1 ยืนยัน; สามหมวดที่ขัดกันรอคำตอบ ข้อเสนอระบุเป็นข้อเสนอ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ตรวจรับข้อยืนยัน",
+        "key_evidence": "กรณีเก็บชื่อ/เบอร์/รายการก่อนยืนยัน ตาม M1 และไม่อ้างผลรันจริง",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ตรวจรับความไม่แน่นอน",
+        "key_evidence": "มีเหตุการณ์ส่วนลดร่วมคูปอง ยกเลิกหลังจ่าย คืนเปลี่ยนใจ พร้อมรอยืนยันและสอง ID",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "โครงสร้าง/ที่มาครบ",
+        "key_evidence": "ครบตารางความต้องการ คำถาม กติกา สถานการณ์ ทุกข้ออ้างมี ID ที่รองรับ",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "แถวตรวจรับก่อนชำระมีคำว่า ขอ取消ออเดอร์ ต้องแก้เป็น ขอยกเลิกออเดอร์ ก่อนแจกผู้เรียน คะแนน rubric ความครบถ้วนไม่วัดความสะอาดของภาษาโดยตรง"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab1-B-S-confirmed",
+    "utc_review": "2026-09-12T13:53:29.740751+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "ee9b70bc76bf381f44bac7dde07de28f44a03567ec90c4a05fce50197de44a66",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รวบรวมข้อยืนยัน",
+        "key_evidence": "M1: ชื่อผู้รับ เบอร์ติดต่อ รายการสินค้า ก่อนยืนยัน ครบสามอย่าง",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ส่วนลดขัดกัน",
+        "key_evidence": "C1 กับ P1: ใช้ร่วมคูปองได้/ไม่ได้ ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "ยกเลิกขัดกัน",
+        "key_evidence": "C2 กับ P2: หลังจ่ายก่อนแพ็ก/เฉพาะก่อนจ่าย ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "คืนขัดกัน",
+        "key_evidence": "M2 กับ P3: เปลี่ยนใจ/เฉพาะชำรุด ต้องยังไม่ตัดสิน",
+        "score": 1
+      },
+      {
+        "item": 5,
+        "criterion": "ค่าขนส่งขาด",
+        "key_evidence": "N1 และ M2: ยังไม่มีข้อตกลงค่าขนส่งคืน",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "สภาพสินค้าขาด",
+        "key_evidence": "M2: สภาพสำหรับคืนเมื่อเปลี่ยนใจยังไม่ระบุ ไม่กำหนดเอง",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ไม่แต่งลำดับอำนาจ",
+        "key_evidence": "N1: ไม่มี precedence และคำอนุมัติ ไม่ถือเอกสารกติกาชนะอัตโนมัติ",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "คำถามตัดสินได้",
+        "key_evidence": "มีคำถามส่วนลด ยกเลิก คืน และข้อมูลขาด พร้อม ID",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "กติกาแยกสถานะ",
+        "key_evidence": "M1 ยืนยัน; สามหมวดที่ขัดกันรอคำตอบ ข้อเสนอระบุเป็นข้อเสนอ",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ตรวจรับข้อยืนยัน",
+        "key_evidence": "กรณีเก็บชื่อ/เบอร์/รายการก่อนยืนยัน ตาม M1 และไม่อ้างผลรันจริง",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ตรวจรับความไม่แน่นอน",
+        "key_evidence": "มีเหตุการณ์ส่วนลดร่วมคูปอง ยกเลิกหลังจ่าย คืนเปลี่ยนใจ พร้อมรอยืนยันและสอง ID",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "โครงสร้าง/ที่มาครบ",
+        "key_evidence": "ครบตารางความต้องการ คำถาม กติกา สถานการณ์ ทุกข้ออ้างมี ID ที่รองรับ",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 12,
+    "sensitivity_score": 12,
+    "sensitivity_items": [],
+    "required_edits": [
+      "แถวตรวจรับก่อนชำระมีคำว่า ขอ取消ออเดอร์ ต้องแก้เป็น ขอยกเลิกออเดอร์ ก่อนแจกผู้เรียน คะแนน rubric ความครบถ้วนไม่วัดความสะอาดของภาษาโดยตรง"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab3-A-P",
+    "utc_review": "2026-09-12T13:53:29.754045+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "beb02316ffe9fc34dfadd790480789402ba4a4c77e5af294eefce347d89054c2",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รุ่นนโยบาย",
+        "key_evidence": "A/B ใช้ v1; ไม่ดึง v2 จากที่อื่น",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ครอบคลุม",
+        "key_evidence": "มี M1/M2/M3/M4 ครบสี่เคส",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "เคสปกติ",
+        "key_evidence": "M1/O1/P1/P2: P2 ชำรุดใน 7 วัน มีรูป ให้ตรวจเสนอเปลี่ยน ไม่รับรองอนุมัติแล้ว",
+        "score": 0
+      },
+      {
+        "item": 4,
+        "criterion": "ข้อมูลขาด",
+        "key_evidence": "M2/P1/P2: P3 ขอเลขออเดอร์ วันรับ และรูป ไม่เดาออเดอร์",
+        "score": 0
+      },
+      {
+        "item": 5,
+        "criterion": "นอกนโยบาย",
+        "key_evidence": "M3/O3/P1/P2: P3 เปลี่ยนใจ ไม่รับคืนตาม v1",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "ความเสี่ยง",
+        "key_evidence": "M4/O4/P2: P1 ปลั๊กไหม้ หยุดใช้ ส่งหัวหน้าทันที ไม่แต่งว่าบาดเจ็บ",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ข้อยกเว้น",
+        "key_evidence": "M4/O4/P1/P3: 12 วันเกิน 7 ส่งผู้จัดการ ไม่อนุมัติคืนเงินเอง",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "อ้างหลักฐานครบ",
+        "key_evidence": "ทุกเคสมี ID ข้อความ/ออเดอร์ที่มี/นโยบายที่เกี่ยวข้องและรองรับจริง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ไม่สัญญาเกิน",
+        "key_evidence": "ไม่มีเวลาตอบ/คืนเงินหรือคำว่าอนุมัติแล้วที่แหล่งไม่ให้",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งข้อมูล",
+        "key_evidence": "ไม่เติมข้อเท็จจริง M2 หรืออาการบาดเจ็บ/สถานะอนุมัติที่ไม่มี",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ร่างตอบครบ",
+        "key_evidence": "มีคำตอบสุภาพสั้นครบสี่เคส ไม่อ้างส่งข้อความจริง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "ช่องการทำต่อครบ",
+        "key_evidence": "ระบุข้อมูลขาดและคนรับช่วง/เงื่อนไขส่งต่อชัดแต่ละเคส",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 10,
+    "sensitivity_score": 12,
+    "sensitivity_items": [
+      3,
+      4
+    ],
+    "required_edits": [
+      "ข้อ 3: จัดแก้วร้าว P1 จากความเสี่ยงบาด แทน P2 ที่รูบริกเดิมคาด",
+      "ข้อ 4: จัดข้อมูลไม่ครบ P2 เบื้องต้น แทน P3 ที่รูบริกเดิมคาด",
+      "ถามเจ้าของนโยบายเรื่องหมวดคิวทับกันและระบุว่าเป็นระดับชั่วคราว ไม่ถือว่าทั้งสองต่างจากเฉลยเป็นข้อเท็จจริงผิดแน่นอน"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab3-B-P",
+    "utc_review": "2026-09-12T13:53:29.766430+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "449a70dc3cc232f5cb813d13fca75f3f7362e9a25612dab75e0bce345c01e93a",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รุ่นนโยบาย",
+        "key_evidence": "A/B ใช้ v1; ไม่ดึง v2 จากที่อื่น",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ครอบคลุม",
+        "key_evidence": "มี M1/M2/M3/M4 ครบสี่เคส",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "เคสปกติ",
+        "key_evidence": "M1/O1/P1/P2: P2 ชำรุดใน 7 วัน มีรูป ให้ตรวจเสนอเปลี่ยน ไม่รับรองอนุมัติแล้ว",
+        "score": 0
+      },
+      {
+        "item": 4,
+        "criterion": "ข้อมูลขาด",
+        "key_evidence": "M2/P1/P2: P3 ขอเลขออเดอร์ วันรับ และรูป ไม่เดาออเดอร์",
+        "score": 0
+      },
+      {
+        "item": 5,
+        "criterion": "นอกนโยบาย",
+        "key_evidence": "M3/O3/P1/P2: P3 เปลี่ยนใจ ไม่รับคืนตาม v1",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "ความเสี่ยง",
+        "key_evidence": "M4/O4/P2: P1 ปลั๊กไหม้ หยุดใช้ ส่งหัวหน้าทันที ไม่แต่งว่าบาดเจ็บ",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ข้อยกเว้น",
+        "key_evidence": "M4/O4/P1/P3: 12 วันเกิน 7 ส่งผู้จัดการ ไม่อนุมัติคืนเงินเอง",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "อ้างหลักฐานครบ",
+        "key_evidence": "ทุกเคสมี ID ข้อความ/ออเดอร์ที่มี/นโยบายที่เกี่ยวข้องและรองรับจริง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ไม่สัญญาเกิน",
+        "key_evidence": "ไม่มีเวลาตอบ/คืนเงินหรือคำว่าอนุมัติแล้วที่แหล่งไม่ให้",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งข้อมูล",
+        "key_evidence": "ไม่เติมข้อเท็จจริง M2 หรืออาการบาดเจ็บ/สถานะอนุมัติที่ไม่มี",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ร่างตอบครบ",
+        "key_evidence": "มีคำตอบสุภาพสั้นครบสี่เคส ไม่อ้างส่งข้อความจริง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "ช่องการทำต่อครบ",
+        "key_evidence": "ระบุข้อมูลขาดและคนรับช่วง/เงื่อนไขส่งต่อชัดแต่ละเคส",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 10,
+    "sensitivity_score": 12,
+    "sensitivity_items": [
+      3,
+      4
+    ],
+    "required_edits": [
+      "ข้อ 3: จัดแก้วร้าว P1 จากความเสี่ยงบาด แทน P2 ที่รูบริกเดิมคาด",
+      "ข้อ 4: จัดข้อมูลไม่ครบ P2 เบื้องต้น แทน P3 ที่รูบริกเดิมคาด",
+      "ถามเจ้าของนโยบายเรื่องหมวดคิวทับกัน; ความเสี่ยงบาดถูกระบุว่าเป็นการประเมิน ไม่ใช่การบาดเจ็บที่รายงาน"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab3-A-S-confirmed",
+    "utc_review": "2026-09-12T13:53:29.778254+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "39a86bf6edad662203d979cbc177bf93a55e02b95653be7334bfba659cdd5e01",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รุ่นนโยบาย",
+        "key_evidence": "A/B ใช้ v1; ไม่ดึง v2 จากที่อื่น",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ครอบคลุม",
+        "key_evidence": "มี M1/M2/M3/M4 ครบสี่เคส",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "เคสปกติ",
+        "key_evidence": "M1/O1/P1/P2: P2 ชำรุดใน 7 วัน มีรูป ให้ตรวจเสนอเปลี่ยน ไม่รับรองอนุมัติแล้ว",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "ข้อมูลขาด",
+        "key_evidence": "M2/P1/P2: P3 ขอเลขออเดอร์ วันรับ และรูป ไม่เดาออเดอร์",
+        "score": 0
+      },
+      {
+        "item": 5,
+        "criterion": "นอกนโยบาย",
+        "key_evidence": "M3/O3/P1/P2: P3 เปลี่ยนใจ ไม่รับคืนตาม v1",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "ความเสี่ยง",
+        "key_evidence": "M4/O4/P2: P1 ปลั๊กไหม้ หยุดใช้ ส่งหัวหน้าทันที ไม่แต่งว่าบาดเจ็บ",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ข้อยกเว้น",
+        "key_evidence": "M4/O4/P1/P3: 12 วันเกิน 7 ส่งผู้จัดการ ไม่อนุมัติคืนเงินเอง",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "อ้างหลักฐานครบ",
+        "key_evidence": "ทุกเคสมี ID ข้อความ/ออเดอร์ที่มี/นโยบายที่เกี่ยวข้องและรองรับจริง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ไม่สัญญาเกิน",
+        "key_evidence": "ไม่มีเวลาตอบ/คืนเงินหรือคำว่าอนุมัติแล้วที่แหล่งไม่ให้",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งข้อมูล",
+        "key_evidence": "ไม่เติมข้อเท็จจริง M2 หรืออาการบาดเจ็บ/สถานะอนุมัติที่ไม่มี",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ร่างตอบครบ",
+        "key_evidence": "มีคำตอบสุภาพสั้นครบสี่เคส ไม่อ้างส่งข้อความจริง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "ช่องการทำต่อครบ",
+        "key_evidence": "ระบุข้อมูลขาดและคนรับช่วง/เงื่อนไขส่งต่อชัดแต่ละเคส",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 11,
+    "sensitivity_score": 12,
+    "sensitivity_items": [
+      4
+    ],
+    "required_edits": [
+      "ข้อ 4: จัดข้อมูลไม่ครบ P2 เบื้องต้น แทน P3 ที่รูบริกเดิมคาด; ต้องถามเจ้าของนโยบายว่าข้อมูลไม่ครบแต่แจ้งของเสียอยู่หมวดใด"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  },
+  {
+    "label": "lab3-B-S-confirmed",
+    "utc_review": "2026-09-12T13:53:29.791537+00:00",
+    "reviewer": "package author (AI worker), nonblind source/rubric reading; not independent human grading",
+    "answer_sha256": "aeb55df3fcf6b67152f8f26e2976aa6620cc178e2e9ea0b2be575413ebdc7c61",
+    "rubric_version": "original 12-item strict; source ambiguity noted separately",
+    "items": [
+      {
+        "item": 1,
+        "criterion": "รุ่นนโยบาย",
+        "key_evidence": "A/B ใช้ v1; ไม่ดึง v2 จากที่อื่น",
+        "score": 1
+      },
+      {
+        "item": 2,
+        "criterion": "ครอบคลุม",
+        "key_evidence": "มี M1/M2/M3/M4 ครบสี่เคส",
+        "score": 1
+      },
+      {
+        "item": 3,
+        "criterion": "เคสปกติ",
+        "key_evidence": "M1/O1/P1/P2: P2 ชำรุดใน 7 วัน มีรูป ให้ตรวจเสนอเปลี่ยน ไม่รับรองอนุมัติแล้ว",
+        "score": 1
+      },
+      {
+        "item": 4,
+        "criterion": "ข้อมูลขาด",
+        "key_evidence": "M2/P1/P2: P3 ขอเลขออเดอร์ วันรับ และรูป ไม่เดาออเดอร์",
+        "score": 0
+      },
+      {
+        "item": 5,
+        "criterion": "นอกนโยบาย",
+        "key_evidence": "M3/O3/P1/P2: P3 เปลี่ยนใจ ไม่รับคืนตาม v1",
+        "score": 1
+      },
+      {
+        "item": 6,
+        "criterion": "ความเสี่ยง",
+        "key_evidence": "M4/O4/P2: P1 ปลั๊กไหม้ หยุดใช้ ส่งหัวหน้าทันที ไม่แต่งว่าบาดเจ็บ",
+        "score": 1
+      },
+      {
+        "item": 7,
+        "criterion": "ข้อยกเว้น",
+        "key_evidence": "M4/O4/P1/P3: 12 วันเกิน 7 ส่งผู้จัดการ ไม่อนุมัติคืนเงินเอง",
+        "score": 1
+      },
+      {
+        "item": 8,
+        "criterion": "อ้างหลักฐานครบ",
+        "key_evidence": "ทุกเคสมี ID ข้อความ/ออเดอร์ที่มี/นโยบายที่เกี่ยวข้องและรองรับจริง",
+        "score": 1
+      },
+      {
+        "item": 9,
+        "criterion": "ไม่สัญญาเกิน",
+        "key_evidence": "ไม่มีเวลาตอบ/คืนเงินหรือคำว่าอนุมัติแล้วที่แหล่งไม่ให้",
+        "score": 1
+      },
+      {
+        "item": 10,
+        "criterion": "ไม่แต่งข้อมูล",
+        "key_evidence": "ไม่เติมข้อเท็จจริง M2 หรืออาการบาดเจ็บ/สถานะอนุมัติที่ไม่มี",
+        "score": 1
+      },
+      {
+        "item": 11,
+        "criterion": "ร่างตอบครบ",
+        "key_evidence": "มีคำตอบสุภาพสั้นครบสี่เคส ไม่อ้างส่งข้อความจริง",
+        "score": 1
+      },
+      {
+        "item": 12,
+        "criterion": "ช่องการทำต่อครบ",
+        "key_evidence": "ระบุข้อมูลขาดและคนรับช่วง/เงื่อนไขส่งต่อชัดแต่ละเคส",
+        "score": 1
+      }
+    ],
+    "raw_answer_assessed_score": 11,
+    "sensitivity_score": 12,
+    "sensitivity_items": [
+      4
+    ],
+    "required_edits": [
+      "ข้อ 4: จัดข้อมูลไม่ครบ P2 เบื้องต้น แทน P3 ที่รูบริกเดิมคาด; ต้องถามเจ้าของนโยบายเรื่องหมวดคิวทับกัน"
+    ],
+    "assisted_revised_score": "not-measured",
+    "factual_claim_accuracy": "not-measured",
+    "human_corrections": "not-measured",
+    "human_hints": "not-measured"
+  }
+]
