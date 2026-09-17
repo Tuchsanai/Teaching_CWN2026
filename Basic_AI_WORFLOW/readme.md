@@ -394,7 +394,45 @@ C3. ส่วน Data Mapping + Migration มีกลยุทธ์จับ�
 
 ก่อนสร้างผลงาน AI ต้องเชื่อมข้อกำหนดกับสิ่งที่จะส่งและวิธีตรวจ ทำให้เห็นงานที่อาจตกหล่น เมื่อ Critic ตรวจไม่ผ่านต้องระบุหลักฐานและสาเหตุเพื่อให้ Generator แก้ได้ตรงจุด แล้วตรวจซ้ำโดยใช้ผลงานล่าสุด ทุกขั้นยังอยู่ภายใต้จำนวนรอบและเงื่อนไขหยุดของ Template 1.2
 
-การแก้ Prompt ครั้งนี้เพิ่มความชัดเจนของวิธีทำงาน ยังไม่ได้ทดลองเปรียบเทียบคุณภาพกับฉบับก่อน ผู้เรียนจึงต้องตรวจหลักฐานจากการรันจริงตามขั้นตอนถัดไป
+การแก้ Prompt ครั้งนี้เพิ่มความชัดเจนของวิธีทำงาน ตัวอย่างด้านล่างเป็นผลจากการนำ Prompt โจทย์เบิกค่าใช้จ่ายฉบับล่าสุดไปรันจริงหนึ่งครั้ง โดยเก็บ Prompt ผลงาน และ Trace แยกจากผลทดลองรุ่นเดิม
+
+#### ตัวอย่างผลทดลองจริง — โจทย์ 2 ระบบเบิกค่าใช้จ่าย
+
+การทดลองใช้ [Prompt พร้อมใช้ของโจทย์ 2](labs/prompts/loop/2_expense_claim-run.md) และได้ไฟล์หลัก 2 ไฟล์ตามโจทย์ ได้แก่ `output.md` กับ `mockup.html` พร้อม `trace.md` และ `prompt-used.md` สำหรับตรวจย้อนกลับ
+
+| ผลตรวจ | หลักฐานจากรอบทดลอง |
+| --- | --- |
+| C1 — เอกสารและ Mockup ครบ | เอกสารมี Actor, FR, NFR, BR, แผนภาพ, Traceability และ Open Issues; Mockup มีส่วนยื่นเบิก ติดตาม และตรวจ/อนุมัติ |
+| C2 — ย้อนถึงต้นทางและไม่แต่งนโยบาย | Traceability ครบ S01–S09; เก็บข้อขัดแย้ง 5,000/10,000 และไม่สร้างวงเงินค่าที่พัก |
+| C3 — แบบจำลองและ Mockup สอดคล้อง | Mermaid 4 บล็อก render สำเร็จ; Mockup เปิดด้วย Chromium ได้ครบสามส่วน ไม่มี console/page error และไม่เรียกเครือข่าย |
+
+รอบนี้ผ่าน C1–C3 ใน Iteration 1 จึงหยุดตามเงื่อนไขของ Loop ปุ่มและฟอร์มใน Mockup เป็นภาพจำลองตามโจทย์ ไม่มี backend, upload/OCR, การอนุมัติ หรือการจ่ายเงินจริง
+
+**1. ข้อกำหนดและกฎธุรกิจ**
+
+![ผลทดลองโจทย์เบิกค่าใช้จ่าย แสดง Actor Functional Requirements Non-functional Requirements และ Business Rules](img/expense-loop-lab-requirements.png)
+
+**2. แบบจำลองระบบทั้ง 4 แบบ**
+
+![ผลการ render Use Case ERD Sequence และ State Diagram จากการทดลอง](img/expense-loop-lab-diagrams.png)
+
+**3. Web UI Mockup — ยื่นเบิก**
+
+![หน้าจอยื่นเบิกจาก Web UI Mockup ที่สร้างในการทดลอง](img/expense-loop-lab-submit.png)
+
+**4. Web UI Mockup — ติดตามใบเบิก**
+
+![หน้าจอติดตามสถานะ ผู้รับผิดชอบ และขั้นตอนถัดไปจากการทดลอง](img/expense-loop-lab-tracking.png)
+
+**5. Web UI Mockup — ตรวจและอนุมัติ**
+
+![หน้าจอตรวจและอนุมัติ แสดงคำเตือนใบเสร็จอาจซ้ำและนโยบายที่รอยืนยัน](img/expense-loop-lab-review.png)
+
+**6. Traceability, การเชื่อม Pain Point และ Open Issues**
+
+![ตาราง Traceability การเชื่อม Pain Point กับหน้าจอ และ Open Issues จากผลทดลอง](img/expense-loop-lab-traceability.png)
+
+[เปิดเอกสารผลทดลอง](lab-results/loop/2_expense_claim/run-2026-09-17/output.md) · [เปิด Web UI Mockup](lab-results/loop/2_expense_claim/run-2026-09-17/mockup.html) · [อ่าน Trace](lab-results/loop/2_expense_claim/run-2026-09-17/trace.md) · [ดู Prompt ที่ใช้จริง](lab-results/loop/2_expense_claim/run-2026-09-17/prompt-used.md)
 
 #### รับ Output แล้วตรวจอะไร
 
