@@ -219,14 +219,6 @@ labs/
 | Graph | [graph-template.md](labs/prompts/graph/graph-template.md) | 2.2 |
 | Dynamic Workflow | [dynamic-template.md](labs/prompts/dynamic/dynamic-template.md) | 3.2 |
 
-### เลือกอ่านแต่ละบท
-
-- [บทที่ 1 เขียน Prompt เพื่อสร้าง Loop](#loop)
-- [บทที่ 2 เขียน Prompt เพื่อสร้าง Graph](#graph)
-- [บทที่ 3 เขียน Prompt เพื่อสร้าง Dynamic Workflow](#dynamic)
-- [บทที่ 4 เปรียบเทียบและฝึกออกแบบ Prompt](#comparison)
-- [หลักฐานและข้อจำกัดของผลทดลอง](#evidence)
-
 ตัวอย่างทั้งหมดต่อจากนี้อ้างอิงการทดลองเดิม ในแต่ละกรณีมีส่วนที่ต้องเติมใน Template, Prompt ฉบับเต็มในกล่องพับ, ตัวอย่างผลงาน และบันทึกการทำงาน ส่วน RUN HARNESS ใน Prompt เดิมใช้กำหนดไฟล์และการเก็บหลักฐานของการทดลองนั้น
 
 <a id="loop"></a>
