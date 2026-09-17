@@ -1047,7 +1047,7 @@ events.md ต้องถอดจาก log จริงด้วยสคร�
 | [AI_Workflow_Engineering.html](AI_Workflow_Engineering.html) | สไลด์เปิดได้ทันที มี Overview, Copy, diagram และผลงานที่ฝังไว้ |
 | [experiments/README.md](experiments/README.md) | ผลทุกชุด นิยามโทเคน เวลา รอบ และวิธีตรวจ |
 | [experiments/](experiments/) | Prompt, trace, events, response, output, log และภาพของแต่ละชุด |
-| [img/](img/) | ภาพประกอบ PNG, SVG และต้นฉบับ Excalidraw |
+| [img/](img/) | ภาพประกอบ PNG และต้นฉบับ Excalidraw |
 | [docs/test-report.md](docs/test-report.md) | ผลตรวจ deck วิธีทดสอบ และข้อจำกัด |
 | [tests/results.json](tests/results.json) | จำนวนหน้าและผลทดสอบสไลด์ |
 | [tests/experiments-results.json](tests/experiments-results.json) | เวลา โทเคน จำนวนรอบ ผลเกณฑ์และหลักฐานจริง |
