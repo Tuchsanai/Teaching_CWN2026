@@ -1,0 +1,238 @@
+<!doctype html><html lang="th"><meta charset="utf-8"><base href="../"><style>body{max-width:1000px;margin:40px auto;font:17px/1.75 Tahoma;color:#243c4d}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd9e1;padding:12px;text-align:left}th{background:#edf4f8}img{max-width:100%;height:auto}h3,h4{margin-top:36px}a{color:#106980}</style><h3>1.4 ผลลัพธ์จากการทดลอง Loop: โจทย์ 1 → 2 → 3</h3>
+<p>หลังทำแล็บในข้อ 1.3 ให้อ่านผลตามลำดับเดียวกับโจทย์: <strong>จองห้องประชุม → เบิกค่าใช้จ่าย → ย้ายระบบคลินิก</strong> แต่ละข้อจัดเหมือนกัน คือ ผลงานที่ได้ → วงจรสร้างและตรวจ → หลักฐาน → ไฟล์สำหรับเปิดดู</p>
+<p>ผลด้านล่างสร้างใหม่วันที่ <strong>17 กันยายน 2026</strong> จาก <code>loop-template.md</code> และพารามิเตอร์ของทั้งสามโจทย์ใน <code>labs/prompts/loop/</code> โดย Codex ในบทสนทนาเดียวกันสลับบทบาท GENERATOR และ CRITIC แล้วใช้เครื่องมือบน Remote ตรวจจริง ไม่ใช่ผลจากโมเดลสองตัวที่แยกอิสระกัน และไม่ได้นำผลจากโฟลเดอร์ทดลองเดิมมาใช้แทนผลใหม่</p>
+<p>แต่ละกรณีเก็บ <code>prompt-used.md</code> ซึ่งแทนพารามิเตอร์แล้ว, ผลงาน, <code>trace.md</code>, ผลตรวจ <code>verification.json</code> และภาพจากผลงานรอบนี้ไว้ด้วยกัน ผลตรวจมีทั้งการอ่านความหมายโดย CRITIC และการทดสอบด้วยเครื่องมือ ระบุวิธีตรวจแยกไว้ในแต่ละข้อ</p>
+<table>
+<thead>
+<tr>
+<th>ลำดับ</th>
+<th>ผลงานรอบใหม่</th>
+<th>สิ่งที่เกิดขึ้นใน Loop</th>
+<th>ผลตาม C1–C3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. จองห้องประชุม</td>
+<td>เว็บ Mock-up ที่จองและยกเลิกได้</td>
+<td>สร้างแล้วทดสอบการคลิกจริง จบ Iteration 1</td>
+<td>ผ่านครบ</td>
+</tr>
+<tr>
+<td>2. เบิกค่าใช้จ่าย</td>
+<td>เอกสารข้อกำหนด แบบจำลอง และ Mockup สามส่วน</td>
+<td>Iteration 1 พบ Sequence render ไม่ผ่าน; แก้และตรวจซ้ำใน Iteration 2</td>
+<td>ผ่านครบหลังแก้</td>
+</tr>
+<tr>
+<td>3. ย้ายระบบคลินิก</td>
+<td>แผนย้ายระบบเฟสแรกและฉบับหลัง Change Request</td>
+<td>Iteration 1 ผ่านเฟสแรก; เมื่อรับข้อมูลใหม่ C1 ไม่ผ่าน จึงแก้และตรวจใน Iteration 2</td>
+<td>ผ่านครบหลังเพิ่มข้อกำหนดใหม่</td>
+</tr>
+</tbody>
+</table>
+<h4>โจทย์ 1 — เว็บจองห้องประชุม</h4>
+<p><strong>ผลงานที่ได้</strong></p>
+<p>เว็บหน้าเดียวมีห้องตัวอย่างสามห้อง ปุ่มดูเวลาว่างตามวันที่ ฟอร์มจอง และตารางสถานะพร้อมปุ่มยกเลิก ผู้เรียนทดลองครบทั้งห้าฟีเจอร์ได้ ข้อมูลเป็นข้อมูลจำลองในหน่วยความจำ รีเฟรชแล้วกลับสู่ข้อมูลตั้งต้น</p>
+<p><img src="lab-results/loop/1_meeting_room/run-2026-09-17-074505/screen-overview.png" alt="หน้าแรกเว็บจองห้องประชุมจากการรัน Loop ใหม่ แสดงห้อง ฟอร์มจอง และรายการสถานะ" /></p>
+<p><strong>วงจรสร้างและตรวจ</strong></p>
+<table>
+<thead>
+<tr>
+<th>Iteration</th>
+<th>GENERATOR</th>
+<th>CRITIC และการตัดสินใจ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>เชื่อมข้อกำหนดกับหน้าจอและสร้างเว็บครบห้าฟีเจอร์</td>
+<td>C1–C3 ผ่านจากการตรวจและ Python Playwright จึงหยุด</td>
+</tr>
+</tbody>
+</table>
+<p><strong>หลักฐานตามเกณฑ์</strong></p>
+<table>
+<thead>
+<tr>
+<th>เกณฑ์</th>
+<th>ผล</th>
+<th>หลักฐานที่ตรวจได้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1 ฟีเจอร์ครบ</td>
+<td>PASS</td>
+<td>แสดงห้อง ดูเวลาว่าง สร้างการจอง ยกเลิก และเห็นสถานะเปลี่ยน</td>
+</tr>
+<tr>
+<td>C2 เปิดและทดลองจริง</td>
+<td>PASS</td>
+<td>Python Playwright เปิด headless Chromium แล้วคลิกครบห้าฟีเจอร์; ไม่พบ console/page error; ตรวจเพิ่มว่าป้องกันเวลาซ้อนและคืนเวลาว่างหลังยกเลิก</td>
+</tr>
+<tr>
+<td>C3 เข้าถึงภายในสองคลิก</td>
+<td>PASS</td>
+<td>รายการห้อง 0 คลิก; ดูเวลาว่าง 1; ฟอร์มจอง 0; ยกเลิกรายการตัวอย่าง 1; ตารางสถานะ 0</td>
+</tr>
+</tbody>
+</table>
+<p>จำนวนคลิกใน C3 หมายถึง <strong>การเข้าถึงฟีเจอร์จากหน้าแรก</strong> ไม่ใช่จำนวนคลิกรวมทุกช่องระหว่างกรอกข้อมูล การส่งฟอร์มหลังกรอกใช้ปุ่มยืนยันอีกหนึ่งคลิก</p>
+<p><img src="lab-results/loop/1_meeting_room/run-2026-09-17-074505/screen-cancelled.png" alt="ผลหลังคลิกยกเลิกการจองทดสอบ สถานะเปลี่ยนเป็นยกเลิกแล้ว" /></p>
+<p><a href="lab-results/loop/1_meeting_room/run-2026-09-17-074505/output.html">เปิดเว็บที่ทดลองได้</a> · <a href="lab-results/loop/1_meeting_room/run-2026-09-17-074505/trace.md">อ่าน Trace</a> · <a href="lab-results/loop/1_meeting_room/run-2026-09-17-074505/verification.json">ดูผลทดสอบจริง</a> · <a href="lab-results/loop/1_meeting_room/run-2026-09-17-074505/prompt-used.md">ดู Prompt ที่ใช้</a></p>
+<p><strong>สิ่งที่เรียนรู้:</strong> Loop หยุดได้ตั้งแต่รอบแรกเมื่อมีหลักฐานว่าผ่านครบ ไม่จำเป็นต้องสร้างรอบแก้ไขให้ครบจำนวนสูงสุด</p>
+<h4>โจทย์ 2 — ข้อกำหนดและ Mockup ระบบเบิกค่าใช้จ่าย</h4>
+<p><strong>ผลงานที่ได้</strong></p>
+<p>ส่งเอกสารข้อกำหนดพร้อม Actor/Stakeholder, FR, NFR, BR, Use Case, ERD, Sequence, State, Traceability, Pain Point → หน้าจอ และ Open Issues ร่วมกับ Mockup สามส่วน ได้แก่ <strong>ยื่นเบิก → ติดตามใบเบิก → ตรวจและอนุมัติ</strong></p>
+<p>เอกสารแยกข้อความสัมภาษณ์เป็น S01–S10 ตามหน่วยความหมาย ย้อนกลับได้ครบทุกบรรทัด เก็บข้อขัดแย้ง <strong>5,000/10,000</strong> ไว้ทั้งสองฝั่ง และไม่สร้างตัวเลขวงเงินที่พัก ข้อเสนอที่ไม่มีในสัมภาษณ์ระบุว่าต้องยืนยัน</p>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/screen-requirements.png" alt="ข้อกำหนด Functional Requirements จากเอกสารรอบใหม่" /></p>
+<p><strong>วงจรสร้างและตรวจ</strong></p>
+<table>
+<thead>
+<tr>
+<th>Iteration</th>
+<th>สิ่งที่สร้างหรือแก้</th>
+<th>ผลตรวจและการตัดสินใจ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>สร้างเอกสารและ Mockup ใหม่</td>
+<td>C1, C2 ผ่าน; C3 ไม่ผ่าน เพราะ Sequence มี semicolon ในข้อความที่ renderer ตีความเป็นตัวแบ่งคำสั่ง</td>
+</tr>
+<tr>
+<td>2</td>
+<td>เปลี่ยนตัวคั่นข้อความใน Sequence โดยคงข้อกำหนดเดิม</td>
+<td>ตรวจ renderer และความสอดคล้องซ้ำ C1–C3 ผ่าน จึงหยุด</td>
+</tr>
+</tbody>
+</table>
+<p>เก็บ <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/output-iteration-1.md">เอกสารก่อนแก้</a> และ <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/verification-iteration-1.json">ข้อผิดพลาดจาก renderer รอบแรก</a> ไว้ให้เห็นว่าเกิดการตรวจพบและแก้จริง</p>
+<p><strong>หลักฐานตามเกณฑ์</strong></p>
+<table>
+<thead>
+<tr>
+<th>เกณฑ์</th>
+<th>ผลสุดท้าย</th>
+<th>หลักฐานที่ตรวจได้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1 เอกสารและ Mockup ครบ</td>
+<td>PASS</td>
+<td>อ่านหัวข้อและแบบจำลองครบ; Chromium แสดง Mockup ทั้งสามส่วน</td>
+</tr>
+<tr>
+<td>C2 ครบต้นทางและไม่แต่งนโยบาย</td>
+<td>PASS</td>
+<td>CRITIC อ่านเทียบสัมภาษณ์กับ S01–S10 และตารางย้อนกลับ; สคริปต์ตรวจว่าทุกรหัสเชื่อม FR/BR; เก็บตัวเลขและข้อขัดแย้งเดิม</td>
+</tr>
+<tr>
+<td>C3 แบบจำลองและหน้าจอสอดคล้อง</td>
+<td>PASS</td>
+<td>Mermaid ทั้ง 4 บล็อก render จริง; ชื่อฟิลด์ที่อ้างตรง ERD; ทุกสถานะมีเจ้าของ; อ่านเทียบสถานะและนโยบายกับ Mockup พร้อมตรวจภาพ ไม่มี console/page error</td>
+</tr>
+</tbody>
+</table>
+<p><strong>แบบจำลองระบบจากผลรอบนี้</strong></p>
+<p>Use Case ใช้ Mermaid flowchart แสดง actor และงาน ไม่ใช่ UML use-case syntax โดยตรง</p>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/diagram-1.png" alt="Use Case ระบบเบิกค่าใช้จ่ายจากการรันใหม่" /></p>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/diagram-2.png" alt="ERD ระบบเบิกค่าใช้จ่ายจากการรันใหม่" /></p>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/diagram-3.png" alt="Sequence ยื่นเบิก อนุมัติ และจ่ายเงิน หลังแก้ใน Iteration 2" /></p>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/diagram-4.png" alt="State แสดงสถานะและผู้รับผิดชอบของใบเบิก" /></p>
+<p><strong>Mockup เรียงตามงานของผู้ใช้</strong></p>
+<ol>
+<li>ยื่นเบิก — รูปใบเสร็จจำลอง ประเภทค่าใช้จ่าย ข้อมูลลูกค้า และเงื่อนไขวันยื่น</li>
+</ol>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/screen-submit.png" alt="Mockup ส่วนยื่นเบิกจากผลรันใหม่" /></p>
+<ol start="2">
+<li>ติดตามใบเบิก — สถานะ ผู้รับผิดชอบ และขั้นตอนถัดไป</li>
+</ol>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/screen-tracking.png" alt="Mockup ส่วนติดตามใบเบิกจากผลรันใหม่" /></p>
+<ol start="3">
+<li>ตรวจและอนุมัติ — คำเตือนใบเสร็จอาจซ้ำและนโยบายที่ยังต้องยืนยัน</li>
+</ol>
+<p><img src="lab-results/loop/2_expense_claim/run-2026-09-17-074505/screen-review.png" alt="Mockup ส่วนตรวจและอนุมัติจากผลรันใหม่" /></p>
+<p>ปุ่มและช่องข้อมูลเป็นภาพจำลองตามขอบเขตโจทย์ ไม่ได้ทดสอบการอนุมัติ จ่ายเงิน หรืออัปโหลดจริง การ render ผ่านเป็นหลักฐานด้านรูปแบบ ส่วนความหมายและความสอดคล้องตรวจอ่านเพิ่มเติมใน Trace</p>
+<p><a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/output.render.html">เปิดเอกสารพร้อมแผนภาพ</a> · <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/output.md">อ่าน Markdown</a> · <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/mockup.html">เปิด Mockup</a> · <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/trace.md">อ่าน Trace</a> · <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/verification.json">ดูผลตรวจจริง</a> · <a href="lab-results/loop/2_expense_claim/run-2026-09-17-074505/prompt-used.md">ดู Prompt ที่ใช้</a></p>
+<p><strong>สิ่งที่เรียนรู้:</strong> ผลงานดูครบยังไม่เท่ากับผ่านทุกเกณฑ์ รอบนี้ C3 ทำให้ Loop กลับไปแก้ข้อผิดพลาดที่ตรวจได้ โดยไม่เปลี่ยนข้อกำหนดหรือแต่งนโยบายให้ข้อขัดแย้งหายไป</p>
+<h4>โจทย์ 3 — แผนย้ายระบบคลินิกและการแก้หลังรับข้อมูลใหม่</h4>
+<p><strong>ผลงานที่ได้ในเฟสแรก</strong></p>
+<p>เอกสารมี As-Is, Data Quality Findings, To-Be และ Data Model, Data Mapping/Migration, Gap/Roll-out และ Plan v1 ระบุปัญหาเก้าประเภทพร้อมแถว R1–R5 และผลกระทบ แยกวันที่หรือการจับคู่ที่เป็นเพียง candidate ออกจากข้อมูลที่ยืนยันแล้ว</p>
+<p><img src="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/screen-findings.png" alt="ตารางปัญหาข้อมูลคลินิก ระบุแถว หลักฐาน ผลกระทบ และวิธีจัดการจากรอบใหม่" /></p>
+<p>ตัวอย่างที่เห็นจากการตรวจจริง: วันที่ R5 ตีความได้เป็น <strong>9 มีนาคม 2026</strong> หรือ <strong>3 กันยายน 2026</strong> แต่ Python ตรวจแล้วเป็นวันจันทร์และวันพฤหัสบดีตามลำดับ ทั้งคู่ไม่ตรงกับหมายเหตุวันพุธ จึงยังเลือกวันแทนเจ้าของข้อมูลไม่ได้ ส่วนเบอร์ของ R1/R2/R5 ปรับรูปแล้วตรงกัน แต่ยังไม่ใช่หลักฐานเพียงพอให้รวมบุคคลโดยอัตโนมัติ</p>
+<p><strong>ทำต่อเมื่อได้รับ Change Request</strong></p>
+<p>หลังเก็บฉบับเฟสแรก จึงส่งข้อกำหนดใหม่จากข้อ 1.6 เรื่องความยินยอมและการจองเองผ่าน LINE OA ให้ CRITIC ตรวจงานเดิมก่อน พบว่า C1 ยังขาดทั้งสองเรื่อง จากนั้นเพิ่มกระบวนการและแบบจำลอง พร้อมบันทึก <strong>Plan v1 → v2</strong>, Impact และ Reuse ในผลงานเดิม โดยเก็บฉบับก่อนเปลี่ยนไว้เปรียบเทียบ</p>
+<table>
+<thead>
+<tr>
+<th>Iteration / ช่วง</th>
+<th>สิ่งที่เกิดขึ้น</th>
+<th>ผลตรวจและการตัดสินใจ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 / เฟสแรก</td>
+<td>สร้างแผนจากโจทย์เดิม ตรวจข้อมูลและ render แผนภาพ 3 บล็อก</td>
+<td>C1–C3 ผ่าน จบเฟสแรกและเก็บ baseline</td>
+</tr>
+<tr>
+<td>2 / ก่อนแก้ตามข้อมูลใหม่</td>
+<td>CRITIC ตรวจ baseline โดยเพิ่มสองข้อใหม่เข้า C1</td>
+<td>C1 FAIL เพราะยังไม่มีความยินยอมและ LINE OA; C2, C3 เดิมยังผ่าน</td>
+</tr>
+<tr>
+<td>2 / หลังแก้</td>
+<td>เพิ่ม To-Be, Data Model, Mapping, Gap/Roll-out และ Plan v2; ตรวจแผนภาพรวม 5 บล็อก</td>
+<td>C1–C3 ผ่าน จบเฟสสอง</td>
+</tr>
+</tbody>
+</table>
+<p><strong>หลักฐานตามเกณฑ์</strong></p>
+<table>
+<thead>
+<tr>
+<th>เกณฑ์</th>
+<th>ผลสุดท้าย</th>
+<th>หลักฐานที่ตรวจได้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1 ผลงานครบรวมข้อกำหนดใหม่</td>
+<td>PASS</td>
+<td>เอกสารครบหัวข้อเฟสแรกและเพิ่ม ConsentRecord, LineIdentity, BookingRequest, กระบวนการจองเอง และ Impact/Reuse</td>
+</tr>
+<tr>
+<td>C2 คุณภาพข้อมูลและความกำกวม</td>
+<td>PASS</td>
+<td>CRITIC อ่านเทียบ raw กับ findings เก้าประเภทและทะเบียนความกำกวม; Python ตรวจวันของ candidate dates</td>
+</tr>
+<tr>
+<td>C3 จับคู่ตัวตนและแผนภาพ</td>
+<td>PASS</td>
+<td>มี normalization ชื่อ/เบอร์และกรณีคนยืนยันครบ R1–R5; Mermaid ฉบับสุดท้ายทั้ง 5 บล็อก render จริง</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ภาพแผนหลังรับข้อมูลใหม่</strong></p>
+<p><img src="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/diagram-4.png" alt="กระบวนการคลินิกเพิ่มเติมสำหรับ LINE OA และการบันทึกความยินยอม" /></p>
+<p><img src="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/screen-impact.png" alt="ตาราง Impact และ Reuse หลังรับ Change Request" /></p>
+<p><img src="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/screen-plan.png" alt="Plan Version Log แสดงแผนเริ่มต้น v1 และส่วนเพิ่ม v2" /></p>
+<p>เอกสารนี้เป็นแผนออกแบบ ไม่มีการย้ายข้อมูลคนไข้หรือเชื่อม LINE จริง และไม่ได้รับรองความครบตามกฎหมาย ประเด็นนโยบาย ตัวตน และข้อมูลกำกวมยังระบุผู้ที่ต้องยืนยันไว้</p>
+<p><a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/output-phase1.md">อ่านผลงานเฟสแรก</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/verification-phase1.json">ดูผลตรวจเฟสแรก</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/output.render.html">เปิดผลงานสุดท้ายพร้อมแผนภาพ</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/output.md">อ่าน Markdown สุดท้าย</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/trace.md">อ่าน Trace ทั้งสองเฟส</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/verification.json">ดูผลตรวจสุดท้าย</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/prompt-used.md">ดู Prompt แรก</a> · <a href="lab-results/loop/3_clinic_migration/run-2026-09-17-074505/prompt-phase2.md">ดู Change Request ที่ใช้</a></p>
+<p><strong>สิ่งที่เรียนรู้:</strong> เมื่อโจทย์เพิ่ม ผลที่เคยผ่านอาจกลับมาไม่ผ่านได้ Loop จึงตรวจงานปัจจุบันกับเกณฑ์ใหม่ก่อนแก้ จำนวน Iteration บอกวงจรสร้าง/ตรวจ ส่วน Plan Version บอกการเปลี่ยนเนื้อหาแผน ต้องอ่านแยกกัน</p>
+<h4>อ่านผลทั้งสามข้อแล้วควรอธิบายอะไรได้</h4>
+<ol>
+<li>ข้อหนึ่งแสดงการหยุดเมื่อผ่านครบพร้อมหลักฐานการคลิกจริง</li>
+<li>ข้อสองแสดงการตรวจพบข้อผิดพลาด แล้วแก้เฉพาะส่วนที่ไม่ผ่านและตรวจซ้ำ</li>
+<li>ข้อสามแสดงการรับโจทย์เพิ่ม ตรวจผลเดิมใหม่ และแยกสิ่งที่แก้กับสิ่งที่ใช้ต่อ</li>
+</ol>
+<p>ทั้งสามข้อใช้เกณฑ์ C1–C3 จาก Prompt ของตนเอง ไม่ได้นำคะแนนตัวตรวจของการทดลองเดิมมาแทนผลรอบนี้</p>
+</html>
