@@ -136,6 +136,24 @@ Output: Web UI Mock-up ที่เปิดและทดลองใช้ง
 
 Template เป็นข้อความสำหรับกำหนดการทำงานของ AI ความสามารถในการเปิดเว็บ ทดสอบ หรือแยกงานจริงขึ้นอยู่กับเครื่องมือที่ใช้ด้วย การระบุหลายบทบาทใน Prompt เพียงอย่างเดียวจึงยังไม่ยืนยันว่ามีผู้ตรวจอิสระหรือมีงานรันพร้อมกัน
 
+### ไฟล์ Prompt สำหรับแล็บ
+
+แยกไฟล์ตามรูปแบบเวิร์กโฟลว์ภายใต้ `labs/prompts/` เพื่อให้เลือก Template ได้ตรงกับบทเรียน
+
+```text
+labs/
+└── prompts/
+    ├── loop/       Template, Prompt พร้อมใช้ และไฟล์ประกอบแล็บ Loop
+    ├── graph/      Graph Prompt Template
+    └── dynamic/    Dynamic Workflow Prompt Template
+```
+
+| เวิร์กโฟลว์ | Template | บทที่ใช้ |
+| --- | --- | --- |
+| Loop | [loop-template.md](labs/prompts/loop/loop-template.md) | 1.2–1.3 |
+| Graph | [graph-template.md](labs/prompts/graph/graph-template.md) | 2.2 |
+| Dynamic Workflow | [dynamic-template.md](labs/prompts/dynamic/dynamic-template.md) | 3.2 |
+
 ### เลือกอ่านแต่ละบท
 
 - [บทที่ 1 เขียน Prompt เพื่อสร้าง Loop](#loop)
@@ -163,7 +181,7 @@ Template นี้กำหนดให้ทำได้สูงสุด 3 �
 
 อ่าน ROLE เพื่อแยกหน้าที่ แล้วอ่าน CRITERIA ควบคู่กับ WORKFLOW และ STOP CONDITION สังเกตว่าผลตรวจของ Critic เป็นข้อมูลที่ Generator ใช้ในรอบถัดไป
 
-[เปิด Template เป็นไฟล์ข้อความ](labs/loop/loop-template.txt) เพื่อนำไปทำแล็บในข้อ 1.3
+[เปิด Template เป็นไฟล์ Markdown](labs/prompts/loop/loop-template.md) เพื่อนำไปทำแล็บในข้อ 1.3
 
 ```text
 บรรทัดที่ขึ้นต้นด้วย "//" คือคำอธิบายสำหรับผู้เรียน ให้ AI ข้ามบรรทัดเหล่านี้
@@ -213,16 +231,16 @@ C3. {{CRITERION_3}}
 
 แล็บนี้ใช้ **Template ในข้อ 1.2 เป็นแม่แบบกลาง** นักศึกษาเลือกโจทย์แล้วคัดลอก Prompt ของโจทย์นั้นทั้งบล็อกไปวางได้เลย ในแต่ละบล็อกมีคำสั่งอ่าน Template พร้อม Requirement และ Criteria ครบแล้ว AI จะเติมข้อมูลลงใน Template เชื่อมข้อกำหนดกับวิธีตรวจ แล้วดำเนินวงจรสร้าง–ตรวจ–แก้โดยใช้หลักฐานจากผลงาน
 
-**เตรียมครั้งเดียว:** ถ้าใช้เครื่องมือ AI ที่อ่านไฟล์ในโปรเจกต์ได้ ให้เปิดโฟลเดอร์ `Basic_AI_WORFLOW` ซึ่งมีไฟล์ `labs/loop/loop-template.txt` อยู่แล้ว ถ้าใช้แชตทั่วไป ให้ดาวน์โหลด [loop-template.txt](labs/loop/loop-template.txt) แล้วแนบในบทสนทนาก่อนวาง Prompt การพิมพ์ชื่อไฟล์อย่างเดียวไม่ได้ทำให้แชตเข้าถึงไฟล์บนเครื่องได้
+**เตรียมครั้งเดียว:** ถ้าใช้เครื่องมือ AI ที่อ่านไฟล์ในโปรเจกต์ได้ ให้เปิดโฟลเดอร์ `Basic_AI_WORFLOW` ซึ่งมีไฟล์ `labs/prompts/loop/loop-template.md` อยู่แล้ว ถ้าใช้แชตทั่วไป ให้ดาวน์โหลด [loop-template.md](labs/prompts/loop/loop-template.md) แล้วแนบในบทสนทนาก่อนวาง Prompt การพิมพ์ชื่อไฟล์อย่างเดียวไม่ได้ทำให้แชตเข้าถึงไฟล์บนเครื่องได้
 
 เริ่มบทสนทนาใหม่สำหรับแต่ละโจทย์ จากนั้น **คัดลอกทั้งบล็อก → วางและส่ง → เปิดผลงาน → ตรวจหลักฐาน C1/C2/C3** งานเว็บต้องใช้เครื่องมือที่สร้างไฟล์ เปิดเว็บ และทดสอบด้วย Playwright ได้ เพื่อให้ตรวจตามเกณฑ์ครบ
 
 #### โจทย์ 1: จองห้องประชุม
 
-คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/loop/1_meeting_room-run.txt)
+คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/prompts/loop/1_meeting_room-run.md)
 
 ```text
-แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/loop/loop-template.txt หรือไฟล์แนบ loop-template.txt อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
+แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/prompts/loop/loop-template.md หรือไฟล์แนบ loop-template.md อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
 
 เติม Template: REQUIREMENT → {{REQUIREMENT}}, C1 → บรรทัด C1, C2 → {{CRITERION_2}}, C3 → {{CRITERION_3}} แล้วลงมือทำตามบทบาท วงจร และเงื่อนไขหยุดเดิมทันที
 
@@ -233,7 +251,7 @@ C3. {{CRITERION_3}}
 4. เมื่อ FAIL ให้ระบุสาเหตุจากหลักฐาน แก้เฉพาะส่วนที่เกี่ยวข้องกับข้อที่ไม่ผ่าน แล้วตรวจซ้ำรวมถึงพฤติกรรมที่การแก้อาจกระทบ คงส่วนที่ผ่านแล้วตามกติกา Template
 5. ใช้ขีดจำกัดและเงื่อนไขหยุดจาก Template ไม่เริ่มนับรอบใหม่เอง ถ้าติดขัดให้ระบุงานค้างและสิ่งที่ขาด แยก “ผ่านครบ” ออกจาก “หยุดทั้งที่ยังไม่ผ่าน”
 
-ส่งมอบใน lab-results/loop/1_meeting_room/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.html, trace.md และ prompt-used.txt ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
+ส่งมอบใน lab-results/loop/1_meeting_room/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.html, trace.md และ prompt-used.md ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
 
 # REQUIREMENT
 สร้างเว็บไซต์สำหรับระบบจองห้องประชุม
@@ -248,10 +266,10 @@ C3. จากหน้าจอแรก เข้าถึงแต่ละฟ
 
 #### โจทย์ 2: เบิกค่าใช้จ่าย
 
-คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/loop/2_expense_claim-run.txt)
+คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/prompts/loop/2_expense_claim-run.md)
 
 ```text
-แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/loop/loop-template.txt หรือไฟล์แนบ loop-template.txt อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
+แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/prompts/loop/loop-template.md หรือไฟล์แนบ loop-template.md อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
 
 เติม Template: REQUIREMENT → {{REQUIREMENT}}, C1 → บรรทัด C1, C2 → {{CRITERION_2}}, C3 → {{CRITERION_3}} แล้วลงมือทำตามบทบาท วงจร และเงื่อนไขหยุดเดิมทันที
 
@@ -262,7 +280,7 @@ C3. จากหน้าจอแรก เข้าถึงแต่ละฟ
 4. เมื่อ FAIL ให้ระบุสาเหตุจากหลักฐาน แก้เฉพาะส่วนที่เกี่ยวข้องกับข้อที่ไม่ผ่าน แล้วตรวจซ้ำรวมถึงพฤติกรรมที่การแก้อาจกระทบ คงส่วนที่ผ่านแล้วตามกติกา Template
 5. ใช้ขีดจำกัดและเงื่อนไขหยุดจาก Template ไม่เริ่มนับรอบใหม่เอง ถ้าติดขัดให้ระบุงานค้างและสิ่งที่ขาด แยก “ผ่านครบ” ออกจาก “หยุดทั้งที่ยังไม่ผ่าน”
 
-ส่งมอบใน lab-results/loop/2_expense_claim/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.md, trace.md และ prompt-used.txt ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
+ส่งมอบใน lab-results/loop/2_expense_claim/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.md, trace.md และ prompt-used.md ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
 
 # REQUIREMENT
 วิเคราะห์ Requirement ระบบเบิกค่าใช้จ่าย จากบันทึกสัมภาษณ์ต่อไปนี้
@@ -287,10 +305,10 @@ C3. ทุก Entity และ Attribute ที่ระบุชื่อใน
 
 #### โจทย์ 3: คลินิกทันตกรรม
 
-คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/loop/3_clinic_migration-run.txt)
+คัดลอกบล็อกนี้ทั้งหมด หรือเปิด [Prompt สำหรับคัดลอก](labs/prompts/loop/3_clinic_migration-run.md)
 
 ````text
-แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/loop/loop-template.txt หรือไฟล์แนบ loop-template.txt อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
+แก้โจทย์ด้านล่างโดยใช้ Loop Template จาก labs/prompts/loop/loop-template.md หรือไฟล์แนบ loop-template.md อ่านไฟล์ก่อนเริ่ม หากไม่มีให้ขอไฟล์นี้
 
 เติม Template: REQUIREMENT → {{REQUIREMENT}}, C1 → บรรทัด C1, C2 → {{CRITERION_2}}, C3 → {{CRITERION_3}} แล้วลงมือทำตามบทบาท วงจร และเงื่อนไขหยุดเดิมทันที
 
@@ -301,7 +319,7 @@ C3. ทุก Entity และ Attribute ที่ระบุชื่อใน
 4. เมื่อ FAIL ให้ระบุสาเหตุจากหลักฐาน แก้เฉพาะส่วนที่เกี่ยวข้องกับข้อที่ไม่ผ่าน แล้วตรวจซ้ำรวมถึงพฤติกรรมที่การแก้อาจกระทบ คงส่วนที่ผ่านแล้วตามกติกา Template
 5. ใช้ขีดจำกัดและเงื่อนไขหยุดจาก Template ไม่เริ่มนับรอบใหม่เอง ถ้าติดขัดให้ระบุงานค้างและสิ่งที่ขาด แยก “ผ่านครบ” ออกจาก “หยุดทั้งที่ยังไม่ผ่าน”
 
-ส่งมอบใน lab-results/loop/3_clinic_migration/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.md, trace.md และ prompt-used.txt ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
+ส่งมอบใน lab-results/loop/3_clinic_migration/ (สร้างโฟลเดอร์รอบใหม่ถ้ามีงานเดิม): output.md, trace.md และ prompt-used.md ที่เติมแล้ว ตอบตาม OUTPUT FORMAT พร้อมลิงก์ไฟล์ หากเขียนไฟล์ไม่ได้ให้แสดงเนื้อหาแยกตามชื่อไฟล์ และรายงานข้อจำกัดตามจริง
 
 # REQUIREMENT
 ย้ายระบบนัดหมายคลินิกจาก Google Sheet สู่ระบบกลาง (As-Is → To-Be + Migration)
@@ -334,7 +352,7 @@ C3. ส่วน Data Mapping + Migration มีกลยุทธ์จับ�
 
 #### รับ Output แล้วตรวจอะไร
 
-AI ควรส่งทั้งผลงาน ตาราง Iteration และผลตรวจพร้อมหลักฐาน นักศึกษาเปิดผลงานจริงแล้วเทียบกับ C1/C2/C3 ในบล็อกที่ส่ง โดยใช้ [แบบบันทึกตรวจผลงาน](labs/loop/review-checklist.txt) ช่วยจดผลได้
+AI ควรส่งทั้งผลงาน ตาราง Iteration และผลตรวจพร้อมหลักฐาน นักศึกษาเปิดผลงานจริงแล้วเทียบกับ C1/C2/C3 ในบล็อกที่ส่ง โดยใช้ [แบบบันทึกตรวจผลงาน](labs/prompts/loop/review-checklist.md) ช่วยจดผลได้
 
 | โจทย์ | C1: ครบตามโจทย์หรือไม่ | C2: หลักฐานที่ต้องดู | C3: หลักฐานที่ต้องดู |
 | --- | --- | --- | --- |
@@ -362,9 +380,9 @@ AI ควรส่งทั้งผลงาน ตาราง Iteration แ�
 
 | โจทย์ | ข้อมูลแยกส่วน | Template ที่แทนค่าแล้วสำหรับเทียบ |
 | --- | --- | --- |
-| จองห้องประชุม | [ข้อมูลโจทย์](labs/loop/1_meeting_room-input.txt) | [Template ที่เติมแล้ว](labs/loop/1_meeting_room-prompt.txt) |
-| เบิกค่าใช้จ่าย | [ข้อมูลโจทย์](labs/loop/2_expense_claim-input.txt) | [Template ที่เติมแล้ว](labs/loop/2_expense_claim-prompt.txt) |
-| คลินิก | [ข้อมูลโจทย์](labs/loop/3_clinic_migration-input.txt) | [Template ที่เติมแล้ว](labs/loop/3_clinic_migration-prompt.txt) |
+| จองห้องประชุม | [ข้อมูลโจทย์](labs/prompts/loop/1_meeting_room-input.md) | [Template ที่เติมแล้ว](labs/prompts/loop/1_meeting_room-prompt.md) |
+| เบิกค่าใช้จ่าย | [ข้อมูลโจทย์](labs/prompts/loop/2_expense_claim-input.md) | [Template ที่เติมแล้ว](labs/prompts/loop/2_expense_claim-prompt.md) |
+| คลินิก | [ข้อมูลโจทย์](labs/prompts/loop/3_clinic_migration-input.md) | [Template ที่เติมแล้ว](labs/prompts/loop/3_clinic_migration-prompt.md) |
 
 Prompt สำหรับคัดลอกเพิ่มคำสั่งอ่าน Template การเชื่อมข้อกำหนดกับหลักฐาน การตรวจและแก้ตามสาเหตุ และการบันทึกไฟล์ ส่วนวงจร Loop และเกณฑ์ใช้ตาม Template กับข้อมูลโจทย์เดิม ไฟล์เหล่านี้เป็นสื่อแล็บที่เตรียมไว้ ยังไม่มีผลทดลอง AI รอบใหม่
 
@@ -736,6 +754,8 @@ Prompt ต้องกำหนดวิธีจัดการเมื่อ�
 ### 2.2 Prompt Template สำหรับ Graph
 
 เริ่มออกแบบ TASK GRAPH แล้วตรวจว่า EXECUTION RULES บอกลำดับการทำงานชัดเจน และ MERGE RULES ตรวจความครบกับความสอดคล้องได้ Template นี้มีตัวอย่างงานแบบจำลองระบบ จึงต้องปรับตารางงานเมื่อเปลี่ยนประเภทผลงาน
+
+[เปิด Template เป็นไฟล์ Markdown](labs/prompts/graph/graph-template.md)
 
 ```text
 บรรทัดที่ขึ้นต้นด้วย "//" คือคำอธิบายสำหรับผู้เรียน ให้ AI ข้ามบรรทัดเหล่านี้
@@ -1229,6 +1249,8 @@ Template นี้จำกัดการปรับแผนไว้ 3 ค�
 ### 3.2 Prompt Template สำหรับ Dynamic Workflow
 
 อ่าน PLAN FORMAT เพื่อดูองค์ประกอบของแผน จากนั้นเชื่อม RE-PLAN TRIGGERS กับ RE-PLAN RULES ให้เห็นว่าเหตุใดนำไปสู่การเปลี่ยนใด และมีหลักฐานใดที่ต้องบันทึก
+
+[เปิด Template เป็นไฟล์ Markdown](labs/prompts/dynamic/dynamic-template.md)
 
 ```text
 บรรทัดที่ขึ้นต้นด้วย "//" คือคำอธิบายสำหรับผู้เรียน ให้ AI ข้ามบรรทัดเหล่านี้
