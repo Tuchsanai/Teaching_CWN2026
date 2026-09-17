@@ -1,0 +1,45 @@
+from pathlib import Path
+from html import escape
+from playwright.sync_api import sync_playwright
+BASE=Path(__file__).resolve().parent
+parts=['''<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1510" viewBox="0 0 1400 1510"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="none" stroke="#697078" stroke-width="1.4"/></marker></defs><rect width="1400" height="1510" fill="white"/><style>text{font-family:'Noto Sans Thai',Tahoma,sans-serif;fill:#35434c}</style>''']
+def text(x,y,lines,size=22):
+ for i,line in enumerate(lines):parts.append(f'<text x="{x}" y="{y+i*32}" text-anchor="middle" font-size="{size}">{escape(line)}</text>')
+def box(x,y,w,h,lines,fill='#f1eee8',stroke='#88817b'):
+ parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="15" fill="{fill}" stroke="{stroke}" stroke-width="1.5"/>');text(x+w/2,y+(h-(len(lines)-1)*32)/2+8,lines)
+def arrow(d,dashed=False):parts.append(f'<path d="{d}" fill="none" stroke="#697078" stroke-width="2" marker-end="url(#arrow)"'+(' stroke-dasharray="7 6"' if dashed else '')+'/>')
+text(700,48,['Dynamic Workflow · โครงสร้างตาม Template 3.2'],30)
+box(425,85,550,80,['INPUT · โจทย์และเป้าหมาย','NEW INFORMATION · รอบแรก NONE'])
+arrow('M700 165 V200')
+box(425,200,550,100,['PLANNER · ผู้วางแผน','สร้าง Plan v1: งาน / Dependency / สถานะ'],'#efebfa','#8a7eb0')
+arrow('M700 300 V350')
+box(425,350,550,115,['EXECUTOR · ผู้ลงมือทำ','เลือกงาน TODO ที่ Dependency ทุกตัว DONE','ทำทีละงานและบันทึกผลลัพธ์'],'#e3f3ed','#699b87')
+arrow('M700 465 V505')
+box(425,505,550,100,['EVALUATOR · ผู้ประเมิน','ตรวจผล: แผนยังเหมาะสมหรือไม่?'],'#fff2da','#c29c5f')
+arrow('M700 605 V675');text(725,647,['ใช่'],20)
+box(425,675,550,100,['ทุกงาน DONE / DROPPED','และผู้ประเมินยืนยันว่าบรรลุเป้าหมาย?'],'#fff2da','#c29c5f')
+arrow('M700 775 V835');text(725,809,['ใช่'],20)
+box(425,835,550,100,['จบ · ส่งมอบผลงานสุดท้าย','บันทึกเวอร์ชันแผน + บันทึกการทำงาน'],'#e3f3ed','#699b87')
+arrow('M975 725 H1010 V408 H975');text(1150,700,['ยังไม่ครบ','ทำงานถัดไป'],20)
+arrow('M425 555 H390 V135 H210 V175');text(325,530,['ไม่ใช่'],20)
+box(40,175,325,125,['ตรวจเหตุให้ปรับแผน','พบงานที่ขาด / งานทำไม่ได้','หรือข้อกำหนดเปลี่ยน'],'#fff2da','#c29c5f')
+arrow('M210 300 V350')
+box(40,350,285,100,['ตรวจขีดจำกัด','Re-plan สูงสุด 3 ครั้ง'],'#fff2da','#c29c5f')
+arrow('M180 450 V575');text(175,495,['ยังไม่ถึงขีดจำกัด'],18)
+box(40,575,285,125,['PLANNER · ปรับแผน','สร้างเวอร์ชันถัดไป vN','พร้อมเหตุผลและผลกระทบ'],'#efebfa','#8a7eb0')
+arrow('M325 630 H365 V325 H700 V350');text(170,744,['ใช้แผนใหม่เลือกงานถัดไป'],18)
+arrow('M40 400 H20 V835 H40');text(165,805,['ถึงขีดจำกัด'],18)
+box(40,835,285,100,['หยุดและรายงาน','สิ่งที่ยังตัดสินใจไม่ได้'],'#f9efef','#cba2a2')
+box(1030,175,330,125,['NEW INFORMATION','ข้อมูลใหม่ / Change Request','ให้ผู้ประเมินพิจารณาผลกระทบ'],'#f1eee8','#88817b')
+arrow('M1195 300 V555 H975',True)
+text(700,1030,['กติกาที่กำกับการปรับแผนทุกครั้ง'],25)
+box(45,1060,640,140,['เหตุผล · ระบุ Trigger ที่เกิดขึ้น','สิ่งที่เปลี่ยน · เพิ่ม / ตัด / แยก / รวม / จัดลำดับ','หรือเปลี่ยน Dependency ของงาน'],'#f7f9fb','#ccd4dc')
+box(715,1060,640,140,['Impact analysis · วิเคราะห์งานและผลที่ได้รับผลกระทบ','Reuse · เก็บผลงาน DONE ที่ยังใช้ได้','ห้ามทำ DONE ซ้ำ ถ้าไม่มีผลกระทบรองรับ'],'#f7f9fb','#ccd4dc')
+box(45,1225,640,115,['ห้ามตัดข้อกำหนดโดยไม่แจ้ง','งาน DROPPED ต้องมีเหตุผล','แผนแรกยังเหมาะสม → ใช้ต่อได้ ไม่ต้องเปลี่ยนเวอร์ชัน'],'#fff5e7','#d5bc91')
+box(715,1225,640,115,['สถานะงาน: TODO / DONE / DROPPED','บันทึกการทำงาน: ขั้นตอน / งาน / ผลลัพธ์','และการตัดสินของ EVALUATOR'],'#f7f9fb','#ccd4dc')
+text(700,1400,['อ่านภาพคู่กับหัวข้อ 3.2: WORKFLOW → RE-PLAN TRIGGERS → RULES → STOP CONDITION'],21)
+text(700,1440,['เส้นประแสดงข้อมูลใหม่ที่ส่งให้ผู้ประเมินพิจารณา'],20)
+parts.append('</svg>');svg=''.join(parts);(BASE/'dynamic-workflow-template.svg').write_text(svg)
+with sync_playwright() as pw:
+ b=pw.chromium.launch(executable_path='/opt/ms-playwright/chromium-1234/chrome-linux64/chrome',args=['--no-sandbox']);p=b.new_page(viewport={'width':1400,'height':1510},device_scale_factor=1.5);p.set_content('<html><meta charset="utf-8"><style>body{margin:0}</style>'+svg+'</html>');p.evaluate('document.fonts.ready');p.locator('svg').screenshot(path=str(BASE/'dynamic-workflow-template.png'));b.close()
+print('Rendered Dynamic diagram')
