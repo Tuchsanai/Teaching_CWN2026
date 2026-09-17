@@ -1,0 +1,26 @@
+{
+  "browser": "Chromium headless",
+  "url": "file:// output.html",
+  "viewports": [
+    "1440×1100",
+    "390×844"
+  ],
+  "fixed_test_date": "2030-01-15 07:00 UTC; advanced to 2030-01-17 for expiry check",
+  "results": [
+    {
+      "case": "เปิดจาก file:// ได้ มีห้อง 4 ห้อง และ desktop ไม่ล้นแนวนอน",
+      "result": "PASS"
+    },
+    {
+      "case": "กรองห้องตามความจุ",
+      "result": "PASS"
+    },
+    {
+      "case": "Execution failure",
+      "result": "FAIL",
+      "detail": "Locator expected to be visible\nActual value: None\nError: strict mode violation: get_by_text(\"ไม่พบห้องที่ตรงกับการค้นหา\") resolved to 2 elements:\n    1) <h3>ไม่พบห้องที่ตรงกับการค้นหา</h3> aka get_by_role(\"heading\", name=\"ไม่พบห้องที่ตรงกับการค้นหา\")\n    2) <p>ไม่พบห้องที่ตรงกับการค้นหา</p> aka locator(\"#schedule\").get_by_text(\"ไม่พบห้องที่ตรงกับการค้นหา\")\n \nCall log:\n  - Expect \"to_be_visible\" with timeout 5000ms\n  - waiting for get_by_text(\"ไม่พบห้องที่ตรงกับการค้นหา\")\n"
+    }
+  ],
+  "javascript_errors": [],
+  "network_requests": []
+}
