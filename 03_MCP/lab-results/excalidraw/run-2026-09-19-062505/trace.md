@@ -22,13 +22,13 @@
 
 ## สรุปจำนวนการเรียก tool (นับจากตารางด้านบน)
 
-| tool | จำนวนครั้ง (โดยประมาณ) |
+| tool | จำนวนครั้ง |
 | --- | --- |
-| batch_create_elements | 16 |
+| batch_create_elements | 14 |
 | update_element | 49 |
-| delete_element | 10 |
-| get_canvas_screenshot | 19 |
-| set_viewport | 15 |
+| delete_element | 8 |
+| get_canvas_screenshot | 16 |
+| set_viewport | 13 |
 | export_to_image / export_scene | 9 / 9 |
 | clear_canvas | 9 |
 | import_scene | 2 (ครั้งแรก error path traversal, ครั้งที่สองพิกัดเพี้ยน) |

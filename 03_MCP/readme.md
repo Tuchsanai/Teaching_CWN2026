@@ -378,8 +378,8 @@ Prompt: [`labs/prompts/lab5-4-modify-diagram.md`](labs/prompts/lab5-4-modify-dia
 | ภาพที่วาด | 9 (d01–d08 + d02b) |
 | ภาพที่ผ่านรอบแรกโดยไม่ต้องแก้ | 2 (d01, d08) |
 | ภาพที่ต้องแก้อย่างน้อย 1 รอบหลังดู screenshot | 7 |
-| `batch_create_elements` / `update_element` / `delete_element` | 16 / 49 / 10 ครั้ง |
-| `get_canvas_screenshot` | 19 ครั้ง |
+| `batch_create_elements` / `update_element` / `delete_element` | 14 / 49 / 8 ครั้ง |
+| `get_canvas_screenshot` | 16 ครั้ง |
 | ปัญหาที่พบบ่อยที่สุด | ข้อความล้นกล่อง (กล่องแคบเกินสำหรับฟอนต์ลายมือ) รองลงมาคือลูกศรทับกล่อง/ป้ายทับลูกศร |
 
 สิ่งที่นักศึกษาควรได้: (1) MCP ทำให้ AI ใช้เครื่องมือวาดภาพได้โดยไม่ต้องเขียน integration (2) คุณภาพงานมาจาก "วงจร วาด → ดู → แก้" ซึ่ง MCP รองรับผ่าน `get_canvas_screenshot` (3) Prompt ที่ดีต้องระบุ layout กติกา และวิธีตรวจ ไม่ใช่แค่ "วาดให้หน่อย"
