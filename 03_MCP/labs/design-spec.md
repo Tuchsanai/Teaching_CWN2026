@@ -72,3 +72,4 @@
 - หลักการ: Host มี Bash → ให้ AI สร้าง venv, ติดตั้งแพ็กเกจ (torch CPU), `npm i -g`, `claude mcp add --scope user` 4 ตัว, เริ่มเว็บ, ตรวจ `claude mcp list`, เขียน `labs/setup-report.md`; นักศึกษาทำเองแค่ เปิด claude → วาง → /exit แล้วเปิดใหม่
 - `labs/kokoro-web/run.sh` ใช้ `PYTHON` env (ค่าเริ่มต้น python3) แทน path ตายตัว; `README-run.md` ใช้ `python` ของ venv
 - หลักฐาน: รัน S0 และ S5 ในคอนเทนเนอร์เปล่า `tuchsanai/devtools:2569_1` (ไม่มี claude/torch/chromium มาก่อน) เก็บใน `lab-results/setup-prompt/run-*/`
+- รอบ 3 (ผู้ใช้ขอให้บทที่ 4 มีคำสั่งครบ ไม่ใช่แค่ชื่อไฟล์): บทที่ 4 สร้างจาก template โดยดึงข้อความพรอมป์ต์ S0–S6 จากไฟล์ใน `labs/prompts/` โดยตรง (4.2–4.4) และเพิ่มข้อ 4.6 คำสั่งติดตั้ง/ตั้งค่าแบบทำเองครบทุกขั้น (คัดจาก `setup-report.md` ที่ AI เขียนหลังติดตั้งจริงในคอนเทนเนอร์) พร้อมไฟล์ config ตัวอย่างเต็ม (`~/.claude.json`, `.mcp.json`, `--mcp-config`, Codex `config.toml`) และหมายเหตุ Windows (ติดป้ายยังไม่ได้ทดลอง)
