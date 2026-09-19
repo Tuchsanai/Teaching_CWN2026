@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "hello-lab": {
+      "command": "/opt/venv/bin/python",
+      "args": ["/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/wire_capture.py", "--log", "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/wire-claude-hello.jsonl", "--", "/opt/venv/bin/python", "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/hello_server.py"]
+    },
+    "kokoro-tts": {
+      "command": "/opt/venv/bin/python",
+      "args": ["/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/wire_capture.py", "--log", "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/wire-claude-tts.jsonl", "--", "/opt/venv/bin/python", "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/tts_server.py"],
+      "env": {"KOKORO_DEVICE": "cpu"}
+    }
+  }
+}

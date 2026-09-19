@@ -1,0 +1,218 @@
+== connected ==
+protocol_version: 2026-07-28
+server_info: {
+  "name": "hello-lab",
+  "version": ""
+}
+server_capabilities: {
+  "prompts": {
+    "listChanged": true
+  },
+  "resources": {
+    "subscribe": true,
+    "listChanged": true
+  },
+  "tools": {
+    "listChanged": true
+  }
+}
+instructions: MCP server สำหรับแล็บ 03_MCP: เครื่องมือคำนวณและนับคำอย่างง่าย
+
+== tools/list ==
+{
+  "name": "add",
+  "description": "บวกเลขจำนวนเต็มสองจำนวน / Add two integers and return the sum.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "a": {
+        "title": "A",
+        "type": "integer"
+      },
+      "b": {
+        "title": "B",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "a",
+      "b"
+    ],
+    "title": "addArguments"
+  }
+}
+{
+  "name": "get_time",
+  "description": "คืนเวลาปัจจุบันของเซิร์ฟเวอร์เป็น ISO 8601 (UTC) / Current server time in UTC.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "title": "get_timeArguments"
+  }
+}
+{
+  "name": "count_words",
+  "description": "นับจำนวนคำและตัวอักษรในข้อความ / Count words and characters in a text.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "title": "Text",
+        "type": "string"
+      }
+    },
+    "required": [
+      "text"
+    ],
+    "title": "count_wordsArguments"
+  }
+}
+
+== resources/list ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "ttlMs": 0,
+  "cacheScope": "private",
+  "resources": [
+    {
+      "name": "lab_info",
+      "uri": "lab://info",
+      "description": "ข้อมูลของแล็บนี้ (resource = ข้อมูลให้อ่าน ไม่ใช่การกระทำ)",
+      "mimeType": "text/plain"
+    }
+  ],
+  "resultType": "complete"
+}
+
+== prompts/list ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "ttlMs": 0,
+  "cacheScope": "private",
+  "prompts": [
+    {
+      "name": "explain_mcp",
+      "description": "แม่แบบข้อความขอให้อธิบายหัวข้อเกี่ยวกับ MCP แบบเข้าใจง่าย",
+      "arguments": [
+        {
+          "name": "topic",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "resultType": "complete"
+}
+
+== tools/call add(17, 25) ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "42"
+    }
+  ],
+  "structuredContent": {
+    "result": 42
+  },
+  "isError": false,
+  "resultType": "complete"
+}
+
+== tools/call get_time() ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "2026-09-19T06:28:56.581541+00:00"
+    }
+  ],
+  "structuredContent": {
+    "result": "2026-09-19T06:28:56.581541+00:00"
+  },
+  "isError": false,
+  "resultType": "complete"
+}
+
+== tools/call count_words('Model Context Protocol lets one server serve many agents') ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"words\": 9,\n  \"characters\": 56,\n  \"longest_word\": \"Protocol\"\n}"
+    }
+  ],
+  "isError": false,
+  "resultType": "complete"
+}
+
+== resources/read lab://info ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "ttlMs": 0,
+  "cacheScope": "private",
+  "contents": [
+    {
+      "uri": "lab://info",
+      "mimeType": "text/plain",
+      "text": "hello-lab: MCP server ตัวอย่างของบทเรียน 03_MCP (KMITL). มี tools add, get_time, count_words และ prompt explain_mcp. สร้างด้วย Python SDK mcp 2.0 ใช้ transport stdio หรือ Streamable HTTP ได้"
+    }
+  ],
+  "resultType": "complete"
+}
+
+== prompts/get explain_mcp(topic='tools/call') ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "hello-lab",
+      "version": ""
+    }
+  },
+  "description": "แม่แบบข้อความขอให้อธิบายหัวข้อเกี่ยวกับ MCP แบบเข้าใจง่าย",
+  "messages": [
+    {
+      "role": "user",
+      "content": {
+        "type": "text",
+        "text": "อธิบายเรื่อง 'tools/call' ในบริบทของ Model Context Protocol ให้นักศึกษาปีหนึ่งเข้าใจ ใช้ตัวอย่างประกอบหนึ่งตัวอย่าง และสรุปเป็นสามประโยค"
+      }
+    }
+  ],
+  "resultType": "complete"
+}
+
+== disconnected ==

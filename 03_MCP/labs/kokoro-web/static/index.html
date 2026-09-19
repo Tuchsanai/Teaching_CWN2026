@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kokoro TTS Lab — ทดลอง Playwright MCP</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f4f6f8; color: #1f2d3a; font: 16px/1.6 "Noto Sans Thai", Tahoma, sans-serif; }
+  header { background: #16324f; color: #fff; padding: 24px 5%; }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: #cfe0f0; }
+  main { max-width: 760px; margin: 28px auto; padding: 0 16px; }
+  section { background: #fff; border: 1px solid #d9e1e8; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+  h2 { margin: 0 0 12px; font-size: 19px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  textarea, select { width: 100%; padding: 10px; border: 1px solid #b7c6d3; border-radius: 8px; font: inherit; background: #fbfdff; }
+  textarea { min-height: 96px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 220px; gap: 14px; align-items: end; margin-top: 12px; }
+  button { padding: 11px 22px; border: 0; border-radius: 8px; background: #1c7c54; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  button:disabled { background: #9fb3c0; cursor: default; }
+  .note { font-size: 14px; color: #5b6f80; background: #fff7e0; border-left: 4px solid #d9a53a; padding: 8px 12px; border-radius: 6px; margin-top: 12px; }
+  #status { font-weight: 700; }
+  #status.ok { color: #1c7c54; }
+  #status.err { color: #c0392b; }
+  dl { display: grid; grid-template-columns: 160px 1fr; gap: 6px 12px; margin: 10px 0 0; }
+  dt { color: #5b6f80; }
+  dd { margin: 0; }
+  audio { width: 100%; margin-top: 10px; }
+  footer { text-align: center; color: #6c7f8e; font-size: 13px; padding: 20px; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kokoro TTS Lab</h1>
+  <p>เว็บทดลองสำหรับ Case Study 2 — ให้ AI Agent ควบคุมผ่าน Playwright MCP: กรอกข้อความ → กดปุ่ม → ตรวจผล → ฟังเสียง</p>
+</header>
+<main>
+  <section id="input-section" aria-labelledby="input-heading">
+    <h2 id="input-heading">1. ข้อความที่ต้องการให้อ่าน</h2>
+    <label for="text">ข้อความภาษาอังกฤษ</label>
+    <textarea id="text" name="text" placeholder="Type an English sentence, e.g. Hello students, welcome to the MCP lab."></textarea>
+    <div class="row">
+      <div>
+        <label for="voice">เสียงที่ใช้</label>
+        <select id="voice" name="voice">
+          <option value="af_heart">af_heart (หญิง อเมริกัน)</option>
+          <option value="af_bella">af_bella (หญิง อเมริกัน)</option>
+          <option value="am_adam">am_adam (ชาย อเมริกัน)</option>
+          <option value="am_michael">am_michael (ชาย อเมริกัน)</option>
+        </select>
+      </div>
+      <button id="speak-btn" type="button">Speak</button>
+    </div>
+    <p class="note">หมายเหตุ: Kokoro-82M รองรับภาษาอังกฤษ ยังไม่รองรับภาษาไทย — พิมพ์ข้อความเป็นภาษาอังกฤษ (ไม่เกิน 500 ตัวอักษร)</p>
+  </section>
+
+  <section id="result" aria-labelledby="result-heading" aria-live="polite">
+    <h2 id="result-heading">2. ผลลัพธ์</h2>
+    <p id="status">ยังไม่ได้สร้างเสียง</p>
+    <dl id="result-details" hidden>
+      <dt>ความยาวเสียง</dt><dd id="duration">-</dd>
+      <dt>เวลาที่ใช้สร้าง</dt><dd id="gen-time">-</dd>
+      <dt>Sample rate</dt><dd id="sample-rate">-</dd>
+      <dt>เสียง</dt><dd id="voice-used">-</dd>
+      <dt>ไฟล์เสียง</dt><dd id="audio-link">-</dd>
+    </dl>
+  </section>
+
+  <section id="player-section" aria-labelledby="player-heading">
+    <h2 id="player-heading">3. เครื่องเล่นเสียง</h2>
+    <audio id="player" controls preload="metadata" aria-label="เครื่องเล่นเสียงที่สร้างจาก Kokoro"></audio>
+  </section>
+</main>
+<footer>Kokoro TTS Lab · FastAPI + Kokoro-82M · ใช้เพื่อการเรียนรู้ MCP</footer>
+
+<script>
+  const textEl = document.getElementById('text');
+  const voiceEl = document.getElementById('voice');
+  const btn = document.getElementById('speak-btn');
+  const statusEl = document.getElementById('status');
+  const details = document.getElementById('result-details');
+  const player = document.getElementById('player');
+
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = cls || '';
+  }
+
+  btn.addEventListener('click', async () => {
+    const text = textEl.value.trim();
+    const voice = voiceEl.value;
+    if (!text) { setStatus('เกิดข้อผิดพลาด: กรุณาพิมพ์ข้อความก่อน', 'err'); details.hidden = true; return; }
+    btn.disabled = true;
+    setStatus('กำลังสร้างเสียง...', '');
+    details.hidden = true;
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice })
+      });
+      const data = await res.json();
+      if (!res.ok) { throw new Error(data.error || ('HTTP ' + res.status)); }
+      document.getElementById('duration').textContent = data.duration_sec + ' วินาที';
+      document.getElementById('gen-time').textContent = data.gen_ms + ' ms (' + data.device + ')';
+      document.getElementById('sample-rate').textContent = data.sample_rate + ' Hz';
+      document.getElementById('voice-used').textContent = data.voice;
+      const a = document.createElement('a');
+      a.href = data.audio_url; a.textContent = data.audio_url; a.id = 'audio-file-link';
+      const link = document.getElementById('audio-link'); link.textContent = ''; link.appendChild(a);
+      player.src = data.audio_url;
+      details.hidden = false;
+      setStatus('สร้างเสียงสำเร็จ', 'ok');
+    } catch (err) {
+      setStatus('เกิดข้อผิดพลาด: ' + err.message, 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
