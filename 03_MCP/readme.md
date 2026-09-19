@@ -2,7 +2,7 @@
 
 บทเรียนนี้ต่อจากบทที่ 02 (Loop / Graph / Dynamic Workflow) ซึ่งนักศึกษาเขียน Prompt ให้ AI ทำงานเป็นเวิร์กโฟลว์ คราวนี้เราจะดูว่า **AI Agent ไปทำงานกับโลกภายนอกได้อย่างไร** เช่น วาดรูปลง canvas, ควบคุมเบราว์เซอร์, หรือเรียกโค้ด Python ของเรา คำตอบคือ **Model Context Protocol (MCP)** มาตรฐานเปิดที่ทำให้ AI ค้นพบและเรียกใช้เครื่องมือภายนอกได้โดยไม่ต้องเขียนตัวเชื่อมใหม่ทุกครั้ง
 
-บทเรียนแบ่งเป็น 8 บท: ทฤษฎี (บทที่ 1–4) → ใช้ MCP server ที่มีอยู่แล้ว (Case Study 1 Excalidraw MCP, Case Study 2 Playwright MCP) → สร้าง MCP server เอง (บทที่ 7) → สรุปและงานส่ง (บทที่ 8) **ทุกภาพในบทเรียนวาดด้วย Excalidraw MCP โดย AI Agent** และ**ทุกตัวเลข ข้อความ error และผลลัพธ์มาจากการรันจริง**บนเครื่องเรียนเมื่อวันที่ 19 กันยายน 2026 เก็บไว้ใน `lab-results/`
+บทเรียนแบ่งเป็น 8 บท: ทฤษฎี (บทที่ 1–3) → ติดตั้งทุกอย่างด้วยพรอมป์ต์เดียว (บทที่ 4) → ใช้ MCP server ที่มีอยู่แล้ว (Case Study 1 Excalidraw MCP, Case Study 2 Playwright MCP) → สร้าง MCP server เอง (บทที่ 7) → สรุปและงานส่ง (บทที่ 8) **ทุกภาพในบทเรียนวาดด้วย Excalidraw MCP โดย AI Agent** และ**ทุกตัวเลข ข้อความ error และผลลัพธ์มาจากการรันจริง**บนเครื่องเรียนเมื่อวันที่ 19 กันยายน 2026 เก็บไว้ใน `lab-results/`
 
 ![แผนที่บทเรียน 03_MCP วาดด้วย Excalidraw MCP](img/d08-lesson-map.png)
 
@@ -24,7 +24,7 @@
 | `kokoro` | 0.9.4 (+ `espeak-ng` 1.51) | สังเคราะห์เสียงภาษาอังกฤษในเว็บทดลอง |
 | FastAPI / uvicorn | 0.136.3 / 0.52.4 | เว็บทดลอง Kokoro TTS |
 
-ติดตั้งส่วนที่ยังไม่มี: `/opt/venv/bin/pip install "mcp[cli]" kokoro soundfile fastapi uvicorn` และ `apt-get install -y espeak-ng` (Kokoro ใช้ CPU ได้ ไม่จำเป็นต้องมี GPU)
+**ติดตั้งทั้งหมดด้วยพรอมป์ต์เดียว ไม่ต้องตั้งค่าเอง**: สิ่งเดียวที่ต้องมีก่อนคือ Claude Code ที่ล็อกอินแล้ว (จากบทที่ 01) กับ Node.js และ Python 3 ในเครื่อง จากนั้นเปิด `claude` ในโฟลเดอร์ `03_MCP` แล้ววาง **Setup Prompt S0** (บทที่ 4.2 หรือไฟล์ [`labs/prompts/setup-00-all-in-one.md`](labs/prompts/setup-00-all-in-one.md)) AI จะสร้าง venv ติดตั้งแพ็กเกจ ลงทะเบียน MCP server ทั้ง 4 ตัว เริ่มเว็บทดลอง ตรวจสอบ และเขียนรายงานให้เอง (Kokoro ใช้ CPU ได้ ไม่จำเป็นต้องมี GPU)
 
 **โครงสร้างโฟลเดอร์**
 
@@ -238,19 +238,86 @@ def speak(text: str, voice: str = "af_heart") -> dict:
 ---
 
 <a id="ch4"></a>
-## บทที่ 4 ติดตั้ง ตั้งค่า และตรวจสอบ MCP Server ใน Claude Code และ Codex
+## บทที่ 4 ติดตั้งและตั้งค่า MCP ด้วยพรอมป์ต์ (ให้ AI ทำให้เอง)
 
-### 4.1 Claude Code
+### 4.1 หลักการ: Host มี Bash แล้ว จึงให้ AI ติดตั้งเครื่องมือของตัวเอง
 
-Claude Code เก็บรายชื่อ MCP server ไว้ในไฟล์ตั้งค่า (`~/.claude.json` ต่อผู้ใช้ หรือ `.mcp.json` ต่อโปรเจกต์) เพิ่มได้ 3 ทาง
+การตั้งค่า MCP แบบเดิมมีหลายขั้น (ติดตั้งแพ็กเกจ Node/Python, หา path, พิมพ์ `claude mcp add` ทีละตัว, ตรวจ `claude mcp list`, เริ่มเว็บทดลอง) ซึ่งเป็นงานที่ Claude Code ทำได้เองเพราะมีเครื่องมือ Bash อยู่แล้ว บทเรียนนี้จึงเปลี่ยนทุกขั้นตอนติดตั้งเป็น **พรอมป์ต์ที่คัดลอกไปวางได้เลย** นักศึกษาทำเองแค่ 3 อย่าง
+
+1. เปิด Claude Code ในโฟลเดอร์บทเรียน: `cd 03_MCP && claude`
+2. วาง Setup Prompt S0 (ด้านล่าง) แล้วรอให้ AI รายงานผล
+3. พิมพ์ `/exit` แล้วเปิด `claude` ใหม่ เพื่อให้ MCP server ที่เพิ่งลงทะเบียนถูกโหลด (MCP server โหลดตอนเริ่ม session เท่านั้น)
+
+พรอมป์ต์ทั้งหมดอยู่ใน [`labs/prompts/`](labs/prompts/) ใช้ได้ทั้งแบบครบชุด (S0) หรือแยกส่วน (S1–S4) และมีพรอมป์ต์ตรวจสอบ (S5) กับถอนการติดตั้ง (S6)
+
+| พรอมป์ต์ | ทำอะไร | ไฟล์ |
+| --- | --- | --- |
+| **S0 ครบชุด** | ตรวจเครื่อง → สร้าง `labs/.venv` → ติดตั้ง `mcp[cli]`, torch (CPU), kokoro, espeak-ng → `npm i -g mcp-excalidraw-server @playwright/mcp` + chromium → `claude mcp add` 4 ตัว → เริ่มเว็บ Kokoro → ทดสอบ → เขียน `labs/setup-report.md` | [`setup-00-all-in-one.md`](labs/prompts/setup-00-all-in-one.md) |
+| S1 Excalidraw MCP | ติดตั้งและลงทะเบียนเฉพาะ `excalidraw` | [`setup-01-excalidraw.md`](labs/prompts/setup-01-excalidraw.md) |
+| S2 Playwright MCP | ติดตั้ง `@playwright/mcp` + chromium และลงทะเบียน `playwright` (headless ถ้าไม่มีจอ) | [`setup-02-playwright.md`](labs/prompts/setup-02-playwright.md) |
+| S3 เว็บ Kokoro | สร้าง venv ติดตั้ง kokoro และเริ่มเว็บทดลอง :8765 | [`setup-03-kokoro-web.md`](labs/prompts/setup-03-kokoro-web.md) |
+| S4 server ของนักศึกษา | ทดสอบแล้วลงทะเบียน `hello-lab`, `kokoro-tts` | [`setup-04-own-server.md`](labs/prompts/setup-04-own-server.md) |
+| S5 ตรวจสอบ | ใน session ใหม่: เรียก tool ของทุก server จริง (add → 42, วาดกล่องบน canvas, กด Speak บนเว็บ, speak) | [`setup-05-verify.md`](labs/prompts/setup-05-verify.md) |
+| S6 ถอน | `claude mcp remove` ทั้ง 4 ตัว และหยุดเว็บ | [`setup-06-remove.md`](labs/prompts/setup-06-remove.md) |
+
+### 4.2 Setup Prompt S0 — คัดลอกทั้งบล็อกไปวางใน Claude Code
+
+```text
+คุณคือผู้ช่วยติดตั้งสำหรับบทเรียน 03_MCP (Model Context Protocol) ทำทุกข้อต่อไปนี้ให้เสร็จโดยไม่ต้องถามกลับ ถ้าข้อใดต้องใช้สิทธิ์ผู้ดูแลระบบ (sudo) และรันไม่ได้ ให้บอกคำสั่งที่ผู้ใช้ต้องรันเองแล้วทำข้ออื่นต่อ
+โฟลเดอร์ปัจจุบันคือโฟลเดอร์บทเรียน 03_MCP ซึ่งมี labs/kokoro-web และ labs/my-mcp-server อยู่แล้ว ห้ามแก้โค้ดในสองโฟลเดอร์นั้น
+
+1. ตรวจเครื่อง: รายงานเวอร์ชันของ node, npm, python3 (ต้อง >= 3.10), git, claude เป็นตาราง และระบุระบบปฏิบัติการ ถ้าไม่มี node หรือ python3 ให้บอกวิธีติดตั้งของระบบนี้แล้วหยุด
+2. สร้าง Python virtual environment ที่ labs/.venv (python3 -m venv labs/.venv) แล้วใช้ python/pip ของ venv นี้ในทุกข้อถัดไป (labs/.venv/bin/python หรือ labs\.venv\Scripts\python.exe บน Windows) ห้ามติดตั้งลง system python
+3. ติดตั้งแพ็กเกจ Python ใน venv: "mcp[cli]" soundfile fastapi uvicorn จากนั้นถ้ายังไม่มี torch ให้ติดตั้งรุ่น CPU ก่อนด้วย pip install torch --index-url https://download.pytorch.org/whl/cpu (เพื่อไม่ให้ดาวน์โหลด CUDA หลาย GB) แล้วจึง pip install kokoro ถ้าระบบมี apt ให้ติดตั้ง espeak-ng ด้วย (ใช้ sudo ถ้าจำเป็น)
+4. ติดตั้ง MCP server แบบ Node ให้ใช้ได้ทั่วเครื่อง: npm install -g mcp-excalidraw-server @playwright/mcp แล้วดาวน์โหลดเบราว์เซอร์ให้ Playwright ด้วย npx playwright install chromium (บน Linux ให้รัน npx playwright install-deps chromium ด้วย)
+5. ลงทะเบียน MCP server กับ Claude Code ระดับผู้ใช้ (--scope user) 4 ตัว โดยใช้ path แบบเต็มทุกตัว:
+   - excalidraw: command mcp-excalidraw-server (ไม่ต้องใส่ argument)
+   - playwright: command playwright-mcp argument --browser chromium (ใช้ chromium ที่เพิ่งติดตั้ง ไม่ใช่ Google Chrome) ถ้าเครื่องนี้ไม่มีจอแสดงผล (เช่น server หรือ container) ให้เพิ่ม --headless และถ้ารันเป็น root ให้เพิ่ม --no-sandbox ด้วย
+   - hello-lab: command <python ของ venv> argument <path เต็มของ labs/my-mcp-server/hello_server.py>
+   - kokoro-tts: command <python ของ venv> argument <path เต็มของ labs/my-mcp-server/tts_server.py> พร้อม env KOKORO_DEVICE=cpu
+   ถ้ามีชื่อซ้ำอยู่แล้วให้ claude mcp remove ชื่อนั้นก่อน
+6. เริ่มเว็บทดลอง Kokoro: ตั้ง PYTHON=<python ของ venv> แล้วรัน labs/kokoro-web/run.sh จากนั้น curl http://127.0.0.1:8765/api/health จนได้ "ok":true (รอได้ไม่เกิน 60 วินาที) แล้วลอง curl -X POST http://127.0.0.1:8765/api/tts -H "Content-Type: application/json" -d '{"text":"Setup test from prompt.","voice":"af_heart"}' บันทึกเวลาที่ใช้ (ครั้งแรกจะช้าเพราะโหลดโมเดล)
+7. ทดสอบ server ของบทเรียนโดยไม่ใช้ LLM: <python ของ venv> labs/my-mcp-server/client_test.py --server hello ต้องเห็น tools/list และผล add(17, 25) = 42
+8. ตรวจสอบสุดท้ายด้วย claude mcp list ต้องเห็น excalidraw, playwright, hello-lab, kokoro-tts และสถานะเป็น Connected ทั้งหมด ถ้าตัวใดไม่ Connected ให้อ่าน error แล้วแก้ (เช่น path ผิด, แพ็กเกจยังไม่ติดตั้ง) จนผ่าน
+9. เขียนไฟล์ labs/setup-report.md ภาษาไทย ประกอบด้วย ตารางเวอร์ชัน, คำสั่งที่รันทั้งหมดตามลำดับ, ผล claude mcp list, เวลาที่ใช้แต่ละขั้น, และปัญหาที่พบพร้อมข้อความ error จริงและวิธีแก้ ห้ามแต่งผลลัพธ์ ถ้าข้อใดไม่ผ่านให้ระบุชัดเจน
+สุดท้ายสรุปให้ผู้ใช้ทราบว่าต้องพิมพ์ /exit แล้วเปิด claude ใหม่เพื่อใช้ MCP server ที่ลงทะเบียน และถ้าเครื่องมีจอ ให้เปิด http://127.0.0.1:3000 ในเบราว์เซอร์เมื่อจะใช้ Excalidraw (ถ้าไม่มีจอ ให้ใช้ Prompt S5 เปิดผ่าน Playwright แทน)
+```
+
+ทำไมพรอมป์ต์ถึงเขียนแบบนี้: (1) สั่ง "ไม่ต้องถามกลับ" และบอกทางออกเมื่อติด sudo เพื่อให้รันจบในรอบเดียว (2) บังคับ venv และ torch รุ่น CPU เพราะเป็นจุดที่นักศึกษาติดบ่อยที่สุด (ระบบ Ubuntu 24.04 ไม่ให้ pip ติดตั้งลง system python และ torch รุ่น CUDA ใหญ่หลาย GB) (3) ใช้ path เต็มใน `claude mcp add` เพราะ Host เป็นคนเปิด process (บทที่ 2.3) (4) ให้ตรวจด้วย `claude mcp list` และ `client_test.py` ก่อนรายงาน (5) บังคับเขียนรายงานที่มี error จริง ไม่ให้แต่งผล
+
+### 4.3 พรอมป์ต์ตรวจสอบหลังติดตั้ง (S5) — ใช้ใน session ใหม่
+
+```text
+ตรวจว่า MCP server ที่ติดตั้งไว้ใช้งานได้จริง ทำตามลำดับและรายงานผลทุกข้อพร้อมชื่อ tool ที่เรียก
+1. เรียก tool add ของ server hello-lab ด้วย a=17, b=25 ต้องได้ 42
+2. ใช้ Playwright MCP เปิด http://127.0.0.1:3000 (canvas ของ Excalidraw) แล้วคง tab นี้ไว้ (ถ้าเครื่องมีจอและผู้ใช้เปิด URL นี้ไว้แล้ว ให้ข้ามข้อนี้ได้)
+3. ใช้ Excalidraw MCP วาดกล่อง 3 กล่อง "Host" → "MCP Client" → "MCP Server" เชื่อมด้วยลูกศร แล้ว get_canvas_screenshot และ export_to_image เป็น PNG บอก path ของไฟล์ที่ได้
+4. ใช้ Playwright MCP เปิด http://127.0.0.1:8765 กรอกข้อความ "Verify prompt works." กด Speak รอจน "สร้างเสียงสำเร็จ" แล้วอ่านความยาวเสียง
+5. เรียก tool speak ของ server kokoro-tts ด้วยข้อความ "Hello from MCP." บอก path และความยาวไฟล์เสียง
+6. สรุปเป็นตาราง: server, tool ที่เรียก, ผล, ผ่าน/ไม่ผ่าน ถ้าข้อใดไม่ผ่านให้คัดลอกข้อความ error จริง
+```
+
+ข้อ 2 คือเคล็ดลับสำคัญ: Excalidraw MCP ต้องมีแท็บเบราว์เซอร์เปิด canvas อยู่จึงจะ screenshot/export ได้ แทนที่จะให้ผู้ใช้เปิดเอง เราให้ **Playwright MCP เปิดแท็บนั้นให้** จึงไม่ต้องทำอะไรเองแม้บนเครื่องที่ไม่มีจอ
+
+### 4.4 สิ่งที่ AI ทำให้เบื้องหลัง (สำหรับคนที่อยากรู้หรือทำเอง)
+
+Claude Code เก็บรายชื่อ MCP server ไว้ในไฟล์ตั้งค่า (`~/.claude.json` ระดับผู้ใช้ หรือ `.mcp.json` ระดับโปรเจกต์) คำสั่งที่ S0 ใช้คือ
+
+```bash
+claude mcp add --scope user excalidraw -- /usr/local/bin/mcp-excalidraw-server
+claude mcp add --scope user playwright -- /usr/local/bin/playwright-mcp --browser chromium --headless   # ตัด --headless ถ้ามีจอ; เพิ่ม --no-sandbox ถ้ารันเป็น root
+claude mcp add --scope user hello-lab  -- /path/to/03_MCP/labs/.venv/bin/python /path/to/03_MCP/labs/my-mcp-server/hello_server.py
+claude mcp add --scope user kokoro-tts -e KOKORO_DEVICE=cpu -- /path/to/03_MCP/labs/.venv/bin/python /path/to/03_MCP/labs/my-mcp-server/tts_server.py
+claude mcp list          # ต้องเห็น ✔ Connected ทั้ง 4 ตัว
+```
 
 | วิธี | คำสั่ง / ไฟล์ | เมื่อไรควรใช้ |
 | --- | --- | --- |
-| เพิ่มถาวรด้วยคำสั่ง | `claude mcp add hello-lab -- /opt/venv/bin/python /path/to/hello_server.py` | ใช้ทุก session |
-| ไฟล์ต่อโปรเจกต์ | `.mcp.json` ในโฟลเดอร์โปรเจกต์ (รูปแบบเดียวกับด้านล่าง) | แชร์ให้ทีมผ่าน git |
-| ชั่วคราวเฉพาะคำสั่ง | `claude -p --strict-mcp-config --mcp-config labs/my-mcp-server/mcp.json "<prompt>"` | ทดลอง/เก็บหลักฐานในแล็บ |
+| ระดับผู้ใช้ (S0 ใช้แบบนี้) | `claude mcp add --scope user ...` → `~/.claude.json` | ใช้ได้ทุกโฟลเดอร์ ไม่ต้องกดอนุมัติ |
+| ระดับโปรเจกต์ | `claude mcp add --scope project ...` → `.mcp.json` ในโฟลเดอร์ | แชร์ให้ทีมผ่าน git (Claude Code จะถามอนุมัติครั้งแรก) |
+| ชั่วคราวเฉพาะคำสั่ง | `claude -p --strict-mcp-config --mcp-config labs/my-mcp-server/mcp.json "<prompt>"` | เก็บหลักฐานในแล็บโดยไม่แตะการตั้งค่าเครื่อง (บทที่ 7 ใช้แบบนี้) |
 
-ตัวอย่าง [`labs/my-mcp-server/mcp.json`](labs/my-mcp-server/mcp.json) ที่ใช้จริงในบทที่ 7 (ห่อ server ด้วย `wire_capture.py` เพื่อดักข้อความบนสาย ถอดออกได้โดยชี้ `command` ไปที่ server ตรง ๆ)
+ตัวอย่าง [`labs/my-mcp-server/mcp.json`](labs/my-mcp-server/mcp.json) ที่ใช้เก็บหลักฐานในบทที่ 7 (ห่อ server ด้วย `wire_capture.py` เพื่อดักข้อความบนสาย ถอดออกได้โดยชี้ `command` ไปที่ server ตรง ๆ)
 
 ```json
 {
@@ -268,18 +335,9 @@ Claude Code เก็บรายชื่อ MCP server ไว้ในไฟ�
 }
 ```
 
-ตรวจว่าต่อได้: `claude mcp list` บนเครื่องเรียนแสดง (ตัดเฉพาะ server ที่ใช้ในบทเรียน)
-
-```text
-playwright: playwright-mcp --cdp-endpoint http://127.0.0.1:9222 --output-dir /root/workspace/.mcp/playwright/output ... - ✔ Connected
-excalidraw: mcp-excalidraw-server  - ✔ Connected
-```
-
 เมื่อต่อสำเร็จ Claude Code จะมองเห็น tool ในชื่อ `mcp__<ชื่อ server>__<ชื่อ tool>` เช่น `mcp__hello-lab__add` และ `mcp__kokoro-tts__speak` (ดู [`claude-discover-summary.md`](lab-results/own-server/run-2026-09-19-062712/claude-discover-summary.md)) ส่วน resource อ่านผ่านเครื่องมือกลาง `ReadMcpResourceTool {"server": "hello-lab", "uri": "lab://info"}`
 
-### 4.2 Codex CLI
-
-Codex ใช้ไฟล์ `~/.codex/config.toml` (หรือ `$CODEX_HOME/config.toml`) ตั้งค่าจริงบนเครื่องเรียนของ server สองตัวที่ใช้ในบทนี้
+**Codex CLI** ใช้ไฟล์ `~/.codex/config.toml` (หรือ `$CODEX_HOME/config.toml`) ตั้งค่าจริงบนเครื่องเรียนของ server สองตัวที่ใช้ในบทนี้
 
 ```toml
 [mcp_servers.playwright]
@@ -295,14 +353,48 @@ EXCALIDRAW_NO_AUTOSTART = "1"
 EXPRESS_SERVER_URL = "http://127.0.0.1:8892"
 ```
 
-สำหรับ server ของนักศึกษามีตัวอย่างใน [`labs/my-mcp-server/codex-config-snippet.toml`](labs/my-mcp-server/codex-config-snippet.toml) (**แนวทาง — ยังไม่ได้ทดลองกับ Codex ในรอบนี้** เพราะโควตาบัญชี Codex ของผู้สอนใกล้หมด)
+ถ้าใช้ Codex ให้วาง S0 ใน Codex แล้วเปลี่ยนข้อ 5 เป็น "เขียน `[mcp_servers.*]` ลง `~/.codex/config.toml` ตาม [`codex-config-snippet.toml`](labs/my-mcp-server/codex-config-snippet.toml) แล้วตรวจด้วย `codex mcp list`" (**แนวทาง — ยังไม่ได้ทดลองกับ Codex ในรอบนี้** เพราะโควตาบัญชี Codex ของผู้สอนใกล้หมด)
 
-### 4.3 ข้อควรระวังตอนตั้งค่า
+### 4.5 ผลการทดสอบ Setup Prompt ในเครื่องเปล่า
+
+ทดสอบวันที่ 19 กันยายน 2026 ในคอนเทนเนอร์ Docker `tuchsanai/devtools:2569_1` (Ubuntu 24.04, Node v22.23.1, Python 3.12.3, **ไม่มี** Claude Code, torch, Chromium, espeak-ng และไม่มีจอแสดงผล) ติดตั้ง Claude Code 2.1.278 แล้ววาง Setup Prompt S0 ตามด้วย Prompt S5 ในสภาพเหมือนนักศึกษาที่มีเครื่องเปล่า หลักฐานทั้งหมดอยู่ใน [`lab-results/setup-prompt/run-2026-09-19-072524/`](lab-results/setup-prompt/run-2026-09-19-072524/) (โมเดล claude-sonnet-5, effort medium)
+
+| รอบ | ผล | เวลา | รายละเอียด |
+| --- | --- | --- | --- |
+| S0 ครั้งที่ 0 | ถูกปฏิเสธทันที | – | `--dangerously-skip-permissions cannot be used with root/sudo privileges for security reasons` — เกิดเฉพาะการรันแบบ non-interactive เป็น root ในคอนเทนเนอร์ (แก้ที่สคริปต์รันด้วย `IS_SANDBOX=1` ไม่ได้แก้พรอมป์ต์) นักศึกษาที่วางพรอมป์ต์ใน `claude` แบบโต้ตอบไม่เจอเรื่องนี้ |
+| S0 ครั้งที่ 1 | **ผ่านทั้ง 9 ข้อ** | 4 นาที 24 วินาที (38 turn) | สร้าง `labs/.venv`, ติดตั้ง mcp 2.2.0, torch 2.14.0+cpu, kokoro 0.9.4, fastapi 0.141.1, espeak-ng, `mcp-excalidraw-server@2.0.0`, `@playwright/mcp@0.0.82` + chromium-1243, ลงทะเบียน 4 server, เว็บ Kokoro ตอบ `ok:true` และ POST /api/tts 200 (ครั้งแรก 3.15 วินาทีรวมโหลดโมเดล), `client_test.py` ได้ 42, เขียน [`setup-report.md`](lab-results/setup-prompt/run-2026-09-19-072524/setup-report.md) เอง |
+| S5 รอบ 1 (session ใหม่) | ผ่าน 3 จาก 5 | 4 นาที 9 วินาที | `add` → 42, `speak` → .wav 2.02 วินาที, Excalidraw export ผ่าน (AI เปิด Chrome headless เองเมื่อพบ `No frontend client connected`) แต่ Playwright MCP ล้มเหลว 2 ครั้ง (ดูด้านล่าง) AI แก้การตั้งค่าเองแล้วบอกให้เปิด session ใหม่ |
+| S5 รอบ 2 (session ใหม่ ไม่แก้อะไรเพิ่ม) | **ผ่าน 5 จาก 5** | 52 วินาที (17 turn) | Playwright เปิด canvas :3000 และเว็บ :8765 กรอก/คลิก/รอ "สร้างเสียงสำเร็จ" (เสียง 1.98 วินาที), Excalidraw export PNG ([`round2-s5-excalidraw-export.png`](lab-results/setup-prompt/run-2026-09-19-072524/round2-s5-excalidraw-export.png)), `speak` → .wav 2.02 วินาที |
+
+ผล `claude mcp list` หลัง S0 (จาก [`container-state-after-s0.txt`](lab-results/setup-prompt/run-2026-09-19-072524/container-state-after-s0.txt))
+
+```text
+excalidraw: mcp-excalidraw-server  - ✔ Connected
+playwright: playwright-mcp --headless - ✔ Connected
+hello-lab: /root/03_MCP/labs/.venv/bin/python /root/03_MCP/labs/my-mcp-server/hello_server.py - ✔ Connected
+kokoro-tts: /root/03_MCP/labs/.venv/bin/python /root/03_MCP/labs/my-mcp-server/tts_server.py - ✔ Connected
+```
+
+ข้อผิดพลาดจริงที่ Playwright MCP ตอบใน S5 รอบ 1 (จาก [`s5-summary.md`](lab-results/setup-prompt/run-2026-09-19-072524/s5-summary.md)) และสิ่งที่นำมาแก้ในพรอมป์ต์
+
+| error ที่พบ | สาเหตุ | สิ่งที่ปรับในพรอมป์ต์ S0/S2 |
+| --- | --- | --- |
+| `Error: async initializeServer: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome Run "npx playwright install chrome"` | `@playwright/mcp` 0.0.82 ใช้ Google Chrome เป็นค่าเริ่มต้น แม้เราติดตั้ง chromium ไว้แล้ว | ลงทะเบียน playwright ด้วย `--browser chromium` |
+| `Running as root without --no-sandbox is not supported. See https://crbug.com/638180.` | รันเป็น root (คอนเทนเนอร์/เซิร์ฟเวอร์) Chromium ไม่ยอมเปิด sandbox | เพิ่ม `--no-sandbox` เมื่อรันเป็น root (AI ในรอบทดสอบแก้ `~/.claude.json` ให้เองแล้วขอ session ใหม่) |
+| `No frontend client connected. Open the canvas in a browser first.` (Excalidraw) | ยังไม่มีแท็บเปิด canvas | S5 ข้อ 2 ให้ Playwright MCP เปิด `http://127.0.0.1:3000` ก่อนวาด |
+
+ตรวจเพิ่มบนเครื่องเรียน ([`host-check-browser-flag.txt`](lab-results/setup-prompt/run-2026-09-19-072524/host-check-browser-flag.txt)): `playwright-mcp` 0.0.80 ยอมรับ `--browser chromium` (แม้ `--help` จะไม่ระบุค่านี้) และจะใช้ `~/.cache/ms-playwright/chromium-1243` ซึ่งเป็นตัวที่ `npx playwright install chromium` ติดตั้ง ส่วนค่าเริ่มต้นมองหา Google Chrome ที่ `/opt/google/chrome/chrome` — จึงต้องใส่ `--browser chromium` เสมอเมื่อติดตั้งแค่ chromium
+
+สิ่งที่ยืนยันได้จากรอบนี้: นักศึกษาที่มี Claude Code + Node + Python ในเครื่องเปล่า **วางพรอมป์ต์เดียวแล้วได้ MCP ครบ 4 ตัวใน 5 นาที** โดยไม่ต้องพิมพ์คำสั่งติดตั้งเอง และเมื่อมีปัญหา AI อ่าน error แล้วแก้การตั้งค่าได้เองภายใน session ถัดไป ไฟล์ stream-json ของทุกรอบ ([`s0-stream.jsonl`](lab-results/setup-prompt/run-2026-09-19-072524/s0-stream.jsonl), [`round1-s5-stream.jsonl`](lab-results/setup-prompt/run-2026-09-19-072524/round1-s5-stream.jsonl), [`round2-s5-stream.jsonl`](lab-results/setup-prompt/run-2026-09-19-072524/round2-s5-stream.jsonl)) บันทึกทุกคำสั่ง Bash และทุก tool ที่ AI เรียก สรุปอ่านง่ายอยู่ใน [`s0-summary.md`](lab-results/setup-prompt/run-2026-09-19-072524/s0-summary.md), [`run-info.json`](lab-results/setup-prompt/run-2026-09-19-072524/run-info.json) และ [`trace.md`](lab-results/setup-prompt/run-2026-09-19-072524/trace.md)
+
+### 4.6 ข้อควรระวังที่พบจริง
 
 1. ใช้ path แบบเต็ม (absolute) ใน `command`/`args` เพราะ Host เป็นคนเปิด process ไม่ใช่เรา และ working directory อาจไม่ใช่ที่เราคิด
 2. server แบบ stdio ห้ามพิมพ์อะไรลง stdout นอกจาก JSON-RPC
-3. Excalidraw MCP บนเครื่องเรียนเขียน/อ่านไฟล์ได้เฉพาะใน `EXCALIDRAW_EXPORT_DIR` (`/root/workspace/.mcp/excalidraw/diagrams`) ถ้าสั่ง export ไปที่อื่นจะได้ `Path traversal blocked` ต้องคัดลอกไฟล์ออกมาเอง (พบจริงใน Lab 5.4)
-4. Playwright MCP บนเครื่องเรียนต่อกับ headless Chrome ตัวเดียวกับที่ Excalidraw ใช้แสดง canvas ถ้าแท็บของเว็บที่ทดสอบอยู่เบื้องหลัง การคลิกจะ timeout (พบจริงใน Lab 6 ดูวิธีแก้ในบทที่ 6.4)
+3. MCP server ที่เพิ่งลงทะเบียนจะถูกโหลดตอนเริ่ม session ใหม่เท่านั้น จึงต้อง `/exit` แล้วเปิด `claude` ใหม่หลังรัน S0 (รวมถึงหลังที่ AI แก้ค่าใน `~/.claude.json` ให้)
+4. `@playwright/mcp` รุ่นใหม่ใช้ Google Chrome เป็นค่าเริ่มต้น ถ้าติดตั้งแค่ chromium ต้องลงทะเบียนด้วย `--browser chromium` และถ้ารันเป็น root ต้องมี `--no-sandbox` (พบจริงในการทดสอบคอนเทนเนอร์ บทที่ 4.5)
+5. Excalidraw MCP บนเครื่องเรียนเขียน/อ่านไฟล์ได้เฉพาะใน `EXCALIDRAW_EXPORT_DIR` (`/root/workspace/.mcp/excalidraw/diagrams`) ถ้าสั่ง export ไปที่อื่นจะได้ `Path traversal blocked` ต้องคัดลอกไฟล์ออกมาเอง (พบจริงใน Lab 5.4)
+6. Playwright MCP บนเครื่องเรียนต่อกับ headless Chrome ตัวเดียวกับที่ Excalidraw ใช้แสดง canvas ถ้าแท็บของเว็บที่ทดสอบอยู่เบื้องหลัง การคลิกจะ timeout (พบจริงใน Lab 6 ดูวิธีแก้ในบทที่ 6.4)
 
 ---
 
@@ -323,7 +415,8 @@ EXPRESS_SERVER_URL = "http://127.0.0.1:8892"
 | `export_to_image` / `export_scene` / `import_scene` | ส่งออก PNG/SVG, ส่งออก/นำเข้าไฟล์ `.excalidraw` |
 | `create_from_mermaid` | แปลง Mermaid เป็น element บน canvas |
 
-![Flow ของ Case Study 1: Prompt → Agent → MCP Client → Excalidraw MCP Server → Canvas พร้อมรายชื่อ tool ที่ใช้จริง](img/d05-case1-excalidraw-flow.png)
+ก่อนเริ่ม: ถ้ายังไม่ได้ติดตั้ง ให้วาง Setup Prompt S0 (หรือ S1 เฉพาะ Excalidraw) ในบทที่ 4 แล้วเปิด `claude` ใหม่ canvas จะเปิดอัตโนมัติที่ `http://127.0.0.1:3000` เมื่อ AI เรียก tool ครั้งแรก ถ้าเครื่องไม่มีจอ ให้ AI เปิดแท็บ canvas ผ่าน Playwright MCP ตามข้อ 2 ของ Prompt S5 (บนเครื่องเรียนของผู้สอน canvas อยู่ที่พอร์ต 8892 ในเบราว์เซอร์ headless)
+\1: Prompt → Agent → MCP Client → Excalidraw MCP Server → Canvas พร้อมรายชื่อ tool ที่ใช้จริง](img/d05-case1-excalidraw-flow.png)
 
 สิ่งที่ควรสังเกต: AI ไม่ได้ "วาดรูป" เอง แต่**ส่ง JSON ของ element** (ชนิด ตำแหน่ง ขนาด สี ข้อความ) ให้ server ทำงานกับ canvas จริง แล้วขอ screenshot กลับมาตรวจ ถ้าข้อความล้นกล่องหรือลูกศรทับกันก็สั่ง `update_element` แก้ วนจนผ่าน แล้วจึง export
 
@@ -378,8 +471,8 @@ Prompt: [`labs/prompts/lab5-4-modify-diagram.md`](labs/prompts/lab5-4-modify-dia
 | ภาพที่วาด | 9 (d01–d08 + d02b) |
 | ภาพที่ผ่านรอบแรกโดยไม่ต้องแก้ | 2 (d01, d08) |
 | ภาพที่ต้องแก้อย่างน้อย 1 รอบหลังดู screenshot | 7 |
-| `batch_create_elements` / `update_element` / `delete_element` | 14 / 49 / 8 ครั้ง |
-| `get_canvas_screenshot` | 16 ครั้ง |
+| `batch_create_elements` / `update_element` / `delete_element` | 15 / 50 / 8 ครั้ง |
+| `get_canvas_screenshot` | 18 ครั้ง |
 | ปัญหาที่พบบ่อยที่สุด | ข้อความล้นกล่อง (กล่องแคบเกินสำหรับฟอนต์ลายมือ) รองลงมาคือลูกศรทับกล่อง/ป้ายทับลูกศร |
 
 สิ่งที่นักศึกษาควรได้: (1) MCP ทำให้ AI ใช้เครื่องมือวาดภาพได้โดยไม่ต้องเขียน integration (2) คุณภาพงานมาจาก "วงจร วาด → ดู → แก้" ซึ่ง MCP รองรับผ่าน `get_canvas_screenshot` (3) Prompt ที่ดีต้องระบุ layout กติกา และวิธีตรวจ ไม่ใช่แค่ "วาดให้หน่อย"
@@ -409,7 +502,7 @@ Prompt: [`labs/prompts/lab5-4-modify-diagram.md`](labs/prompts/lab5-4-modify-dia
 | Result | `#status` + รายละเอียด ความยาวเสียง / เวลาที่ใช้สร้าง / sample rate / เสียง / ไฟล์ | ข้อความสำเร็จคือ "สร้างเสียงสำเร็จ" ข้อความผิดพลาดขึ้นต้นด้วย "เกิดข้อผิดพลาด" |
 | Audio Player | `<audio id="player" controls>` | `src` ชี้ไปที่ `/audio/<file>.wav` |
 
-เริ่มเว็บ: `labs/kokoro-web/run.sh` (เปิดที่ `http://127.0.0.1:8765` เก็บ pid ใน `server.pid`) ตรวจ: `curl http://127.0.0.1:8765/api/health` → `{"ok":true,"device":"cpu","model_loaded":true,...}` ครั้งแรกที่กด Speak จะช้ากว่าปกติเพราะโหลดโมเดล (จาก curl: ครั้งแรก 6.66 วินาที ครั้งต่อไป 0.55 วินาที ตาม [`web-curl-tts-time.txt`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts-time.txt) และ [`web-curl-tts-second.txt`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts-second.txt))
+เริ่มเว็บด้วยพรอมป์ต์: วาง Setup Prompt S3 (หรือ S0 ซึ่งรวมข้อนี้แล้ว) AI จะสร้าง venv ติดตั้ง kokoro และรัน `labs/kokoro-web/run.sh` ให้ (เปิดที่ `http://127.0.0.1:8765` เก็บ pid ใน `server.pid`; ทำเองได้ด้วย `PYTHON=<python ของ venv> labs/kokoro-web/run.sh`) ตรวจ: `curl http://127.0.0.1:8765/api/health` → `{"ok":true,"device":"cpu","model_loaded":true,...}` ครั้งแรกที่กด Speak จะช้ากว่าปกติเพราะโหลดโมเดล (จาก curl: ครั้งแรก 6.66 วินาที ครั้งต่อไป 0.55 วินาที ตาม [`web-curl-tts-time.txt`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts-time.txt) และ [`web-curl-tts-second.txt`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts-second.txt))
 
 ![หน้าเว็บ Kokoro TTS Lab หลังเปิดครั้งแรก (screenshot จาก Playwright MCP)](lab-results/playwright/run-2026-09-19-064547/cs2-01-loaded.png)
 
@@ -516,9 +609,11 @@ Web Application (Kokoro TTS Lab: Text Input → Button → POST /api/tts → Res
 
 ### 7.1 ติดตั้งและโครงสร้างไฟล์
 
+ถ้ารัน Setup Prompt S0 แล้ว venv `labs/.venv` จะมี `mcp[cli]` และ server ทั้งสองถูกลงทะเบียนไว้แล้ว (หรือใช้ S4 เฉพาะข้อนี้) ถ้าจะทำเอง:
+
 ```bash
-/opt/venv/bin/pip install "mcp[cli]"      # Python SDK 2.0 (มี mcp dev / mcp run ด้วย)
-cd labs/my-mcp-server && cat README-run.md   # คำสั่งทั้งหมดของแล็บนี้
+python3 -m venv labs/.venv && labs/.venv/bin/pip install "mcp[cli]"   # Python SDK 2.0 (มี mcp dev / mcp run ด้วย)
+cd labs/my-mcp-server && cat README-run.md                              # คำสั่งทั้งหมดของแล็บนี้
 ```
 
 | ไฟล์ใน [`labs/my-mcp-server/`](labs/my-mcp-server/) | หน้าที่ |
@@ -599,7 +694,7 @@ server_capabilities: {"prompts": {"listChanged": true}, "resources": {"subscribe
 
 ### 7.4 Lab 7.3 — ให้ Claude Code ค้นพบและเรียก tool ของเรา
 
-รัน 3 รอบด้วยบัญชี Claude Code อีกบัญชี (`--model sonnet --effort medium`, ผ่าน `--mcp-config mcp.json` ที่ห่อ server ด้วย `wire_capture.py`) Prompt และผลอยู่ใน [`labs/prompts/lab7-own-mcp-server.md`](labs/prompts/lab7-own-mcp-server.md) และ `lab-results/own-server/run-2026-09-19-062712/`
+\1 — ถ้าลงทะเบียน server ด้วย S0/S4 แล้ว นักศึกษาวาง Prompt เหล่านี้ใน `claude` ได้ทันทีโดยไม่ต้องใส่ `--mcp-config` Prompt และผลอยู่ใน [`labs/prompts/lab7-own-mcp-server.md`](labs/prompts/lab7-own-mcp-server.md) และ `lab-results/own-server/run-2026-09-19-062712/`
 
 | รอบ | Prompt (ย่อ) | สิ่งที่ Claude ทำจริง | หลักฐาน |
 | --- | --- | --- | --- |
@@ -724,8 +819,9 @@ server_capabilities: {"prompts": {"listChanged": true}, "resources": {"subscribe
 | `lab-results/playwright/run-2026-09-19-064547/` | `trace.md`, `cs2-01-loaded.png`, `cs2-02-filled.png`, `cs2-03-result.png`, `cs2-04-error-empty.png`, `snapshot-*.yml`, `console.log`, `result-audio.wav`, `run-info.json`, `sha256.txt` |
 | `lab-results/own-server/run-2026-09-19-062712/` | `trace.md`, `run-info.json`, `wire-hello.jsonl`, `wire-tts.jsonl`, `client-hello-output.txt`, `client-tts-output.txt`, `client-http-output.txt`, `http-curl.txt`, `http-server.log`, `claude-{discover,use,tts}-{prompt.txt,stream.jsonl,summary.md,wire-hello.jsonl,wire-tts.jsonl}`, `web-curl-*.json/txt`, `web-wav-check.txt`, `speak-output.wav`, `sha256.json` |
 | `img/` | `d01`–`d08` และ `d02b` ทั้ง `.png` และ `.excalidraw` |
-| `labs/` | `design-spec.md`, `prompts/`, `kokoro-web/`, `my-mcp-server/` |
+| `lab-results/setup-prompt/run-*/` | ผลการรัน Setup Prompt S0 และ S5 ในคอนเทนเนอร์เปล่า (stream-json, `setup-report.md`, `claude mcp list`, เวอร์ชัน, error จริง) |
+\1 (`prompts/setup-00..06-*.md` = พรอมป์ต์ติดตั้ง/ตรวจ/ถอน)
 
-**วิธีรันซ้ำทั้งบทเรียน**: (1) `labs/kokoro-web/run.sh` (2) เปิด Claude Code ในโฟลเดอร์นี้ ตรวจ `claude mcp list` ว่ามี `excalidraw` และ `playwright` (3) ใช้ Prompt ใน `labs/prompts/` ทีละแล็บ (4) สำหรับบทที่ 7 ทำตาม `labs/my-mcp-server/README-run.md`
+**วิธีรันซ้ำทั้งบทเรียน**: (1) `cd 03_MCP && claude` แล้ววาง Setup Prompt S0 (2) `/exit` แล้วเปิด `claude` ใหม่ วาง Prompt S5 เพื่อยืนยันว่า MCP ทุกตัวใช้ได้ (3) ใช้ Prompt ใน `labs/prompts/` ทีละแล็บ (4) สำหรับบทที่ 7 ทำตาม `labs/my-mcp-server/README-run.md` (5) จบบทเรียนแล้วใช้ Prompt S6 ถอนการตั้งค่า
 
 *บทเรียนนี้ออกแบบและสร้างหลักฐานโดย Claude Fable 5.1 ผ่าน Claude Code 2.1.258 เมื่อ 19 กันยายน 2026 (สเปกการออกแบบ: `labs/design-spec.md`) — โค้ดเว็บและ MCP server ของนักศึกษาเขียนใน session เดียวกัน ไม่ได้ใช้ Codex ในรอบนี้*

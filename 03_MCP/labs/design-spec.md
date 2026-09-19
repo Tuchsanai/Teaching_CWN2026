@@ -65,3 +65,10 @@
 - ทุกตัวเลข/ข้อความ error ใน readme ต้องมาจากไฟล์ใน lab-results หรือ labs
 - แนวคิดที่ไม่ได้ทดลองต้องติดป้าย "แนวทาง — ยังไม่ได้ทดลอง"
 - ทุก run เก็บ `run-info.json` (วันเวลา UTC, เวอร์ชันเครื่องมือ, บัญชี/โมเดลที่ใช้) และ `trace.md`
+
+## 8. ปรับปรุงรอบ 2 (2026-09-19 บ่าย): ติดตั้งด้วยพรอมป์ต์
+ผู้ใช้ขอให้ลดขั้นตอนตั้งค่าด้วยตัวเองให้มากที่สุด จึงเปลี่ยนบทที่ 4 และทุกจุดที่มีคำสั่งติดตั้งเป็น "พรอมป์ต์ที่คัดลอกไปวางใน Claude Code ได้เลย"
+- `labs/prompts/setup-00-all-in-one.md` (S0 ครบชุด), `setup-01..04` (แยกส่วน: Excalidraw, Playwright, เว็บ Kokoro, server ของนักศึกษา), `setup-05-verify.md` (ตรวจใน session ใหม่ รวมเคล็ดลับให้ Playwright เปิดแท็บ canvas ของ Excalidraw), `setup-06-remove.md`
+- หลักการ: Host มี Bash → ให้ AI สร้าง venv, ติดตั้งแพ็กเกจ (torch CPU), `npm i -g`, `claude mcp add --scope user` 4 ตัว, เริ่มเว็บ, ตรวจ `claude mcp list`, เขียน `labs/setup-report.md`; นักศึกษาทำเองแค่ เปิด claude → วาง → /exit แล้วเปิดใหม่
+- `labs/kokoro-web/run.sh` ใช้ `PYTHON` env (ค่าเริ่มต้น python3) แทน path ตายตัว; `README-run.md` ใช้ `python` ของ venv
+- หลักฐาน: รัน S0 และ S5 ในคอนเทนเนอร์เปล่า `tuchsanai/devtools:2569_1` (ไม่มี claude/torch/chromium มาก่อน) เก็บใน `lab-results/setup-prompt/run-*/`

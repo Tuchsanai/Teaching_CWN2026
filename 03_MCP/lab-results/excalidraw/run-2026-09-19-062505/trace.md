@@ -17,20 +17,21 @@
 | 7 | d07-own-server | `clear_canvas` → `batch_create_elements` (18 elements: 3 client, server, wire_capture, tts server, 3 กล่องผล, 7 arrows, footer) → `set_viewport` → `get_canvas_screenshot` → พบป้ายลูกศรยาวทับกล่อง client และ tts box ล้นทับ footer → `update_element` ×10 (ขยับ server/ผลไปขวา, ย่อข้อความ, ขยาย tts box, เลื่อน footer) → `delete_element` ×3 → `batch_create_elements` (ลูกศร 3 เส้นป้ายสั้นลง) → `set_viewport` → `get_canvas_screenshot` → `export_to_image` → `export_scene` | แก้ 1 รอบ (arrow-label overlap) แล้วผ่าน |
 | 8 | d08-lesson-map | `clear_canvas` → `batch_create_elements` (21 elements: 8 กล่องบท 2 แถว, 7 arrows, legend 4 กล่อง, footer) → `set_viewport` → `get_canvas_screenshot` → `export_to_image` → `export_scene` | ผ่านรอบแรก |
 | 9 | Lab 5.4 แก้ d02 จาก Prompt | `import_scene` (filePath ใน 03_MCP/img) → **error** `Path traversal blocked: ... resolves outside the allowed directory "/root/workspace/.mcp/excalidraw/diagrams"` → `import_scene` จากโฟลเดอร์ที่อนุญาต (43 elements) → `update_element` ×5 (ขยาย zone 3 กล่อง, เลื่อน footer, เปลี่ยนสี hello_server.py เป็นเขียว) → `batch_create_elements` (Client #4, tts_server.py, kokoro_core, ลูกศร 3 เส้น) → `set_viewport` → `get_canvas_screenshot` → พบว่า scene ที่ import กลับมา **ตำแหน่งกล่องกับข้อความเลื่อนไม่เท่ากัน** (zone และกล่องเลื่อนขวา ~570 px แต่ข้อความอิสระไม่เลื่อน) → ตัดสินใจ `clear_canvas` แล้ว `batch_create_elements` ใหม่จาก JSON เดิมของ d02 + ส่วนที่ Prompt สั่งเพิ่ม (41 elements) → `set_viewport` → `get_canvas_screenshot` → `export_to_image` → `export_scene` | สำเร็จหลังเปลี่ยนวิธี (ข้อค้นพบ: import_scene ของ server รุ่นนี้ทำให้พิกัดเพี้ยน จึงควรเก็บ JSON ต้นฉบับไว้สร้างซ้ำ) |
+| 10 | d08-lesson-map (แก้รอบ 2, 14:26 UTC+7) | ผู้ใช้ขอเปลี่ยนบทที่ 4 เป็น "ติดตั้งด้วยพรอมป์ต์" → `clear_canvas` → `batch_create_elements` (21 elements จาก JSON เดิม เปลี่ยนข้อความกล่องบทที่ 4 และ footer) → `set_viewport` → `get_canvas_screenshot` → ข้อความกล่องบทที่ 4 ยาว 4 บรรทัดชิดขอบ → `update_element` (ย่อข้อความ, font 13) → `get_canvas_screenshot` → `export_to_image` → `export_scene` | แก้ 1 รอบ แล้วผ่าน (แทนที่ไฟล์ d08 เดิม) |
 
-จบ: 2026-09-19T06:45:32Z
+จบ (รอบแรก): 2026-09-19T06:45:32Z
 
 ## สรุปจำนวนการเรียก tool (นับจากตารางด้านบน)
 
 | tool | จำนวนครั้ง |
 | --- | --- |
-| batch_create_elements | 14 |
-| update_element | 49 |
+| batch_create_elements | 15 |
+| update_element | 50 |
 | delete_element | 8 |
-| get_canvas_screenshot | 16 |
-| set_viewport | 13 |
-| export_to_image / export_scene | 9 / 9 |
-| clear_canvas | 9 |
+| get_canvas_screenshot | 18 |
+| set_viewport | 14 |
+| export_to_image / export_scene | 10 / 10 |
+| clear_canvas | 10 |
 | import_scene | 2 (ครั้งแรก error path traversal, ครั้งที่สองพิกัดเพี้ยน) |
 | read_diagram_guide / describe_scene | 1 / 1 |
 
