@@ -4,7 +4,7 @@ direct_call_kokoro.py — เรียก MCP tool ตรง ๆ จาก Pytho
 ไฟล์นี้คือ "MCP Client ขนาดเล็ก" ที่ทำงานแทน Host (Claude Code / Codex) ครบทุกขั้น:
 
     1. เปิด MCP server ของบทเรียนเป็น subprocess แบบ stdio
-    2. initialize  → ตกลงเวอร์ชันโปรโตคอลและ capabilities
+    2. เชื่อมต่อและค้นพบ server → SDK จัดการเวอร์ชันโปรโตคอลและ capabilities
     3. tools/list  → ค้นพบว่ามี tool อะไรบ้าง พร้อม inputSchema
     4. tools/call  → เรียกใช้จริง (sanity check: hello-lab add, งานหลัก: kokoro-tts speak)
     5. ตรวจไฟล์เสียงที่ได้ด้วย soundfile แล้วเขียนผลเป็น JSON
@@ -42,7 +42,7 @@ import sys
 import traceback
 
 # --- แพ็กเกจของ MCP Python SDK 2.x ------------------------------------------------
-# mcp.Client                      = ฝั่ง client ของโปรโตคอล (initialize/list/call)
+# mcp.Client                      = ฝั่ง client ของโปรโตคอล (discover/list/call)
 # mcp.client.stdio.stdio_client   = transport แบบ stdio: เปิด server เป็น subprocess
 try:
     from mcp import Client

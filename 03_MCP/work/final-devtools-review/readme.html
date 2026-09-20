@@ -2,7 +2,7 @@
 <p>บทเรียนนี้ต่อจากบทที่ 02 (Loop / Graph / Dynamic Workflow) ซึ่งนักศึกษาเขียน Prompt ให้ AI ทำงานเป็นเวิร์กโฟลว์ คราวนี้เราจะดูว่า <strong>AI Agent ไปทำงานกับโลกภายนอกได้อย่างไร</strong> เช่น วาดรูปลง canvas, ควบคุมเบราว์เซอร์, หรือเรียกโค้ด Python ของเรา คำตอบคือ <strong>Model Context Protocol (MCP)</strong> มาตรฐานเปิดที่ทำให้ AI ค้นพบและเรียกใช้เครื่องมือภายนอกได้โดยไม่ต้องเขียนตัวเชื่อมใหม่ทุกครั้ง</p>
 <p>บทเรียนแบ่งเป็น 8 บท: ทฤษฎี (บทที่ 1–3) → ติดตั้งทุกอย่างด้วยพรอมป์ต์เดียว (บทที่ 4) → ใช้ MCP server ที่มีอยู่แล้ว (Case Study 1 Excalidraw MCP, Case Study 2 Playwright MCP) → สร้าง MCP server เอง (บทที่ 7) → สรุปและงานส่ง (บทที่ 8) <strong>ทุกภาพในบทเรียนวาดด้วย Excalidraw MCP โดย AI Agent</strong> และ<strong>ตัวเลข ข้อความ error และผลลัพธ์ในส่วนบันทึกการทดลองมาจากการรันจริง</strong>บนเครื่องเรียนเมื่อวันที่ 19 กันยายน 2026 เก็บไว้ใน <code>lab-results/</code></p>
 <p><img src="img/d08-lesson-map.png" alt="แผนที่บทเรียน 03_MCP วาดด้วย Excalidraw MCP" /></p>
-<p><strong>เลือกอ่าน:</strong> <a href="#prep">เตรียมตัวและงานส่ง</a> · <a href="#ch1">บทที่ 1 MCP คืออะไร</a> · <a href="#ch2">บทที่ 2 โครงสร้าง</a> · <a href="#ch3">บทที่ 3 MCP vs Function vs API</a> · <a href="#ch4">บทที่ 4 ติดตั้ง</a> · <a href="#ch5">บทที่ 5 Excalidraw MCP</a> · <a href="#ch6">บทที่ 6 Playwright MCP</a> · <a href="#ch7">บทที่ 7 สร้าง MCP server</a> · <a href="#ch8">บทที่ 8 สรุป</a> · <a href="#appendix">ภาคผนวก</a></p>
+<p><strong>เลือกอ่าน:</strong> <a href="#prep">เตรียมตัวและงานส่ง</a> · <a href="#ch1">บทที่ 1 MCP คืออะไร</a> · <a href="#ch2">บทที่ 2 โครงสร้าง</a> · <a href="#ch3">บทที่ 3 MCP vs Function vs API</a> · <a href="#ch3-1">3.1 โค้ดเรียก MCP ฉบับเต็ม</a> · <a href="#ch4">บทที่ 4 ติดตั้ง</a> · <a href="#ch5">บทที่ 5 Excalidraw MCP</a> · <a href="#ch6">บทที่ 6 Playwright MCP</a> · <a href="#ch7">บทที่ 7 สร้าง MCP server</a> · <a href="#ch8">บทที่ 8 สรุป</a> · <a href="#appendix">ภาคผนวก</a></p>
 <p><a id="prep"></a></p>
 <h2>สิ่งที่ต้องเตรียม และสิ่งที่ต้องส่ง</h2>
 <p><strong>เครื่องมือที่ใช้ในบทเรียนนี้ (เวอร์ชันที่ทดลองจริง)</strong></p>
@@ -260,6 +260,7 @@
 <h2>บทที่ 3 MCP ต่างจากการเรียก Python Function หรือ API โดยตรงอย่างไร</h2>
 <p>ใช้งานเดียวกันตลอดบทเรียน: <strong>สังเคราะห์เสียงภาษาอังกฤษด้วย Kokoro-82M</strong> เราเปิดความสามารถนี้ให้เรียกได้ 3 แบบ โดยโค้ด Kokoro ไม่ต้องแก้เลย</p>
 <p><img src="img/d04-three-ways.png" alt="งานเดียวกันเรียกได้ 3 แบบ: Python function, REST API, MCP tool" /></p>
+<p>สามบล็อกถัดไปเป็นโค้ด <strong>ที่ตัดมาเฉพาะส่วนสำคัญ</strong> เพื่อเทียบรูปแบบของทั้งสามวิธี (ฉบับเต็มอยู่ในไฟล์ที่ลิงก์ไว้) ส่วนโค้ดที่คัดลอกแล้วรันได้ทันทีตั้งแต่ <code>import</code> จนถึง <code>main()</code> อยู่ในข้อ <a href="#ch3-1">3.1</a></p>
 <p><strong>แบบที่ 1 — Python function</strong> (<a href="labs/kokoro-web/kokoro_core.py"><code>labs/kokoro-web/kokoro_core.py</code></a>)</p>
 <pre><code class="language-python">def synthesize(text: str, voice: str = &quot;af_heart&quot;) -&gt; dict:
     &quot;&quot;&quot;แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav&quot;&quot;&quot;
@@ -334,7 +335,480 @@ def speak(text: str, voice: str = &quot;af_heart&quot;) -&gt; dict:
 </tbody>
 </table>
 <p>สรุป: MCP ไม่ได้มาแทน function หรือ API แต่เป็น &quot;ชั้นประกาศและเรียกใช้แบบมาตรฐาน&quot; ที่ครอบของเดิม ในบทที่ 7 นักศึกษาจะเห็นว่าห่อ function เป็น MCP tool ใช้โค้ดเพิ่มไม่ถึง 20 บรรทัด</p>
-<hr />
+<p><a id="ch3-1"></a></p>
+<h3>3.1 โค้ดเรียก MCP ตรง ๆ ฉบับเต็ม (คัดลอกแล้วรันได้)</h3>
+<p>ตารางด้านบนบอกว่า MCP ต่างจาก function/API อย่างไร ส่วนนี้พิสูจน์ด้วยโค้ดที่รันได้จริง: เขียน <strong>MCP Client ด้วยมือ 1 ไฟล์</strong> ทำหน้าที่แทน Host (Claude Code / Codex) แล้วเรียก <strong>tool <code>speak</code> ของ <code>kokoro-tts</code></strong> ซึ่งเป็น &quot;แบบที่ 3&quot; ในหัวข้อนี้ พร้อม sanity check ด้วย <code>add</code> ของ <code>hello-lab</code> ก่อน เพื่อแยกให้ออกว่าถ้าพังคือพังที่เส้นทาง MCP หรือพังที่ Kokoro ทั้งสอง server เป็นของจริงในโฟลเดอร์ <a href="labs/my-mcp-server/"><code>labs/my-mcp-server/</code></a> ไม่ใช่ API สมมติ</p>
+<p><strong>บริบทก่อนรัน</strong></p>
+<table>
+<thead>
+<tr>
+<th>สิ่งที่ต้องรู้</th>
+<th>ค่าที่ใช้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>working directory ของทุกคำสั่ง</td>
+<td>โฟลเดอร์บทเรียน <code>03_MCP</code> (บนเครื่องผู้สอนคือ <code>/root/workspace/CWN/Teaching/03_MCP</code>) เอกสารนี้แทนด้วย <code>&lt;PATH_TO_03_MCP&gt;</code></td>
+</tr>
+<tr>
+<td>ตัวแปลภาษา Python</td>
+<td><code>/opt/venv/bin/python</code> (เครื่องเรียนของผู้สอน) หรือ <code>labs/.venv/bin/python</code> ถ้าติดตั้งเองตามข้อ 4.6.2</td>
+</tr>
+<tr>
+<td>แพ็กเกจที่ต้องมี</td>
+<td><code>mcp</code> 2.x, <code>kokoro</code>, <code>soundfile</code>, <code>torch</code> (CPU พอ)</td>
+</tr>
+<tr>
+<td>ไฟล์ที่เกี่ยวข้อง</td>
+<td><code>labs/my-mcp-server/direct_call_kokoro.py</code> (client), <code>hello_server.py</code>, <code>tts_server.py</code>, <code>wire_capture.py</code> และ <code>labs/kokoro-web/kokoro_core.py</code> (ตัวเรียกโมเดลจริง)</td>
+</tr>
+<tr>
+<td>เครือข่าย</td>
+<td>ครั้งแรกที่เรียก <code>speak</code> ต้องต่ออินเทอร์เน็ตเพื่อดาวน์โหลดโมเดล Kokoro-82M จาก Hugging Face ครั้งถัดไปใช้แคช</td>
+</tr>
+<tr>
+<td>working directory ของ <strong>server</strong></td>
+<td>ไม่ต้องสนใจ — client เปิด server เองด้วย path เต็ม และ server อ้าง path จากตำแหน่งไฟล์ตัวเอง</td>
+</tr>
+</tbody>
+</table>
+<p>ขั้นเตรียม (ตรวจก่อนว่าครบ ถ้าขั้นนี้ไม่ผ่านอย่าเพิ่งรัน client)</p>
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+ls labs/my-mcp-server/direct_call_kokoro.py labs/my-mcp-server/tts_server.py labs/kokoro-web/kokoro_core.py
+/opt/venv/bin/python -c &quot;import mcp, soundfile, kokoro; print('deps ok')&quot;
+</code></pre>
+<p><strong>โค้ดเต็มของ client</strong> — ไฟล์ <a href="labs/my-mcp-server/direct_call_kokoro.py"><code>labs/my-mcp-server/direct_call_kokoro.py</code></a> (แสดงครบทั้งไฟล์ ไม่มีส่วนที่ตัดออก)</p>
+<pre><code class="language-python">&quot;&quot;&quot;
+direct_call_kokoro.py — เรียก MCP tool ตรง ๆ จาก Python โดยไม่ผ่าน LLM (ฉบับเต็ม คัดลอกแล้วรันได้)
+====================================================================================
+ไฟล์นี้คือ &quot;MCP Client ขนาดเล็ก&quot; ที่ทำงานแทน Host (Claude Code / Codex) ครบทุกขั้น:
+
+    1. เปิด MCP server ของบทเรียนเป็น subprocess แบบ stdio
+    2. เชื่อมต่อและค้นพบ server → SDK จัดการเวอร์ชันโปรโตคอลและ capabilities
+    3. tools/list  → ค้นพบว่ามี tool อะไรบ้าง พร้อม inputSchema
+    4. tools/call  → เรียกใช้จริง (sanity check: hello-lab add, งานหลัก: kokoro-tts speak)
+    5. ตรวจไฟล์เสียงที่ได้ด้วย soundfile แล้วเขียนผลเป็น JSON
+
+ต้องมีก่อนรัน
+-------------
+* Python 3.10+ ที่ติดตั้งแพ็กเกจ `mcp` 2.x, `kokoro`, `soundfile`, `torch` (CPU ก็พอ)
+  - เครื่องเรียนของผู้สอนใช้ /opt/venv/bin/python
+  - ถ้าทำตาม readme.md ข้อ 4.6.2 จะได้ labs/.venv/bin/python
+* โฟลเดอร์ปัจจุบัน (working directory) ไม่สำคัญ เพราะสคริปต์อ้าง path จากตำแหน่งไฟล์ตัวเองเสมอ
+  แต่ตัวอย่างคำสั่งด้านล่างรันจากโฟลเดอร์บทเรียน 03_MCP
+
+วิธีรัน
+-------
+    # จากโฟลเดอร์ 03_MCP
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
+        --text &quot;Model Context Protocol lets one server serve many agents.&quot; \
+        --out  lab-results/documentation-check/direct-call-result.json
+
+    # ข้าม sanity check ของ hello-lab (เรียกเฉพาะ Kokoro)
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity
+
+    # บันทึกข้อความ JSON-RPC ทุกบรรทัดบนสายผ่าน wire_capture.py
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --wire wire-direct.jsonl
+
+exit code: 0 = สำเร็จทุกขั้น, 1 = มีขั้นที่ล้มเหลว (รายละเอียดพิมพ์ลง stderr)
+&quot;&quot;&quot;
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import pathlib
+import sys
+import traceback
+
+# --- แพ็กเกจของ MCP Python SDK 2.x ------------------------------------------------
+# mcp.Client                      = ฝั่ง client ของโปรโตคอล (discover/list/call)
+# mcp.client.stdio.stdio_client   = transport แบบ stdio: เปิด server เป็น subprocess
+try:
+    from mcp import Client
+    from mcp.client.stdio import StdioServerParameters, stdio_client
+except ImportError as exc:  # แพ็กเกจยังไม่ได้ติดตั้ง หรือรันด้วย python ผิดตัว
+    sys.exit(
+        f&quot;[FATAL] import mcp ไม่สำเร็จ: {exc}\n&quot;
+        &quot;        ติดตั้งด้วย:  &lt;python ของ venv&gt; -m pip install 'mcp[cli]'\n&quot;
+        f&quot;        python ที่ใช้อยู่ตอนนี้: {sys.executable}&quot;
+    )
+
+HERE = pathlib.Path(__file__).resolve().parent          # .../labs/my-mcp-server
+HELLO_SERVER = HERE / &quot;hello_server.py&quot;
+TTS_SERVER = HERE / &quot;tts_server.py&quot;
+WIRE_PROXY = HERE / &quot;wire_capture.py&quot;
+PY = sys.executable                                      # ใช้ python ตัวเดียวกับที่รันสคริปต์นี้
+
+
+def dump(obj) -&gt; str:
+    &quot;&quot;&quot;แปลงผลลัพธ์ของ SDK (pydantic model) เป็น JSON อ่านง่าย&quot;&quot;&quot;
+    if hasattr(obj, &quot;model_dump&quot;):
+        obj = obj.model_dump(by_alias=True, exclude_none=True, mode=&quot;json&quot;)
+    return json.dumps(obj, ensure_ascii=False, indent=2)
+
+
+def stdio_target(script: pathlib.Path, wire: str | None):
+    &quot;&quot;&quot;สร้าง transport stdio ที่ชี้ไปยัง server 1 ตัว (ใส่ wire_capture.py คั่นได้)&quot;&quot;&quot;
+    if not script.exists():
+        raise FileNotFoundError(f&quot;ไม่พบไฟล์ server: {script}&quot;)
+    args = [str(script)] if not wire else [str(WIRE_PROXY), &quot;--log&quot;, wire, &quot;--&quot;, PY, str(script)]
+    return stdio_client(StdioServerParameters(command=PY, args=args))
+
+
+def tool_text(result) -&gt; str:
+    &quot;&quot;&quot;ดึงข้อความจาก content block แรกของผล tools/call (MCP คืนผลเป็น list ของ content)&quot;&quot;&quot;
+    for block in getattr(result, &quot;content&quot;, []) or []:
+        text = getattr(block, &quot;text&quot;, None)
+        if text is not None:
+            return text
+    return &quot;&quot;
+
+
+def check_not_error(result, label: str) -&gt; None:
+    &quot;&quot;&quot;MCP ไม่ได้โยน exception เมื่อ tool ทำงานพลาด แต่ตั้งธง isError=true ต้องเช็กเอง&quot;&quot;&quot;
+    if getattr(result, &quot;is_error&quot;, False) or getattr(result, &quot;isError&quot;, False):
+        raise RuntimeError(f&quot;tool {label} ตอบกลับด้วย isError=true: {tool_text(result)}&quot;)
+
+
+async def sanity_check_hello(wire: str | None) -&gt; dict:
+    &quot;&quot;&quot;ขั้นที่ 1 — ตรวจว่าเส้นทาง MCP ทั้งเส้นใช้งานได้ ด้วย server ที่ไม่มี dependency หนัก&quot;&quot;&quot;
+    print(&quot;=&quot; * 72)
+    print(&quot;[1/2] sanity check — hello-lab (add)&quot;)
+    print(&quot;=&quot; * 72)
+    async with Client(stdio_target(HELLO_SERVER, wire)) as client:
+        print(&quot;protocol_version :&quot;, client.protocol_version)
+        print(&quot;server_info      :&quot;, dump(client.server_info))
+
+        tools = await client.list_tools()
+        names = [t.name for t in tools.tools]
+        print(&quot;tools/list       :&quot;, names)
+        if &quot;add&quot; not in names:
+            raise RuntimeError(f&quot;ไม่พบ tool ชื่อ add ใน {names}&quot;)
+
+        result = await client.call_tool(&quot;add&quot;, {&quot;a&quot;: 17, &quot;b&quot;: 25})
+        check_not_error(result, &quot;add&quot;)
+        print(&quot;tools/call add(17, 25) →&quot;, tool_text(result))
+        if tool_text(result).strip() != &quot;42&quot;:
+            raise RuntimeError(f&quot;add(17, 25) ควรได้ 42 แต่ได้ {tool_text(result)!r}&quot;)
+        return {&quot;tools&quot;: names, &quot;add_17_25&quot;: tool_text(result).strip()}
+
+
+async def call_kokoro(text: str, voice: str, wire: str | None) -&gt; dict:
+    &quot;&quot;&quot;ขั้นที่ 2 — งานหลักของบทที่ 3: เรียก Kokoro ผ่าน MCP (tool speak ของ kokoro-tts)&quot;&quot;&quot;
+    print()
+    print(&quot;=&quot; * 72)
+    print(&quot;[2/2] งานหลัก — kokoro-tts (speak)&quot;)
+    print(&quot;=&quot; * 72)
+    async with Client(stdio_target(TTS_SERVER, wire)) as client:
+        print(&quot;protocol_version :&quot;, client.protocol_version)
+        print(&quot;instructions     :&quot;, client.instructions)
+
+        tools = await client.list_tools()
+        by_name = {t.name: t for t in tools.tools}
+        print(&quot;tools/list       :&quot;, list(by_name))
+        if &quot;speak&quot; not in by_name:
+            raise RuntimeError(f&quot;ไม่พบ tool ชื่อ speak ใน {list(by_name)}&quot;)
+        print(&quot;inputSchema ของ speak:&quot;)
+        print(dump(by_name[&quot;speak&quot;].input_schema))
+
+        voices = await client.call_tool(&quot;list_voices&quot;, {})
+        check_not_error(voices, &quot;list_voices&quot;)
+        available = [getattr(b, &quot;text&quot;, &quot;&quot;) for b in (voices.content or [])]
+        print(&quot;list_voices      :&quot;, available)
+        if available and voice not in available:
+            raise RuntimeError(f&quot;voice {voice!r} ไม่อยู่ในรายการที่ server รองรับ: {available}&quot;)
+
+        print(f&quot;tools/call speak(text={text!r}, voice={voice!r}) ...&quot;)
+        result = await client.call_tool(&quot;speak&quot;, {&quot;text&quot;: text, &quot;voice&quot;: voice})
+        check_not_error(result, &quot;speak&quot;)
+        raw = tool_text(result)
+        print(&quot;ผลดิบจาก tool   :&quot;, raw)
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f&quot;ผลของ speak ไม่ใช่ JSON: {raw!r}&quot;) from exc
+        return payload
+
+
+def verify_wav(path_str: str) -&gt; dict:
+    &quot;&quot;&quot;ขั้นสุดท้าย — เปิดไฟล์ .wav ที่ได้จริง เพื่อยืนยันว่าไม่ใช่ค่าที่ tool แต่งขึ้น&quot;&quot;&quot;
+    path = pathlib.Path(path_str)
+    if not path.exists():
+        raise FileNotFoundError(f&quot;tool คืน path มาแต่ไม่พบไฟล์จริง: {path}&quot;)
+    try:
+        import soundfile as sf
+    except ImportError:
+        print(&quot;[warn] ไม่มี soundfile จึงตรวจได้แค่ขนาดไฟล์&quot;, file=sys.stderr)
+        return {&quot;bytes&quot;: path.stat().st_size}
+    info = sf.info(str(path))
+    return {
+        &quot;bytes&quot;: path.stat().st_size,
+        &quot;verified_duration_sec&quot;: round(info.frames / info.samplerate, 2),
+        &quot;verified_sample_rate&quot;: info.samplerate,
+        &quot;channels&quot;: info.channels,
+    }
+
+
+def leaf_errors(exc: BaseException) -&gt; list[BaseException]:
+    &quot;&quot;&quot;แตก ExceptionGroup ของ anyio ให้เหลือ error ใบสุดท้าย
+    (SDK ใช้ task group ภายใน ข้อผิดพลาดที่เราโยนจึงถูกห่อมาเป็นกลุ่ม)&quot;&quot;&quot;
+    inner = getattr(exc, &quot;exceptions&quot;, None)
+    if not inner:
+        return [exc]
+    out: list[BaseException] = []
+    for e in inner:
+        out.extend(leaf_errors(e))
+    return out
+
+
+async def run(args: argparse.Namespace) -&gt; int:
+    summary: dict = {&quot;python&quot;: PY, &quot;server_dir&quot;: str(HERE)}
+    try:
+        if not args.skip_sanity:
+            summary[&quot;hello&quot;] = await sanity_check_hello(args.wire)
+        summary[&quot;speak&quot;] = await call_kokoro(args.text, args.voice, args.wire)
+        summary[&quot;wav&quot;] = verify_wav(summary[&quot;speak&quot;][&quot;path&quot;])
+    except Exception as exc:  # noqa: BLE001 — จับทุกกรณีเพื่อรายงานสาเหตุจริงให้ผู้เรียน
+        known = [e for e in leaf_errors(exc) if isinstance(e, (RuntimeError, FileNotFoundError))]
+        if known:
+            for e in known:
+                print(f&quot;[FAIL] {type(e).__name__}: {e}&quot;, file=sys.stderr)
+        else:
+            print(&quot;[FAIL] ข้อผิดพลาดที่ไม่ได้คาดไว้:&quot;, file=sys.stderr)
+            traceback.print_exc()
+        return 1
+
+    print()
+    print(&quot;=&quot; * 72)
+    print(&quot;สรุปผล (JSON)&quot;)
+    print(&quot;=&quot; * 72)
+    text = json.dumps(summary, ensure_ascii=False, indent=2)
+    print(text)
+    if args.out:
+        out = pathlib.Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text + &quot;\n&quot;, encoding=&quot;utf-8&quot;)
+        print(f&quot;เขียนผลลง {out}&quot;)
+    return 0
+
+
+def main() -&gt; int:
+    ap = argparse.ArgumentParser(description=&quot;เรียก MCP tool ตรง ๆ จาก Python (ไม่ผ่าน LLM)&quot;)
+    ap.add_argument(&quot;--text&quot;, default=&quot;Model Context Protocol lets one server serve many agents.&quot;,
+                    help=&quot;ข้อความภาษาอังกฤษที่จะให้ Kokoro อ่าน&quot;)
+    ap.add_argument(&quot;--voice&quot;, default=&quot;af_heart&quot;, help=&quot;ชื่อเสียง (ดูจาก tool list_voices)&quot;)
+    ap.add_argument(&quot;--wire&quot;, default=None, help=&quot;path ไฟล์ .jsonl สำหรับบันทึกข้อความบนสาย&quot;)
+    ap.add_argument(&quot;--out&quot;, default=None, help=&quot;path ไฟล์ .json สำหรับเขียนผลสรุป&quot;)
+    ap.add_argument(&quot;--skip-sanity&quot;, action=&quot;store_true&quot;, help=&quot;ข้ามการตรวจ hello-lab add&quot;)
+    args = ap.parse_args()
+    try:
+        return asyncio.run(run(args))
+    except KeyboardInterrupt:
+        print(&quot;ยกเลิกโดยผู้ใช้&quot;, file=sys.stderr)
+        return 130
+
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(main())
+</code></pre>
+<p><strong>คำสั่งรัน</strong> (จากโฟลเดอร์ <code>03_MCP</code>)</p>
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+RUN=lab-results/documentation-check/run-$(date -u +%Y-%m-%d-%H%M%S)
+mkdir -p &quot;$RUN&quot;
+/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
+    --text &quot;Model Context Protocol lets one server serve many agents.&quot; \
+    --voice af_heart \
+    --wire &quot;$RUN/direct-wire.jsonl&quot; \
+    --out  &quot;$RUN/direct-call-result.json&quot; \
+    &gt; &quot;$RUN/direct-call-stdout.txt&quot; 2&gt; &quot;$RUN/direct-call-stderr.txt&quot;
+echo &quot;exit code: $?&quot;      # 0 = ผ่านทุกขั้น
+cat &quot;$RUN/direct-call-result.json&quot;
+</code></pre>
+<p><strong>ผลรันจริง</strong> (stdout ทั้งหมดของการรันเมื่อ 20 กันยายน 2026 เวลา 02:25 UTC บนเครื่องเรียน เก็บไว้ที่ <a href="lab-results/documentation-check/run-2026-09-20-022330/direct-call-stdout.txt"><code>direct-call-stdout.txt</code></a> — exit code 0)</p>
+<pre><code class="language-text">========================================================================
+[1/2] sanity check — hello-lab (add)
+========================================================================
+protocol_version : 2026-07-28
+server_info      : {
+  &quot;name&quot;: &quot;hello-lab&quot;,
+  &quot;version&quot;: &quot;&quot;
+}
+tools/list       : ['add', 'get_time', 'count_words']
+tools/call add(17, 25) → 42
+
+========================================================================
+[2/2] งานหลัก — kokoro-tts (speak)
+========================================================================
+protocol_version : 2026-07-28
+instructions     : แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M (ไม่รองรับภาษาไทย)
+tools/list       : ['list_voices', 'speak']
+inputSchema ของ speak:
+{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;voice&quot;: {
+      &quot;default&quot;: &quot;af_heart&quot;,
+      &quot;title&quot;: &quot;Voice&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;speakArguments&quot;
+}
+list_voices      : ['af_heart', 'af_bella', 'am_adam', 'am_michael']
+tools/call speak(text='Model Context Protocol lets one server serve many agents.', voice='af_heart') ...
+ผลดิบจาก tool   : {
+  &quot;path&quot;: &quot;/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav&quot;,
+  &quot;duration_sec&quot;: 4.45,
+  &quot;sample_rate&quot;: 24000,
+  &quot;gen_ms&quot;: 681,
+  &quot;voice&quot;: &quot;af_heart&quot;
+}
+
+========================================================================
+สรุปผล (JSON)
+========================================================================
+{
+  &quot;python&quot;: &quot;/opt/venv/bin/python&quot;,
+  &quot;server_dir&quot;: &quot;/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server&quot;,
+  &quot;hello&quot;: {
+    &quot;tools&quot;: [
+      &quot;add&quot;,
+      &quot;get_time&quot;,
+      &quot;count_words&quot;
+    ],
+    &quot;add_17_25&quot;: &quot;42&quot;
+  },
+  &quot;speak&quot;: {
+    &quot;path&quot;: &quot;/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav&quot;,
+    &quot;duration_sec&quot;: 4.45,
+    &quot;sample_rate&quot;: 24000,
+    &quot;gen_ms&quot;: 681,
+    &quot;voice&quot;: &quot;af_heart&quot;
+  },
+  &quot;wav&quot;: {
+    &quot;bytes&quot;: 213644,
+    &quot;verified_duration_sec&quot;: 4.45,
+    &quot;verified_sample_rate&quot;: 24000,
+    &quot;channels&quot;: 1
+  }
+}
+เขียนผลลง lab-results/documentation-check/run-2026-09-20-022330/direct-call-result.json
+</code></pre>
+<p><strong>อธิบายทีละขั้น</strong> — เทียบโค้ดกับข้อความ JSON-RPC ที่เกิดขึ้นจริง</p>
+<table>
+<thead>
+<tr>
+<th>ขั้น</th>
+<th>ในโค้ด</th>
+<th>เกิดอะไรบนสาย</th>
+<th>เห็นอะไรในผลรัน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. เลือก transport</td>
+<td><code>stdio_target()</code> สร้าง <code>StdioServerParameters(command=PY, args=[...])</code></td>
+<td>ยังไม่มีข้อความ เป็นแค่การเตรียมคำสั่งเปิด subprocess</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2. เปิดการเชื่อมต่อ</td>
+<td><code>async with Client(...)</code></td>
+<td>client เปิด server เป็นลูก แล้วทำ handshake (ใน SDK 2.x คือ <code>server/discover</code>)</td>
+<td><code>protocol_version : 2026-07-28</code>, <code>server_info</code></td>
+</tr>
+<tr>
+<td>3. ค้นพบเครื่องมือ</td>
+<td><code>await client.list_tools()</code></td>
+<td><code>tools/list</code></td>
+<td><code>['add', 'get_time', 'count_words']</code> และ <code>['list_voices', 'speak']</code> พร้อม <code>inputSchema</code> ที่ SDK สร้างจาก type hint</td>
+</tr>
+<tr>
+<td>4. เรียกเครื่องมือ</td>
+<td><code>await client.call_tool(&quot;add&quot;, {&quot;a&quot;: 17, &quot;b&quot;: 25})</code></td>
+<td><code>tools/call</code></td>
+<td><code>42</code></td>
+</tr>
+<tr>
+<td>5. เรียกงานหลัก</td>
+<td><code>await client.call_tool(&quot;speak&quot;, {...})</code></td>
+<td><code>tools/call</code> ไปยัง server คนละตัว</td>
+<td>JSON ที่มี <code>path</code>, <code>duration_sec</code>, <code>sample_rate</code>, <code>gen_ms</code>, <code>voice</code></td>
+</tr>
+<tr>
+<td>6. ตรวจผลจริง</td>
+<td><code>verify_wav()</code> อ่านไฟล์ด้วย <code>soundfile</code></td>
+<td>ไม่ใช่ข้อความ MCP — เป็นการตรวจว่า tool ไม่ได้แต่งตัวเลข</td>
+<td><code>verified_duration_sec: 4.45</code>, <code>verified_sample_rate: 24000</code>, <code>channels: 1</code></td>
+</tr>
+<tr>
+<td>7. ปิดการเชื่อมต่อ</td>
+<td>ออกจาก <code>async with</code></td>
+<td>client ปิด stdin ของ server แล้ว process ของ server จบ</td>
+<td>สคริปต์คืน exit code 0</td>
+</tr>
+</tbody>
+</table>
+<p>จุดที่ต้องสังเกตในโค้ด</p>
+<ol>
+<li><strong><code>tools/call</code> ที่ล้มเหลวไม่โยน exception</strong> — MCP ตอบกลับเป็นผลปกติแต่ตั้งธง <code>isError=true</code> จึงต้องมี <code>check_not_error()</code> เช็กเองทุกครั้ง ถ้าลืม โปรแกรมจะเดินต่อด้วยข้อมูลผิด</li>
+<li><strong>ผลของ tool เป็น list ของ content block</strong> ไม่ใช่ค่าเดี่ยว ๆ <code>tool_text()</code> จึงดึงข้อความจาก block แรกออกมาแล้วค่อย <code>json.loads()</code></li>
+<li><strong>SDK ใช้ task group ภายใน</strong> ข้อผิดพลาดที่เราโยนใน <code>async with</code> จะถูกห่อมาเป็น <code>ExceptionGroup</code> ฟังก์ชัน <code>leaf_errors()</code> จึงแตกกลุ่มออกมาเพื่อพิมพ์สาเหตุจริงแทน traceback ยาว ๆ</li>
+<li><strong>ใช้ <code>sys.executable</code></strong> เป็นคำสั่งเปิด server เสมอ เพื่อให้ server ใช้ venv ตัวเดียวกับ client (สาเหตุยอดฮิตของ <code>ModuleNotFoundError: kokoro</code>)</li>
+<li><strong>ไม่ผูกกับ working directory</strong> ทุก path อ้างจาก <code>pathlib.Path(__file__).resolve().parent</code> จะรันจากโฟลเดอร์ไหนก็ได้</li>
+</ol>
+<p><strong>ข้อความจริงบนสาย</strong> — ใส่ <code>--wire</code> แล้ว <code>wire_capture.py</code> จะคั่นกลางและบันทึกทุกบรรทัด (<a href="lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl"><code>direct-wire.jsonl</code></a> 15 บรรทัด)</p>
+<pre><code class="language-bash">/opt/venv/bin/python - &lt;&lt;'PY'
+import json
+for line in open(&quot;lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl&quot;):
+    rec = json.loads(line)
+    msg = rec[&quot;msg&quot;]
+    label = msg.get(&quot;method&quot;) or f&quot;result id={msg.get('id')}&quot; if isinstance(msg, dict) else &quot;NON-JSON: &quot; + msg[:60]
+    print(rec[&quot;dir&quot;], &quot;|&quot;, label)
+PY
+</code></pre>
+<pre><code class="language-text">client-&gt;server | server/discover
+server-&gt;client | result id=1
+client-&gt;server | tools/list
+server-&gt;client | result id=2
+client-&gt;server | tools/call
+server-&gt;client | result id=3
+client-&gt;server | server/discover
+server-&gt;client | NON-JSON: WARNING: Defaulting repo_id to hexgrad/Kokoro-82M. Pass re
+server-&gt;client | result id=1
+client-&gt;server | tools/list
+server-&gt;client | result id=2
+client-&gt;server | tools/call
+server-&gt;client | result id=3
+client-&gt;server | tools/call
+server-&gt;client | result id=4
+</code></pre>
+<p>บรรทัด <code>NON-JSON</code> คือกับดักจริงของ transport แบบ stdio: ไลบรารี Kokoro พิมพ์คำเตือนลง <strong>stdout</strong> ของ server ซึ่งเป็นช่องเดียวกับ JSON-RPC ฝั่ง client จึง log ว่า <code>Failed to parse JSONRPC message from server</code> ลง stderr (<a href="lab-results/documentation-check/run-2026-09-20-022330/direct-call-stderr.txt"><code>direct-call-stderr.txt</code></a>) แล้วข้ามบรรทัดนั้นไป งานยังสำเร็จเพราะ SDK ทนต่อบรรทัดที่ไม่ใช่ JSON แต่ในโค้ดของเราเองต้องจำกฎนี้ให้แม่น: <strong>server แบบ stdio ห้ามพิมพ์อะไรลง stdout นอกจาก JSON-RPC</strong> (ดูข้อ 4.7)</p>
+<p><strong>การจัดการ error — ทดสอบจริง</strong> ส่งชื่อเสียงที่ไม่มีอยู่จริง client ตรวจกับผล <code>list_voices</code> แล้วหยุดก่อนเรียก <code>speak</code></p>
+<pre><code class="language-bash">/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity --voice xx_bad
+echo &quot;exit code: $?&quot;
+</code></pre>
+<pre><code class="language-text">[FAIL] RuntimeError: voice 'xx_bad' ไม่อยู่ในรายการที่ server รองรับ: ['af_heart', 'af_bella', 'am_adam', 'am_michael']
+exit code: 1
+</code></pre>
+<p>หลักฐานอยู่ที่ <a href="lab-results/documentation-check/run-2026-09-20-022330/direct-call-badvoice-stderr.txt"><code>direct-call-badvoice-stderr.txt</code></a> กรณี error อื่นที่โค้ดครอบไว้: <code>import mcp</code> ไม่ได้ (บอกให้ติดตั้งและพิมพ์ว่ากำลังใช้ python ตัวไหน), ไม่พบไฟล์ server, ไม่พบ tool ที่ต้องการใน <code>tools/list</code>, tool ตอบ <code>isError=true</code>, ผลไม่ใช่ JSON และ tool คืน path ที่ไม่มีไฟล์จริง</p>
+<p><strong>ฟังเสียงที่ได้จากการเรียกครั้งนี้</strong></p>
+<p><audio controls src="lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav"></audio></p>
+<p>ถ้าตัวเรนเดอร์ Markdown ไม่รองรับแท็บเสียง ให้เปิดไฟล์ตรง ๆ: <a href="lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav"><code>direct-call-kokoro.wav</code></a> (4.45 วินาที, 24000 Hz, 1 ช่อง, 213,644 ไบต์ — ตรวจซ้ำด้วย <code>soundfile</code> แล้ว)</p>
+<blockquote>
+<p><strong>ขอบเขตของหลักฐานชุดนี้:</strong> ทั้งหมดเป็นผลของ <strong>Python MCP client</strong> ที่รันด้วย <code>/opt/venv/bin/python</code> ไม่ใช่ผลจาก Codex CLI เป็น Host และไม่ใช่ผลจาก Claude Code รอบนี้ การรันก่อนหน้าด้วย <code>client_test.py</code> เก็บไว้ที่ <a href="lab-results/documentation-check/run-2026-09-20-021614/"><code>run-2026-09-20-021614/</code></a> (มี <code>hello-stdout.txt</code>, <code>tts-stdout.txt</code>, wire log, <a href="lab-results/documentation-check/run-2026-09-20-021614/kokoro-result.json"><code>kokoro-result.json</code></a> และไฟล์เสียง <a href="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"><code>kokoro-actual.wav</code></a> ยาว 4.45 วินาที 24000 Hz เช่นกัน)</p>
+</blockquote>
+<p><audio controls src="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"></audio></p>
+<h2>ไฟล์เสียงของรอบก่อนหน้า (ถ้าเล่นในหน้านี้ไม่ได้ ให้กดลิงก์): <a href="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"><code>kokoro-actual.wav</code></a></h2>
 <p><a id="ch4"></a></p>
 <h2>บทที่ 4 ติดตั้งและตั้งค่า MCP ด้วยพรอมป์ต์ (ให้ AI ทำให้เอง)</h2>
 <h3>4.1 เริ่มตรงนี้: ส่งลิงก์ repo ต้นทางให้ AI แล้วขอด้วยภาษาธรรมดา</h3>
@@ -352,7 +826,7 @@ def speak(text: str, voice: str = &quot;af_heart&quot;) -&gt; dict:
 <tr>
 <td>Excalidraw MCP</td>
 <td><a href="https://github.com/yctimlin/mcp_excalidraw">https://github.com/yctimlin/mcp_excalidraw</a></td>
-<td>เป็น MCP server พร้อมใช้ (แพ็กเกจ npm <code>mcp-excalidraw-server</code> ระบุ <code>repository.url</code> ชี้มา repo นี้) README บอกว่ามี 3 ทางเลือก: agent skill + CLI (<code>npx -y mcp-excalidraw-server &lt;command&gt;</code>), MCP server แบบ stdio, และ REST API — ให้ AI เลือกเองว่าจะใช้ทางไหนกับ Host ของเรา</td>
+<td>เป็น MCP server พร้อมใช้ (แพ็กเกจ npm <code>mcp-excalidraw-server</code> ระบุ <code>repository.url</code> ชี้มา repo นี้) README บอกว่ามี 3 ทางเลือก: agent skill + CLI (<code>npx -y mcp-excalidraw-server &lt;command&gt;</code>), MCP server แบบ stdio, และ REST API — บทเรียนนี้ให้ AI เลือกการเชื่อมต่อ <strong>MCP server แบบ stdio</strong> เพื่อให้ได้ฝึก MCP จริง</td>
 </tr>
 <tr>
 <td>Playwright MCP</td>
@@ -483,7 +957,7 @@ Kokoro: repo เป็นไลบรารี ไม่มี MCP server จึ
 <h4>4.2.2 สำหรับ Codex CLI</h4>
 <p>เปิด <code>codex</code> ในโฟลเดอร์ทำงาน แล้ววางข้อความนี้ ใช้ <strong>repo ต้นทางชุดเดียวกับ 4.2.1</strong> ต่างกันเฉพาะ Host ที่ให้ตั้งค่า ไฟล์พร้อมคัดลอก: <a href="labs/prompts/setup-00-codex.md"><code>setup-00-codex.md</code></a></p>
 <blockquote>
-<p>ขอบเขตตามจริง: รอบนี้เป็นการแก้เอกสารเท่านั้น ยังไม่มีผลรันจริงฝั่ง Codex เพราะการทดสอบครั้งก่อนติดปัญหาการยืนยันตัวตนของ Codex default profile หลักฐานภาพ/เสียง/สาย JSON-RPC ทั้งหมดในบทเรียนมาจาก Claude Code อย่าอ่านว่าเป็นผลของ Codex</p>
+<p>ขอบเขตตามจริง: รอบนี้เป็นการแก้เอกสารเท่านั้น ยังไม่มีผลรันจริงฝั่ง Codex เพราะการทดสอบครั้งก่อนติดปัญหาการยืนยันตัวตนของ Codex default profile หลักฐานชุดเดิมมาจาก Claude Code และส่วน 3.1 มีผลทดสอบ Python MCP client เพิ่มเติม ทั้งสองชุดไม่ใช่ผลของ Codex CLI</p>
 </blockquote>
 <pre><code class="language-text">ช่วยติดตั้งเครื่องมือ MCP 3 ตัวนี้ให้ Codex CLI บนเครื่องนี้ ให้ใช้งานได้จริง
 
@@ -656,7 +1130,7 @@ virtual environment และไฟล์งานยังอยู่
 <tr>
 <td><code>Error: async initializeServer: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome Run &quot;npx playwright install chrome&quot;</code></td>
 <td><code>@playwright/mcp</code> 0.0.82 (เวอร์ชันที่ใช้ตอนทดลอง) ใช้ Google Chrome เป็นค่าเริ่มต้น แม้เราติดตั้ง chromium ไว้แล้ว</td>
-<td>ให้ AI ตั้งค่าเบราว์เซอร์ให้ตรงกับที่ติดตั้งจริง เช่น <code>--browser chromium</code> (README ต้นทางระบุค่าที่รับได้ไว้ในตารางตัวเลือกของ CLI และตัวอย่าง Docker ของ repo ใช้ <code>--browser chromium</code>)</td>
+<td>ให้ AI ตั้งค่าเบราว์เซอร์ให้ตรงกับที่ติดตั้งจริงด้วย <code>--browser &lt;ค่า&gt;</code> โดยยืนยันค่าที่รับได้จาก <code>playwright-mcp --help</code> ของเวอร์ชันที่ติดตั้ง (0.0.82 ในรอบทดลองรับ <code>chromium</code>; help ของ 0.0.80 บนเครื่องเรียนระบุ <code>chrome, firefox, webkit, msedge</code>)</td>
 </tr>
 <tr>
 <td><code>Running as root without --no-sandbox is not supported. See https://crbug.com/638180.</code></td>
@@ -673,54 +1147,275 @@ virtual environment และไฟล์งานยังอยู่
 <p>สำหรับ Codex ใช้ <code>codex mcp get &lt;ชื่อ server&gt;</code> ตรวจค่าที่ลงทะเบียน และ <code>/mcp</code> ใน session ดู server ที่ใช้งานอยู่ จากนั้นเรียก tool ซ้ำเพื่อยืนยันผล ส่วน Claude Code ใช้ <code>claude mcp list</code> แล้วทดสอบด้วย S5 เช่นกัน</p>
 <p>ข้อความ error ทั้งสามแถวมาจากการทดลองติดตั้งจริงเมื่อ 19 กันยายน 2026 ด้วย Claude Code บันทึกเก็บไว้ใน <a href="lab-results/setup-prompt/run-2026-09-19-072524/"><code>lab-results/setup-prompt/run-2026-09-19-072524/</code></a> สำหรับผู้ที่ต้องการดูรายละเอียด (ยังไม่มีผลรันฝั่ง Codex)</p>
 <h3>4.6 คำสั่งติดตั้งและตั้งค่าแบบทำเอง (ครบทุกขั้น คัดลอกวางในเทอร์มินัลได้)</h3>
-<p><strong>ส่วนนี้เป็นข้อมูลอ้างอิงเสริม ไม่ใช่เส้นทางหลักของบทเรียน</strong> เส้นทางหลักคือส่งลิงก์ repo ต้นทางพร้อมคำขอสั้น ๆ ตามข้อ 4.2–4.3 แล้วให้ AI อ่าน README และเลือกวิธีเอง คำสั่งชุดนี้เก็บไว้เพื่อ (1) ตรวจสอบย้อนหลังว่าในการติดตั้งจริงรอบก่อนเกิดอะไรขึ้น (คัดจาก <a href="lab-results/setup-prompt/run-2026-09-19-072524/setup-report.md"><code>setup-report.md</code></a> ที่ AI เขียนหลังติดตั้งจริงเมื่อ 19 กันยายน 2026) (2) ใช้เมื่ออยากทำเองทีละขั้น หรือใช้ Host ที่ไม่มี Bash ค่าและเวอร์ชันของแพ็กเกจอาจเปลี่ยนไปแล้ว ให้ยึด README ต้นทางเป็นหลักเสมอ ทุกคำสั่ง<strong>รันจากโฟลเดอร์ <code>03_MCP</code></strong> บน Linux/macOS (Windows ดูข้อ 4.6.8)</p>
+<p><strong>ส่วนนี้เป็นข้อมูลอ้างอิงเสริม ไม่ใช่เส้นทางหลักของบทเรียน</strong> เส้นทางหลักคือส่งลิงก์ repo ต้นทางพร้อมคำขอสั้น ๆ ตามข้อ 4.2–4.3 แล้วให้ AI อ่าน README และเลือกวิธีเอง คำสั่งชุดนี้ให้ครบทุกขั้นของ<strong>แต่ละเครื่องมือแยกกัน</strong> (ข้อ 4.6.3) และให้ทั้งฝั่ง Claude Code (4.6.4) และ Codex CLI (4.6.7) เก็บไว้เพื่อ (1) ตรวจสอบย้อนหลังว่าในการติดตั้งจริงรอบก่อนเกิดอะไรขึ้น (คัดจาก <a href="lab-results/setup-prompt/run-2026-09-19-072524/setup-report.md"><code>setup-report.md</code></a> ที่ AI เขียนหลังติดตั้งจริงเมื่อ 19 กันยายน 2026) (2) ใช้เมื่ออยากทำเองทีละขั้น หรือใช้ Host ที่ไม่มี Bash ค่าและเวอร์ชันของแพ็กเกจอาจเปลี่ยนไปแล้ว ให้ยึด README ต้นทางเป็นหลักเสมอ ทุกคำสั่ง<strong>รันจากโฟลเดอร์ <code>03_MCP</code></strong> บน Linux/macOS (Windows ดูข้อ 4.6.8)</p>
 <h4>4.6.1 สิ่งที่ต้องมีก่อน (ครั้งเดียวต่อเครื่อง)</h4>
-<pre><code class="language-bash">node -v &amp;&amp; npm -v        # ต้อง v18 ขึ้นไป (บทเรียนทดสอบกับ v22 และ v24) — ถ้าไม่มี: ติดตั้ง Node.js LTS จาก https://nodejs.org หรือผ่าน nvm
-python3 --version        # ต้อง 3.10 ขึ้นไป (บทเรียนทดสอบกับ 3.12) — Ubuntu: sudo apt-get install -y python3 python3-venv python3-pip
+<pre><code class="language-bash">node -v &amp;&amp; npm -v        # ต้อง v18 ขึ้นไป (Excalidraw MCP 2.0 ต้องการ v20 ขึ้นไป; เครื่องเรียนใช้ v24.20.0)
+python3 --version        # ต้อง 3.10 ขึ้นไป (เครื่องเรียนใช้ 3.12.3) — Ubuntu: sudo apt-get install -y python3 python3-venv python3-pip
 git --version
-claude --version         # ต้องได้เลขเวอร์ชัน (บทเรียนทดสอบกับ 2.1.258 และ 2.1.278)
+claude --version         # ใช้ Claude Code เป็น Host (เครื่องเรียนใช้ 2.1.258)
+codex --version          # ใช้ Codex CLI เป็น Host (เครื่องเรียนใช้ codex-cli 0.154.0)
 </code></pre>
-<p>ถ้ายังไม่มี Claude Code ให้ติดตั้งแล้วล็อกอิน (รายละเอียดในบทที่ 01)</p>
-<pre><code class="language-bash">curl -fsSL https://claude.ai/install.sh | bash     # ติดตั้ง Claude Code (Linux/macOS) แล้วเปิดเทอร์มินัลใหม่
-claude                                             # เปิดครั้งแรก แล้วพิมพ์ /login เพื่อล็อกอินด้วยบัญชี Claude
+<p>ถ้ายังไม่มี Host ให้ติดตั้งแล้วล็อกอินก่อน (รายละเอียดในบทที่ 01)</p>
+<pre><code class="language-bash">curl -fsSL https://claude.ai/install.sh | bash     # Claude Code (Linux/macOS) แล้วเปิดเทอร์มินัลใหม่
+claude                                             # เปิดครั้งแรก แล้วพิมพ์ /login
+npm install -g @openai/codex                       # Codex CLI
+codex login                                        # ล็อกอินด้วยบัญชี ChatGPT หรือ API key
 </code></pre>
-<h4>4.6.2 Python virtual environment และแพ็กเกจ</h4>
-<pre><code class="language-bash">python3 -m venv labs/.venv
+<h4>4.6.2 Python virtual environment, แพ็กเกจ และไลบรารี Kokoro</h4>
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+python3 -m venv labs/.venv
 labs/.venv/bin/pip install --upgrade pip
-labs/.venv/bin/pip install &quot;mcp[cli]&quot; soundfile fastapi uvicorn
+labs/.venv/bin/pip install &quot;mcp[cli]&gt;=2,&lt;3&quot; soundfile fastapi uvicorn
 labs/.venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu   # torch รุ่น CPU (ข้ามถ้ามี torch อยู่แล้ว) ~26 วินาทีในการทดสอบ
 labs/.venv/bin/pip install kokoro                                                   # ~23 วินาที (โมเดล Kokoro-82M ดาวน์โหลดตอนใช้ครั้งแรก)
 sudo apt-get update &amp;&amp; sudo apt-get install -y espeak-ng                            # Linux (Debian/Ubuntu); macOS: brew install espeak-ng (แนวทาง — ยังไม่ได้ทดลอง)
 labs/.venv/bin/pip list | grep -iE &quot;^(mcp|kokoro|torch|fastapi|uvicorn|soundfile) &quot;   # ตรวจเวอร์ชัน
 </code></pre>
-<h4>4.6.3 MCP server แบบ Node และเบราว์เซอร์ของ Playwright</h4>
-<pre><code class="language-bash">npm install -g mcp-excalidraw-server @playwright/mcp     # ~53 วินาทีในการทดสอบ (เติม sudo ถ้า npm global ต้องใช้สิทธิ์)
-npx playwright install chromium                          # ดาวน์โหลด Chromium ให้ Playwright (~30 วินาที)
-sudo npx playwright install-deps chromium                # Linux เท่านั้น: ไลบรารีระบบที่ Chromium ต้องใช้ (~15 วินาที)
-command -v mcp-excalidraw-server playwright-mcp          # ต้องพิมพ์ path ออกมาทั้งสองบรรทัด
+<p><strong>ทดสอบ Kokoro แบบไลบรารีล้วน ๆ ก่อน (ยังไม่เกี่ยวกับ MCP)</strong> — ขั้นนี้พิสูจน์ว่า repo ต้นทางให้ &quot;ไลบรารี&quot; มา ไม่ใช่ MCP server</p>
+<pre><code class="language-bash">cat &gt; /tmp/kokoro_smoke.py &lt;&lt;'PY'
+&quot;&quot;&quot;ทดสอบ Kokoro แบบไลบรารีล้วน ๆ (ยังไม่เกี่ยวกับ MCP)&quot;&quot;&quot;
+from kokoro import KPipeline
+import soundfile as sf
+
+pipeline = KPipeline(lang_code=&quot;a&quot;, device=&quot;cpu&quot;)   # 'a' = American English
+for i, (graphemes, phonemes, audio) in enumerate(pipeline(&quot;Kokoro library test, no MCP yet.&quot;, voice=&quot;af_heart&quot;)):
+    sf.write(f&quot;/tmp/kokoro-lib-{i}.wav&quot;, audio, 24000)
+    print(&quot;wrote&quot;, f&quot;/tmp/kokoro-lib-{i}.wav&quot;, &quot;frames:&quot;, len(audio))
+PY
+labs/.venv/bin/python /tmp/kokoro_smoke.py
 </code></pre>
+<p>ผลรันจริงบนเครื่องเรียนด้วย <code>/opt/venv/bin/python</code> (20 กันยายน 2026, exit code 0 — เก็บไว้ที่ <a href="lab-results/documentation-check/run-2026-09-20-022330/kokoro-library-only-stdout.txt"><code>kokoro-library-only-stdout.txt</code></a>)</p>
+<pre><code class="language-text">WARNING: Defaulting repo_id to hexgrad/Kokoro-82M. Pass repo_id='hexgrad/Kokoro-82M' to suppress this warning.
+wrote /tmp/kokoro-lib-0.wav frames: 81000
+</code></pre>
+<p>81000 เฟรมที่ 24000 Hz = 3.375 วินาที · ใช้ <code>device=&quot;cpu&quot;</code> เสมอบนเครื่องที่ไม่มี GPU ที่ตั้งค่าไว้ ถ้าปล่อยให้เลือกเองบนเครื่องเรียน (RTX + torch nightly) จะได้ <code>RuntimeError: GET was unable to find an engine to execute this computation</code> (พบจริงในรอบตรวจนี้ และเป็นเหตุผลที่ <a href="labs/kokoro-web/kokoro_core.py"><code>kokoro_core.py</code></a> อ่าน <code>KOKORO_DEVICE</code> โดยมีค่าเริ่มต้นเป็น <code>cpu</code>) · สังเกตว่า <code>WARNING</code> ออกทาง <strong>stdout</strong> ซึ่งเป็นกับดักของ MCP แบบ stdio (ดูข้อ 3.1 และ 4.7)</p>
+<h4>4.6.3 ติดตั้งเครื่องมือทีละตัว (ครบทุกขั้นของแต่ละตัว)</h4>
+<p><strong>ก. Excalidraw MCP — เป็น MCP server พร้อมใช้ ติดตั้งแล้วใช้ได้เลย</strong></p>
+<pre><code class="language-bash">npm install -g mcp-excalidraw-server              # ~เพิ่ม sudo ถ้า npm global ต้องใช้สิทธิ์
+command -v mcp-excalidraw-server                  # ต้องพิมพ์ path ออกมา
+mcp-excalidraw-server --help                      # ดูรายการคำสั่งของ CLI และค่าเริ่มต้นของ canvas
+mcp-excalidraw-server start                       # เปิด canvas server แบบ detached
+mcp-excalidraw-server status                      # ตรวจว่า canvas ตอบ (running, url, elements, browserClients)
+# mcp-excalidraw-server stop                      # หยุด canvas เมื่อเลิกใช้
+</code></pre>
+<p>ตัวแปรสภาพแวดล้อมที่ใช้บ่อย (ตั้งตอนลงทะเบียน MCP หรือ export ก่อนเรียก CLI)</p>
+<table>
+<thead>
+<tr>
+<th>ตัวแปร</th>
+<th>ความหมาย</th>
+<th>ค่าเริ่มต้นตาม CLI</th>
+<th>ค่าจริงบนเครื่องเรียนของผู้สอน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EXPRESS_SERVER_URL</code></td>
+<td>URL ของ canvas ที่ทั้ง MCP server และ CLI จะคุยด้วย</td>
+<td><code>http://127.0.0.1:3000</code></td>
+<td><code>http://127.0.0.1:8892</code></td>
+</tr>
+<tr>
+<td><code>EXCALIDRAW_NO_AUTOSTART</code></td>
+<td><code>1</code> = ห้ามคำสั่ง CLI เปิด canvas ให้เอง (ใช้เมื่อมี canvas เปิดอยู่แล้ว)</td>
+<td>ไม่ตั้ง (auto-start)</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>EXCALIDRAW_EXPORT_DIR</code></td>
+<td>โฟลเดอร์เดียวที่อนุญาตให้เขียน/อ่านไฟล์ export</td>
+<td>ไม่ตั้ง</td>
+<td><code>/root/workspace/.mcp/excalidraw/diagrams</code></td>
+</tr>
+</tbody>
+</table>
+<p>ตรวจแบบไม่ผ่าน LLM (ผลจริงจากเครื่องเรียนเมื่อ 20 กันยายน 2026 — canvas ที่ผู้สอนเปิดค้างไว้)</p>
+<pre><code class="language-bash">EXCALIDRAW_NO_AUTOSTART=1 EXPRESS_SERVER_URL=http://127.0.0.1:8892 mcp-excalidraw-server status
+</code></pre>
+<pre><code class="language-json">{
+  &quot;running&quot;: true,
+  &quot;url&quot;: &quot;http://127.0.0.1:8892&quot;,
+  &quot;pid&quot;: 816,
+  &quot;elements&quot;: 21,
+  &quot;browserClients&quot;: 1,
+  &quot;success&quot;: true,
+  &quot;elementCount&quot;: 21,
+  &quot;websocketClients&quot;: 1
+}
+</code></pre>
+<p><code>browserClients</code> ต้องมากกว่า 0 ก่อนสั่ง <code>screenshot</code>/<code>export</code> — นั่นคือต้องมีแท็บเบราว์เซอร์เปิดหน้า canvas อยู่ ถ้าเครื่องไม่มีจอ ให้ Playwright MCP เปิดแท็บให้ (S5 ข้อ 2)</p>
+<p><strong>ข. Playwright MCP — เป็น MCP server พร้อมใช้ แต่ต้องดาวน์โหลดเบราว์เซอร์เพิ่ม</strong></p>
+<pre><code class="language-bash">npm install -g @playwright/mcp                    # เครื่องเรียนใช้ 0.0.80
+command -v playwright-mcp
+npx playwright install chromium                   # ดาวน์โหลดเบราว์เซอร์ (~30 วินาที)
+sudo npx playwright install-deps chromium         # Linux เท่านั้น: ไลบรารีระบบที่ Chromium ต้องใช้ (~15 วินาที)
+playwright-mcp --help | head -40                  # **ตรวจชื่อตัวเลือกของเวอร์ชันที่ติดตั้งจริงก่อนใช้**
+</code></pre>
+<p>ตัวเลือกที่ต้องรู้ (ยืนยันจาก <code>playwright-mcp --help</code> ของ 0.0.80 บนเครื่องเรียน)</p>
+<table>
+<thead>
+<tr>
+<th>ตัวเลือก</th>
+<th>ใช้เมื่อไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--browser &lt;browser&gt;</code></td>
+<td>ตัวอย่างนี้ติดตั้ง Chromium จึงใช้ <code>--browser chromium</code> ให้ตรงกัน แม้ help ของ 0.0.80 ไม่แสดงค่านี้ แต่ <a href="lab-results/setup-prompt/run-2026-09-19-072524/host-check-browser-flag.txt">ผลตรวจ flag บนเครื่องเรียน</a> ยืนยันว่ารับค่านี้ได้ ถ้าต้องการใช้ <code>chrome</code> ให้ติดตั้ง Chrome เพิ่มด้วย <code>npx playwright install chrome</code></td>
+</tr>
+<tr>
+<td><code>--headless</code></td>
+<td>เครื่องไม่มีจอ (server / WSL ไม่มี GUI / container)</td>
+</tr>
+<tr>
+<td><code>--no-sandbox</code></td>
+<td>รันเป็น root (container) ไม่ใส่จะได้ <code>Running as root without --no-sandbox is not supported</code></td>
+</tr>
+<tr>
+<td><code>--cdp-endpoint &lt;url&gt;</code></td>
+<td>ต่อกับเบราว์เซอร์ที่เปิดค้างไว้แล้วแทนการเปิดใหม่ — เครื่องเรียนใช้ <code>http://127.0.0.1:9222</code></td>
+</tr>
+<tr>
+<td><code>--output-dir &lt;path&gt;</code></td>
+<td>โฟลเดอร์เก็บ screenshot/ไฟล์ที่ tool สร้าง</td>
+</tr>
+<tr>
+<td><code>--isolated</code></td>
+<td>ไม่เก็บโปรไฟล์เบราว์เซอร์ลงดิสก์</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ค. Kokoro TTS — ไม่ใช่ MCP server ต้องมีคนห่อ</strong></p>
+<p>repo ต้นทาง <a href="https://github.com/hexgrad/kokoro">https://github.com/hexgrad/kokoro</a> ให้ <strong>ไลบรารี Python</strong> มาอย่างเดียว (ติดตั้งแล้วในข้อ 4.6.2) ไม่มีคำสั่งอย่าง <code>kokoro-mcp-server</code> ให้รัน สิ่งที่ทำให้ Kokoro กลายเป็น MCP tool คือ wrapper ที่เราเขียนเอง — ในบทเรียนนี้คือ <a href="labs/my-mcp-server/tts_server.py"><code>labs/my-mcp-server/tts_server.py</code></a> (20 บรรทัดแรกของบทที่ 7 สอนวิธีเขียน) ดังนั้นลำดับที่ถูกต้องคือ</p>
+<pre><code class="language-bash">labs/.venv/bin/pip show kokoro | head -3                                   # 1. มีไลบรารีแล้ว
+labs/.venv/bin/python /tmp/kokoro_smoke.py                                 # 2. ไลบรารีสร้างเสียงได้จริง
+labs/.venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity   # 3. wrapper ทำงานผ่าน MCP ได้จริง (ยังไม่ต้องมี Host)
+</code></pre>
+<p><strong>สรุปว่าอะไรติดตั้งได้เลย อะไรต้องเขียน wrapper</strong></p>
+<table>
+<thead>
+<tr>
+<th>เครื่องมือ</th>
+<th>ต้นทางให้อะไรมา</th>
+<th>คำสั่งติดตั้ง</th>
+<th>ต้องเขียน MCP server เองไหม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Excalidraw MCP</td>
+<td>MCP server + CLI พร้อมใช้</td>
+<td><code>npm install -g mcp-excalidraw-server</code></td>
+<td>ไม่ต้อง</td>
+</tr>
+<tr>
+<td>Playwright MCP</td>
+<td>MCP server พร้อมใช้</td>
+<td><code>npm install -g @playwright/mcp</code> + <code>npx playwright install chromium</code></td>
+<td>ไม่ต้อง</td>
+</tr>
+<tr>
+<td>Kokoro TTS</td>
+<td>ไลบรารี Python (โมเดล Kokoro-82M)</td>
+<td><code>pip install kokoro</code> (+ <code>espeak-ng</code>)</td>
+<td><strong>ต้อง</strong> — ในบทเรียนใช้ <code>labs/my-mcp-server/tts_server.py</code></td>
+</tr>
+<tr>
+<td>hello-lab</td>
+<td>ไม่มีต้นทาง เป็นแล็บของบทเรียน</td>
+<td><code>pip install &quot;mcp[cli]&quot;</code></td>
+<td><strong>ต้อง</strong> — <code>labs/my-mcp-server/hello_server.py</code> (บทที่ 7)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>พอร์ตและ path ที่บทเรียนนี้ใช้</strong></p>
+<table>
+<thead>
+<tr>
+<th>บริการ</th>
+<th>พอร์ต/path</th>
+<th>ใครเปิด</th>
+<th>ตรวจด้วย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Excalidraw canvas</td>
+<td><code>http://127.0.0.1:3000</code> (ค่าเริ่มต้นของ CLI) หรือ <code>http://127.0.0.1:8892</code> (เครื่องเรียน ตั้งผ่าน <code>EXPRESS_SERVER_URL</code>)</td>
+<td><code>mcp-excalidraw-server start</code></td>
+<td><code>mcp-excalidraw-server status</code></td>
+</tr>
+<tr>
+<td>เว็บทดลอง Kokoro (FastAPI)</td>
+<td><code>http://127.0.0.1:8765</code></td>
+<td><code>labs/kokoro-web/run.sh</code></td>
+<td><code>curl -s http://127.0.0.1:8765/api/health</code></td>
+</tr>
+<tr>
+<td><code>hello_server.py</code> แบบ Streamable HTTP</td>
+<td><code>http://127.0.0.1:8766/mcp</code></td>
+<td><code>hello_server.py --http</code></td>
+<td><code>client_test.py --server http</code></td>
+</tr>
+<tr>
+<td>headless Chrome ของเครื่องเรียน (CDP)</td>
+<td><code>http://127.0.0.1:9222</code></td>
+<td>เปิดไว้ล่วงหน้าโดยผู้สอน</td>
+<td><code>curl -s http://127.0.0.1:9222/json/version</code></td>
+</tr>
+<tr>
+<td>ไฟล์เสียงที่สร้าง</td>
+<td><code>labs/kokoro-web/audio_out/*.wav</code></td>
+<td><code>kokoro_core.synthesize()</code></td>
+<td><code>ls -lt labs/kokoro-web/audio_out | head</code></td>
+</tr>
+</tbody>
+</table>
 <h4>4.6.4 ลงทะเบียน MCP server กับ Claude Code</h4>
-<pre><code class="language-bash">claude mcp add --scope user excalidraw -- mcp-excalidraw-server
-claude mcp add --scope user playwright -- playwright-mcp --browser chromium                             # เครื่องที่มีจอแสดงผล
-# claude mcp add --scope user playwright -- playwright-mcp --browser chromium --headless                # เครื่องไม่มีจอ (server / WSL ไม่มี GUI)
-# claude mcp add --scope user playwright -- playwright-mcp --browser chromium --headless --no-sandbox   # รันเป็น root (container)
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+
+# 1) Excalidraw — แบบพื้นฐาน (canvas ใช้ค่าเริ่มต้น http://127.0.0.1:3000)
+claude mcp add --scope user excalidraw -- mcp-excalidraw-server
+
+# 1b) Excalidraw — แบบเดียวกับเครื่องเรียน (canvas อยู่พอร์ต 8892 และเปิดค้างไว้แล้ว)
+# claude mcp add --scope user excalidraw \
+#   -e EXPRESS_SERVER_URL=http://127.0.0.1:8892 \
+#   -e EXCALIDRAW_NO_AUTOSTART=1 \
+#   -e EXCALIDRAW_EXPORT_DIR=/root/workspace/.mcp/excalidraw/diagrams \
+#   -- mcp-excalidraw-server
+
+# 2) Playwright — เลือกบรรทัดเดียวให้ตรงกับเครื่อง (ตรวจชื่อค่าของ --browser จาก playwright-mcp --help ก่อน)
+claude mcp add --scope user playwright -- playwright-mcp --browser chromium                              # เครื่องที่มีจอ
+# claude mcp add --scope user playwright -- playwright-mcp --browser chromium --headless                 # เครื่องไม่มีจอ
+# claude mcp add --scope user playwright -- playwright-mcp --browser chromium --headless --no-sandbox    # รันเป็น root ใน container
+# claude mcp add --scope user playwright -- playwright-mcp --cdp-endpoint http://127.0.0.1:9222        # ต่อเบราว์เซอร์ที่เปิดค้างไว้ (แบบเครื่องเรียน)
+
+# 3) แล็บของบทเรียน (ต้องมีโฟลเดอร์ labs/ ก่อน)
 claude mcp add --scope user hello-lab  -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/hello_server.py&quot;
-claude mcp add --scope user kokoro-tts --env KOKORO_DEVICE=cpu -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/tts_server.py&quot;
-claude mcp list                 # ต้องเห็น ✔ Connected ทั้ง 4 ตัว
+claude mcp add --scope user kokoro-tts -e KOKORO_DEVICE=cpu -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/tts_server.py&quot;
+
+# 4) ตรวจผล
+claude mcp list                 # ต้องเห็น ✔ Connected ครบทุกตัว
 claude mcp get playwright       # ดูค่าที่ลงทะเบียนของตัวใดตัวหนึ่ง
 # claude mcp remove playwright  # ถอนก่อนลงทะเบียนใหม่ (ชื่อซ้ำจะ error)
 </code></pre>
-<p>ตัวเลือก <code>--scope</code>: <code>user</code> = ใช้ได้ทุกโฟลเดอร์ (เก็บใน <code>~/.claude.json</code>), <code>project</code> = เก็บใน <code>.mcp.json</code> ของโฟลเดอร์ปัจจุบันเพื่อแชร์ผ่าน git (Claude Code จะถามอนุมัติครั้งแรกที่เปิด), <code>local</code> (ค่าเริ่มต้น) = เฉพาะโฟลเดอร์นี้บนเครื่องนี้</p>
+<p>ตัวเลือก <code>--scope</code>: <code>user</code> = ใช้ได้ทุกโฟลเดอร์ (เก็บใน <code>~/.claude.json</code>), <code>project</code> = เก็บใน <code>.mcp.json</code> ของโฟลเดอร์ปัจจุบันเพื่อแชร์ผ่าน git (Claude Code จะถามอนุมัติครั้งแรกที่เปิด), <code>local</code> (ค่าเริ่มต้น) = เฉพาะโฟลเดอร์นี้บนเครื่องนี้ · ตัวเลือกกำหนดตัวแปรสภาพแวดล้อมคือ <code>-e KEY=value</code> (ใส่ซ้ำได้หลายตัว) · หลังลงทะเบียนต้อง <code>/exit</code> แล้วเปิด <code>claude</code> ใหม่ Host จึงจะโหลด server</p>
 <h4>4.6.5 เริ่มเว็บทดลองและทดสอบโดยไม่ใช้ LLM</h4>
-<pre><code class="language-bash">PYTHON=&quot;$(pwd)/labs/.venv/bin/python&quot; labs/kokoro-web/run.sh                     # เปิด http://127.0.0.1:8765 (pid ใน labs/kokoro-web/server.pid)
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+PYTHON=&quot;$(pwd)/labs/.venv/bin/python&quot; labs/kokoro-web/run.sh                     # เปิด http://127.0.0.1:8765 (pid ใน labs/kokoro-web/server.pid)
 curl -s http://127.0.0.1:8765/api/health                                         # {&quot;ok&quot;:true,&quot;device&quot;:&quot;cpu&quot;,...}
 curl -s -X POST http://127.0.0.1:8765/api/tts -H &quot;Content-Type: application/json&quot; \
      -d '{&quot;text&quot;:&quot;Setup test from prompt.&quot;,&quot;voice&quot;:&quot;af_heart&quot;}'                  # ครั้งแรก ~3 วินาที (โหลดโมเดล) ครั้งต่อไปต่ำกว่า 1 วินาที
 labs/.venv/bin/python labs/my-mcp-server/client_test.py --server hello           # ต้องเห็น tools/list และ add(17, 25) → 42
-kill &quot;$(cat labs/kokoro-web/server.pid)&quot;                                         # หยุดเว็บเมื่อเลิกใช้
+labs/.venv/bin/python labs/my-mcp-server/direct_call_kokoro.py                   # เรียก MCP tool ตรง ๆ ครบวงจร (ดูข้อ 3.1) exit code 0 = ผ่าน
+</code></pre>
+<p>ผลจริงของ <code>curl /api/health</code> บนเครื่องเรียนเมื่อ 20 กันยายน 2026: <code>{&quot;ok&quot;:true,&quot;device&quot;:&quot;cpu&quot;,&quot;model_loaded&quot;:true,&quot;voices&quot;:[&quot;af_heart&quot;,&quot;af_bella&quot;,&quot;am_adam&quot;,&quot;am_michael&quot;]}</code></p>
+<p>หยุดเว็บเมื่อจบแล็บแล้วเท่านั้น:</p>
+<pre><code class="language-bash">kill &quot;$(cat labs/kokoro-web/server.pid)&quot;
 </code></pre>
 <h4>4.6.6 ไฟล์ตั้งค่าที่คำสั่งด้านบนสร้างให้ (แก้เองได้)</h4>
-<p>ระดับผู้ใช้ <code>~/.claude.json</code> ส่วน <code>mcpServers</code> ตามรูปแบบที่การติดตั้งสร้างให้ (ค่าจริงหลังรันพรอมป์ต์ติดตั้งฉบับละเอียดในข้อ 4.6.9 เมื่อการทดสอบ 19 กันยายน 2026อยู่ใน <a href="lab-results/setup-prompt/run-2026-09-19-072524/container-state-after-s0.txt"><code>container-state-after-s0.txt</code></a> ซึ่งตอนนั้น <code>playwright</code> มี <code>args</code> เพียง <code>[&quot;--headless&quot;]</code> ก่อนที่พรอมป์ต์จะถูกปรับให้ใส่ <code>--browser chromium</code>; แทน path ด้วยตัวยึด <code>&lt;PATH_TO_03_MCP&gt;</code>)</p>
+<p>ระดับผู้ใช้ <code>~/.claude.json</code> ส่วน <code>mcpServers</code> ตามรูปแบบที่การติดตั้งสร้างให้ (ค่าจริงหลังรันพรอมป์ต์ติดตั้งฉบับละเอียดในข้อ 4.6.9 เมื่อการทดสอบ 19 กันยายน 2026อยู่ใน <a href="lab-results/setup-prompt/run-2026-09-19-072524/container-state-after-s0.txt"><code>container-state-after-s0.txt</code></a> ซึ่งตอนนั้น <code>playwright</code> มี <code>args</code> เพียง <code>[&quot;--headless&quot;]</code> ก่อนที่พรอมป์ต์จะถูกปรับให้ใส่ <code>--browser</code>; แทน path ด้วยตัวยึด <code>&lt;PATH_TO_03_MCP&gt;</code>)</p>
 <pre><code class="language-json">{
   &quot;mcpServers&quot;: {
     &quot;excalidraw&quot;: {&quot;type&quot;: &quot;stdio&quot;, &quot;command&quot;: &quot;mcp-excalidraw-server&quot;, &quot;args&quot;: [], &quot;env&quot;: {}},
@@ -729,6 +1424,19 @@ kill &quot;$(cat labs/kokoro-web/server.pid)&quot;                              
                    &quot;args&quot;: [&quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/hello_server.py&quot;], &quot;env&quot;: {}},
     &quot;kokoro-tts&quot;: {&quot;type&quot;: &quot;stdio&quot;, &quot;command&quot;: &quot;&lt;PATH_TO_03_MCP&gt;/labs/.venv/bin/python&quot;,
                    &quot;args&quot;: [&quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/tts_server.py&quot;], &quot;env&quot;: {&quot;KOKORO_DEVICE&quot;: &quot;cpu&quot;}}
+  }
+}
+</code></pre>
+<p>ค่าจริงบนเครื่องเรียนของผู้สอน (คัดเฉพาะสอง server แรกจากไฟล์ตั้งค่าของ Host ที่ใช้สอน — ต่อเบราว์เซอร์ที่เปิดค้างไว้ และ canvas อยู่พอร์ต 8892)</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;playwright&quot;: {&quot;type&quot;: &quot;stdio&quot;, &quot;command&quot;: &quot;playwright-mcp&quot;,
+                   &quot;args&quot;: [&quot;--cdp-endpoint&quot;, &quot;http://127.0.0.1:9222&quot;,
+                            &quot;--output-dir&quot;, &quot;/root/workspace/.mcp/playwright/output&quot;]},
+    &quot;excalidraw&quot;: {&quot;type&quot;: &quot;stdio&quot;, &quot;command&quot;: &quot;mcp-excalidraw-server&quot;, &quot;args&quot;: [],
+                   &quot;env&quot;: {&quot;EXPRESS_SERVER_URL&quot;: &quot;http://127.0.0.1:8892&quot;,
+                           &quot;EXCALIDRAW_EXPORT_DIR&quot;: &quot;/root/workspace/.mcp/excalidraw/diagrams&quot;,
+                           &quot;EXCALIDRAW_NO_AUTOSTART&quot;: &quot;1&quot;}}
   }
 }
 </code></pre>
@@ -742,43 +1450,66 @@ kill &quot;$(cat labs/kokoro-web/server.pid)&quot;                              
   }
 }
 </code></pre>
-<p>ชั่วคราวเฉพาะคำสั่งเดียว (ไม่แตะการตั้งค่าเครื่อง ใช้เก็บหลักฐานในบทที่ 7): <code>claude -p --strict-mcp-config --mcp-config labs/my-mcp-server/mcp.json &quot;&lt;prompt&gt;&quot;</code> — ไฟล์ <a href="labs/my-mcp-server/mcp.json"><code>labs/my-mcp-server/mcp.json</code></a> เป็นตัวอย่างที่ห่อ server ด้วย <code>wire_capture.py</code> เพื่อดักข้อความบนสาย</p>
+<p>ชั่วคราวเฉพาะคำสั่งเดียว (ไม่แตะการตั้งค่าเครื่อง ใช้เก็บหลักฐานในบทที่ 7): <code>claude -p --strict-mcp-config --mcp-config labs/my-mcp-server/mcp.json &quot;&lt;prompt&gt;&quot;</code> — ไฟล์ <a href="labs/my-mcp-server/mcp.json"><code>labs/my-mcp-server/mcp.json</code></a> เป็นตัวอย่างที่ห่อ server ด้วย <code>wire_capture.py</code> เพื่อดักข้อความบนสาย (ไฟล์จริงใช้ path เต็ม ที่นี่ย่อให้อ่านง่าย)</p>
 <pre><code class="language-json">{
   &quot;mcpServers&quot;: {
     &quot;hello-lab&quot;: {
       &quot;command&quot;: &quot;/opt/venv/bin/python&quot;,
-      &quot;args&quot;: [&quot;.../wire_capture.py&quot;, &quot;--log&quot;, &quot;.../wire-claude-hello.jsonl&quot;, &quot;--&quot;, &quot;/opt/venv/bin/python&quot;, &quot;.../hello_server.py&quot;]
+      &quot;args&quot;: [&quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/wire_capture.py&quot;, &quot;--log&quot;, &quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/wire-claude-hello.jsonl&quot;,
+               &quot;--&quot;, &quot;/opt/venv/bin/python&quot;, &quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/hello_server.py&quot;]
     },
     &quot;kokoro-tts&quot;: {
       &quot;command&quot;: &quot;/opt/venv/bin/python&quot;,
-      &quot;args&quot;: [&quot;.../wire_capture.py&quot;, &quot;--log&quot;, &quot;.../wire-claude-tts.jsonl&quot;, &quot;--&quot;, &quot;/opt/venv/bin/python&quot;, &quot;.../tts_server.py&quot;],
+      &quot;args&quot;: [&quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/wire_capture.py&quot;, &quot;--log&quot;, &quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/wire-claude-tts.jsonl&quot;,
+               &quot;--&quot;, &quot;/opt/venv/bin/python&quot;, &quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/tts_server.py&quot;],
       &quot;env&quot;: {&quot;KOKORO_DEVICE&quot;: &quot;cpu&quot;}
     }
   }
 }
 </code></pre>
 <p>เมื่อต่อสำเร็จ Claude Code จะมองเห็น tool ในชื่อ <code>mcp__&lt;ชื่อ server&gt;__&lt;ชื่อ tool&gt;</code> เช่น <code>mcp__hello-lab__add</code> และ <code>mcp__kokoro-tts__speak</code> (ดู <a href="lab-results/own-server/run-2026-09-19-062712/claude-discover-summary.md"><code>claude-discover-summary.md</code></a>) ส่วน resource อ่านผ่านเครื่องมือกลาง <code>ReadMcpResourceTool {&quot;server&quot;: &quot;hello-lab&quot;, &quot;uri&quot;: &quot;lab://info&quot;}</code></p>
-<h4>4.6.7 Codex CLI — คำสั่งติดตั้ง MCP และตรวจการตั้งค่า</h4>
-<p>หลังติดตั้งแพ็กเกจและสร้าง venv ตามข้อ 4.6.2–4.6.3 แล้ว รันจากโฟลเดอร์ <code>03_MCP</code> บน Linux/macOS:</p>
-<pre><code class="language-bash">codex mcp add excalidraw -- &quot;$(command -v mcp-excalidraw-server)&quot;
+<h4>4.6.7 Codex CLI — คำสั่งติดตั้งและตั้งค่าครบทุกเครื่องมือ</h4>
+<p>ขั้นตอนก่อนหน้า (4.6.1–4.6.3) ใช้ร่วมกันทั้งสอง Host เพราะเป็นการติดตั้งแพ็กเกจ ต่างกันเฉพาะขั้นลงทะเบียน รันจากโฟลเดอร์ <code>03_MCP</code> บน Linux/macOS</p>
+<pre><code class="language-bash"># รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
+
+# 1) Excalidraw
+codex mcp add excalidraw -- &quot;$(command -v mcp-excalidraw-server)&quot;
+# แบบเดียวกับเครื่องเรียน (canvas พอร์ต 8892 เปิดค้างไว้แล้ว):
+# codex mcp add excalidraw \
+#   --env EXPRESS_SERVER_URL=http://127.0.0.1:8892 \
+#   --env EXCALIDRAW_NO_AUTOSTART=1 \
+#   --env EXCALIDRAW_EXPORT_DIR=/root/workspace/.mcp/excalidraw/diagrams \
+#   -- &quot;$(command -v mcp-excalidraw-server)&quot;
+
+# 2) Playwright (ตรวจค่าที่ --browser รับได้จาก playwright-mcp --help ของเวอร์ชันที่ติดตั้ง)
 codex mcp add playwright -- &quot;$(command -v playwright-mcp)&quot; --browser chromium
-# เครื่องไม่มีจอ: เติม --headless ต่อท้ายคำสั่ง playwright
-# ถ้ารันเป็น root ใน container: เติม --headless --no-sandbox
-codex mcp add hello-lab -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/hello_server.py&quot;
+# เครื่องไม่มีจอ: เติม --headless ต่อท้าย · รันเป็น root ใน container: เติม --headless --no-sandbox
+# ต่อเบราว์เซอร์ที่เปิดค้างไว้: codex mcp add playwright -- &quot;$(command -v playwright-mcp)&quot; --cdp-endpoint http://127.0.0.1:9222
+
+# 3) แล็บของบทเรียน
+codex mcp add hello-lab  -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/hello_server.py&quot;
 codex mcp add kokoro-tts --env KOKORO_DEVICE=cpu -- &quot;$(pwd)/labs/.venv/bin/python&quot; &quot;$(pwd)/labs/my-mcp-server/tts_server.py&quot;
+
+# 4) ตรวจค่าที่ลงทะเบียน
 codex mcp list
 codex mcp get playwright
+# codex mcp remove playwright   # ถอนทีละตัวเมื่อต้องแก้
 </code></pre>
-<p>เปิด <code>codex</code> เป็น session ใหม่ ใช้ <code>/mcp</code> ดู server ที่ใช้งานอยู่ แล้วใช้ S5 ทดสอบจริง <code>codex mcp list</code> แสดงค่าที่ลงทะเบียน ไม่ใช่หลักฐานว่าทุก tool ทำงานผ่านแล้ว</p>
-<p>เมื่อต้องถอน ใช้ <code>codex mcp remove &lt;ชื่อ server&gt;</code> ทีละตัว ได้แก่ <code>excalidraw</code>, <code>playwright</code>, <code>hello-lab</code>, <code>kokoro-tts</code> ส่วนการหยุดเว็บ Kokoro ใช้ขั้นตอนเดียวกับ S6</p>
-<p>รูปแบบคำสั่งอ้างอิง <a href="https://developers.openai.com/codex/mcp">เอกสาร MCP ของ OpenAI</a> และ help ของ CLI บน Remote; ยังไม่ได้ทดสอบติดตั้งครบชุดด้วย Codex ในรอบนี้</p>
-<p>Codex ใช้ไฟล์ <code>~/.codex/config.toml</code> (หรือ <code>$CODEX_HOME/config.toml</code>) วางส่วนนี้ต่อท้ายไฟล์แล้วตรวจด้วย <code>codex mcp list</code> (ค่าจริงบนเครื่องเรียนของผู้สอนต่างเล็กน้อย: <code>playwright</code> ใช้ <code>args = [&quot;--cdp-endpoint&quot;, &quot;http://127.0.0.1:9222&quot;]</code> เพื่อต่อ headless Chrome ที่เปิดไว้แล้ว และ <code>excalidraw</code> มี <code>[mcp_servers.excalidraw.env]</code> กำหนด <code>EXPRESS_SERVER_URL = &quot;http://127.0.0.1:8892&quot;</code>, <code>EXCALIDRAW_NO_AUTOSTART = &quot;1&quot;</code>, <code>EXCALIDRAW_EXPORT_DIR = &quot;/root/workspace/.mcp/excalidraw/diagrams&quot;</code>)</p>
+<p>รูปแบบคำสั่ง (<code>--env KEY=VALUE</code>, <code>-- &lt;COMMAND&gt;...</code>, <code>--url</code> สำหรับ Streamable HTTP) ยืนยันจาก <code>codex mcp add --help</code> ของ <code>codex-cli</code> 0.154.0 บนเครื่องเรียนเมื่อ 20 กันยายน 2026 · เปิด <code>codex</code> เป็น session ใหม่ ใช้ <code>/mcp</code> ดู server ที่ใช้งานอยู่ แล้วใช้ S5 ทดสอบจริง — <code>codex mcp list</code> แสดงค่าที่ลงทะเบียน <strong>ไม่ใช่</strong> หลักฐานว่าทุก tool ทำงานผ่านแล้ว · เอกสารอ้างอิง: <a href="https://developers.openai.com/codex/mcp">MCP ของ OpenAI</a> · <strong>ยังไม่ได้ทดสอบติดตั้งครบชุดด้วย Codex ในรอบนี้</strong> (รอบนี้ตรวจเฉพาะ <code>codex mcp add --help</code> แบบอ่านอย่างเดียว)</p>
+<p>Codex เก็บค่าไว้ใน <code>~/.codex/config.toml</code> (หรือ <code>$CODEX_HOME/config.toml</code>) ถ้าจะแก้เองให้วางส่วนนี้ต่อท้ายไฟล์แล้วตรวจด้วย <code>codex mcp list</code></p>
 <pre><code class="language-toml">[mcp_servers.excalidraw]
 command = &quot;mcp-excalidraw-server&quot;
+
+# เฉพาะเครื่องผู้สอนที่เปิด canvas ไว้ที่ 8892 แล้ว จึงเปิดใช้ส่วนนี้:
+# [mcp_servers.excalidraw.env]
+# EXPRESS_SERVER_URL = &quot;http://127.0.0.1:8892&quot;
+# EXCALIDRAW_NO_AUTOSTART = &quot;1&quot;
+# EXCALIDRAW_EXPORT_DIR = &quot;/root/workspace/.mcp/excalidraw/diagrams&quot;
 
 [mcp_servers.playwright]
 command = &quot;playwright-mcp&quot;
 args = [&quot;--browser&quot;, &quot;chromium&quot;]
+# เครื่องเรียนของผู้สอนใช้: args = [&quot;--cdp-endpoint&quot;, &quot;http://127.0.0.1:9222&quot;]
 
 [mcp_servers.hello-lab]
 command = &quot;&lt;PATH_TO_03_MCP&gt;/labs/.venv/bin/python&quot;
@@ -791,7 +1522,7 @@ args = [&quot;&lt;PATH_TO_03_MCP&gt;/labs/my-mcp-server/tts_server.py&quot;]
 [mcp_servers.kokoro-tts.env]
 KOKORO_DEVICE = &quot;cpu&quot;
 </code></pre>
-<p>ถ้าใช้ Codex เป็น Host ให้เริ่มจากคำขอภาษาธรรมดาในข้อ 4.2.2 ก่อน แล้วใช้คำสั่งด้านบนเป็นตัวเทียบผลเท่านั้น</p>
+<p>เมื่อต้องถอน ใช้ <code>codex mcp remove &lt;ชื่อ server&gt;</code> ทีละตัว ได้แก่ <code>excalidraw</code>, <code>playwright</code>, <code>hello-lab</code>, <code>kokoro-tts</code> ส่วนการหยุดเว็บ Kokoro และ canvas ใช้ขั้นตอนเดียวกับ S6 · ถ้าใช้ Codex เป็น Host ให้เริ่มจากคำขอภาษาธรรมดาในข้อ 4.2.2 ก่อน แล้วใช้คำสั่งด้านบนเป็นตัวเทียบผลเท่านั้น</p>
 <h4>4.6.8 หมายเหตุสำหรับ Windows (แนวทาง — ยังไม่ได้ทดลอง)</h4>
 <ul>
 <li>python ของ venv อยู่ที่ <code>labs\.venv\Scripts\python.exe</code> และใช้ <code>where mcp-excalidraw-server</code> แทน <code>command -v</code></li>
@@ -800,7 +1531,7 @@ KOKORO_DEVICE = &quot;cpu&quot;
 <li><code>run.sh</code> เป็นสคริปต์ bash ให้รันผ่าน Git Bash/WSL หรือรันตรงจากโฟลเดอร์ <code>labs\kokoro-web</code>: <code>..\.venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8765</code></li>
 </ul>
 <h4>4.6.9 พรอมป์ต์ติดตั้งฉบับละเอียด (ฉบับเดิม — เก็บไว้เป็นข้อมูลอ้างอิง)</h4>
-<p>พรอมป์ต์สองบล็อกนี้คือฉบับที่ใช้ในการทดลองติดตั้งเมื่อ 19 กันยายน 2026 ซึ่งผู้สอนสั่งขั้นตอนให้ AI ครบทั้ง 9 ข้อ <strong>ไม่ใช่เส้นทางการเรียนหลักแล้ว</strong> (เส้นทางหลักคือข้อ 4.2 ส่งลิงก์ repo + คำขอสั้น ๆ) เก็บไว้เพราะหลักฐานใน <code>lab-results/setup-prompt/run-2026-09-19-072524/</code> เกิดจากพรอมป์ต์ชุดนี้ และใช้เทียบได้ว่าคำสั่งที่ AI ควรเลือกเองมีหน้าตาอย่างไร บล็อกนี้อ้างถึงโค้ดแล็บของบทเรียน (<code>labs/kokoro-web</code>, <code>labs/my-mcp-server</code>) จึงใช้ได้เฉพาะเมื่อมีโฟลเดอร์บทเรียนอยู่แล้ว</p>
+<p>บล็อก Claude Code ด้านล่างเป็นฉบับอ้างอิงจากการทดลองติดตั้งเมื่อ 19 กันยายน 2026 ส่วนบล็อก Codex เป็นฉบับดัดแปลงที่ยังไม่ได้ทดสอบรันจริง ซึ่งผู้สอนสั่งขั้นตอนให้ AI ครบทั้ง 9 ข้อ <strong>ไม่ใช่เส้นทางการเรียนหลักแล้ว</strong> (เส้นทางหลักคือข้อ 4.2 ส่งลิงก์ repo + คำขอสั้น ๆ) เก็บไว้เพราะหลักฐานใน <code>lab-results/setup-prompt/run-2026-09-19-072524/</code> เกิดจากพรอมป์ต์ชุดนี้ และใช้เทียบได้ว่าคำสั่งที่ AI ควรเลือกเองมีหน้าตาอย่างไร บล็อกนี้อ้างถึงโค้ดแล็บของบทเรียน (<code>labs/kokoro-web</code>, <code>labs/my-mcp-server</code>) จึงใช้ได้เฉพาะเมื่อมีโฟลเดอร์บทเรียนอยู่แล้ว</p>
 <p><strong>ฉบับ Claude Code (เดิม)</strong></p>
 <pre><code class="language-text">คุณคือผู้ช่วยติดตั้งสำหรับบทเรียน 03_MCP (Model Context Protocol) ทำทุกข้อต่อไปนี้ให้เสร็จโดยไม่ต้องถามกลับ ถ้าข้อใดต้องใช้สิทธิ์ผู้ดูแลระบบ (sudo) และรันไม่ได้ ให้บอกคำสั่งที่ผู้ใช้ต้องรันเองแล้วทำข้ออื่นต่อ
 โฟลเดอร์ปัจจุบันคือโฟลเดอร์บทเรียน 03_MCP ซึ่งมี labs/kokoro-web และ labs/my-mcp-server อยู่แล้ว ห้ามแก้โค้ดในสองโฟลเดอร์นั้น
@@ -846,7 +1577,7 @@ KOKORO_DEVICE = &quot;cpu&quot;
 <li>ใช้ path แบบเต็ม (absolute) ใน <code>command</code>/<code>args</code> เพราะ Host เป็นคนเปิด process ไม่ใช่เรา และ working directory อาจไม่ใช่ที่เราคิด</li>
 <li>server แบบ stdio ห้ามพิมพ์อะไรลง stdout นอกจาก JSON-RPC</li>
 <li>MCP server ที่เพิ่งลงทะเบียนจะถูกโหลดตอนเริ่ม session ใหม่เท่านั้น จึงต้อง <code>/exit</code> แล้วเปิด <code>claude</code> ใหม่หลังรัน S0 (รวมถึงหลังที่ AI แก้ค่าใน <code>~/.claude.json</code> ให้)</li>
-<li><code>@playwright/mcp</code> รุ่นใหม่ใช้ Google Chrome เป็นค่าเริ่มต้น ถ้าติดตั้งแค่ chromium ต้องลงทะเบียนด้วย <code>--browser chromium</code> และถ้ารันเป็น root ต้องมี <code>--no-sandbox</code> (พบจริงในการทดสอบคอนเทนเนอร์ ข้อ 4.5)</li>
+<li><code>@playwright/mcp</code> รุ่นใหม่ใช้ Google Chrome เป็นค่าเริ่มต้น ถ้าติดตั้งเบราว์เซอร์ตัวอื่นต้องระบุ <code>--browser &lt;ค่า&gt;</code> ให้ตรงกับที่ <code>playwright-mcp --help</code> ของเวอร์ชันนั้นรับ (รอบทดลอง 0.0.82 ใช้ <code>chromium</code> ผ่าน ส่วน 0.0.80 บนเครื่องเรียนระบุค่า <code>chrome, firefox, webkit, msedge</code>) และถ้ารันเป็น root ต้องมี <code>--no-sandbox</code> (พบจริงในการทดสอบคอนเทนเนอร์ ข้อ 4.5)</li>
 <li>Excalidraw MCP บนเครื่องเรียนเขียน/อ่านไฟล์ได้เฉพาะใน <code>EXCALIDRAW_EXPORT_DIR</code> (<code>/root/workspace/.mcp/excalidraw/diagrams</code>) ถ้าสั่ง export ไปที่อื่นจะได้ <code>Path traversal blocked</code> ต้องคัดลอกไฟล์ออกมาเอง (พบจริงใน Lab 5.4)</li>
 <li>Playwright MCP บนเครื่องเรียนต่อกับ headless Chrome ตัวเดียวกับที่ Excalidraw ใช้แสดง canvas ถ้าแท็บของเว็บที่ทดสอบอยู่เบื้องหลัง การคลิกจะ timeout (พบจริงใน Lab 6 ดูวิธีแก้ในบทที่ 6.4)</li>
 </ol>
