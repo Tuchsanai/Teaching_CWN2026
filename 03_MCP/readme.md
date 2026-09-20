@@ -662,6 +662,7 @@ exit code: 1
 <audio controls src="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"></audio>
 
 ไฟล์เสียงของรอบก่อนหน้า (ถ้าเล่นในหน้านี้ไม่ได้ ให้กดลิงก์): [`kokoro-actual.wav`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav)
+
 ---
 
 <a id="ch4"></a>
