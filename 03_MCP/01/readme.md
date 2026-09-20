@@ -185,9 +185,7 @@ claude          # หรือ codex
 
 ```text
 ช่วยติดตั้ง Kokoro TTS (โมเดล hexgrad/Kokoro-82M) ให้เป็น MCP server ชื่อ kokoro-demo
-ทำในโฟลเดอร์ ~/kokoro-mcp โดย venv อยู่ที่ ~/kokoro-mcp/.venv (ลง torch แบบ CPU)
-ไฟล์ server ชื่อ ~/kokoro-mcp/kokoro_mcp_demo.py มี tool ชื่อ speak รับข้อความภาษาอังกฤษ
-แล้วบันทึกเป็น .wav ลงใน ~/kokoro-mcp/audio_out
+ทำในโฟลเดอร์ ~/kokoro-mcp
 ลงทะเบียนให้ฉันด้วย mcp add แบบ --scope user เสร็จแล้วบอกว่าต้องทำอะไรต่อ
 ```
 
@@ -200,7 +198,7 @@ claude mcp list              # ต้องมีบรรทัด  kokoro-demo
 claude mcp get kokoro-demo   # ดู command และ path ที่ลงทะเบียนไว้ พร้อมสถานะการเชื่อมต่อ
 ```
 
-จากนั้นเปิด `claude` แล้วพิมพ์ `/mcp` เลือก `kokoro-demo` ต้องเห็น tool ชื่อ `speak`
+จากนั้นเปิด `claude` แล้วพิมพ์ `/mcp` เลือก `kokoro-demo` ต้องเห็น tool สำหรับสร้างเสียง (แบบ B ชื่อ `speak` แบบ A ชื่ออาจต่างไปตามที่ AI ตั้ง)
 
 **Codex CLI**
 
@@ -209,7 +207,7 @@ codex mcp list               # ต้องมี kokoro-demo (คำสั่�
 codex mcp get kokoro-demo    # ดู command และ path ที่ลงทะเบียนไว้
 ```
 
-จากนั้นเปิด `codex` แล้วพิมพ์ `/mcp` ต้องเห็น `kokoro-demo` พร้อม tool ชื่อ `speak` (Codex จะต่อ server จริงตอนเปิด session จึงต้องเช็กในนี้)
+จากนั้นเปิด `codex` แล้วพิมพ์ `/mcp` ต้องเห็น `kokoro-demo` พร้อม tool สำหรับสร้างเสียง (Codex จะต่อ server จริงตอนเปิด session จึงต้องเช็กในนี้)
 
 **ทดสอบเรียกจริง** ปิดแล้วเปิด Host ใหม่ แล้วลองสั่ง:
 
@@ -217,16 +215,16 @@ codex mcp get kokoro-demo    # ดู command และ path ที่ลงท�
 ใช้ kokoro-demo อ่านประโยค "Hello from MCP" ให้ฟังหน่อย แล้วบอก path ไฟล์เสียง
 ```
 
-ได้ path ไฟล์ `.wav` ใน `~/kokoro-mcp/audio_out/` ที่เปิดฟังได้ = ผ่าน
+ได้ path ไฟล์ `.wav` ที่เปิดฟังได้ = ผ่าน
 
 **ถ้าไม่ผ่าน**
 
 | อาการ | สาเหตุที่พบบ่อย | ทางแก้ |
 | --- | --- | --- |
 | ไม่มีชื่อ `kokoro-demo` ใน `list` | ยังไม่ได้ `mcp add` หรือ add ไว้คนละ scope/โฟลเดอร์ | รัน `mcp add` ใหม่จากโฟลเดอร์เดิม |
-| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import kokoro` ไม่ได้ | รัน server ตรง ๆ แบบ A: `~/kokoro-mcp/.venv/bin/python ~/kokoro-mcp/kokoro_mcp_demo.py` แบบ B: `work/.venv/bin/python work/kokoro_mcp_demo.py` ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
-| เห็น server แต่ไม่เห็น `speak` | Host ยังใช้ session เก่าก่อน add | ปิดแล้วเปิด Host ใหม่ |
-| เรียก `speak` แล้ว `isError: true` | ยังไม่ลง `espeak-ng` หรือดาวน์โหลดโมเดลครั้งแรกยังไม่เสร็จ | ลง `espeak-ng` แล้วลองใหม่ รอครั้งแรกให้จบก่อน |
+| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import kokoro` ไม่ได้ | รัน server ตรง ๆ ด้วยคำสั่งที่ `mcp get kokoro-demo` แสดง (แบบ B คือ `work/.venv/bin/python work/kokoro_mcp_demo.py`) ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
+| เห็น server แต่ไม่เห็น tool | Host ยังใช้ session เก่าก่อน add | ปิดแล้วเปิด Host ใหม่ |
+| เรียก tool แล้ว `isError: true` | ยังไม่ลง `espeak-ng` หรือดาวน์โหลดโมเดลครั้งแรกยังไม่เสร็จ | ลง `espeak-ng` แล้วลองใหม่ รอครั้งแรกให้จบก่อน |
 
 ถ้าติดตั้งแบบ A แล้วไม่ผ่าน วาง error ให้ AI ใน session เดิมแล้วสั่ง "แก้ให้จนผ่าน" ได้เลย
 
