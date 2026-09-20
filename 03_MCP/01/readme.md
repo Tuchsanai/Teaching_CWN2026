@@ -343,14 +343,35 @@ Whisper คือโมเดล Speech-to-Text (STT) แบบ open-source ข�
 
 `MODEL_ID = "openai/whisper-base"` คือ **repo id** บน Hub (รูปแบบ `องค์กร/ชื่อโมเดล` — เปิดดูไฟล์ทั้งหมดได้ที่หน้าโมเดล) เมื่อเรียก `from_pretrained(MODEL_ID)` ไลบรารีจะดาวน์โหลดไฟล์น้ำหนักและไฟล์ตั้งค่าของ repo นั้นมาเก็บใน cache เครื่อง (ค่าเริ่มต้น `~/.cache/huggingface/hub`, เปลี่ยนได้ด้วย `HF_HOME`) เมื่อยังไม่มีไฟล์ใน cache ครั้งถัดไปนำไฟล์เดิมกลับมาใช้ได้ แต่โหมดปกติอาจติดต่อ Hub เพื่อตรวจเวอร์ชัน หากต้องการออฟไลน์ ให้ดาวน์โหลดไฟล์ให้ครบก่อนแล้วตั้ง `HF_HUB_OFFLINE=1` โมเดลนี้เป็น public **ไม่ต้องใช้ API key หรือ token** และการถอดเสียงทั้งหมดรันบนเครื่องตัวเอง (ต้องต่อเน็ตเมื่อดาวน์โหลดไฟล์ที่ยังไม่มีใน cache) รุ่น `base` เป็นแบบหลายภาษา (ต่างจาก `base.en` ที่รับเฉพาะอังกฤษ) จึงระบุ `language="th"` ได้ แต่บทเรียนยังไม่ได้วัดคุณภาพภาษาไทยของรุ่นนี้
 
-**ติดตั้งเพิ่ม** ใน `work/.venv` เดิมที่มี torch รุ่น CPU และ `mcp` อยู่แล้ว (รันจาก `03_MCP`) — `transformers` จะดึง `tokenizers`/`safetensors`/`huggingface_hub` ให้เอง ส่วน `ffmpeg` จำเป็นเพราะ pipeline อ่านไฟล์เสียงจาก path ผ่าน ffmpeg:
+การติดตั้งมี 2 แบบเหมือน Kokoro **เลือกทำแบบใดแบบหนึ่ง**
+
+**แบบ A: Prompt-based ให้ AI ติดตั้ง Whisper MCP ให้เอง**
+
+```bash
+mkdir -p ~/whisper-mcp && cd ~/whisper-mcp
+claude          # หรือ codex
+```
+
+วาง prompt นี้ใน Claude Code (หรือ Codex CLI):
+
+```text
+ช่วยติดตั้ง Whisper STT (โมเดล openai/whisper-base) ให้เป็น MCP server ชื่อ whisper-demo
+ทำในโฟลเดอร์ ~/whisper-mcp ลงทะเบียนให้ฉันด้วย mcp add --scope user
+ทำให้จบจนใช้งานได้ ทดสอบถอดเสียงจากไฟล์ .wav ให้ดูด้วย ถ้า error ให้แก้เองจนผ่าน ไม่ต้องถามฉัน
+```
+
+ตรวจสอบเหมือนข้อ 3.1 แต่เปลี่ยนชื่อเป็น `whisper-demo`: `claude mcp list` ต้องขึ้น `✔ Connected` (Codex ใช้ `codex mcp list` แล้วเช็ก `/mcp` ใน session) จากนั้นข้ามไปที่ **ทดลองใช้งาน** ด้านล่างได้เลย
+
+**แบบ B: Direct ติดตั้งและเขียน MCP server เองทีละขั้น**
+
+**ขั้น 1 ติดตั้งเพิ่ม** ใน `work/.venv` เดิมที่มี torch รุ่น CPU และ `mcp` อยู่แล้ว (รันจาก `03_MCP`) — `transformers` จะดึง `tokenizers`/`safetensors`/`huggingface_hub` ให้เอง ส่วน `ffmpeg` จำเป็นเพราะ pipeline อ่านไฟล์เสียงจาก path ผ่าน ffmpeg:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y ffmpeg
 work/.venv/bin/pip install -U "transformers>=5,<6"
 ```
 
-**สร้าง MCP server** — บันทึกเป็น `work/whisper_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
+**ขั้น 2 สร้าง MCP server** — บันทึกเป็น `work/whisper_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
 
 ```python
 """whisper_mcp_demo.py — MCP server ที่โหลด Whisper จาก Hugging Face แล้วถอดเสียง"""
@@ -412,17 +433,16 @@ if __name__ == "__main__":
 ```
 
 
-**ลงทะเบียนและทดลอง** ในชื่อ `whisper-demo` รันจาก `03_MCP` (Codex CLI ใช้ `codex mcp add` ตามข้อ 4.6 ด้วยชื่อและ path เดียวกัน):
+**ขั้น 3 ลงทะเบียน** ในชื่อ `whisper-demo` รันจาก `03_MCP` (Codex CLI ใช้ `codex mcp add` ตามข้อ 4.6 ด้วยชื่อและ path เดียวกัน) แบบ A ข้ามขั้นนี้เพราะ AI ลงทะเบียนให้แล้ว:
 
 ```bash
 claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/whisper_mcp_demo.py"
 ```
 
-เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 หรือ 3.2 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
+**ทดลองใช้งาน** (ใช้ได้ทั้งแบบ A และ B) เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 หรือ 3.2 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
 
 ```text
-ใช้ tool transcribe ของ whisper-demo อ่านไฟล์เสียงที่ kokoro-demo เพิ่งสร้าง
-(ใช้ path จากผลของ speak) ด้วย language "en" แล้วบอกข้อความที่ถอดได้
+ใช้ whisper-demo อ่านไฟล์เสียงที่ kokoro-demo เพิ่งสร้าง แล้วบอกข้อความที่ถอดได้
 ```
 
 **ลำดับการทำงาน:** ข้อความ → `speak` (Kokoro) → ไฟล์ `.wav` ใน `work/audio_out/` → `transcribe` (Whisper) → ข้อความ ผลที่ควรได้คือข้อความใกล้เคียงประโยคต้นฉบับ แต่ไม่จำเป็นต้องตรงทุกตัวอักษร (ตัวพิมพ์ เครื่องหมายวรรคตอน หรือคำบางคำอาจต่างไป) ถ้าได้ข้อความว่างหรือ `isError: true` ให้ตรวจ path และ `ffmpeg` ก่อน
