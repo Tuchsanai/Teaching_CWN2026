@@ -171,6 +171,8 @@ Kokoro คือโมเดล Text-to-Speech (TTS) แบบ open-weight ท�
 | **A. Prompt-based** สั่ง AI ให้ติดตั้งให้ด้วยภาษาคน | อยากใช้งานเร็ว ไม่สนใจโค้ดข้างใน | [3.1](#ch3-1) |
 | **B. Direct** ติดตั้งและเขียน server เองทีละขั้น | อยากเห็นว่า MCP server เขียนอย่างไร | [3.2](#ch3-2) |
 
+ทำแบบไหนก็ตาม จบแล้วให้ **ตรวจสอบตามข้อ [3.3](#ch3-3)** ว่า Host เห็นและเรียก tool ได้จริง
+
 <a id="ch3-1"></a>
 ### 3.1 แบบ A: Prompt-based ให้ AI ติดตั้ง Kokoro MCP ให้เอง
 
@@ -299,7 +301,49 @@ claude mcp add --scope user kokoro-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd
 **ผลที่ควรได้:** path ของไฟล์ `.wav` ใน `work/audio_out/`, `duration_sec`, `sample_rate` (24000) และ `voice` โดยไฟล์เสียงต้องเปิดได้และความยาวมากกว่า 0 หากผล tool มี `isError: true` ให้ตรวจข้อความ error ก่อนถือว่าผ่าน
 
 <a id="ch3-3"></a>
-### 3.3 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
+### 3.3 ตรวจสอบว่า kokoro-demo ใช้งานได้ (Claude Code และ Codex CLI)
+
+ใช้ได้ทั้งหลังติดตั้งแบบ A และ B ตรวจ 2 ชั้น: **ลงทะเบียนแล้วหรือยัง** (สั่งจาก shell) และ **Host ต่อติดและเห็น tool ไหม** (สั่งใน session)
+
+**Claude Code**
+
+```bash
+claude mcp list              # ต้องมีบรรทัด  kokoro-demo: ... - ✔ Connected
+claude mcp get kokoro-demo   # ดู command และ path ที่ลงทะเบียนไว้ พร้อมสถานะการเชื่อมต่อ
+```
+
+จากนั้นเปิด `claude` แล้วพิมพ์ `/mcp` เลือก `kokoro-demo` ต้องเห็น tool ชื่อ `speak`
+
+**Codex CLI**
+
+```bash
+codex mcp list               # ต้องมี kokoro-demo (คำสั่งนี้แสดง config อย่างเดียว ยังไม่ได้ลองต่อ)
+codex mcp get kokoro-demo    # ดู command และ path ที่ลงทะเบียนไว้
+```
+
+จากนั้นเปิด `codex` แล้วพิมพ์ `/mcp` ต้องเห็น `kokoro-demo` พร้อม tool ชื่อ `speak` (Codex จะต่อ server จริงตอนเปิด session จึงต้องเช็กในนี้)
+
+**ทดสอบเรียกจริง** ใช้ prompt เดียวกันได้ทั้งสอง Host:
+
+```text
+มี tool อะไรใน kokoro-demo บ้าง ลองเรียก speak ด้วยข้อความ "MCP check" แล้วบอก path ไฟล์เสียง
+```
+
+ผ่านเมื่อ Host ตอบชื่อ tool `speak` และคืน path ไฟล์ `.wav` ที่เปิดฟังได้
+
+**ถ้าไม่ผ่าน**
+
+| อาการ | สาเหตุที่พบบ่อย | ทางแก้ |
+| --- | --- | --- |
+| ไม่มีชื่อ `kokoro-demo` ใน `list` | ยังไม่ได้ `mcp add` หรือ add ไว้คนละ scope/โฟลเดอร์ | รัน `mcp add` ใหม่จากโฟลเดอร์เดิม |
+| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import kokoro` ไม่ได้ | รัน `work/.venv/bin/python work/kokoro_mcp_demo.py` ตรง ๆ ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
+| เห็น server แต่ไม่เห็น `speak` | Host ยังใช้ session เก่าก่อน add | ปิดแล้วเปิด Host ใหม่ |
+| เรียก `speak` แล้ว `isError: true` | ยังไม่ลง `espeak-ng` หรือดาวน์โหลดโมเดลครั้งแรกยังไม่เสร็จ | ลง `espeak-ng` แล้วลองใหม่ รอครั้งแรกให้จบก่อน |
+
+ถ้าติดตั้งแบบ A แล้วไม่ผ่าน วาง error ให้ AI ใน session เดิมแล้วสั่ง "แก้ให้จนผ่าน" ได้เลย
+
+<a id="ch3-4"></a>
+### 3.4 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
 
 Whisper คือโมเดล Speech-to-Text (STT) แบบ open-source ของ OpenAI ทำงาน **กลับทิศกับ Kokoro**: Kokoro รับข้อความแล้วให้ไฟล์เสียง ส่วน Whisper รับไฟล์เสียงแล้วให้ข้อความ
 
