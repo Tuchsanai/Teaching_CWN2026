@@ -1473,7 +1473,7 @@ server_capabilities: {"prompts": {"listChanged": true}, "resources": {"subscribe
 | `lab-results/excalidraw/run-2026-09-19-062505/` | `trace.md` (ทุก tool ที่เรียกตอนวาด 9 ภาพ + ข้อค้นพบ), `lab54-before.png`, `lab54-after.png`, `run-info.json`, `sha256.txt` |
 | `lab-results/playwright/run-2026-09-19-064547/` | `trace.md`, `cs2-01-loaded.png`, `cs2-02-filled.png`, `cs2-03-result.png`, `cs2-04-error-empty.png`, `snapshot-*.yml`, `console.log`, `result-audio.wav`, `run-info.json`, `sha256.txt` |
 | `lab-results/own-server/run-2026-09-19-062712/` | `trace.md`, `run-info.json`, `wire-hello.jsonl`, `wire-tts.jsonl`, `client-hello-output.txt`, `client-tts-output.txt`, `client-http-output.txt`, `http-curl.txt`, `http-server.log`, `claude-{discover,use,tts}-{prompt.txt,stream.jsonl,summary.md,wire-hello.jsonl,wire-tts.jsonl}`, `web-curl-*.json/txt`, `web-wav-check.txt`, `speak-output.wav`, `sha256.json` |
-| `img/` | `d01`–`d08` และ `d02b` ทั้ง `.png` และ `.excalidraw` |
+| `img/` | `d01`–`d03`, `d05`–`d07` และ `d02b` ทั้ง `.png` และ `.excalidraw` (ภาพที่ฝังใน README ทั้งหมด) |
 | `lab-results/setup-prompt/run-*/` | ผลการรันพรอมป์ต์ติดตั้งฉบับละเอียด (ข้อ 4.6.9) และ S5 ในคอนเทนเนอร์เปล่า (stream-json, `setup-report.md`, `claude mcp list`, เวอร์ชัน, error จริง) |
 | `labs/` | โค้ดแล็บและพรอมป์ต์ของบทเรียน (`prompts/setup-00..06-*.md` = คำขอติดตั้ง/ตรวจ/ถอน) |
 
