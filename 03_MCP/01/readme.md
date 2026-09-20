@@ -360,7 +360,44 @@ claude          # หรือ codex
 ทำให้จบจนใช้งานได้ ทดสอบถอดเสียงจากไฟล์ .wav ให้ดูด้วย ถ้า error ให้แก้เองจนผ่าน ไม่ต้องถามฉัน
 ```
 
-ตรวจสอบเหมือนข้อ 3.1 แต่เปลี่ยนชื่อเป็น `whisper-demo`: `claude mcp list` ต้องขึ้น `✔ Connected` (Codex ใช้ `codex mcp list` แล้วเช็ก `/mcp` ใน session) จากนั้นข้ามไปที่ **ทดลองใช้งาน** ด้านล่างได้เลย
+**ตรวจสอบว่าติดตั้งสำเร็จ** (ใช้ได้ทั้งแบบ A และ B) ตรวจ 2 ชั้น: ลงทะเบียนแล้วหรือยัง (สั่งจาก shell) และ Host ต่อติดและเห็น tool ไหม (สั่งใน session)
+
+**Claude Code**
+
+```bash
+claude mcp list               # ต้องมีบรรทัด  whisper-demo: ... - ✔ Connected
+claude mcp get whisper-demo   # ดู command และ path ที่ลงทะเบียนไว้ พร้อมสถานะการเชื่อมต่อ
+```
+
+จากนั้นเปิด `claude` แล้วพิมพ์ `/mcp` เลือก `whisper-demo` ต้องเห็น tool สำหรับถอดเสียง (แบบ B ชื่อ `transcribe` แบบ A ชื่ออาจต่างไปตามที่ AI ตั้ง)
+
+**Codex CLI**
+
+```bash
+codex mcp list                # ต้องมี whisper-demo (คำสั่งนี้แสดง config อย่างเดียว ยังไม่ได้ลองต่อ)
+codex mcp get whisper-demo    # ดู command และ path ที่ลงทะเบียนไว้
+```
+
+จากนั้นเปิด `codex` แล้วพิมพ์ `/mcp` ต้องเห็น `whisper-demo` พร้อม tool สำหรับถอดเสียง (Codex จะต่อ server จริงตอนเปิด session จึงต้องเช็กในนี้)
+
+**ทดสอบเรียกจริง** ปิดแล้วเปิด Host ใหม่ แล้วลองสั่ง (ถ้ายังไม่มีไฟล์เสียง ให้ kokoro-demo สร้างก่อน หรือใช้ไฟล์ `.wav` ใดก็ได้ในเครื่อง):
+
+```text
+ใช้ whisper-demo ถอดเสียงไฟล์ .wav ที่ kokoro-demo สร้างไว้ล่าสุด แล้วบอกข้อความที่ได้
+```
+
+ได้ข้อความใกล้เคียงกับที่พูดในไฟล์ = ผ่าน
+
+**ถ้าไม่ผ่าน**
+
+| อาการ | สาเหตุที่พบบ่อย | ทางแก้ |
+| --- | --- | --- |
+| ไม่มีชื่อ `whisper-demo` ใน `list` | ยังไม่ได้ `mcp add` หรือ add ไว้คนละ scope/โฟลเดอร์ | รัน `mcp add` ใหม่จากโฟลเดอร์เดิม |
+| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import transformers` ไม่ได้ | รัน server ตรง ๆ ด้วยคำสั่งที่ `mcp get whisper-demo` แสดง (แบบ B คือ `work/.venv/bin/python work/whisper_mcp_demo.py`) ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
+| เห็น server แต่ไม่เห็น tool | Host ยังใช้ session เก่าก่อน add | ปิดแล้วเปิด Host ใหม่ |
+| เรียก tool แล้ว `isError: true` หรือได้ข้อความว่าง | ยังไม่ลง `ffmpeg`, path ไฟล์เสียงผิด หรือดาวน์โหลดโมเดลครั้งแรกยังไม่เสร็จ | ลง `ffmpeg` ตรวจ path แล้วลองใหม่ รอครั้งแรกให้จบก่อน |
+
+ถ้าติดตั้งแบบ A แล้วไม่ผ่าน วาง error ให้ AI ใน session เดิมแล้วสั่ง "แก้ให้จนผ่าน" ได้เลย
 
 **แบบ B: Direct ติดตั้งและเขียน MCP server เองทีละขั้น**
 
