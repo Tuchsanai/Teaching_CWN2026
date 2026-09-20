@@ -185,8 +185,10 @@ claude          # หรือ codex
 
 ```text
 ช่วยติดตั้ง Kokoro TTS (โมเดล hexgrad/Kokoro-82M) ให้เป็น MCP server ชื่อ kokoro-demo
-ในโฟลเดอร์นี้ ใช้ venv แยก ลง torch แบบ CPU มี tool ชื่อ speak รับข้อความภาษาอังกฤษ
-แล้วบันทึกเป็นไฟล์ .wav ลงทะเบียนให้ฉันด้วยคำสั่ง mcp add เสร็จแล้วบอกว่าต้องทำอะไรต่อ
+ทำในโฟลเดอร์ ~/kokoro-mcp โดย venv อยู่ที่ ~/kokoro-mcp/.venv (ลง torch แบบ CPU)
+ไฟล์ server ชื่อ ~/kokoro-mcp/kokoro_mcp_demo.py มี tool ชื่อ speak รับข้อความภาษาอังกฤษ
+แล้วบันทึกเป็น .wav ลงใน ~/kokoro-mcp/audio_out
+ลงทะเบียนให้ฉันด้วย mcp add แบบ --scope user เสร็จแล้วบอกว่าต้องทำอะไรต่อ
 ```
 
 **ตรวจสอบว่าติดตั้งสำเร็จ** (ใช้ได้ทั้งแบบ A และ B) ตรวจ 2 ชั้น: ลงทะเบียนแล้วหรือยัง (สั่งจาก shell) และ Host ต่อติดและเห็น tool ไหม (สั่งใน session)
@@ -215,14 +217,14 @@ codex mcp get kokoro-demo    # ดู command และ path ที่ลงท�
 ใช้ kokoro-demo อ่านประโยค "Hello from MCP" ให้ฟังหน่อย แล้วบอก path ไฟล์เสียง
 ```
 
-ได้ path ไฟล์ `.wav` ที่เปิดฟังได้ = ผ่าน
+ได้ path ไฟล์ `.wav` ใน `~/kokoro-mcp/audio_out/` ที่เปิดฟังได้ = ผ่าน
 
 **ถ้าไม่ผ่าน**
 
 | อาการ | สาเหตุที่พบบ่อย | ทางแก้ |
 | --- | --- | --- |
 | ไม่มีชื่อ `kokoro-demo` ใน `list` | ยังไม่ได้ `mcp add` หรือ add ไว้คนละ scope/โฟลเดอร์ | รัน `mcp add` ใหม่จากโฟลเดอร์เดิม |
-| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import kokoro` ไม่ได้ | รัน `work/.venv/bin/python work/kokoro_mcp_demo.py` ตรง ๆ ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
+| `✘ Failed to connect` หรือ `/mcp` ไม่ขึ้น server | path ของ python หรือไฟล์ผิด, `import kokoro` ไม่ได้ | รัน server ตรง ๆ แบบ A: `~/kokoro-mcp/.venv/bin/python ~/kokoro-mcp/kokoro_mcp_demo.py` แบบ B: `work/.venv/bin/python work/kokoro_mcp_demo.py` ถ้ารอเงียบ ๆ ไม่มี error คือปกติ (กด Ctrl+C) ถ้ามี error ให้แก้ตามนั้น |
 | เห็น server แต่ไม่เห็น `speak` | Host ยังใช้ session เก่าก่อน add | ปิดแล้วเปิด Host ใหม่ |
 | เรียก `speak` แล้ว `isError: true` | ยังไม่ลง `espeak-ng` หรือดาวน์โหลดโมเดลครั้งแรกยังไม่เสร็จ | ลง `espeak-ng` แล้วลองใหม่ รอครั้งแรกให้จบก่อน |
 
