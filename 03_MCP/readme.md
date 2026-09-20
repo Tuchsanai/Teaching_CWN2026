@@ -6,7 +6,7 @@
 
 ![แผนที่บทเรียน 03_MCP วาดด้วย Excalidraw MCP](img/d08-lesson-map.png)
 
-**เลือกอ่าน:** [เตรียมตัวและงานส่ง](#prep) · [บทที่ 1 MCP คืออะไร](#ch1) · [บทที่ 2 โครงสร้าง](#ch2) · [บทที่ 3 MCP vs Function vs API](#ch3) · [บทที่ 4 ติดตั้ง](#ch4) · [บทที่ 5 Excalidraw MCP](#ch5) · [บทที่ 6 Playwright MCP](#ch6) · [บทที่ 7 สร้าง MCP server](#ch7) · [บทที่ 8 สรุป](#ch8) · [ภาคผนวก](#appendix)
+**เลือกอ่าน:** [เตรียมตัวและงานส่ง](#prep) · [บทที่ 1 MCP คืออะไร](#ch1) · [บทที่ 2 โครงสร้าง](#ch2) · [บทที่ 3 MCP vs Function vs API](#ch3) · [3.1 โค้ดเรียก MCP ฉบับเต็ม](#ch3-1) · [บทที่ 4 ติดตั้ง](#ch4) · [บทที่ 5 Excalidraw MCP](#ch5) · [บทที่ 6 Playwright MCP](#ch6) · [บทที่ 7 สร้าง MCP server](#ch7) · [บทที่ 8 สรุป](#ch8) · [ภาคผนวก](#appendix)
 
 <a id="prep"></a>
 ## สิ่งที่ต้องเตรียม และสิ่งที่ต้องส่ง
@@ -174,6 +174,8 @@ server ตัวเดียวกัน (`hello_server.py` ที่เขี�
 
 ![งานเดียวกันเรียกได้ 3 แบบ: Python function, REST API, MCP tool](img/d04-three-ways.png)
 
+สามบล็อกถัดไปเป็นโค้ด **ที่ตัดมาเฉพาะส่วนสำคัญ** เพื่อเทียบรูปแบบของทั้งสามวิธี (ฉบับเต็มอยู่ในไฟล์ที่ลิงก์ไว้) ส่วนโค้ดที่คัดลอกแล้วรันได้ทันทีตั้งแต่ `import` จนถึง `main()` อยู่ในข้อ [3.1](#ch3-1)
+
 **แบบที่ 1 — Python function** ([`labs/kokoro-web/kokoro_core.py`](labs/kokoro-web/kokoro_core.py))
 
 ```python
@@ -223,6 +225,443 @@ def speak(text: str, voice: str = "af_heart") -> dict:
 
 สรุป: MCP ไม่ได้มาแทน function หรือ API แต่เป็น "ชั้นประกาศและเรียกใช้แบบมาตรฐาน" ที่ครอบของเดิม ในบทที่ 7 นักศึกษาจะเห็นว่าห่อ function เป็น MCP tool ใช้โค้ดเพิ่มไม่ถึง 20 บรรทัด
 
+
+<a id="ch3-1"></a>
+### 3.1 โค้ดเรียก MCP ตรง ๆ ฉบับเต็ม (คัดลอกแล้วรันได้)
+
+ตารางด้านบนบอกว่า MCP ต่างจาก function/API อย่างไร ส่วนนี้พิสูจน์ด้วยโค้ดที่รันได้จริง: เขียน **MCP Client ด้วยมือ 1 ไฟล์** ทำหน้าที่แทน Host (Claude Code / Codex) แล้วเรียก **tool `speak` ของ `kokoro-tts`** ซึ่งเป็น "แบบที่ 3" ในหัวข้อนี้ พร้อม sanity check ด้วย `add` ของ `hello-lab` ก่อน เพื่อแยกให้ออกว่าถ้าพังคือพังที่เส้นทาง MCP หรือพังที่ Kokoro ทั้งสอง server เป็นของจริงในโฟลเดอร์ [`labs/my-mcp-server/`](labs/my-mcp-server/) ไม่ใช่ API สมมติ
+
+**บริบทก่อนรัน**
+
+| สิ่งที่ต้องรู้ | ค่าที่ใช้ |
+| --- | --- |
+| working directory ของทุกคำสั่ง | โฟลเดอร์บทเรียน `03_MCP` (บนเครื่องผู้สอนคือ `/root/workspace/CWN/Teaching/03_MCP`) เอกสารนี้แทนด้วย `<PATH_TO_03_MCP>` |
+| ตัวแปลภาษา Python | `/opt/venv/bin/python` (เครื่องเรียนของผู้สอน) หรือ `labs/.venv/bin/python` ถ้าติดตั้งเองตามข้อ 4.6.2 |
+| แพ็กเกจที่ต้องมี | `mcp` 2.x, `kokoro`, `soundfile`, `torch` (CPU พอ) |
+| ไฟล์ที่เกี่ยวข้อง | `labs/my-mcp-server/direct_call_kokoro.py` (client), `hello_server.py`, `tts_server.py`, `wire_capture.py` และ `labs/kokoro-web/kokoro_core.py` (ตัวเรียกโมเดลจริง) |
+| เครือข่าย | ครั้งแรกที่เรียก `speak` ต้องต่ออินเทอร์เน็ตเพื่อดาวน์โหลดโมเดล Kokoro-82M จาก Hugging Face ครั้งถัดไปใช้แคช |
+| working directory ของ **server** | ไม่ต้องสนใจ — client เปิด server เองด้วย path เต็ม และ server อ้าง path จากตำแหน่งไฟล์ตัวเอง |
+
+ขั้นเตรียม (ตรวจก่อนว่าครบ ถ้าขั้นนี้ไม่ผ่านอย่าเพิ่งรัน client)
+
+```bash
+cd <PATH_TO_03_MCP>
+ls labs/my-mcp-server/direct_call_kokoro.py labs/my-mcp-server/tts_server.py labs/kokoro-web/kokoro_core.py
+/opt/venv/bin/python -c "import mcp, soundfile, kokoro; print('deps ok')"
+```
+
+**โค้ดเต็มของ client** — ไฟล์ [`labs/my-mcp-server/direct_call_kokoro.py`](labs/my-mcp-server/direct_call_kokoro.py) (แสดงครบทั้งไฟล์ ไม่มีส่วนที่ตัดออก)
+
+```python
+"""
+direct_call_kokoro.py — เรียก MCP tool ตรง ๆ จาก Python โดยไม่ผ่าน LLM (ฉบับเต็ม คัดลอกแล้วรันได้)
+====================================================================================
+ไฟล์นี้คือ "MCP Client ขนาดเล็ก" ที่ทำงานแทน Host (Claude Code / Codex) ครบทุกขั้น:
+
+    1. เปิด MCP server ของบทเรียนเป็น subprocess แบบ stdio
+    2. initialize  → ตกลงเวอร์ชันโปรโตคอลและ capabilities
+    3. tools/list  → ค้นพบว่ามี tool อะไรบ้าง พร้อม inputSchema
+    4. tools/call  → เรียกใช้จริง (sanity check: hello-lab add, งานหลัก: kokoro-tts speak)
+    5. ตรวจไฟล์เสียงที่ได้ด้วย soundfile แล้วเขียนผลเป็น JSON
+
+ต้องมีก่อนรัน
+-------------
+* Python 3.10+ ที่ติดตั้งแพ็กเกจ `mcp` 2.x, `kokoro`, `soundfile`, `torch` (CPU ก็พอ)
+  - เครื่องเรียนของผู้สอนใช้ /opt/venv/bin/python
+  - ถ้าทำตาม readme.md ข้อ 4.6.2 จะได้ labs/.venv/bin/python
+* โฟลเดอร์ปัจจุบัน (working directory) ไม่สำคัญ เพราะสคริปต์อ้าง path จากตำแหน่งไฟล์ตัวเองเสมอ
+  แต่ตัวอย่างคำสั่งด้านล่างรันจากโฟลเดอร์บทเรียน 03_MCP
+
+วิธีรัน
+-------
+    # จากโฟลเดอร์ 03_MCP
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
+        --text "Model Context Protocol lets one server serve many agents." \
+        --out  lab-results/documentation-check/direct-call-result.json
+
+    # ข้าม sanity check ของ hello-lab (เรียกเฉพาะ Kokoro)
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity
+
+    # บันทึกข้อความ JSON-RPC ทุกบรรทัดบนสายผ่าน wire_capture.py
+    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --wire wire-direct.jsonl
+
+exit code: 0 = สำเร็จทุกขั้น, 1 = มีขั้นที่ล้มเหลว (รายละเอียดพิมพ์ลง stderr)
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import pathlib
+import sys
+import traceback
+
+# --- แพ็กเกจของ MCP Python SDK 2.x ------------------------------------------------
+# mcp.Client                      = ฝั่ง client ของโปรโตคอล (initialize/list/call)
+# mcp.client.stdio.stdio_client   = transport แบบ stdio: เปิด server เป็น subprocess
+try:
+    from mcp import Client
+    from mcp.client.stdio import StdioServerParameters, stdio_client
+except ImportError as exc:  # แพ็กเกจยังไม่ได้ติดตั้ง หรือรันด้วย python ผิดตัว
+    sys.exit(
+        f"[FATAL] import mcp ไม่สำเร็จ: {exc}\n"
+        "        ติดตั้งด้วย:  <python ของ venv> -m pip install 'mcp[cli]'\n"
+        f"        python ที่ใช้อยู่ตอนนี้: {sys.executable}"
+    )
+
+HERE = pathlib.Path(__file__).resolve().parent          # .../labs/my-mcp-server
+HELLO_SERVER = HERE / "hello_server.py"
+TTS_SERVER = HERE / "tts_server.py"
+WIRE_PROXY = HERE / "wire_capture.py"
+PY = sys.executable                                      # ใช้ python ตัวเดียวกับที่รันสคริปต์นี้
+
+
+def dump(obj) -> str:
+    """แปลงผลลัพธ์ของ SDK (pydantic model) เป็น JSON อ่านง่าย"""
+    if hasattr(obj, "model_dump"):
+        obj = obj.model_dump(by_alias=True, exclude_none=True, mode="json")
+    return json.dumps(obj, ensure_ascii=False, indent=2)
+
+
+def stdio_target(script: pathlib.Path, wire: str | None):
+    """สร้าง transport stdio ที่ชี้ไปยัง server 1 ตัว (ใส่ wire_capture.py คั่นได้)"""
+    if not script.exists():
+        raise FileNotFoundError(f"ไม่พบไฟล์ server: {script}")
+    args = [str(script)] if not wire else [str(WIRE_PROXY), "--log", wire, "--", PY, str(script)]
+    return stdio_client(StdioServerParameters(command=PY, args=args))
+
+
+def tool_text(result) -> str:
+    """ดึงข้อความจาก content block แรกของผล tools/call (MCP คืนผลเป็น list ของ content)"""
+    for block in getattr(result, "content", []) or []:
+        text = getattr(block, "text", None)
+        if text is not None:
+            return text
+    return ""
+
+
+def check_not_error(result, label: str) -> None:
+    """MCP ไม่ได้โยน exception เมื่อ tool ทำงานพลาด แต่ตั้งธง isError=true ต้องเช็กเอง"""
+    if getattr(result, "is_error", False) or getattr(result, "isError", False):
+        raise RuntimeError(f"tool {label} ตอบกลับด้วย isError=true: {tool_text(result)}")
+
+
+async def sanity_check_hello(wire: str | None) -> dict:
+    """ขั้นที่ 1 — ตรวจว่าเส้นทาง MCP ทั้งเส้นใช้งานได้ ด้วย server ที่ไม่มี dependency หนัก"""
+    print("=" * 72)
+    print("[1/2] sanity check — hello-lab (add)")
+    print("=" * 72)
+    async with Client(stdio_target(HELLO_SERVER, wire)) as client:
+        print("protocol_version :", client.protocol_version)
+        print("server_info      :", dump(client.server_info))
+
+        tools = await client.list_tools()
+        names = [t.name for t in tools.tools]
+        print("tools/list       :", names)
+        if "add" not in names:
+            raise RuntimeError(f"ไม่พบ tool ชื่อ add ใน {names}")
+
+        result = await client.call_tool("add", {"a": 17, "b": 25})
+        check_not_error(result, "add")
+        print("tools/call add(17, 25) →", tool_text(result))
+        if tool_text(result).strip() != "42":
+            raise RuntimeError(f"add(17, 25) ควรได้ 42 แต่ได้ {tool_text(result)!r}")
+        return {"tools": names, "add_17_25": tool_text(result).strip()}
+
+
+async def call_kokoro(text: str, voice: str, wire: str | None) -> dict:
+    """ขั้นที่ 2 — งานหลักของบทที่ 3: เรียก Kokoro ผ่าน MCP (tool speak ของ kokoro-tts)"""
+    print()
+    print("=" * 72)
+    print("[2/2] งานหลัก — kokoro-tts (speak)")
+    print("=" * 72)
+    async with Client(stdio_target(TTS_SERVER, wire)) as client:
+        print("protocol_version :", client.protocol_version)
+        print("instructions     :", client.instructions)
+
+        tools = await client.list_tools()
+        by_name = {t.name: t for t in tools.tools}
+        print("tools/list       :", list(by_name))
+        if "speak" not in by_name:
+            raise RuntimeError(f"ไม่พบ tool ชื่อ speak ใน {list(by_name)}")
+        print("inputSchema ของ speak:")
+        print(dump(by_name["speak"].input_schema))
+
+        voices = await client.call_tool("list_voices", {})
+        check_not_error(voices, "list_voices")
+        available = [getattr(b, "text", "") for b in (voices.content or [])]
+        print("list_voices      :", available)
+        if available and voice not in available:
+            raise RuntimeError(f"voice {voice!r} ไม่อยู่ในรายการที่ server รองรับ: {available}")
+
+        print(f"tools/call speak(text={text!r}, voice={voice!r}) ...")
+        result = await client.call_tool("speak", {"text": text, "voice": voice})
+        check_not_error(result, "speak")
+        raw = tool_text(result)
+        print("ผลดิบจาก tool   :", raw)
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"ผลของ speak ไม่ใช่ JSON: {raw!r}") from exc
+        return payload
+
+
+def verify_wav(path_str: str) -> dict:
+    """ขั้นสุดท้าย — เปิดไฟล์ .wav ที่ได้จริง เพื่อยืนยันว่าไม่ใช่ค่าที่ tool แต่งขึ้น"""
+    path = pathlib.Path(path_str)
+    if not path.exists():
+        raise FileNotFoundError(f"tool คืน path มาแต่ไม่พบไฟล์จริง: {path}")
+    try:
+        import soundfile as sf
+    except ImportError:
+        print("[warn] ไม่มี soundfile จึงตรวจได้แค่ขนาดไฟล์", file=sys.stderr)
+        return {"bytes": path.stat().st_size}
+    info = sf.info(str(path))
+    return {
+        "bytes": path.stat().st_size,
+        "verified_duration_sec": round(info.frames / info.samplerate, 2),
+        "verified_sample_rate": info.samplerate,
+        "channels": info.channels,
+    }
+
+
+def leaf_errors(exc: BaseException) -> list[BaseException]:
+    """แตก ExceptionGroup ของ anyio ให้เหลือ error ใบสุดท้าย
+    (SDK ใช้ task group ภายใน ข้อผิดพลาดที่เราโยนจึงถูกห่อมาเป็นกลุ่ม)"""
+    inner = getattr(exc, "exceptions", None)
+    if not inner:
+        return [exc]
+    out: list[BaseException] = []
+    for e in inner:
+        out.extend(leaf_errors(e))
+    return out
+
+
+async def run(args: argparse.Namespace) -> int:
+    summary: dict = {"python": PY, "server_dir": str(HERE)}
+    try:
+        if not args.skip_sanity:
+            summary["hello"] = await sanity_check_hello(args.wire)
+        summary["speak"] = await call_kokoro(args.text, args.voice, args.wire)
+        summary["wav"] = verify_wav(summary["speak"]["path"])
+    except Exception as exc:  # noqa: BLE001 — จับทุกกรณีเพื่อรายงานสาเหตุจริงให้ผู้เรียน
+        known = [e for e in leaf_errors(exc) if isinstance(e, (RuntimeError, FileNotFoundError))]
+        if known:
+            for e in known:
+                print(f"[FAIL] {type(e).__name__}: {e}", file=sys.stderr)
+        else:
+            print("[FAIL] ข้อผิดพลาดที่ไม่ได้คาดไว้:", file=sys.stderr)
+            traceback.print_exc()
+        return 1
+
+    print()
+    print("=" * 72)
+    print("สรุปผล (JSON)")
+    print("=" * 72)
+    text = json.dumps(summary, ensure_ascii=False, indent=2)
+    print(text)
+    if args.out:
+        out = pathlib.Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text + "\n", encoding="utf-8")
+        print(f"เขียนผลลง {out}")
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="เรียก MCP tool ตรง ๆ จาก Python (ไม่ผ่าน LLM)")
+    ap.add_argument("--text", default="Model Context Protocol lets one server serve many agents.",
+                    help="ข้อความภาษาอังกฤษที่จะให้ Kokoro อ่าน")
+    ap.add_argument("--voice", default="af_heart", help="ชื่อเสียง (ดูจาก tool list_voices)")
+    ap.add_argument("--wire", default=None, help="path ไฟล์ .jsonl สำหรับบันทึกข้อความบนสาย")
+    ap.add_argument("--out", default=None, help="path ไฟล์ .json สำหรับเขียนผลสรุป")
+    ap.add_argument("--skip-sanity", action="store_true", help="ข้ามการตรวจ hello-lab add")
+    args = ap.parse_args()
+    try:
+        return asyncio.run(run(args))
+    except KeyboardInterrupt:
+        print("ยกเลิกโดยผู้ใช้", file=sys.stderr)
+        return 130
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+**คำสั่งรัน** (จากโฟลเดอร์ `03_MCP`)
+
+```bash
+cd <PATH_TO_03_MCP>
+RUN=lab-results/documentation-check/run-$(date -u +%Y-%m-%d-%H%M%S)
+mkdir -p "$RUN"
+/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
+    --text "Model Context Protocol lets one server serve many agents." \
+    --voice af_heart \
+    --wire "$RUN/direct-wire.jsonl" \
+    --out  "$RUN/direct-call-result.json" \
+    > "$RUN/direct-call-stdout.txt" 2> "$RUN/direct-call-stderr.txt"
+echo "exit code: $?"      # 0 = ผ่านทุกขั้น
+cat "$RUN/direct-call-result.json"
+```
+
+**ผลรันจริง** (stdout ทั้งหมดของการรันเมื่อ 20 กันยายน 2026 เวลา 02:25 UTC บนเครื่องเรียน เก็บไว้ที่ [`direct-call-stdout.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-stdout.txt) — exit code 0)
+
+```text
+========================================================================
+[1/2] sanity check — hello-lab (add)
+========================================================================
+protocol_version : 2026-07-28
+server_info      : {
+  "name": "hello-lab",
+  "version": ""
+}
+tools/list       : ['add', 'get_time', 'count_words']
+tools/call add(17, 25) → 42
+
+========================================================================
+[2/2] งานหลัก — kokoro-tts (speak)
+========================================================================
+protocol_version : 2026-07-28
+instructions     : แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M (ไม่รองรับภาษาไทย)
+tools/list       : ['list_voices', 'speak']
+inputSchema ของ speak:
+{
+  "type": "object",
+  "properties": {
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "voice": {
+      "default": "af_heart",
+      "title": "Voice",
+      "type": "string"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "speakArguments"
+}
+list_voices      : ['af_heart', 'af_bella', 'am_adam', 'am_michael']
+tools/call speak(text='Model Context Protocol lets one server serve many agents.', voice='af_heart') ...
+ผลดิบจาก tool   : {
+  "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav",
+  "duration_sec": 4.45,
+  "sample_rate": 24000,
+  "gen_ms": 681,
+  "voice": "af_heart"
+}
+
+========================================================================
+สรุปผล (JSON)
+========================================================================
+{
+  "python": "/opt/venv/bin/python",
+  "server_dir": "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server",
+  "hello": {
+    "tools": [
+      "add",
+      "get_time",
+      "count_words"
+    ],
+    "add_17_25": "42"
+  },
+  "speak": {
+    "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav",
+    "duration_sec": 4.45,
+    "sample_rate": 24000,
+    "gen_ms": 681,
+    "voice": "af_heart"
+  },
+  "wav": {
+    "bytes": 213644,
+    "verified_duration_sec": 4.45,
+    "verified_sample_rate": 24000,
+    "channels": 1
+  }
+}
+เขียนผลลง lab-results/documentation-check/run-2026-09-20-022330/direct-call-result.json
+```
+
+**อธิบายทีละขั้น** — เทียบโค้ดกับข้อความ JSON-RPC ที่เกิดขึ้นจริง
+
+| ขั้น | ในโค้ด | เกิดอะไรบนสาย | เห็นอะไรในผลรัน |
+| --- | --- | --- | --- |
+| 1. เลือก transport | `stdio_target()` สร้าง `StdioServerParameters(command=PY, args=[...])` | ยังไม่มีข้อความ เป็นแค่การเตรียมคำสั่งเปิด subprocess | — |
+| 2. เปิดการเชื่อมต่อ | `async with Client(...)` | client เปิด server เป็นลูก แล้วทำ handshake (ใน SDK 2.x คือ `server/discover`) | `protocol_version : 2026-07-28`, `server_info` |
+| 3. ค้นพบเครื่องมือ | `await client.list_tools()` | `tools/list` | `['add', 'get_time', 'count_words']` และ `['list_voices', 'speak']` พร้อม `inputSchema` ที่ SDK สร้างจาก type hint |
+| 4. เรียกเครื่องมือ | `await client.call_tool("add", {"a": 17, "b": 25})` | `tools/call` | `42` |
+| 5. เรียกงานหลัก | `await client.call_tool("speak", {...})` | `tools/call` ไปยัง server คนละตัว | JSON ที่มี `path`, `duration_sec`, `sample_rate`, `gen_ms`, `voice` |
+| 6. ตรวจผลจริง | `verify_wav()` อ่านไฟล์ด้วย `soundfile` | ไม่ใช่ข้อความ MCP — เป็นการตรวจว่า tool ไม่ได้แต่งตัวเลข | `verified_duration_sec: 4.45`, `verified_sample_rate: 24000`, `channels: 1` |
+| 7. ปิดการเชื่อมต่อ | ออกจาก `async with` | client ปิด stdin ของ server แล้ว process ของ server จบ | สคริปต์คืน exit code 0 |
+
+จุดที่ต้องสังเกตในโค้ด
+
+1. **`tools/call` ที่ล้มเหลวไม่โยน exception** — MCP ตอบกลับเป็นผลปกติแต่ตั้งธง `isError=true` จึงต้องมี `check_not_error()` เช็กเองทุกครั้ง ถ้าลืม โปรแกรมจะเดินต่อด้วยข้อมูลผิด
+2. **ผลของ tool เป็น list ของ content block** ไม่ใช่ค่าเดี่ยว ๆ `tool_text()` จึงดึงข้อความจาก block แรกออกมาแล้วค่อย `json.loads()`
+3. **SDK ใช้ task group ภายใน** ข้อผิดพลาดที่เราโยนใน `async with` จะถูกห่อมาเป็น `ExceptionGroup` ฟังก์ชัน `leaf_errors()` จึงแตกกลุ่มออกมาเพื่อพิมพ์สาเหตุจริงแทน traceback ยาว ๆ
+4. **ใช้ `sys.executable`** เป็นคำสั่งเปิด server เสมอ เพื่อให้ server ใช้ venv ตัวเดียวกับ client (สาเหตุยอดฮิตของ `ModuleNotFoundError: kokoro`)
+5. **ไม่ผูกกับ working directory** ทุก path อ้างจาก `pathlib.Path(__file__).resolve().parent` จะรันจากโฟลเดอร์ไหนก็ได้
+
+**ข้อความจริงบนสาย** — ใส่ `--wire` แล้ว `wire_capture.py` จะคั่นกลางและบันทึกทุกบรรทัด ([`direct-wire.jsonl`](lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl) 15 บรรทัด)
+
+```bash
+/opt/venv/bin/python - <<'PY'
+import json
+for line in open("lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl"):
+    rec = json.loads(line)
+    msg = rec["msg"]
+    label = msg.get("method") or f"result id={msg.get('id')}" if isinstance(msg, dict) else "NON-JSON: " + msg[:60]
+    print(rec["dir"], "|", label)
+PY
+```
+
+```text
+client->server | server/discover
+server->client | result id=1
+client->server | tools/list
+server->client | result id=2
+client->server | tools/call
+server->client | result id=3
+client->server | server/discover
+server->client | NON-JSON: WARNING: Defaulting repo_id to hexgrad/Kokoro-82M. Pass re
+server->client | result id=1
+client->server | tools/list
+server->client | result id=2
+client->server | tools/call
+server->client | result id=3
+client->server | tools/call
+server->client | result id=4
+```
+
+บรรทัด `NON-JSON` คือกับดักจริงของ transport แบบ stdio: ไลบรารี Kokoro พิมพ์คำเตือนลง **stdout** ของ server ซึ่งเป็นช่องเดียวกับ JSON-RPC ฝั่ง client จึง log ว่า `Failed to parse JSONRPC message from server` ลง stderr ([`direct-call-stderr.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-stderr.txt)) แล้วข้ามบรรทัดนั้นไป งานยังสำเร็จเพราะ SDK ทนต่อบรรทัดที่ไม่ใช่ JSON แต่ในโค้ดของเราเองต้องจำกฎนี้ให้แม่น: **server แบบ stdio ห้ามพิมพ์อะไรลง stdout นอกจาก JSON-RPC** (ดูข้อ 4.7)
+
+**การจัดการ error — ทดสอบจริง** ส่งชื่อเสียงที่ไม่มีอยู่จริง client ตรวจกับผล `list_voices` แล้วหยุดก่อนเรียก `speak`
+
+```bash
+/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity --voice xx_bad
+echo "exit code: $?"
+```
+
+```text
+[FAIL] RuntimeError: voice 'xx_bad' ไม่อยู่ในรายการที่ server รองรับ: ['af_heart', 'af_bella', 'am_adam', 'am_michael']
+exit code: 1
+```
+
+หลักฐานอยู่ที่ [`direct-call-badvoice-stderr.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-badvoice-stderr.txt) กรณี error อื่นที่โค้ดครอบไว้: `import mcp` ไม่ได้ (บอกให้ติดตั้งและพิมพ์ว่ากำลังใช้ python ตัวไหน), ไม่พบไฟล์ server, ไม่พบ tool ที่ต้องการใน `tools/list`, tool ตอบ `isError=true`, ผลไม่ใช่ JSON และ tool คืน path ที่ไม่มีไฟล์จริง
+
+**ฟังเสียงที่ได้จากการเรียกครั้งนี้**
+
+<audio controls src="lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav"></audio>
+
+ถ้าตัวเรนเดอร์ Markdown ไม่รองรับแท็บเสียง ให้เปิดไฟล์ตรง ๆ: [`direct-call-kokoro.wav`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav) (4.45 วินาที, 24000 Hz, 1 ช่อง, 213,644 ไบต์ — ตรวจซ้ำด้วย `soundfile` แล้ว)
+
+> **ขอบเขตของหลักฐานชุดนี้:** ทั้งหมดเป็นผลของ **Python MCP client** ที่รันด้วย `/opt/venv/bin/python` ไม่ใช่ผลจาก Codex CLI เป็น Host และไม่ใช่ผลจาก Claude Code รอบนี้ การรันก่อนหน้าด้วย `client_test.py` เก็บไว้ที่ [`run-2026-09-20-021614/`](lab-results/documentation-check/run-2026-09-20-021614/) (มี `hello-stdout.txt`, `tts-stdout.txt`, wire log, [`kokoro-result.json`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-result.json) และไฟล์เสียง [`kokoro-actual.wav`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav) ยาว 4.45 วินาที 24000 Hz เช่นกัน)
+
+<audio controls src="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"></audio>
+
+ไฟล์เสียงของรอบก่อนหน้า (ถ้าเล่นในหน้านี้ไม่ได้ ให้กดลิงก์): [`kokoro-actual.wav`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav)
 ---
 
 <a id="ch4"></a>
