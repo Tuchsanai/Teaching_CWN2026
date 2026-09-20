@@ -1,0 +1,96 @@
+--- before/readme.md
++++ after/readme.md
+@@ -158,7 +158,7 @@
+ ---
+ 
+ <a id="ch3"></a>
+-## บทที่ 3 เรียกใช้ Kokoro ผ่าน MCP ด้วย `MCPServer`
++## บทที่ 3 เรียกใช้ Kokoro (TTS) และ Whisper (STT) ผ่าน MCP ด้วย `MCPServer`
+ 
+ Kokoro คือโมเดล Text-to-Speech (TTS) แบบ open-weight ที่แปลงข้อความเป็นเสียงพูด รุ่น Kokoro-82M มีพารามิเตอร์ประมาณ 82 ล้านตัว (ต้นทาง: [GitHub hexgrad/kokoro](https://github.com/hexgrad/kokoro), [Hugging Face hexgrad/Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)) แพ็กเกจ Python ชื่อ `kokoro` ให้เรียกใช้โมเดลผ่านคลาส `KPipeline` และในบทนี้ใช้ข้อความภาษาอังกฤษกับเสียง `af_heart` เป็นตัวอย่าง ข้อสำคัญคือ repo ต้นทางเป็นไลบรารี ไม่ได้ให้ MCP server สำเร็จรูปมา ดังนั้นเราจะใช้ `MCPServer` ห่อความสามารถนี้เป็น tool ให้ Host เรียกเอง
+ 
+@@ -264,6 +264,84 @@
+ **ผลที่ควรได้:** path ของไฟล์ `.wav` ใน `work/audio_out/`, `duration_sec`, `sample_rate` (24000) และ `voice` โดยไฟล์เสียงต้องเปิดได้และความยาวมากกว่า 0 หากผล tool มี `isError: true` ให้ตรวจข้อความ error ก่อนถือว่าผ่าน
+ 
+ หมายเหตุหลักฐาน: ตัวเลข **4.45 วินาที** ที่ **24000 Hz** ([ผลการทดลอง](lab-results/own-server/run-2026-09-19-062712/claude-tts-summary.md)) เป็นผลของแล็บเดิม `kokoro-tts` (`tts_server.py`) ผ่าน Claude Code ไม่ใช่ผลของ `kokoro_mcp_demo.py` ตัวอย่างในบทนี้ตรวจเพิ่มเติมผ่าน Python MCP client บน Remote เมื่อ 20 กันยายน 2026 ด้วย `/opt/venv/bin/python`: ได้ WAV 4.45 วินาที ที่ 24000 Hz และข้อความว่างคืน `isError: true` ([ผลตรวจ](work/yolo2-ch3-direct-kokoro-20260920-034725/smoke-result.json)); ยังไม่ได้ทดสอบ demo นี้ผ่าน Claude Code หรือ Codex CLI และยังไม่ได้ทดสอบติดตั้ง venv ใหม่ ส่วนสคริปต์ `direct_call_kokoro.py` ในแล็บชี้ไปที่ `tts_server.py` จึงใช้ทดสอบ demo นี้ไม่ได้ (การเขียน MCP client เองดูบทที่ 7.3)
++
++<a id="ch3-2"></a>
++### 3.2 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
++
++Whisper คือโมเดล Speech-to-Text (STT) แบบ open-source ของ OpenAI (ต้นทาง: [GitHub openai/whisper](https://github.com/openai/whisper)) ทำงาน **กลับทิศกับ Kokoro**: Kokoro รับข้อความแล้วให้ไฟล์เสียง ส่วน Whisper รับไฟล์เสียงแล้วให้ข้อความ ในบทนี้ใช้แพ็กเกจ `openai-whisper` รันโมเดลบนเครื่องเองด้วย CPU ไม่ใช้ API key และไม่เรียก cloud ตามที่ README ต้นทางระบุ แพ็กเกจต้องการ `ffmpeg` บนระบบเพื่ออ่านไฟล์เสียง โมเดลรุ่น `base` เป็นแบบหลายภาษา (ต่างจาก `base.en` ที่รับเฉพาะภาษาอังกฤษ) จึงระบุ `language="th"` ได้ แต่บทเรียนยังไม่ได้วัดคุณภาพภาษาไทยของรุ่นนี้
++
++**ติดตั้งเพิ่ม** ใน `work/.venv` เดิมที่มี torch รุ่น CPU และ `mcp` อยู่แล้ว (รันจาก `03_MCP`):
++
++```bash
++sudo apt-get update && sudo apt-get install -y ffmpeg
++work/.venv/bin/pip install -U openai-whisper
++```
++
++**สร้าง MCP server** — บันทึกเป็น `work/whisper_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
++
++```python
++"""whisper_mcp_demo.py — MCP server ที่เรียก Whisper (STT) โดยตรงในไฟล์เดียว"""
++import contextlib
++import pathlib
++import sys
++
++from mcp.server import MCPServer
++
++_model = None
++
++
++def get_model():
++    """โหลดโมเดล base (หลายภาษา) ครั้งแรกที่ถูกเรียก แล้วใช้ตัวเดิมซ้ำ"""
++    global _model
++    if _model is None:
++        with contextlib.redirect_stdout(sys.stderr):   # กัน print ของไลบรารีปนกับ JSON-RPC
++            import whisper
++            _model = whisper.load_model("base", device="cpu")
++    return _model
++
++
++mcp = MCPServer("whisper-demo", instructions="ถอดเสียงพูดจากไฟล์เสียงเป็นข้อความด้วย Whisper")
++
++
++@mcp.tool()
++def transcribe(audio_path: str, language: str = "en") -> dict:
++    """ถอดเสียงจากไฟล์เสียง (path สัมบูรณ์บนเครื่องที่รัน server) แล้วคืนข้อความและภาษา"""
++    path = pathlib.Path(audio_path)
++    if not path.is_absolute():
++        raise ValueError("audio_path must be an absolute path")
++    if not path.is_file():
++        raise ValueError(f"audio file not found: {path}")
++
++    model = get_model()
++    with contextlib.redirect_stdout(sys.stderr):
++        result = model.transcribe(str(path), language=language, fp16=False, verbose=None)
++    return {"text": result["text"].strip(), "language": result.get("language", language)}
++
++
++if __name__ == "__main__":
++    mcp.run()   # stdio — ห้ามครอบด้วย redirect_stdout เช่นเดียวกับตัวอย่าง Kokoro
++```
++
++- โครงเหมือน `kokoro_mcp_demo.py` ทุกจุด: `MCPServer` + `@mcp.tool()` + โหลดโมเดลแบบ lazy + `mcp.run()` ผ่าน stdio ต่างกันแค่ tool ชื่อ `transcribe` รับ path เสียงแทนข้อความ
++- `whisper.load_model("base", device="cpu")` บังคับ CPU (ค่าเริ่มต้นของไลบรารีจะเลือก CUDA ถ้ามี) ครั้งแรกจะดาวน์โหลดน้ำหนักโมเดลจึงช้ากว่าครั้งถัดไป ส่วน `fp16=False` เลือกการคำนวณแบบ FP32 บน CPU และ `verbose=None` ปิดการพิมพ์ความคืบหน้าตาม docstring ของ `transcribe` ผลลัพธ์เป็น dict ที่มี `text`, `segments`, `language` ตัวอย่างนี้คืนเฉพาะ `text` และ `language`
++- **ไฟล์เสียงต้องอยู่บนเครื่องที่ server รัน** เพราะ tool รับ path ไม่ได้รับตัวไฟล์ ถ้า Host อยู่คนละเครื่องกับ server ต้องส่งไฟล์ไปไว้ที่ฝั่ง server ก่อน ตัวอย่างนี้ตรวจแค่ว่าเป็น path สัมบูรณ์และเป็นไฟล์จริง (path แบบ relative หรือโฟลเดอร์จะได้ `isError: true`) ยังไม่จำกัดโฟลเดอร์ที่อ่านได้ ซึ่งพอสำหรับ demo บนเครื่องตัวเอง แต่ควรเพิ่มถ้าจะเปิดให้คนอื่นใช้
++
++**ลงทะเบียนและทดลอง** ในชื่อ `whisper-demo` รันจาก `03_MCP` (Codex CLI ใช้ `codex mcp add` ตามข้อ 4.6 ด้วยชื่อและ path เดียวกัน):
++
++```bash
++claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/whisper_mcp_demo.py"
++```
++
++เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
++
++```text
++ใช้ tool transcribe ของ whisper-demo อ่านไฟล์เสียงที่ kokoro-demo เพิ่งสร้าง
++(ใช้ path จากผลของ speak) ด้วย language "en" แล้วบอกข้อความที่ถอดได้
++```
++
++**ลำดับการทำงาน:** ข้อความ → `speak` (Kokoro) → ไฟล์ `.wav` ใน `work/audio_out/` → `transcribe` (Whisper) → ข้อความ ผลที่ควรได้คือข้อความใกล้เคียงประโยคต้นฉบับ แต่ไม่จำเป็นต้องตรงทุกตัวอักษร (ตัวพิมพ์ เครื่องหมายวรรคตอน หรือคำบางคำอาจต่างไป) ถ้าได้ข้อความว่างหรือ `isError: true` ให้ตรวจ path และ `ffmpeg` ก่อน
++
++หมายเหตุหลักฐาน: ตัวอย่าง Whisper ในข้อนี้ **ยังไม่ได้ทดสอบรันจริง** ทั้งการติดตั้งและการเรียกผ่าน Host คำสั่งและชื่อ API ตรวจกับ README และซอร์สโค้ดของ `openai/whisper` (`load_model`, `transcribe`, คีย์ผลลัพธ์ `text`/`language`) เมื่อ 20 กันยายน 2026 เท่านั้น ยังไม่มีตัวเลขเวลาหรือข้อความผลลัพธ์ให้อ้าง
+ 
+ ---
+ 

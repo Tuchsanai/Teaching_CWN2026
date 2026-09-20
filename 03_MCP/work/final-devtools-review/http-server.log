@@ -15,3 +15,60 @@
 127.0.0.1 - - [20/Sep/2026 02:21:29] "GET /lab-results/playwright/run-2026-09-19-064547/cs2-04-error-empty.png HTTP/1.1" 200 -
 127.0.0.1 - - [20/Sep/2026 02:21:29] code 404, message File not found
 127.0.0.1 - - [20/Sep/2026 02:21:29] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [20/Sep/2026 02:35:38] "GET /work/final-devtools-review/readme.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 41234)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/http/server.py", line 1311, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+127.0.0.1 - - [20/Sep/2026 02:35:39] "GET /work/final-devtools-review/readme.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/Sep/2026 02:35:39] "GET /lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav HTTP/1.1" 200 -
+127.0.0.1 - - [20/Sep/2026 02:35:39] "GET /lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav HTTP/1.1" 200 -
+127.0.0.1 - - [20/Sep/2026 02:36:50] "GET /work/final-devtools-review/readme.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 35518)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/http/server.py", line 1311, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/usr/lib/python3.12/http/server.py", line 672, in __init__
+    super().__init__(*args, **kwargs)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/usr/lib/python3.12/http/server.py", line 679, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/usr/lib/python3.12/http/server.py", line 878, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/usr/lib/python3.12/shutil.py", line 204, in copyfileobj
+    fdst_write(buf)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+127.0.0.1 - - [20/Sep/2026 02:36:51] "GET /work/final-devtools-review/readme.html HTTP/1.1" 200 -
+127.0.0.1 - - [20/Sep/2026 02:36:51] "GET /lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav HTTP/1.1" 304 -

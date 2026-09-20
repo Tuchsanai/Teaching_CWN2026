@@ -1,39 +1,15 @@
 # เรียนรู้ Model Context Protocol (MCP): จากแนวคิดพื้นฐานสู่การสร้าง MCP Server ของตัวเอง
 
-บทเรียนนี้ต่อจากบทที่ 02 (Loop / Graph / Dynamic Workflow) ซึ่งนักศึกษาเขียน Prompt ให้ AI ทำงานเป็นเวิร์กโฟลว์ คราวนี้เราจะดูว่า **AI Agent ไปทำงานกับโลกภายนอกได้อย่างไร** เช่น วาดรูปลง canvas, ควบคุมเบราว์เซอร์, หรือเรียกโค้ด Python ของเรา คำตอบคือ **Model Context Protocol (MCP)** มาตรฐานเปิดที่ทำให้ AI ค้นพบและเรียกใช้เครื่องมือภายนอกได้โดยไม่ต้องเขียนตัวเชื่อมใหม่ทุกครั้ง
-
-บทเรียนแบ่งเป็น 8 บท: ทฤษฎี (บทที่ 1–3) → ติดตั้งทุกอย่างด้วยพรอมป์ต์เดียว (บทที่ 4) → ใช้ MCP server ที่มีอยู่แล้ว (Case Study 1 Excalidraw MCP, Case Study 2 Playwright MCP) → สร้าง MCP server เอง (บทที่ 7) → สรุปและงานส่ง (บทที่ 8) **ทุกภาพในบทเรียนวาดด้วย Excalidraw MCP โดย AI Agent** และ**ตัวเลข ข้อความ error และผลลัพธ์ในส่วนบันทึกการทดลองมาจากการรันจริง**บนเครื่องเรียนเมื่อวันที่ 19 กันยายน 2026 เก็บไว้ใน `lab-results/`
-
-![แผนที่บทเรียน 03_MCP วาดด้วย Excalidraw MCP](img/d08-lesson-map.png)
-
-**เลือกอ่าน:** [เตรียมตัวและงานส่ง](#prep) · [บทที่ 1 MCP คืออะไร](#ch1) · [บทที่ 2 โครงสร้าง](#ch2) · [บทที่ 3 MCP vs Function vs API](#ch3) · [3.1 โค้ดเรียก MCP ฉบับเต็ม](#ch3-1) · [บทที่ 4 ติดตั้ง](#ch4) · [บทที่ 5 Excalidraw MCP](#ch5) · [บทที่ 6 Playwright MCP](#ch6) · [บทที่ 7 สร้าง MCP server](#ch7) · [บทที่ 8 สรุป](#ch8) · [ภาคผนวก](#appendix)
-
 <a id="prep"></a>
 ## สิ่งที่ต้องเตรียม และสิ่งที่ต้องส่ง
 
-**เครื่องมือที่ใช้ในบทเรียนนี้ (เวอร์ชันที่ทดลองจริง)**
+**เครื่องมือที่ใช้ในบทเรียนนี้**
 
-| เครื่องมือ | เวอร์ชัน | ใช้ทำอะไร |
-| --- | --- | --- |
-| Claude Code | 2.1.258 | Host ของ MCP (AI Agent ที่นักศึกษาสั่งงาน) |
-| Node.js | v24.20.0 | รัน MCP server ที่เขียนด้วย JavaScript |
-| `mcp-excalidraw-server` | 2.0.0 | Excalidraw MCP (Case Study 1) |
-| `@playwright/mcp` | 0.0.80 | Playwright MCP (Case Study 2) ต่อ headless Chrome 153 ผ่าน CDP |
-| Python | 3.12.3 (`/opt/venv/bin/python`) | เขียน MCP server เองและเว็บทดลอง |
-| `mcp` (Python SDK) | 2.0.0 (รองรับ spec 2026-07-28) | สร้าง MCP server / client |
-| `kokoro` | 0.9.4 (+ `espeak-ng` 1.51) | สังเคราะห์เสียงภาษาอังกฤษในเว็บทดลอง |
-| FastAPI / uvicorn | 0.136.3 / 0.52.4 | เว็บทดลอง Kokoro TTS |
-
-**ติดตั้งด้วยการส่งลิงก์ repo ต้นทาง ไม่ต้องตั้งค่าเอง**: สิ่งเดียวที่ต้องมีก่อนคือ Claude Code ที่ล็อกอินแล้ว (จากบทที่ 01) กับ Node.js และ Python 3 ในเครื่อง จากนั้นเปิด `claude` แล้วส่ง **ลิงก์ GitHub ของเครื่องมือพร้อมคำขอสั้น ๆ** (บทที่ 4.2.1 หรือไฟล์ [`labs/prompts/setup-00-all-in-one.md`](labs/prompts/setup-00-all-in-one.md)) AI จะอ่าน README ของ repo เลือกวิธีติดตั้งเอง ตั้งค่า MCP ให้ Host และทดสอบจนใช้งานได้ (Kokoro ใช้ CPU ได้ ไม่จำเป็นต้องมี GPU และเป็นไลบรารี ไม่ใช่ MCP server สำเร็จรูป)
-
-**ใช้ Codex CLI ได้เช่นกัน:** เปิด `codex` แล้วใช้คำขอในข้อ 4.2.2 หรือ [`setup-00-codex.md`](labs/prompts/setup-00-codex.md) ซึ่งใช้ repo ต้นทางชุดเดียวกัน ต่างเฉพาะ Host ที่ให้ตั้งค่า จากนั้นเปิด session ใหม่และทดสอบด้วย S5 (หลักฐานการรันจริงในบทเรียนนี้มาจาก Claude Code ยังไม่มีผลรันฝั่ง Codex)
-
-**งานที่นักศึกษาต้องส่ง** (เกณฑ์ละเอียดอยู่ในบทที่ 8)
-
-1. Lab 5: ภาพจาก Excalidraw MCP อย่างน้อย 3 ภาพ (architecture, workflow, flow) + ภาพที่แก้จาก Prompt 1 ภาพ + บันทึกลำดับ tool ที่ AI เรียก
-2. Lab 6: screenshot ชุดของการควบคุมเว็บ Kokoro ผ่าน Playwright MCP + snapshot + บันทึกขั้นตอน
-3. Lab 7: MCP server ของตัวเอง (มี tool ที่เพิ่มเองอย่างน้อย 1 ตัว) + wire log + ผลที่ Claude Code เรียก tool ได้จริง
-4. รายงานสั้น 1 หน้า: MCP แก้ปัญหาอะไร และสิ่งที่ค้นพบระหว่างทดลอง (ต้องอ้างไฟล์หลักฐานของตัวเอง)
+| เครื่องมือ | ใช้ทำอะไร |
+| --- | --- |
+| Claude Code | Host ของ MCP (AI Agent ที่นักศึกษาสั่งงาน) |
+| Codex CLI | Host ของ MCP (AI Agent ที่นักศึกษาสั่งงาน) |
+| Node.js | รัน MCP server ที่เขียนด้วย JavaScript |
 
 ---
 
@@ -52,34 +28,48 @@ LLM (เช่น Claude) เก่งเรื่องอ่านและเ
 
 ### 1.2 MCP คืออะไร
 
-**Model Context Protocol (MCP)** คือโปรโตคอลเปิด (open protocol) ที่ Anthropic เผยแพร่ในเดือนพฤศจิกายน 2024 และปัจจุบันดูแลโดยชุมชนที่ [modelcontextprotocol.io](https://modelcontextprotocol.io) สเปกฉบับล่าสุดที่ใช้ในบทเรียนนี้คือรุ่น **2026-07-28** ซึ่งนิยามไว้ว่า
+**Model Context Protocol (MCP)** คือโปรโตคอลเปิด (open protocol) ที่ Anthropic เผยแพร่เมื่อ 25 พฤศจิกายน 2024 ([ประกาศ](https://www.anthropic.com/news/model-context-protocol)) และปัจจุบันดูแลเป็นมาตรฐานเปิดที่ [modelcontextprotocol.io](https://modelcontextprotocol.io) สเปกรุ่น **2026-07-28** ที่บทเรียนนี้อ้าง ([หน้าสเปก](https://modelcontextprotocol.io/specification/2026-07-28)) นิยามไว้ว่า
 
 > MCP is an open protocol that enables seamless integration between LLM applications and external data sources and tools.
 
+คำว่า "โปรโตคอล" หมายถึง **ข้อตกลง** ไม่ใช่โปรแกรมหรือไลบรารี สองฝ่ายที่ไม่เคยเห็นโค้ดของกันและกันตกลงกันว่าจะส่งข้อความรูปแบบไหน คำขอชื่ออะไรแปลว่าอะไร และคำตอบต้องมีหน้าตาอย่างไร Claude Code จึงไม่ต้องรู้เลยว่า `mcp-excalidraw-server` เขียนด้วยภาษาอะไรหรือวาดรูปลง canvas อย่างไร รู้แค่ว่าส่งคำขอตามข้อตกลงแล้วจะได้ผลกลับมา ผู้สอนจึงไม่ต้องเขียนโค้ดเชื่อม Excalidraw กับ Claude แม้แต่บรรทัดเดียว
+
 หัวใจของ MCP มี 3 อย่าง
 
-1. **ภาษากลางแบบเดียว** — ทุกข้อความเป็น [JSON-RPC 2.0](https://www.jsonrpc.org/) (JSON ที่มี `method`, `params`, `id`, `result`)
-2. **การค้นพบอัตโนมัติ** — server "ประกาศ" ว่ามีเครื่องมืออะไร รับ argument แบบไหน (`tools/list`) โดย Host ไม่ต้องรู้ล่วงหน้า
-3. **แยกบทบาทชัดเจน** — Host/Client เป็นฝั่ง AI, Server เป็นฝั่งเครื่องมือ ใครเขียนฝั่งไหนก็ได้ ภาษาอะไรก็ได้
+1. **ภาษากลางแบบเดียว** — ทุกข้อความเป็น [JSON-RPC 2.0](https://www.jsonrpc.org/specification) ใช้ JSON ที่มี field ตามชนิดข้อความ เช่น request มี `method` และ `id` ส่วน response มี `result` หรือ `error` (ชนิดข้อความ request / response / notification และตัวอย่างจริงที่ดักได้จากสายอยู่ในข้อ 2.2)
+2. **การค้นพบ (discovery) ตอนรันจริง** — หลังต่อกันแล้ว Host เรียก `tools/list` ถามว่า server มีเครื่องมืออะไร แต่ละตัวมี `name`, `inputSchema` และอาจมี `description` ช่วยให้ LLM เลือกใช้; `inputSchema` คือ (JSON Schema บอกว่ารับ argument อะไร ตัวไหนบังคับ) แล้วเรียกใช้ด้วย `tools/call {name, arguments}` ได้ผลกลับมาใน `content` ([Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools))
+3. **แยกบทบาทชัดเจน** — **Host** คือแอป AI ที่ผู้ใช้ใช้งาน (Claude Code, Codex CLI) เป็นเจ้าของ LLM และผู้คุมสิทธิ์; **Client** คือตัวเชื่อมที่ Host สร้าง 1 ตัวต่อ 1 server; **Server** คือโปรแกรมที่ถือเครื่องมือจริงและประกาศ Tools / Resources / Prompts (ในบทเรียนนี้คือ `mcp-excalidraw-server`, `playwright-mcp`, `tts_server.py`) ใครเขียนฝั่งไหนก็ได้ ภาษาอะไรก็ได้ ([Architecture](https://modelcontextprotocol.io/specification/2026-07-28/architecture) ตารางเต็มอยู่ในข้อ 2.1)
 
-สเปกเปรียบ MCP กับ Language Server Protocol (LSP) ที่ทำให้ editor ทุกตัวรองรับภาษาโปรแกรมได้ผ่านมาตรฐานเดียว หลายคนจึงเรียก MCP ว่า "USB-C ของ AI"
+ข้อควรระวังเรื่อง discovery: มันไม่ได้แปลว่า Host ไปหา server มาติดตั้งเอง นักศึกษายังต้องติดตั้งและลงทะเบียน server กับ Host ก่อน (บทที่ 4) สิ่งที่อัตโนมัติคือ "หลังต่อกันแล้ว Host ไม่ต้องรู้ล่วงหน้าว่ามีเครื่องมืออะไร"
+
+MCP ยังอยู่คนละชั้นกับ LLM และ tool calling ซึ่งมักถูกพูดปนกัน
+
+- **LLM** เป็นผู้ "ตัดสินใจ" ว่าจะตอบข้อความหรือจะเรียกเครื่องมือชื่ออะไรด้วย argument อะไร
+- **tool calling** คือรูปแบบที่แต่ละค่ายโมเดล (Anthropic, OpenAI ฯลฯ) ใช้คุยกับ Host มีมาก่อน MCP และใช้ได้โดยไม่มี MCP
+- **MCP** คือข้อตกลงระหว่าง Host กับ server Host เป็นตัวแปลระหว่างสองชั้น (Claude Code ตั้งชื่อให้โมเดลเห็นเป็น `mcp__<server>__<tool>` ตามหลักฐานในบทที่ 3) และ MCP client ก็เรียกเครื่องมือได้โดยไม่มีโมเดลเลย (บทที่ 7.3) MCP จึงไม่ได้ทำให้โมเดลฉลาดขึ้น แค่ทำให้รายการเครื่องมือที่โมเดลเห็นมาจากมาตรฐานเดียว
+
+**flow สั้น ๆ ในหนึ่งบรรทัด** (Lab 5.1 สั่งวาด architecture diagram): เปิด Claude Code → Host เรียก `tools/list` จาก Excalidraw server → ผู้ใช้พิมพ์ prompt → LLM เลือก `batch_create_elements` พร้อม JSON ของกล่องและลูกศร → Host ตรวจนโยบายอนุมัติแล้วส่ง `tools/call` → server วาดลง canvas แล้วตอบ `content` → วนซ้ำจนพอใจแล้ว `export_to_image` ได้ PNG (ลำดับจริงที่ AI เรียกอยู่ใน [`trace.md`](lab-results/excalidraw/run-2026-09-19-062505/trace.md))
+
+เว็บ MCP เปรียบ MCP กับ **พอร์ต USB-C ของแอป AI** ([Introduction](https://modelcontextprotocol.io/introduction)) และสเปกบอกว่าได้แรงบันดาลใจจาก [Language Server Protocol (LSP)](https://microsoft.github.io/language-server-protocol/) ที่ทำให้ editor ทุกตัวรองรับภาษาโปรแกรมผ่านมาตรฐานเดียว อุปมานี้อธิบายเรื่อง "หัวต่อเดียว" ได้ดี แต่ไม่ครอบคลุมเรื่องการอนุมัติ ความปลอดภัย และการต่อรองเวอร์ชัน (ข้อ 1.4)
 
 ### 1.3 ทำไม AI Agent / LLM จึงต้องใช้ MCP
 
-| ถ้าไม่มี MCP | เมื่อมี MCP |
+| ประโยชน์ | ตัวอย่างในบทเรียนนี้ |
 | --- | --- |
-| ต้องเขียนโค้ดบอก LLM เองว่า tool แต่ละตัวชื่ออะไร รับ argument อะไร | Host เรียก `tools/list` แล้วได้ชื่อ คำอธิบาย และ `inputSchema` (JSON Schema) จาก server อัตโนมัติ |
-| ต้องเขียน glue code แปลงคำตอบของ LLM ไปเรียก API จริง | Host ส่ง `tools/call {name, arguments}` ตามมาตรฐาน server ทำงานแล้วตอบ `result` |
-| เครื่องมือที่ทำให้ Claude Code ใช้ ไม่ได้ทำให้ Codex ใช้ | server เดียวใช้ได้กับทุก Host ที่พูด MCP (บทเรียนนี้ใช้ Excalidraw MCP และ Playwright MCP ตัวเดียวกันทั้งใน Claude Code และ Codex) |
-| ไม่มีจุดกลางสำหรับขออนุมัติผู้ใช้ | สเปกกำหนดให้ Host ถามผู้ใช้ก่อนเรียก tool ("there SHOULD always be a human in the loop") |
+| **ไม่ต้องบอกรายชื่อเครื่องมือล่วงหน้า** — Host ได้ชื่อ คำอธิบาย และ `inputSchema` จาก `tools/list` ตอนรันจริง เมื่อ server เพิ่มเครื่องมือ Host ก็เห็นโดยไม่ต้องแก้ตัวเชื่อม ตราบใดที่รุ่นและฟีเจอร์ยังเข้ากันได้ | `playwright-mcp` ประกาศ `browser_navigate`, `browser_snapshot`, `browser_fill_form`, `browser_click` ฯลฯ ผู้สอนไม่เคยพิมพ์ชื่อเหล่านี้ลงในการตั้งค่า Claude Code เลย |
+| **glue code รูปแบบเดียว** — Host ส่ง `tools/call {name, arguments}` เหมือนกันทุกเครื่องมือ server เป็นผู้แปลงไปเรียกของจริง | Excalidraw (canvas), Playwright (เบราว์เซอร์), Kokoro (ไลบรารี Python ครอบด้วย `tts_server.py`) ถูกเรียกด้วยข้อความรูปแบบเดียวกันทั้งหมด |
+| **server เดียวใช้ได้หลาย Host (reuse / interoperability)** — ใช้ server ที่คนอื่นเขียนได้ทันทีโดยไม่ต้องอ่านโค้ดข้างใน มีเงื่อนไขว่าทั้งสองฝั่งต้องรองรับ **เวอร์ชันโปรโตคอล capability และ transport** ที่ตรงกัน ไม่เช่นนั้น MCP ก็ไม่ช่วยอะไร (ข้อ 2.3–2.4) | Playwright MCP ของ Microsoft และ Excalidraw MCP ของชุมชน ตั้งค่าได้ทั้ง Claude Code และ Codex CLI แต่หลักฐานการรันจริงมีเฉพาะฝั่ง Claude Code (ดู [`lab-results/codex-setup/`](lab-results/codex-setup/run-2026-09-19-093629/evidence.md)) |
+| **จุดอนุมัติร่วมกัน** — สเปกให้ทุก Host มีจุดเดียวกันก่อน `tools/call` ที่คนอนุมัติหรือปฏิเสธได้ ("there SHOULD always be a human in the loop with the ability to deny tool invocations" — [Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)) | Claude Code ให้ผู้ใช้อนุมัติล่วงหน้าได้ หลักฐานหลายรอบในบทเรียนนี้ (เช่น `run-info.json` ของบทที่ 7) รันแบบข้ามการถามเพื่อบันทึกผลอัตโนมัติ |
 
-ตัวอย่างในบทเรียนนี้เอง: **แผนภาพทั้ง 9 ภาพวาดโดย AI Agent (Claude Code) ผ่าน Excalidraw MCP** และ **การกรอกฟอร์มบนเว็บ Kokoro ทำผ่าน Playwright MCP** โดยผู้สอนไม่ได้เขียนโค้ดเชื่อม Excalidraw หรือเบราว์เซอร์กับ Claude เลย เพียงตั้งค่าให้ Claude Code รู้จัก MCP server สองตัวนี้
+ต้องเข้าใจให้ตรง: **ไม่ใช่ทุกงานต้องใช้ MCP** ถ้ามีแอปเดียว เครื่องมือเดียว และไม่ต้องให้ LLM เลือกเอง การเรียกฟังก์ชันหรือ API ตรง ๆ ง่ายและเร็วกว่า และแอปที่ไม่ใช้ MCP ก็ทำ approval และ discovery เองได้ (เครื่องมือในตัวของ Claude Code เช่นอ่านไฟล์หรือรันคำสั่ง ไม่ใช่ MCP tool แต่ก็ถามอนุมัติ และแอปทั่วไปโหลดรายการ API จากไฟล์ OpenAPI ตอนรันได้) สิ่งที่ MCP เพิ่มคือ "ทำแบบเดียวกันทุกแอปทุกเครื่องมือ" จึงคุ้มเมื่อมีหลาย Host หลายเครื่องมือ หรือต้องการใช้ server ที่คนอื่นเขียนแล้ว
 
 ### 1.4 สิ่งที่ MCP ไม่ใช่
 
-- ไม่ใช่โมเดล AI และไม่ใช่ agent framework — เป็นแค่ "ภาษากลาง" ระหว่าง AI กับเครื่องมือ
-- ไม่ได้มาแทน REST API หรือ Python function — แต่ครอบของเดิมให้ AI ค้นพบและเรียกได้ (ดูบทที่ 3)
-- ไม่ได้ทำให้ AI ทำอะไรก็ได้ — Host ยังเป็นผู้คุมสิทธิ์และผู้ใช้เป็นผู้อนุมัติ
+- **ไม่ใช่โมเดล AI และไม่ใช่ agent framework** — MCP ไม่ตัดสินใจอะไรเลย ผู้เลือกว่าจะเรียก `browser_click` หรือไม่คือ LLM ผู้จัดลำดับงาน วนลูป และคุมสิทธิ์คือ Host
+- **ไม่ได้มาแทน REST API หรือ Python function** — `tts_server.py` แค่ครอบไลบรารี Kokoro ให้ AI ค้นพบและเรียกได้ ของเดิมยังอยู่และยังเรียกตรงได้เหมือนเดิม (บทที่ 3)
+- **ไม่ได้ทำให้ AI ทำอะไรก็ได้ และไม่ได้บังคับให้ถามทุก call** — สเปกใช้คำว่า SHOULD ระดับการอนุมัติเป็นนโยบายที่ Host และผู้ใช้ตั้งค่าตามผลกระทบของงาน trace และ wire log ช่วยตรวจย้อนหลังแต่ไม่ทดแทนการจำกัดสิทธิ์และขอบเขตก่อนรัน
+- **ไม่รับประกันว่าเครื่องมือปลอดภัยหรือถูกต้อง** — สเปกบอกตรง ๆ ว่า "MCP itself cannot enforce these security principles at the protocol level" และให้ client ถือว่าคำอธิบายเครื่องมือจาก server ที่ไม่น่าเชื่อถือเป็นข้อมูลที่เชื่อไม่ได้ ([หน้าสเปก](https://modelcontextprotocol.io/specification/2026-07-28) หัวข้อ Security and Trust & Safety) server ที่พูด MCP ถูกต้องทุกประการก็ตอบผิดหรือหลอกโมเดลได้ ความรับผิดชอบอยู่ที่ผู้เขียนและผู้เลือกใช้ server
+- **ไม่ใช่ "รุ่นเดียวใช้ได้ตลอดไป"** — MCP มีหลายรุ่น (ระบุด้วยวันที่) แต่ละฝั่งอาจรองรับไม่ครบ SDK ช่วยต่อรองให้ แต่บนสายมีการต่อรองรุ่นและ capability อยู่จริง เช่น Claude Code รุ่นที่ทดลองยังส่ง `2025-11-25` ขณะที่ Python SDK `mcp` 2.0.0 ใช้ `2026-07-28` (ข้อ 2.4 และหน้า [Versioning](https://modelcontextprotocol.io/specification/versioning))
 
 ---
 
@@ -168,538 +158,217 @@ server ตัวเดียวกัน (`hello_server.py` ที่เขี�
 ---
 
 <a id="ch3"></a>
-## บทที่ 3 MCP ต่างจากการเรียก Python Function หรือ API โดยตรงอย่างไร
+## บทที่ 3 เรียกใช้ Kokoro (TTS) และ Whisper (STT) ผ่าน MCP ด้วย `MCPServer`
 
-ใช้งานเดียวกันตลอดบทเรียน: **สังเคราะห์เสียงภาษาอังกฤษด้วย Kokoro-82M** เราเปิดความสามารถนี้ให้เรียกได้ 3 แบบ โดยโค้ด Kokoro ไม่ต้องแก้เลย
+Kokoro คือโมเดล Text-to-Speech (TTS) แบบ open-weight ที่แปลงข้อความเป็นเสียงพูด รุ่น Kokoro-82M มีพารามิเตอร์ประมาณ 82 ล้านตัว (ต้นทาง: [GitHub hexgrad/kokoro](https://github.com/hexgrad/kokoro), [Hugging Face hexgrad/Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)) แพ็กเกจ Python ชื่อ `kokoro` ให้เรียกใช้โมเดลผ่านคลาส `KPipeline` และในบทนี้ใช้ข้อความภาษาอังกฤษกับเสียง `af_heart` เป็นตัวอย่าง ข้อสำคัญคือ repo ต้นทางเป็นไลบรารี ไม่ได้ให้ MCP server สำเร็จรูปมา ดังนั้นเราจะใช้ `MCPServer` ห่อความสามารถนี้เป็น tool ให้ Host เรียกเอง
 
-![งานเดียวกันเรียกได้ 3 แบบ: Python function, REST API, MCP tool](img/d04-three-ways.png)
+ตัวอย่างนี้เปิดความสามารถ **สังเคราะห์เสียงภาษาอังกฤษด้วย Kokoro-82M** เป็น MCP tool ชื่อ `speak` ในไฟล์เดียว โค้ดเรียก `from kokoro import KPipeline` ตรง ๆ ไม่พึ่งโมดูลอื่นของแล็บ จึงอ่านแล้วเห็นครบว่า MCP server ทำอะไรบ้าง (ฉบับแล็บที่แยกชั้นเป็น `kokoro_core` + เว็บ ดูบทที่ 7.5)
 
-สามบล็อกถัดไปเป็นโค้ด **ที่ตัดมาเฉพาะส่วนสำคัญ** เพื่อเทียบรูปแบบของทั้งสามวิธี (ฉบับเต็มอยู่ในไฟล์ที่ลิงก์ไว้) ส่วนโค้ดที่คัดลอกแล้วรันได้ทันทีตั้งแต่ `import` จนถึง `main()` อยู่ในข้อ [3.1](#ch3-1)
+**ติดตั้งบน Linux (Ubuntu/Debian)** — รันจากโฟลเดอร์ `03_MCP` ใช้ venv แยกที่ `work/.venv` จึงไม่ทับ `labs/.venv` ของบทที่ 4 ติดตั้ง torch รุ่น CPU ก่อนเพื่อไม่ให้ `kokoro` ดึง torch รุ่น CUDA หลาย GB:
 
-**แบบที่ 1 — Python function** ([`labs/kokoro-web/kokoro_core.py`](labs/kokoro-web/kokoro_core.py))
-
-```python
-def synthesize(text: str, voice: str = "af_heart") -> dict:
-    """แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav"""
-    ...
-    return {"path": str(path), "duration_sec": ..., "sample_rate": 24000, "gen_ms": gen_ms, "voice": voice}
+```bash
+python3 -m venv work/.venv
+work/.venv/bin/pip install --upgrade pip
+work/.venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
+work/.venv/bin/pip install "mcp[cli]>=2,<3" kokoro soundfile numpy
+sudo apt-get update && sudo apt-get install -y espeak-ng   # ตัวช่วยอ่านคำนอกคลังของ Kokoro
 ```
 
-ใครเรียกได้: เฉพาะโค้ด Python ใน process เดียวกัน (`from kokoro_core import synthesize`)
-
-**แบบที่ 2 — REST API ด้วย FastAPI** ([`labs/kokoro-web/app.py`](labs/kokoro-web/app.py))
+**สร้าง MCP server** — บันทึกเป็น `work/kokoro_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
 
 ```python
-@app.post("/api/tts")
-async def tts(req: TTSRequest):
-    result = await run_in_threadpool(kokoro_core.synthesize, req.text, req.voice)
-    return {"audio_url": f"/audio/{result['filename']}", "duration_sec": result["duration_sec"], ...}
-```
+"""kokoro_mcp_demo.py — MCP server ที่เรียก Kokoro โดยตรงในไฟล์เดียว"""
+import contextlib
+import pathlib
+import sys
+import uuid
 
-ใครเรียกได้: ทุกโปรแกรมที่ส่ง HTTP ได้ (เบราว์เซอร์, curl, แอปอื่น) ผลจริงจาก curl: [`web-curl-tts.json`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts.json) ได้เสียงยาว 3.98 วินาที ใช้เวลาสร้าง 672 ms บน CPU · ส่งข้อความว่างได้ `{"error":"text must not be empty"}` HTTP 400 ([`web-curl-tts-empty.txt`](lab-results/own-server/run-2026-09-19-062712/web-curl-tts-empty.txt))
+import numpy as np
+import soundfile as sf
+from mcp.server import MCPServer
 
-**แบบที่ 3 — MCP tool** ([`labs/my-mcp-server/tts_server.py`](labs/my-mcp-server/tts_server.py))
+AUDIO_DIR = pathlib.Path(__file__).resolve().parent / "audio_out"
+SAMPLE_RATE = 24_000          # Kokoro ให้เสียง 24 kHz เสมอ
+_pipeline = None
 
-```python
-mcp = MCPServer("kokoro-tts", instructions="แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M")
+
+def get_pipeline():
+    """โหลดโมเดลครั้งแรกที่ถูกเรียก แล้วใช้ตัวเดิมซ้ำทุกครั้ง"""
+    global _pipeline
+    if _pipeline is None:
+        # import/โหลดโมเดลอาจ print ลง stdout จึงเบี่ยงไป stderr ชั่วคราว ไม่ให้ปนกับ JSON-RPC
+        with contextlib.redirect_stdout(sys.stderr):
+            from kokoro import KPipeline
+            _pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M", device="cpu")
+    return _pipeline
+
+
+mcp = MCPServer("kokoro-demo", instructions="สร้างเสียงภาษาอังกฤษด้วย Kokoro-82M")
+
 
 @mcp.tool()
 def speak(text: str, voice: str = "af_heart") -> dict:
-    """สังเคราะห์เสียงภาษาอังกฤษจากข้อความ แล้วคืน path ของไฟล์ .wav พร้อมความยาว (วินาที)"""
-    r = kokoro_core.synthesize(text, voice)
-    return {"path": r["path"], "duration_sec": r["duration_sec"], "sample_rate": r["sample_rate"], "gen_ms": r["gen_ms"], "voice": r["voice"]}
-```
+    """สร้างเสียงภาษาอังกฤษจากข้อความ แล้วคืน path ของไฟล์ .wav และข้อมูลเสียง"""
+    text = text.strip()
+    if not text:
+        raise ValueError("text must not be empty")
 
-ใครเรียกได้: ทุก MCP host โดย LLM ค้นพบเองจาก `tools/list` ผลจริง: Claude Code เรียก `mcp__kokoro-tts__speak {"text": "Model Context Protocol lets one server serve many agents."}` แล้วได้ไฟล์เสียงยาว 4.45 วินาที ([`claude-tts-summary.md`](lab-results/own-server/run-2026-09-19-062712/claude-tts-summary.md))
+    pipe = get_pipeline()
+    chunks = []
+    with contextlib.redirect_stdout(sys.stderr):
+        for _graphemes, _phonemes, audio in pipe(text, voice=voice):
+            chunks.append(np.asarray(audio))
+    if not chunks:
+        raise ValueError("Kokoro produced no audio")
 
-**ตารางเปรียบเทียบ**
-
-| ประเด็น | Python function | REST API | MCP tool |
-| --- | --- | --- | --- |
-| ใครเรียกได้ | โค้ดใน process เดียวกัน | ทุกโปรแกรมที่ส่ง HTTP ได้ | ทุก MCP host (Claude Code, Codex, แอปของคุณ) |
-| LLM รู้จักได้เองไหม | ไม่ ต้องเขียนโค้ดเรียกเอง | ไม่ ต้องเขียน glue code + อธิบาย API ให้ LLM ทุกแอป | รู้ จาก `tools/list` + `inputSchema` อัตโนมัติ |
-| รูปแบบข้อความ | การเรียกฟังก์ชัน | กำหนดเองต่อ API (path, JSON ต่างกัน) | มาตรฐานเดียว JSON-RPC 2.0 |
-| การอนุมัติจากผู้ใช้ | ไม่มี | แล้วแต่แอป | Host ถามผู้ใช้ก่อนเรียก tool |
-| ข้ามภาษา/ข้ามเครื่อง | ไม่ได้ | ได้ | ได้ (stdio ในเครื่อง, Streamable HTTP ข้ามเครื่อง) |
-| เหมาะกับ | logic ภายในโปรแกรม | ให้บริการแอปอื่น/หน้าเว็บ | ให้ AI Agent ใช้เป็นเครื่องมือ |
-
-สรุป: MCP ไม่ได้มาแทน function หรือ API แต่เป็น "ชั้นประกาศและเรียกใช้แบบมาตรฐาน" ที่ครอบของเดิม ในบทที่ 7 นักศึกษาจะเห็นว่าห่อ function เป็น MCP tool ใช้โค้ดเพิ่มไม่ถึง 20 บรรทัด
-
-
-<a id="ch3-1"></a>
-### 3.1 โค้ดเรียก MCP ตรง ๆ ฉบับเต็ม (คัดลอกแล้วรันได้)
-
-ตารางด้านบนบอกว่า MCP ต่างจาก function/API อย่างไร ส่วนนี้พิสูจน์ด้วยโค้ดที่รันได้จริง: เขียน **MCP Client ด้วยมือ 1 ไฟล์** ทำหน้าที่แทน Host (Claude Code / Codex) แล้วเรียก **tool `speak` ของ `kokoro-tts`** ซึ่งเป็น "แบบที่ 3" ในหัวข้อนี้ พร้อม sanity check ด้วย `add` ของ `hello-lab` ก่อน เพื่อแยกให้ออกว่าถ้าพังคือพังที่เส้นทาง MCP หรือพังที่ Kokoro ทั้งสอง server เป็นของจริงในโฟลเดอร์ [`labs/my-mcp-server/`](labs/my-mcp-server/) ไม่ใช่ API สมมติ
-
-**บริบทก่อนรัน**
-
-| สิ่งที่ต้องรู้ | ค่าที่ใช้ |
-| --- | --- |
-| working directory ของทุกคำสั่ง | โฟลเดอร์บทเรียน `03_MCP` (บนเครื่องผู้สอนคือ `/root/workspace/CWN/Teaching/03_MCP`) เอกสารนี้แทนด้วย `<PATH_TO_03_MCP>` |
-| ตัวแปลภาษา Python | `/opt/venv/bin/python` (เครื่องเรียนของผู้สอน) หรือ `labs/.venv/bin/python` ถ้าติดตั้งเองตามข้อ 4.6.2 |
-| แพ็กเกจที่ต้องมี | `mcp` 2.x, `kokoro`, `soundfile`, `torch` (CPU พอ) |
-| ไฟล์ที่เกี่ยวข้อง | `labs/my-mcp-server/direct_call_kokoro.py` (client), `hello_server.py`, `tts_server.py`, `wire_capture.py` และ `labs/kokoro-web/kokoro_core.py` (ตัวเรียกโมเดลจริง) |
-| เครือข่าย | ครั้งแรกที่เรียก `speak` ต้องต่ออินเทอร์เน็ตเพื่อดาวน์โหลดโมเดล Kokoro-82M จาก Hugging Face ครั้งถัดไปใช้แคช |
-| working directory ของ **server** | ไม่ต้องสนใจ — client เปิด server เองด้วย path เต็ม และ server อ้าง path จากตำแหน่งไฟล์ตัวเอง |
-
-ขั้นเตรียม (ตรวจก่อนว่าครบ ถ้าขั้นนี้ไม่ผ่านอย่าเพิ่งรัน client)
-
-```bash
-# รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
-ls labs/my-mcp-server/direct_call_kokoro.py labs/my-mcp-server/tts_server.py labs/kokoro-web/kokoro_core.py
-/opt/venv/bin/python -c "import mcp, soundfile, kokoro; print('deps ok')"
-```
-
-**โค้ดเต็มของ client** — ไฟล์ [`labs/my-mcp-server/direct_call_kokoro.py`](labs/my-mcp-server/direct_call_kokoro.py) (แสดงครบทั้งไฟล์ ไม่มีส่วนที่ตัดออก)
-
-```python
-"""
-direct_call_kokoro.py — เรียก MCP tool ตรง ๆ จาก Python โดยไม่ผ่าน LLM (ฉบับเต็ม คัดลอกแล้วรันได้)
-====================================================================================
-ไฟล์นี้คือ "MCP Client ขนาดเล็ก" ที่ทำงานแทน Host (Claude Code / Codex) ครบทุกขั้น:
-
-    1. เปิด MCP server ของบทเรียนเป็น subprocess แบบ stdio
-    2. เชื่อมต่อและค้นพบ server → SDK จัดการเวอร์ชันโปรโตคอลและ capabilities
-    3. tools/list  → ค้นพบว่ามี tool อะไรบ้าง พร้อม inputSchema
-    4. tools/call  → เรียกใช้จริง (sanity check: hello-lab add, งานหลัก: kokoro-tts speak)
-    5. ตรวจไฟล์เสียงที่ได้ด้วย soundfile แล้วเขียนผลเป็น JSON
-
-ต้องมีก่อนรัน
--------------
-* Python 3.10+ ที่ติดตั้งแพ็กเกจ `mcp` 2.x, `kokoro`, `soundfile`, `torch` (CPU ก็พอ)
-  - เครื่องเรียนของผู้สอนใช้ /opt/venv/bin/python
-  - ถ้าทำตาม readme.md ข้อ 4.6.2 จะได้ labs/.venv/bin/python
-* โฟลเดอร์ปัจจุบัน (working directory) ไม่สำคัญ เพราะสคริปต์อ้าง path จากตำแหน่งไฟล์ตัวเองเสมอ
-  แต่ตัวอย่างคำสั่งด้านล่างรันจากโฟลเดอร์บทเรียน 03_MCP
-
-วิธีรัน
--------
-    # จากโฟลเดอร์ 03_MCP
-    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
-        --text "Model Context Protocol lets one server serve many agents." \
-        --out  lab-results/documentation-check/direct-call-result.json
-
-    # ข้าม sanity check ของ hello-lab (เรียกเฉพาะ Kokoro)
-    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity
-
-    # บันทึกข้อความ JSON-RPC ทุกบรรทัดบนสายผ่าน wire_capture.py
-    /opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --wire wire-direct.jsonl
-
-exit code: 0 = สำเร็จทุกขั้น, 1 = มีขั้นที่ล้มเหลว (รายละเอียดพิมพ์ลง stderr)
-"""
-from __future__ import annotations
-
-import argparse
-import asyncio
-import json
-import pathlib
-import sys
-import traceback
-
-# --- แพ็กเกจของ MCP Python SDK 2.x ------------------------------------------------
-# mcp.Client                      = ฝั่ง client ของโปรโตคอล (discover/list/call)
-# mcp.client.stdio.stdio_client   = transport แบบ stdio: เปิด server เป็น subprocess
-try:
-    from mcp import Client
-    from mcp.client.stdio import StdioServerParameters, stdio_client
-except ImportError as exc:  # แพ็กเกจยังไม่ได้ติดตั้ง หรือรันด้วย python ผิดตัว
-    sys.exit(
-        f"[FATAL] import mcp ไม่สำเร็จ: {exc}\n"
-        "        ติดตั้งด้วย:  <python ของ venv> -m pip install 'mcp[cli]'\n"
-        f"        python ที่ใช้อยู่ตอนนี้: {sys.executable}"
-    )
-
-HERE = pathlib.Path(__file__).resolve().parent          # .../labs/my-mcp-server
-HELLO_SERVER = HERE / "hello_server.py"
-TTS_SERVER = HERE / "tts_server.py"
-WIRE_PROXY = HERE / "wire_capture.py"
-PY = sys.executable                                      # ใช้ python ตัวเดียวกับที่รันสคริปต์นี้
-
-
-def dump(obj) -> str:
-    """แปลงผลลัพธ์ของ SDK (pydantic model) เป็น JSON อ่านง่าย"""
-    if hasattr(obj, "model_dump"):
-        obj = obj.model_dump(by_alias=True, exclude_none=True, mode="json")
-    return json.dumps(obj, ensure_ascii=False, indent=2)
-
-
-def stdio_target(script: pathlib.Path, wire: str | None):
-    """สร้าง transport stdio ที่ชี้ไปยัง server 1 ตัว (ใส่ wire_capture.py คั่นได้)"""
-    if not script.exists():
-        raise FileNotFoundError(f"ไม่พบไฟล์ server: {script}")
-    args = [str(script)] if not wire else [str(WIRE_PROXY), "--log", wire, "--", PY, str(script)]
-    return stdio_client(StdioServerParameters(command=PY, args=args))
-
-
-def tool_text(result) -> str:
-    """ดึงข้อความจาก content block แรกของผล tools/call (MCP คืนผลเป็น list ของ content)"""
-    for block in getattr(result, "content", []) or []:
-        text = getattr(block, "text", None)
-        if text is not None:
-            return text
-    return ""
-
-
-def check_not_error(result, label: str) -> None:
-    """MCP ไม่ได้โยน exception เมื่อ tool ทำงานพลาด แต่ตั้งธง isError=true ต้องเช็กเอง"""
-    if getattr(result, "is_error", False) or getattr(result, "isError", False):
-        raise RuntimeError(f"tool {label} ตอบกลับด้วย isError=true: {tool_text(result)}")
-
-
-async def sanity_check_hello(wire: str | None) -> dict:
-    """ขั้นที่ 1 — ตรวจว่าเส้นทาง MCP ทั้งเส้นใช้งานได้ ด้วย server ที่ไม่มี dependency หนัก"""
-    print("=" * 72)
-    print("[1/2] sanity check — hello-lab (add)")
-    print("=" * 72)
-    async with Client(stdio_target(HELLO_SERVER, wire)) as client:
-        print("protocol_version :", client.protocol_version)
-        print("server_info      :", dump(client.server_info))
-
-        tools = await client.list_tools()
-        names = [t.name for t in tools.tools]
-        print("tools/list       :", names)
-        if "add" not in names:
-            raise RuntimeError(f"ไม่พบ tool ชื่อ add ใน {names}")
-
-        result = await client.call_tool("add", {"a": 17, "b": 25})
-        check_not_error(result, "add")
-        print("tools/call add(17, 25) →", tool_text(result))
-        if tool_text(result).strip() != "42":
-            raise RuntimeError(f"add(17, 25) ควรได้ 42 แต่ได้ {tool_text(result)!r}")
-        return {"tools": names, "add_17_25": tool_text(result).strip()}
-
-
-async def call_kokoro(text: str, voice: str, wire: str | None) -> dict:
-    """ขั้นที่ 2 — งานหลักของบทที่ 3: เรียก Kokoro ผ่าน MCP (tool speak ของ kokoro-tts)"""
-    print()
-    print("=" * 72)
-    print("[2/2] งานหลัก — kokoro-tts (speak)")
-    print("=" * 72)
-    async with Client(stdio_target(TTS_SERVER, wire)) as client:
-        print("protocol_version :", client.protocol_version)
-        print("instructions     :", client.instructions)
-
-        tools = await client.list_tools()
-        by_name = {t.name: t for t in tools.tools}
-        print("tools/list       :", list(by_name))
-        if "speak" not in by_name:
-            raise RuntimeError(f"ไม่พบ tool ชื่อ speak ใน {list(by_name)}")
-        print("inputSchema ของ speak:")
-        print(dump(by_name["speak"].input_schema))
-
-        voices = await client.call_tool("list_voices", {})
-        check_not_error(voices, "list_voices")
-        available = [getattr(b, "text", "") for b in (voices.content or [])]
-        print("list_voices      :", available)
-        if available and voice not in available:
-            raise RuntimeError(f"voice {voice!r} ไม่อยู่ในรายการที่ server รองรับ: {available}")
-
-        print(f"tools/call speak(text={text!r}, voice={voice!r}) ...")
-        result = await client.call_tool("speak", {"text": text, "voice": voice})
-        check_not_error(result, "speak")
-        raw = tool_text(result)
-        print("ผลดิบจาก tool   :", raw)
-        try:
-            payload = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise RuntimeError(f"ผลของ speak ไม่ใช่ JSON: {raw!r}") from exc
-        return payload
-
-
-def verify_wav(path_str: str) -> dict:
-    """ขั้นสุดท้าย — เปิดไฟล์ .wav ที่ได้จริง เพื่อยืนยันว่าไม่ใช่ค่าที่ tool แต่งขึ้น"""
-    path = pathlib.Path(path_str)
-    if not path.exists():
-        raise FileNotFoundError(f"tool คืน path มาแต่ไม่พบไฟล์จริง: {path}")
-    try:
-        import soundfile as sf
-    except ImportError:
-        print("[warn] ไม่มี soundfile จึงตรวจได้แค่ขนาดไฟล์", file=sys.stderr)
-        return {"bytes": path.stat().st_size}
-    info = sf.info(str(path))
+    wav = np.concatenate(chunks)          # รวมทุก chunk ก่อนเขียน ไม่งั้นจะได้แค่ประโยคสุดท้าย
+    AUDIO_DIR.mkdir(exist_ok=True)
+    path = AUDIO_DIR / f"{uuid.uuid4().hex[:8]}.wav"
+    sf.write(str(path), wav, SAMPLE_RATE)
     return {
-        "bytes": path.stat().st_size,
-        "verified_duration_sec": round(info.frames / info.samplerate, 2),
-        "verified_sample_rate": info.samplerate,
-        "channels": info.channels,
+        "path": str(path),
+        "duration_sec": round(len(wav) / SAMPLE_RATE, 2),
+        "sample_rate": SAMPLE_RATE,
+        "voice": voice,
     }
-
-
-def leaf_errors(exc: BaseException) -> list[BaseException]:
-    """แตก ExceptionGroup ของ anyio ให้เหลือ error ใบสุดท้าย
-    (SDK ใช้ task group ภายใน ข้อผิดพลาดที่เราโยนจึงถูกห่อมาเป็นกลุ่ม)"""
-    inner = getattr(exc, "exceptions", None)
-    if not inner:
-        return [exc]
-    out: list[BaseException] = []
-    for e in inner:
-        out.extend(leaf_errors(e))
-    return out
-
-
-async def run(args: argparse.Namespace) -> int:
-    summary: dict = {"python": PY, "server_dir": str(HERE)}
-    try:
-        if not args.skip_sanity:
-            summary["hello"] = await sanity_check_hello(args.wire)
-        summary["speak"] = await call_kokoro(args.text, args.voice, args.wire)
-        summary["wav"] = verify_wav(summary["speak"]["path"])
-    except Exception as exc:  # noqa: BLE001 — จับทุกกรณีเพื่อรายงานสาเหตุจริงให้ผู้เรียน
-        known = [e for e in leaf_errors(exc) if isinstance(e, (RuntimeError, FileNotFoundError))]
-        if known:
-            for e in known:
-                print(f"[FAIL] {type(e).__name__}: {e}", file=sys.stderr)
-        else:
-            print("[FAIL] ข้อผิดพลาดที่ไม่ได้คาดไว้:", file=sys.stderr)
-            traceback.print_exc()
-        return 1
-
-    print()
-    print("=" * 72)
-    print("สรุปผล (JSON)")
-    print("=" * 72)
-    text = json.dumps(summary, ensure_ascii=False, indent=2)
-    print(text)
-    if args.out:
-        out = pathlib.Path(args.out)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(text + "\n", encoding="utf-8")
-        print(f"เขียนผลลง {out}")
-    return 0
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser(description="เรียก MCP tool ตรง ๆ จาก Python (ไม่ผ่าน LLM)")
-    ap.add_argument("--text", default="Model Context Protocol lets one server serve many agents.",
-                    help="ข้อความภาษาอังกฤษที่จะให้ Kokoro อ่าน")
-    ap.add_argument("--voice", default="af_heart", help="ชื่อเสียง (ดูจาก tool list_voices)")
-    ap.add_argument("--wire", default=None, help="path ไฟล์ .jsonl สำหรับบันทึกข้อความบนสาย")
-    ap.add_argument("--out", default=None, help="path ไฟล์ .json สำหรับเขียนผลสรุป")
-    ap.add_argument("--skip-sanity", action="store_true", help="ข้ามการตรวจ hello-lab add")
-    args = ap.parse_args()
-    try:
-        return asyncio.run(run(args))
-    except KeyboardInterrupt:
-        print("ยกเลิกโดยผู้ใช้", file=sys.stderr)
-        return 130
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    mcp.run()   # stdio — ห้ามครอบด้วย redirect_stdout เพราะโปรโตคอลต้องส่งคำตอบทาง stdout
 ```
 
-**คำสั่งรัน** (จากโฟลเดอร์ `03_MCP`)
+- `MCPServer(...)` สร้าง server พร้อมชื่อและคำแนะนำการใช้งาน โดยใช้คลาสจาก MCP Python SDK 2.x ของบทเรียน
+- `@mcp.tool()` ประกาศฟังก์ชันเป็น tool: docstring เป็นคำอธิบาย และ type hint ช่วยสร้าง `inputSchema` โดย `text` จำเป็น ส่วน `voice` มีค่าเริ่มต้น ถ้าโยน `ValueError` Host จะได้ผล `isError: true`
+- `KPipeline(lang_code="a", ...)` คือ Kokoro โดยตรง (`a` = American English) โหลดแบบ lazy ครั้งแรกที่มีคนเรียก `speak` แล้วเก็บไว้ใช้ซ้ำ ครั้งแรกจะดาวน์โหลดโมเดล `hexgrad/Kokoro-82M` จาก Hugging Face จึงช้ากว่าครั้งถัดไป
+- `mcp.run()` เริ่มรับข้อความผ่าน **stdio** ให้ Host เปิด server เป็น subprocess ได้ stdout เป็นช่อง JSON-RPC ดังนั้นจุดที่ไลบรารีอาจ `print` (import และสังเคราะห์) ถูกครอบด้วย `redirect_stdout(sys.stderr)` เฉพาะจุด ไม่ครอบ `mcp.run()`
+
+<a id="ch3-1"></a>
+### 3.1 เรียก MCP tool ผ่าน Host
+
+ลงทะเบียนในชื่อ `kokoro-demo` (แยกจาก `kokoro-tts` ของแล็บบทที่ 4) รันจาก `03_MCP`:
 
 ```bash
-# รันจากโฟลเดอร์บทเรียน 03_MCP ที่มี labs/ อยู่แล้ว
-RUN=lab-results/documentation-check/run-$(date -u +%Y-%m-%d-%H%M%S)
-mkdir -p "$RUN"
-/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py \
-    --text "Model Context Protocol lets one server serve many agents." \
-    --voice af_heart \
-    --wire "$RUN/direct-wire.jsonl" \
-    --out  "$RUN/direct-call-result.json" \
-    > "$RUN/direct-call-stdout.txt" 2> "$RUN/direct-call-stderr.txt"
-echo "exit code: $?"      # 0 = ผ่านทุกขั้น
-cat "$RUN/direct-call-result.json"
+claude mcp add --scope user kokoro-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/kokoro_mcp_demo.py"
 ```
 
-**ผลรันจริง** (stdout ทั้งหมดของการรันเมื่อ 20 กันยายน 2026 เวลา 02:25 UTC บนเครื่องเรียน เก็บไว้ที่ [`direct-call-stdout.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-stdout.txt) — exit code 0)
+ถ้าใช้ Codex CLI ให้ใช้รูปแบบ `codex mcp add` ตามข้อ 4.6 โดยใช้ชื่อ `kokoro-demo` และ path เดียวกันนี้ จากนั้นเปิด Host session ใหม่ แล้วส่งคำขอ:
 
 ```text
-========================================================================
-[1/2] sanity check — hello-lab (add)
-========================================================================
-protocol_version : 2026-07-28
-server_info      : {
-  "name": "hello-lab",
-  "version": ""
-}
-tools/list       : ['add', 'get_time', 'count_words']
-tools/call add(17, 25) → 42
-
-========================================================================
-[2/2] งานหลัก — kokoro-tts (speak)
-========================================================================
-protocol_version : 2026-07-28
-instructions     : แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M (ไม่รองรับภาษาไทย)
-tools/list       : ['list_voices', 'speak']
-inputSchema ของ speak:
-{
-  "type": "object",
-  "properties": {
-    "text": {
-      "title": "Text",
-      "type": "string"
-    },
-    "voice": {
-      "default": "af_heart",
-      "title": "Voice",
-      "type": "string"
-    }
-  },
-  "required": [
-    "text"
-  ],
-  "title": "speakArguments"
-}
-list_voices      : ['af_heart', 'af_bella', 'am_adam', 'am_michael']
-tools/call speak(text='Model Context Protocol lets one server serve many agents.', voice='af_heart') ...
-ผลดิบจาก tool   : {
-  "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav",
-  "duration_sec": 4.45,
-  "sample_rate": 24000,
-  "gen_ms": 681,
-  "voice": "af_heart"
-}
-
-========================================================================
-สรุปผล (JSON)
-========================================================================
-{
-  "python": "/opt/venv/bin/python",
-  "server_dir": "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server",
-  "hello": {
-    "tools": [
-      "add",
-      "get_time",
-      "count_words"
-    ],
-    "add_17_25": "42"
-  },
-  "speak": {
-    "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022520-5a71c7e0.wav",
-    "duration_sec": 4.45,
-    "sample_rate": 24000,
-    "gen_ms": 681,
-    "voice": "af_heart"
-  },
-  "wav": {
-    "bytes": 213644,
-    "verified_duration_sec": 4.45,
-    "verified_sample_rate": 24000,
-    "channels": 1
-  }
-}
-เขียนผลลง lab-results/documentation-check/run-2026-09-20-022330/direct-call-result.json
+ใช้ tool speak ของ kokoro-demo สร้างเสียงจากข้อความ
+"Model Context Protocol lets one server serve many agents."
+แล้วบอก path ของไฟล์เสียงและความยาวเป็นวินาที
 ```
 
-**อธิบายทีละขั้น** — เทียบโค้ดกับข้อความ JSON-RPC ที่เกิดขึ้นจริง
+**ลำดับการทำงาน:** Host เรียก `tools/list` เพื่อรู้จัก `speak` → โมเดลเลือก tool และ argument → Host ตรวจนโยบายอนุมัติแล้วส่ง `tools/call` → server สร้างเสียงและคืนผลให้ Host สรุป
 
-| ขั้น | ในโค้ด | เกิดอะไรบนสาย | เห็นอะไรในผลรัน |
-| --- | --- | --- | --- |
-| 1. เลือก transport | `stdio_target()` สร้าง `StdioServerParameters(command=PY, args=[...])` | ยังไม่มีข้อความ เป็นแค่การเตรียมคำสั่งเปิด subprocess | — |
-| 2. เปิดการเชื่อมต่อ | `async with Client(...)` | client เปิด server เป็นลูก แล้วทำ handshake (ใน SDK 2.x คือ `server/discover`) | `protocol_version : 2026-07-28`, `server_info` |
-| 3. ค้นพบเครื่องมือ | `await client.list_tools()` | `tools/list` | `['add', 'get_time', 'count_words']` และ `['list_voices', 'speak']` พร้อม `inputSchema` ที่ SDK สร้างจาก type hint |
-| 4. เรียกเครื่องมือ | `await client.call_tool("add", {"a": 17, "b": 25})` | `tools/call` | `42` |
-| 5. เรียกงานหลัก | `await client.call_tool("speak", {...})` | `tools/call` ไปยัง server คนละตัว | JSON ที่มี `path`, `duration_sec`, `sample_rate`, `gen_ms`, `voice` |
-| 6. ตรวจผลจริง | `verify_wav()` อ่านไฟล์ด้วย `soundfile` | ไม่ใช่ข้อความ MCP — เป็นการตรวจว่า tool ไม่ได้แต่งตัวเลข | `verified_duration_sec: 4.45`, `verified_sample_rate: 24000`, `channels: 1` |
-| 7. ปิดการเชื่อมต่อ | ออกจาก `async with` | client ปิด stdin ของ server แล้ว process ของ server จบ | สคริปต์คืน exit code 0 |
+**ผลที่ควรได้:** path ของไฟล์ `.wav` ใน `work/audio_out/`, `duration_sec`, `sample_rate` (24000) และ `voice` โดยไฟล์เสียงต้องเปิดได้และความยาวมากกว่า 0 หากผล tool มี `isError: true` ให้ตรวจข้อความ error ก่อนถือว่าผ่าน
 
-จุดที่ต้องสังเกตในโค้ด
+หมายเหตุหลักฐาน: ตัวเลข **4.45 วินาที** ที่ **24000 Hz** ([ผลการทดลอง](lab-results/own-server/run-2026-09-19-062712/claude-tts-summary.md)) เป็นผลของแล็บเดิม `kokoro-tts` (`tts_server.py`) ผ่าน Claude Code ไม่ใช่ผลของ `kokoro_mcp_demo.py` ตัวอย่างในบทนี้ตรวจเพิ่มเติมผ่าน Python MCP client บน Remote เมื่อ 20 กันยายน 2026 ด้วย `/opt/venv/bin/python`: ได้ WAV 4.45 วินาที ที่ 24000 Hz และข้อความว่างคืน `isError: true` ([ผลตรวจ](work/yolo2-ch3-direct-kokoro-20260920-034725/smoke-result.json)); ยังไม่ได้ทดสอบ demo นี้ผ่าน Claude Code หรือ Codex CLI และยังไม่ได้ทดสอบติดตั้ง venv ใหม่ ส่วนสคริปต์ `direct_call_kokoro.py` ในแล็บชี้ไปที่ `tts_server.py` จึงใช้ทดสอบ demo นี้ไม่ได้ (การเขียน MCP client เองดูบทที่ 7.3)
 
-1. **`tools/call` ที่ล้มเหลวไม่โยน exception** — MCP ตอบกลับเป็นผลปกติแต่ตั้งธง `isError=true` จึงต้องมี `check_not_error()` เช็กเองทุกครั้ง ถ้าลืม โปรแกรมจะเดินต่อด้วยข้อมูลผิด
-2. **ผลของ tool เป็น list ของ content block** ไม่ใช่ค่าเดี่ยว ๆ `tool_text()` จึงดึงข้อความจาก block แรกออกมาแล้วค่อย `json.loads()`
-3. **SDK ใช้ task group ภายใน** ข้อผิดพลาดที่เราโยนใน `async with` จะถูกห่อมาเป็น `ExceptionGroup` ฟังก์ชัน `leaf_errors()` จึงแตกกลุ่มออกมาเพื่อพิมพ์สาเหตุจริงแทน traceback ยาว ๆ
-4. **ใช้ `sys.executable`** เป็นคำสั่งเปิด server เสมอ เพื่อให้ server ใช้ venv ตัวเดียวกับ client (สาเหตุยอดฮิตของ `ModuleNotFoundError: kokoro`)
-5. **ไม่ผูกกับ working directory** ทุก path อ้างจาก `pathlib.Path(__file__).resolve().parent` จะรันจากโฟลเดอร์ไหนก็ได้
+<a id="ch3-2"></a>
+### 3.2 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
 
-**ข้อความจริงบนสาย** — ใส่ `--wire` แล้ว `wire_capture.py` จะคั่นกลางและบันทึกทุกบรรทัด ([`direct-wire.jsonl`](lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl) 15 บรรทัด)
+Whisper คือโมเดล Speech-to-Text (STT) แบบ open-source ของ OpenAI ทำงาน **กลับทิศกับ Kokoro**: Kokoro รับข้อความแล้วให้ไฟล์เสียง ส่วน Whisper รับไฟล์เสียงแล้วให้ข้อความ
+
+ในบทนี้เราโหลด Whisper **จาก Hugging Face Hub ด้วยไลบรารี Transformers** เพื่อให้เห็นวิธีดึงโมเดลจาก Hub ซึ่งเป็นแพตเทิร์นเดียวกับที่ Kokoro ใช้ (`hexgrad/Kokoro-82M`) แยกให้ชัด 2 ชั้น:
+
+- **โมเดล** ยังคือ Whisper ของ OpenAI อยู่ที่ repo id [`openai/whisper-base`](https://huggingface.co/openai/whisper-base)
+- **ไลบรารี** ที่ใช้ดาวน์โหลดและรันคือ [`transformers`](https://huggingface.co/docs/transformers/en/main_classes/pipelines#transformers.AutomaticSpeechRecognitionPipeline) ของ Hugging Face
+
+`MODEL_ID = "openai/whisper-base"` คือ **repo id** บน Hub (รูปแบบ `องค์กร/ชื่อโมเดล` — เปิดดูไฟล์ทั้งหมดได้ที่หน้าโมเดล) เมื่อเรียก `from_pretrained(MODEL_ID)` ไลบรารีจะดาวน์โหลดไฟล์น้ำหนักและไฟล์ตั้งค่าของ repo นั้นมาเก็บใน cache เครื่อง (ค่าเริ่มต้น `~/.cache/huggingface/hub`, เปลี่ยนได้ด้วย `HF_HOME`) เมื่อยังไม่มีไฟล์ใน cache ครั้งถัดไปนำไฟล์เดิมกลับมาใช้ได้ แต่โหมดปกติอาจติดต่อ Hub เพื่อตรวจเวอร์ชัน หากต้องการออฟไลน์ ให้ดาวน์โหลดไฟล์ให้ครบก่อนแล้วตั้ง `HF_HUB_OFFLINE=1` โมเดลนี้เป็น public **ไม่ต้องใช้ API key หรือ token** และการถอดเสียงทั้งหมดรันบนเครื่องตัวเอง (ต้องต่อเน็ตเมื่อดาวน์โหลดไฟล์ที่ยังไม่มีใน cache) รุ่น `base` เป็นแบบหลายภาษา (ต่างจาก `base.en` ที่รับเฉพาะอังกฤษ) จึงระบุ `language="th"` ได้ แต่บทเรียนยังไม่ได้วัดคุณภาพภาษาไทยของรุ่นนี้
+
+**ติดตั้งเพิ่ม** ใน `work/.venv` เดิมที่มี torch รุ่น CPU และ `mcp` อยู่แล้ว (รันจาก `03_MCP`) — `transformers` จะดึง `tokenizers`/`safetensors`/`huggingface_hub` ให้เอง ส่วน `ffmpeg` จำเป็นเพราะ pipeline อ่านไฟล์เสียงจาก path ผ่าน ffmpeg:
 
 ```bash
-/opt/venv/bin/python - <<'PY'
-import json
-for line in open("lab-results/documentation-check/run-2026-09-20-022330/direct-wire.jsonl"):
-    rec = json.loads(line)
-    msg = rec["msg"]
-    label = msg.get("method") or f"result id={msg.get('id')}" if isinstance(msg, dict) else "NON-JSON: " + msg[:60]
-    print(rec["dir"], "|", label)
-PY
+sudo apt-get update && sudo apt-get install -y ffmpeg
+work/.venv/bin/pip install -U "transformers>=5,<6"
 ```
 
-```text
-client->server | server/discover
-server->client | result id=1
-client->server | tools/list
-server->client | result id=2
-client->server | tools/call
-server->client | result id=3
-client->server | server/discover
-server->client | NON-JSON: WARNING: Defaulting repo_id to hexgrad/Kokoro-82M. Pass re
-server->client | result id=1
-client->server | tools/list
-server->client | result id=2
-client->server | tools/call
-server->client | result id=3
-client->server | tools/call
-server->client | result id=4
+**สร้าง MCP server** — บันทึกเป็น `work/whisper_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
+
+```python
+"""whisper_mcp_demo.py — MCP server ที่โหลด Whisper จาก Hugging Face แล้วถอดเสียง"""
+import contextlib
+import pathlib
+import sys
+
+from mcp.server import MCPServer
+
+MODEL_ID = "openai/whisper-base"   # repo id บน Hugging Face Hub
+_asr = None
+
+
+def get_asr():
+    """โหลดโมเดล+processor จาก Hub ครั้งแรกที่ถูกเรียก แล้วใช้ pipeline เดิมซ้ำ"""
+    global _asr
+    if _asr is None:
+        # import/ดาวน์โหลด/โหลดโมเดลอาจ print ลง stdout จึงเบี่ยงไป stderr ไม่ให้ปนกับ JSON-RPC
+        with contextlib.redirect_stdout(sys.stderr):
+            import torch
+            from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+
+            processor = AutoProcessor.from_pretrained(MODEL_ID)
+            model = AutoModelForSpeechSeq2Seq.from_pretrained(MODEL_ID, dtype=torch.float32)
+            _asr = pipeline(
+                "automatic-speech-recognition",
+                model=model,
+                tokenizer=processor.tokenizer,
+                feature_extractor=processor.feature_extractor,
+                device=-1,               # -1 = CPU
+            )
+    return _asr
+
+
+mcp = MCPServer("whisper-demo", instructions="ถอดเสียงพูดจากไฟล์เสียงเป็นข้อความด้วย Whisper")
+
+
+@mcp.tool()
+def transcribe(audio_path: str, language: str = "en") -> dict:
+    """ถอดเสียงจากไฟล์เสียง (path สัมบูรณ์บนเครื่องที่รัน server) แล้วคืนข้อความ"""
+    path = pathlib.Path(audio_path)
+    if not path.is_absolute():
+        raise ValueError("audio_path must be an absolute path")
+    if not path.is_file():
+        raise ValueError(f"audio file not found: {path}")
+
+    asr = get_asr()
+    with contextlib.redirect_stdout(sys.stderr):
+        result = asr(
+            str(path),
+            # ส่งต่อให้ model.generate() — บังคับ "ถอดเสียงภาษาเดิม" ไม่ใช่แปลเป็นอังกฤษ
+            generate_kwargs={"language": language, "task": "transcribe"},
+        )
+    return {"text": result["text"].strip(), "language": language}
+
+
+if __name__ == "__main__":
+    mcp.run()   # stdio — ห้ามครอบด้วย redirect_stdout เช่นเดียวกับตัวอย่าง Kokoro
 ```
 
-บรรทัด `NON-JSON` คือกับดักจริงของ transport แบบ stdio: ไลบรารี Kokoro พิมพ์คำเตือนลง **stdout** ของ server ซึ่งเป็นช่องเดียวกับ JSON-RPC ฝั่ง client จึง log ว่า `Failed to parse JSONRPC message from server` ลง stderr ([`direct-call-stderr.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-stderr.txt)) แล้วข้ามบรรทัดนั้นไป งานยังสำเร็จเพราะ SDK ทนต่อบรรทัดที่ไม่ใช่ JSON แต่ในโค้ดของเราเองต้องจำกฎนี้ให้แม่น: **server แบบ stdio ห้ามพิมพ์อะไรลง stdout นอกจาก JSON-RPC** (ดูข้อ 4.7)
+- โครงเหมือน `kokoro_mcp_demo.py` ทุกจุด: `MCPServer` + `@mcp.tool()` + โหลดโมเดลแบบ lazy (ครั้งแรกที่มีคนเรียก `transcribe` แล้วเก็บ pipeline ไว้ใช้ซ้ำ) + `mcp.run()` ผ่าน stdio ต่างกันแค่ tool ชื่อ `transcribe` รับ path เสียงแทนข้อความ
+- `AutoProcessor.from_pretrained(MODEL_ID)` ดึง **ตัวเตรียมข้อมูล** ของ repo นี้มา ซึ่งรวม 2 ส่วน: `feature_extractor` (แปลงคลื่นเสียง 16 kHz เป็น log-Mel ที่โมเดลรับ) และ `tokenizer` (แปลง token กลับเป็นข้อความ) ส่วน `AutoModelForSpeechSeq2Seq.from_pretrained(MODEL_ID, dtype=torch.float32)` ดึง **ตัวโมเดล** แบบ float32 ซึ่งเป็นรุ่นที่ CPU รันได้ (ตรงกับ `torch_dtype: float32` ใน `config.json` ของ repo)
+- `pipeline("automatic-speech-recognition", ...)` ประกอบ 3 ชิ้นข้างบนเป็นขั้นตอนเดียว: อ่านไฟล์ → feature extractor → `model.generate()` → tokenizer decode คืน dict ที่มีคีย์ `text` ส่วน `device=-1` คือ CPU (ถ้าอยากชัดกว่านี้ใช้ `device="cpu"` ได้)
+- `generate_kwargs={"language": ..., "task": "transcribe"}` ถูกส่งต่อไปยัง `model.generate()` ของ Whisper — `task="transcribe"` กันไม่ให้โมเดลเผลอ **แปล** เป็นภาษาอังกฤษ (นั่นคือ `task="translate"`) และ `language` รับค่าอย่าง `"en"`/`"th"` ค่า `language` ที่ tool คืนกลับคือ **ค่าที่ผู้เรียกระบุมา** ไม่ใช่ภาษาที่โมเดลตรวจจับได้เอง (pipeline ไม่ได้คืนภาษาที่ detect มาให้ในโหมดนี้)
+- **ไฟล์เสียงต้องอยู่บนเครื่องที่ server รัน** เพราะ tool รับ path ไม่ได้รับตัวไฟล์ ถ้า Host อยู่คนละเครื่องกับ server ต้องส่งไฟล์ไปไว้ที่ฝั่ง server ก่อน ตัวอย่างนี้ตรวจแค่ว่าเป็น path สัมบูรณ์และเป็นไฟล์จริง (path แบบ relative หรือโฟลเดอร์จะได้ `isError: true`) ยังไม่จำกัดโฟลเดอร์ที่อ่านได้ ซึ่งพอสำหรับ demo บนเครื่องตัวเอง แต่ควรเพิ่มถ้าจะเปิดให้คนอื่นใช้
 
-**การจัดการ error — ทดสอบจริง** ส่งชื่อเสียงที่ไม่มีอยู่จริง client ตรวจกับผล `list_voices` แล้วหยุดก่อนเรียก `speak`
+**ลงทะเบียนและทดลอง** ในชื่อ `whisper-demo` รันจาก `03_MCP` (Codex CLI ใช้ `codex mcp add` ตามข้อ 4.6 ด้วยชื่อและ path เดียวกัน):
 
 ```bash
-/opt/venv/bin/python labs/my-mcp-server/direct_call_kokoro.py --skip-sanity --voice xx_bad
-echo "exit code: $?"
+claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/whisper_mcp_demo.py"
 ```
+
+เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
 
 ```text
-[FAIL] RuntimeError: voice 'xx_bad' ไม่อยู่ในรายการที่ server รองรับ: ['af_heart', 'af_bella', 'am_adam', 'am_michael']
-exit code: 1
+ใช้ tool transcribe ของ whisper-demo อ่านไฟล์เสียงที่ kokoro-demo เพิ่งสร้าง
+(ใช้ path จากผลของ speak) ด้วย language "en" แล้วบอกข้อความที่ถอดได้
 ```
 
-หลักฐานอยู่ที่ [`direct-call-badvoice-stderr.txt`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-badvoice-stderr.txt) กรณี error อื่นที่โค้ดครอบไว้: `import mcp` ไม่ได้ (บอกให้ติดตั้งและพิมพ์ว่ากำลังใช้ python ตัวไหน), ไม่พบไฟล์ server, ไม่พบ tool ที่ต้องการใน `tools/list`, tool ตอบ `isError=true`, ผลไม่ใช่ JSON และ tool คืน path ที่ไม่มีไฟล์จริง
+**ลำดับการทำงาน:** ข้อความ → `speak` (Kokoro) → ไฟล์ `.wav` ใน `work/audio_out/` → `transcribe` (Whisper) → ข้อความ ผลที่ควรได้คือข้อความใกล้เคียงประโยคต้นฉบับ แต่ไม่จำเป็นต้องตรงทุกตัวอักษร (ตัวพิมพ์ เครื่องหมายวรรคตอน หรือคำบางคำอาจต่างไป) ถ้าได้ข้อความว่างหรือ `isError: true` ให้ตรวจ path และ `ffmpeg` ก่อน
 
-**ฟังเสียงที่ได้จากการเรียกครั้งนี้**
-
-<audio controls src="lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav"></audio>
-
-ถ้าตัวเรนเดอร์ Markdown ไม่รองรับแท็บเสียง ให้เปิดไฟล์ตรง ๆ: [`direct-call-kokoro.wav`](lab-results/documentation-check/run-2026-09-20-022330/direct-call-kokoro.wav) (4.45 วินาที, 24000 Hz, 1 ช่อง, 213,644 ไบต์ — ตรวจซ้ำด้วย `soundfile` แล้ว)
-
-> **ขอบเขตของหลักฐานชุดนี้:** ทั้งหมดเป็นผลของ **Python MCP client** ที่รันด้วย `/opt/venv/bin/python` ไม่ใช่ผลจาก Codex CLI เป็น Host และไม่ใช่ผลจาก Claude Code รอบนี้ การรันก่อนหน้าด้วย `client_test.py` เก็บไว้ที่ [`run-2026-09-20-021614/`](lab-results/documentation-check/run-2026-09-20-021614/) (มี `hello-stdout.txt`, `tts-stdout.txt`, wire log, [`kokoro-result.json`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-result.json) และไฟล์เสียง [`kokoro-actual.wav`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav) ยาว 4.45 วินาที 24000 Hz เช่นกัน)
-
-<audio controls src="lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav"></audio>
-
-ไฟล์เสียงของรอบก่อนหน้า (ถ้าเล่นในหน้านี้ไม่ได้ ให้กดลิงก์): [`kokoro-actual.wav`](lab-results/documentation-check/run-2026-09-20-021614/kokoro-actual.wav)
+หมายเหตุหลักฐาน: ตัวอย่าง Whisper ในข้อนี้ **ยังไม่ได้ทดสอบรันจริง** ทั้งการติดตั้ง การดาวน์โหลดโมเดล และการถอดเสียง ตรวจเฉพาะชื่อ API กับเอกสารและซอร์สโค้ดเมื่อ 20 กันยายน 2026: หน้าโมเดล [`openai/whisper-base`](https://huggingface.co/openai/whisper-base) (มีตัวอย่าง `AutoProcessor` + `AutoModelForSpeechSeq2Seq` และ `torch_dtype: float32` ใน `config.json`), [เอกสาร ASR pipeline](https://huggingface.co/docs/transformers/en/main_classes/pipelines#transformers.AutomaticSpeechRecognitionPipeline) (อินพุตเป็น path ต้องมี ffmpeg, ผลลัพธ์มีคีย์ `text`, ส่ง `generate_kwargs` ได้) และซอร์สของ `transformers` **5.14.1** ที่ติดตั้งบน Remote (พารามิเตอร์ `tokenizer`/`feature_extractor`/`device` ของ `pipeline()`, พารามิเตอร์ `language`/`task` ของ `WhisperGenerationMixin.generate`, `dtype` ของ `from_pretrained`) — ยังไม่มีตัวเลขเวลาหรือข้อความผลลัพธ์ให้อ้าง
 
 ---
-
-<a id="ch4"></a>
-## บทที่ 4 ติดตั้งและตั้งค่า MCP ด้วยพรอมป์ต์ (ให้ AI ทำให้เอง)
-
-### 4.1 เริ่มตรงนี้: ส่งลิงก์ repo ต้นทางให้ AI แล้วขอด้วยภาษาธรรมดา
-
-ทักษะที่ต้องการจากบทนี้ไม่ใช่การท่องคำสั่งติดตั้ง แต่คือ **การส่งลิงก์ GitHub ของเครื่องมือ พร้อมบอกสั้น ๆ ว่าต้องการอะไร** แล้วให้ AI Host อ่าน README ของ repo นั้นเอง สำรวจว่ามีวิธีติดตั้งแบบใดบ้าง เลือกวิธีที่เหมาะกับเครื่องและ Host ที่ใช้อยู่ ตั้งค่า MCP ให้ แล้วทดสอบจนใช้งานได้จริง เพราะในงานจริงเครื่องมือใหม่จะออกมาเรื่อย ๆ และผู้สอนไม่สามารถแจกขั้นตอนสำเร็จรูปให้ทุกตัวได้
-
-เครื่องมือ 3 ตัวที่บทนี้ใช้ และ repo ต้นทางที่ต้องส่งให้ AI
-
-| เครื่องมือ | repo ต้นทาง | เป็นอะไรตามเอกสารต้นทาง |
-| --- | --- | --- |
-| Excalidraw MCP | <https://github.com/yctimlin/mcp_excalidraw> | เป็น MCP server พร้อมใช้ (แพ็กเกจ npm `mcp-excalidraw-server` ระบุ `repository.url` ชี้มา repo นี้) README บอกว่ามี 3 ทางเลือก: agent skill + CLI (`npx -y mcp-excalidraw-server <command>`), MCP server แบบ stdio, และ REST API — บทเรียนนี้ให้ AI เลือกการเชื่อมต่อ **MCP server แบบ stdio** เพื่อให้ได้ฝึก MCP จริง |
-| Playwright MCP | <https://github.com/microsoft/playwright-mcp> | MCP server ควบคุมเบราว์เซอร์ของ Microsoft ใช้ accessibility snapshot แทนภาพ README มีคำสั่งเพิ่ม server ให้ทั้ง Claude Code และ Codex อยู่แล้ว |
-| Kokoro TTS | <https://github.com/hexgrad/kokoro> | **เป็นไลบรารี TTS (Python) ไม่ใช่ MCP server** README เป็นวิธี `pip install kokoro` แล้วเรียก `KPipeline` ในโค้ด ไม่มี MCP server มาให้ ถ้าต้องการใช้ผ่าน MCP ต้องให้ AI **เขียน wrapper ห่อเป็น MCP server เอง** (ดูข้อ 4.3.3 และบทที่ 7) |
-
-> ข้อมูลในตารางนี้มาจากการเปิดอ่าน README ของ repo ต้นทางและข้อมูลแพ็กเกจ npm แบบอ่านอย่างเดียวเมื่อ 20 กันยายน 2026 ไม่ได้ติดตั้งหรือรันซ้ำในรอบนี้ ถ้า README ต้นทางเปลี่ยน ให้เชื่อ README ก่อนเอกสารนี้ และนี่คือเหตุผลที่บทเรียนให้ AI ไปอ่าน README เองทุกครั้ง
-
-**ทำตาม 3 ขั้นตอนนี้**
-
-1. เปิดเทอร์มินัลในโฟลเดอร์ทำงานของตัวเอง แล้วเปิด Host ที่ติดตั้งและล็อกอินไว้แล้วจากตารางด้านล่าง
-2. ส่ง **คำขอภาษาธรรมดา + ลิงก์ repo** ตามข้อ 4.2 ให้ตรงกับ Host ที่ใช้ แล้วให้ AI อ่าน README ติดตั้ง ตั้งค่า และรายงานผล
-3. เมื่อจบ เปิด Host เป็น session ใหม่ แล้วใช้ **Prompt S5** ในข้อ 4.4.1 ทดสอบว่าเรียก tool ได้จริง
-
-| ใช้โปรแกรมไหน | คำสั่งเปิด | คำขอที่ใช้ |
-| --- | --- | --- |
-| Claude Code | `claude` | ข้อ 4.2.1 |
-| Codex CLI | `codex` | ข้อ 4.2.2 |
-
-สอง Host นี้ใช้ **repo ต้นทางชุดเดียวกัน** ต่างกันเฉพาะว่าให้ AI ตั้งค่า MCP ให้ Host ตัวไหน (`claude mcp add` / `~/.claude.json` เทียบกับ `codex mcp add` / `~/.codex/config.toml`) ซึ่ง AI จะหาวิธีที่ถูกต้องจาก README ของ repo และเอกสารของ Host เอง
-
-**สิ่งที่ต้องมีก่อน:** Host ที่ล็อกอินแล้ว, Node.js (Excalidraw MCP รุ่น 2.0 ต้องการ Node ≥ 20 ตาม README ต้นทาง, Playwright MCP ระบุ Node ≥ 18) และ Python 3.10 ขึ้นไปถ้าจะทำส่วน Kokoro **ไม่ต้องมีโค้ดแล็บใด ๆ ของบทเรียนก่อน** ทั้ง `labs/kokoro-web` และ `labs/my-mcp-server` เป็นแล็บต่อเนื่องในข้อ 4.3.4 และบทที่ 7 ไม่ใช่เงื่อนไขเริ่มต้นของการติดตั้งเครื่องมือภายนอก
-
-**ทำไมให้ AI ติดตั้งได้?** Host คือโปรแกรมที่เราใช้คุยกับ AI เช่น Claude Code หรือ Codex CLI ซึ่งเรียกใช้เทอร์มินัลได้ บน Linux/macOS มักใช้ Bash ดังนั้น AI จึงอ่าน README รันคำสั่งติดตั้ง ตั้งค่า MCP และตรวจผลให้ได้ ภายใต้สิทธิ์ที่ Host อนุญาต
-
-**เมื่อพร้อมเรียนต่อ:** ต้องส่งออกภาพจาก Excalidraw ได้, เปิดเว็บจริงด้วย Playwright ได้ และสร้างไฟล์เสียงที่เปิดฟังได้จาก Kokoro การมีชื่อ server อยู่ในรายการเพียงอย่างเดียวยังไม่ยืนยันว่าเรียก tool สำเร็จ
 
 | คำขอ/พรอมป์ต์ | ทำอะไร | อยู่ที่ |
 | --- | --- | --- |
@@ -1700,7 +1369,7 @@ server_capabilities: {"prompts": {"listChanged": true}, "resources": {"subscribe
 
 ### 7.5 Lab 7.4 — เปิด Kokoro เป็น MCP tool (`tts_server.py`)
 
-โค้ดอยู่ในบทที่ 3 (แบบที่ 3) ทดสอบด้วย `client_test.py --server tts --wire wire-tts.jsonl` ได้ไฟล์เสียง 4.45 วินาที gen 693 ms ([`client-tts-output.txt`](lab-results/own-server/run-2026-09-19-062712/client-tts-output.txt), [`speak-output.wav`](lab-results/own-server/run-2026-09-19-062712/speak-output.wav)) และ Claude Code เรียกได้ตามตารางด้านบน
+โค้ดอยู่ในบทที่ 3 ทดสอบด้วย `client_test.py --server tts --wire wire-tts.jsonl` ได้ไฟล์เสียง 4.45 วินาที gen 693 ms ([`client-tts-output.txt`](lab-results/own-server/run-2026-09-19-062712/client-tts-output.txt), [`speak-output.wav`](lab-results/own-server/run-2026-09-19-062712/speak-output.wav)) และ Claude Code เรียกได้ตามตารางด้านบน
 
 เปรียบเทียบกับ Lab 6: งานเดียวกัน (สังเคราะห์เสียง) แต่ผ่าน MCP tool AI ไม่ต้องเปิดเบราว์เซอร์ ไม่ต้องรู้ URL และผลกลับมาเป็น JSON ที่ตรวจได้ทันที นี่คือความหมายของ "MCP เป็นตัวกลางที่ทำให้ AI ใช้ tool ภายนอกได้โดยไม่ต้องเขียน integration ใหม่ทุกครั้ง"
 
