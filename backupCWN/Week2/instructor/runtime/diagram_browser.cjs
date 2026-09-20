@@ -1,2 +1,0 @@
-const {chromium}=require('/tmp/week2-browser-tools/node_modules/playwright');
-(async()=>{const b=await chromium.launch({headless:true,executablePath:"/opt/ms-playwright/chromium-1243/chrome-linux64/chrome"});const p=await b.newPage({viewport:{width:1500,height:1000}});await p.goto('http://127.0.0.1:3017');console.log('canvas browser ready');process.on('SIGTERM',async()=>{await b.close();process.exit(0)});await new Promise(()=>{});})();
