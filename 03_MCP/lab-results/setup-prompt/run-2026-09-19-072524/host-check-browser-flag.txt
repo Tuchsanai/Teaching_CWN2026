@@ -1,9 +1,0 @@
-# ตรวจเพิ่มบนเครื่องเรียน (host, playwright-mcp 0.0.80) 2026-09-19 07:49Z
-# วิธี: Python mcp.Client เปิด playwright-mcp เป็น subprocess แล้วเรียก browser_navigate ไป http://127.0.0.1:8765/api/health
-== args: ['--browser', 'chromium', '--headless', '--no-sandbox', '--isolated']
-isError: True | ### Error Error: Browser "chrome-for-testing" is not installed; expected executable at /root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome. Run `npx @playwright/mcp install-browser chrome-for-testing` to install
-== args: ['--headless', '--no-sandbox', '--isolated']
-isError: True | ### Error Error: async createBrowserWithInfo: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome Run "npx playwright install chrome"
-# สรุป: flag --browser chromium ถูกยอมรับ (help ของ 0.0.80 ไม่ได้ระบุค่านี้) และจะใช้ chromium-1243 ใน ~/.cache/ms-playwright ซึ่งเป็นตัวที่ `npx playwright install chromium` ติดตั้ง (ในคอนเทนเนอร์มีอยู่จริง ดู container-state-after-s0.txt)
-# ส่วนค่าเริ่มต้น (ไม่ใส่ --browser) มองหา Google Chrome ที่ /opt/google/chrome/chrome ตรงกับ error ที่พบใน S5 รอบ 1
-# เครื่องเรียนของผู้สอนไม่มี chromium-1243 เพราะใช้ headless Chrome ผ่าน --cdp-endpoint แทน จึง error ทั้งสองแบบบน host (ไม่ใช่ปัญหาของ flag)
