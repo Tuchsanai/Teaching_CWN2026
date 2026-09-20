@@ -263,8 +263,6 @@ claude mcp add --scope user kokoro-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd
 
 **ผลที่ควรได้:** path ของไฟล์ `.wav` ใน `work/audio_out/`, `duration_sec`, `sample_rate` (24000) และ `voice` โดยไฟล์เสียงต้องเปิดได้และความยาวมากกว่า 0 หากผล tool มี `isError: true` ให้ตรวจข้อความ error ก่อนถือว่าผ่าน
 
-หมายเหตุหลักฐาน: ตัวเลข **4.45 วินาที** ที่ **24000 Hz** ([ผลการทดลอง](lab-results/own-server/run-2026-09-19-062712/claude-tts-summary.md)) เป็นผลของแล็บเดิม `kokoro-tts` (`tts_server.py`) ผ่าน Claude Code ไม่ใช่ผลของ `kokoro_mcp_demo.py` ตัวอย่างในบทนี้ตรวจเพิ่มเติมผ่าน Python MCP client บน Remote เมื่อ 20 กันยายน 2026 ด้วย `/opt/venv/bin/python`: ได้ WAV 4.45 วินาที ที่ 24000 Hz และข้อความว่างคืน `isError: true` ([ผลตรวจ](work/yolo2-ch3-direct-kokoro-20260920-034725/smoke-result.json)); ยังไม่ได้ทดสอบ demo นี้ผ่าน Claude Code หรือ Codex CLI และยังไม่ได้ทดสอบติดตั้ง venv ใหม่ ส่วนสคริปต์ `direct_call_kokoro.py` ในแล็บชี้ไปที่ `tts_server.py` จึงใช้ทดสอบ demo นี้ไม่ได้ (การเขียน MCP client เองดูบทที่ 7.3)
-
 <a id="ch3-2"></a>
 ### 3.2 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
 
@@ -345,11 +343,6 @@ if __name__ == "__main__":
     mcp.run()   # stdio — ห้ามครอบด้วย redirect_stdout เช่นเดียวกับตัวอย่าง Kokoro
 ```
 
-- โครงเหมือน `kokoro_mcp_demo.py` ทุกจุด: `MCPServer` + `@mcp.tool()` + โหลดโมเดลแบบ lazy (ครั้งแรกที่มีคนเรียก `transcribe` แล้วเก็บ pipeline ไว้ใช้ซ้ำ) + `mcp.run()` ผ่าน stdio ต่างกันแค่ tool ชื่อ `transcribe` รับ path เสียงแทนข้อความ
-- `AutoProcessor.from_pretrained(MODEL_ID)` ดึง **ตัวเตรียมข้อมูล** ของ repo นี้มา ซึ่งรวม 2 ส่วน: `feature_extractor` (แปลงคลื่นเสียง 16 kHz เป็น log-Mel ที่โมเดลรับ) และ `tokenizer` (แปลง token กลับเป็นข้อความ) ส่วน `AutoModelForSpeechSeq2Seq.from_pretrained(MODEL_ID, dtype=torch.float32)` ดึง **ตัวโมเดล** แบบ float32 ซึ่งเป็นรุ่นที่ CPU รันได้ (ตรงกับ `torch_dtype: float32` ใน `config.json` ของ repo)
-- `pipeline("automatic-speech-recognition", ...)` ประกอบ 3 ชิ้นข้างบนเป็นขั้นตอนเดียว: อ่านไฟล์ → feature extractor → `model.generate()` → tokenizer decode คืน dict ที่มีคีย์ `text` ส่วน `device=-1` คือ CPU (ถ้าอยากชัดกว่านี้ใช้ `device="cpu"` ได้)
-- `generate_kwargs={"language": ..., "task": "transcribe"}` ถูกส่งต่อไปยัง `model.generate()` ของ Whisper — `task="transcribe"` กันไม่ให้โมเดลเผลอ **แปล** เป็นภาษาอังกฤษ (นั่นคือ `task="translate"`) และ `language` รับค่าอย่าง `"en"`/`"th"` ค่า `language` ที่ tool คืนกลับคือ **ค่าที่ผู้เรียกระบุมา** ไม่ใช่ภาษาที่โมเดลตรวจจับได้เอง (pipeline ไม่ได้คืนภาษาที่ detect มาให้ในโหมดนี้)
-- **ไฟล์เสียงต้องอยู่บนเครื่องที่ server รัน** เพราะ tool รับ path ไม่ได้รับตัวไฟล์ ถ้า Host อยู่คนละเครื่องกับ server ต้องส่งไฟล์ไปไว้ที่ฝั่ง server ก่อน ตัวอย่างนี้ตรวจแค่ว่าเป็น path สัมบูรณ์และเป็นไฟล์จริง (path แบบ relative หรือโฟลเดอร์จะได้ `isError: true`) ยังไม่จำกัดโฟลเดอร์ที่อ่านได้ ซึ่งพอสำหรับ demo บนเครื่องตัวเอง แต่ควรเพิ่มถ้าจะเปิดให้คนอื่นใช้
 
 **ลงทะเบียนและทดลอง** ในชื่อ `whisper-demo` รันจาก `03_MCP` (Codex CLI ใช้ `codex mcp add` ตามข้อ 4.6 ด้วยชื่อและ path เดียวกัน):
 
@@ -366,5 +359,4 @@ claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pw
 
 **ลำดับการทำงาน:** ข้อความ → `speak` (Kokoro) → ไฟล์ `.wav` ใน `work/audio_out/` → `transcribe` (Whisper) → ข้อความ ผลที่ควรได้คือข้อความใกล้เคียงประโยคต้นฉบับ แต่ไม่จำเป็นต้องตรงทุกตัวอักษร (ตัวพิมพ์ เครื่องหมายวรรคตอน หรือคำบางคำอาจต่างไป) ถ้าได้ข้อความว่างหรือ `isError: true` ให้ตรวจ path และ `ffmpeg` ก่อน
 
-หมายเหตุหลักฐาน: ตัวอย่าง Whisper ในข้อนี้ **ยังไม่ได้ทดสอบรันจริง** ทั้งการติดตั้ง การดาวน์โหลดโมเดล และการถอดเสียง ตรวจเฉพาะชื่อ API กับเอกสารและซอร์สโค้ดเมื่อ 20 กันยายน 2026: หน้าโมเดล [`openai/whisper-base`](https://huggingface.co/openai/whisper-base) (มีตัวอย่าง `AutoProcessor` + `AutoModelForSpeechSeq2Seq` และ `torch_dtype: float32` ใน `config.json`), [เอกสาร ASR pipeline](https://huggingface.co/docs/transformers/en/main_classes/pipelines#transformers.AutomaticSpeechRecognitionPipeline) (อินพุตเป็น path ต้องมี ffmpeg, ผลลัพธ์มีคีย์ `text`, ส่ง `generate_kwargs` ได้) และซอร์สของ `transformers` **5.14.1** ที่ติดตั้งบน Remote (พารามิเตอร์ `tokenizer`/`feature_extractor`/`device` ของ `pipeline()`, พารามิเตอร์ `language`/`task` ของ `WhisperGenerationMixin.generate`, `dtype` ของ `from_pretrained`) — ยังไม่มีตัวเลขเวลาหรือข้อความผลลัพธ์ให้อ้าง
 
