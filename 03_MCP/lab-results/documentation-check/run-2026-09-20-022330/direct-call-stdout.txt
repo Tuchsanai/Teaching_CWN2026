@@ -1,0 +1,75 @@
+========================================================================
+[1/2] sanity check — hello-lab (add)
+========================================================================
+protocol_version : 2026-07-28
+server_info      : {
+  "name": "hello-lab",
+  "version": ""
+}
+tools/list       : ['add', 'get_time', 'count_words']
+tools/call add(17, 25) → 42
+
+========================================================================
+[2/2] งานหลัก — kokoro-tts (speak)
+========================================================================
+protocol_version : 2026-07-28
+instructions     : แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M (ไม่รองรับภาษาไทย)
+tools/list       : ['list_voices', 'speak']
+inputSchema ของ speak:
+{
+  "type": "object",
+  "properties": {
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "voice": {
+      "default": "af_heart",
+      "title": "Voice",
+      "type": "string"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "speakArguments"
+}
+list_voices      : ['af_heart', 'af_bella', 'am_adam', 'am_michael']
+tools/call speak(text='Model Context Protocol lets one server serve many agents.', voice='af_heart') ...
+ผลดิบจาก tool   : {
+  "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022344-7e299a97.wav",
+  "duration_sec": 4.45,
+  "sample_rate": 24000,
+  "gen_ms": 687,
+  "voice": "af_heart"
+}
+
+========================================================================
+สรุปผล (JSON)
+========================================================================
+{
+  "python": "/opt/venv/bin/python",
+  "server_dir": "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server",
+  "hello": {
+    "tools": [
+      "add",
+      "get_time",
+      "count_words"
+    ],
+    "add_17_25": "42"
+  },
+  "speak": {
+    "path": "/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-022344-7e299a97.wav",
+    "duration_sec": 4.45,
+    "sample_rate": 24000,
+    "gen_ms": 687,
+    "voice": "af_heart"
+  },
+  "wav": {
+    "bytes": 213644,
+    "verified_duration_sec": 4.45,
+    "verified_sample_rate": 24000,
+    "channels": 1
+  }
+}
+เขียนผลลง lab-results/documentation-check/run-2026-09-20-022330/direct-call-result.json
