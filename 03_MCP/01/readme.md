@@ -164,10 +164,17 @@ Kokoro คือโมเดล Text-to-Speech (TTS) แบบ open-weight ท�
 
 ตัวอย่างนี้เปิดความสามารถ **สังเคราะห์เสียงภาษาอังกฤษด้วย Kokoro-82M** เป็น MCP tool ชื่อ `speak` ในไฟล์เดียว โค้ดเรียก `from kokoro import KPipeline` ตรง ๆ ไม่พึ่งโมดูลอื่นของแล็บ จึงอ่านแล้วเห็นครบว่า MCP server ทำอะไรบ้าง (ฉบับแล็บที่แยกชั้นเป็น `kokoro_core` + เว็บ ดูบทที่ 7.5)
 
-<a id="ch3-0"></a>
-### 3.0 ทางลัด: ให้ AI ติดตั้ง Kokoro MCP ให้เอง (สั่งด้วยภาษาคน)
+การติดตั้งมี 2 แบบ **เลือกทำแบบใดแบบหนึ่ง** ก็พอ:
 
-ไม่อยากทำหลายขั้นตอนเอง? ให้ Host ทำแทนได้ทั้งหมด **copy 2 บรรทัดนี้** แล้ววาง prompt ตาม:
+| แบบ | เหมาะกับ | หัวข้อ |
+| --- | --- | --- |
+| **A. Prompt-based** สั่ง AI ให้ติดตั้งให้ด้วยภาษาคน | อยากใช้งานเร็ว ไม่สนใจโค้ดข้างใน | [3.1](#ch3-1) |
+| **B. Direct** ติดตั้งและเขียน server เองทีละขั้น | อยากเห็นว่า MCP server เขียนอย่างไร | [3.2](#ch3-2) |
+
+<a id="ch3-1"></a>
+### 3.1 แบบ A: Prompt-based ให้ AI ติดตั้ง Kokoro MCP ให้เอง
+
+ไม่ต้องลงอะไรเอง ให้ Host ทำแทนทั้งหมด **copy 2 บรรทัดนี้** แล้ววาง prompt ตาม:
 
 ```bash
 mkdir -p ~/kokoro-mcp && cd ~/kokoro-mcp
@@ -190,9 +197,12 @@ claude          # หรือ codex
 
 ได้ path ไฟล์ `.wav` ที่เปิดฟังได้ = ผ่าน ถ้าติดปัญหาให้พิมพ์บอก AI ตรง ๆ เช่น "ยัง error อยู่ แก้ให้หน่อย" ไม่ต้องแก้เอง
 
-ส่วนด้านล่างนี้คือแบบ **ทำเองทีละขั้น** สำหรับคนที่อยากเห็นว่าข้างในมีอะไรบ้าง
+<a id="ch3-2"></a>
+### 3.2 แบบ B: Direct ติดตั้งและเขียน MCP server เองทีละขั้น
 
-**ติดตั้งบน Linux (Ubuntu/Debian)** — รันจากโฟลเดอร์ `03_MCP` ใช้ venv แยกที่ `work/.venv` จึงไม่ทับ `labs/.venv` ของบทที่ 4 ติดตั้ง torch รุ่น CPU ก่อนเพื่อไม่ให้ `kokoro` ดึง torch รุ่น CUDA หลาย GB:
+แบบนี้ทำ 3 ขั้น: **ติดตั้งไลบรารี → เขียน server → ลงทะเบียนกับ Host**
+
+**ขั้น 1 ติดตั้งบน Linux (Ubuntu/Debian)** — รันจากโฟลเดอร์ `03_MCP` ใช้ venv แยกที่ `work/.venv` จึงไม่ทับ `labs/.venv` ของบทที่ 4 ติดตั้ง torch รุ่น CPU ก่อนเพื่อไม่ให้ `kokoro` ดึง torch รุ่น CUDA หลาย GB:
 
 ```bash
 python3 -m venv work/.venv
@@ -202,7 +212,7 @@ work/.venv/bin/pip install "mcp[cli]>=2,<3" kokoro soundfile numpy
 sudo apt-get update && sudo apt-get install -y espeak-ng   # ตัวช่วยอ่านคำนอกคลังของ Kokoro
 ```
 
-**สร้าง MCP server** — บันทึกเป็น `work/kokoro_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
+**ขั้น 2 สร้าง MCP server** — บันทึกเป็น `work/kokoro_mcp_demo.py` (ยังไม่มีในแล็บ ให้พิมพ์เอง):
 
 ```python
 """kokoro_mcp_demo.py — MCP server ที่เรียก Kokoro โดยตรงในไฟล์เดียว"""
@@ -270,10 +280,7 @@ if __name__ == "__main__":
 - `KPipeline(lang_code="a", ...)` คือ Kokoro โดยตรง (`a` = American English) โหลดแบบ lazy ครั้งแรกที่มีคนเรียก `speak` แล้วเก็บไว้ใช้ซ้ำ ครั้งแรกจะดาวน์โหลดโมเดล `hexgrad/Kokoro-82M` จาก Hugging Face จึงช้ากว่าครั้งถัดไป
 - `mcp.run()` เริ่มรับข้อความผ่าน **stdio** ให้ Host เปิด server เป็น subprocess ได้ stdout เป็นช่อง JSON-RPC ดังนั้นจุดที่ไลบรารีอาจ `print` (import และสังเคราะห์) ถูกครอบด้วย `redirect_stdout(sys.stderr)` เฉพาะจุด ไม่ครอบ `mcp.run()`
 
-<a id="ch3-1"></a>
-### 3.1 เรียก MCP tool ผ่าน Host
-
-ลงทะเบียนในชื่อ `kokoro-demo` (แยกจาก `kokoro-tts` ของแล็บบทที่ 4) รันจาก `03_MCP`:
+**ขั้น 3 ลงทะเบียนและเรียก tool ผ่าน Host** — ลงทะเบียนในชื่อ `kokoro-demo` (แยกจาก `kokoro-tts` ของแล็บบทที่ 4) รันจาก `03_MCP`:
 
 ```bash
 claude mcp add --scope user kokoro-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/kokoro_mcp_demo.py"
@@ -291,8 +298,8 @@ claude mcp add --scope user kokoro-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd
 
 **ผลที่ควรได้:** path ของไฟล์ `.wav` ใน `work/audio_out/`, `duration_sec`, `sample_rate` (24000) และ `voice` โดยไฟล์เสียงต้องเปิดได้และความยาวมากกว่า 0 หากผล tool มี `isError: true` ให้ตรวจข้อความ error ก่อนถือว่าผ่าน
 
-<a id="ch3-2"></a>
-### 3.2 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
+<a id="ch3-3"></a>
+### 3.3 ตัวอย่างที่สอง: Whisper แปลงเสียงเป็นข้อความ (STT) ด้วย `MCPServer`
 
 Whisper คือโมเดล Speech-to-Text (STT) แบบ open-source ของ OpenAI ทำงาน **กลับทิศกับ Kokoro**: Kokoro รับข้อความแล้วให้ไฟล์เสียง ส่วน Whisper รับไฟล์เสียงแล้วให้ข้อความ
 
@@ -378,7 +385,7 @@ if __name__ == "__main__":
 claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pwd)/work/whisper_mcp_demo.py"
 ```
 
-เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
+เปิด Host session ใหม่แล้วต่อจากผลของข้อ 3.1 หรือ 3.2 — ให้ TTS สร้าง WAV แล้วส่ง path นั้นให้ STT อ่านกลับ:
 
 ```text
 ใช้ tool transcribe ของ whisper-demo อ่านไฟล์เสียงที่ kokoro-demo เพิ่งสร้าง
