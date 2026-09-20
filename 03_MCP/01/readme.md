@@ -547,3 +547,70 @@ claude mcp add --scope user whisper-demo -- "$(pwd)/work/.venv/bin/python" "$(pw
 ```
 
 **ลำดับการทำงาน:** ข้อความ → `speak` (Kokoro) → ไฟล์ `.wav` ใน `work/audio_out/` → `transcribe` (Whisper) → ข้อความ ผลที่ควรได้คือข้อความใกล้เคียงประโยคต้นฉบับ แต่ไม่จำเป็นต้องตรงทุกตัวอักษร (ตัวพิมพ์ เครื่องหมายวรรคตอน หรือคำบางคำอาจต่างไป) ถ้าได้ข้อความว่างหรือ `isError: true` ให้ตรวจ path และ `ffmpeg` ก่อน
+
+<a id="ch3-5"></a>
+### 3.5 ต่อยอด Whisper: ถอดเสียง YouTube บน GPU cloud แล้วทำสื่อสอน `whisper_lesson.html` ด้วย prompt เดียว
+
+ข้อ 3.4 รัน `whisper-base` บน CPU ในเครื่องเรา พอสำหรับไฟล์เสียงสั้น ๆ แต่ถ้าจะถอดเสียงคลิป YouTube ยาวหลายนาทีด้วยโมเดลใหญ่ (`large-v3`) บน CPU จะช้ามาก ตัวอย่างนี้จึงย้าย Whisper ไปรันบน **GPU เช่ารายชั่วโมงจาก Vast.ai** (RTX 4090 ราคาไม่เกิน 0.4 USD/ชม.) แล้วให้ MCP server บนเครื่อง cloud คุยกับ Host ในเครื่องเราผ่าน **Streamable HTTP** (ข้อ 2.3) ส่วน Kokoro ยังใช้ `kokoro-demo` ตัวเดิมในเครื่อง
+
+**สิ่งที่จะได้** ไฟล์ `whisper_lesson.html` ไฟล์เดียวที่
+
+- ฝังวิดีโอ YouTube ไว้ด้านบน มี **Timeline** แสดงทุก segment ของทั้งคลิป คลิกแล้ววิดีโอกระโดดไปเวลานั้น
+- ตารางถอดเสียง เวลา / ต้นฉบับ / คำแปลจีน ไฮไลต์แถวที่ตรงกับเวลาวิดีโอที่กำลังเล่น
+- **3 นาทีแรก** แปลเป็นภาษาจีน แล้วให้ Kokoro อ่านคำแปลจีน ฝังเสียงเป็น base64 กดเล่นได้ทีละประโยคหรือต่อเนื่อง ไฮไลต์วิ่งตามคำพร้อม pinyin ใต้คำ (เหมือนข้อ 3.3)
+- เมื่องานเสร็จ AI **ลบเครื่อง cloud ทิ้งเอง** แล้วสรุปค่าใช้จ่ายจริงเป็น USD
+
+**ลำดับการทำงาน:** prompt → skill `vastai` หา offer 4090 → เช่าเครื่อง → ติดตั้ง Whisper + เขียน MCP server (HTTP) บน cloud → ลงทะเบียน `whisper-cloud` ในเครื่องเรา → `transcribe_youtube` (cloud) → `translate_segments` (cloud) → `speak` (kokoro-demo ในเครื่อง) → ประกอบ `whisper_lesson.html` → ทดสอบใน browser → `destroy` เครื่อง cloud → สรุปราคา
+
+**ก่อนวาง prompt ต้องมีครบ 3 อย่าง**
+
+| ต้องมี | ตรวจอย่างไร |
+| --- | --- |
+| skill `vastai` พร้อม `VAST_API_KEY` และ SSH key ผูกกับบัญชี Vast แล้ว | รัน `python /tmp/vast.py env` และ `python /tmp/vast.py keys` ตามที่ skill บอก ต้องไม่ error และ `registered:true` (เครดิตในบัญชี Vast อย่างน้อย 1 USD) |
+| `kokoro-demo` ที่อัปเกรดพูดจีนและคืนเวลารายคำแล้ว (ข้อ 3.3 ขั้น 1) | `claude mcp list` เห็น `kokoro-demo … ✔ Connected` |
+| เปิด Host จากโฟลเดอร์ที่อยากได้ไฟล์ | `pwd` แล้วค่อย `claude` หรือ `codex` |
+
+> **ค่าใช้จ่าย** เครื่องนี้คิดเงินตั้งแต่วินาทีที่ `create` สำเร็จจนถึง `destroy` งานทั้งชุดใช้เวลาราว 20–40 นาที ที่ราคาไม่เกิน 0.4 USD/ชม. จึงควรอยู่ในหลัก 0.1–0.3 USD prompt ด้านล่างสั่งให้ AI ลบเครื่องทันทีที่งานผ่าน แต่ **ให้เข้าไปดูที่ https://cloud.vast.ai/instances/ ด้วยตัวเองอีกครั้งเสมอ** ว่าไม่มีเครื่องค้าง
+
+**Prompt** (copy ทั้งก้อน แก้ URL วิดีโอได้ตามใจ ควรเป็นคลิปพูดภาษาอังกฤษยาว 5–15 นาที):
+
+```text
+ใช้ skill vastai เช่า GPU บน Vast.ai 1 เครื่อง label whisper-lab เกณฑ์: RTX 4090, ราคารวมไม่เกิน 0.4 USD/ชม. (ส่ง --max-dph 0.4), inet_down มากกว่า 1000 Mbps (--min-inet 1000), disk 40 GB
+plan แล้วแสดง offer_id / ราคา / disk / image ให้ดู แล้วเช่าได้เลย ฉันยืนยันล่วงหน้าเฉพาะครั้งนี้ ถ้าไม่มี offer ตรงเกณฑ์ให้หยุดแล้วบอกฉัน ห้ามขยายเพดานราคาเอง
+บนเครื่อง cloud: ติดตั้ง ffmpeg, yt-dlp, faster-whisper (โมเดล large-v3 บน GPU) และโมเดลแปล facebook/nllb-200-distilled-600M
+แล้วเขียน MCP server ชื่อ whisper-cloud ด้วย MCPServer แบบ Streamable HTTP ฟังที่ 0.0.0.0 บน port ที่ Vast map ออก public ให้ มี tool 2 ตัว:
+- transcribe_youtube(url, language="en") ดาวน์โหลดเสียงด้วย yt-dlp แล้วถอดเสียง คืน segments เป็น list ของ {start, end, text} ทั้งคลิป
+- translate_segments(segments, target="zho_Hans") แปล text ของแต่ละ segment เป็นภาษาจีน คืน list เดิมที่เพิ่ม field zh
+รัน server ค้างไว้ด้วย nohup แล้วลงทะเบียนในเครื่องฉันเป็น whisper-cloud (Claude Code: claude mcp add --transport http --scope user whisper-cloud http://<ip>:<port>/mcp, Codex: codex mcp add whisper-cloud --url ...) ต้องเห็น ✔ Connected ก่อนไปต่อ
+จากนั้นสร้างสื่อสอนเป็นไฟล์เดียวชื่อ whisper_lesson.html ในโฟลเดอร์นี้ จากวิดีโอ https://www.youtube.com/watch?v=uPKMWr1fmYs
+ห้ามใช้ CDN หรือโหลด JS/CSS/เสียงจากเน็ต (ยกเว้น iframe ของ YouTube เท่านั้น) ฝังเสียงและข้อมูลถอดเสียงทั้งหมดในไฟล์
+หน้าเว็บต้องมี:
+- วิดีโอ YouTube ฝังด้านบน ใช้ YouTube IFrame API เพื่ออ่านเวลาที่กำลังเล่น
+- Timeline แนวนอนแสดงช่วงเวลาของทุก segment ทั้งคลิป คลิก segment ให้วิดีโอเลื่อนไปเวลานั้น ช่วง 3 นาทีแรกให้ใช้สีต่างจากช่วงที่เหลือ
+- ตารางถอดเสียง 3 คอลัมน์: เวลา (mm:ss) / ต้นฉบับ / คำแปลจีน ไฮไลต์แถวที่ตรงกับเวลาวิดีโอที่กำลังเล่น และเลื่อนตารางตามอัตโนมัติ
+- เฉพาะ segment ใน 0:00–3:00: แปลเป็นจีนด้วย translate_segments แล้วใช้ kokoro-demo (lang z) อ่านคำแปลจีนของแต่ละ segment ฝังเสียงเป็น base64 มีปุ่มเล่นรายประโยค ปุ่มเล่นต่อเนื่องทั้ง 3 นาที และปุ่มช้า 0.7x ตอนเล่นให้ไฮไลต์วิ่งตามคำจีนที่กำลังออกเสียง ใต้แต่ละคำจีนแสดง pinyin ตอนเล่นเสียง Kokoro ให้หยุดวิดีโอ YouTube ก่อน
+- segment หลัง 3:00 แสดงแค่ต้นฉบับ ไม่ต้องแปล ไม่ต้องอ่านเสียง
+เสร็จแล้วเปิดไฟล์ใน browser ทดสอบให้ดู: Timeline คลิกได้ แถวไฮไลต์ตามวิดีโอ เสียงจีนเล่นได้และไฮไลต์ตรงคำ ถ้า error แก้เองจนผ่าน ไม่ต้องถามฉัน
+เมื่อ whisper_lesson.html ผ่านแล้ว ให้ destroy เครื่อง cloud label whisper-lab ทันที แล้วรัน sweep ยืนยันว่าไม่เหลือเครื่องค้างในบัญชี
+สุดท้ายสรุปค่าใช้จ่ายเป็นตาราง: เวลาที่เช่าจริง (นาที), ราคา GPU ต่อชั่วโมง, ค่า storage, รวมเป็น USD พร้อมแนบผล destroy และ sweep ให้ดู
+```
+
+**ผลที่ควรได้**
+
+- ระหว่างทำ AI แสดง offer ที่เลือก (ต้องเป็น `RTX 4090` ราคา ≤ 0.4 USD/ชม. `inet_down` > 1000) แล้วสร้างเครื่อง ตามด้วยบรรทัด `whisper-cloud: http://… - ✔ Connected` จาก `claude mcp list`
+- ไฟล์ `whisper_lesson.html` ในโฟลเดอร์ ขนาดหลัก MB (เสียงจีน 3 นาทีฝังอยู่) เปิดแล้ววิดีโอเล่นได้ Timeline คลิกแล้ววิดีโอกระโดด แถวตารางไฮไลต์วิ่งตามวิดีโอ กดเล่นเสียงจีนแล้วคำจีนไฮไลต์ทีละคำพร้อม pinyin
+- ท้ายสุด AI แสดงผล `destroy` และ `sweep` ที่ว่าง แล้วสรุปราคา เช่น เช่า 27 นาที × 0.35 USD/ชม. + storage ≈ 0.17 USD ตัวเลขจริงขึ้นกับ offer ที่ได้และเวลาที่ใช้
+
+**ถ้าไม่ผ่าน**
+
+| อาการ | สาเหตุที่พบบ่อย | ทางแก้ |
+| --- | --- | --- |
+| `ไม่มี offer <= $0.4/hr ที่ตรงเกณฑ์` | ช่วงนั้น 4090 ที่เน็ตเร็วกว่า 1000 Mbps ราคาเกิน 0.4 ทั้งหมด | ลด `--min-inet` เป็น 500 หรือรอแล้วลองใหม่ **อย่าให้ AI ขยายเพดานราคาเอง** ถ้าจะยอมจ่ายเพิ่มให้สั่งใหม่พร้อมตัวเลขที่รับได้ |
+| `whisper-cloud … ✘ Failed to connect` | server ยังโหลดโมเดลไม่เสร็จ, port ที่ลงทะเบียนไม่ใช่ port ที่ Vast map ออก, หรือ server ฟังที่ `127.0.0.1` แทน `0.0.0.0` | สั่งต่อว่า "เช็ก port mapping ของเครื่องด้วย vast.py status แล้วแก้ URL ที่ลงทะเบียน server ต้องฟัง 0.0.0.0" |
+| `transcribe_youtube` error `Sign in to confirm you're not a bot` | YouTube บล็อก yt-dlp จาก IP ของ datacenter | สั่งต่อว่า "ดาวน์โหลดเสียงในเครื่องฉันด้วย yt-dlp แล้ว push ไฟล์ .m4a ขึ้นเครื่อง cloud ด้วย vast.py push แล้วถอดเสียงจากไฟล์แทน" |
+| ตารางมีคำแปลจีนแต่ไม่มีเสียง หรือเสียงจีนเป็น `isError` | `kokoro-demo` ยังไม่ได้อัปเกรดตามข้อ 3.3 ขั้น 1 (ไม่มี `misaki[zh]`) | ทำข้อ 3.3 ขั้น 1 ให้จบ ปิดเปิด Host ใหม่ แล้วสั่ง "ทำต่อจากขั้นสร้างเสียงจีน" |
+| ไฮไลต์คำจีนไม่ตรงเสียง | AI ประมาณเวลาแทนใช้เวลารายคำจาก `speak` | สั่งต่อว่า "จีนให้สังเคราะห์ทีละคำแล้วต่อเสียง เอาเวลาจริงจาก kokoro-demo มาใช้" |
+| เปิดไฟล์แล้ว browser ขอโหลดจากเน็ต | มี `<script src=https://…>` หลุดมา (นอกจาก IFrame API ของ YouTube) | สั่งต่อว่า "เอา CDN ออกให้หมด ให้เหลือแค่ iframe/IFrame API ของ YouTube" |
+| AI หยุดก่อนถึงขั้น destroy หรือ session หลุด | โควตาหมด หรือปิด terminal ก่อน | **รีบรัน** `python /tmp/vast.py sweep` แล้ว `python /tmp/vast.py destroy --label whisper-lab --yes` ด้วยตัวเอง แล้วเช็กหน้า Instances บนเว็บ Vast ซ้ำ |
+
+**ทำไมต้องเป็น Streamable HTTP** เครื่อง cloud อยู่คนละเครื่องกับ Host จึงใช้ stdio (ข้อ 2.3) ไม่ได้ เพราะ stdio ต้องให้ Host เป็นคน spawn process ของ server เอง แต่ HTTP ให้ server รันค้างอยู่ที่ไหนก็ได้ที่ Host ต่อ URL ถึง นี่คือกรณีใช้งานจริงของ transport แบบที่สองที่บทที่ 2 พูดถึง และเป็นเหตุผลว่าทำไม MCP จึงออกแบบให้ Host เรียก `tools/list` ตอนต่อครั้งแรกแทนที่จะ hardcode รายชื่อ tool: Host ในเครื่องเราไม่เคยเห็นโค้ดของ `whisper-cloud` เลย แต่ใช้งานได้ทันทีที่ต่อติด
