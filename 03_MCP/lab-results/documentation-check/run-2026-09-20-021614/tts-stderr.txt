@@ -1,0 +1,38 @@
+[09/20/26 02:16:27] INFO     HTTP Request: HEAD                  _client.py:1025
+                             https://huggingface.co/hexgrad/Koko                
+                             ro-82M/resolve/main/config.json                    
+                             "HTTP/1.1 307 Temporary Redirect"                  
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+                    WARNING  Warning: You are sending               _http.py:955
+                             unauthenticated requests to the HF                 
+                             Hub. Please set a HF_TOKEN to enable               
+                             higher rate limits and faster                      
+                             downloads.                                         
+                    INFO     HTTP Request: HEAD                  _client.py:1025
+                             https://huggingface.co/api/resolve-                
+                             cache/models/hexgrad/Kokoro-82M/f3f                
+                             f3571791e39611d31c381e3a41a3af07b49                
+                             87/config.json "HTTP/1.1 200 OK"                   
+/usr/local/lib/python3.12/dist-packages/torch/nn/modules/rnn.py:1011: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  super().__init__("LSTM", *args, **kwargs)
+/usr/local/lib/python3.12/dist-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+[09/20/26 02:16:28] INFO     HTTP Request: HEAD                  _client.py:1025
+                             https://huggingface.co/hexgrad/Koko                
+                             ro-82M/resolve/main/kokoro-v1_0.pth                
+                              "HTTP/1.1 302 Found"                              
+[09/20/26 02:16:29] INFO     HTTP Request: HEAD                  _client.py:1025
+                             https://huggingface.co/hexgrad/Koko                
+                             ro-82M/resolve/main/voices/af_heart                
+                             .pt "HTTP/1.1 302 Found"                           
+Failed to parse JSONRPC message from server
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/mcp/client/stdio.py", line 221, in _parse_line
+    message = types.jsonrpc_message_adapter.validate_json(line, by_name=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/pydantic/type_adapter.py", line 492, in validate_json
+    return self.validator.validate_json(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for union[JSONRPCRequest,JSONRPCNotification,JSONRPCResponse,JSONRPCError]
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value="WARNING: Defaulting repo... suppress this warning.", input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/json_invalid

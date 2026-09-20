@@ -1,0 +1,24 @@
+{
+  "mcp_servers.playwright.command": "/usr/local/bin/playwright-mcp",
+  "mcp_servers.playwright.args": [
+    "--cdp-endpoint",
+    "http://127.0.0.1:9222"
+  ],
+  "mcp_servers.excalidraw.command": "/usr/local/bin/mcp-excalidraw-server",
+  "mcp_servers.excalidraw.env": {
+    "EXPRESS_SERVER_URL": "http://127.0.0.1:8892",
+    "EXCALIDRAW_NO_AUTOSTART": "1",
+    "EXCALIDRAW_EXPORT_DIR": "/root/workspace/.mcp/excalidraw/diagrams"
+  },
+  "mcp_servers.hello-lab.command": "/opt/venv/bin/python",
+  "mcp_servers.hello-lab.args": [
+    "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/hello_server.py"
+  ],
+  "mcp_servers.kokoro-tts.command": "/opt/venv/bin/python",
+  "mcp_servers.kokoro-tts.args": [
+    "/root/workspace/CWN/Teaching/03_MCP/labs/my-mcp-server/tts_server.py"
+  ],
+  "mcp_servers.kokoro-tts.env": {
+    "KOKORO_DEVICE": "cpu"
+  }
+}

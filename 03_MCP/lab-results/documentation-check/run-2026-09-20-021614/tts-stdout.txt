@@ -1,0 +1,138 @@
+== connected ==
+protocol_version: 2026-07-28
+server_info: {
+  "name": "kokoro-tts",
+  "version": ""
+}
+server_capabilities: {
+  "prompts": {
+    "listChanged": true
+  },
+  "resources": {
+    "subscribe": true,
+    "listChanged": true
+  },
+  "tools": {
+    "listChanged": true
+  }
+}
+instructions: แปลงข้อความภาษาอังกฤษเป็นไฟล์เสียง .wav ด้วย Kokoro-82M (ไม่รองรับภาษาไทย)
+
+== tools/list ==
+{
+  "name": "list_voices",
+  "description": "รายชื่อเสียงที่ใช้ได้ / Available Kokoro voices.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "title": "list_voicesArguments"
+  }
+}
+{
+  "name": "speak",
+  "description": "สังเคราะห์เสียงภาษาอังกฤษจากข้อความ แล้วคืน path ของไฟล์ .wav พร้อมความยาว (วินาที)\n    Synthesize English speech with Kokoro; returns wav path, duration_sec, gen_ms.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "title": "Text",
+        "type": "string"
+      },
+      "voice": {
+        "default": "af_heart",
+        "title": "Voice",
+        "type": "string"
+      }
+    },
+    "required": [
+      "text"
+    ],
+    "title": "speakArguments"
+  }
+}
+
+== resources/list ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "kokoro-tts",
+      "version": ""
+    }
+  },
+  "ttlMs": 0,
+  "cacheScope": "private",
+  "resources": [],
+  "resultType": "complete"
+}
+
+== prompts/list ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "kokoro-tts",
+      "version": ""
+    }
+  },
+  "ttlMs": 0,
+  "cacheScope": "private",
+  "prompts": [],
+  "resultType": "complete"
+}
+
+== tools/call list_voices() ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "kokoro-tts",
+      "version": ""
+    }
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "af_heart"
+    },
+    {
+      "type": "text",
+      "text": "af_bella"
+    },
+    {
+      "type": "text",
+      "text": "am_adam"
+    },
+    {
+      "type": "text",
+      "text": "am_michael"
+    }
+  ],
+  "structuredContent": {
+    "result": [
+      "af_heart",
+      "af_bella",
+      "am_adam",
+      "am_michael"
+    ]
+  },
+  "isError": false,
+  "resultType": "complete"
+}
+
+== tools/call speak('Model Context Protocol lets one server serve many agents.') ==
+{
+  "_meta": {
+    "io.modelcontextprotocol/serverInfo": {
+      "name": "kokoro-tts",
+      "version": ""
+    }
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"path\": \"/root/workspace/CWN/Teaching/03_MCP/labs/kokoro-web/audio_out/20260920-021630-e7d7ac24.wav\",\n  \"duration_sec\": 4.45,\n  \"sample_rate\": 24000,\n  \"gen_ms\": 685,\n  \"voice\": \"af_heart\"\n}"
+    }
+  ],
+  "isError": false,
+  "resultType": "complete"
+}
+
+== disconnected ==
