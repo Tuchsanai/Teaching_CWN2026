@@ -171,6 +171,10 @@ Kokoro คือโมเดล Text-to-Speech (TTS) แบบ open-weight ท�
 | **A. Prompt-based** สั่ง AI ให้ติดตั้งให้ด้วยภาษาคน | อยากใช้งานเร็ว ไม่สนใจโค้ดข้างใน | [3.1](#ch3-1) |
 | **B. Direct** ติดตั้งและเขียน server เองทีละขั้น | อยากเห็นว่า MCP server เขียนอย่างไร | [3.2](#ch3-2) |
 
+![ภาพรวมบทที่ 3: Host (Claude Code / Codex CLI) มี MCP client 2 ตัวต่อผ่าน stdio ไปหา kokoro-demo (tool speak, Kokoro-82M) และ whisper-demo (tool transcribe, openai/whisper-base) โมเดลดาวน์โหลดจาก Hugging Face Hub ครั้งเดียว ไฟล์ .wav จาก speak ส่งต่อให้ transcribe](img/d04-ch3-kokoro-whisper-architecture.png)
+
+*ภาพรวมบทนี้: Host ตัวเดียวเปิด MCP client แยกกันให้ server แต่ละตัว (1)(2) คุยกันผ่าน stdio ด้วย JSON-RPC ตามลำดับ `tools/list` → `tools/call` ทั้ง `kokoro-demo` และ `whisper-demo` เขียนด้วยคลาส `MCPServer` เดียวกัน ต่างกันแค่ tool และโมเดลที่ครอบไว้ โมเดลทั้งสองดึงจาก Hugging Face Hub ครั้งแรกแล้วเก็บใน cache ไฟล์ `.wav` ที่ `speak` สร้าง (3) คือ input ของ `transcribe` (4) จึงต่อกันเป็นวง TTS → STT ได้ในข้อ 3.4 แถวล่างคือหัวข้อย่อยที่ต่อยอดจากสองตัวนี้*
+
 <a id="ch3-1"></a>
 ### 3.1 แบบ A: Prompt-based ให้ AI ติดตั้ง Kokoro MCP ให้เอง
 
@@ -612,6 +616,10 @@ https://www.youtube.com/watch?v=uPKMWr1fmYs
 | ลบเครื่อง + ค่าใช้จ่าย | เครื่องแรก 15 นาที: GPU 0.108 + storage 0.004 + download 0.009 (3.5 GB × 0.003) = **0.12 USD** · เครื่องที่สอง 26 นาที: GPU 0.162 + storage 0.006 + download **0.338** (11.8 GB × 0.029) + upload 0.001 = **0.51 USD** · รวมทั้งรอบ **0.63 USD** (`sweep` ยืนยัน 0 เครื่องค้าง) |
 
 สคริปต์ที่ AI เขียนในรอบนั้นเก็บไว้ให้ดูใน [`whisper_cloud_scripts/`](whisper_cloud_scripts/): `setup.sh` (ติดตั้งบน cloud) `whisper_cloud_mcp.py` (MCP server 3 tools) `build_whisper_lesson.py` (MCP client ฝั่งเครื่องเราที่เรียก tools ผ่าน tunnel) และ `make_whisper_lesson_html.py` (ประกอบ HTML)
+
+![โหมดสำรองของ whisper_lesson.html เมื่อ YouTube เล่นไม่ได้: แถบแจ้งเหตุ error 153 และแถบเล่นเสียงต้นฉบับที่ฝังในไฟล์](img/d09-whisper-lesson-fallback.png)
+
+*โหมดสำรอง (จำลอง error 153 ด้วย Playwright): ใต้วิดีโอมีแถบแจ้งสาเหตุ และแถบเล่นเสียงต้นฉบับพร้อม seek bar กับปุ่ม "เปิดบน YouTube" Timeline และตารางเลื่อนตามเสียงนี้แทน*
 
 ![หน้า whisper_lesson.html: วิดีโอ YouTube, Timeline ทั้งคลิป และตารางถอดเสียงพร้อมคำแปลจีน](img/d09-whisper-lesson-top.png)
 
