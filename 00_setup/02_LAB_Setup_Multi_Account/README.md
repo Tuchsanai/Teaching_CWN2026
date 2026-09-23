@@ -216,23 +216,6 @@ login-guide.md (ขั้นตอนล็อกอินทีละบัญ�
 
 ![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
 
-*ภาพหน้าจอจริงที่ขยายและเพิ่มวงกลมกับลูกศรด้วย Imagegen เพื่อชี้ตำแหน่งคลิก หากไม่เห็นโฟลเดอร์ที่ขึ้นต้นด้วยจุด ให้เปิดการแสดงไฟล์ซ่อนใน File Browser*
-
-ในภาพใช้ผู้ใช้ `root` จึงได้ `/root/ai-accounts` ส่วนเครื่องผู้เรียนให้ยึด `$HOME/ai-accounts` ของผู้ใช้ที่รันจริง ภายใน `.Claude` มี `yolo1`–`yolo5` และ `shared` ส่วน `.Codex` มี `cyolo1`–`cyolo5` และ `shared`
-
-| สิ่งที่ตรวจ | ผลจากการสาธิตครั้งนี้ |
-|---|---|
-| Claude Code | `2.1.280` เรียกผ่าน `/root/.local/bin/claude` |
-| Codex CLI | `0.156.1` |
-| `yolo1`–`yolo5 --version` | PASS ครบ 5/5 |
-| `cyolo1`–`cyolo5 --version` | PASS ครบ 5/5 |
-| โฟลเดอร์แยกบัญชี | `.Claude/yolo1`–`yolo5` และ `.Codex/cyolo1`–`cyolo5` ครบ |
-| ติดตั้งซ้ำ | PASS: ข้อมูลเดิมไม่เปลี่ยนตามการตรวจใน checklist |
-| รายงาน | `setup-report.md`, `login-guide.md`, `checklist.md` ครบ 3 ไฟล์ |
-| ล็อกอินบัญชีใหม่และทดสอบใช้งานจริง | SKIP: เจ้าของบัญชีทำเองในขั้นที่ 3 |
-
-**ข้อสังเกตจากรอบนี้:** Terminal ใหม่เรียก `claude` ด้วยชื่อสั้นไม่ได้ เพราะตำแหน่งติดตั้งยังไม่อยู่ใน PATH จึงใช้ absolute path ของโปรแกรมที่มีอยู่แล้ว ไม่ติดตั้งซ้ำและไม่แก้ `.bashrc` ส่วน wrapper ที่สร้างขึ้นเรียกได้ครบทั้งสิบตัว ผลนี้ยืนยันการตั้งค่าและการเปิด CLI; การยืนยันบัญชีจริงและการใช้บริการของแต่ละบัญชียังเป็น SKIP
-
 ไฟล์จากการสาธิตอยู่ใน `/workspace` ของ `devtools` ซึ่งเป็นโฟลเดอร์ที่เปิด Claude ในรอบนี้ เก็บสำเนาหลักฐานไว้กับบทเรียน: [รายงานตั้งค่า](evidence/devtools-setup/setup-report.md), [วิธีล็อกอิน](evidence/devtools-setup/login-guide.md), [checklist](evidence/devtools-setup/checklist.md) และ [ตัวติดตั้งที่ Claude สร้าง](evidence/devtools-setup/install-ai-accounts.sh)
 
 ### 🔍 จุดที่ผู้เรียนต้องตรวจ (🖥️ เปิด Terminal อีกแท็บใน JupyterLab)
