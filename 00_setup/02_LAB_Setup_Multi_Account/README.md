@@ -292,7 +292,7 @@ yolo1
 
 หากมีหน้าจอเลือกธีม ให้เลือกธีมก่อน จากนั้นเลือก **Claude account with subscription** แล้วกด Enter
 
-![เลือกล็อกอิน Claude ด้วย subscription](img/terminal-claude-subscription.png)
+![หน้าเลือกล็อกอิน Claude ด้วย subscription ใน JupyterLab ของ devtools](img/devtools-claude-login-jupyter.png)
 
 ##### 3.2.1.3 · ยืนยันบัญชีในเบราว์เซอร์
 
@@ -312,7 +312,7 @@ yolo1
 
 เห็นหน้า Claude Code และช่องพิมพ์ข้อความ แสดงว่ามาถึงหน้าสนทนาแล้ว
 
-![Claude Code หลังเข้าใช้บัญชี subscription พร้อมพิมพ์พรอมต์](img/terminal-yolo1-ready.png)
+![Claude บัญชี yolo1 พร้อมพิมพ์พรอมต์ใน Terminal ของ JupyterLab](img/devtools-yolo1-ready-jupyter.png)
 
 ---
 
@@ -324,7 +324,7 @@ yolo1
 
 พิมพ์ `/model` แล้วกด Enter เลื่อนมาที่ **Fable** ใช้ลูกศรซ้าย/ขวาปรับเป็น **Medium** แล้วกด Enter ยืนยัน
 
-![เลือก Fable และ Medium ในหน้า Claude Code](img/terminal-ui-fable-model-medium.png)
+![เลือก Fable และ Medium ใน Claude Code ภายใน JupyterLab](img/devtools-yolo1-model-jupyter.png)
 
 ##### 3.2.2.2 · วางคำถาม
 
