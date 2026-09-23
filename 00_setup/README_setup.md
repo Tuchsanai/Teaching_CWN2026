@@ -129,6 +129,8 @@ docker info
 
 ### 3.1 พรอมป์สำหรับสร้าง container
 
+**คัดลอกง่าย:** เปิด [ไฟล์พรอมป์พร้อมคัดลอก](prompt-create-devtools.txt) แล้วกด **Ctrl+A → Ctrl+C** จากนั้นใช้ **Ctrl+V** วางใน Claude Code ตามหัวข้อ 3.2
+
 คัดลอกพรอมป์ด้านล่างไปวางใน Claude Code ตามหัวข้อ 3.2 เพื่อให้ดำเนินการกับ Docker บนเครื่องผู้เรียน
 
 > ขั้นตอนตามต้นฉบับจะลบ devtools ตัวเดิม หากมีงานอยู่ ให้สำรองก่อน เพราะไฟล์ใน writable layer จะหายเมื่อลบ container
@@ -187,9 +189,9 @@ docker exec -it devtools bash -c \
 4. เลือก **Attach Visual Studio Code**
 5. รอหน้าต่างใหม่เชื่อมต่อและเตรียม VS Code Server
 
-![เมนูจริง แสดง Attach Shell และ Attach Visual Studio Code](assets/04-attach-devtools-only.png)
+![เมนูจริง แสดง Attach Shell และ Attach Visual Studio Code](assets/04-attach-highlight.png)
 
-*เลือก Attach Visual Studio Code เพื่อเข้า container ภาพปรับด้วย Imagegen ให้เหลือ devtools ด้านบนและซ่อนรายการใน Images เพื่อให้อ่านขั้นตอนได้ชัดเจน*
+*เลือก Attach Visual Studio Code เพื่อเข้า container ภาพปรับด้วย Imagegen ให้เหลือ devtools ด้านบนและซ่อนรายการใน Images พร้อมตัวชี้เมาส์และกรอบสีส้มเน้นเมนู Attach Visual Studio Code*
 
 อีกวิธีคือกด `Ctrl+Shift+P` แล้วค้นหา:
 
@@ -203,112 +205,74 @@ Dev Containers: Attach to Running Container...
 
 *ภาพที่ 5: ตรวจแถบล่างซ้ายว่าระบุ Container และ image ของวิชาก่อนทำ LAB*
 
-## 6. เปิดโฟลเดอร์ทดลอง /workspace
+### ตรวจเครื่องมือหลังเข้า container
 
-ในหน้าต่างที่เชื่อม container แล้ว:
-
-1. เลือก **File → Open Folder...** หรือ **Open Folder...** บนหน้า Welcome
-2. ใส่ `/workspace`
-3. กด **OK** หากครั้งแรกเป็นการเข้าโฟลเดอร์ ให้กด OK อีกครั้งเพื่อเปิด
-4. ตรวจ Explorer ว่ารากเป็น `workspace` และแถบล่างซ้ายยังระบุ Container
-
-![ระบุ /workspace ในหน้าต่าง Open Folder จริง](assets/06-open-workspace.jpg)
-
-*ภาพที่ 6: ใช้พาธ Linux ภายใน container ไม่ใช่โฟลเดอร์ Windows*
-
-![เปิด workspace ภายใน devtools สำเร็จจริง](assets/07-workspace-ready-redacted.png)
-
-*ภาพที่ 7: พร้อมสร้างไฟล์ทดลองใน workspace โฟลเดอร์ว่างใน container ใหม่เป็นเรื่องปกติ*
-
-เปิด **Terminal → New Terminal** ในหน้าต่างนี้ แล้วตรวจ:
+เปิด **Terminal → New Terminal** ในหน้าต่าง VS Code ที่เชื่อมกับ container แล้วรันทีละคำสั่ง:
 
 ```bash
-pwd
-python --version
-node --version
-docker --version
-git --version
+whoami
+claude --version
+codex --version
 ```
 
-`pwd` ควรได้ `/workspace` และเครื่องมือควรแสดงเวอร์ชัน
+`whoami` ควรแสดง `root` และอีกสองคำสั่งต้องแสดงเวอร์ชัน หากไม่พบ `claude` ให้เปิด terminal ใหม่ หรือรัน `export PATH="$HOME/.local/bin:$PATH"` แล้วตรวจอีกครั้ง
 
-## 7. ทางเลือก SSH และ Jupyter
+![ผลเวอร์ชันจริงของ Claude Code และ Codex ใน root shell ของ devtools](assets/05-vscode-cli-versions.jpg)
 
-### SSH
+*ผลตรวจจริง: Claude Code 2.1.280 และ codex-cli 0.156.1 ภาพจริงจาก Integrated Terminal ของ VS Code ที่ Attach เข้า devtools แล้ว โดยรันคำสั่งตรวจในฐานะ root ภายใน container เวอร์ชันที่ผู้เรียนได้อาจใหม่กว่า การแสดงเวอร์ชันยืนยันว่ามีเครื่องมือแล้ว แต่ยังไม่ใช่การเข้าสู่ระบบ*
 
-รันจาก PowerShell บนเครื่องที่รัน Docker หากใช้พอร์ตเริ่มต้น:
+## 6. อีกวิธี: ใช้งานผ่าน JupyterLab
 
-```powershell
-ssh root@localhost -p 2222
-```
+นอกจาก Terminal ใน VS Code เรายังใช้เครื่องมือชุดเดียวกันผ่าน Terminal ของ JupyterLab ภายใน devtools ได้
 
-เปลี่ยนเลขพอร์ตตามที่ใช้จริง ตรวจปลายทางก่อนยอมรับ fingerprint ครั้งแรก และใช้รหัสผ่าน container ที่ผู้สอนแจ้ง
+### 6.1 เปิด JupyterLab
 
-### Jupyter
+1. ในหน้าต่าง VS Code บนเครื่อง เปิดแถบ **Containers** แล้วคลิกขวาที่ **devtools**
+2. เลือก **Open in External Browser**
+3. เลือก **8888 localhost:8885** คือพอร์ต **8888 ภายใน container** ที่แมปมายังพอร์ต **8885 บนเครื่อง**
+4. เบราว์เซอร์จะเปิด [JupyterLab](http://localhost:8885/lab)
 
-หากใช้พอร์ตเริ่มต้น เปิด [Jupyter บนเครื่องตนเอง](http://localhost:8885) การแมปพอร์ตไม่ได้รับประกันว่า server เริ่มแล้ว หากเปิดไม่ได้ให้ตรวจ:
+![เปิด External Browser และเลือกพอร์ต](assets/06-jupyter-open.png)
 
-```powershell
-docker logs --tail 80 devtools
-docker exec devtools bash -lc 'jupyter server list'
-```
+*ภาพจากหน้าจอจริง ปรับด้วย Imagegen เพื่อซ่อนรายการที่ไม่เกี่ยวข้องและเน้นจุดที่ต้องเลือก*
 
-ใช้ token/รหัสผ่านที่ผู้สอนกำหนด ไม่ใส่ค่าลับจาก `.env` ลงในคู่มือ หากยังไม่มี server ให้รันใน terminal **ภายใน container** และเปิด terminal ค้างไว้:
+### 6.2 เปิด Terminal และใช้เครื่องมือ
+
+ที่หน้า **Launcher** เลือก **Terminal** ในกลุ่ม **Other** หากไม่เห็น Launcher ให้กดปุ่ม **+**
+
+![หน้า Launcher จริงของ JupyterLab](assets/06-jupyter-launcher.png)
+
+ตรวจเครื่องมือ:
 
 ```bash
-jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+whoami
+claude --version
+codex --version
 ```
 
-ใช้ token ที่แสดงใน terminal ของตนเอง
+หากพบ `claude: command not found` ให้เพิ่มตำแหน่งติดตั้งใน PATH ของ Terminal ปัจจุบัน แล้วตรวจอีกครั้ง:
 
-> localhost หมายถึงเครื่องที่เปิด browser/SSH หาก Docker อยู่บนเครื่อง Remote ต้องเชื่อมเครือข่ายหรือทำ port forwarding ให้ถูกต้องก่อน
-
-## 8. กลับมาทำงานครั้งถัดไป
-
-ไม่ต้องสร้างใหม่ทุกครั้ง จาก PowerShell บนเครื่องผู้เรียน:
-
-```powershell
-docker start devtools
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+claude --version
 ```
 
-จากนั้น Attach VS Code และเปิด `/workspace` ตามเดิม เมื่อจบงาน:
+![ผลตรวจเครื่องมือจริงใน JupyterLab Terminal](assets/06-jupyter-versions.png)
 
-```powershell
-docker stop devtools
+*ผลตรวจจริงหลังปรับ PATH: root, Claude Code 2.1.280 และ codex-cli 0.156.1 ภาพ Terminal เป็นภาพจริง ไม่ได้สร้างผลลัพธ์ด้วย AI*
+
+เริ่ม Claude Code ด้วย:
+
+```bash
+claude
 ```
 
-stop/start เก็บไฟล์ไว้ แต่ `docker rm` ลบ writable layer คำสั่งตาม `1.txt` ยังไม่ได้ mount volume สำหรับ `/workspace` จึงต้องสำรองงานหรือใช้ Git ก่อนลบ container
+หรือเปิด Terminal อีกแท็บเพื่อใช้ Codex:
 
-## 9. ตรวจความพร้อมและแก้ปัญหา
+```bash
+codex
+```
 
-- [ ] Docker Desktop แสดง Engine running และ docker info ติดต่อ Server ได้
-- [ ] devtools อยู่ในสถานะ Up
-- [ ] จดพอร์ต SSH/Jupyter จริง
-- [ ] Claude Code สรุปว่าติดตั้งและตรวจเวอร์ชัน Claude Code/Codex ใน container สำเร็จ
-- [ ] VS Code แสดงสถานะ Container
-- [ ] เปิด /workspace และตรวจ Python, Node.js, Docker, Git ได้
+ทำขั้นตอนเข้าสู่ระบบตามที่เครื่องมือแสดงเมื่อใช้ครั้งแรก ภาพนี้ยืนยันการติดตั้งจากเวอร์ชัน ยังไม่ใช่ผลการเข้าสู่ระบบหรือส่งงานให้ AI
 
-| อาการ | วิธีตรวจและแก้ |
-| --- | --- |
-| ไม่รู้จัก docker | ตรวจการติดตั้งแล้วเปิด terminal ใหม่ |
-| ติดต่อ daemon ไม่ได้ | เปิด Docker Desktop และรอ Engine running |
-| ชื่อ devtools ซ้ำ | สำรองงานก่อนลบ หรือ start ตัวเดิมหากไม่ได้ต้องการสร้างใหม่ |
-| พอร์ตชน/ถูกสงวน | เลือกเลขถัดไปและใช้เลขใหม่ใน SSH/Jupyter |
-| ไม่มีเมนู Attach | ตรวจ Dev Containers หรือใช้ Command Palette |
-| VS Code ไม่พบ container | ตรวจว่า CLI/VS Code ใช้ Docker context เดียวกันด้วย docker context show และ docker ps |
-| เห็นไฟล์ Windows หลัง Open Folder | กลับไปหน้าต่างที่สถานะเป็น Container แล้วเปิด /workspace |
-| ไม่พบ claude หลังติดตั้ง | เปิด shell ใหม่ หรือตรวจ $HOME/.local/bin/claude และ PATH |
-
-## แหล่งอ้างอิงและผลตรวจภาพ
-
-- `1.txt`: image, ชื่อ container, พอร์ต และคำสั่งติดตั้ง
-- `tool.pdf`: ลำดับ Docker → VS Code → Attach Shell/Attach Visual Studio Code
-- [Docker Desktop: Windows installation](https://docs.docker.com/desktop/setup/install/windows-install/)
-- [VS Code: Attach to a running container](https://code.visualstudio.com/docs/devcontainers/attach-container)
-- ภาพขั้นตอนใช้งานจับจากแอปจริงด้วย Computer Use; ภาพที่ 1, 3, 4 และ 7 ใช้ฉบับปิดบังข้อมูลด้วย Imagegen โดยเก็บต้นฉบับไว้
-
-เครื่องตัวอย่างสร้าง devtools สำเร็จ ใช้ SSH `2222:22` และ Jupyter `8885:8888` และ Attach VS Code เข้า `/workspace` ได้จริง ตรวจ CLI ผ่าน Docker exec ได้ Python 3.12.3, Node.js 22.23.2, Docker 29.8.1 และ Git 2.55.0 เลขเหล่านี้เป็นผลเครื่องตัวอย่าง ไม่ใช่ข้อกำหนดว่าทุกเครื่องต้องตรงทุกตัว
-
-ภาพ Claude Code เป็นการสาธิตวางพรอมป์จริงโดยยังไม่กดส่ง ส่วนภาพรายการ devtools แสดง container ที่สร้างและตรวจไว้ก่อนหน้า
-
-**การส่งต่อ:** คัดลอก Markdown พร้อมโฟลเดอร์ `assets` เสมอ เปิด Markdown Preview ด้วย `Ctrl+Shift+V` เพื่อดูภาพ
+ทั้ง **VS Code → Terminal** และ **JupyterLab → Terminal** เป็นสองทางเข้าถึง shell ภายใน devtools เดียวกัน เลือกใช้ตามสะดวก
