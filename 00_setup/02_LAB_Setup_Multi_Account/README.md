@@ -210,11 +210,33 @@ login-guide.md (ขั้นตอนล็อกอินทีละบัญ�
 
 ### 2.6 · เปิดดูโฟลเดอร์ที่สร้างจริงผ่าน File Browser
 
+#### 2.6.1 · เปิดโฟลเดอร์ ai-accounts
+
 1. คลิกไอคอนรูปโฟลเดอร์ **File Browser** ที่แถบซ้ายสุดของ JupyterLab
 2. กลับไปที่โฟลเดอร์บนสุด `/` แล้วดับเบิลคลิก **root** จากนั้นดับเบิลคลิก **ai-accounts**
 3. ตรวจแถบตำแหน่งด้านบนให้เป็น **/ root / ai-accounts /** ตามวงกลมสีแดง ภายในจะเห็นโฟลเดอร์ **.Claude** และ **.Codex**
 
 ![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
+
+#### 2.6.2 · เปิดดูบัญชี Claude และ shared
+
+ดับเบิลคลิก **.Claude** ใน File Browser จะเห็น **yolo1–yolo5** และ **shared** ตามโครงสร้างในหัวข้อ 2.2 ตรวจแถบตำแหน่งให้ลงท้ายด้วย **ai-accounts / .Claude /**
+
+![File Browser ใน JupyterLab แสดงโฟลเดอร์จริง yolo1 ถึง yolo5 และ shared ภายใน .Claude](img/devtools-claude-account-folders.png)
+
+ดับเบิลคลิก **shared** จะเห็นโฟลเดอร์ **mcp** และ **skills** ของ Claude
+
+![โฟลเดอร์ mcp และ skills จริงภายใน .Claude shared ใน JupyterLab](img/devtools-claude-shared-folders.png)
+
+#### 2.6.3 · เปิดดูบัญชี Codex และ shared
+
+กลับไปที่ **ai-accounts** โดยคลิกแถบตำแหน่งด้านบน หากชื่อถูกย่อเป็น **…** ให้คลิกตำแหน่งนั้นเพื่อกลับขึ้นไป จากนั้นดับเบิลคลิก **.Codex** จะเห็น **cyolo1–cyolo5** และ **shared** ตามโครงสร้างในหัวข้อ 2.2
+
+![File Browser ใน JupyterLab แสดงโฟลเดอร์จริง cyolo1 ถึง cyolo5 และ shared ภายใน .Codex](img/devtools-codex-account-folders.png)
+
+ดับเบิลคลิก **shared** จะเห็นโฟลเดอร์ **mcp** และ **skills** ของ Codex
+
+![โฟลเดอร์ mcp และ skills จริงภายใน .Codex shared ใน JupyterLab](img/devtools-codex-shared-folders.png)
 
 ### 2.7 · 🔍 จุดที่ผู้เรียนต้องตรวจ (🖥️ เปิด Terminal อีกแท็บใน JupyterLab)
 
