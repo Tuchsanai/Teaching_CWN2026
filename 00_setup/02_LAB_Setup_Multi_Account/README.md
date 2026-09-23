@@ -216,8 +216,6 @@ login-guide.md (ขั้นตอนล็อกอินทีละบัญ�
 
 ![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
 
-ไฟล์จากการสาธิตอยู่ใน `/workspace` ของ `devtools` ซึ่งเป็นโฟลเดอร์ที่เปิด Claude ในรอบนี้ เก็บสำเนาหลักฐานไว้กับบทเรียน: [รายงานตั้งค่า](evidence/devtools-setup/setup-report.md), [วิธีล็อกอิน](evidence/devtools-setup/login-guide.md), [checklist](evidence/devtools-setup/checklist.md) และ [ตัวติดตั้งที่ Claude สร้าง](evidence/devtools-setup/install-ai-accounts.sh)
-
 ### 🔍 จุดที่ผู้เรียนต้องตรวจ (🖥️ เปิด Terminal อีกแท็บใน JupyterLab)
 
 กด **+ → Terminal** เพื่อเปิดอีกแท็บ แล้วตรวจคำสั่งต่อไปนี้:
@@ -227,7 +225,7 @@ yolo2 --version; cyolo2 --version
 yolo3 --version; cyolo3 --version
 ```
 
-![ผลตรวจเวอร์ชัน yolo1–5 และ cyolo1–5 ครบสิบตัวจริงใน devtools](img/devtools-accounts-verified.png)
+![ผลตรวจ yolo1–3 และ cyolo1–3 ด้วยคำสั่งเดียวกับตัวอย่างใน JupyterLab](img/devtools-accounts-1-3-versions.png)
 
 - [ ] คำสั่งของบัญชี 1–3 ทั้งสอง CLI แสดงเวอร์ชันครบ 6 ตัว
 - [ ] มีไฟล์รายงาน 3 ไฟล์ในโฟลเดอร์งาน
