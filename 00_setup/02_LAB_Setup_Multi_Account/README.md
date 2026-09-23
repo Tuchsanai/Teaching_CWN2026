@@ -288,11 +288,11 @@ yolo1
 
 ##### 3.2.1.2 · เลือกวิธีล็อกอิน
 
-หากบัญชีนี้ล็อกอินไว้แล้ว โปรแกรมอาจข้ามหน้าล็อกอิน ให้ไปต่อที่หน้าพร้อมสนทนาในหัวข้อ 3.2.1.5
+หากบัญชีนี้ล็อกอินไว้แล้ว โปรแกรมอาจข้ามหน้าล็อกอิน ให้ไปต่อที่หน้าพร้อมสนทนาในหัวข้อ 3.2.1.5 หากต้องการเปิดหน้าเลือกล็อกอินอีกครั้ง ให้พิมพ์ `/login` ในช่องสนทนาของบัญชี `yolo1` ตามภาพ
 
 หากมีหน้าจอเลือกธีม ให้เลือกธีมก่อน จากนั้นเลือก **Claude account with subscription** แล้วกด Enter
 
-![หน้าเลือกล็อกอิน Claude ด้วย subscription ใน JupyterLab ของ devtools](img/devtools-claude-login-jupyter.png)
+![เปิดด้วย yolo1 แล้วแสดงหน้าเลือกล็อกอินใน JupyterLab ของ devtools](img/devtools-yolo1-login-jupyter.png)
 
 ##### 3.2.1.3 · ยืนยันบัญชีในเบราว์เซอร์
 
@@ -304,9 +304,9 @@ yolo1
 
 ![Claude Code ให้ยืนยันโฟลเดอร์งานใน JupyterLab](img/devtools-yolo1-trust.png)
 
-คำสั่ง yolo1 จากขั้นที่ 2 เปิดโหมด Bypass Permissions หากกำลังใช้คอนเทนเนอร์แลปที่เตรียมไว้ ให้เลือก **Yes, I accept** เพื่อทำต่อ
+คำสั่ง yolo1 จากขั้นที่ 2 เปิดโหมด Bypass Permissions หากมีหน้าขอยืนยันในคอนเทนเนอร์แลปที่เตรียมไว้ ให้เลือก **Yes, I accept** เพื่อทำต่อ เมื่อยืนยันแล้ว แถบด้านล่างของหน้าสนทนาจะแสดง **bypass permissions on** ตามภาพ
 
-![Claude Code ให้ยืนยันโหมดของแลป](img/terminal-claude-bypass.png)
+![แถบ bypass permissions on ของ yolo1 ใน JupyterLab หลังยืนยันโหมดของแลป](img/devtools-yolo1-ready-jupyter.png)
 
 ##### 3.2.1.5 · พร้อมพิมพ์พรอมต์
 
