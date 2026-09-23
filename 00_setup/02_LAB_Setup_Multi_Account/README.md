@@ -101,23 +101,16 @@ Terminal ทำงานบนเครื่องที่รัน Jupyter se
 
 **1. พิมพ์คำสั่งเปิด Claude ใน Terminal ก่อน**
 
-ใช้ Terminal ที่เปิดจากหัวข้อ 1.1 พิมพ์ `claude` แล้วกด Enter หากเครื่องนี้ขึ้น `claude: command not found` ให้เรียกโปรแกรมที่ติดตั้งไว้แล้วด้วยคำสั่งตามภาพ:
+ใช้ Terminal ที่เปิดจากหัวข้อ 1.1 โดยอยู่ในโฟลเดอร์งานที่ต้องการ แล้วพิมพ์ `claude` และกด Enter เพื่อเปิดโปรแกรม
 
-```bash
-$HOME/.local/bin/claude
-```
-
-![พิมพ์คำสั่งเปิด Claude Code ที่ shell ใน Terminal ของ devtools ก่อนกด Enter](img/devtools-open-claude-command.png)
-
-*ภาพหน้าจอจริงจาก devtools แสดงคำสั่งเปิด Claude ก่อนกด Enter; ขั้นนี้ยังเป็น shell จึงยังไม่วางพรอมต์ตั้งค่าลงไป*
+![พิมพ์ claude ใน Terminal ของ JupyterLab เพื่อเปิด Claude Code](img/devtools-open-claude-simple.png)
 
 **2. ล็อกอินบัญชีตัวช่วยตั้งค่าให้พร้อม**
 
 หากเปิดครั้งแรก ให้เลือกธีมตามหน้าจอ จากนั้นเลือก **Claude account with subscription** และยืนยันบัญชีของตนเองในเบราว์เซอร์ หากล็อกอินไว้แล้วให้ไปขั้นถัดไปได้
 
-![ตัวอย่างหน้าเลือกล็อกอิน Claude account with subscription ก่อนเริ่มวางพรอมต์](img/terminal-claude-subscription.png)
+![หน้าล็อกอิน Claude Code ภายใน Terminal ของ JupyterLab บน devtools](img/devtools-claude-login-jupyter.png)
 
-*ใช้ภาพหน้าล็อกอินเดิมจากบทเรียนประกอบขั้นตอน หน้าตาหรือเวอร์ชันอาจต่างกันเล็กน้อย บัญชีนี้เป็นตัวช่วยตั้งค่า ส่วนบัญชี yolo1–yolo5 และ cyolo1–cyolo5 จะล็อกอินแยกในขั้นที่ 3*
 
 **3. วางพรอมต์ในช่องสนทนาของ Claude**
 
@@ -215,13 +208,15 @@ login-guide.md (ขั้นตอนล็อกอินทีละบัญ�
 
 ![Claude สรุปผลตั้งค่าหลายบัญชีเสร็จใน JupyterLab ของ devtools](img/devtools-setup-complete.png)
 
-**เปิดดูโฟลเดอร์ที่สร้างจริง:** ในแถบ File Browser เปิด `/root/ai-accounts` จะเห็น `.Claude` และ `.Codex` หากไม่เห็นโฟลเดอร์ที่ขึ้นต้นด้วยจุด ให้เปิดการแสดงไฟล์ซ่อน แล้วตรวจใน Terminal อีกแท็บด้วยคำสั่ง:
+**เปิดดูโฟลเดอร์ที่สร้างจริงผ่าน File Browser**
 
-```bash
-find "$HOME/ai-accounts" -maxdepth 2 -type d | sort
-```
+1. คลิกไอคอนรูปโฟลเดอร์ **File Browser** ที่แถบซ้ายสุดของ JupyterLab
+2. กลับไปที่โฟลเดอร์บนสุด `/` แล้วดับเบิลคลิก **root** จากนั้นดับเบิลคลิก **ai-accounts**
+3. ตรวจแถบตำแหน่งด้านบนให้เป็น **/ root / ai-accounts /** ตามวงกลมสีแดง ภายในจะเห็นโฟลเดอร์ **.Claude** และ **.Codex**
 
-![File Browser แสดง ai-accounts ภายในมี .Claude และ .Codex พร้อมผล find ของบัญชีครบสิบชุด](img/devtools-ai-accounts-folders.png)
+![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
+
+*ภาพหน้าจอจริงที่ขยายและเพิ่มวงกลมกับลูกศรด้วย Imagegen เพื่อชี้ตำแหน่งคลิก หากไม่เห็นโฟลเดอร์ที่ขึ้นต้นด้วยจุด ให้เปิดการแสดงไฟล์ซ่อนใน File Browser*
 
 ในภาพใช้ผู้ใช้ `root` จึงได้ `/root/ai-accounts` ส่วนเครื่องผู้เรียนให้ยึด `$HOME/ai-accounts` ของผู้ใช้ที่รันจริง ภายใน `.Claude` มี `yolo1`–`yolo5` และ `shared` ส่วน `.Codex` มี `cyolo1`–`cyolo5` และ `shared`
 
