@@ -240,14 +240,14 @@ login-guide.md (ขั้นตอนล็อกอินทีละบัญ�
 
 ### 2.7 · 🔍 จุดที่ผู้เรียนต้องตรวจ (🖥️ เปิด Terminal อีกแท็บใน JupyterLab)
 
-กด **+ → Terminal** เพื่อเปิดอีกแท็บ แล้วตรวจคำสั่งต่อไปนี้:
+กด **+ → Terminal** เพื่อเปิดอีกแท็บ คัดลอกคำสั่งทั้งสามบรรทัดในกรอบด้านล่าง วางพร้อมกันใน Terminal แล้วกด **Enter** เพื่อรันทั้งชุด:
 ```bash
 yolo1 --version; cyolo1 --version
 yolo2 --version; cyolo2 --version
 yolo3 --version; cyolo3 --version
 ```
 
-![ผลตรวจ yolo1–3 และ cyolo1–3 ด้วยคำสั่งเดียวกับตัวอย่างใน JupyterLab](img/devtools-accounts-1-3-versions.png)
+![วางคำสั่งทั้งสามบรรทัดพร้อมกันแล้วกด Enter แสดงผลเวอร์ชันครบหกคำสั่งใน JupyterLab](img/devtools-versions-block-paste.png)
 
 
 ## ขั้นที่ 3 · ทดลองใช้งานแยกตามเครื่องมือ (~10 นาที)
