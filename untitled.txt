@@ -1,66 +1,22 @@
+ให้เตรียม Docker container ชื่อ `devtools` ตามเงื่อนไขนี้:
 
- 
-พิจารณาโฟลเดอร์ `02_Basic_AI_WORFLOW` และออกแบบบทเรียนสำหรับนักศึกษาเพื่อเรียนรู้เกี่ยวกับ **Model Context Protocol (MCP)** ตั้งแต่แนวคิดพื้นฐานไปจนถึงการสร้าง MCP Server ใช้งานเองจร
-- ให้ทำทุกอย่างลงใน floder ./03_MCP
-- ผลลัพธ์ที่ต้องส่ง
+* ถ้ามี container `devtools` อยู่แล้ว ให้ลบก่อน
+* ตรวจสอบ port `2222` และ `8885`
+* หาก port ชน ให้เปลี่ยนเป็น port ว่างที่เหมาะสม
+* จากนั้นรัน:
 
-| ไฟล์ | เนื้อหา |
-| --- | --- |
-| `./03_MCP/readme.md` | สื่อการสอนภาษาไทยไฟล์เดียว เปิดได้ทันที |
-ิง
+```bash
+docker run -dit --name devtools --privileged \
+  -p <SSH_PORT>:22 \
+  -p <JUPYTER_PORT>:8885 \
+  tuchsanai/devtools:2569_1
+```
 
-## เป้าหมายของบทเรียน
 
-ให้นักศึกษาเข้าใจว่า
+ให้ ssh ไปยัง devtools  จากนั้น ให้ไปยัง floder /workspace
 
-- MCP คืออะไร
-- MCP ถูกสร้างขึ้นมาเพื่อแก้ปัญหาอะไร
-- ทำไม AI Agent หรือ LLM จึงต้องใช้ MCP
-- โครงสร้างการทำงานของ MCP เช่น
-  - LLM / AI Agent
-  - MCP Client
-  - MCP Server
-  - Tools / Resources
-- MCP แตกต่างจากการเรียก Python Function หรือ API โดยตรงอย่างไร
-- สามารถติดตั้ง ทดลอง และสร้าง MCP Server อย่างงกษาเห็นอย่างชัดเจน
 
----
+ติดตั้ง Claude Code (🖥️ Terminal) และ 
+curl -fsSL https://claude.ai/install.sh | bash
 
-# Case Study 1: Excalidraw MCP
-
-ใช้ **Excalidraw MCP** เป็นตัวอย่างแรกเพื่อให้นักศึกษาเห็นว่า AI Agent สามารถเรียกใช้เครื่องมือภายนอกผ่าน MCP ได้อย่างไร
-
-ให้นักศึกษาทดลองสั่ง AI ผ่าน Prompt เช่น
-
-- วาด Architecture Diagram
-- วาด MCP Workflow
-- วาด Flow ระหว่าง AI Agent → MCP Client → MCP Server → Tool
-- ปรับแก้ Diagram จาก Prompt
-
-รูป Diagram และรูปประกอบทั้งหมดในบทเรียนให้สร้างด้วย **Excalidraw MCP**
-
-เป้าหมายคือให้นักศึกษาเห็นภาพว่า MCP ทำหน้าที่เป็นตัวกลางที่ทำให้ AI สามารถใช้ Tool ภายนอกได้ โดยไม่ต้องเขียน Integration ใหม่ทุกครั้ง
-
----
-
-# Case Study 2: Playwright MCP
-
-ใช้ **Playwright MCP** เป็นตัวอย่างข กำหนดให้เล่นจาก อง MCP ที่สามารถควบคุม Web Browser ได้จริง
-
-สร้างหรือเลือก Web Application ตัวอย่างสำหรับทดลอง เช่น Web Form ที่มี
- apply by kokoro https://github.com/hexgrad/kokoro
-- Text Input
-- Button
-- Result
-- Audio Player
-
-จากนั้นให้นักศึกษาสั่ง AI Agent ผ่าน Prompt เพื่อให้ Playwright MCP ทำงาน เช่น
-
-1. เปิดเว็บไซต์
-2. ตรวจสอบ Element บนหน้าเว็บ
-3. กรอกข้อมูลลง Form
-4. กด Button
-5. ตรวจสอบผลลัพธ์
-6. Capture Screenshot
-7. ใช้ Screenshot เป็นหลักฐานผลการทดลอง
-
+ติดตั้ง codex

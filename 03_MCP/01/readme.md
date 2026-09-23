@@ -78,7 +78,7 @@ MCP ยังอยู่คนละชั้นกับ LLM และ tool ca
 
 ### 2.1 Host, MCP Client, MCP Server, Tools / Resources / Prompts
 
-![โครงสร้าง MCP บนเครื่องเรียน: Host → MCP Client → MCP Server → เครื่องมือจริง](img/d02-mcp-architecture.png)
+![โครงสร้าง MCP: Host มี LLM และ MCP Client ซึ่งเชื่อมสองทางกับ MCP Server ที่ให้บริการ Tools, Resources และ Prompts](img/d02-mcp-architecture-imagegen.png)
 
 | องค์ประกอบ | หน้าที่ | ตัวอย่างจริงในบทเรียนนี้ |
 | --- | --- | --- |

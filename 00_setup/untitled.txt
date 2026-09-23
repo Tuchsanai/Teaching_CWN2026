@@ -1,0 +1,8 @@
+docker run -dit --name devtools --privileged \
+  -p <SSH_PORT>:22 \
+  -p <JUPYTER_PORT>:8885 \
+  tuchsanai/devtools:2569_1
+
+ติดตั้ง หลังจากรัน devtools
+curl -fsSL https://claude.ai/install.sh | bash
+npm install -g @openai/codex
