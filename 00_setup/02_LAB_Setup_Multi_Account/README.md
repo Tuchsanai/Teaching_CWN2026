@@ -350,7 +350,7 @@ yolo1
 yolo1 --model fable --effort medium -p 'ร้านค้าลดราคา 10% เมื่อซื้อครบ 1000 บาท จงคำนวณยอดจ่ายสำหรับยอดซื้อ 999, 1000 และ 1500 บาท ตอบเป็นตารางยอดซื้อและยอดจ่ายทศนิยม 2 ตำแหน่ง ตามด้วยคำอธิบายสั้น ๆ และข้อควรระวัง 1 ข้อ ไม่ต้องสร้างไฟล์หรือรันคำสั่งอื่น'
 ```
 
-![รัน yolo1 พร้อม model fable และ effort medium จาก shell จริงใน JupyterLab แสดงคำตอบและกลับสู่ shell](img/devtools-fable-shell-result.png)
+![ภาพคำสั่ง yolo1 model fable และผลจาก shell ขยายข้อความด้วย Imagegen](img/devtools-fable-shell-readable.png)
 
 เก็บภาพคำตอบจาก Claude Code ทั้งสองวิธี แล้วไปทดลอง Codex ในหัวข้อ 3.3
 
