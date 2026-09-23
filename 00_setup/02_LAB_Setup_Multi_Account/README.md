@@ -358,35 +358,31 @@ yolo1 --model fable --effort medium -p 'ร้านค้าลดราคา 
 
 ### 3.3 · Codex (cyolo1)
 
-ทำในโฟลเดอร์งานเดิม โดยใช้คำถามเดียวกับหัวข้อ 3.2
+ทดลองใน Terminal พื้นขาวของ JupyterLab โดยใช้บัญชี `cyolo1` และโจทย์เดียวกับหัวข้อ 3.1 เพื่อเปรียบเทียบกับ Claude Code
 
 #### 3.3.1 · เปิดโปรแกรมและล็อกอิน
 
-##### 3.3.1.1 · เปิดโปรแกรมและเลือก Sign in with ChatGPT
+##### 3.3.1.1 · เปิดบัญชี Codex ใน Terminal
+
+พิมพ์คำสั่งต่อไปนี้ใน Terminal ของ JupyterLab แล้วกด **Enter**
 
 ```bash
 cyolo1
 ```
 
-พิมพ์คำสั่งนี้ที่ shell ใน Terminal ของ JupyterLab แล้วกด **Enter** หากยังไม่ได้ล็อกอิน ให้เลือก **Sign in with ChatGPT** แล้วกด Enter เพื่อใช้บัญชี ChatGPT ที่มีสิทธิ์ใช้งาน Codex หากล็อกอินไว้แล้ว ให้ไปต่อที่หน้าพร้อมสนทนาในหัวข้อ 3.3.1.4
+![พิมพ์ cyolo1 ใน Terminal พื้นขาวของ JupyterLab](img/devtools-cyolo1-open.png)
 
-![เลือก Sign in with ChatGPT ใน Codex](img/terminal-codex-subscription.png)
+##### 3.3.1.2 · เลือกวิธีล็อกอินและยืนยันบัญชี
 
-##### 3.3.1.2 · ยืนยันบัญชีในเบราว์เซอร์
+หากยังไม่ได้ล็อกอิน ให้เลือก **Sign in with ChatGPT** แล้วกด **Enter** จากนั้นยืนยันบัญชีในเบราว์เซอร์ หากใช้ container หรือ SSH แล้วเบราว์เซอร์กลับมาที่ CLI ไม่ได้ ให้เลือก **Sign in with Device Code** และทำตามขั้นตอนบนหน้าจอ หากบัญชีนี้ล็อกอินไว้แล้ว ให้ไปต่อหัวข้อ 3.3.1.3
 
-ล็อกอินด้วยบัญชี ChatGPT ที่ต้องการใช้และยืนยันการเชื่อมต่อ หากใช้ container หรือ SSH แล้วเบราว์เซอร์กลับมาที่ CLI ไม่ได้ ให้เลือก **Sign in with Device Code** และทำตามขั้นตอนบนหน้าจอ
+![หน้าเลือกวิธีล็อกอิน Codex ใน JupyterLab จากพื้นที่สาธิตที่ยังไม่ล็อกอิน](img/devtools-cyolo1-login.png)
 
-##### 3.3.1.3 · ยืนยันโฟลเดอร์งาน
+##### 3.3.1.3 · เข้าสู่หน้าสนทนา
 
-กลับมาที่ Terminal หากเป็นโฟลเดอร์แลปที่เตรียมไว้ ให้เลือก **Yes, continue**
+กลับมาที่ Terminal หากมีคำถามยืนยันโฟลเดอร์ ให้ตรวจว่าเป็นโฟลเดอร์แลปที่เตรียมไว้ก่อนดำเนินการต่อ เมื่อเห็นชื่อโมเดลและช่อง **Ask Codex to do anything** ให้ไปเลือกโมเดลในหัวข้อ 3.3.2
 
-![Codex ให้ยืนยันโฟลเดอร์งาน](img/terminal-codex-trust.png)
-
-##### 3.3.1.4 · พร้อมพิมพ์พรอมต์
-
-เห็นหน้า Codex พร้อมชื่อโมเดลและช่องพิมพ์ข้อความ แสดงว่ามาถึงหน้าสนทนาแล้ว
-
-![Codex หลังเข้าใช้บัญชี ChatGPT พร้อมพิมพ์พรอมต์](img/terminal-cyolo1-ready.png)
+![หน้าพร้อมสนทนาของบัญชี cyolo1 ใน JupyterLab](img/devtools-cyolo1-ready.png)
 
 ---
 
@@ -398,13 +394,13 @@ cyolo1
 
 ในหน้าสนทนา Codex พิมพ์ `/model` แล้วกด Enter เลือก **gpt-6-astra** และกด Enter อีกครั้ง
 
-![เลือก Astra ในหน้า Codex](img/terminal-ui-astra-model.png)
+![เลือก Astra ในหน้า Codex](img/devtools-astra-model.png)
 
 ##### 3.3.2.2 · ปรับ effort
 
 หน้าถัดไปให้เลือกระดับ reasoning เป็น **Medium** แล้วกด Enter ยืนยัน
 
-![เลือกระดับ Medium ของ Astra](img/terminal-ui-astra-effort.png)
+![เลือกระดับ Medium ของ Astra](img/devtools-astra-effort.png)
 
 ##### 3.3.2.3 · วางคำถามเดียวกัน
 
@@ -414,25 +410,25 @@ cyolo1
 ร้านค้าลดราคา 10% เมื่อซื้อครบ 1000 บาท จงคำนวณยอดจ่ายสำหรับยอดซื้อ 999, 1000 และ 1500 บาท ตอบเป็นตารางยอดซื้อและยอดจ่ายทศนิยม 2 ตำแหน่ง ตามด้วยคำอธิบายสั้น ๆ และข้อควรระวัง 1 ข้อ ไม่ต้องสร้างไฟล์หรือรันคำสั่งอื่น
 ```
 
-![วางคำถามในหน้า Codex หลังเลือก Astra medium](img/terminal-ui-astra-question.png)
+![วางคำถามในหน้า Codex หลังเลือก Astra medium](img/devtools-astra-question.png)
 
 ##### 3.3.2.4 · ส่งและดูคำตอบ
 
 กด Enter แล้วรอจนตอบจบ เช่นเดียวกับ Claude หน้าสนทนาจะยังเปิดไว้ให้ถามต่อได้
 
-![คำตอบจริงจาก Astra medium ผ่านหน้าสนทนา](img/terminal-ui-astra-answer.png)
+![คำตอบจริงจาก Astra medium ขยายตารางและข้อความด้วย Imagegen](img/devtools-astra-answer-readable.png)
 
 ---
 
 #### 3.3.3 · วิธีที่ 2: ส่งด้วยคำสั่งจาก shell
 
-เมื่อดูคำตอบจากหน้าสนทนาแล้ว ให้คลิกใน Terminal ของ JupyterLab โดยไม่เลือกข้อความ แล้วออกจากหน้า AI กลับมาที่ shell โดยกด Ctrl+C สองครั้ง จากนั้นรันคำสั่งด้านล่างในโฟลเดอร์งานเดิม คำสั่งนี้ระบุโมเดล ระดับ effort และคำถามไว้ด้วยกัน เมื่อ AI ตอบจบจะกลับมาที่ shell
+เมื่อดูคำตอบจากหน้าสนทนาแล้ว ให้คลิกใน Terminal ของ JupyterLab โดยไม่เลือกข้อความ แล้วออกจากหน้า AI กลับมาที่ shell โดยพิมพ์ `/exit` แล้วกด Enter จากนั้นรันคำสั่งด้านล่างในโฟลเดอร์งานเดิม คำสั่งนี้ระบุโมเดล ระดับ effort และคำถามไว้ด้วยกัน เมื่อ AI ตอบจบจะกลับมาที่ shell
 
 ```bash
 cyolo1 exec --skip-git-repo-check --model gpt-6-astra -c model_reasoning_effort=medium 'ร้านค้าลดราคา 10% เมื่อซื้อครบ 1000 บาท จงคำนวณยอดจ่ายสำหรับยอดซื้อ 999, 1000 และ 1500 บาท ตอบเป็นตารางยอดซื้อและยอดจ่ายทศนิยม 2 ตำแหน่ง ตามด้วยคำอธิบายสั้น ๆ และข้อควรระวัง 1 ข้อ ไม่ต้องสร้างไฟล์หรือรันคำสั่งอื่น'
 ```
 
-![ผลตอบจริงจาก cyolo1: Astra ระดับ medium](img/terminal-astra-medium-response.png)
+![ผลตอบจริงจาก cyolo1: Astra ระดับ medium](img/devtools-astra-shell.png)
 
 เก็บภาพคำตอบจาก Codex ทั้งสองวิธี แล้วเปรียบเทียบกับ Claude Code ในหัวข้อ 3.4
 
