@@ -53,18 +53,16 @@ CONVERSATION_JSON:
 
 ---
 
-## 3 · พรอมต์ 1: สร้าง backend (~20 นาที)
+## 3 · สร้าง Backend
 
-เปิด `yolo3` ใน 🖥️ Terminal ที่โฟลเดอร์งาน
+คัดลอกพรอมต์ด้านล่างไปวางใน `yolo3` ใน devtools
 
-```bash
-mkdir -p /workspace/04_API_MultiAccount_Server && cd /workspace/04_API_MultiAccount_Server && yolo3
-```
-
-##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 1 · Backend (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
 LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/04_API_MultiAccount_Server/api
+ถ้ายังไม่มี ให้สร้างโฟลเดอร์ /workspace/04_API_MultiAccount_Server/api และโฟลเดอร์ย่อยที่จำเป็น ทำงานเฉพาะภายใต้ /workspace/04_API_MultiAccount_Server เท่านั้น
+ไฟล์ที่มีอยู่แล้วต้องเก็บไว้ และแก้เฉพาะส่วนที่จำเป็น
 ถ้ามีไฟล์อยู่แล้ว ให้ตรวจเทียบกับข้อกำหนดนี้ แก้เฉพาะจุดที่ไม่ตรง แล้วรันเทสต์ ห้ามเขียนทับทั้งโฟลเดอร์
 ห้ามล็อกอิน ห้ามเรียกโมเดลจริง ห้าม deploy ห้ามอ่านค่า credential
 
@@ -148,9 +146,9 @@ python3 -m venv /tmp/lab04venv && /tmp/lab04venv/bin/pip install -q -r requireme
 
 ---
 
-## 4 · พรอมต์ 2: สร้างหน้าแชต `index.html` (~15 นาที)
+## 4 · สร้างหน้าแชต index.html
 
-##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 2 · HTML (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
 LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล์เดียว /workspace/04_API_MultiAccount_Server/web/index.html
@@ -187,9 +185,9 @@ LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล�
 
 ---
 
-## 5 · พรอมต์ 3: สคริปต์ deploy และสำเนา credential (~15 นาที)
+## 5 · เตรียม Deployment
 
-##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 3 · Deployment (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
 LAB 004 ขั้นที่ 3: เขียนสคริปต์ deploy ใน /workspace/04_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
