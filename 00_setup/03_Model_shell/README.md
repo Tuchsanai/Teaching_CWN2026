@@ -141,7 +141,7 @@ yolo1 --model opus --effort medium -p "$Q"
 
 ![ตารางระดับ reasoning effort ที่โมเดลของ Codex แต่ละตัวรองรับ: gpt-6-astra, gpt-6-sol และ gpt-6-luna](img/model-shell-02-codex-effort.png)
 
-*ภาพแนวคิดสร้างด้วย Imagegen ผ่าน `cyolo1` สรุปเฉพาะฝั่ง Codex จากตารางด้านล่าง ไม่ใช่ภาพหน้าจอจริง*
+*ภาพนี้เป็นแผนภาพแนวคิดที่สร้างขึ้นด้วยเครื่องมือ Imagegen เพื่อสรุปการรองรับของฝั่ง Codex จากตารางด้านล่าง ไม่ใช่ภาพหน้าจอจริง*
 
 | โมเดล | `none` | `minimal` | `low` | `medium` | `high` | `xhigh` | `max` |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
