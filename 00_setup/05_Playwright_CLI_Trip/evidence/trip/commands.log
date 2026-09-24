@@ -1,0 +1,13 @@
+2026-09-24T12:01:17Z | mono 351688.17→351692.74 | 4.57s | rc=0 | playwright-cli -s=trip open https://www.trip.com/?locale=en-xx&curr=THB
+2026-09-24T12:01:22Z | mono 351692.75→351693.00 | 0.25s | rc=0 | playwright-cli -s=trip screenshot --filename=evidence/trip/01-home.png
+2026-09-24T12:01:22Z | mono 351693.01→351693.21 | 0.20s | rc=0 | playwright-cli -s=trip snapshot --filename=evidence/trip/01-home.yml
+2026-09-24T12:01:49Z | mono 351719.52→351719.82 | 0.30s | rc=0 | playwright-cli -s=trip screenshot --filename=evidence/trip/02-verify-after-wait.png
+2026-09-24T12:01:49Z | mono 351719.83→351720.04 | 0.21s | rc=0 | playwright-cli -s=trip snapshot --filename=evidence/trip/02-verify-after-wait.yml
+2026-09-24T12:02:00Z | mono 351731.20→351732.09 | 0.89s | rc=0 | playwright-cli -s=trip goto https://www.trip.com/
+2026-09-24T12:02:07Z | mono 351738.09→351738.39 | 0.30s | rc=0 | playwright-cli -s=trip screenshot --filename=evidence/trip/03-retry-blocked.png
+2026-09-24T12:02:07Z | mono 351738.39→351738.59 | 0.20s | rc=0 | playwright-cli -s=trip snapshot --filename=evidence/trip/03-retry-blocked.yml
+2026-09-24T12:02:14Z | mono 351745.32→351745.54 | 0.22s | rc=0 | playwright-cli -s=trip tracing-start
+2026-09-24T12:02:15Z | mono 351745.55→351746.02 | 0.47s | rc=0 | playwright-cli -s=trip reload
+2026-09-24T12:02:15Z | mono 351746.03→351746.29 | 0.26s | rc=0 | playwright-cli -s=trip screenshot --filename=evidence/trip/04-reload-still-blocked.png
+2026-09-24T12:02:15Z | mono 351746.29→351746.50 | 0.21s | rc=0 | playwright-cli -s=trip tracing-stop
+2026-09-24T12:02:19Z | mono 351750.50→351750.72 | 0.22s | rc=0 | playwright-cli -s=trip close

@@ -1,0 +1,17 @@
+Playwright CLI is installed and working headless, and the whole lab passed in 85.53 seconds (measured with the monotonic clock, 11:58:49Z to 12:00:14Z UTC).
+
+- **Tools found:** Node v22.23.2 and npm 12.0.2 were already there. `playwright-cli` was not.
+- **CLI install:** I installed the official `@playwright/cli` package (version 0.1.21, from Microsoft's `microsoft/playwright-cli` repository) with `npm install -g @playwright/cli@latest`. I read `playwright-cli --help`, the help for each command I used, and the official README before choosing any flags. Headless is the default, so no flag was needed.
+- **Browser install:** `playwright-cli install-browser chromium` installed Chromium and its headless shell (both 154.0.8037.0). I didn't need `--with-deps`.
+- **One failure, then fixed:** the first `open` failed because the CLI uses Google Chrome by default and it isn't installed (`Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`). I didn't install Chrome system-wide. Instead I added the config file from the docs, `.playwright/cli.config.json`, in this folder to use the Chromium already installed in headless mode.
+- **Lab run:** `playwright-cli -s=lab05 open https://example.com` loaded the "Example Domain" page. The snapshot showed the heading, the paragraph and the "Learn more" link. I saved a real 1280x720 screenshot and checked it by viewing it. `playwright-cli -s=lab05 close` closed only that session, and `playwright-cli list` then showed no browsers open.
+- **Safety:** I used no MCP or external browser tool, disabled no security protections, changed no account settings, and read no `.env` or credential files. The only changes outside this folder are the global npm package and the browser files in `/root/.cache/ms-playwright/`.
+
+For students: installing Chrome with `playwright-cli install-browser chrome` should also avoid that first error, but I didn't try it.
+
+Files are in `05_Playwright_CLI_Trip/`:
+- `setup-report.md`
+- `evidence/setup/lab05-example.png`
+- `evidence/setup/lab05-snapshot.yml`
+- `evidence/setup/open.log`
+- `.playwright/cli.config.json`

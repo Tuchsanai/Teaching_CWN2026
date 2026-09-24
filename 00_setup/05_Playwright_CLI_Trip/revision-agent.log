@@ -1,0 +1,35 @@
+I've revised the LAB05 files and all 12 fixes are in. The final validation checks pass. I didn't rerun the Trip.com website or the setup, and every evidence screenshot has the same sha256 before and after my edits.
+
+**Files I changed:** `README.md`, `prompt-install.txt`, `prompt-trip.txt`, `validation.md`. Nothing under `evidence/` was touched.
+
+**The 12 fixes:**
+1. **Run folder:** the new snippet puts each run under `/root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip/runs`. It calls `date` once, uses `mktemp -d` to get a unique name, quotes `LAB_DIR`, and only runs `cd` if the folder was created. I used `&&` rather than `|| exit 1`, because `exit` would close the student's JupyterLab terminal. A note explains that Remote and devtools are separate filesystems with no shared mount, so the teacher exports files deliberately.
+2. **Prompts in the README:** both complete Thai prompts are in `text` code fences labeled "💬 AI chat". The fences are generated from the `.txt` files, and a script confirmed they are byte-identical.
+3. **Dates:** calculated from `DEPART_OFFSET` and `NIGHTS`. I tested it: it gives 2026-09-27 and 2026-10-01 with the defaults, and the dates change when the values are edited.
+4. **Setup prompt:**
+   - It allows the official global npm install and the browser cache outside the project.
+   - It never overwrites an existing `.playwright/cli.config.json`.
+   - It stops with FAIL if Node or npm is missing.
+   - It records failures that were recovered from, and marks Overall PASS if the 4 final checks pass.
+5. **Closing sessions:** `close-all` and `kill-all` are gone. Each prompt closes only its own session (`lab05` or `trip`). The only requirement is that this session no longer appears in `playwright-cli list`; other browsers can stay open.
+6. **Assumptions:** `MAX_ITEMS`, `HOTEL_TARGET`, `NIGHTS`, `DESTINATION` and the other made-up values are labeled as classroom assumptions, not things the user specified.
+7. **Workflow image:** it's near the top, with a Thai caption saying it's an AI-generated concept illustration made with ChatGPT's built-in ImageGen, not by yolo3, and not evidence.
+8. **Measured time:** 85.53 + 91.58 = **177.11 s (about 2m57s)**. This leaves out the 57.76 s gap between the two runs, README writing and image generation. The per-phase timings are kept, and it says clearly this is not time for a successful search (the run was BLOCKED).
+9. **Teaching time:** a separate table estimates 55–85 minutes, labeled as an estimate, not a measurement.
+10. **Who ran it:** the README says yolo3 executed everything inside devtools via JupyterLab. It states that the final Thai prompts were **not** rerun word for word, and lists the known differences from the earlier runs.
+11. **Safety section:** cut to 3 rules: stop before booking, don't solve or get around a CAPTCHA (report BLOCKED), and write "unknown" rather than inventing data.
+12. **Screenshots:** the setup screenshot is in step 4, and the three Trip screenshots are in step 6 and section 6. All use links relative to the README.
+
+**Validation:**
+- **Links:** all 24 local Markdown links and 14 in-page links resolve.
+- **Images:** all 5 embedded images exist and are real PNG files.
+- **Arithmetic:** the sums, the clock differences and the phase boundaries all add up.
+- **Leftovers:** no "teacher ran" wording, `close-all`/`kill-all`, `3+4` or placeholders remain.
+
+My first image check flagged 6 files as missing. These were false alarms: bare filenames in the file tree, and output paths inside the prompts that a future run will create. A second check that reads them in context passed. `validation.md` records both runs honestly.
+
+**Still open:**
+- **Prompts untested:** the new prompt rules haven't been tried against the live site. The evidence comes from the earlier setup and Trip tasks.
+- **Old wording in evidence:** `evidence/trip/steps.md` still says "actual run by the instructor/AI" in its header. I left it alone to preserve the evidence; section 6 of the README gives the accurate description.
+- **Duplicate screenshot:** `04-reload-still-blocked.png` is byte-identical to `01-home.png`. The README notes this and doesn't show it.
+- **Remote not updated:** I only edited the devtools copy. The files need to be exported to the Remote authoring folder.
