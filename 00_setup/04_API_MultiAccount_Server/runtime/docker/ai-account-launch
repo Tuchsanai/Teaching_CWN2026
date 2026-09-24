@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# yolo1..yolo5 / cyolo1..cyolo5 launcher for the chat app container.
+# Adapted from the devtools launcher: same naming and one config folder per account,
+# but paths point at this container's private volume, and it never enables the
+# permission/sandbox bypass modes (those flags are refused).
+set -euo pipefail
+BASE_PATH="${AI_ACCOUNTS_BASE:-/data/accounts}"
+CLAUDE_BIN="${CLAUDE_BIN:-/usr/local/bin/claude}"
+CODEX_BIN="${CODEX_BIN:-/usr/local/bin/codex}"
+name="$(basename "$0")"
+warn() { printf '[%s] %s\n' "$name" "$*" >&2; }
+
+case "$name" in
+  yolo[1-5])  tool=claude; root="$BASE_PATH/.Claude/$name" ;;
+  cyolo[1-5]) tool=codex;  root="$BASE_PATH/.Codex/$name"  ;;
+  *) warn "unknown command name; invoke as yolo1..yolo5 or cyolo1..cyolo5"; exit 2 ;;
+esac
+
+if [ ! -d "$root" ]; then
+  warn "account folder not found in the app volume; run scripts/deploy.sh from devtools to sync it"
+  exit 3
+fi
+
+for arg in "$@"; do
+  case "$arg" in
+    --dangerously-*|--allow-dangerously-skip-permissions|bypassPermissions|danger-full-access|--yolo)
+      warn "refusing '$arg': permission/sandbox bypass is disabled in this container"; exit 2 ;;
+  esac
+done
+
+# Use only this account's stored login, never a key from the environment.
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN ANTHROPIC_PROFILE \
+      CLAUDE_CODE_USE_BEDROCK CLAUDE_CODE_USE_VERTEX CLAUDE_CODE_USE_FOUNDRY \
+      OPENAI_API_KEY CODEX_API_KEY IS_SANDBOX
+
+if [ "$tool" = claude ]; then
+  export CLAUDE_CONFIG_DIR="$root"
+  export DISABLE_AUTOUPDATER=1
+  exec "$CLAUDE_BIN" "$@"
+else
+  export CODEX_HOME="$root"
+  exec "$CODEX_BIN" "$@"
+fi
