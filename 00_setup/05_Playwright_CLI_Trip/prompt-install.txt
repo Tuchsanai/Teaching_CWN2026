@@ -26,7 +26,10 @@
    สำหรับ open, goto, snapshot, screenshot, find, click, fill, press, tracing-start, tracing-stop, close, list, install-browser
    แล้วสรุปสั้น ๆ ว่าแต่ละคำสั่งรับ argument หรือ option อะไรบ้าง
 5) ตรวจ config ของโปรเจกต์ก่อนแก้ไขใด ๆ:
-   - ถ้ามีไฟล์ `.playwright/cli.config.json` อยู่แล้ว ให้แสดงเนื้อหาในรายงาน และห้ามเขียนทับหรือแก้ไข
+   - ถ้ามีไฟล์ `.playwright/cli.config.json` อยู่แล้ว ห้ามเขียนทับหรือแก้ไข และห้ามพิมพ์ทั้งไฟล์ลงรายงานหรือแชต
+     ให้ตรวจแบบปิดบังความลับ: รายงานเฉพาะชื่อ key และค่าที่ไม่เป็นความลับ (เช่น browserName, channel, headless)
+     ค่าที่อาจเป็นความลับ (เช่น token, password, secret, key, auth, cookie, header, proxy, storageState
+     หรือ URL ที่มี user:pass) ให้เขียนเป็น [REDACTED]
      ถ้า config เดิมทำให้ขั้นถัดไปใช้งานไม่ได้ ให้หยุดและรายงานว่าต้องแก้อะไร แล้วรอให้ฉันตัดสินใจ
    - ถ้ายังไม่มีไฟล์นี้ ให้สร้างได้เฉพาะในกรณีของขั้น 6 เท่านั้น
 6) ตรวจ browser: `playwright-cli install-browser --list` (ถ้า help รองรับ)

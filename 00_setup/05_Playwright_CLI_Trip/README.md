@@ -16,7 +16,7 @@
 2. [คำศัพท์สำหรับมือใหม่](#s2)
 3. [กฎสั้น ๆ ก่อนเริ่ม](#s3)
 4. [สมมติฐานของห้องเรียน (แก้ไขได้)](#s4)
-5. [ขั้นตอนปฏิบัติ](#s5)
+5. [ขั้นตอนปฏิบัติ](#s5) — ถ้า AI ขอความช่วยเหลือ ดู[ขั้นที่ 6.1 (Dashboard)](#s5-human)
 6. [ผลการทดลองจริง (yolo3 ใน devtools, 2026-09-24)](#s6)
 7. [เวลาที่วัดได้ และเวลาที่ควรเผื่อในคาบเรียน](#s7)
 8. [โครงสร้างไฟล์ผลลัพธ์](#s8)
@@ -52,12 +52,16 @@
 | **trace** | บันทึกการทำงานสำหรับดูย้อนหลัง (ไม่ใช่สคริปต์ที่นำไปรันซ้ำได้) |
 | **monotonic time** | นาฬิกาที่เดินไปข้างหน้าอย่างเดียว (`/proc/uptime`) ใช้จับเวลาได้แม่นกว่าเวลานาฬิกาปกติ |
 | **PASS / FAIL / SKIP / BLOCKED** | ผ่าน / ไม่ผ่าน / ข้ามพร้อมเหตุผล / ถูกเว็บปิดกั้น |
+| **WAITING_FOR_HUMAN** | สถานะชั่วคราว: AI หยุดรอให้มนุษย์ทำ verification เอง โดยเก็บ session และแท็บเดิมไว้ ไม่ปิด ไม่ reload |
+| **Dashboard** (`playwright-cli show`) | หน้าเว็บสำหรับดูและควบคุม session ที่กำลังรันอยู่ ใช้ตอนมนุษย์เข้าไปช่วย |
 
 <a id="s3"></a>
 ## 3. กฎสั้น ๆ ก่อนเริ่ม
 
 1. **หยุดก่อนจองเสมอ** — ดูราคาได้ แต่ห้ามกดจนถึงหน้ากรอกข้อมูลผู้โดยสาร ห้ามล็อกอิน ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน
-2. **เจอ CAPTCHA ห้ามแก้หรือหลบเลี่ยง** — รอแล้วลองใหม่ 1 ครั้ง ถ้ายังติดให้รายงาน **BLOCKED** พร้อมหลักฐาน (ถือว่าเป็นผลที่ถูกต้อง)
+2. **เจอ CAPTCHA/verification: AI ห้ามแก้หรือหลบเลี่ยง แต่ต้องขอให้มนุษย์ช่วย** — AI หยุดรอเป็น **WAITING_FOR_HUMAN** โดยเก็บ session/แท็บเดิมไว้
+   นักศึกษาทำ verification **ด้วยตัวเอง** ผ่าน dashboard ([ขั้นที่ 6.1](#s5-human)) แล้วบอก AI ให้ทำต่อจากขั้นที่ค้าง
+   ถ้าช่วยไม่ได้ หรือเป็นหน้าบังคับล็อกอิน ให้บันทึก **BLOCKED** พร้อมหลักฐาน (ถือว่าเป็นผลที่ถูกต้อง)
 3. **ไม่เห็นบนหน้าจอ = unknown** — ห้ามแต่งราคาหรือรีวิวขึ้นมาเอง
 
 <a id="s4"></a>
@@ -91,6 +95,7 @@ echo "RUN_DATE=$RUN_DATE DEPART=$DEPART RETURN_SEARCH=$RETURN_SEARCH"
 ```
 
 ถ้ารันวันที่ 2026-09-24 ด้วยค่าเริ่มต้น จะได้ `DEPART=2026-09-27` และ `RETURN_SEARCH=2026-10-01`
+(กล่องนี้ใช้ลองเองเท่านั้น ใน Prompt ที่ 2 ให้แก้ค่าที่ **กล่องพารามิเตอร์ที่เดียว** ขั้น 0 จะสั่งให้ AI ตั้งตัวแปร shell จากกล่องนั้นเอง)
 
 **กฎเรื่องวันที่เข้าพัก:** check-in คือ **วันที่เครื่องลงจอดจริงที่ญี่ปุ่น** (เวลาท้องถิ่น) ส่วน check-out คือ **วันที่เที่ยวบินกลับออกจากญี่ปุ่น**
 เช่น ออกจาก BKK วันที่ 27 เวลา 23:50 แล้วถึง HND วันที่ 28 เวลา 07:55 → check-in วันที่ 28 ถ้าวันกลับยังเป็นวันเดิม จำนวนคืนจริง (`ACTUAL_NIGHTS`) จะน้อยกว่า `NIGHTS` หนึ่งคืน และ AI ต้องอธิบายไว้ในรายงาน
@@ -169,7 +174,10 @@ yolo3
    สำหรับ open, goto, snapshot, screenshot, find, click, fill, press, tracing-start, tracing-stop, close, list, install-browser
    แล้วสรุปสั้น ๆ ว่าแต่ละคำสั่งรับ argument หรือ option อะไรบ้าง
 5) ตรวจ config ของโปรเจกต์ก่อนแก้ไขใด ๆ:
-   - ถ้ามีไฟล์ `.playwright/cli.config.json` อยู่แล้ว ให้แสดงเนื้อหาในรายงาน และห้ามเขียนทับหรือแก้ไข
+   - ถ้ามีไฟล์ `.playwright/cli.config.json` อยู่แล้ว ห้ามเขียนทับหรือแก้ไข และห้ามพิมพ์ทั้งไฟล์ลงรายงานหรือแชต
+     ให้ตรวจแบบปิดบังความลับ: รายงานเฉพาะชื่อ key และค่าที่ไม่เป็นความลับ (เช่น browserName, channel, headless)
+     ค่าที่อาจเป็นความลับ (เช่น token, password, secret, key, auth, cookie, header, proxy, storageState
+     หรือ URL ที่มี user:pass) ให้เขียนเป็น [REDACTED]
      ถ้า config เดิมทำให้ขั้นถัดไปใช้งานไม่ได้ ให้หยุดและรายงานว่าต้องแก้อะไร แล้วรอให้ฉันตัดสินใจ
    - ถ้ายังไม่มีไฟล์นี้ ให้สร้างได้เฉพาะในกรณีของขั้น 6 เท่านั้น
 6) ตรวจ browser: `playwright-cli install-browser --list` (ถ้า help รองรับ)
@@ -247,8 +255,9 @@ snapshot คู่กันอยู่ที่ [`evidence/setup/lab05-snapshot
 
 ### ขั้นที่ 6 — วาง Prompt ที่ 2: Trip.com
 
-1. (ไม่บังคับ) แก้ค่าในกล่อง **พารามิเตอร์** ก่อนวาง เช่น `DESTINATION`, `DEPART_OFFSET`, `NIGHTS` (ถ้าแก้ `DEPART_OFFSET`/`NIGHTS` ให้แก้ในขั้น 0 ให้ตรงกันด้วย)
+1. (ไม่บังคับ) แก้ค่าในกล่อง **พารามิเตอร์** ก่อนวาง เช่น `DESTINATION`, `DEPART_OFFSET`, `NIGHTS` — แก้ที่กล่องนี้ **ที่เดียว** (ขั้น 0 ไม่มีตัวเลขซ้ำให้แก้)
 2. คัดลอกข้อความ **ทั้งหมด** ในกล่องด้านล่าง (เหมือนไฟล์ [`prompt-trip.txt`](prompt-trip.txt) ทุกตัวอักษร) แล้ววางในแชต yolo3 **ช่องเดิม** จากนั้นกด Enter
+3. ถ้า AI แจ้ง **WAITING_FOR_HUMAN** ให้ทำ[ขั้นที่ 6.1](#s5-human) (อย่าปิดแชต yolo3 และอย่าสั่งให้ AI เปิด browser ใหม่)
 
 **💬 AI chat — Prompt ที่ 2 (Trip.com)**
 ```text
@@ -273,9 +282,24 @@ SESSION         = trip                                           [ชื่อ s
 ---------------- กฎหลัก ----------------
 1. หยุดก่อนการจองเสมอ: ห้ามกด Book/Reserve/Select จนเข้าหน้ากรอกข้อมูลผู้โดยสารหรือผู้เข้าพัก
    ห้ามล็อกอิน ห้ามกรอกข้อมูลส่วนตัวหรือบัตร ห้ามชำระเงิน งานนี้จบที่ "การเปรียบเทียบและคำแนะนำ"
-2. ถ้าเจอ CAPTCHA, หน้า verification หรือหน้าที่บังคับล็อกอิน: ห้ามแก้ puzzle และห้ามพยายามหลบเลี่ยง
-   ให้รอ 5-10 วินาที แล้วเปิด URL เดิมใหม่ได้ 1 ครั้ง ถ้ายังติด ให้เก็บ screenshot + snapshot
-   เขียน evidence/trip/blocker.md รายงานผลเป็น BLOCKED และหยุด branch นั้น
+2. ถ้าเจอ CAPTCHA, หน้า verification หรือหน้าที่บังคับล็อกอิน: AI ห้ามแก้ puzzle ห้ามพยายามหลบเลี่ยง และห้ามกรอกบัญชีใด ๆ
+   ห้ามจบงานเป็น BLOCKED ทันทีที่เจอครั้งแรก ให้ขอความช่วยเหลือจากมนุษย์ (ฉัน) แล้วหยุดรอ ตามลำดับนี้
+   ก) รอ 5-10 วินาที แล้ว snapshot ใหม่ 1 ครั้ง (ห้าม goto/reload) ถ้าหน้าจริงแสดงแล้ว ให้ทำขั้นเดิมต่อ
+   ข) ถ้ายังติด: เก็บ screenshot + snapshot แล้วเขียน evidence/trip/human-help.md (ขั้นที่ค้าง, URL, ชนิดของหน้า, ไฟล์หลักฐาน)
+      บันทึก WAIT_START (UTC + monotonic) ลง evidence/trip/human-wait.log และตั้งสถานะเป็น WAITING_FOR_HUMAN
+   ค) แจ้งฉันว่า WAITING_FOR_HUMAN พร้อมชื่อ session (trip), path ของโฟลเดอร์ปัจจุบัน (pwd), URL และขั้นที่ค้าง
+      ขอให้ฉันทำ verification ด้วยตัวเองผ่าน dashboard ตาม README ขั้นที่ 6.1 แล้วหยุดรอคำตอบของฉัน
+   ง) ระหว่างรอ ต้องเก็บ session trip, browser context เดิม และแท็บปัจจุบันไว้ตามเดิม:
+      ห้ามรันคำสั่ง playwright-cli กับ session trip, ห้าม close/reload/goto, ห้ามเปลี่ยนแท็บ และห้ามเปิด browser/session ใหม่
+   จ) เมื่อฉันยืนยันชัดเจนว่าทำเสร็จแล้ว: บันทึก WAIT_END ลง human-wait.log แล้ว snapshot + screenshot ใหม่ของ session trip
+      ถ้า snapshot ใหม่แสดงว่าเข้าหน้าจริงได้ (ไม่ใช่หน้า verification/login) ให้ทำต่อจากขั้นที่ค้างทันที
+      ห้ามทำขั้น 0-1 ซ้ำ ห้ามคำนวณวันที่ใหม่ และห้าม open ใหม่
+   ฉ) ถ้ายังติด: บันทึกผลรอบนั้น แล้วกลับเป็น WAITING_FOR_HUMAN และขอความช่วยเหลือใหม่ได้
+      ถ้าฉันบอกว่าช่วยไม่ได้หรือให้หยุด ให้เขียน evidence/trip/blocker.md รายงาน BLOCKED พร้อมเหตุผล ห้ามแต่งว่าสำเร็จ
+   ช) ถ้าหน้าบังคับล็อกอิน: แจ้งฉันว่า LAB นี้ไม่อนุญาตให้ล็อกอิน และแนะนำให้หยุด branch นั้นเป็น BLOCKED (login required)
+      ห้ามขอ ห้ามพิมพ์ และห้ามบันทึกชื่อผู้ใช้ รหัสผ่าน หรือ OTP ลงไฟล์หรือ log ใด ๆ
+   ซ) ถ้าเป็นหน้า Access Denied หรือ server unavailable ทั่วไป มนุษย์อาจแก้ไม่ได้ ให้แจ้งฉันแล้วบันทึกสถานะตามจริง
+      (WAITING_FOR_HUMAN ถ้ายังรอ หรือ BLOCKED พร้อมเหตุผล)
 3. ใช้ ref จาก snapshot ล่าสุดเท่านั้น (หลัง navigation, click หรือ Enter ต้อง snapshot ใหม่ทุกครั้ง) ห้ามเดา selector
 4. ห้ามแต่งราคา เวลาบิน คะแนนรีวิว หรือนโยบายยกเลิก ถ้าไม่เห็นบนหน้าจอให้เขียน "ไม่แสดง/unknown"
    และห้ามแนะนำตัวเลือกที่ไม่มีหลักฐาน (screenshot + snapshot) รองรับ
@@ -289,6 +313,9 @@ SESSION         = trip                                           [ชื่อ s
   (monotonic อ่านจาก `cut -d' ' -f1 /proc/uptime` จะเขียน wrapper script เล็ก ๆ ไว้ใน evidence/trip/ ก็ได้)
 - บันทึกขอบเขตของแต่ละช่วง (phase) ได้แก่ setup, search, flight, hotels, report ลง evidence/trip/phases.log (UTC + monotonic)
   ช่วงต้องต่อกันพอดีเพื่อไม่นับเวลาซ้ำ ส่วนการรอ (sleep) และ retry ให้นับอยู่ใน phase ที่เกิดขึ้น และระบุไว้ในหมายเหตุ
+- เวลารอมนุษย์: ทุกรอบให้บันทึก WAIT_START/WAIT_END (UTC + monotonic) และวินาที ลง evidence/trip/human-wait.log
+  เวลารอนี้อยู่ใน phase ที่เกิดขึ้น จึงนับใน end-to-end เพียงครั้งเดียว (ห้ามบวกซ้ำ) และต้องรายงานแยก 3 ค่า
+  human_wait = ผลรวมเวลารอมนุษย์ | active_automation = end_to_end - human_wait | end_to_end = เวลาตั้งแต่เริ่มจนจบทั้งหมด
 - ทุกขั้นที่มีความหมาย ให้เก็บ screenshot และ snapshot ที่ตั้งชื่อตามลำดับ เช่น
   evidence/trip/05-flight-results.png และ evidence/trip/05-flight-results.yml
 - เขียน evidence/trip/steps.md เป็นตาราง: # | สถานะก่อนทำ | action (คำสั่ง) | ผลที่เห็นจริง | ไฟล์หลักฐาน | elapsed (s)
@@ -297,14 +324,13 @@ SESSION         = trip                                           [ชื่อ s
 
 ---------------- ขั้นตอน ----------------
 ขั้น 0: คำนวณวันที่จากพารามิเตอร์ (ห้ามพิมพ์ตัวเลขวันลงไปตรง ๆ ให้ใช้ตัวแปร)
-  DEPART_OFFSET=3
-  NIGHTS=4
+  กล่องพารามิเตอร์ด้านบนเป็นที่เดียวที่แก้ค่าได้: ให้กำหนดตัวแปร shell DEPART_OFFSET และ NIGHTS
+  เป็นค่าที่อ่านได้จากกล่องพารามิเตอร์ตอนนี้ (ห้ามใช้ค่าอื่น) แล้วรัน
   RUN_DATE=$(TZ=Asia/Bangkok date +%F)
   DEPART=$(date -d "$RUN_DATE +${DEPART_OFFSET} days" +%F)
   RETURN_SEARCH=$(date -d "$DEPART +${NIGHTS} days" +%F)
-  echo "RUN_DATE=$RUN_DATE DEPART=$DEPART RETURN_SEARCH=$RETURN_SEARCH"
-  ถ้าแก้ DEPART_OFFSET หรือ NIGHTS ในกล่องพารามิเตอร์ ให้ใช้ค่าใหม่ในสองบรรทัดแรกให้ตรงกัน
-  บันทึกค่าทั้งสามลงในรายงาน
+  echo "DEPART_OFFSET=$DEPART_OFFSET NIGHTS=$NIGHTS RUN_DATE=$RUN_DATE DEPART=$DEPART RETURN_SEARCH=$RETURN_SEARCH"
+  บันทึกค่าทั้งหมดลงในรายงาน (ถ้าต้องรอมนุษย์ ให้ใช้ค่าชุดเดิมต่อ ห้ามคำนวณใหม่)
 
 ขั้น 1 (setup): playwright-cli -s=trip open https://www.trip.com/
   ทำ screenshot และ snapshot แล้วตรวจว่าเป็นหน้าเว็บจริงหรือหน้า verification (ถ้าเป็นหน้า verification ให้ทำตามกฎข้อ 2)
@@ -313,6 +339,7 @@ SESSION         = trip                                           [ชื่อ s
   -> วันไป DEPART / วันกลับ RETURN_SEARCH -> 1 Adult, Economy -> Search
   ถ้ามี popup (cookie banner หรือ login prompt) ให้ปิดได้เฉพาะด้วยปุ่มปิดหรือปุ่ม "No thanks" ที่มองเห็น
   หลังผลค้นหาโหลดเสร็จ ให้ทำ snapshot ใหม่ และใช้ `playwright-cli find` หาข้อความราคาหรือชื่อสายการบิน
+  ถ้าเจอ verification หรือ login ในขั้นใดก็ตาม ให้ทำตามกฎข้อ 2 แล้วทำต่อจากขั้นที่ค้าง
 
 ขั้น 3 (flight): เลือกเที่ยวบินที่มีให้เลือกจริงไม่เกิน MAX_ITEMS และบันทึกข้อมูลต่อไปนี้ตามที่เห็นจริง
   เวลาที่ดูข้อมูล (UTC) | สายการบิน/เที่ยวบิน | สนามบินไป-ถึง | เวลาออก-ถึงตามเวลาท้องถิ่น พร้อม "วันที่" ถึง
@@ -334,17 +361,23 @@ SESSION         = trip                                           [ชื่อ s
   | สกุลเงิน | เวลาที่ดู (UTC)
   ถ้าไม่มีโรงแรมที่ราคาใกล้ HOTEL_TARGET ให้บอกตรง ๆ
 
-ขั้น 6 (report): playwright-cli -s=trip close แล้ว playwright-cli list เพื่อยืนยันว่าไม่มี session trip แล้ว
+ขั้น 6 (report): เมื่องานจบแล้วเท่านั้น (ไม่ใช่ระหว่าง WAITING_FOR_HUMAN) ให้ playwright-cli -s=trip close
+  แล้ว playwright-cli list เพื่อยืนยันว่าไม่มี session trip แล้ว
   (ถ้า list ยังแสดง session อื่นที่ไม่ใช่ของ LAB นี้ ไม่ถือว่าผิด ห้ามไปปิด)
   จากนั้นเขียน evidence/trip/report.md ประกอบด้วย
   - สมมติฐานของห้องเรียน และวันที่ทั้งหมด (RUN_DATE, DEPART, RETURN_SEARCH, CHECK_IN, CHECK_OUT, ACTUAL_NIGHTS)
   - ตารางเปรียบเทียบเที่ยวบินและโรงแรม ทุกช่องต้องอ้างอิงไฟล์หลักฐาน
   - คำแนะนำ 1 เที่ยวบิน + 1 โรงแรม พร้อมเหตุผลจากหลักฐาน (หรือเขียน "ไม่มีคำแนะนำ" ถ้าหลักฐานไม่พอ)
   - หมายเหตุว่าราคาเปลี่ยนแปลงได้ ข้อมูลนี้เป็น snapshot ณ เวลาที่บันทึก และไม่ได้มีการจองใด ๆ
-  - ตารางเวลา: phase | UTC start | UTC end | seconds | PASS/FAIL/SKIP/BLOCKED | หมายเหตุ (waits/retries) และแถว total
-  - ผลรวม: PASS / PARTIAL / BLOCKED / FAIL
+  - ตารางเวลา: phase | UTC start | UTC end | seconds | PASS/FAIL/SKIP/BLOCKED | หมายเหตุ (waits/retries/human wait) และแถว total
+    ต่อด้วย human_wait, active_automation และ end_to_end (นับเวลารอมนุษย์ครั้งเดียว)
+  - ถ้ามีมนุษย์ช่วย: ระบุว่ามนุษย์เป็นผู้ทำ verification เอง AI ไม่ได้แก้ และอ้างอิง human-help.md, human-wait.log
+    และ snapshot หลังกลับมาทำต่อ
+  - ผลรวม: PASS / PARTIAL / BLOCKED / FAIL (หรือ WAITING_FOR_HUMAN ถ้ายังรอมนุษย์อยู่)
 
-ขั้น 7: สรุปให้ฉันเป็นภาษาไทยไม่เกิน 10 บรรทัด ได้แก่ สถานะแต่ละ branch, คำแนะนำ (ถ้ามี), เวลารวม และ path ของไฟล์หลักฐาน
+ขั้น 7: สรุปให้ฉันเป็นภาษาไทยไม่เกิน 10 บรรทัด ได้แก่ สถานะแต่ละ branch, คำแนะนำ (ถ้ามี),
+  เวลา (human_wait / active_automation / end_to_end) และ path ของไฟล์หลักฐาน
+  ถ้าใช้ dashboard ให้เตือนฉันให้กด Ctrl+C ปิด playwright-cli show และ SSH tunnel
 ```
 
 ลำดับงานและหลักฐานที่ควรได้:
@@ -363,12 +396,57 @@ SESSION         = trip                                           [ชื่อ s
 
 *ภาพที่ 2 — **หลักฐานจริง** [`evidence/trip/01-home.png`](evidence/trip/01-home.png) (12:01:22Z) snapshot: [`01-home.yml`](evidence/trip/01-home.yml)*
 
+<a id="s5-human"></a>
+### ขั้นที่ 6.1 — เมื่อ AI แจ้ง `WAITING_FOR_HUMAN`: ทำ verification เองผ่าน Dashboard (session เดิม)
+
+> ⚠️ **ทางเลือกแบบ manual ตามเอกสาร (documented/manual path) — ยังไม่ได้ทดสอบครบวงจร (end-to-end) ใน LAB นี้**
+> สิ่งที่ตรวจแล้วมีเพียง `playwright-cli --help show` ของเวอร์ชัน 0.1.21 ที่ติดตั้งจริง ซึ่งแสดงว่า `--port` จะ "start as a blocking http server on this port" และมี `--host`
+> ส่วน README ทางการของ Playwright CLI ระบุว่าหน้า *Session detail* ของ dashboard มี "full remote control"
+> devtools ไม่มี `jupyter_server_proxy` จึงต้องเปิดดู dashboard ผ่าน SSH tunnel จากเครื่องของนักศึกษา
+
+AI จะหยุดรอโดย **เก็บ session `trip`, browser context เดิม และแท็บปัจจุบันไว้** (ไม่ close/reload/goto และไม่เปิด browser ใหม่) ให้ทำตามนี้
+
+**1. 🖥️ Terminal ที่ 2 ใน JupyterLab (Bash)** — File → New → Terminal (อย่าปิด Terminal แรกที่ yolo3 รันอยู่)
+```bash
+cd -- "/root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip/runs/lab05-YYYYMMDD-HHMMSS-XXXXXX"
+playwright-cli show --host 127.0.0.1 --port 9230
+```
+- แทน `lab05-YYYYMMDD-HHMMSS-XXXXXX` ด้วยโฟลเดอร์จริงของรอบนี้ (ที่ `pwd` พิมพ์ในขั้นที่ 2 หรือที่ AI แจ้งมา) เพื่อให้อยู่ workspace เดียวกับ session `trip`
+- คำสั่งนี้เป็น server แบบ **blocking** Terminal จะค้างอยู่อย่างนั้น ซึ่งเป็นเรื่องปกติ **ปล่อยให้รันไว้** จนกว่า LAB จะจบ
+
+**2. 🪟 PowerShell บนเครื่องของนักศึกษา** — เปิดหน้าต่างใหม่แล้วสร้าง SSH tunnel
+```powershell
+ssh -N -L 127.0.0.1:9230:127.0.0.1:9230 -p 2222 root@localhost
+```
+- `-p 2222` ต้องเป็น **พอร์ต SSH เดียวกับที่ตั้งไว้ตอน setup devtools** ก่อนหน้านี้ ถ้าของเราเป็นพอร์ตอื่นให้แก้ตามนั้น
+- ยืนยันตัวตน (รหัสผ่าน/key) **ด้วยตัวเอง** ห้ามใส่รหัสผ่านไว้ในคำสั่ง และห้ามส่งรหัสผ่านให้ AI
+- `-N` คือเปิด tunnel อย่างเดียวไม่เปิด shell หน้าต่างจะดูเหมือนค้าง ซึ่งเป็นเรื่องปกติ **ปล่อยเปิดไว้**
+
+**3. 🌐 Browser บนเครื่องของนักศึกษา**
+1. เปิด <http://localhost:9230>
+2. เลือก session **`trip`** ของ LAB นี้ (ดูชื่อ session และ URL ให้ตรง) เพื่อเข้าหน้า Session detail
+3. คลิกในภาพหน้าเว็บเพื่อควบคุมเมาส์/คีย์บอร์ด แล้วทำ verification **ด้วยตัวเอง** เสร็จแล้วกด Esc เพื่อคืนการควบคุม
+4. **ห้าม** กด reload/back หรือพิมพ์ URL ใหม่, ห้ามปิด session หรือลบข้อมูล, ห้ามเปิดแท็บใหม่, ห้ามล็อกอิน, ห้ามกรอกข้อมูลส่วนตัว และห้ามจองหรือชำระเงิน
+
+**4. 💬 กลับไปที่แชต yolo3** แล้วบอกชัด ๆ เช่น `ทำ verification เสร็จแล้ว ให้ทำต่อ` หรือ `ช่วยไม่ได้ ให้หยุด`
+AI จะบันทึกเวลารอ แล้ว snapshot ใหม่ ถ้าเข้าหน้าจริงได้จะทำต่อจากขั้นที่ค้าง (ไม่ทำ setup ซ้ำ) ถ้ายังติดจะรอต่อ (WAITING_FOR_HUMAN) หรือบันทึก BLOCKED พร้อมเหตุผล
+
+**5. เมื่อ LAB จบแล้ว** (AI สรุปผลขั้น 7 แล้ว) ให้กด **Ctrl+C** ใน Terminal ที่ 2 เพื่อหยุด dashboard และกด **Ctrl+C** ใน PowerShell เพื่อปิด tunnel
+
+> 🔒 **ข้อควรระวัง**
+> - ห้ามเปิด dashboard ที่ `--host 0.0.0.0` และห้ามปิดการยืนยันตัวตนของ SSH ให้ใช้ `127.0.0.1` ผ่าน tunnel เท่านั้น
+> - ถ้าพอร์ต `9230` ถูกใช้อยู่ ให้เลือกพอร์ตว่างอื่น แล้วใช้เลขเดียวกันให้ครบทั้ง 3 ที่: `show --port`, ทั้งสองฝั่งของ `-L` และ URL ใน browser
+> - หน้า verification เป็นสิ่งที่ **มนุษย์** ทำเอง AI จะไม่แก้ CAPTCHA ให้ ส่วนหน้า Access Denied / server unavailable ทั่วไปมนุษย์อาจแก้ไม่ได้ ให้บอก AI ตามจริง
+> - ถ้าเป็นหน้าบังคับล็อกอิน **อย่าล็อกอิน** (LAB นี้ไม่อนุญาต) ให้บอก AI ให้หยุด branch นั้นเป็น BLOCKED
+
 ### ขั้นที่ 7 — ตรวจผลลัพธ์ด้วยตัวเอง
 
 1. เปิด `evidence/trip/steps.md` แล้วตรวจว่าทุกแถวมีไฟล์หลักฐานที่ **มีอยู่จริง**
 2. เปิด screenshot แล้วเทียบราคาในภาพกับตัวเลขใน `report.md` ว่าตรงกัน
 3. ตรวจว่ามีหัวข้อ "สมมติฐานของห้องเรียน" และวัน check-in ตรงกับวันที่เครื่องลงจอด
-4. ถ้าเจอ CAPTCHA ผลต้องเป็น **BLOCKED** และต้องไม่มีคำแนะนำที่แต่งขึ้นเอง
+4. ถ้าเจอ CAPTCHA ต้องมี `human-help.md` และ `human-wait.log` ถ้ามนุษย์ช่วยแล้วผ่าน ต้องมี snapshot ใหม่ที่ยืนยันว่าเข้าหน้าจริงได้
+   ถ้าช่วยไม่ได้ ผลต้องเป็น **BLOCKED** และต้องไม่มีคำแนะนำที่แต่งขึ้นเอง
+5. ตารางเวลาแยก `human_wait`, `active_automation`, `end_to_end` และนับเวลารอมนุษย์เพียงครั้งเดียว
 
 <a id="s6"></a>
 ## 6. ผลการทดลองจริง (yolo3 ใน devtools, 2026-09-24)
@@ -380,6 +458,11 @@ SESSION         = trip                                           [ชื่อ s
 > ขั้นตอนหลักตรงกัน (ตรวจ/ติดตั้ง CLI, smoke test ด้วย session `lab05`, เปิด Trip ด้วย session `trip`, รอแล้ว retry 1 ครั้ง, BLOCKED)
 > แต่มีจุดต่าง เช่น รอบทดลองเปิด `https://www.trip.com/?locale=en-xx&curr=THB` และรันในโฟลเดอร์ของบทเรียนโดยตรง (ยังไม่ได้ใช้ `runs/`)
 > ส่วนการแก้ prompt รอบนี้ (ตัวแปรวันที่, การปิดเฉพาะ session ของตัวเอง, การไม่เขียนทับ config) ยังไม่ได้ทดสอบกับเว็บจริง
+
+> 🕰️ **รอบนี้เป็นรอบประวัติศาสตร์ ก่อนแก้ prompt ให้ขอความช่วยเหลือจากมนุษย์ (human-assistance revision)**
+> ตอนนั้นกฎยังเป็น "รอ → `goto` URL เดิม 1 ครั้ง → BLOCKED" จึง **ไม่มีการขอให้มนุษย์ช่วย และไม่มีมนุษย์คนใดทำ verification** ในรอบนั้น
+> ผล BLOCKED ด้านล่างเป็นผลจริงของรอบนั้น ไม่ใช่ผลของ prompt ฉบับปัจจุบัน (ฉบับปัจจุบันจะหยุดรอเป็น WAITING_FOR_HUMAN โดยไม่ reload)
+> ขั้นตอน WAITING_FOR_HUMAN และ dashboard/SSH tunnel ใน[ขั้นที่ 6.1](#s5-human) **ยังไม่ได้ทดสอบกับเว็บจริง**
 
 **ผล: BLOCKED ⛔** — Trip.com ส่งต่อ (redirect) ไปยัง `verify.trip.com/static/tripVerify.html` (หน้า "Trip.com-Verification")
 ซึ่งเป็น CAPTCHA แบบ "Select icons in the correct order" yolo3 รอ 8 วินาที แล้วลองใหม่ 1 ครั้งตามกฎ แต่ยังติดหน้าเดิม จึงหยุดโดยไม่แตะ puzzle
@@ -402,7 +485,8 @@ SESSION         = trip                                           [ชื่อ s
 | Trace (ไม่บังคับ) | ✅ PASS | [`evidence/trip/trace/trace-1790251335008.trace`](evidence/trip/trace/trace-1790251335008.trace) |
 
 > 🎓 **บทเรียน:** ผล BLOCKED ที่มีหลักฐานครบ **มีค่ามากกว่า** ตารางราคาที่แต่งขึ้นเอง ผลอาจต่างไปตามเครือข่ายและช่วงเวลา
-> ถ้ารอบของนักศึกษาไปถึงหน้าผลค้นหาได้ ให้ทำตาม prompt จนครบ ถ้าไม่ได้ ให้ส่งงานเป็น BLOCKED พร้อมหลักฐาน
+> ถ้ารอบของนักศึกษาไปถึงหน้าผลค้นหาได้ ให้ทำตาม prompt จนครบ ถ้าติด verification ให้ช่วยผ่าน[ขั้นที่ 6.1](#s5-human)
+> ถ้าช่วยแล้วยังไม่ได้ ให้ส่งงานเป็น BLOCKED พร้อมหลักฐาน
 
 รายละเอียด: [`evidence/trip/steps.md`](evidence/trip/steps.md), [`evidence/trip/blocker.md`](evidence/trip/blocker.md), [`evidence/trip/timing.md`](evidence/trip/timing.md), [`evidence/trip/commands.log`](evidence/trip/commands.log)
 (ไฟล์หลักฐานเหล่านี้เป็นของเดิมจากรอบทดลอง เก็บไว้ตามที่บันทึก ไม่ได้แก้ไขภายหลัง)
@@ -433,6 +517,15 @@ SESSION         = trip                                           [ชื่อ s
 
 - ตัวเลขรวม **ไม่นับ** ช่วงว่างระหว่างสองงาน (≈ 57.76 วินาที ตั้งแต่ mono 351625.49 ถึง 351683.25), เวลาเขียน README และเวลาสร้างภาพประกอบ
 - ⚠️ **177.11 วินาทีนี้ไม่ใช่เวลาที่ค้นหาเที่ยวบิน/โรงแรมสำเร็จ** เพราะงาน Trip ถูก BLOCKED ตั้งแต่ก่อนถึงฟอร์มค้นหา การค้นหาที่สำเร็จจริงจะใช้เวลานานกว่านี้
+- รอบประวัติศาสตร์นี้ไม่มีการรอมนุษย์ (`human_wait` = 0 วินาที) wait 8.01 + 6.00 วินาทีเป็นการรอของ automation เอง
+
+**รอบใหม่ที่อาจมีการรอมนุษย์** ให้รายงานเวลาแยก 3 ค่า (เวลารอมนุษย์อยู่ใน phase ที่เกิดขึ้น จึงนับใน end-to-end **ครั้งเดียว**):
+
+| ค่า | ความหมาย |
+|---|---|
+| `human_wait` | ผลรวมช่วง WAIT_START → WAIT_END ใน `evidence/trip/human-wait.log` |
+| `active_automation` | `end_to_end` − `human_wait` |
+| `end_to_end` | เวลาตั้งแต่เริ่มจนจบทั้งหมด (= ผลรวมของทุก phase) |
 
 ### 7.2 เวลาที่ควรเผื่อในคาบเรียน (ค่าประมาณ ไม่ใช่เวลาที่วัดได้)
 
@@ -441,10 +534,12 @@ SESSION         = trip                                           [ชื่อ s
 | แนะนำ LAB, ภาพแนวคิด, กฎสั้น ๆ, สมมติฐาน | 10 |
 | เปิด Terminal, สร้างโฟลเดอร์, เปิด yolo3 | 5–10 |
 | Prompt ที่ 1 (ติดตั้ง) + ตรวจผล — ขึ้นกับความเร็วดาวน์โหลด npm/Chromium | 10–20 |
-| Prompt ที่ 2 (Trip) — BLOCKED จบเร็ว, ถ้าค้นหาได้จริงจะนานกว่า | 5–20 |
+| Prompt ที่ 2 (Trip) — BLOCKED จบเร็ว, ถ้าค้นหาได้จริงจะนานกว่า (ไม่รวมเวลารอมนุษย์) | 5–20 |
 | ตรวจหลักฐาน (`steps.md`, screenshot, `report.md`) | 15 |
 | สรุปและอภิปราย (ref, trace, BLOCKED) | 10 |
 | **รวมโดยประมาณ** | **55–85 นาที (ประมาณ 1–1.5 ชั่วโมง)** |
+
+ถ้าต้องช่วย verification ผ่าน dashboard ([ขั้นที่ 6.1](#s5-human)) ให้เผื่อเวลาเพิ่ม (ยังไม่ได้วัดจริง เพราะขั้นตอนนี้ยังไม่ได้ทดสอบ)
 
 <a id="s8"></a>
 ## 8. โครงสร้างไฟล์ผลลัพธ์
@@ -478,6 +573,7 @@ SESSION         = trip                                           [ชื่อ s
 ```
 
 ของนักศึกษาแต่ละรอบจะอยู่ใน `runs/lab05-<วันเวลา>-<สุ่ม>/` และถ้าค้นหาได้สำเร็จ ควรมี `evidence/trip/report.md` กับ screenshot ของหน้าผลเที่ยวบินและหน้าผลโรงแรมเพิ่มเติม
+ถ้ามีการขอความช่วยเหลือจากมนุษย์ จะมี `evidence/trip/human-help.md` และ `evidence/trip/human-wait.log` เพิ่ม (รอบประวัติศาสตร์ด้านบนไม่มีสองไฟล์นี้)
 
 <a id="s9"></a>
 ## 9. Checklist ก่อนส่งงาน
@@ -491,8 +587,11 @@ SESSION         = trip                                           [ชื่อ s
 - [ ] ระบุ **สมมติฐานของห้องเรียน** ชัดเจน (Tokyo, `NIGHTS`, 1 ผู้ใหญ่, `HOTEL_TARGET`, `MAX_ITEMS`)
 - [ ] วัน check-in ตรงกับวันที่เครื่องลงจอดจริง และอธิบายไว้ถ้าจำนวนคืนเปลี่ยน
 - [ ] ทุกราคามีสกุลเงิน บอกว่าต่อคนหรือรวม และรวมภาษีหรือไม่ (ไม่ทราบ = unknown)
-- [ ] ไม่มีการจอง ล็อกอิน หรือกรอกข้อมูลส่วนตัว; ถ้าเจอ CAPTCHA ผลเป็น BLOCKED พร้อม screenshot และ `blocker.md`
+- [ ] ไม่มีการจอง ล็อกอิน หรือกรอกข้อมูลส่วนตัว และ AI ไม่ได้แก้ CAPTCHA เอง
+- [ ] ถ้าเจอ verification: มี `human-help.md` + `human-wait.log` และผลสุดท้ายตรงกับ snapshot ล่าสุด (ทำต่อได้จริง หรือ BLOCKED พร้อม `blocker.md`)
+- [ ] ตารางเวลามี `human_wait` / `active_automation` / `end_to_end` และนับเวลารอมนุษย์ครั้งเดียว
 - [ ] `playwright-cli list` ไม่มี session `trip` (และ `lab05`) ของ LAB นี้แล้ว
+- [ ] ถ้าใช้ dashboard: กด Ctrl+C หยุด `playwright-cli show` และปิด SSH tunnel ใน PowerShell แล้ว
 
 <a id="s10"></a>
 ## 10. วิธีแก้ปัญหา (Recovery)
@@ -505,7 +604,12 @@ SESSION         = trip                                           [ชื่อ s
 | `Executable doesn't exist` | ยังไม่ได้ติดตั้ง browser | `playwright-cli install-browser chromium` |
 | click แล้วบอกว่าไม่พบ ref | ref เก่าเพราะหน้าเว็บเปลี่ยนไปแล้ว | สั่ง `snapshot` ใหม่ แล้วใช้ ref ล่าสุด |
 | session ของเราค้าง | process ค้างอยู่ | `playwright-cli list` แล้วปิดเฉพาะ session ของเรา เช่น `playwright-cli -s=trip close` ถ้ายังค้างให้แจ้งผู้สอน (อย่าปิด browser/session ของคนอื่น) |
-| หน้า `verify.trip.com` / CAPTCHA | เว็บตรวจพบ browser อัตโนมัติ | อย่าแก้หรือหลบเลี่ยง รอแล้วลองใหม่ 1 ครั้ง จากนั้นรายงาน BLOCKED |
+| หน้า `verify.trip.com` / CAPTCHA | เว็บตรวจพบ browser อัตโนมัติ | AI ห้ามแก้หรือหลบเลี่ยง ให้ AI หยุดรอเป็น WAITING_FOR_HUMAN (ไม่ปิด/ไม่ reload) แล้วมนุษย์ทำ verification เองผ่าน[ขั้นที่ 6.1](#s5-human) ถ้าช่วยไม่ได้ → BLOCKED |
+| หน้าบังคับล็อกอิน | เว็บต้องการบัญชี | อย่าล็อกอิน และห้ามให้ AI กรอกหรือบันทึกบัญชี/รหัสผ่าน แนะนำให้หยุด branch นั้นเป็น BLOCKED (login required) |
+| Access Denied / server unavailable | เว็บปฏิเสธหรือล่ม | มนุษย์อาจแก้ไม่ได้ บันทึกสถานะตามจริง (WAITING_FOR_HUMAN หรือ BLOCKED) ห้ามแต่งว่าสำเร็จ |
+| `playwright-cli show` แจ้งว่าพอร์ตถูกใช้ | มีโปรแกรมอื่นใช้ 9230 อยู่ | เลือกพอร์ตว่างอื่น แล้วใช้เลขเดียวกันใน `--port`, `-L` และ URL |
+| เปิด `http://localhost:9230` ไม่ขึ้น | tunnel หรือ dashboard ถูกปิดไป | ตรวจว่า Terminal ที่ 2 ยังรัน `show` อยู่ และ PowerShell ยังเปิด tunnel อยู่ ตรวจพอร์ต SSH ให้ตรงกับตอน setup devtools |
+| dashboard ไม่เห็น session `trip` | อยู่คนละ workspace หรือ session ถูกปิดแล้ว | `cd` ไปโฟลเดอร์รอบเดียวกันก่อนรัน `show` และตรวจ `playwright-cli list` (ห้ามให้ AI เปิด session ใหม่แทน) |
 | วาง prompt แล้ว Bash ขึ้น error จำนวนมาก | วางผิดที่ (ลงใน Bash) | กด Ctrl+C แล้วรัน `yolo3` ก่อน จากนั้นวางใหม่ในหน้าแชต |
 | ราคาใน report ไม่ตรงกับภาพ | AI อ่านผิดหรือแต่งข้อมูล | บอก AI ให้ตรวจกับ snapshot/screenshot แล้วแก้เป็นค่าที่เห็นจริง หรือเขียน unknown |
 
@@ -527,4 +631,5 @@ SESSION         = trip                                           [ชื่อ s
 | npm package `@playwright/cli` | <https://www.npmjs.com/package/@playwright/cli> |
 | Playwright (เว็บไซต์หลัก) | <https://playwright.dev> |
 | Trace Viewer | <https://playwright.dev/docs/trace-viewer> |
+| Dashboard (`playwright-cli show`) — หัวข้อ dashboard ใน README ทางการ | <https://github.com/microsoft/playwright-cli> และ `playwright-cli --help show` |
 | Help ในเครื่อง (ตรงกับเวอร์ชันที่ติดตั้งมากที่สุด) | `playwright-cli --help` และ `playwright-cli --help <command>` |
