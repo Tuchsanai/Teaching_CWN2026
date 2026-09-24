@@ -1,0 +1,16 @@
+[1;34m[lab04][0m new API token written to /root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server/deploy/.secrets/api_token (value not shown).
+[1;34m[lab04][0m open it yourself when you need to paste it into the web page.
+[1;34m[lab04][0m copied claude/yolo1
+[1;34m[lab04][0m copied codex/cyolo1
+[1;34m[lab04][0m volume lab04-accounts contents (existence only):
+  present  /data/accounts/claude/yolo1/.credentials.json
+  present  /data/accounts/codex/cyolo1/auth.json
+[1;33m[lab04][0m these are COPIES. If either side refreshes a login, the other copy may stop working;
+[1;33m[lab04][0m re-login in devtools and run 'creds' again (see README section 6).
+[1;34m[lab04][0m waiting for lab04-api to become healthy…
+[1;34m[lab04][0m published ports: 127.0.0.1:8004 (api), 127.0.0.1:8005 (web)
+[1;34m[lab04][0m   PASS container network: lab04-api:8000 and lab04-web:8080 answer on lab04-net
+[1;34m[lab04][0m   PASS published API  host.docker.internal:8004/health (HTTP 200)
+[1;34m[lab04][0m   PASS published web  host.docker.internal:8005/ (HTTP 200)
+[1;34m[lab04][0m browser (Windows host): http://localhost:8005  → API http://127.0.0.1:8004
+[1;34m[lab04][0m token file on the control host: /root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server/deploy/.secrets/api_token

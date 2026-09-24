@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>LAB 004 · Multi-Account Chat</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6fdb'/%3E%3Cpath d='M16 20h32v18H30l-8 7v-7h-6z' fill='white'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #f4f6fb; --panel: #ffffff; --line: #dfe4ee; --text: #1c2333; --muted: #667085;
+  --accent: #2f6fdb; --accent-ink: #ffffff; --user: #e8f0ff; --assistant: #ffffff;
+  --ok: #117a47; --ok-bg: #e3f6ec; --warn: #9a5b00; --warn-bg: #fff3dc;
+  --bad: #b42318; --bad-bg: #fde8e7; --idle-bg: #eef1f6; --notice: #f7f8fb;
+  --radius: 12px; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 2px 8px rgba(16,24,40,.05);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f131a; --panel: #161b24; --line: #2a3140; --text: #e6e9ef; --muted: #98a2b3;
+    --accent: #5b8cff; --user: #1d2a44; --assistant: #161b24;
+    --ok: #4ade80; --ok-bg: #12301f; --warn: #fbbf24; --warn-bg: #33270d;
+    --bad: #f87171; --bad-bg: #3a1616; --idle-bg: #1f2530; --notice: #121720;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", "Leelawadee UI", sans-serif;
+  background: var(--bg); color: var(--text);
+  display: grid; grid-template-rows: auto 1fr;
+}
+header.top {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line);
+}
+header.top h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: .1px; }
+header.top h1 small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+  font-size: 12.5px; background: var(--idle-bg); color: var(--muted); border: 1px solid transparent;
+}
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .85; }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+main { display: grid; grid-template-columns: 330px 1fr; min-height: 0; }
+aside {
+  background: var(--panel); border-right: 1px solid var(--line); padding: 16px;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+}
+fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin: 0; }
+legend { font-weight: 600; font-size: 13px; padding: 0 6px; color: var(--muted); }
+label { display: block; font-size: 12.5px; color: var(--muted); margin: 8px 0 4px; }
+label:first-of-type { margin-top: 0; }
+input, select, textarea {
+  width: 100%; font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+select:disabled, input:disabled, textarea:disabled { opacity: .55; }
+.hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+#connect { margin-top: 10px; width: 100%; }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+button {
+  font: inherit; border-radius: 8px; padding: 8px 14px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--text); cursor: pointer;
+}
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button:not(:disabled):hover { filter: brightness(1.06); }
+.caps { font-size: 12px; color: var(--muted); font-family: var(--mono); white-space: pre-wrap; margin: 8px 0 0; }
+section.chat { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+.chatbar {
+  display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--muted); background: var(--panel); flex-wrap: wrap;
+}
+.chatbar .target { font-family: var(--mono); color: var(--text); }
+.chatbar .spacer { flex: 1; }
+#transcript { overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.empty { margin: auto; text-align: center; color: var(--muted); max-width: 520px; }
+.empty strong { color: var(--text); }
+.msg { max-width: min(820px, 92%); border-radius: var(--radius); padding: 10px 14px; box-shadow: var(--shadow); border: 1px solid var(--line); }
+.msg.user { align-self: flex-end; background: var(--user); border-color: transparent; }
+.msg.assistant { align-self: flex-start; background: var(--assistant); }
+.msg.notice { align-self: center; background: var(--notice); box-shadow: none; font-size: 13px; color: var(--muted); max-width: 720px; }
+.msg.error { align-self: flex-start; background: var(--bad-bg); border-color: transparent; color: var(--bad); }
+.msg.failed { opacity: .6; }
+.msg .who { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+.msg .who b { color: var(--text); font-weight: 600; }
+.msg.error .who, .msg.error .who b { color: var(--bad); }
+.msg .body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tag { font-family: var(--mono); font-size: 11.5px; background: var(--idle-bg); border-radius: 6px; padding: 0 6px; }
+.composer { border-top: 1px solid var(--line); background: var(--panel); padding: 12px 20px 16px; }
+.composer textarea { min-height: 76px; max-height: 40vh; resize: vertical; }
+.composer .actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.composer .meter { font-size: 12px; color: var(--muted); margin-right: auto; }
+.meter.over { color: var(--bad); font-weight: 600; }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+@media (max-width: 860px) {
+  main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  aside { border-right: 0; border-bottom: 1px solid var(--line); max-height: 45vh; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>LAB 004 · Multi-Account Chat <small>Claude Code + Codex CLI ผ่าน FastAPI</small></h1>
+  <div class="pills" aria-live="polite">
+    <span class="pill" id="pill-api" title="GET /health">API: ยังไม่เชื่อมต่อ</span>
+    <span class="pill" id="pill-token" title="GET /v1/models ด้วย Bearer token">Token: ยังไม่ตรวจ</span>
+    <span class="pill" id="pill-auth" title="พิสูจน์ได้จากคำตอบจริงของ /v1/chat/completions เท่านั้น">บัญชี: ยังไม่มีคำตอบจริง</span>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <fieldset>
+      <legend>1 · การเชื่อมต่อ</legend>
+      <label for="base">API base URL</label>
+      <input id="base" value="http://127.0.0.1:8004" spellcheck="false" autocomplete="off">
+      <label for="token">API token</label>
+      <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="วาง token ที่ได้จากขั้น deploy">
+      <p class="hint">token เก็บในหน่วยความจำของแท็บนี้เท่านั้น ไม่บันทึกลง localStorage หรือ cookie รีเฟรชหน้าแล้วต้องวางใหม่</p>
+      <button class="primary" id="connect">เชื่อมต่อ</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>2 · เลือกโมเดลและบัญชี</legend>
+      <label for="provider">Provider</label>
+      <select id="provider" disabled></select>
+      <label for="model">Model</label>
+      <select id="model" disabled></select>
+      <label for="effort">Reasoning effort</label>
+      <select id="effort" disabled></select>
+      <label for="account">Account</label>
+      <select id="account" disabled></select>
+      <p class="hint" id="account-hint">“มีไฟล์ credential” แปลว่าพบไฟล์ใน container เท่านั้น ยังไม่ใช่หลักฐานว่าล็อกอินใช้ได้</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>ความสามารถที่ API รายงาน</legend>
+      <p class="caps" id="caps">ยังไม่ได้เชื่อมต่อ</p>
+    </fieldset>
+  </aside>
+
+  <section class="chat">
+    <div class="chatbar">
+      <span>ส่งถัดไปที่</span><span class="target" id="target">—</span>
+      <span class="spacer"></span>
+      <button id="export" disabled title="ดาวน์โหลด transcript เป็น JSON (ไม่มี token)">ดาวน์โหลด transcript</button>
+      <button id="clear" disabled>ล้างแชต</button>
+    </div>
+
+    <div id="transcript" aria-live="polite">
+      <div class="empty" id="empty">
+        <p><strong>ยังไม่มีข้อความ</strong></p>
+        <p>เชื่อมต่อ API ทางซ้าย เลือกโมเดล แล้วพิมพ์คำถามด้านล่าง<br>
+        ทุกครั้งที่กดส่ง หน้าเว็บจะส่ง <b>ประวัติข้อความทั้งหมด</b> ไปด้วย เพราะ CLI แต่ละครั้งเริ่มใหม่และจำอะไรไม่ได้เอง</p>
+      </div>
+    </div>
+
+    <div class="composer">
+      <textarea id="input" placeholder="พิมพ์ข้อความ… (Ctrl+Enter เพื่อส่ง)" disabled></textarea>
+      <div class="actions">
+        <span class="meter" id="meter">ประวัติที่จะส่ง: 0 ข้อความ</span>
+        <span id="waiting" class="hidden"><span class="spinner"></span><span id="waiting-text"></span></span>
+        <button class="primary" id="send" disabled>ส่ง</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const el = {
+    base: $("base"), token: $("token"), connect: $("connect"),
+    provider: $("provider"), model: $("model"), effort: $("effort"), account: $("account"),
+    caps: $("caps"), target: $("target"), transcript: $("transcript"), empty: $("empty"),
+    input: $("input"), send: $("send"), clear: $("clear"), exportBtn: $("export"),
+    meter: $("meter"), waiting: $("waiting"), waitingText: $("waiting-text"),
+    pillApi: $("pill-api"), pillToken: $("pill-token"), pillAuth: $("pill-auth"),
+  };
+
+  // Everything lives in memory only. Nothing is written to storage.
+  let token = "";
+  let base = "";
+  let catalog = null;
+  let busy = false;
+  let connecting = false;
+  let lastTarget = "";
+  const verified = new Set();       // "provider/account" that returned a real reply this session
+  const items = [];                 // transcript items: {kind, role?, content, meta?, failed?}
+
+  function pill(node, cls, text) {
+    node.className = "pill" + (cls ? " " + cls : "");
+    node.textContent = text;
+  }
+
+  function option(value, text) {
+    const o = document.createElement("option");
+    o.value = value;
+    o.textContent = text;
+    return o;
+  }
+
+  function normBase(v) {
+    const u = new URL(v.trim());
+    if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error("URL ต้องเป็น http หรือ https");
+    return u.origin;
+  }
+
+  async function api(path, opts = {}) {
+    const headers = Object.assign({}, opts.headers || {});
+    if (opts.auth) headers["Authorization"] = "Bearer " + token;
+    if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), (opts.timeoutS || 15) * 1000);
+    try {
+      const r = await fetch(base + path, {
+        method: opts.body !== undefined ? "POST" : "GET",
+        headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+        signal: ctrl.signal, cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer",
+      });
+      let data = null;
+      try { data = await r.json(); } catch (_) { data = null; }
+      return { ok: r.ok, status: r.status, data, rid: r.headers.get("X-Request-ID") };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // ------------------------------------------------------------ connect ---
+  async function connect() {
+    if (connecting || busy) return;
+    // A reconnect first drops everything learned from the previous endpoint, so
+    // stale "ready" dropdowns can never send to an endpoint that has not passed the checks again.
+    resetConnection();
+    let target;
+    try {
+      target = normBase(el.base.value);
+    } catch (e) {
+      pill(el.pillApi, "bad", "API: URL ไม่ถูกต้อง");
+      return;
+    }
+    const tok = el.token.value.trim();
+    setConnecting(true);
+    try {
+      base = target;
+      pill(el.pillApi, "", "API: กำลังตรวจ…");
+      pill(el.pillToken, "", "Token: รอ");
+      try {
+        const h = await api("/health");
+        if (!h.ok || !h.data || h.data.status !== "ok") throw new Error("health " + h.status);
+        const cli = h.data.cli || {};
+        const missing = Object.keys(cli).filter((k) => !cli[k].available);
+        pill(el.pillApi, missing.length ? "warn" : "ok",
+          "API: ตอบ /health" + (missing.length ? " (ไม่พบ CLI: " + missing.join(", ") + ")" : ""));
+      } catch (e) {
+        resetConnection();
+        pill(el.pillApi, "bad", "API: ติดต่อไม่ได้ (" + (e.name === "AbortError" ? "timeout" : "network/CORS") + ")");
+        return;
+      }
+      if (!tok) {
+        pill(el.pillToken, "warn", "Token: ยังไม่ได้ใส่");
+        return;
+      }
+      token = tok;
+      try {
+        const m = await api("/v1/models", { auth: true });
+        if (m.status === 401) throw Object.assign(new Error("401"), { label: "Token: ถูกปฏิเสธ (401)" });
+        if (!m.ok || !m.data) throw new Error("models " + m.status);
+        pill(el.pillToken, "ok", "Token: ผ่าน /v1/models");
+        setCatalog(m.data);
+      } catch (e) {
+        token = "";
+        setCatalog(null);
+        pill(el.pillToken, "bad", e.label || "Token: ตรวจไม่สำเร็จ");
+      }
+    } finally {
+      setConnecting(false);
+    }
+  }
+
+  function setConnecting(on) {
+    connecting = on;
+    refreshControls();
+  }
+
+  function resetConnection() {
+    base = "";
+    token = "";
+    verified.clear();
+    setCatalog(null);
+    pill(el.pillApi, "", "API: ยังไม่เชื่อมต่อ");
+    pill(el.pillToken, "", "Token: ยังไม่ตรวจ");
+    pill(el.pillAuth, "", "บัญชี: ยังไม่มีคำตอบจริง");
+  }
+
+  function setCatalog(data) {
+    catalog = data;
+    el.provider.replaceChildren();
+    if (!data) {
+      for (const s of [el.model, el.effort, el.account]) s.replaceChildren();
+      el.caps.textContent = "ยังไม่ได้เชื่อมต่อ";
+      updateTarget();
+      refreshControls();
+      return;
+    }
+    for (const p of data.providers) {
+      el.provider.append(option(p.id, p.id + (p.cli_available ? "" : " (ไม่มี CLI)")));
+    }
+    const lim = data.limits || {};
+    el.caps.textContent =
+      "models: " + data.data.map((m) => m.id).join(", ") + "\n" +
+      "params: " + data.supported_parameters.join(", ") + "\n" +
+      "ไม่รองรับ (ปฏิเสธ 400): " + (data.rejected_parameters_examples || []).filter((k) =>
+        ["max_completion_tokens", "max_tokens", "temperature", "tools", "stream_options"].includes(k)).join(", ") + ", …\n" +
+      "limits: " + lim.max_messages + " msgs, " + lim.max_message_chars + " chars/msg, " +
+      lim.max_transcript_chars + " chars รวม, timeout " + lim.cli_timeout_s + " s";
+    fillModels();
+    refreshControls();
+  }
+
+  function currentProvider() {
+    return catalog && catalog.providers.find((p) => p.id === el.provider.value);
+  }
+  function currentModel() {
+    return catalog && catalog.data.find((m) => m.id === el.model.value);
+  }
+
+  function fillModels() {
+    const p = el.provider.value;
+    el.model.replaceChildren(...catalog.data.filter((m) => m.provider === p).map((m) => option(m.id, m.id + " · " + m.label)));
+    const prov = currentProvider();
+    el.account.replaceChildren(...prov.accounts.map((a) =>
+      option(a.id, a.id + (a.default ? " (default)" : "") + (a.credential_file_present ? " · มีไฟล์ credential" : " · ไม่พบ credential"))));
+    fillEfforts();
+  }
+
+  function fillEfforts() {
+    const m = currentModel();
+    const prev = el.effort.value;
+    el.effort.replaceChildren(...m.reasoning_efforts.map((e) => option(e, e)));
+    el.effort.value = m.reasoning_efforts.includes(prev) ? prev : m.default_reasoning_effort;
+    updateTarget();
+  }
+
+  function targetKey() {
+    return [el.provider.value, el.model.value, el.effort.value, el.account.value].join(" / ");
+  }
+
+  function updateTarget() {
+    el.target.textContent = catalog ? targetKey() : "—";
+    const hasHistory = items.some((i) => i.kind === "msg" && !i.failed);
+    if (catalog && lastTarget && lastTarget !== targetKey() && hasHistory) {
+      addNotice("เปลี่ยนเป้าหมายเป็น " + targetKey() + " — รอบถัดไปประวัติทั้งหมดจะถูกส่งเป็นข้อความให้ตัวใหม่ " +
+        "ตัวใหม่ไม่ได้ “จำ” อะไรเอง และบัญชีคนละบัญชีไม่แชร์ session กัน");
+    }
+    lastTarget = catalog ? targetKey() : "";
+  }
+
+  function refreshControls() {
+    const ready = !!catalog && !busy && !connecting;
+    // Connection fields are locked while a check or a chat request is in flight.
+    for (const f of [el.base, el.token, el.connect]) f.disabled = busy || connecting;
+    for (const s of [el.provider, el.model, el.effort, el.account]) s.disabled = !ready;
+    el.input.disabled = !ready;
+    el.send.disabled = !ready;
+    const hasItems = items.length > 0;
+    el.clear.disabled = busy || !hasItems;
+    el.exportBtn.disabled = busy || !hasItems;
+    updateMeter();
+  }
+
+  // --------------------------------------------------------- transcript ---
+  function history() {
+    return items.filter((i) => i.kind === "msg" && !i.failed).map((i) => ({ role: i.role, content: i.content }));
+  }
+
+  function updateMeter() {
+    const h = history();
+    const draft = el.input.value.trim();
+    const n = h.length + (draft ? 1 : 0);
+    const chars = h.reduce((a, m) => a + m.content.length, 0) + draft.length;
+    const lim = catalog && catalog.limits;
+    let text = "ประวัติที่จะส่ง: " + n + " ข้อความ · " + chars.toLocaleString() + " ตัวอักษร";
+    let over = false;
+    if (lim) {
+      text += " / " + lim.max_transcript_chars.toLocaleString();
+      over = chars > lim.max_transcript_chars || n > lim.max_messages || draft.length > lim.max_message_chars;
+    }
+    el.meter.textContent = text + (over ? " — เกินขีดจำกัด ล้างแชตก่อน" : "");
+    el.meter.classList.toggle("over", over);
+  }
+
+  function render(item) {
+    el.empty.classList.add("hidden");
+    const box = document.createElement("div");
+    const who = document.createElement("div");
+    who.className = "who";
+    const body = document.createElement("div");
+    body.className = "body";
+    body.textContent = item.content;          // always text, never HTML
+    if (item.kind === "notice") {
+      box.className = "msg notice";
+      box.append(body);
+    } else if (item.kind === "error") {
+      box.className = "msg error";
+      const b = document.createElement("b");
+      b.textContent = "ข้อผิดพลาด";
+      who.append(b, tag(item.meta.type), tag("HTTP " + item.meta.status));
+      if (item.meta.rid) who.append(tag("request " + item.meta.rid));
+      box.append(who, body);
+    } else {
+      box.className = "msg " + item.role;
+      const b = document.createElement("b");
+      b.textContent = item.role === "user" ? "คุณ" : "ผู้ช่วย";
+      who.append(b);
+      if (item.meta) {
+        const m = item.meta;
+        who.append(tag(m.provider + "/" + m.model), tag("effort " + m.effort), tag("account " + m.account));
+        if (m.duration_ms != null) who.append(tag((m.duration_ms / 1000).toFixed(1) + " s"));
+        if (m.history != null) who.append(tag("ส่งประวัติ " + m.history + " ข้อความ"));
+        if (m.truncated) who.append(tag("ถูกตัดท้าย"));
+      }
+      box.append(who, body);
+    }
+    item.node = box;
+    el.transcript.append(box);
+    el.transcript.scrollTop = el.transcript.scrollHeight;
+  }
+
+  function tag(text) {
+    const s = document.createElement("span");
+    s.className = "tag";
+    s.textContent = text;
+    return s;
+  }
+
+  function addNotice(text) {
+    const it = { kind: "notice", content: text };
+    items.push(it);
+    render(it);
+  }
+
+  // --------------------------------------------------------------- send ---
+  async function send() {
+    const text = el.input.value.trim();
+    if (!text || busy || !catalog) return;
+    const provider = el.provider.value, model = el.model.value;
+    const effort = el.effort.value, account = el.account.value;
+    const userItem = { kind: "msg", role: "user", content: text };
+    items.push(userItem);
+    render(userItem);
+    el.input.value = "";
+    const messages = history();
+
+    busy = true;
+    refreshControls();
+    const started = Date.now();
+    el.waiting.classList.remove("hidden");
+    const tick = () => { el.waitingText.textContent = "รอ " + provider + "/" + model + " (" + effort + ") · " + Math.round((Date.now() - started) / 1000) + " s"; };
+    tick();
+    const timer = setInterval(tick, 1000);
+    const timeoutS = ((catalog.limits && catalog.limits.cli_timeout_s) || 300) + 30;
+
+    try {
+      const r = await api("/v1/chat/completions", {
+        auth: true, timeoutS,
+        body: { model, provider, reasoning_effort: effort, account, messages },
+      });
+      if (r.ok && r.data && r.data.choices && r.data.choices[0]) {
+        const x = r.data.x_backend || {};
+        const it = {
+          kind: "msg", role: "assistant", content: r.data.choices[0].message.content,
+          meta: { provider, model, effort, account, duration_ms: x.duration_ms,
+                  history: x.history_messages_sent, truncated: !!x.output_truncated, rid: r.rid },
+        };
+        items.push(it);
+        render(it);
+        verified.add(provider + "/" + account);
+        pill(el.pillAuth, "ok", "ตอบจริงสำเร็จ: " + Array.from(verified).join(", "));
+      } else {
+        failUser(userItem, text);
+        const e = (r.data && r.data.error) || {};
+        addError(e.type || "http_error", e.message || "API ตอบกลับไม่ถูกรูปแบบ", r.status, e.request_id || r.rid);
+        if (r.status === 401) pill(el.pillToken, "bad", "Token: ถูกปฏิเสธ (401)");
+        if (e.type === "upstream_auth_error") pill(el.pillAuth, "bad", "บัญชี " + provider + "/" + account + ": ยืนยันตัวตนไม่ผ่าน");
+      }
+    } catch (e) {
+      failUser(userItem, text);
+      addError(e.name === "AbortError" ? "client_timeout" : "network_error",
+        e.name === "AbortError" ? "เบราว์เซอร์รอเกิน " + timeoutS + " s" : "ติดต่อ API ไม่ได้ (เครือข่ายหรือ CORS)", 0, null);
+    } finally {
+      clearInterval(timer);
+      el.waiting.classList.add("hidden");
+      busy = false;
+      refreshControls();
+      el.input.focus();
+    }
+  }
+
+  function failUser(item, text) {
+    // A user turn without a reply is excluded from later history; its text goes back to the box.
+    item.failed = true;
+    if (item.node) item.node.classList.add("failed");
+    if (!el.input.value) el.input.value = text;
+  }
+
+  function addError(type, message, status, rid) {
+    const it = { kind: "error", content: message, meta: { type, status, rid } };
+    items.push(it);
+    render(it);
+  }
+
+  function clearChat() {
+    items.length = 0;
+    el.transcript.replaceChildren(el.empty);
+    el.empty.classList.remove("hidden");
+    lastTarget = catalog ? targetKey() : "";
+    refreshControls();
+  }
+
+  function exportTranscript() {
+    const doc = {
+      exported_at: new Date().toISOString(),
+      api_base: base,
+      note: "Transcript exported from LAB 004 chat UI. Contains no API token.",
+      items: items.map((i) => ({ kind: i.kind, role: i.role, content: i.content,
+                                 failed: !!i.failed, meta: i.meta || null })),
+    };
+    const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "lab04-transcript-" + doc.exported_at.replace(/[:.]/g, "-") + ".json";
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  // ------------------------------------------------------------- wiring ---
+  el.connect.addEventListener("click", connect);
+  el.token.addEventListener("keydown", (e) => { if (e.key === "Enter") connect(); });
+  el.base.addEventListener("keydown", (e) => { if (e.key === "Enter") connect(); });
+  el.provider.addEventListener("change", fillModels);
+  el.model.addEventListener("change", fillEfforts);
+  el.effort.addEventListener("change", updateTarget);
+  el.account.addEventListener("change", updateTarget);
+  el.send.addEventListener("click", send);
+  el.clear.addEventListener("click", clearChat);
+  el.exportBtn.addEventListener("click", exportTranscript);
+  el.input.addEventListener("input", updateMeter);
+  el.input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+  });
+})();
+</script>
+</body>
+</html>

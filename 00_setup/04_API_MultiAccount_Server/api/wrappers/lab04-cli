@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# LAB 004 · constrained account wrapper, used ONLY inside the API container.
+#
+# Installed as symlinks yolo1..yolo5 (Claude Code) and cyolo1..cyolo5 (Codex CLI).
+# The name picks the account, like the LAB 001 wrappers, but this one is a
+# narrow API wrapper, not the permissive devtools one:
+#   * selects the COPIED config dir: CLAUDE_CONFIG_DIR / CODEX_HOME under /data/accounts
+#   * accepts only --model, --effort (and --output-last-message for Codex) or --version
+#   * reads the prompt from stdin; adds fixed no-tools / read-only flags itself
+#   * never passes --dangerously-skip-permissions or --dangerously-bypass-approvals-and-sandbox
+#
+#   echo "question" | yolo1  --model fable       --effort medium
+#   echo "question" | cyolo1 --model gpt-6-astra --effort low --output-last-message "$TMPDIR/last.txt"
+set -euo pipefail
+
+name="$(basename "$0")"
+ROOT="${LAB04_ACCOUNTS_ROOT:-/data/accounts}"
+CLAUDE_REAL="${LAB04_CLAUDE_BIN:-/usr/local/bin/claude}"
+CODEX_REAL="${LAB04_CODEX_BIN:-/usr/local/bin/codex}"
+SANDBOX="${LAB04_CODEX_SANDBOX:-read-only}"
+
+die() { local code="$1"; shift; printf '[%s] %s\n' "$name" "$*" >&2; exit "$code"; }
+
+case "$name" in
+  yolo[1-5])  tool=claude; dir="$ROOT/claude/$name" ;;
+  cyolo[1-5]) tool=codex;  dir="$ROOT/codex/$name"  ;;
+  *) die 2 "unknown account command (allowed: yolo1..yolo5, cyolo1..cyolo5)" ;;
+esac
+
+# Optional second allowlist from the API (CLAUDE_ACCOUNTS / CODEX_ACCOUNTS).
+if [ -n "${LAB04_ALLOWED_ACCOUNTS:-}" ] && [[ ",$LAB04_ALLOWED_ACCOUNTS," != *",$name,"* ]]; then
+  die 2 "account $name is not enabled for this API"
+fi
+
+if [ "${1:-}" = --version ] && [ $# -eq 1 ]; then
+  if [ "$tool" = claude ]; then exec "$CLAUDE_REAL" --version; else exec "$CODEX_REAL" --version; fi
+fi
+
+model="" effort="" out=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --model)  [ $# -ge 2 ] || die 2 "--model needs a value";  model="$2";  shift 2 ;;
+    --effort) [ $# -ge 2 ] || die 2 "--effort needs a value"; effort="$2"; shift 2 ;;
+    --output-last-message)
+      [ "$tool" = codex ] || die 2 "--output-last-message is only for cyoloN"
+      [ $# -ge 2 ] || die 2 "--output-last-message needs a value"; out="$2"; shift 2 ;;
+    *) die 2 "argument not allowed: ${1:0:40}" ;;
+  esac
+done
+
+[[ "$model" =~ ^[a-z0-9][a-z0-9.-]{0,40}$ ]] || die 2 "invalid or missing --model"
+[[ "$effort" =~ ^(none|low|medium|high|xhigh|max)$ ]] || die 2 "invalid or missing --effort"
+[ -d "$dir" ] || die 3 "account $name is not provisioned (no copied config dir)"
+
+# Auth must come from the copied account dir only, never from inherited variables.
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN OPENAI_API_KEY CODEX_API_KEY
+
+if [ "$tool" = claude ]; then
+  export CLAUDE_CONFIG_DIR="$dir" DISABLE_AUTOUPDATER=1
+  # Flags checked against `claude --help` (Claude Code 2.1.281).
+  # --tools "" removes every built-in tool, so no permission bypass is needed.
+  exec "$CLAUDE_REAL" -p \
+    --model "$model" --effort "$effort" \
+    --output-format json --no-session-persistence \
+    --tools "" --strict-mcp-config --disable-slash-commands \
+    --setting-sources "" --permission-mode dontAsk
+fi
+
+case "$SANDBOX" in read-only|workspace-write) ;; *) die 2 "LAB04_CODEX_SANDBOX must be read-only or workspace-write" ;; esac
+[ -n "${TMPDIR:-}" ] && [[ "$out" == "$TMPDIR"/* ]] && [[ "$out" != *..* ]] \
+  || die 2 "--output-last-message must be a file inside \$TMPDIR"
+export CODEX_HOME="$dir"
+# Flags checked against `codex exec --help` (codex-cli 0.156.1). Codex has no verified
+# flag to remove its shell tool, so it runs read-only, never asks for approval, in an empty cwd.
+exec "$CODEX_REAL" exec \
+  --skip-git-repo-check --ephemeral --ignore-user-config --ignore-rules \
+  --sandbox "$SANDBOX" --color never -C "$PWD" \
+  -m "$model" -c "model_reasoning_effort=$effort" \
+  -c approval_policy=never -c cli_auth_credentials_store=file \
+  -o "$out" -

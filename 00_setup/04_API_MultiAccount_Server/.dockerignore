@@ -1,0 +1,17 @@
+# Safety net in case someone builds with the repo root as context.
+# Credentials and generated secrets must never enter an image.
+**/.credentials.json
+**/auth.json
+**/.claude.json
+**/*.token
+**/api_token*
+deploy/.secrets/
+deploy/lab04.env
+**/.env
+**/.env.*
+**/__pycache__
+**/*.pyc
+api/tests/
+evidence/
+assets/
+*.png

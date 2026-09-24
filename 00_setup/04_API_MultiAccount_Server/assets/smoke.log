@@ -1,0 +1,14 @@
+[1;34m[lab04][0m readiness checks via host.docker.internal (no model is called)
+  PASS GET /health (HTTP 200)
+  PASS GET /v1/models without token -> 401 (HTTP 401)
+  PASS GET /v1/models with token (HTTP 200)
+  PASS at least one account has a credential file (NOT proof of login)
+  PASS CORS allows the web page origin
+  PASS CORS rejects a foreign origin
+  PASS gpt-6-astra + effort none rejected (HTTP 400)
+  PASS fable + effort minimal rejected (HTTP 400)
+  PASS max_completion_tokens rejected (HTTP 400)
+  PASS web page GET / (HTTP 200)
+  PASS web page CSP limits connect-src to the API
+[1;34m[lab04][0m skipped authenticated checks (add --live). Readiness != authenticated model success.
+[1;34m[lab04][0m smoke: 11 PASS, 0 FAIL
