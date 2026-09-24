@@ -1,0 +1,35 @@
+ผมหยุดไว้ก่อนลงมือ deploy เพราะจาก devtools เชื่อมต่อ Docker host ชั้นนอกไม่ได้ และ `.env` ก็ยังไม่มีค่าที่บอกวิธีเชื่อมต่อ ตอนนี้ยังไม่มีการ build, deploy หรือเรียกโมเดลบน host จริงเลย
+
+### สิ่งที่ตรวจพบ
+- **Docker ที่คำสั่งเชื่อมต่ออยู่คือ Docker ชั้นในของ devtools:** มี `dockerd` รันอยู่ใน devtools เอง (PID 11) ชื่อ daemon ตรงกับ hostname ของ devtools และไม่มี container เลย ใน prompt 1 ผม build image ไว้บน daemon นี้ ซึ่งไม่ใช่ host ที่ต้องการ
+- **ไม่พบช่องทางไป host ชั้นนอก:**
+  - มี socket แค่ของ daemon ชั้นใน
+  - ไม่มี docker context หรือตัวแปร `DOCKER_*`
+  - พอร์ต 2375/2376 และ SSH ที่ `host.docker.internal` และ gateway ปิดอยู่ทั้งหมด
+  - `host.docker.internal` resolve ได้ จึงน่าจะเป็น Docker Desktop บน WSL2 แต่ยังต่อ daemon ของมันไม่ได้
+- **ผลการอ่านโค้ด (ข้อ 1):** ยังเป็นไปตามพรอมต์ 1 และ 2 แต่มี 3 จุดที่จะพังเมื่อ daemon อยู่คนละเครื่องหรือคนละ filesystem ผมแก้ไว้แล้ว
+
+### สิ่งที่แก้และเตรียมไว้
+- **พอร์ตภายใน:** แอปฟัง `0.0.0.0:8004` ตายตัวใน container ฝั่ง host ผูก `127.0.0.1:${APP_PORT}` เปลี่ยนได้เฉพาะพอร์ตฝั่ง host
+- **หน้าเว็บ:** เปลี่ยนจาก mount `./web` (ซึ่ง daemon จะไปหาบนเครื่องของมันเอง) เป็น `${HOST_APP_DIR}/web` แบบอ่านอย่างเดียว deploy จะคัดลอก `index.html` และสำเนา build context ไปไว้บน host แล้วเทียบ checksum ก่อน mount
+- **Token:** ย้ายออกจาก `.env` ไปไว้ที่ `secrets/api_token` (สิทธิ์ 0600) ระหว่างย้ายไม่ได้พิมพ์ค่าออกมา ตอน deploy จะส่งผ่าน pipe เข้า volume ไปอยู่ที่ `/data/secrets/api_token` (เจ้าของคือผู้ใช้ app สิทธิ์ 0400) ไม่ได้อยู่ใน env ของ container คุณอ่านค่าเองได้ด้วย `cat secrets/api_token`
+- **`deploy.sh` ใหม่:** นอกจากขั้นตอนเดิม มีเพิ่มดังนี้
+  - ปฏิเสธถ้า `DOCKER_HOST` ว่างหรือชี้ไปที่ daemon ชั้นใน ทดสอบแล้วทั้งสองกรณี
+  - แสดง container, volume และ network ที่มีอยู่เดิมโดยไม่แตะต้อง
+  - รอ /health ไม่เกิน 90 วินาที ถ้าไม่ผ่านจะแสดง log ที่ตัดความลับออกแล้ว
+  - ตรวจรุ่น `yolo1`/`cyolo1` และให้แต่ละ provider ตอบจริงหนึ่งครั้ง (`python3 -m app.smoke`) ภายใน container แอป
+  - ลองหา URL ที่ devtools เข้าถึงได้จริงด้วย /health ก่อนบันทึก `APP_URL`/`APP_TEST_URL`
+- **`.env.example`:** เพิ่มชื่อค่า `DOCKER_HOST`, `HOST_APP_DIR`, `APP_URL`, `APP_TEST_URL`, `API_TOKEN_FILE` (ไม่มีค่าความลับ) ใน `.env` ใส่ไว้เป็นค่าว่าง
+- เทสต์ backend ยังผ่าน 63 ข้อ
+
+### ขอข้อมูล 2 อย่าง
+**1. วิธีเชื่อมต่อ Docker host ชั้นนอก (ใส่ใน `DOCKER_HOST`)** เลือกทางใดทางหนึ่ง:
+- **(แนะนำ)** mount socket ของ host เข้ามาใน devtools แล้วบอก path ใน container ให้ผม เช่น เพิ่ม `-v /var/run/docker.sock:/var/run/docker-host.sock` (หรือเพิ่ม mount แบบเดียวกันใน devcontainer.json) แล้ว rebuild/restart devtools ค่าจะเป็น `unix:///var/run/docker-host.sock`
+- หรือ SSH ไป host ที่ตั้งค่า key ไว้แล้ว ให้บอก `ssh://ผู้ใช้@host` (ผมจะไม่เดาชื่อผู้ใช้หรือ credential)
+- หรือ TCP ที่เปิด TLS ไว้ พร้อมตำแหน่งไฟล์ cert
+
+**2. `HOST_APP_DIR`: โฟลเดอร์บน Docker host ที่อนุญาตให้ผมใช้** เป็น path แบบที่ daemon เห็น เช่น path ใน WSL หรือ path ที่ Docker Desktop แชร์ไว้ ผมจะตรวจว่าโฟลเดอร์มีอยู่จริงและเขียนได้ก่อนใช้ และจะไม่สร้างขึ้นเอง
+
+พอได้ 2 ค่านี้ ผมจะรัน `scripts/deploy.sh --check` เพื่อยืนยัน daemon ตรวจพอร์ต และดูของเดิมบน host ก่อน จากนั้นจึง deploy จริงและทดสอบด้วย Playwright ตามข้อ 10–15
+
+ใน devtools มี Playwright และ Chromium ติดตั้งอยู่แล้ว (`@playwright/cli` และ `~/.cache/ms-playwright`) ผมจะใช้ของเดิม

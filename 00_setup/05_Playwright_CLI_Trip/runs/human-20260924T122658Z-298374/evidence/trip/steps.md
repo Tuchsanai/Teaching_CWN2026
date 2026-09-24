@@ -10,3 +10,4 @@
 | 5 | ต้นทางตั้งแล้ว | click dest combobox, fill "Tokyo", click "โตเกียว · ทุกสนามบิน" (NRT+HND) | ปลายทาง โตเกียว สนามบินทั้งหมด | 08-dest-open.yml, 09-dest-typed.yml, 10-dest-set.png/.yml | see commands.log |
 | 6 | ปลายทางตั้งแล้ว | click วันออกเดินทาง, click "วันอาทิตย์ 27 กันยายน 2026", click "วันพฤหัสบดี 1 ตุลาคม 2026" | อา. 27 ก.ย. — พฤ. 1 ต.ค. | 11-calendar.png/.yml, 12-depart-picked.yml, 13-dates-set.png/.yml | see commands.log |
 | 7 | ฟอร์มครบ | click "ค้นหา" (f4e749) | URL showfarefirst?dcity=bkk&acity=tyo&ddate=2026-09-27&rdate=2026-10-01&triptype=rt&class=y&quantity=1 → **HTTP 432 "whaleguard block"** → WAITING_FOR_HUMAN | 14-flight-results.png/.yml (yml ว่าง) | see commands.log |
+| 8 | whaleguard wait | user asked for a retry (wait closed as not solved), tab-new homepage, redid the UI search | whaleguard block again, WAITING_FOR_HUMAN | retry-watch/steps.md, retry-watch/15-flight-results.* | see retry-watch/commands.log |
