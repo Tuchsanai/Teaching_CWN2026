@@ -1,13 +1,5 @@
 # API หลายบัญชี: FastAPI + หน้าแชต index.html ที่เรียก Claude Code และ Codex CLI
 
-**สิ่งที่จะได้:** ใช้พรอมต์สั่ง `yolo3` ให้สร้าง API จริงด้วย FastAPI ที่เรียก `yolo1` (Claude Code) และ `cyolo1` (Codex CLI) ใน container ใหม่ของตัวเอง พร้อมหน้าแชต `index.html` แยกต่างหากที่เลือก provider · model · effort · account ได้ แล้ว deploy ทั้งสองเป็น container **พี่น้อง (sibling)** ของ `devtools` บน Docker Desktop ชั้นนอก และทดสอบแชตหลายรอบด้วยคำตอบจริง
-
-ขอบเขต: Claude Code ผ่าน `yolo1` และ Codex CLI ผ่าน `cyolo1` เท่านั้น (ค่าเริ่มต้น 1 บัญชีต่อ provider) รายการโมเดลและระดับ effort ใช้ผลที่ตรวจจริงแล้วจาก LAB 003
-
-> **สถานะของเอกสารนี้ (24 ก.ย. 2026):** ผู้ประสานงาน deploy จริงบน daemon `docker-desktop` แล้ว (build · สำเนา credential · up · verify ผ่าน) `smoke` ผ่าน 13/13 (รวมตรวจขอบเขตบัญชี) เรียกผ่าน OpenAI Python SDK ได้จริง และทดสอบแชตจริงในเบราว์เซอร์ 10 รอบ (Fable/low/yolo1 5 รอบ ตามด้วย Astra/low/cyolo1 5 รอบ) หลักฐานดิบอยู่ใน [`assets/`](assets/) · โมเดลและ effort อื่นในแลปนี้ **ยังไม่ได้เรียกจริง** (ตารางโมเดล × effort มาจาก LAB 003) · ภาพแนวคิดทั้งสองภาพยังเป็นฉบับร่าง
-
----
-
 ## 1 · ภาพรวมสถาปัตยกรรม
 
 ![ภาพแนวคิดฉบับร่าง: devtools เป็นศูนย์ควบคุม สร้าง index.html และสั่ง build พร้อมคัดลอก config บัญชีไปยัง API container ใหม่ที่มี FastAPI, yoloN/cyoloN และโมเดล Fable/Opus กับ Astra/Sol/Luna ส่วนเบราว์เซอร์ส่งคำถามและรับคำตอบกับ API container โดยตรง](assets/architecture.png)
@@ -24,15 +16,6 @@
  devtools (JupyterLab + yolo3) ── ssh -S <socket> ──▶ control host :22022 ── docker ──▶ daemon "docker-desktop"
    └─ docker ในตัวเอง = daemon ชั้นใน (ไม่ใช้)            (lab04-api, lab04-web, devtools เป็นพี่น้องกัน)
 ```
-
-| ส่วน | อยู่ที่ไหน | หน้าที่ |
-|---|---|---|
-| `devtools` | container เดิม (ไม่แก้ไข) | เขียนโค้ดด้วย `yolo3` และสั่ง deploy ผ่าน SSH |
-| control host | `host.docker.internal:22022` | รัน `deploy/lab04.sh` ด้วย `docker` ที่คุยกับ `docker-desktop` |
-| `lab04-api` | container ใหม่บน daemon ชั้นนอก | FastAPI + Claude Code CLI + Codex CLI + wrapper `yolo1..5` / `cyolo1..5` ของตัวเอง |
-| `lab04-accounts` | named volume | **สำเนา** credential ที่เลือก ไม่ใช่ของจริงที่ mount สด และไม่ได้อยู่ใน image |
-| `lab04-web` | container ใหม่ (nginx unprivileged) | เสิร์ฟ `index.html` ไฟล์เดียว ไม่ proxy ไปหา API |
-| เบราว์เซอร์ | Windows host | โหลดหน้าเว็บจาก `:8005` แล้วเรียก API ที่ `:8004` ตรง ๆ (CORS อนุญาตเฉพาะ origin ของหน้าเว็บ) |
 
 ทำไมหน้าเว็บต้องมี container ของตัวเอง: ถ้าเปิด `index.html` แบบ `file://` เบราว์เซอร์จะส่ง origin เป็น `null` ซึ่ง API ไม่อนุญาต (การอนุญาต `null` เปิดทางให้หน้าเว็บอื่นใช้ได้ด้วย) จึงเลือกทางที่เล็กที่สุดคือ nginx ที่เสิร์ฟไฟล์เดียวบนพอร์ต `8005`
 
@@ -70,7 +53,7 @@ CONVERSATION_JSON:
 
 ---
 
-## 3 · พรอมต์ 1: ตรวจเครื่องและ CLI (~5 นาที)
+## 3 · พรอมต์ 1: สร้าง backend (~20 นาที)
 
 เปิด `yolo3` ใน 🖥️ Terminal ที่โฟลเดอร์งาน
 
@@ -81,35 +64,7 @@ mkdir -p /workspace/04_API_MultiAccount_Server && cd /workspace/04_API_MultiAcco
 ##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
-LAB 004 ขั้นที่ 1: ตรวจอย่างเดียว ห้ามแก้ไฟล์ ห้ามล็อกอิน ห้ามเรียกโมเดลจริง
-โฟลเดอร์งาน: /workspace/04_API_MultiAccount_Server
-
-ตรวจแล้วรายงานเป็นตาราง รายการ | คำสั่งที่ใช้ | ผลจริง:
-1. เวอร์ชันของ claude และ codex ที่ wrapper yolo1 / cyolo1 เรียกจริง (อ่านไฟล์ wrapper ด้วย cat ได้)
-2. flag จาก `claude --help` และ `codex exec --help` ของเวอร์ชันนี้ที่เกี่ยวกับ:
-   --model, --effort, -p, --output-format, --no-session-persistence, --tools, --permission-mode,
-   --setting-sources, --strict-mcp-config, --disable-slash-commands,
-   exec, --ephemeral, --sandbox, --ignore-user-config, --ignore-rules, -C, -o, -c model_reasoning_effort, อ่านพรอมต์จาก stdin ด้วย "-"
-3. wrapper yolo1/cyolo1 ใน devtools ใช้ flag ข้ามการขออนุญาตตัวไหน (แค่รายงาน ห้ามแก้ wrapper เดิม)
-4. ไฟล์บัญชีมีอยู่หรือไม่: ~/ai-accounts/.Claude/yolo1/.credentials.json และ ~/ai-accounts/.Codex/cyolo1/auth.json
-   ดูแค่ว่ามีและขนาดไม่เป็นศูนย์ ห้ามเปิดอ่านหรือพิมพ์ค่าในไฟล์ credential
-5. `docker info --format '{{.Name}}'` ใน devtools ได้ชื่ออะไร และอธิบายว่าเป็น daemon ชั้นในหรือชั้นนอก
-6. ตรวจ flag โดยไม่ใช้ credential ได้ด้วยการรันกับ config dir ว่างชั่วคราว
-   (CLAUDE_CONFIG_DIR=$(mktemp -d) / CODEX_HOME=$(mktemp -d)) ต้องไปจบที่ข้อความว่ายังไม่ได้ล็อกอิน ไม่ใช่ error เรื่อง flag
-
-ทำเฉพาะขั้นนี้ แล้วหยุดรอ
-```
-
-**สิ่งที่ควรเห็น (จากเครื่องที่ใช้เขียนแลปนี้ 24 ก.ย. 2026):** Claude Code `2.1.281`, codex-cli `0.156.1` · flag ทุกตัวในข้อ 2 มีอยู่จริง · wrapper เดิมใช้ `--dangerously-skip-permissions` และ `--dangerously-bypass-approvals-and-sandbox` · daemon ใน devtools คือ `567edcb8c206` (ชั้นใน) · การรันกับ config ว่างจบที่ `Not logged in` (Claude) และ `401 Unauthorized` (Codex) ซึ่งแปลว่า flag ถูกต้อง
-
----
-
-## 4 · พรอมต์ 2: สร้าง backend (~20 นาที)
-
-##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
-
-```text
-LAB 004 ขั้นที่ 2: สร้าง backend ใน /workspace/04_API_MultiAccount_Server/api
+LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/04_API_MultiAccount_Server/api
 ถ้ามีไฟล์อยู่แล้ว ให้ตรวจเทียบกับข้อกำหนดนี้ แก้เฉพาะจุดที่ไม่ตรง แล้วรันเทสต์ ห้ามเขียนทับทั้งโฟลเดอร์
 ห้ามล็อกอิน ห้ามเรียกโมเดลจริง ห้าม deploy ห้ามอ่านค่า credential
 
@@ -193,12 +148,12 @@ python3 -m venv /tmp/lab04venv && /tmp/lab04venv/bin/pip install -q -r requireme
 
 ---
 
-## 5 · พรอมต์ 3: สร้างหน้าแชต `index.html` (~15 นาที)
+## 4 · พรอมต์ 2: สร้างหน้าแชต `index.html` (~15 นาที)
 
 ##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
-LAB 004 ขั้นที่ 3: สร้างหน้าแชตไฟล์เดียว /workspace/04_API_MultiAccount_Server/web/index.html
+LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล์เดียว /workspace/04_API_MultiAccount_Server/web/index.html
 และ container เสิร์ฟไฟล์ static แยกจาก API ถ้ามีไฟล์แล้วให้ตรวจเทียบข้อกำหนดและแก้เฉพาะจุด ห้าม deploy
 
 ## หน้าเว็บ
@@ -232,12 +187,12 @@ LAB 004 ขั้นที่ 3: สร้างหน้าแชตไฟล�
 
 ---
 
-## 6 · พรอมต์ 4: สคริปต์ deploy และสำเนา credential (~15 นาที)
+## 5 · พรอมต์ 3: สคริปต์ deploy และสำเนา credential (~15 นาที)
 
 ##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
-LAB 004 ขั้นที่ 4: เขียนสคริปต์ deploy ใน /workspace/04_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
+LAB 004 ขั้นที่ 3: เขียนสคริปต์ deploy ใน /workspace/04_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
 ข้อเท็จจริง: docker ใน devtools คือ daemon ชั้นใน ใช้สร้าง sibling container ไม่ได้
 daemon ชั้นนอกชื่อ docker-desktop เข้าได้ผ่าน control host ทาง SSH root@host.docker.internal พอร์ต 22022
 control host เองเป็น container ดังนั้น localhost ของมันไม่ใช่พอร์ตที่ Docker Desktop publish
@@ -273,9 +228,9 @@ control host เองเป็น container ดังนั้น localhost ข
 
 ---
 
-## 7 · Deploy ขึ้น Docker Desktop ชั้นนอก (~15 นาที)
+## 6 · Deploy ขึ้น Docker Desktop ชั้นนอก (~15 นาที)
 
-### 7.1 · ผู้เรียนเปิดการเชื่อมต่อ SSH เอง (ห้ามให้ AI พิมพ์รหัสผ่าน)
+### 6.1 · ผู้เรียนเปิดการเชื่อมต่อ SSH เอง (ห้ามให้ AI พิมพ์รหัสผ่าน)
 
 ใน 🖥️ Terminal **อีกแท็บ** (ไม่ใช่ในช่องสนทนาของ `yolo3`)
 
@@ -287,12 +242,12 @@ bash deploy/remote.sh daemon    # ต้องเห็น devtools = daemon ช
 
 socket อยู่ใน `/tmp/lab04-ssh-<uid>/` ใช้ได้เฉพาะผู้ใช้เดียวกันใน devtools `yolo3` จึงใช้การเชื่อมต่อนี้ต่อได้โดยไม่ต้องรู้รหัสผ่าน และปิดเองเมื่อว่าง 2 ชั่วโมง
 
-### 7.2 · ให้ `yolo3` สั่ง deploy ผ่าน socket นั้น
+### 6.2 · ให้ `yolo3` สั่ง deploy ผ่าน socket นั้น
 
 ##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
 
 ```text
-LAB 004 ขั้นที่ 5: deploy ผ่าน deploy/remote.sh ที่ฉันเปิดการเชื่อมต่อ SSH ไว้แล้ว
+LAB 004 ขั้นที่ 4: deploy ผ่าน deploy/remote.sh ที่ฉันเปิดการเชื่อมต่อ SSH ไว้แล้ว
 ห้ามพิมพ์หรือเดารหัสผ่าน ห้ามรัน reveal-token ห้ามอ่านไฟล์ใน deploy/.secrets ห้ามเรียก smoke --live
 ห้ามใช้ docker ของ devtools สร้าง container
 
@@ -330,11 +285,11 @@ LAB 004 ขั้นที่ 5: deploy ผ่าน deploy/remote.sh ที่�
 
 ![ภาพหน้าจอจริง: Terminal ใน JupyterLab รัน lab04.sh smoke ผ่าน ssh -S ผลแสดง PASS 11 รายการ ได้แก่ health, 401 เมื่อไม่มี token, models, credential file, CORS ทั้งสองแบบ, astra+none 400, fable+minimal 400, max_completion_tokens 400, หน้าเว็บ 200 และ CSP ปิดท้ายด้วย smoke: 11 PASS, 0 FAIL](assets/08-api-smoke.png)
 
-*ภาพหน้าจอจริงของ `smoke` รอบแรก (11 รายการ) · รอบล่าสุด 13 รายการที่รวม N4 อยู่ในหัวข้อ 8.3*
+*ภาพหน้าจอจริงของ `smoke` รอบแรก (11 รายการ) · รอบล่าสุด 13 รายการที่รวม N4 อยู่ในหัวข้อ 7.3*
 
 ข้อสังเกตจากการ deploy จริง: Claude Code ใน container **ใช้งานได้โดยคัดลอกแค่ `.credentials.json`** (ไม่ต้องใช้ `.claude.json`) และ Codex ตอบได้จริงด้วย `auth.json` อย่างเดียว
 
-### 7.3 · ผู้เรียนดู token และเปิดหน้าเว็บ
+### 6.3 · ผู้เรียนดู token และเปิดหน้าเว็บ
 
 ```bash
 bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิมพ์ yes · ห้ามวางค่าลงในแชตกับ AI หรือในภาพหน้าจอ
@@ -344,9 +299,9 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 ---
 
-## 8 · ทดสอบในเบราว์เซอร์: แชตจริง 10 รอบ และการปฏิเสธ (~25 นาที)
+## 7 · ทดสอบในเบราว์เซอร์: แชตจริง 10 รอบ และการปฏิเสธ (~25 นาที)
 
-### 8.1 · พร้อม ≠ ใช้ได้จริง
+### 7.1 · พร้อม ≠ ใช้ได้จริง
 
 | ระดับ | ดูจากไหน | พิสูจน์อะไร | ไม่ได้พิสูจน์อะไร |
 |---|---|---|---|
@@ -357,7 +312,7 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 ป้าย L3 ขึ้นเฉพาะหลังได้คำตอบจริงเท่านั้น และแยกต่อ provider/account
 
-### 8.2 · แชตจริง 10 รอบ ในบทสนทนาเดียว
+### 7.2 · แชตจริง 10 รอบ ในบทสนทนาเดียว
 
 ผู้ประสานงานพิมพ์ในหน้าเว็บจริงที่ `http://localhost:8005/` ผ่าน computer use ไม่มีการจำลองคำตอบ รอบ 1–5 ใช้ **claude / fable / low / yolo1** แล้วเปลี่ยนเป็น **codex / gpt-6-astra / low / cyolo1** ในรอบ 6–10 โดย **ไม่ล้างแชต** ตารางด้านล่างคัดลอกจาก [`assets/ten-exchanges.json`](assets/ten-exchanges.json) ตรงตามที่บันทึก (ข้อความเดียวกันอยู่ใน [`ten-exchanges.txt`](assets/ten-exchanges.txt) และ 5 รอบแรกใน [`fable-five-exchanges.txt`](assets/fable-five-exchanges.txt)) เครื่องหมาย `**` ในคำตอบเป็นข้อความดิบที่โมเดลส่งมา หน้าเว็บไม่ render Markdown
 
@@ -392,7 +347,7 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 **ขอบเขตของหลักฐาน:** เรียกจริงแค่ 2 ชุด คือ `fable/low/yolo1` และ `gpt-6-astra/low/cyolo1` · Opus, Sol, Luna และ effort อื่นยังไม่ได้เรียกผ่าน API ของแลปนี้ (ตารางการรองรับมาจากการรันจริงใน LAB 003) · การที่ Codex ตอบได้ **ไม่ใช่** การทดสอบว่า sandbox ห้ามคำสั่ง shell ได้จริง
 
-### 8.3 · ทดสอบการปฏิเสธและขอบเขตบัญชี
+### 7.3 · ทดสอบการปฏิเสธและขอบเขตบัญชี
 
 | # | ทดสอบ | วิธี | ผลจริง | หลักฐาน |
 |---|---|---|---|---|
@@ -416,14 +371,14 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 *ภาพหน้าจอจริง N4: ตรวจขอบเขตบัญชีใน smoke รอบล่าสุด*
 
-### 8.4 · ขอบเขตเมื่อสลับบัญชี
+### 7.4 · ขอบเขตเมื่อสลับบัญชี
 
 - บัญชีคนละบัญชี = config dir คนละโฟลเดอร์ใน volume โควตาและ subscription แยกกัน ไม่มี session ร่วม
 - สิ่งเดียวที่ข้ามไปถึงบัญชีใหม่คือ **ข้อความในประวัติ** ที่หน้าเว็บส่งไป
 - การเพิ่มบัญชี (เช่น `yolo2`) ต้องทำครบสามอย่าง: ใส่ใน `CLAUDE_ACCOUNTS` ของ `deploy/lab04.env`, `run creds`, `run up` ถ้าใส่ชื่อแต่ยังไม่ได้คัดลอก API ตอบ 503 `account_not_provisioned`
 - ค่าเริ่มต้นของแลปนี้เปิดแค่ 1 บัญชีต่อ provider
 
-### 8.5 · เรียก API จาก Python ด้วย OpenAI SDK
+### 7.5 · เรียก API จาก Python ด้วย OpenAI SDK
 
 API นี้รับรูปแบบคำขอแบบเดียวกับ Chat Completions จึงใช้ไลบรารี `openai` ได้ โดยมีเงื่อนไข
 
@@ -484,7 +439,7 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ---
 
-## 9 · ข้อจำกัดด้านความปลอดภัยที่ต้องรู้
+## 8 · ข้อจำกัดด้านความปลอดภัยที่ต้องรู้
 
 | เรื่อง | สิ่งที่ทำ | ข้อจำกัดที่ยังมีอยู่ |
 |---|---|---|
@@ -500,7 +455,7 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ---
 
-## 10 · แก้ปัญหาที่พบบ่อย
+## 9 · แก้ปัญหาที่พบบ่อย
 
 | อาการ | สาเหตุที่เป็นไปได้ | ทางแก้ |
 |---|---|---|
@@ -516,7 +471,7 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ---
 
-## 11 · ไฟล์ในโฟลเดอร์นี้
+## 10 · ไฟล์ในโฟลเดอร์นี้
 
 | ไฟล์ | หน้าที่ |
 |---|---|
@@ -539,7 +494,7 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 | `assets/ten-exchanges.json`, `.txt`, `fable-five-exchanges.txt`, `dropdown-checks.json` | transcript จริง 10 รอบ และผลตรวจ dropdown |
 | `assets/authoring-environment-note.md` | บันทึกแพ็กเกจ apt ที่ติดตั้งใน devtools ระหว่างเขียนแลป |
 
-## 12 · สถานะและสิ่งที่ยังค้างอยู่
+## 11 · สถานะและสิ่งที่ยังค้างอยู่
 
 เสร็จและมีหลักฐานแล้ว
 
@@ -556,6 +511,6 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ข้อจำกัดที่รู้อยู่ (ทำเพิ่มได้ ไม่ใช่เงื่อนไขของแลปแชตนี้)
 
-- การบังคับห้ามคำสั่ง/เครื่องมือของ sandbox Codex และ `--tools ""` ของ Claude **ยังไม่ได้ทดสอบเฉพาะ** (หัวข้อ 9)
+- การบังคับห้ามคำสั่ง/เครื่องมือของ sandbox Codex และ `--tools ""` ของ Claude **ยังไม่ได้ทดสอบเฉพาะ** (หัวข้อ 8)
 - โมเดลและ effort อื่นนอกจาก Fable/low และ Astra/low ยังไม่ได้เรียกผ่าน API นี้ (อ้างอิง LAB 003)
 - แพ็กเกจ apt ใน devtools คงไว้ตามที่บันทึกใน [`authoring-environment-note.md`](assets/authoring-environment-note.md) ไม่มีการลบ
