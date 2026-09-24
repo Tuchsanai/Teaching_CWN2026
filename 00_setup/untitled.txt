@@ -15,4 +15,30 @@
 
 
 
+อ่านและทำความ
+
+
+- from openai import OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-5.6",
+    reasoning_effort="high",
+    max_completion_tokens=1000,
+    messages=[
+        {
+            "role": "system",
+            "content": "คุณเป็นอาจารย์สอน AI อธิบายให้เข้าใจง่าย"
+        },
+        {
+            "role": "user",
+            "content": "อธิบาย AI Agent แบบสั้นๆ"
+        }
+    ]
+)
+
+print(response.choices[0].message.content)
+
+
 
