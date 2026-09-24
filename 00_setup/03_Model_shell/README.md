@@ -264,7 +264,7 @@ QG='ร้านลด 10% เมื่อซื้อครบ 1000 บาท �
 ตอบเป็นตาราง ยอดซื้อ | ส่วนลด | ยอดหลังลด | ค่าส่ง | ยอดจ่ายจริง ทศนิยม 2 ตำแหน่ง
 ห้ามสร้างไฟล์หรือรันคำสั่งอื่น'
 
-# --- โหนด A และ B ทำงานขนานกัน (เครื่องหมาย & คือสั่งให้ทำงานเบื้องหลัง) ---
+# --- โหนด A และ B ทำงานขนานกัน ---
 yolo1 --model fable --effort medium -p "$QG" > a-fable.md &
 cyolo1 exec --skip-git-repo-check --model gpt-6-astra -c model_reasoning_effort=medium -o b-astra.md "$QG" > /dev/null 2>&1 &
 wait
