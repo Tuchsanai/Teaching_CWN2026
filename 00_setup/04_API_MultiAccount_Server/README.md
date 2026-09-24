@@ -1,71 +1,10 @@
-# LAB 004 · API หลายบัญชี: FastAPI + หน้าแชต index.html ที่เรียก Claude Code และ Codex CLI
+# API หลายบัญชี: FastAPI + หน้าแชต index.html ที่เรียก Claude Code และ Codex CLI
 
 **สิ่งที่จะได้:** ใช้พรอมต์สั่ง `yolo3` ให้สร้าง API จริงด้วย FastAPI ที่เรียก `yolo1` (Claude Code) และ `cyolo1` (Codex CLI) ใน container ใหม่ของตัวเอง พร้อมหน้าแชต `index.html` แยกต่างหากที่เลือก provider · model · effort · account ได้ แล้ว deploy ทั้งสองเป็น container **พี่น้อง (sibling)** ของ `devtools` บน Docker Desktop ชั้นนอก และทดสอบแชตหลายรอบด้วยคำตอบจริง
 
 ขอบเขต: Claude Code ผ่าน `yolo1` และ Codex CLI ผ่าน `cyolo1` เท่านั้น (ค่าเริ่มต้น 1 บัญชีต่อ provider) รายการโมเดลและระดับ effort ใช้ผลที่ตรวจจริงแล้วจาก LAB 003
 
-**โครงของแลป**
-
-| หัวข้อ | เนื้อหา | ใครทำ | เวลา |
-|---|---|---|---|
-| 0 | ก่อนเริ่ม และเงื่อนไขการเชื่อมต่อครั้งเดียว | ผู้เรียน | 5 นาที |
-| 1 | ภาพรวมสถาปัตยกรรม | อ่าน | 5 นาที |
-| 2 | ประวัติแชตถูกส่งให้ CLI อย่างไร (ต่างจาก API จริงตรงไหน) | อ่าน | 5 นาที |
-| 3 | พรอมต์ 1: ตรวจเครื่องและ CLI | `yolo3` | 5 นาที |
-| 4 | พรอมต์ 2: สร้าง backend (FastAPI + wrapper) | `yolo3` | 20 นาที |
-| 5 | พรอมต์ 3: สร้างหน้าแชต `index.html` | `yolo3` | 15 นาที |
-| 6 | พรอมต์ 4: สคริปต์ deploy และสำเนา credential | `yolo3` | 15 นาที |
-| 7 | Deploy ขึ้น Docker Desktop ชั้นนอก | ผู้เรียน + `yolo3` | 15 นาที |
-| 8 | ทดสอบแชตจริง 10 รอบ และทดสอบการปฏิเสธ | ผู้เรียน (เบราว์เซอร์) | 25 นาที |
-| 9 | ข้อจำกัดด้านความปลอดภัยที่ต้องรู้ | อ่าน | 5 นาที |
-
 > **สถานะของเอกสารนี้ (24 ก.ย. 2026):** ผู้ประสานงาน deploy จริงบน daemon `docker-desktop` แล้ว (build · สำเนา credential · up · verify ผ่าน) `smoke` ผ่าน 13/13 (รวมตรวจขอบเขตบัญชี) เรียกผ่าน OpenAI Python SDK ได้จริง และทดสอบแชตจริงในเบราว์เซอร์ 10 รอบ (Fable/low/yolo1 5 รอบ ตามด้วย Astra/low/cyolo1 5 รอบ) หลักฐานดิบอยู่ใน [`assets/`](assets/) · โมเดลและ effort อื่นในแลปนี้ **ยังไม่ได้เรียกจริง** (ตารางโมเดล × effort มาจาก LAB 003) · ภาพแนวคิดทั้งสองภาพยังเป็นฉบับร่าง
-
----
-
-## 0 · ก่อนเริ่ม
-
-แลปนี้ถือว่าผู้เรียนมีครบแล้ว
-
-1. `yolo1` (Claude) และ `cyolo1` (Codex) ล็อกอินแล้วใน container `devtools` (LAB 001–002)
-2. เรียกโมเดลจาก shell ได้ตามตารางของ LAB 003
-3. เปิด 🖥️ Terminal ใน JupyterLab ของ `devtools` และมีบัญชี `yolo3` ไว้ใช้เป็นผู้ช่วยเขียนโค้ด
-
-ตรวจความพร้อมใน 🖥️ Terminal
-
-```bash
-yolo1 --version; cyolo1 --version; yolo3 --version
-ls -la ~/ai-accounts/.Claude/yolo1/.credentials.json ~/ai-accounts/.Codex/cyolo1/auth.json
-```
-
-บรรทัดที่สองดูแค่ว่า **มีไฟล์** หรือไม่ ห้ามเปิดดูเนื้อไฟล์ เพราะเป็น credential
-
-### 0.1 · เงื่อนไขการเชื่อมต่อครั้งเดียว: `docker` ใน devtools ไม่ใช่ Docker ตัวที่เราต้องการ
-
-ใน `devtools` มีคำสั่ง `docker` ก็จริง แต่ชี้ไปที่ **Docker daemon ชั้นใน** ที่ซ้อนอยู่ใน devtools เอง ไม่ใช่ Docker Desktop ของเครื่อง Windows
-
-```bash
-docker info --format '{{.Name}}'
-```
-
-| ผลที่เห็น | ความหมาย |
-|---|---|
-| รหัสแบบ `567edcb8c206` | daemon **ชั้นใน** ของ devtools · container ที่สร้างตรงนี้ไม่ใช่ sibling ของ devtools และพอร์ตไม่เปิดให้เบราว์เซอร์บน Windows |
-| `docker-desktop` | daemon **ชั้นนอก** ของ Docker Desktop · ตัวที่แลปนี้ต้องใช้ |
-
-ดังนั้น devtools ทำหน้าที่เป็น **ศูนย์ควบคุมและเขียนโค้ด** เท่านั้น การสร้าง container ต้องสั่งผ่าน **control host** ที่ `docker` ของมันคุยกับ `docker-desktop` ในชุดทดลองนี้ control host เข้าได้จาก devtools ทาง SSH
-
-| รายการ | ค่า |
-|---|---|
-| ปลายทาง SSH | `root@host.docker.internal` พอร์ต `22022` |
-| โฟลเดอร์งานบน control host | `/root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server` |
-| วิธีล็อกอิน | พิมพ์รหัสผ่านเองหนึ่งครั้ง ระบบเปิด OpenSSH ControlMaster ชั่วคราว แล้วคำสั่งถัด ๆ ไปใช้ `ssh -S <socket>` ซ้ำ |
-
-สิ่งที่ **ไม่ทำ**: ไม่ rebuild หรือสร้าง devtools ใหม่ · ไม่ mount Docker socket ของ host เข้า devtools · ไม่แก้ wrapper `yoloN`/`cyoloN` และ credential เดิมใน `~/ai-accounts` · ไม่แก้ `~/.ssh/config` ไม่สร้างคีย์ ไม่เก็บรหัสผ่าน (host key เก็บในโฟลเดอร์ชั่วคราวเท่านั้น)
-
-> ⚠️ **บันทึกตามจริง:** ระหว่างเขียนแลปนี้ มีการติดตั้ง dependency ชั่วคราวใน devtools ได้แก่ venv ใน `/tmp` สำหรับ unit test และ **แพ็กเกจ apt 93 ตัว** ที่ Playwright ติดตั้งให้ (ภายหลังตัดการทดสอบนั้นออกแล้ว) แพ็กเกจ apt ยังไม่ได้ลบ เพื่อไม่ให้กระทบงานอื่น รายการครบอยู่ใน [`assets/authoring-environment-note.md`](assets/authoring-environment-note.md) ดังนั้น devtools **ไม่ได้ถูก rebuild และ wrapper/credential ไม่ถูกแก้** แต่ก็ไม่ได้ "ไม่ถูกแตะเลย"
-
-> ถ้าเครื่องของผู้เรียนไม่มี control host แบบนี้ ต้องใช้ Terminal บนเครื่อง host ที่ `docker info --format '{{.Name}}'` ขึ้น `docker-desktop` แทน (เช่น WSL ที่เปิด WSL integration ของ Docker Desktop) แล้วรัน `bash deploy/lab04.sh ...` ตรงนั้น โดยตั้ง `PROBE_HOST=127.0.0.1` ใน `deploy/lab04.env`
 
 ---
 
