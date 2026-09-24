@@ -25,245 +25,64 @@
 
 ---
 
-## 2 · ประวัติแชตถูกส่งให้ CLI อย่างไร
+## 2 · สร้าง Backend
 
-`claude -p` และ `codex exec` ตอบคำถาม **ครั้งเดียวแล้วจบ** API นี้ยังสั่งไม่ให้เก็บ session (`--no-session-persistence`, `--ephemeral`) ดังนั้น **CLI จำอะไรข้ามรอบไม่ได้เลย** สิ่งที่ทำให้ถามต่อได้คือ **หน้าเว็บส่งประวัติข้อความทั้งหมดไปทุกครั้ง** แล้ว API แปลงเป็นพรอมต์ก้อนเดียว
+คัดลอกแต่ละพรอมต์ในหัวข้อ 2–4 ไปวางในช่องสนทนาของ AI (`yolo3`) ที่เปิดผ่าน JupyterLab ไม่ใช่ใน cell ของ Python notebook
 
-```text
-You are the assistant in a simple web chat application.
-The conversation so far is given below as a JSON array of {"role", "content"} objects, oldest first.
-...
-CONVERSATION_JSON:
-[
- {"role": "user", "content": "สวัสดี ฉันชื่อมะลิ"},
- {"role": "assistant", "content": "สวัสดีค่ะคุณมะลิ"},
- {"role": "user", "content": "ฉันชื่ออะไร"}
-]
-```
-
-| เรื่อง | Chat API จริง (native) | API ของแลปนี้ (transcript → CLI) |
-|---|---|---|
-| ความจำระหว่างรอบ | ฝั่ง client ส่ง `messages` เหมือนกัน | เหมือนกัน แต่ถูก **รวมเป็นข้อความเดียว** ส่งทาง stdin |
-| ขอบเขตของ role | แยกโดยโครงสร้างของ API | ใส่ role ไว้ใน JSON ทำให้ข้อความที่ผู้ใช้พิมพ์ถูก escape อยู่ใน `content` เสมอ แต่ทั้งก้อนยังเป็น **ข้อความธรรมดา** ที่โมเดลอ่าน **ไม่ได้รับประกันว่ากัน prompt injection ได้** ข้อความในประวัติยังชักนำโมเดลได้เหมือนข้อความทั่วไป |
-| `system` | system prompt จริง | เป็นแค่ข้อความที่ขอให้โมเดลเคารพ ไม่มีสิทธิ์พิเศษ |
-| เปลี่ยนโมเดล/บัญชีกลางบทสนทนา | ส่ง messages เดิมให้โมเดลใหม่ | เหมือนกัน · ตัวใหม่เห็นแค่ **ข้อความ** ไม่รู้ว่ารอบก่อนใครตอบ และบัญชีคนละบัญชีไม่แชร์ session |
-| `max_completion_tokens`, `temperature`, `tools`, `stream` | รองรับ | **ปฏิเสธด้วย HTTP 400** เพราะ CLI ไม่ได้รับค่าเหล่านี้ ไม่ทำเป็นว่ารองรับ |
-| token usage | มีตัวเลขจริง | `"usage": null` ไม่เดาตัวเลข |
-| ต้นทุนต่อรอบ | คิดตาม token | ทุกรอบเริ่ม CLI ใหม่และส่งประวัติทั้งหมด ยิ่งคุยยาวยิ่งช้าและกินโควตา มีเพดาน 40 ข้อความ / 48,000 ตัวอักษร |
-
----
-
-## 3 · สร้าง Backend
-
-คัดลอกพรอมต์ด้านล่างไปวางใน `yolo3` ใน devtools
-
-##### 📋 พรอมต์ 1 · Backend (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 1 · สร้าง Backend
 
 ```text
-LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/04_API_MultiAccount_Server/api
-ถ้ายังไม่มี ให้สร้างโฟลเดอร์ /workspace/04_API_MultiAccount_Server/api และโฟลเดอร์ย่อยที่จำเป็น ทำงานเฉพาะภายใต้ /workspace/04_API_MultiAccount_Server เท่านั้น
-ไฟล์ที่มีอยู่แล้วต้องเก็บไว้ และแก้เฉพาะส่วนที่จำเป็น
-ถ้ามีไฟล์อยู่แล้ว ให้ตรวจเทียบกับข้อกำหนดนี้ แก้เฉพาะจุดที่ไม่ตรง แล้วรันเทสต์ ห้ามเขียนทับทั้งโฟลเดอร์
-ห้ามล็อกอิน ห้ามเรียกโมเดลจริง ห้าม deploy ห้ามอ่านค่า credential
-
-## Endpoint
-- GET /health  ไม่ต้องใช้ token · บอกว่า CLI แต่ละตัวรันได้ (ผ่าน wrapper --version) · ห้ามบอกข้อมูลบัญชี
-  ต้องเขียนชัดว่า health ไม่ได้พิสูจน์ว่าล็อกอินใช้ได้
-- GET /v1/models  ต้องใช้ Bearer token · รายการโมเดล, effort ต่อโมเดล, บัญชีต่อ provider
-  (credential_file_present = ดูแค่ว่ามีไฟล์ ห้ามเปิดไฟล์), limits, พารามิเตอร์ที่รองรับ
-- POST /v1/chat/completions  ต้องใช้ Bearer token · รูปแบบคล้าย OpenAI
-  ฟิลด์ที่รับ: model, messages, reasoning_effort, account, provider, stream(false เท่านั้น)
-  ฟิลด์อื่นทั้งหมดตอบ 400 unsupported_parameter (เช่น max_completion_tokens, max_tokens, temperature, tools)
-  ห้ามอ้างว่ารองรับ max_completion_tokens · usage เป็น null
-
-## โมเดลและ effort (มาจากผลจริงของ LAB 003)
-- fable, opus (claude): low medium high xhigh max
-- gpt-6-astra (codex): low medium high xhigh max
-- gpt-6-sol, gpt-6-luna (codex): none low medium high xhigh max
-- minimal ห้ามมี · ค่าอื่นตอบ 400 unsupported_reasoning_effort · ค่าเริ่มต้น medium
-
-## บัญชีและ wrapper
-- บัญชีตั้งได้ด้วย CLAUDE_ACCOUNTS / CODEX_ACCOUNTS ค่าเริ่มต้น yolo1 / cyolo1 (1 บัญชีต่อ provider)
-  ชื่อต้องเป็น yolo1..yolo5 / cyolo1..cyolo5 เท่านั้น บัญชีที่ไม่ได้เปิดตอบ 400 ไม่มีไฟล์ credential ตอบ 503
-- API ต้องเรียกโมเดลผ่าน wrapper ชื่อ yoloN / cyoloN ที่อยู่ใน container ของ API เอง (api/wrappers/lab04-cli + symlink)
-  ห้ามแก้หรือคัดลอก wrapper เดิมของ devtools · wrapper ใหม่ต้องแคบกว่า:
-  - เลือก config dir ที่เป็นสำเนา: CLAUDE_CONFIG_DIR=/data/accounts/claude/yoloN, CODEX_HOME=/data/accounts/codex/cyoloN
-  - รับแค่ --model --effort (Codex เพิ่ม --output-last-message ที่ต้องอยู่ใน $TMPDIR) หรือ --version อย่างอื่นปฏิเสธ
-  - พรอมต์เข้าทาง stdin · ห้ามใช้ --dangerously-skip-permissions / --dangerously-bypass-approvals-and-sandbox
-  - Claude: -p --output-format json --no-session-persistence --tools "" --strict-mcp-config
-            --disable-slash-commands --setting-sources "" --permission-mode dontAsk
-  - Codex: exec --skip-git-repo-check --ephemeral --ignore-user-config --ignore-rules --sandbox read-only
-           --color never -C "$PWD" -c model_reasoning_effort=... -c approval_policy=never
-           -c cli_auth_credentials_store=file -o <file> -
-  - unset ตัวแปร auth ที่อาจทับบัญชี (ANTHROPIC_API_KEY, OPENAI_API_KEY ฯลฯ)
-  ยืนยัน flag ทุกตัวกับ --help ของเวอร์ชันจริงก่อนใช้ ถ้าไม่มีจริงให้รายงาน ห้ามเดา
-
-## การรัน subprocess
-- asyncio.create_subprocess_exec แบบ argv list ห้ามใช้ shell · พรอมต์ส่งทาง stdin ไม่ใส่ใน argv
-- HOME คงที่เป็น home ของผู้ใช้ app ใน container ห้ามเปลี่ยน HOME ต่อ request
-- ต่อ request: cwd ว่างและ TMPDIR ของตัวเอง ลบทิ้งเมื่อจบ · env ขั้นต่ำ ไม่ส่ง env ของ server ต่อ
-- timeout (ค่าเริ่ม 300 s) ฆ่าทั้ง process group · จำกัดขนาด stdout/stderr · ตัดคำตอบยาวเกิน 24,000 ตัวอักษร (finish_reason=length)
-- จำกัด body 256 KiB ทั้งกรณีมี Content-Length และกรณี chunked ที่ไม่มี Content-Length (นับไบต์ระหว่างอ่าน)
-- จำกัด 40 ข้อความ, 8,000 ตัวอักษรต่อข้อความ, 48,000 ตัวอักษรรวม, ข้อความสุดท้ายต้องเป็น user
-- concurrency ต่อ (provider, account) ค่าเริ่ม 1 และรวมทั้ง server ค่าเริ่ม 4 · ไม่ว่างตอบ 429
-
-## ความลับและ error
-- token: server เก็บแค่ SHA-256 (API_TOKEN_SHA256) เทียบด้วย hmac.compare_digest ไม่มีค่านี้ต้องไม่ยอมเริ่ม
-- CORS: origin ที่ระบุชัดเท่านั้น (http://127.0.0.1:8005, http://localhost:8005) ห้าม * และห้าม null · ไม่ใช้ cookie
-- error ที่ส่งกลับเป็นข้อความคงที่ตามประเภท (upstream_auth_error, upstream_rate_limited, cli_timeout …) ห้ามส่ง stderr/stdout ดิบ
-  Codex พิมพ์พรอมต์ซ้ำใน stderr ให้จัดประเภทจากบรรทัด ERROR เท่านั้น
-- log ได้แค่ request id, provider, model, effort, account, จำนวนข้อความ, จำนวนตัวอักษร, สถานะ, เวลา
-  ห้าม log เนื้อข้อความ คำตอบ token หรือ traceback · validation error ห้ามสะท้อนค่าที่ส่งมา
-
-## ประวัติแชต
-- รวม messages เป็นพรอมต์เดียว: คำอธิบายสั้น + CONVERSATION_JSON (json.dumps, ensure_ascii=False)
-
-## ไฟล์และการทดสอบ
-- api/app/{catalog,config,transcript,runner,main}.py, api/wrappers/lab04-cli
-- api/requirements.txt pin ทุกแพ็กเกจรวม dependency ย่อย, requirements-dev.txt สำหรับเทสต์
-- api/Dockerfile: base image pin tag+digest, ติดตั้ง Claude Code และ Codex เวอร์ชันเดียวกับ devtools,
-  symlink yolo1..5 / cyolo1..5 ไปที่ wrapper, ผู้ใช้ไม่ใช่ root, ไม่มี credential ใน image
-- .dockerignore กัน credential/secret/เทสต์ออกจาก image
-- unittest ด้วย CLI ปลอม (tests/fakes) ครอบคลุม: argv/env/HOME/cwd, wrapper ปฏิเสธ flag อันตราย,
-  effort ผิด, max_completion_tokens, บัญชีผิด/ไม่มีไฟล์, body เกินทั้งแบบมีและไม่มี Content-Length,
-  timeout, error ไม่รั่ว, log ไม่มีเนื้อข้อความ, concurrency ต่อบัญชี, CORS
-
-รันเทสต์ด้วย venv ชั่วคราวนอกโฟลเดอร์งาน รายงานผลจริง PASS/FAIL พร้อมจำนวนเทสต์
-ทำเฉพาะขั้นนี้ แสดงตารางไฟล์ที่สร้าง/แก้และหน้าที่ของแต่ละไฟล์ แล้วหยุดรอ
-```
-
-**สิ่งที่ต้องตรวจหลัง `yolo3` ทำเสร็จ**
-
-```bash
-cd /workspace/04_API_MultiAccount_Server/api
-python3 -m venv /tmp/lab04venv && /tmp/lab04venv/bin/pip install -q -r requirements-dev.txt
-/tmp/lab04venv/bin/python -m unittest discover -s tests 2>&1 | tail -3
-```
-
-ผลจากโฟลเดอร์ต้นฉบับของแลปนี้ (CLI ปลอม ไม่ได้เรียกโมเดลจริง): `Ran 29 tests … OK`
-
-> 🔍 **จุดที่ผู้เรียนต้องตรวจ:** เปิด `api/wrappers/lab04-cli` แล้วหาคำว่า `dangerously` ต้องเจอเฉพาะในคอมเมนต์ที่บอกว่า **ไม่ใช้** ถ้าไปอยู่ในบรรทัดคำสั่ง แปลว่า wrapper กว้างเกินไป
-
----
-
-## 4 · สร้างหน้าแชต index.html
-
-##### 📋 พรอมต์ 2 · HTML (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
-
-```text
-LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล์เดียว /workspace/04_API_MultiAccount_Server/web/index.html
-และ container เสิร์ฟไฟล์ static แยกจาก API ถ้ามีไฟล์แล้วให้ตรวจเทียบข้อกำหนดและแก้เฉพาะจุด ห้าม deploy
-
-## หน้าเว็บ
-- ไฟล์เดียว ไม่มี CDN หรือไฟล์ภายนอก มี <script> และ <style> อย่างละหนึ่งก้อน ไม่มี style= หรือ onclick= ใน HTML
-- แถบซ้าย: API base URL (ค่าเริ่ม http://127.0.0.1:8004), ช่อง token แบบ password, ปุ่มเชื่อมต่อ
-  token อยู่ในตัวแปร JavaScript เท่านั้น ห้าม localStorage/sessionStorage/cookie
-- dropdown Provider → Model → Effort → Account เติมจาก /v1/models เท่านั้น
-  effort เปลี่ยนตามโมเดล (Astra ไม่มี none, Sol/Luna มี none) account เปลี่ยนตาม provider
-- ป้ายสถานะสามระดับ แยกให้ชัด: API ตอบ /health · Token ผ่าน /v1/models · บัญชีตอบจริงสำเร็จ (เฉพาะหลังได้คำตอบจริง)
-- เชื่อมต่อใหม่: ล้าง catalog และสถานะเดิมก่อนเสมอ ถ้าเชื่อมต่อใหม่ไม่ผ่าน dropdown/ช่องพิมพ์ต้องปิด
-  ห้ามเหลือตัวเลือกเก่าที่ส่งไป endpoint ที่เพิ่งล้มเหลวได้
-  ระหว่างตรวจหรือระหว่างรอคำตอบ ให้ล็อกช่อง URL, token และปุ่มเชื่อมต่อ
-- transcript แบบแชตทั่วไป: ข้อความผู้ใช้ชิดขวา ผู้ช่วยชิดซ้าย แต่ละคำตอบมีป้าย provider/model, effort, account, เวลา,
-  จำนวนข้อความประวัติที่ส่ง · แสดงเนื้อหาด้วย textContent เท่านั้น (ไม่แปลง Markdown ไม่ใช้ innerHTML)
-- ส่ง (ปุ่มหรือ Ctrl+Enter) ส่งประวัติทั้งหมดที่สำเร็จ + ข้อความใหม่ · ถ้าล้มเหลว ข้อความนั้นไม่ถูกนับในประวัติและคืนกลับช่องพิมพ์
-- ล้างแชต, ดาวน์โหลด transcript เป็น JSON (ไม่มี token), ตัวนับจำนวนข้อความ/ตัวอักษรเทียบเพดาน
-- เปลี่ยนโมเดลหรือบัญชีกลางบทสนทนา ให้แสดงข้อความแจ้งว่าประวัติจะถูกส่งเป็นข้อความให้ตัวใหม่ และบัญชีไม่แชร์ session
-- error แสดงประเภท, HTTP status, request id และข้อความจาก API
-- รองรับโหมดมืด และจอแคบ
-
-## container ของหน้าเว็บ (web/)
-- nginx แบบ unprivileged pin tag+digest เสิร์ฟ index.html อย่างเดียว ไม่ proxy ไป API
-- build_csp.py คำนวณ sha256 ของ <script>/<style> ตอน build แล้วใส่ CSP:
-  default-src 'none'; script-src/style-src ด้วย hash; img-src data:; connect-src เฉพาะ origin ของ API;
-  base-uri 'none'; form-action 'none'; frame-ancestors 'none' พร้อม header nosniff, no-referrer, DENY frame
-- .dockerignore ให้เข้า image เฉพาะไฟล์ที่ใช้
-
-ตรวจ syntax ของ JavaScript และลอง build_csp.py ในเครื่อง ห้ามติดตั้งเบราว์เซอร์หรือเปิด server ทดสอบค้างไว้
-ทำเฉพาะขั้นนี้ แล้วหยุดรอ
+ช่วยสร้าง backend ของแลป 04 ในโฟลเดอร์ /workspace/04_API_MultiAccount_Server ที่ devtools ถ้ายังไม่มีโฟลเดอร์ใดให้สร้างเอง และถ้ามีงานเดิมให้เก็บไว้แล้วแก้เฉพาะส่วนที่ยังไม่ตรง
+devtools เป็นแค่ที่เขียนงาน ส่วน API จะรันใน container ของตัวเองชื่อ lab04-api แยกจาก devtools โดยเปิดพอร์ต 8004 ของเครื่องไปที่พอร์ต 8000 ข้างใน
+API ต้องคุยได้กับ Claude รุ่น Fable และ Opus และกับ Codex รุ่น Astra, Sol และ Luna โดยใช้ชื่อโมเดลและระดับ effort ตามที่ยืนยันแล้วจากคำสั่งจริงในแลป 03
+ให้ใช้บัญชี yolo1 ของ Claude และ cyolo1 ของ Codex ที่ล็อกอินไว้แล้ว โดยคัดลอกสำเนา credential ไปไว้ใน volume ส่วนตัวของ API ห้ามแก้ไฟล์ต้นฉบับ ห้ามแสดงค่า และห้ามใส่ไว้ใน image
+รูปแบบคำขอให้เข้ากันได้กับ OpenAI chat completions คือรับ messages, model, reasoning_effort และ account ส่วนฟิลด์ที่ทำไม่ได้จริงให้ปฏิเสธพร้อมบอกเหตุผล
+ให้โมเดลได้เห็นประวัติแชตทั้งหมดที่ส่งมาเพื่อให้ถามต่อได้ และถ้าเรียกโมเดลไม่สำเร็จให้ตอบ error ห้ามแต่งคำตอบขึ้นเอง
+API ต้องมี token ป้องกัน มีเพดานขนาดคำขอและเวลาที่เหมาะสม และข้อความ error ต้องอ่านเข้าใจได้โดยไม่เผยความลับ
+เลือกโครงไฟล์ เวอร์ชัน และวิธีทดสอบเองจากไฟล์ในแลปเดิมและสภาพแวดล้อมจริง แล้วทดสอบโดยยังไม่ต้องเรียกโมเดลจริง
+เสร็จแล้วสรุปสั้น ๆ ว่าสร้างหรือแก้อะไร และผลทดสอบจริงเป็นอย่างไร แล้วรอฉันก่อน
 ```
 
 ---
 
-## 5 · เตรียม Deployment
+## 3 · สร้างหน้าแชต
 
-##### 📋 พรอมต์ 3 · Deployment (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 2 · สร้างหน้าแชต
 
 ```text
-LAB 004 ขั้นที่ 3: เขียนสคริปต์ deploy ใน /workspace/04_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
-ข้อเท็จจริง: docker ใน devtools คือ daemon ชั้นใน ใช้สร้าง sibling container ไม่ได้
-daemon ชั้นนอกชื่อ docker-desktop เข้าได้ผ่าน control host ทาง SSH root@host.docker.internal พอร์ต 22022
-control host เองเป็น container ดังนั้น localhost ของมันไม่ใช่พอร์ตที่ Docker Desktop publish
-
-## deploy/lab04.sh (รันบน control host)
-- ไม่ยอมทำงานถ้า docker info --format '{{.Name}}' ไม่ใช่ docker-desktop
-- ตรวจ config ทุกค่าก่อนนำไปใส่คำสั่ง docker: ชื่อบัญชี yolo[1-5]/cyolo[1-5], ชื่อ container/volume/network,
-  พอร์ต, path (ห้าม ..), PROBE_HOST · path ที่ต้อง mkdir ส่งเป็น argument ห้ามต่อเป็นสตริง shell
-- แตะเฉพาะของที่มี label lab04=<หน้าที่> (api, web, loader, accounts, net) เจอชื่อซ้ำที่ไม่มี label ให้หยุด ห้ามลบ
-- คำสั่งย่อย: check, build, token, creds, up, verify, smoke [--live], status, logs [N], down [--purge]
-- token: สุ่ม 32 ไบต์ลง deploy/.secrets/api_token (chmod 600) ห้ามพิมพ์ค่า · container ได้แค่ SHA-256
-- creds: สร้าง named volume, container loader ที่หยุดอยู่ (label lab04=loader),
-  docker cp จาก devtools เป็น tar stream ส่งต่อเข้า loader ไม่ผ่านดิสก์ ไม่พิมพ์ค่า
-  คัดลอกเฉพาะ yoloN/.credentials.json และ cyoloN/auth.json แล้ว chown ให้ uid 10001 · รายงานแค่ว่ามีไฟล์
-- up: API และ web ผูก 127.0.0.1:8004 / 127.0.0.1:8005 · --read-only, --cap-drop ALL, no-new-privileges,
-  จำกัด pids/memory · tmpfs ที่ /tmp และ /home/app (HOME ต้องเขียนได้) · รอ healthy แล้ว verify
-- verify: เช็คสองทาง (ผ่าน network ของ container และผ่านพอร์ตที่ publish ด้วย PROBE_HOST=host.docker.internal)
-  FAIL ต้องรายงานว่า FAIL ห้ามเหมาเป็น PASS
-- smoke: health, 401 ไม่มี token, models, CORS ของหน้าเว็บ/origin แปลกปลอม, astra+none=400, fable+minimal=400,
-  max_completion_tokens=400, บัญชีที่ไม่เปิด=400, CSP ของหน้าเว็บ · --live เท่านั้นที่เรียกโมเดลจริง
-- deploy/lab04.env.example ไม่มีความลับ
-
-## deploy/remote.sh (รันใน devtools)
-- open: ssh -F /dev/null -o ControlMaster=yes -o ControlPath=<โฟลเดอร์ชั่วคราว 700>/ctl -o ControlPersist=2h -fN
-  ผู้ใช้พิมพ์รหัสผ่านเอง · known_hosts อยู่ในโฟลเดอร์ชั่วคราว · ไม่ใช้คีย์ ไม่แก้ ~/.ssh
-- ทุกคำสั่งหลังจากนั้นใช้ ssh -S <socket> -o BatchMode=yes
-- daemon, sync (tar ไปที่ /root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server ยกเว้น deploy/.secrets),
-  run <คำสั่งย่อยที่อนุญาต>, reveal-token (ผู้ใช้รันเองและต้องพิมพ์ yes), close
-
-ตรวจ bash -n และทดสอบการปฏิเสธ config ผิดแบบ offline เท่านั้น ห้ามเปิด SSH ห้าม deploy
-ทำเฉพาะขั้นนี้ แล้วหยุดรอ
+ต่อจาก backend ช่วยสร้างหน้าแชตเป็นไฟล์ index.html ในโฟลเดอร์ web ของแลปเดียวกัน ถ้าโฟลเดอร์ยังไม่มีให้สร้างเอง และถ้ามีไฟล์เดิมให้ปรับจากของเดิม
+หน้าเว็บนี้ต้องแยกจาก API โดยเสิร์ฟจาก container ของตัวเองชื่อ lab04-web ที่พอร์ต 8005 และให้เบราว์เซอร์เรียก API ที่พอร์ต 8004 โดยตรง
+ให้มี dropdown เลือก provider, model, effort และ account ที่ดึงรายการจริงจาก API และเปลี่ยนตัวเลือกให้ตรงกับโมเดลและ provider ที่เลือกอยู่
+ผู้ใช้กรอกที่อยู่ API และ token เองบนหน้าเว็บ ห้ามฝัง token หรือความลับใด ๆ ไว้ในไฟล์ HTML และไม่ต้องจำ token ไว้ในเบราว์เซอร์
+หน้าแชตต้องจำบทสนทนาได้โดยส่งประวัติทั้งหมดไปกับทุกคำถาม และแสดงเฉพาะคำตอบจริงที่ได้จาก API เท่านั้น
+ให้บอกสถานะชัด ๆ ว่าเชื่อมต่อ API ได้หรือยัง token ผ่านหรือยัง และบัญชีตอบจริงแล้วหรือยัง ถ้ามีปัญหาให้แสดง error ที่เข้าใจง่าย
+ออกแบบให้อ่านง่ายทั้งจอกว้าง จอแคบ และโหมดมืด แล้วตรวจไฟล์เท่าที่ทำได้โดยยังไม่ต้อง deploy
+เสร็จแล้วสรุปสั้น ๆ ว่าทำอะไรไปบ้าง แล้วรอฉันก่อน
 ```
 
 ---
 
-## 6 · Deploy ขึ้น Docker Desktop ชั้นนอก (~15 นาที)
+## 4 · เปิดใช้งานและทดลอง
 
-### 6.1 · ผู้เรียนเปิดการเชื่อมต่อ SSH เอง (ห้ามให้ AI พิมพ์รหัสผ่าน)
-
-ใน 🖥️ Terminal **อีกแท็บ** (ไม่ใช่ในช่องสนทนาของ `yolo3`)
-
-```bash
-cd /workspace/04_API_MultiAccount_Server
-bash deploy/remote.sh open      # ถามยืนยัน host key (พิมพ์ yes) แล้วถามรหัสผ่านหนึ่งครั้ง
-bash deploy/remote.sh daemon    # ต้องเห็น devtools = daemon ชั้นใน และ control host = docker-desktop
-```
-
-socket อยู่ใน `/tmp/lab04-ssh-<uid>/` ใช้ได้เฉพาะผู้ใช้เดียวกันใน devtools `yolo3` จึงใช้การเชื่อมต่อนี้ต่อได้โดยไม่ต้องรู้รหัสผ่าน และปิดเองเมื่อว่าง 2 ชั่วโมง
-
-### 6.2 · ให้ `yolo3` สั่ง deploy ผ่าน socket นั้น
-
-##### 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์ 3 · เปิดใช้งานและทดลอง
 
 ```text
-LAB 004 ขั้นที่ 4: deploy ผ่าน deploy/remote.sh ที่ฉันเปิดการเชื่อมต่อ SSH ไว้แล้ว
-ห้ามพิมพ์หรือเดารหัสผ่าน ห้ามรัน reveal-token ห้ามอ่านไฟล์ใน deploy/.secrets ห้ามเรียก smoke --live
-ห้ามใช้ docker ของ devtools สร้าง container
-
-รันตามลำดับ หยุดทันทีที่ขั้นใดล้มเหลว แล้วรายงานข้อความ error จริง:
-1. bash deploy/remote.sh daemon
-2. bash deploy/remote.sh sync
-3. bash deploy/remote.sh run check
-4. bash deploy/remote.sh run build
-5. bash deploy/remote.sh run token
-6. bash deploy/remote.sh run creds
-7. bash deploy/remote.sh run up
-8. bash deploy/remote.sh run smoke
-
-รายงานเป็นตาราง ขั้น | ผลจริง | PASS/FAIL และระบุชัดว่า smoke เป็นแค่ readiness ยังไม่ใช่หลักฐานว่าบัญชีตอบได้จริง
-แล้วหยุดรอ
+ต่อไปช่วยเปิดใช้งาน API และหน้าแชตของแลป 04 ให้ใช้ได้จริง ถ้ายังไม่มีสคริปต์ deploy ให้เขียนเองด้วย
+Docker ใน devtools เป็น daemon ชั้นใน ห้าม deploy ลงที่นั่น ให้หา Docker Desktop ชั้นนอกผ่านช่องทางเข้า control host ที่มีอยู่แล้ว
+ถ้าต้องใช้ค่าลับ ให้อ่านจาก /root/workspace/DGX_2024/.env ได้ แต่ห้ามแสดงค่าใด ๆ ออกมา
+คัดลอกไฟล์งานฉบับสุดท้ายไปไว้ที่ /root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server บน control host โดยสร้างโฟลเดอร์เองถ้ายังไม่มี และเก็บงานเดิมไว้
+จากนั้น build และเปิด lab04-api ที่พอร์ต 8004 กับ lab04-web ที่พอร์ต 8005 แล้วตรวจให้แน่ใจว่าใช้ได้จริง
+บริการอื่นที่ทำงานอยู่นอกแลปนี้ต้องไม่ถูกแตะ หยุด หรือเปลี่ยน
+เมื่อพร้อมแล้วให้ลองแชตจริงบนหน้าเว็บ 10 รอบในบทสนทนาเดียว ใช้ Fable 5 รอบแล้วเปลี่ยนเป็น Astra อีก 5 รอบ โดยถามให้เห็นว่ายังจำเรื่องก่อนหน้าได้
+เก็บภาพหน้าจอจริงที่อ่านออก ห้ามแต่งผลหรือคำตอบขึ้นเองเด็ดขาด และถ้าขั้นไหนไม่ผ่านให้บอกตามจริง
+สุดท้ายให้ลิงก์เปิดหน้าเว็บ บอกวิธีใส่ token โดยไม่พิมพ์ค่า token ลงในแชต และสรุปผลที่เกิดขึ้นจริง
 ```
 
-**ผลจริงจากการ deploy ของผู้ประสานงาน (24 ก.ย. 2026)**
+---
+
+## 5 · ผลจริงจากการ deploy และทดสอบ
+
+### 5.1 · ผลการ deploy ของผู้ประสานงาน (24 ก.ย. 2026)
 
 ผู้ประสานงานสั่งผ่าน 🖥️ Terminal ใน JupyterLab ด้วย SSH socket ของตัวเอง (`/tmp/lab04-coordinator.sock`) ซึ่งเทียบเท่ากับ `remote.sh run …` และบน control host โหลดค่าจาก `/root/workspace/DGX_2024/.env` ก่อนรัน `deploy/lab04.sh` (ไฟล์นี้เป็นของสภาพแวดล้อมผู้ประสานงาน ไม่ใช่ส่วนของแลป และไม่ได้เปิดเผยค่าในเอกสารนี้)
 
@@ -283,23 +102,11 @@ LAB 004 ขั้นที่ 4: deploy ผ่าน deploy/remote.sh ที่�
 
 ![ภาพหน้าจอจริง: Terminal ใน JupyterLab รัน lab04.sh smoke ผ่าน ssh -S ผลแสดง PASS 11 รายการ ได้แก่ health, 401 เมื่อไม่มี token, models, credential file, CORS ทั้งสองแบบ, astra+none 400, fable+minimal 400, max_completion_tokens 400, หน้าเว็บ 200 และ CSP ปิดท้ายด้วย smoke: 11 PASS, 0 FAIL](assets/08-api-smoke.png)
 
-*ภาพหน้าจอจริงของ `smoke` รอบแรก (11 รายการ) · รอบล่าสุด 13 รายการที่รวม N4 อยู่ในหัวข้อ 7.3*
+*ภาพหน้าจอจริงของ `smoke` รอบแรก (11 รายการ) · รอบล่าสุด 13 รายการที่รวม N4 อยู่ในหัวข้อ 5.4*
 
 ข้อสังเกตจากการ deploy จริง: Claude Code ใน container **ใช้งานได้โดยคัดลอกแค่ `.credentials.json`** (ไม่ต้องใช้ `.claude.json`) และ Codex ตอบได้จริงด้วย `auth.json` อย่างเดียว
 
-### 6.3 · ผู้เรียนดู token และเปิดหน้าเว็บ
-
-```bash
-bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิมพ์ yes · ห้ามวางค่าลงในแชตกับ AI หรือในภาพหน้าจอ
-```
-
-เปิดเบราว์เซอร์บน Windows ที่ **http://localhost:8005** (หรือ `http://127.0.0.1:8005`) วาง token แล้วกด **เชื่อมต่อ**
-
----
-
-## 7 · ทดสอบในเบราว์เซอร์: แชตจริง 10 รอบ และการปฏิเสธ (~25 นาที)
-
-### 7.1 · พร้อม ≠ ใช้ได้จริง
+### 5.2 · พร้อม ≠ ใช้ได้จริง
 
 | ระดับ | ดูจากไหน | พิสูจน์อะไร | ไม่ได้พิสูจน์อะไร |
 |---|---|---|---|
@@ -310,7 +117,7 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 ป้าย L3 ขึ้นเฉพาะหลังได้คำตอบจริงเท่านั้น และแยกต่อ provider/account
 
-### 7.2 · แชตจริง 10 รอบ ในบทสนทนาเดียว
+### 5.3 · แชตจริง 10 รอบ ในบทสนทนาเดียว
 
 ผู้ประสานงานพิมพ์ในหน้าเว็บจริงที่ `http://localhost:8005/` ผ่าน computer use ไม่มีการจำลองคำตอบ รอบ 1–5 ใช้ **claude / fable / low / yolo1** แล้วเปลี่ยนเป็น **codex / gpt-6-astra / low / cyolo1** ในรอบ 6–10 โดย **ไม่ล้างแชต** ตารางด้านล่างคัดลอกจาก [`assets/ten-exchanges.json`](assets/ten-exchanges.json) ตรงตามที่บันทึก (ข้อความเดียวกันอยู่ใน [`ten-exchanges.txt`](assets/ten-exchanges.txt) และ 5 รอบแรกใน [`fable-five-exchanges.txt`](assets/fable-five-exchanges.txt)) เครื่องหมาย `**` ในคำตอบเป็นข้อความดิบที่โมเดลส่งมา หน้าเว็บไม่ render Markdown
 
@@ -345,7 +152,7 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 **ขอบเขตของหลักฐาน:** เรียกจริงแค่ 2 ชุด คือ `fable/low/yolo1` และ `gpt-6-astra/low/cyolo1` · Opus, Sol, Luna และ effort อื่นยังไม่ได้เรียกผ่าน API ของแลปนี้ (ตารางการรองรับมาจากการรันจริงใน LAB 003) · การที่ Codex ตอบได้ **ไม่ใช่** การทดสอบว่า sandbox ห้ามคำสั่ง shell ได้จริง
 
-### 7.3 · ทดสอบการปฏิเสธและขอบเขตบัญชี
+### 5.4 · ทดสอบการปฏิเสธและขอบเขตบัญชี
 
 | # | ทดสอบ | วิธี | ผลจริง | หลักฐาน |
 |---|---|---|---|---|
@@ -369,14 +176,14 @@ bash deploy/remote.sh reveal-token   # รันเองใน Terminal พิ�
 
 *ภาพหน้าจอจริง N4: ตรวจขอบเขตบัญชีใน smoke รอบล่าสุด*
 
-### 7.4 · ขอบเขตเมื่อสลับบัญชี
+### 5.5 · ขอบเขตเมื่อสลับบัญชี
 
 - บัญชีคนละบัญชี = config dir คนละโฟลเดอร์ใน volume โควตาและ subscription แยกกัน ไม่มี session ร่วม
 - สิ่งเดียวที่ข้ามไปถึงบัญชีใหม่คือ **ข้อความในประวัติ** ที่หน้าเว็บส่งไป
 - การเพิ่มบัญชี (เช่น `yolo2`) ต้องทำครบสามอย่าง: ใส่ใน `CLAUDE_ACCOUNTS` ของ `deploy/lab04.env`, `run creds`, `run up` ถ้าใส่ชื่อแต่ยังไม่ได้คัดลอก API ตอบ 503 `account_not_provisioned`
 - ค่าเริ่มต้นของแลปนี้เปิดแค่ 1 บัญชีต่อ provider
 
-### 7.5 · เรียก API จาก Python ด้วย OpenAI SDK
+### 5.6 · เรียก API จาก Python ด้วย OpenAI SDK (ไม่บังคับ)
 
 API นี้รับรูปแบบคำขอแบบเดียวกับ Chat Completions จึงใช้ไลบรารี `openai` ได้ โดยมีเงื่อนไข
 
@@ -384,14 +191,6 @@ API นี้รับรูปแบบคำขอแบบเดียวก�
 - `account` ไม่ใช่ฟิลด์ของ OpenAI จึงส่งผ่าน `extra_body`
 - ห้ามส่ง `max_completion_tokens`, `max_tokens`, `temperature`, `tools`, `stream=True` เพราะ API ตอบ 400
 - `base_url` ค่าเริ่มต้นสำหรับรัน **ใน devtools** คือ `http://host.docker.internal:8004/v1` ถ้ารันจาก Terminal บน Windows ให้ใช้ `http://localhost:8004/v1`
-
-ติดตั้งแบบแยก venv (ไม่บังคับ และไม่แตะ Python ของระบบ)
-
-```bash
-python3 -m venv /tmp/lab04-sdk && /tmp/lab04-sdk/bin/pip install -q openai
-/tmp/lab04-sdk/bin/python examples/openai_client.py                     # fable / low / บัญชีค่าเริ่มต้น
-/tmp/lab04-sdk/bin/python examples/openai_client.py --model gpt-6-astra --effort low --account cyolo1
-```
 
 แกนของโค้ด ([`examples/openai_client.py`](examples/openai_client.py)) ที่คัดลอกไปใช้ได้
 
@@ -418,7 +217,7 @@ print("model:", resp.model)
 print("reply:", resp.choices[0].message.content)
 ```
 
-ข้อความ `system` ในที่นี้ยังเป็นแค่ข้อความในประวัติตามหัวข้อ 2 ไม่ใช่ system prompt จริงของ CLI
+ข้อความ `system` ในที่นี้ยังเป็นแค่ข้อความในประวัติตามหัวข้อ 6 ไม่ใช่ system prompt จริงของ CLI
 
 **ผลจริง (ผู้ประสานงานรันผ่าน Jupyter ด้วย computer use · `openai` 3.19.2):**
 
@@ -437,7 +236,43 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ---
 
-## 8 · ข้อจำกัดด้านความปลอดภัยที่ต้องรู้
+## 6 · ประวัติแชตถูกส่งให้ CLI อย่างไร (อ่านเพิ่มเติม)
+
+<details>
+<summary>เปิดอ่าน: ทำไมหน้าเว็บต้องส่งประวัติทั้งหมดทุกรอบ และต่างจาก Chat API จริงอย่างไร</summary>
+
+`claude -p` และ `codex exec` ตอบคำถาม **ครั้งเดียวแล้วจบ** API นี้ยังสั่งไม่ให้เก็บ session (`--no-session-persistence`, `--ephemeral`) ดังนั้น **CLI จำอะไรข้ามรอบไม่ได้เลย** สิ่งที่ทำให้ถามต่อได้คือ **หน้าเว็บส่งประวัติข้อความทั้งหมดไปทุกครั้ง** แล้ว API แปลงเป็นพรอมต์ก้อนเดียว
+
+```text
+You are the assistant in a simple web chat application.
+The conversation so far is given below as a JSON array of {"role", "content"} objects, oldest first.
+...
+CONVERSATION_JSON:
+[
+ {"role": "user", "content": "สวัสดี ฉันชื่อมะลิ"},
+ {"role": "assistant", "content": "สวัสดีค่ะคุณมะลิ"},
+ {"role": "user", "content": "ฉันชื่ออะไร"}
+]
+```
+
+| เรื่อง | Chat API จริง (native) | API ของแลปนี้ (transcript → CLI) |
+|---|---|---|
+| ความจำระหว่างรอบ | ฝั่ง client ส่ง `messages` เหมือนกัน | เหมือนกัน แต่ถูก **รวมเป็นข้อความเดียว** ส่งทาง stdin |
+| ขอบเขตของ role | แยกโดยโครงสร้างของ API | ใส่ role ไว้ใน JSON ทำให้ข้อความที่ผู้ใช้พิมพ์ถูก escape อยู่ใน `content` เสมอ แต่ทั้งก้อนยังเป็น **ข้อความธรรมดา** ที่โมเดลอ่าน **ไม่ได้รับประกันว่ากัน prompt injection ได้** ข้อความในประวัติยังชักนำโมเดลได้เหมือนข้อความทั่วไป |
+| `system` | system prompt จริง | เป็นแค่ข้อความที่ขอให้โมเดลเคารพ ไม่มีสิทธิ์พิเศษ |
+| เปลี่ยนโมเดล/บัญชีกลางบทสนทนา | ส่ง messages เดิมให้โมเดลใหม่ | เหมือนกัน · ตัวใหม่เห็นแค่ **ข้อความ** ไม่รู้ว่ารอบก่อนใครตอบ และบัญชีคนละบัญชีไม่แชร์ session |
+| `max_completion_tokens`, `temperature`, `tools`, `stream` | รองรับ | **ปฏิเสธด้วย HTTP 400** เพราะ CLI ไม่ได้รับค่าเหล่านี้ ไม่ทำเป็นว่ารองรับ |
+| token usage | มีตัวเลขจริง | `"usage": null` ไม่เดาตัวเลข |
+| ต้นทุนต่อรอบ | คิดตาม token | ทุกรอบเริ่ม CLI ใหม่และส่งประวัติทั้งหมด ยิ่งคุยยาวยิ่งช้าและกินโควตา มีเพดาน 40 ข้อความ / 48,000 ตัวอักษร |
+
+</details>
+
+---
+
+## 7 · ข้อจำกัดด้านความปลอดภัยที่ต้องรู้ (อ่านเพิ่มเติม)
+
+<details>
+<summary>เปิดอ่าน: สิ่งที่ป้องกันไว้ และข้อจำกัดที่ยังมีอยู่</summary>
 
 | เรื่อง | สิ่งที่ทำ | ข้อจำกัดที่ยังมีอยู่ |
 |---|---|---|
@@ -451,25 +286,35 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 | log | เก็บแค่ metadata (โมเดล บัญชี จำนวนตัวอักษร เวลา สถานะ) | CLI เองอาจเขียนข้อมูลลงใน config dir ของบัญชี (เช่น log ของ Codex ใน `CODEX_HOME`) |
 | ลบทิ้ง | `run down --purge` ลบ container, volume สำเนา credential และ network ที่มี label `lab04` | ไม่ลบ image และไม่แตะของที่ไม่มี label |
 
+</details>
+
 ---
 
-## 9 · แก้ปัญหาที่พบบ่อย
+## 8 · แก้ปัญหาที่พบบ่อย (อ่านเพิ่มเติม)
+
+<details>
+<summary>เปิดอ่าน: อาการ สาเหตุ และสิ่งที่ขอให้ AI ทำ</summary>
 
 | อาการ | สาเหตุที่เป็นไปได้ | ทางแก้ |
 |---|---|---|
-| `lab04.sh` บอกว่า daemon ไม่ใช่ `docker-desktop` | รันใน devtools ตรง ๆ | ใช้ `deploy/remote.sh run …` |
-| `remote.sh` บอก `no open connection` | master หมดอายุหรือถูกปิด | `bash deploy/remote.sh open` ใหม่ |
+| `lab04.sh` บอกว่า daemon ไม่ใช่ `docker-desktop` | สั่งงานกับ Docker ของ devtools ซึ่งเป็น daemon ชั้นใน | บอก AI ให้ deploy ผ่าน control host ไปยัง Docker Desktop ชั้นนอก |
+| `remote.sh` บอก `no open connection` | การเชื่อมต่อไป control host หมดอายุหรือถูกปิด | บอก AI ให้เปิดการเชื่อมต่อไป control host ใหม่ |
 | `verify` FAIL เฉพาะ published port | `PROBE_HOST` ไม่ตรงกับตำแหน่งของ control host | control host เป็น container ใช้ `host.docker.internal` · รันบน host เองใช้ `127.0.0.1` แล้วยืนยันในเบราว์เซอร์ |
 | ป้าย API แดง `network/CORS` | API ไม่รัน หรือเปิดหน้าเว็บจาก origin อื่น (`file://`) | เปิดผ่าน `http://localhost:8005` เท่านั้น |
-| `upstream_auth_error` | สำเนา credential หมดอายุหรือถูก refresh ทับ | ล็อกอินใหม่ใน devtools → `run creds` → ลองใหม่ (ไม่ต้อง `up` ใหม่) |
+| `upstream_auth_error` | สำเนา credential หมดอายุหรือถูก refresh ทับ | ล็อกอินใหม่ใน devtools แล้วบอก AI ให้คัดลอก credential ใหม่ (`run creds`) โดยไม่ต้องเปิด container ใหม่ |
 | `upstream_rate_limited` | บัญชีชนเพดานการใช้ | รอ หรือเปลี่ยนบัญชี |
 | `busy` (429) | บัญชีนั้นกำลังตอบอีกคำขอ (1 คำขอต่อบัญชี) | รอให้คำตอบก่อนหน้าจบ |
 | `transcript_too_long` | ประวัติเกิน 48,000 ตัวอักษร | กดล้างแชต |
-| `cli_timeout` | effort สูงกับโจทย์ยาวเกิน 300 s | ลด effort หรือปรับ `CLI_TIMEOUT_S` |
+| `cli_timeout` | effort สูงกับโจทย์ยาวเกิน 300 s | ลด effort หรือให้ AI ปรับ `CLI_TIMEOUT_S` |
+
+</details>
 
 ---
 
-## 10 · ไฟล์ในโฟลเดอร์นี้
+## 9 · ไฟล์ในโฟลเดอร์นี้
+
+<details>
+<summary>เปิดอ่าน: หน้าที่ของแต่ละไฟล์</summary>
 
 | ไฟล์ | หน้าที่ |
 |---|---|
@@ -491,8 +336,11 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 | `assets/build.log`, `deploy.log`, `smoke.log`, `smoke-with-account-checks.log` | log จริงของ build · token/creds/up/verify · smoke รอบแรก (11) และรอบล่าสุด (13) |
 | `assets/ten-exchanges.json`, `.txt`, `fable-five-exchanges.txt`, `dropdown-checks.json` | transcript จริง 10 รอบ และผลตรวจ dropdown |
 | `assets/authoring-environment-note.md` | บันทึกแพ็กเกจ apt ที่ติดตั้งใน devtools ระหว่างเขียนแลป |
+| `docs/implementation-reference.md` | ข้อกำหนดการสร้างแบบละเอียดสำหรับ AI อ้างอิง (ผู้เรียนไม่ต้องอ่าน) |
 
-## 11 · สถานะและสิ่งที่ยังค้างอยู่
+</details>
+
+## 10 · สถานะและสิ่งที่ยังค้างอยู่
 
 เสร็จและมีหลักฐานแล้ว
 
@@ -509,6 +357,6 @@ reply: ลาเต้สามแก้วราคา 240 บาทค่ะ �
 
 ข้อจำกัดที่รู้อยู่ (ทำเพิ่มได้ ไม่ใช่เงื่อนไขของแลปแชตนี้)
 
-- การบังคับห้ามคำสั่ง/เครื่องมือของ sandbox Codex และ `--tools ""` ของ Claude **ยังไม่ได้ทดสอบเฉพาะ** (หัวข้อ 8)
+- การบังคับห้ามคำสั่ง/เครื่องมือของ sandbox Codex และ `--tools ""` ของ Claude **ยังไม่ได้ทดสอบเฉพาะ** (หัวข้อ 7)
 - โมเดลและ effort อื่นนอกจาก Fable/low และ Astra/low ยังไม่ได้เรียกผ่าน API นี้ (อ้างอิง LAB 003)
 - แพ็กเกจ apt ใน devtools คงไว้ตามที่บันทึกใน [`authoring-environment-note.md`](assets/authoring-environment-note.md) ไม่มีการลบ
