@@ -29,6 +29,26 @@ changed in the sidebar). The port is `APP_PORT` in `.env`; the page URL is `http
 The token is typed into the page and kept in memory only. `/v1/models` also returns `limits`,
 which the page uses for its message/size counters.
 
-## Deploy
-    scripts/deploy.sh            # first time / updates (keeps logins already in the volume)
-    scripts/deploy.sh --refresh-logins   # copy login files from devtools again
+## Deploy (outer Docker host, from devtools)
+All connection values are in `.env` (names in `.env.example`); nothing is hard-coded in the scripts.
+
+    scripts/deploy.sh --check          # verify daemon (refuses devtools' inner Docker), list existing objects, check port
+    scripts/deploy.sh                  # build + copy source/web/logins + start + smoke test + record URLs
+    scripts/deploy.sh --refresh-logins # copy login files from devtools again (otherwise kept)
+
+- `docker` reaches `DOCKER_HOST=ssh://...` through `scripts/ssh-shim/ssh`, which reuses the open
+  ControlMaster (`SSH_CONTROL_PATH`, `SSH_KNOWN_HOSTS`). The shim is put in PATH only for docker
+  calls (`scripts/remote-env.sh`); global SSH config is not changed.
+- The daemon does not share the control host's filesystem, so nothing is bind-mounted:
+  `index.html` goes into the named volume `WEB_VOLUME` (mounted read-only), logins and the token
+  into `ACCOUNTS_VOLUME`, both through pipes. The complete source is copied to `REMOTE_SOURCE_DIR`.
+- Token: `cat secrets/api_token` (0600 file in devtools; 0400 file in the volume; never printed).
+
+## Operate (this app only)
+    scripts/app.sh status | stop | start | restart | logs [N] | health
+
+## Tests
+    scripts/test.sh                    # unit tests with fake CLIs, --network none
+    python3 tests/e2e/api_check.py     # real API checks against APP_TEST_URL
+    node tests/e2e/chat_e2e.js         # real Chromium, real page, real models (10 rounds)
+Artifacts (screenshots, conversation JSON, logs; no secrets) go to `tests/artifacts/`.
