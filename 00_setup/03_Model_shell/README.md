@@ -89,6 +89,7 @@ Claude Code รับ effort 5 ระดับ (`claude --help` ระบุ `lo
 **ตัวอย่างที่ 1 · Fable medium**
 
 ```bash
+Q='ซื้อครบ 1000 บาทลด 10%: ยอดซื้อ 999, 1000, 1500 บาท จ่ายเท่าไร? ตอบเป็นตารางทศนิยม 2 ตำแหน่ง'
 yolo1 --model fable --effort medium -p "$Q"
 ```
 
@@ -99,6 +100,7 @@ yolo1 --model fable --effort medium -p "$Q"
 **ตัวอย่างที่ 2 · Opus medium**
 
 ```bash
+Q='ซื้อครบ 1000 บาทลด 10%: ยอดซื้อ 999, 1000, 1500 บาท จ่ายเท่าไร? ตอบเป็นตารางทศนิยม 2 ตำแหน่ง'
 yolo1 --model opus --effort medium -p "$Q"
 ```
 
