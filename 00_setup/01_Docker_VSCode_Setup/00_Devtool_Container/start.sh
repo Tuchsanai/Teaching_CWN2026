@@ -38,6 +38,8 @@ chown -R root:root /root/.ssh
 
 /usr/sbin/sshd
 
+# docker restart / docker start ทิ้ง pid file เก่าไว้ → dockerd ไม่ยอม start ("process with PID xx is still running")
+rm -f /var/run/docker.pid /var/run/docker/containerd/containerd.pid
 dockerd > /var/log/dockerd.log 2>&1 &
 
 # --- JupyterLab -------------------------------------------------------------
