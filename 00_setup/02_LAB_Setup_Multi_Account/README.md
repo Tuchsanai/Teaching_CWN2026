@@ -170,6 +170,10 @@ BASE_PATH="$HOME/ai-accounts"   # แก้ที่นี่ที่เดี�
 
 ![Claude สรุปผลตั้งค่าหลายบัญชีเสร็จใน JupyterLab ของ devtools](img/devtools-setup-complete.png)
 
+**ถ้า Claude ถามยืนยันการเพิ่ม PATH:** installer อาจวาง wrapper ไว้ในโฟลเดอร์ที่ยังไม่อยู่ใน PATH (เช่น `~/ai-accounts/bin`) แล้วหยุดถามตามกติกาในพรอมต์ ให้ตอบยืนยันในช่องสนทนา เพื่อให้พิมพ์ `yolo1` หรือ `cyolo1` ได้ตรง ๆ ในหัวข้อ 2.7 และขั้นที่ 3
+
+Claude อาจต้องติดตั้ง system library ของ Chromium เพิ่ม (`playwright install-deps chromium`) เพราะ image `devtools` ยังไม่มี ข้อนี้เป็นเรื่องปกติและจะแจ้งไว้ใน `setup-report.md`
+
 ### 2.6 · เปิดดูโฟลเดอร์ที่สร้างจริงผ่าน File Browser
 
 #### 2.6.1 · เปิดโฟลเดอร์ ai-accounts
@@ -344,7 +348,8 @@ cyolo1 mcp list 2>/dev/null
 2. รันทีละบัญชีจาก shell: yolo1 -p "$(cat ~/verify-prompt.txt)", yolo2 เช่นเดียวกัน,
    cyolo1 exec --skip-git-repo-check "$(cat ~/verify-prompt.txt)", cyolo2 เช่นเดียวกัน
    รันแบบ foreground ทีละบัญชี (ไม่ใช้ background) timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
-3. คัดลอกภาพ screenshot ที่แต่ละบัญชีรายงานไปไว้ที่ ./evidence/<บัญชี>/ ห้ามแก้ไฟล์ตั้งค่า
+3. คัดลอกภาพ screenshot ที่แต่ละบัญชีรายงานไปเป็น ./evidence/<บัญชี>/1-open.png, 2-search.png, 3-results.png
+   พร้อม log คำตอบเป็น ./evidence/<บัญชี>/run.log ห้ามแก้ไฟล์ตั้งค่า
 4. สรุปตารางรวม บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
    บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
 ====
@@ -358,8 +363,9 @@ cyolo1 mcp list 2>/dev/null
    ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
    ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
    ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
-4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright 3 ภาพ: 1-open.png (หน้าเว็บเปิดได้),
-   2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา), 3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
+4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น (ไม่ใช่ทั้งหน้า) 3 ภาพ
+   ตั้งชื่อนำหน้าด้วยชื่อโฟลเดอร์ config root เช่น yolo1-1-open.png: <บัญชี>-1-open.png (หน้าเว็บเปิดได้),
+   <บัญชี>-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา), <บัญชี>-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
 5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว:
    - config root
    - รหัสจาก skill shared-check
@@ -381,6 +387,18 @@ cyolo1 mcp list 2>/dev/null
 | `3-results.png` | รายการเที่ยวบินพร้อมเวลาและราคา | การค้นหาทำงานจริง ไม่ใช่คำตอบที่โมเดลเดา |
 
 ภาพของแต่ละบัญชีควรคล้ายกัน แต่ราคาและลำดับเที่ยวบินอาจต่างกันตามเวลาที่ค้นหา หากบัญชีใดไม่มีภาพ `3-results.png` ให้ดูในตารางสรุปว่าติดขั้นไหน
+
+ภาพต่อไปนี้คือภาพจริงที่ Playwright MCP ของบัญชี `yolo1` บันทึกไว้ในการทดสอบวันที่ 29 กันยายน 2026 บน container ใหม่ที่ตั้งค่าด้วยพรอมต์ 2.4.3.1 ฉบับนี้ ไม่ได้ตกแต่งภาพ
+
+![yolo1-1-open: Playwright เปิดหน้า Google Flights ได้จริงจาก container](img/devtools-web-yolo1-open.png)
+
+![yolo1-2-search: กรอก One way, 1 คน, Economy, Bangkok BKK ไป Tokyo วันที่ Thu Oct 15 ก่อนกด Search](img/devtools-web-yolo1-search.png)
+
+![yolo1-3-results: ผลค้นหา Top flights จริงพร้อมเวลา จำนวนแวะ และราคา THB](img/devtools-web-yolo1-results.png)
+
+ภาพรวมผลค้นหา (`3-results.png`) ของทั้ง 4 บัญชี แต่ละช่องครอปเฉพาะส่วนบนของภาพจริงและเพิ่มแถบชื่อบัญชีกับ config root ทั้ง 4 บัญชีเห็นเที่ยวบินชุดเดียวกัน แปลว่า Playwright MCP จาก `shared` ทำงานได้ทั้งฝั่ง Claude และ Codex
+
+![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2](img/devtools-web-results-4accounts.png)
 
 #### 3.3.4 · ผลการทดลองจริง (29 กันยายน 2026)
 
