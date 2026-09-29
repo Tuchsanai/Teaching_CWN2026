@@ -196,6 +196,9 @@ $BASE_PATH/
 - Codex เก็บ MCP ใน $CODEX_HOME/config.toml ของแต่ละบัญชี แต่ -c mcp_servers.<name>={...} ใช้ได้ทั้งตอนเปิดและกับ codex mcp list
 - Playwright MCP ใน container ที่รันเป็น root ต้องใช้ --browser chromium --headless --isolated --no-sandbox
   (ค่าเริ่มต้นหา Chrome ที่ /opt/google/chrome ไม่เจอ) และควรตั้ง --output-dir นอกโฟลเดอร์งาน
+  ติดตั้ง Chromium ด้วย playwright ที่มากับ @playwright/mcp (npx playwright install --with-deps chromium ในโฟลเดอร์แพ็กเกจนั้น) เวอร์ชันจึงจะตรงกัน
+- ใน container ล็อกอิน Codex แบบเบราว์เซอร์ส่งผลกลับเข้า container ไม่ได้ ให้ใช้ codex login --device-auth
+- วิธีเรียก skill ต่างกัน: Claude ใช้ /shared-check หรือเครื่องมือ Skill, Codex ใช้ $shared-check แล้วเปิด SKILL.md จาก path ที่ CLI แสดง
 
 ## ทดสอบ (รายงานตามจริง PASS / FAIL / SKIP)
 - yolo1..yolo5 --version และ cyolo1..cyolo5 --version ทำงานครบ 10 ตัว
@@ -207,7 +210,7 @@ $BASE_PATH/
 
 ## รายงาน
 เขียน 3 ไฟล์ในโฟลเดอร์ปัจจุบัน: setup-report.md (โครงสร้าง config root ตำแหน่ง credential ข้อจำกัด),
-login-guide.md (ขั้นตอนล็อกอินทีละบัญชีที่ผู้ใช้ทำเองใน Terminal), checklist.md (ตาราง รายการ | หลักฐาน | PASS/FAIL/SKIP | เหตุผล)
+login-guide.md (ขั้นตอนล็อกอินทีละบัญชีที่ผู้ใช้ทำเองใน Terminal และวิธีตรวจ skill/MCP ส่วนกลางหลังล็อกอิน), checklist.md (ตาราง รายการ | หลักฐาน | PASS/FAIL/SKIP | เหตุผล)
 ห้ามใส่ข้อมูลลับในไฟล์ใด ๆ
 
 ทำเฉพาะขั้นนี้ เมื่อเสร็จให้แสดงเนื้อหาสำคัญของไฟล์ที่สร้าง (ไม่ใช่แค่ชื่อไฟล์) เป็นตารางที่ฉันอ่านตรวจได้ แล้วหยุดรอ ห้ามล็อกอินแทนฉัน ห้ามทำขั้นถัดไปเอง
