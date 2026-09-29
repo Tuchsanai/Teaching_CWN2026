@@ -128,7 +128,7 @@ print("|".join([
   f"{si.get('name','?')} {si.get('version','')} protocol {i.get('protocolVersion','?')}" if i.get("ok") else "-",
   f"{t.get('count',0)} tools, มี {','.join(t.get('has',[]))}" if t.get("ok") else ("ERR" if t else "-"),
   (f"title=\"{n.get('title','')}\"" if n.get("ok") else "ERR " + (n.get("excerpt") or j.get("error",""))[:150]) if n or j.get("error") else "-",
-  s.get("reported", "") if s.get("ok") else "",
+  f"{s.get('file','')} ({s.get('bytes',0)} bytes)" if s.get("ok") else "",
 ]))
 PY
 )"
@@ -147,7 +147,7 @@ rec SKIP "Claude /mcp เห็น playwright, AI เรียก tool playwrigh
 
 # ---- ตาราง ---------------------------------------------------------------------
 w=0; for r in "${ROWS[@]}"; do IFS='|' read -r s i e <<<"$r"; l=$(printf %s "$i" | wc -m); [ $l -gt $w ] && w=$l; done
-printf '\n%-4s  %s  %s\n' "ผล" "$(printf '%-*s' $w 'รายการ')" "หลักฐาน"
+printf '\n%s    %s%*s  %s\n' "ผล" "รายการ" $((w - 6)) "" "หลักฐาน"
 for r in "${ROWS[@]}"; do
     IFS='|' read -r s i e <<<"$r"
     pad=$((w - $(printf %s "$i" | wc -m)))

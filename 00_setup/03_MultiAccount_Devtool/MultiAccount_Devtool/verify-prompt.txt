@@ -8,6 +8,7 @@
 #   timeout 15m cyolo1 exec --skip-git-repo-check "$(cat /tmp/verify.txt)" | tee evidence/cyolo1/run.log
 #   (สร้างโฟลเดอร์ก่อน: mkdir -p evidence/yolo1 evidence/cyolo1)
 # ภาพที่ Playwright MCP บันทึกอยู่ใต้ /root/ai-accounts/playwright-output/<claude|codex>/ ตาม path ที่บัญชีรายงาน
+# คัดลอกเป็นหลักฐาน: cp /root/ai-accounts/playwright-output/claude/yolo1-*.png evidence/yolo1/
 # ผลที่คาด: บัญชีต่างกันแต่ CLI เดียวกันได้รหัส shared-check เดียวกัน; Claude กับ Codex ได้รหัสคนละชุด
 ====
 ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
@@ -16,16 +17,18 @@
 2. ใช้ skill $shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
    ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
 3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
-   เปิด https://en.wikipedia.org/wiki/Special:Search
-   ค้นหาคำว่า Bangkok ในช่องค้นหาของหน้าเว็บ แล้วเปิดบทความ Bangkok
-   ค้นหาและอ่านอย่างเดียว ห้ามล็อกอิน ห้ามแก้ไขหน้าใด ห้ามกรอกข้อมูลส่วนตัว ห้ามจองหรือชำระเงินใด ๆ
-   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาเนื้อหา
+   เปิด https://www.google.com/travel/flights?hl=en
+   ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
+   ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
+   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
 4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น (ไม่ใช่ทั้งหน้า) 3 ภาพ
-   ตั้งชื่อนำหน้าด้วยชื่อโฟลเดอร์ config root เช่น yolo1-1-open.png: <บัญชี>-1-open.png (หน้าค้นหาเปิดได้),
-   <บัญชี>-2-search.png (พิมพ์คำค้นแล้วก่อนกดค้นหา), <บัญชี>-3-results.png (หน้าบทความ Bangkok) แล้วรายงาน path เต็มของแต่ละภาพ
+   ตั้งชื่อนำหน้าด้วยชื่อโฟลเดอร์ config root เช่น yolo1-1-open.png: <บัญชี>-1-open.png (หน้าเว็บเปิดได้),
+   <บัญชี>-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา), <บัญชี>-3-results.png (รายการผลเที่ยวบิน)
+   ส่ง filename เป็น path เต็มใต้ /root/ai-accounts/playwright-output/<claude หรือ codex ตาม CLI นี้>/ เช่น
+   /root/ai-accounts/playwright-output/claude/yolo1-1-open.png (ชื่อแบบ relative จะไปอยู่ในโฟลเดอร์งาน) แล้วรายงาน path เต็มของแต่ละภาพ
 5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว:
    - config root
    - รหัสจาก skill shared-check
    - ชื่อ MCP server และชื่อ tool ที่เรียกจริง
    - ภาพหน้าจอ 3 ภาพ (path)
-   - หัวเรื่องบทความ และประโยคแรกของบทความ (ตามที่เห็นบนหน้าเว็บ)
+   - เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)

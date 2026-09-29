@@ -1,4 +1,4 @@
-สร้างระบบหลายบัญชีใน Linux container  g
+สร้างระบบหลายบัญชีใน Linux container  
 
 BASE_PATH="$HOME/ai-accounts"   # แก้ที่นี่ที่เดียว
 

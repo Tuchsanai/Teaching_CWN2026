@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import queue
+import re
 import subprocess
 import sys
 import threading
@@ -81,11 +82,18 @@ def main():
                                    "isError": bool(nav.get("isError")),
                                    "excerpt": txt[:300] if nav.get("isError") else ""}
         if a.screenshot:
+            # filename แบบ relative จะถูกบันทึกเทียบกับ cwd ของ server (เช่น /workspace) ไม่ใช่ --output-dir
+            # จึงส่ง path เต็มภายใต้ --output-dir ของ config
+            args = cfg.get("args", [])
+            outdir = args[args.index("--output-dir") + 1] if "--output-dir" in args else os.getcwd()
+            want = os.path.join(outdir, os.path.basename(a.screenshot))
             shot = call("tools/call", {"name": "browser_take_screenshot",
-                                       "arguments": {"filename": a.screenshot, "type": "png"}})
-            st = text_of(shot)
-            path = next((w.strip("`()[]'\",") for w in st.split() if w.strip("`()[]'\",").endswith(".png")), "")
-            out["browser_take_screenshot"] = {"ok": not shot.get("isError"), "reported": path}
+                                       "arguments": {"filename": want, "type": "png"}})
+            m = re.search(r"\]\(([^)]+\.png)\)", text_of(shot))
+            path = os.path.normpath(os.path.join(os.getcwd(), m.group(1))) if m else ""
+            out["browser_take_screenshot"] = {"ok": not shot.get("isError") and os.path.isfile(want),
+                                              "reported": path, "file": want,
+                                              "bytes": os.path.getsize(want) if os.path.isfile(want) else 0}
         try:
             call("tools/call", {"name": "browser_close", "arguments": {}})
         except Exception:  # noqa: BLE001

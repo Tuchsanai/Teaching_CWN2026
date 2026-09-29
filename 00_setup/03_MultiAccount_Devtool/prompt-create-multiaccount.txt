@@ -19,8 +19,9 @@ OUT_DIR="03_MultiAccount_Devtool/MultiAccount_Devtool"   # แก้ที่น
 - คัดลอกไฟล์ base ที่ Dockerfile ต้องใช้ (start.sh, jupyter_overrides.json) มาไว้ใน $OUT_DIR แล้วแก้เฉพาะที่จำเป็น
 - สคริปต์/wrapper ที่ COPY เข้า image, docker-compose.yml, .dockerignore
 - readme.md ภาษาไทย: build, run, ล็อกอินทีละบัญชี, โครงสร้างโฟลเดอร์, ต่างจาก base ตรงไหน
-- verify-prompt.txt: พรอมต์ตรวจหลังล็อกอินตามแนว 3.3.2 ของ 02 (config root, skill shared-check,
-  Playwright MCP เปิดเว็บจริง + screenshot, ตารางสรุป PASS/FAIL) ห้ามจองหรือกรอกข้อมูลส่วนตัว
+- verify-prompt.txt: พรอมต์ตรวจหลังล็อกอิน ยึดข้อความใต้เส้น ==== ของ 3.3.2 เป็นต้นแบบ
+  (config root, skill shared-check, Playwright MCP ค้นเที่ยวบิน Google Flights เงื่อนไขเดิม + screenshot 3 ภาพ,
+  ตารางสรุป PASS/FAIL) ปรับเฉพาะส่วนที่ต้องต่างใน image นี้ เช่น path ของภาพ ห้ามจอง ห้ามกรอกข้อมูลส่วนตัว
 
 ## ปรับ 2.4.3.1 ให้เข้ากับการติดตั้งใน image
 - ข้อ "ห้ามติดตั้งซ้ำ" ใช้ไม่ได้ที่นี่: Dockerfile ต้องติดตั้ง Claude Code และ Codex CLI เอง
