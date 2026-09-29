@@ -513,11 +513,14 @@ cyolo1 mcp list 2>/dev/null
 
 ![cyolo1 ได้รหัส SHARED_SKILL_OK-codex จาก skill และเรียก tool mcp__playwright__ สำเร็จ](img/devtools-shared-cyolo1.png)
 
+![cyolo2 เป็นอีกบัญชีแต่ได้รหัส skill เดียวกับ cyolo1 และเรียก tool mcp__playwright__ สำเร็จ](img/devtools-shared-cyolo2.png)
+
 | บัญชี | config root | รหัสจาก `shared-check` | Playwright MCP |
 |---|---|---|---|
 | yolo1 | `.Claude/yolo1` | `SHARED_SKILL_OK-claude-…` | PASS |
 | yolo2 | `.Claude/yolo2` | รหัสเดียวกับ yolo1 | PASS |
 | cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-…` | PASS |
+| cyolo2 | `.Codex/cyolo2` | รหัสเดียวกับ cyolo1 | PASS |
 
 **อ่านผลอย่างไร:** บัญชีต่างกันแต่ได้รหัสเดียวกัน แปลว่าอ่าน skill จากไฟล์เดียวกันใน `shared` และการเรียก tool ชื่อ `playwright` แปลว่า MCP ส่วนกลางถูกโหลดในบัญชีนั้น รหัสและราคาของแต่ละเครื่องจะต่างจากภาพ เพราะรหัสสุ่มตอนติดตั้งและราคาเปลี่ยนตามเวลา
 
