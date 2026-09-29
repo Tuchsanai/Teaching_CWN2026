@@ -1,0 +1,72 @@
+#!/bin/bash
+# ai-account — wrapper กลางของ yolo1..yolo5 (Claude Code) และ cyolo1..cyolo5 (Codex CLI)
+# เรียกผ่าน symlink ชื่อบัญชี เช่น /usr/local/bin/yolo1 -> ai-account
+#   yoloN  → CLAUDE_CONFIG_DIR=$BASE_PATH/.Claude/yoloN  claude --dangerously-skip-permissions --mcp-config=<shared mcp.json> "$@"
+#   cyoloN → CODEX_HOME=$BASE_PATH/.Codex/cyoloN         codex --dangerously-bypass-approvals-and-sandbox -c mcp_servers.<name>={...} "$@"
+# shared (skills + mcp.json) ถูกอ่านใหม่ทุกครั้งที่เปิด → แก้ shared แล้วไม่ต้องรัน installer ซ้ำ
+# ไม่เปลี่ยน $HOME ไม่แตะ .bashrc ไม่พิมพ์ secret
+# AI_ACCOUNTS_DRY_RUN=1 yolo1 ...  → พิมพ์คำสั่งที่จะรันแล้วออก (ไม่เปิด CLI)
+set -u
+. /etc/ai-accounts.conf
+
+name="$(basename "$0")"
+case "$name" in
+    yolo[0-9]*)  tool=claude; dir="$BASE_PATH/.Claude/$name"; shared="$BASE_PATH/.Claude/shared" ;;
+    cyolo[0-9]*) tool=codex;  dir="$BASE_PATH/.Codex/$name";  shared="$BASE_PATH/.Codex/shared" ;;
+    *) echo "ai-account: ให้เรียกผ่านชื่อบัญชี เช่น yolo1 หรือ cyolo1 (ได้ '$name')" >&2; exit 64 ;;
+esac
+
+if [ ! -d "$dir" ]; then
+    echo "$name: ไม่พบโฟลเดอร์บัญชี $dir" >&2
+    echo "$name: รัน 'ai-accounts-setup' (หรือ docker restart container) เพื่อสร้างโฟลเดอร์บัญชี แล้วลองใหม่" >&2
+    exit 2
+fi
+
+export IS_SANDBOX=1                       # root ใน container: ยอมใช้โหมดข้ามการยืนยัน
+export PLAYWRIGHT_BROWSERS_PATH
+mcp="$shared/mcp/mcp.json"
+
+if [ "$tool" = claude ]; then
+    export CLAUDE_CONFIG_DIR="$dir"
+    export DISABLE_AUTOUPDATER=1          # CLI อยู่ใน image; อัปเดตโดย build image ใหม่
+    cmd=(claude --dangerously-skip-permissions)
+    if [ -f "$mcp" ]; then
+        cmd+=("--mcp-config=$mcp")        # ต้องมี = ไม่งั้น --mcp-config (รับหลายค่า) จะกิน argument ถัดไป
+    else
+        echo "$name: คำเตือน: ไม่พบ $mcp — เปิดโดยไม่มี MCP ส่วนกลาง" >&2
+    fi
+    envs=("CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR")
+else
+    export CODEX_HOME="$dir"
+    # credential แบบไฟล์ต่อ CODEX_HOME — ส่งซ้ำทาง -c กันกรณี config.toml ถูกแก้
+    cmd=(codex --dangerously-bypass-approvals-and-sandbox -c 'cli_auth_credentials_store="file"')
+    # re-sync skill ส่วนกลาง: ลิงก์รายตัวเฉพาะที่ยังไม่มี (skill ใหม่ใน shared เห็นตอนเปิดครั้งถัดไป)
+    if [ -d "$shared/skills" ]; then
+        mkdir -p "$dir/skills"
+        for s in "$shared"/skills/*/; do
+            [ -d "$s" ] || continue
+            s="${s%/}"; l="$dir/skills/${s##*/}"
+            [ -e "$l" ] || [ -L "$l" ] || ln -s "../../shared/skills/${s##*/}" "$l"
+        done
+        # ลิงก์ที่ skill ปลายทางถูกลบออกจาก shared แล้ว → ลบลิงก์ค้าง (เฉพาะลิงก์ที่ชี้เข้า shared)
+        for l in "$dir"/skills/*; do
+            [ -L "$l" ] && [ ! -e "$l" ] && case "$(readlink "$l")" in ../../shared/skills/*) rm -f "$l" ;; esac
+        done
+    fi
+    if [ -f "$mcp" ]; then
+        if overrides="$(python3 /usr/local/lib/ai-accounts/mcp_json_to_codex.py "$mcp")"; then
+            while IFS= read -r line; do [ -n "$line" ] && cmd+=(-c "$line"); done <<<"$overrides"
+        else
+            echo "$name: คำเตือน: อ่าน $mcp ไม่ได้ — เปิดโดยไม่มี MCP ส่วนกลาง" >&2
+        fi
+    else
+        echo "$name: คำเตือน: ไม่พบ $mcp — เปิดโดยไม่มี MCP ส่วนกลาง" >&2
+    fi
+    envs=("CODEX_HOME=$CODEX_HOME")
+fi
+
+if [ -n "${AI_ACCOUNTS_DRY_RUN:-}" ]; then
+    printf '%q ' env IS_SANDBOX=1 "${envs[@]}" "${cmd[@]}" "$@"; echo
+    exit 0
+fi
+exec "${cmd[@]}" "$@"
