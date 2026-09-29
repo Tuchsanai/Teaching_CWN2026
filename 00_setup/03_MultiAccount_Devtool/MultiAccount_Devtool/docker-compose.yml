@@ -1,0 +1,40 @@
+# docker-compose.yml — รัน MultiAccount_Devtool (SSH + JupyterLab + Docker-in-Docker + ระบบหลายบัญชี)
+#
+#   docker compose up -d --build  # build จาก Dockerfile ในโฟลเดอร์นี้ แล้วรัน
+#   docker compose up -d          # ใช้ image multiaccount_devtool:2569_1 ที่ build ไว้แล้ว
+#   docker compose down           # หยุดและลบ container (บัญชีใน volume ai-accounts ยังอยู่)
+#
+# ใช้ชื่อ container MultiAccount_Devtool และ volume ai-accounts เดียวกับคำสั่ง docker run ใน readme
+# → ลบ container เดิมก่อน (docker rm -f MultiAccount_Devtool) แล้วสลับไปมาได้โดยไม่ต้องล็อกอินใหม่
+#
+# ปรับค่าได้ผ่าน environment หรือไฟล์ .env ข้าง ๆ (ทุกค่ามี default):
+#   SSH_PORT=2223  JUPYTER_PORT=8886  JUPYTER_PASSWORD=   (ว่าง = ไม่มีรหัสผ่าน)
+#
+# ต่างจาก compose ของ base: ไม่โหลด env_file (/root/workspace/DGX_2024/.env) เพราะถ้าในไฟล์มี
+# ANTHROPIC_API_KEY / OPENAI_API_KEY จะทับการล็อกอินรายบัญชีของ yoloN / cyoloN
+
+services:
+  multiaccount-devtool:
+    image: multiaccount_devtool:2569_1
+    build: .
+    container_name: MultiAccount_Devtool
+    hostname: multiaccount-devtool
+    privileged: true            # จำเป็นสำหรับ Docker-in-Docker (dockerd ข้างใน)
+    stdin_open: true            # -i
+    tty: true                   # -t  → start.sh จะเปิด bash ให้เมื่อ attach
+    restart: unless-stopped
+    environment:
+      JUPYTER_PASSWORD: ${JUPYTER_PASSWORD:-}   # ว่าง = JupyterLab ไม่ถามรหัสผ่าน
+    ports:
+      - "${SSH_PORT:-2223}:22"        # SSH        → ssh root@localhost -p 2223 (password: passwd)
+      - "${JUPYTER_PORT:-8886}:8888"  # JupyterLab → http://localhost:8886  (ไม่มีรหัสผ่าน)
+    volumes:
+      - ai-accounts:/root/ai-accounts # credential/config/session ทุกบัญชี + shared (ไม่อยู่ใน image)
+      - ./workspace:/workspace        # งานของนักศึกษาอยู่บน host ไม่หายเมื่อลบ container
+      - multiaccount-dind:/var/lib/docker  # image/container ของ Docker-in-Docker
+      - ./Devtool_SSH:/etc/devtools/ssh    # devtoolSSH(.pub) → start.sh ใส่ .pub ใน authorized_keys (ว่าง = สร้างให้)
+
+volumes:
+  ai-accounts:
+    name: ai-accounts           # ชื่อตรงกับ docker run -v ai-accounts:... (ไม่เติม prefix ของ project)
+  multiaccount-dind:

@@ -1,0 +1,107 @@
+#!/bin/bash
+# ai-accounts-init — สร้างโฟลเดอร์บัญชีและ shared ใน $BASE_PATH (volume) — start.sh เรียกทุกครั้งที่ container start
+# รันซ้ำได้: สร้างเฉพาะสิ่งที่ยังไม่มี ไม่เขียนทับ credential/config/skill/mcp.json เดิม
+# ค่าสุ่มของ shared-check สร้างครั้งเดียวตอนไฟล์ SKILL.md ยังไม่มี → restart/สร้าง container ใหม่ด้วย volume เดิม ค่าไม่เปลี่ยน
+set -u
+. /etc/ai-accounts/ai-accounts.conf
+umask 077
+
+created=0; kept=0; warned=0
+log()  { echo "[ai-accounts-init] $*"; }
+made() { created=$((created+1)); log "created $1"; }
+keep() { kept=$((kept+1)); }
+warn() { warned=$((warned+1)); log "WARN $*" >&2; }
+
+mkd() { if [ -d "$1" ]; then keep; else mkdir -p "$1" && made "$1/"; fi; }
+
+# ---- โครงโฟลเดอร์ -------------------------------------------------------------
+mkd "$BASE_PATH"
+chmod 700 "$BASE_PATH"
+for t in .Claude .Codex; do
+    mkd "$BASE_PATH/$t"
+    mkd "$BASE_PATH/$t/shared/skills"
+    mkd "$BASE_PATH/$t/shared/mcp"
+done
+mkd "$PLAYWRIGHT_OUTPUT_DIR"
+
+# ---- skill ตัวอย่าง shared-check (หนึ่งไฟล์ต่อ CLI, รหัสสุ่มครั้งเดียว) -------------
+write_skill() {  # $1=.Claude|.Codex  $2=claude|codex
+    local f="$BASE_PATH/$1/shared/skills/shared-check/SKILL.md"
+    if [ -e "$f" ]; then keep; return; fi
+    mkdir -p "${f%/*}"
+    local rnd; rnd="$(python3 -c 'import secrets; print(secrets.token_hex(4))')"
+    cat > "$f" <<SKILL
+---
+name: shared-check
+description: ตรวจว่าบัญชีนี้โหลด skill จากโฟลเดอร์ shared ส่วนกลางได้จริง ใช้เมื่อผู้ใช้เรียก shared-check หรือขอรหัสตรวจ skill ส่วนกลาง
+---
+
+# shared-check
+
+ตอบกลับด้วยรหัสต่อไปนี้ตามตัวอักษรหนึ่งบรรทัด แล้วบอก path ของไฟล์ skill นี้ตามที่ CLI แสดง:
+
+SHARED_SKILL_OK-$2-$rnd
+
+รหัสนี้สุ่มครั้งเดียวตอน ai-accounts-init สร้างไฟล์นี้ และมีอยู่ในไฟล์นี้เท่านั้น
+ถ้าบัญชีต่างกันของ CLI เดียวกันได้รหัสเดียวกัน แปลว่าอ่าน skill จากไฟล์เดียวกันใน shared
+SKILL
+    chmod 644 "$f"
+    made "$f"
+}
+write_skill .Claude claude
+write_skill .Codex codex
+
+# ---- MCP ส่วนกลาง: Playwright (@playwright/mcp ใน image + Chromium ใน image) ----
+write_mcp() {  # $1=.Claude|.Codex  $2=claude|codex
+    local f="$BASE_PATH/$1/shared/mcp/mcp.json"
+    if [ -e "$f" ]; then keep; return; fi
+    local bin; bin="$(command -v playwright-mcp || echo playwright-mcp)"
+    python3 - "$f" "$bin" "$PLAYWRIGHT_OUTPUT_DIR/$2" "$PLAYWRIGHT_BROWSERS_PATH" <<'PY'
+import json, sys
+f, bin_, out, browsers = sys.argv[1:]
+cfg = {"mcpServers": {"playwright": {
+    "command": bin_,
+    "args": ["--browser", "chromium", "--headless", "--isolated", "--no-sandbox",
+             "--output-dir", out],
+    "env": {"PLAYWRIGHT_BROWSERS_PATH": browsers},
+}}}
+with open(f, "w") as fh:
+    json.dump(cfg, fh, indent=2)
+    fh.write("\n")
+PY
+    chmod 644 "$f"
+    mkdir -p "$PLAYWRIGHT_OUTPUT_DIR/$2"
+    made "$f"
+}
+write_mcp .Claude claude
+write_mcp .Codex codex
+
+# ---- บัญชี Claude: yoloN/skills -> ../shared/skills (Claude อ่าน $CLAUDE_CONFIG_DIR/skills) ----
+# ไม่ symlink .claude.json (มีสถานะล็อกอิน) — แต่ละบัญชีมีของตัวเอง
+for a in $CLAUDE_ACCOUNTS; do
+    d="$BASE_PATH/.Claude/$a"
+    mkd "$d"; chmod 700 "$d"
+    if [ -L "$d/skills" ]; then keep
+    elif [ -e "$d/skills" ]; then warn "$d/skills เป็นโฟลเดอร์จริง (ไม่ใช่ลิงก์ไป shared) — ไม่แก้ไขของเดิม"
+    else ln -s ../shared/skills "$d/skills" && made "$d/skills -> ../shared/skills"
+    fi
+done
+
+# ---- บัญชี Codex: CODEX_HOME ต้องมีก่อน, credential แบบไฟล์, skill เชื่อมรายตัว ------
+for a in $CODEX_ACCOUNTS; do
+    d="$BASE_PATH/.Codex/$a"
+    mkd "$d"; chmod 700 "$d"
+    mkd "$d/skills"
+    if [ -e "$d/config.toml" ]; then keep
+    else
+        printf '# สร้างโดย ai-accounts-init — แก้ได้ ไม่ถูกเขียนทับ\ncli_auth_credentials_store = "file"\n' > "$d/config.toml"
+        made "$d/config.toml"
+    fi
+    for s in "$BASE_PATH"/.Codex/shared/skills/*/; do
+        [ -d "$s" ] || continue
+        s="${s%/}"; l="$d/skills/${s##*/}"
+        if [ -e "$l" ] || [ -L "$l" ]; then keep; else ln -s "$s" "$l" && made "$l -> $s"; fi
+    done
+done
+
+log "done: base=$BASE_PATH created=$created kept=$kept warnings=$warned"

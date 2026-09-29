@@ -1,0 +1,31 @@
+# verify-prompt.txt — พรอมต์ตรวจหลังล็อกอิน (MultiAccount_Devtool)
+# ใช้หลังจากล็อกอินบัญชีที่ต้องการตรวจแล้วเท่านั้น (เช่น yolo1 yolo2 cyolo1 cyolo2)
+#
+# วิธีที่ 1 — วางทีละบัญชี: คัดลอกเฉพาะข้อความใต้เส้น ==== ไปวางใน 💬 ช่องสนทนาของบัญชีนั้น
+# วิธีที่ 2 — รันจาก shell ทีละบัญชี (foreground, รอจนจบก่อนบัญชีถัดไป):
+#   sed '1,/^====$/d' verify-prompt.txt > /tmp/verify.txt
+#   timeout 15m yolo1 -p "$(cat /tmp/verify.txt)"                          | tee evidence/yolo1/run.log
+#   timeout 15m cyolo1 exec --skip-git-repo-check "$(cat /tmp/verify.txt)" | tee evidence/cyolo1/run.log
+#   (สร้างโฟลเดอร์ก่อน: mkdir -p evidence/yolo1 evidence/cyolo1)
+# ภาพที่ Playwright MCP บันทึกอยู่ใต้ /root/ai-accounts/playwright-output/<claude|codex>/ ตาม path ที่บัญชีรายงาน
+# ผลที่คาด: บัญชีต่างกันแต่ CLI เดียวกันได้รหัส shared-check เดียวกัน; Claude กับ Codex ได้รหัสคนละชุด
+====
+ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
+
+1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
+2. ใช้ skill $shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
+   ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
+3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
+   เปิด https://en.wikipedia.org/wiki/Special:Search
+   ค้นหาคำว่า Bangkok ในช่องค้นหาของหน้าเว็บ แล้วเปิดบทความ Bangkok
+   ค้นหาและอ่านอย่างเดียว ห้ามล็อกอิน ห้ามแก้ไขหน้าใด ห้ามกรอกข้อมูลส่วนตัว ห้ามจองหรือชำระเงินใด ๆ
+   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาเนื้อหา
+4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น (ไม่ใช่ทั้งหน้า) 3 ภาพ
+   ตั้งชื่อนำหน้าด้วยชื่อโฟลเดอร์ config root เช่น yolo1-1-open.png: <บัญชี>-1-open.png (หน้าค้นหาเปิดได้),
+   <บัญชี>-2-search.png (พิมพ์คำค้นแล้วก่อนกดค้นหา), <บัญชี>-3-results.png (หน้าบทความ Bangkok) แล้วรายงาน path เต็มของแต่ละภาพ
+5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว:
+   - config root
+   - รหัสจาก skill shared-check
+   - ชื่อ MCP server และชื่อ tool ที่เรียกจริง
+   - ภาพหน้าจอ 3 ภาพ (path)
+   - หัวเรื่องบทความ และประโยคแรกของบทความ (ตามที่เห็นบนหน้าเว็บ)
