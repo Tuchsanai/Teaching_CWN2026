@@ -1,8 +1,0 @@
-#!/bin/sh
-# Project-only ssh shim for `docker` over DOCKER_HOST=ssh://... . It reuses the already-open
-# ControlMaster and a dedicated known_hosts file; global SSH config is not touched.
-# Put this directory first in PATH only for docker commands (scripts/docker.sh does that).
-: "${LAB_SSH_CONTROL_PATH:?LAB_SSH_CONTROL_PATH not set (SSH_CONTROL_PATH in .env)}"
-: "${LAB_SSH_KNOWN_HOSTS:?LAB_SSH_KNOWN_HOSTS not set (SSH_KNOWN_HOSTS in .env)}"
-exec /usr/bin/ssh -o ControlPath="$LAB_SSH_CONTROL_PATH" -o ControlMaster=no \
-  -o UserKnownHostsFile="$LAB_SSH_KNOWN_HOSTS" -o StrictHostKeyChecking=yes -o BatchMode=yes "$@"
