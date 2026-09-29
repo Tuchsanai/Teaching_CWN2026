@@ -168,6 +168,12 @@ $BASE_PATH/
 6. Skills/MCP ใน <tool>/shared เป็น source เดียวต่อ CLI ต้องเชื่อมด้วยวิธีที่เวอร์ชันจริงรองรับ
    ห้ามสมมติว่า CLI อ่าน shared อัตโนมัติ ห้ามแชร์ credential/token ของบัญชี
    ถ้า CLI ใดไม่รองรับส่วนใด ให้ระบุชัดและทำเท่าที่รองรับ
+   - MCP ส่วนกลางเก็บเป็นไฟล์เดียวต่อ CLI: <tool>/shared/mcp/mcp.json รูปแบบ {"mcpServers":{...}} ห้ามใส่ secret
+   - ใส่ Playwright MCP (@playwright/mcp) เป็น MCP ส่วนกลางตัวแรก ติดตั้งครั้งเดียวพร้อม Chromium
+   - สร้าง skill ตัวอย่าง shared-check ใน <tool>/shared/skills เพื่อพิสูจน์การแชร์: เมื่อถูกเรียกให้ตอบรหัส
+     SHARED_SKILL_OK-<tool>-<ค่าสุ่มตอนติดตั้ง> ซึ่งมีอยู่ในไฟล์นี้เท่านั้น
+   - เพิ่ม skill/MCP ใหม่ใน shared แล้วทุกบัญชีของ CLI นั้นต้องเห็นเมื่อเปิดครั้งถัดไป โดยไม่ต้องรัน installer ซ้ำ
+   - รายงานว่าแต่ละ CLI อ่าน skill และ MCP ของบัญชีจากไฟล์/โฟลเดอร์ใด และ shared เชื่อมเข้าไปด้วยวิธีใด
 
 ## Installer
 7. รันซ้ำได้โดยไม่ลบหรือเขียนทับ credential/config เดิม
@@ -182,12 +188,21 @@ $BASE_PATH/
 - ถ้ารันเป็น root ต้องตั้ง IS_SANDBOX=1 ไม่งั้น claude ปฏิเสธ --dangerously-skip-permissions
 - CODEX_HOME ต้อง mkdir -p ก่อน codex ไม่สร้างโฟลเดอร์ให้เอง
 - codex login status ไม่ตรวจว่า token ยังใช้ได้ ให้ยืนยันด้วย codex exec เท่านั้น
+- Claude อ่าน skill จาก $CLAUDE_CONFIG_DIR/skills แต่ MCP ระดับ user อยู่ใน $CLAUDE_CONFIG_DIR/.claude.json ซึ่งมีสถานะล็อกอินปนอยู่
+  ห้าม symlink ไฟล์นี้ ให้ wrapper ส่ง --mcp-config=<ไฟล์> (ต้องมี = เพราะ option นี้รับหลายค่า จะกินอาร์กิวเมนต์ถัดไป)
+  และ claude mcp list จะไม่แสดง MCP ที่มาจาก --mcp-config ให้ตรวจด้วย /mcp หลังล็อกอิน
+- Codex อ่าน skill จาก $CODEX_HOME/skills และเขียน skills/.system ลงโฟลเดอร์นี้เอง จึงไม่ควร symlink ทั้งโฟลเดอร์ไปที่ shared
+  Codex อ่าน ~/.agents/skills ด้วย ซึ่งทุกบัญชีเห็นร่วมกันโดยอัตโนมัติ ห้ามใช้เป็นทางลัด
+- Codex เก็บ MCP ใน $CODEX_HOME/config.toml ของแต่ละบัญชี แต่ -c mcp_servers.<name>={...} ใช้ได้ทั้งตอนเปิดและกับ codex mcp list
+- Playwright MCP ใน container ที่รันเป็น root ต้องใช้ --browser chromium --headless --isolated --no-sandbox
+  (ค่าเริ่มต้นหา Chrome ที่ /opt/google/chrome ไม่เจอ) และควรตั้ง --output-dir นอกโฟลเดอร์งาน
 
 ## ทดสอบ (รายงานตามจริง PASS / FAIL / SKIP)
 - yolo1..yolo5 --version และ cyolo1..cyolo5 --version ทำงานครบ 10 ตัว
 - แต่ละคำสั่งชี้ config root คนละโฟลเดอร์ ตรวจด้วย find <root>
 - installer รอบ 2 ไม่ทำลายของเดิม
 - Git/SSH ทำงานปกติ
+- cyolo1..cyolo5 mcp list เห็น playwright และ skill shared-check ของทุกบัญชีชี้ไปไฟล์เดียวกันใน shared (ตรวจด้วย readlink -f)
 - ทุกอย่างที่ต้องล็อกอินหรือใช้ credential จริง รอบนี้เป็น SKIP เจ้าของบัญชีจะทำเองภายหลัง
 
 ## รายงาน
@@ -447,3 +462,63 @@ cyolo1 exec --skip-git-repo-check --model gpt-6-astra -c model_reasoning_effort=
 **ผล:** Fable และ Astra คำนวณถูกครบทั้งสองวิธี โดยลด 10% ตั้งแต่ยอดซื้อ 1000 บาทขึ้นไป ถ้อยคำอาจต่างกันได้ แต่ยอดจ่ายต้องตรงตาราง
 
 เมื่อทดลองเอง ให้ตรวจชื่อโมเดลและ effort จากหน้าจอ แล้วเก็บภาพคำตอบไว้เทียบ หากรันไม่ได้ ให้บันทึกว่า **ยังไม่ได้ทดลอง**
+
+### 3.5 · ตรวจการแชร์ Skill และ MCP ข้ามบัญชี (หลังล็อกอิน)
+
+ใช้ตรวจว่า skill `shared-check` และ Playwright MCP ที่ตั้งไว้ใน `shared` เรียกใช้ได้จริงจากหลายบัญชี ต้องล็อกอินอย่างน้อย 2 บัญชีต่อเครื่องมือก่อน เช่น `yolo1`, `yolo2`, `cyolo1`, `cyolo2` หากเบราว์เซอร์ส่งผลล็อกอิน Codex กลับเข้า container ไม่ได้ ให้ใช้ `cyolo1 login --device-auth` แทน
+
+#### 3.5.1 · 🖥️ ตรวจการเชื่อม shared ใน Terminal
+
+```bash
+for a in yolo1 yolo2 cyolo1 cyolo2; do printf "%-7s " $a; $a --version 2>/dev/null; done
+ls -l ~/ai-accounts/.Claude/yolo1/skills ~/ai-accounts/.Codex/cyolo1/skills/ | grep -E "skills|shared"
+cyolo1 mcp list 2>/dev/null
+```
+
+ต้องเห็นว่า `yolo1/skills` ชี้ไป `../shared/skills` ส่วน `cyolo1/skills/shared-check` ชี้ไป `.Codex/shared/skills/shared-check` และ `cyolo1 mcp list` มี `playwright` สำหรับ Claude จะเห็น MCP จาก `--mcp-config` ด้วยคำสั่ง `/mcp` ในหน้าสนทนาเท่านั้น ไม่แสดงใน `claude mcp list`
+
+![ตรวจเวอร์ชัน ลิงก์ skill ไปยัง shared และ MCP playwright ของ cyolo1 ใน JupyterLab Terminal](img/devtools-shared-setup.png)
+
+#### 3.5.2 · 📋 พรอมต์ตรวจ (วางใน 💬 ช่องสนทนาของแต่ละบัญชี หรือส่งจาก shell)
+
+ใช้พรอมต์เดียวกันกับทุกบัญชี ใน Codex คำว่า `$shared-check` คือการเรียก skill ตามชื่อ การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
+
+```text
+ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
+
+1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
+2. ใช้ skill $shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
+   ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
+3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
+   เปิด https://www.google.com/travel/flights?hl=en
+   ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
+   ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
+   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
+4. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว:
+   - config root
+   - รหัสจาก skill shared-check
+   - ชื่อ MCP server และชื่อ tool ที่เรียกจริง
+   - เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
+```
+
+หากบันทึกพรอมต์ไว้ในไฟล์ `~/verify-prompt.txt` สามารถส่งจาก shell ได้ด้วย `yolo1 -p "$(cat ~/verify-prompt.txt)"` และ `cyolo1 exec --skip-git-repo-check "$(cat ~/verify-prompt.txt)"`
+
+#### 3.5.3 · ผลการทดลองจริง (29 กันยายน 2026)
+
+ภาพต่อไปนี้ถ่ายจาก JupyterLab Terminal ของ container ทดลองหลังล็อกอินบัญชีจริง ส่งพรอมต์ด้วยวิธี shell และครอปเฉพาะส่วนผลลัพธ์
+
+![yolo1 ได้รหัส SHARED_SKILL_OK-claude จาก skill และค้นเที่ยวบินผ่าน playwright MCP สำเร็จ](img/devtools-shared-yolo1.png)
+
+![yolo2 เป็นอีกบัญชีแต่ได้รหัส skill เดียวกับ yolo1 และค้นเที่ยวบินผ่าน playwright MCP สำเร็จ](img/devtools-shared-yolo2.png)
+
+![cyolo1 ได้รหัส SHARED_SKILL_OK-codex จาก skill และเรียก tool mcp__playwright__ สำเร็จ](img/devtools-shared-cyolo1.png)
+
+| บัญชี | config root | รหัสจาก `shared-check` | Playwright MCP |
+|---|---|---|---|
+| yolo1 | `.Claude/yolo1` | `SHARED_SKILL_OK-claude-…` | PASS |
+| yolo2 | `.Claude/yolo2` | รหัสเดียวกับ yolo1 | PASS |
+| cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-…` | PASS |
+
+**อ่านผลอย่างไร:** บัญชีต่างกันแต่ได้รหัสเดียวกัน แปลว่าอ่าน skill จากไฟล์เดียวกันใน `shared` และการเรียก tool ชื่อ `playwright` แปลว่า MCP ส่วนกลางถูกโหลดในบัญชีนั้น รหัสและราคาของแต่ละเครื่องจะต่างจากภาพ เพราะรหัสสุ่มตอนติดตั้งและราคาเปลี่ยนตามเวลา
+
+**ข้อควรรู้:** Claude เรียก skill ผ่านเครื่องมือ `Skill` ส่วน Codex ไม่มีเครื่องมือแยก จะเปิด `SKILL.md` จาก path ที่ CLI ระบุในรายการ skill ซึ่งเป็นกลไกปกติของ Codex คำตอบของโมเดลเป็นเพียงคำบอกเล่า หากต้องการหลักฐานการเรียกจริง ให้ตรวจ log ของ session ใน `$CLAUDE_CONFIG_DIR/projects/` หรือ `$CODEX_HOME/sessions/`
