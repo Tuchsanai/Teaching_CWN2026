@@ -15,8 +15,8 @@
 ##### ข้อกำหนดเดิม 1 · Backend
 
 ```text
-LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/04_API_MultiAccount_Server/api
-ถ้ายังไม่มี ให้สร้างโฟลเดอร์ /workspace/04_API_MultiAccount_Server/api และโฟลเดอร์ย่อยที่จำเป็น ทำงานเฉพาะภายใต้ /workspace/04_API_MultiAccount_Server เท่านั้น
+LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/05_API_MultiAccount_Server/api
+ถ้ายังไม่มี ให้สร้างโฟลเดอร์ /workspace/05_API_MultiAccount_Server/api และโฟลเดอร์ย่อยที่จำเป็น ทำงานเฉพาะภายใต้ /workspace/05_API_MultiAccount_Server เท่านั้น
 ไฟล์ที่มีอยู่แล้วต้องเก็บไว้ และแก้เฉพาะส่วนที่จำเป็น
 ถ้ามีไฟล์อยู่แล้ว ให้ตรวจเทียบกับข้อกำหนดนี้ แก้เฉพาะจุดที่ไม่ตรง แล้วรันเทสต์ ห้ามเขียนทับทั้งโฟลเดอร์
 ห้ามล็อกอิน ห้ามเรียกโมเดลจริง ห้าม deploy ห้ามอ่านค่า credential
@@ -90,7 +90,7 @@ LAB 004 ขั้นที่ 1: สร้าง backend ใน /workspace/04_AP
 **สิ่งที่ต้องตรวจหลัง `yolo3` ทำเสร็จ**
 
 ```bash
-cd /workspace/04_API_MultiAccount_Server/api
+cd /workspace/05_API_MultiAccount_Server/api
 python3 -m venv /tmp/lab04venv && /tmp/lab04venv/bin/pip install -q -r requirements-dev.txt
 /tmp/lab04venv/bin/python -m unittest discover -s tests 2>&1 | tail -3
 ```
@@ -106,7 +106,7 @@ python3 -m venv /tmp/lab04venv && /tmp/lab04venv/bin/pip install -q -r requireme
 ##### ข้อกำหนดเดิม 2 · HTML
 
 ```text
-LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล์เดียว /workspace/04_API_MultiAccount_Server/web/index.html
+LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล์เดียว /workspace/05_API_MultiAccount_Server/web/index.html
 และ container เสิร์ฟไฟล์ static แยกจาก API ถ้ามีไฟล์แล้วให้ตรวจเทียบข้อกำหนดและแก้เฉพาะจุด ห้าม deploy
 
 ## หน้าเว็บ
@@ -145,7 +145,7 @@ LAB 004 ขั้นที่ 2: สร้างหน้าแชตไฟล�
 ##### ข้อกำหนดเดิม 3 · Deployment
 
 ```text
-LAB 004 ขั้นที่ 3: เขียนสคริปต์ deploy ใน /workspace/04_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
+LAB 004 ขั้นที่ 3: เขียนสคริปต์ deploy ใน /workspace/05_API_MultiAccount_Server/deploy ห้ามรันจริงในขั้นนี้
 ข้อเท็จจริง: docker ใน devtools คือ daemon ชั้นใน ใช้สร้าง sibling container ไม่ได้
 daemon ชั้นนอกชื่อ docker-desktop เข้าได้ผ่าน control host ทาง SSH root@host.docker.internal พอร์ต 22022
 control host เองเป็น container ดังนั้น localhost ของมันไม่ใช่พอร์ตที่ Docker Desktop publish
@@ -172,7 +172,7 @@ control host เองเป็น container ดังนั้น localhost ข
 - open: ssh -F /dev/null -o ControlMaster=yes -o ControlPath=<โฟลเดอร์ชั่วคราว 700>/ctl -o ControlPersist=2h -fN
   ผู้ใช้พิมพ์รหัสผ่านเอง · known_hosts อยู่ในโฟลเดอร์ชั่วคราว · ไม่ใช้คีย์ ไม่แก้ ~/.ssh
 - ทุกคำสั่งหลังจากนั้นใช้ ssh -S <socket> -o BatchMode=yes
-- daemon, sync (tar ไปที่ /root/workspace/CWN/Teaching/00_setup/04_API_MultiAccount_Server ยกเว้น deploy/.secrets),
+- daemon, sync (tar ไปที่ /root/workspace/CWN/Teaching/00_setup/05_API_MultiAccount_Server ยกเว้น deploy/.secrets),
   run <คำสั่งย่อยที่อนุญาต>, reveal-token (ผู้ใช้รันเองและต้องพิมพ์ yes), close
 
 ตรวจ bash -n และทดสอบการปฏิเสธ config ผิดแบบ offline เท่านั้น ห้ามเปิด SSH ห้าม deploy
@@ -188,7 +188,7 @@ control host เองเป็น container ดังนั้น localhost ข
 ใน 🖥️ Terminal **อีกแท็บ** (ไม่ใช่ในช่องสนทนาของ `yolo3`)
 
 ```bash
-cd /workspace/04_API_MultiAccount_Server
+cd /workspace/05_API_MultiAccount_Server
 bash deploy/remote.sh open      # ถามยืนยัน host key (พิมพ์ yes) แล้วถามรหัสผ่านหนึ่งครั้ง
 bash deploy/remote.sh daemon    # ต้องเห็น devtools = daemon ชั้นใน และ control host = docker-desktop
 ```

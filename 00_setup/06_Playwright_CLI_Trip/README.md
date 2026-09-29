@@ -116,16 +116,16 @@ echo "RUN_DATE=$RUN_DATE DEPART=$DEPART RETURN_SEARCH=$RETURN_SEARCH"
 
 **🖥️ Terminal (Bash)**
 ```bash
-RUNS_DIR="/root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip/runs"
+RUNS_DIR="/root/workspace/CWN/Teaching/00_setup/06_Playwright_CLI_Trip/runs"
 mkdir -p -- "$RUNS_DIR"
 LAB_DIR="$(mktemp -d -- "$RUNS_DIR/lab05-$(date +%Y%m%d-%H%M%S)-XXXXXX")" && cd -- "$LAB_DIR" && pwd
 ```
 
 - `date` ถูกเรียก **ครั้งเดียว** และ `mktemp -d` เติมตัวอักษรสุ่มท้ายชื่อ (`XXXXXX`) จึงได้โฟลเดอร์ใหม่ที่ไม่ชนกับรอบอื่นแน่นอน (`cd` จะทำงานเฉพาะเมื่อ `mktemp` สร้างโฟลเดอร์สำเร็จแล้วเท่านั้น)
-- ทุกโฟลเดอร์ของแต่ละรอบอยู่ใต้ `runs/` ของ LAB นี้ ดูย้อนหลังได้ด้วย `ls -d /root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip/runs/lab05-*`
+- ทุกโฟลเดอร์ของแต่ละรอบอยู่ใต้ `runs/` ของ LAB นี้ ดูย้อนหลังได้ด้วย `ls -d /root/workspace/CWN/Teaching/00_setup/06_Playwright_CLI_Trip/runs/lab05-*`
 - ถ้าปิด Terminal แล้วเปิดใหม่ ตัวแปร `LAB_DIR` จะหายไป ให้ `cd` ไปยัง path ที่ `pwd` พิมพ์ไว้
 
-> 📁 **โฟลเดอร์ชื่อเดียวกัน แต่อยู่คนละเครื่อง:** path `/root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip` มีอยู่สองที่ที่ **แยกจากกัน**
+> 📁 **โฟลเดอร์ชื่อเดียวกัน แต่อยู่คนละเครื่อง:** path `/root/workspace/CWN/Teaching/00_setup/06_Playwright_CLI_Trip` มีอยู่สองที่ที่ **แยกจากกัน**
 > (1) โฟลเดอร์ต้นฉบับบน **Remote** ที่ผู้สอนใช้เขียนบทเรียน (ฉบับหลัก) และ (2) โฟลเดอร์ชื่อเดียวกันใน **devtools** ที่ yolo3 รันผ่าน JupyterLab
 > ทั้งสองเป็นคนละ filesystem และ **ไม่มีการ mount ร่วมกัน** ไฟล์ที่สร้างใน devtools (เช่น `runs/`, `evidence/`) จะไม่ไปปรากฏบน Remote เอง
 > ผู้สอนต้อง export/คัดลอกไฟล์ที่ต้องการกลับไปเองอย่างตั้งใจ
@@ -408,7 +408,7 @@ AI จะหยุดรอโดย **เก็บ session `trip`, browser cont
 
 **1. 🖥️ Terminal ที่ 2 ใน JupyterLab (Bash)** — File → New → Terminal (อย่าปิด Terminal แรกที่ yolo3 รันอยู่)
 ```bash
-cd -- "/root/workspace/CWN/Teaching/00_setup/05_Playwright_CLI_Trip/runs/lab05-YYYYMMDD-HHMMSS-XXXXXX"
+cd -- "/root/workspace/CWN/Teaching/00_setup/06_Playwright_CLI_Trip/runs/lab05-YYYYMMDD-HHMMSS-XXXXXX"
 playwright-cli show --host 127.0.0.1 --port 9230
 ```
 - แทน `lab05-YYYYMMDD-HHMMSS-XXXXXX` ด้วยโฟลเดอร์จริงของรอบนี้ (ที่ `pwd` พิมพ์ในขั้นที่ 2 หรือที่ AI แจ้งมา) เพื่อให้อยู่ workspace เดียวกับ session `trip`
@@ -547,7 +547,7 @@ AI จะบันทึกเวลารอ แล้ว snapshot ใหม่
 ไฟล์ในโฟลเดอร์บทเรียนนี้ (มีอยู่จริง):
 
 ```
-05_Playwright_CLI_Trip/
+06_Playwright_CLI_Trip/
 ├── README.md                 ← เอกสารนี้
 ├── prompt-install.txt        ← 💬 Prompt ที่ 1 (ตรงกับกล่องในขั้นที่ 4)
 ├── prompt-trip.txt           ← 💬 Prompt ที่ 2 (ตรงกับกล่องในขั้นที่ 6)
