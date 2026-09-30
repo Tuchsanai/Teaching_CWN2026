@@ -436,3 +436,53 @@ START `today=2026-09-30 departure=2026-10-15 (Thu, Oct 15)` · MCP `Playwright 1
 
 - หมายเหตุ lab5-compare: หัวภาพเป็น `prompt.txt (lines sent to the LLM)` เพราะบรรทัดมาจาก prompt.txt (ไม่มี box ในบรรทัด → กรอบวาดจาก box ใน snapshot.yml ของ step เดียวกันตาม ref)
 - เก็บกวาด: ไม่มีโปรเซส cyolo1 ค้าง · ไม่ได้เปิดเบราว์เซอร์/MCP ใน container ในเฟสนี้ (ตรวจแล้ว chromium/playwright-mcp = 0) · ไม่ได้แตะ container
+
+---
+
+# เฟส 5 · ทดสอบพรอมต์แบบนักศึกษา (สรุปผล)
+
+- รันจริง 2026-09-30 เวลา 13:01–13:50 (เวลาไทย) ใน container `devtools-pwmcp-c34a6add` · ของเดิมใน `/workspace` (`.probe_mcp/`, `.ref_mcp/`) ย้ายไป `/root/old_ws_backup/` ก่อนเริ่ม → `/workspace` ว่าง
+- วิธีรัน: `student/extract_prompt.py N` ดึงกรอบ 💬 ของ LAB N จาก README ทุกตัวอักษร → `student/run_lab.sh N` = `docker exec ... 'cd /workspace && yolo1 -p --model sonnet --output-format json "$(cat /tmp/labN.prompt.txt)" < /dev/null'` ทีละ LAB ไม่ขนาน (โมเดลที่ได้จริงใน `modelUsage`: `claude-sonnet-5-5`)
+- ผลเก็บใน `student/`: `labN.json` (ผลของ yolo1), `labN.prompt.txt` (พรอมต์ที่ส่งจริง), `labN.err` (ว่างทุกไฟล์), `ws_after_labN/` (สำเนา `/workspace` หลัง LAB นั้น ไม่รวม `mcp-out/`), `procs_after_labN.txt` (ว่างทุกไฟล์ = ไม่มี chromium/MCP ค้าง), `runs.log`, `check.sh` (คำสั่ง "วิธีตรวจ" ต่อ LAB), `tools_used.sh` (อ่าน transcript ของ yolo1 ใน container ว่าเรียก tool อะไร), `README.before_phase5_edit.md` (README ก่อนแก้)
+- ตรวจทุก LAB ด้วยคำสั่งจริงใน container (`check.sh`) + เปิดไฟล์ผลเอง + อ่าน transcript ว่าไม่มีการเรียก `mcp__playwright__*` (ทุก LAB ใช้แค่ Bash/Read/Write)
+
+## ผลต่อ LAB
+
+| LAB | ผล | turn | เวลา (wall) | $ | หลักฐานสำคัญ (ตรวจเอง) |
+|---|---|---|---|---|---|
+| 1 | **PASS** | 2 | 23 วินาที | 0.096 | browserName chromium · tools.txt 25 บรรทัด · example.yml บรรทัด 8 `link "Learn more" [ref=e13] [box=919,537,83,26]` · example.png 3840×2160 · rpc.jsonl เริ่มด้วย initialize, `bytes image/png` 1 ครั้ง · exit 0 · lab1.txt = `Version 0.0.83` (README ขอแค่ผลของ `--version`) |
+| 2 | **PASS** (รอบ 2 ของการรัน ดูหมายเหตุ) | 4 | 32 วินาที | 0.078 | flights.yml 253 / form-partial.yml 24 (target e99) / form.txt 7 บรรทัด ref+box ตรงการรันอ้างอิงทั้ง 7 · find.txt ตรงทุกตัวอักษร · responses.txt: navigate ลิงก์, snapshot inline ×2 · isError 0 |
+| 3 | รอบ 1 **FAIL** → แก้พรอมต์ → รอบ 2 **PASS** | 5 / 7 | 44 / 55 วินาที | 0.121 / 0.149 | รอบ 2: final.yml บรรทัด 31 `One way [ref=e873]`, 42 `Where from? Bangkok BKK [ref=e876]`, `[expanded]` 0 · refs e107 e541 e637 e735 e852 · `await page.getBy` 5 · browser_type ไม่มี Snapshot (190 bytes) · isError 0 ใน rpc.jsonl |
+| 4 | **PASS** | 5 | 36 วินาที | 0.122 | stale.txt บรรทัด 841–842 `Ref e107 not found` + `[isError: true]` · rpc.jsonl isError true 1, `"error"` 0 (id 9) · old.yml:31 e107 / new.yml:31 e634 |
+| 5 | **PASS** | 8 | 96 วินาที | 0.264 | step/ ครบ 8 ไฟล์ · innerHTML 0 · disallowedTools 1 · tools/call จริง: navigate, wait_for, snapshot×2, screenshot×2, evaluate×2, click, close · verify.yml:37 option One way · prompt ส่ง 30 บรรทัด · Haiku ตอบ click e107 |
+| 6 | **PASS** | 16 | 12 นาที 18 วินาที | 0.799 | run จริง 13:38:39→13:40:45 (2:06) 11 step ref ตรงการรันอ้างอิงทุกตัว · วันที่ 2026-10-15 · tools=25 · exit 0 · isError 0 · top3 = Hong Kong Express 7241 (บรรทัด 112) / Vietjet 7346 (142) / THAI 11320 (175) ตรง snapshot ทุกตัวอักษร · page.png วงรีแดงถูกตำแหน่ง (เปิดดูเอง step 06) |
+| 7 | **PASS** | 14 | 1 นาที 53 วินาที | 0.274 | A: LLM `click e85` Sign in → `name_not_denylisted` fail → STOP, tools/call 4 ไม่มี click · B: inject ถึง prompt ทั้ง 3 step, LLM e107 → e542 → stop · check_no_signin: A 0 / B 0 · validate/denylist ไม่ถูกแก้ (diff trip_agent.py LAB 6 vs 7 = เพิ่มแค่ `--inject`) |
+
+รวมที่วัดได้: 8 การรัน (รวม LAB 3 สองรอบ) · ต้นทุน sonnet **$1.905** · wall **1,137 วินาที (~19 นาที)** · ไม่รวม: (1) Haiku ที่ agent ของนักศึกษาเรียกใน LAB 5–7 (โค้ดของ AI ไม่ได้บันทึก `total_cost_usd` — การรันอ้างอิงใช้ $0.086 ต่อรอบเต็ม) (2) LAB 2 รอบแรกที่ถูก kill (06:03–06:19 UTC ไม่มีไฟล์ผล ต้นทุนไม่ทราบ)
+
+หมายเหตุ LAB 2: รอบแรกถูก kill กลางทางเพราะผม (session เฟส 5 ก่อนหน้า) สั่งเป็น background task แล้วโหมด `-p` ปิด session · ผู้ควบคุมลบ `/workspace/lab2` แล้วให้รันใหม่แบบ foreground → ผ่านใน 32 วินาที (ไม่ได้แก้พรอมต์)
+
+## สิ่งที่แก้ใน README และเหตุผล
+
+1. **พรอมต์ LAB 3 (แก้ 1 ครั้ง รันใหม่ 1 ครั้ง):** เพิ่ม `(ส่ง ref ใน argument ชื่อ "target")` และ `; บันทึก JSON-RPC ลง lab3/rpc.jsonl`
+   - เหตุ: รอบแรกพรอมต์ไม่ได้สั่งเก็บ JSON-RPC → AI ตั้งชื่อเอง `mcp_log.jsonl` → วิธีตรวจ `grep ... lab3/rpc.jsonl` ใช้ไม่ได้ · และรอบแรก AI ส่ง `{"ref": "e107"}` ได้ `expected string, received undefined → at target` (ยืนยันจาก transcript ใน container) ก่อนแก้เอง
+2. **"วิธีตรวจ" ที่ผิดเอง (แก้คำสั่ง ไม่ได้แก้พรอมต์ ไม่ต้องรันใหม่):**
+   - LAB 3 `grep -c "await page"` ได้ 8 ไม่ใช่ 5 (นับ `page.goto`/`page.screenshot` ด้วย) → ใช้ `grep -c "await page.getBy"` = 5
+   - LAB 5 และ LAB 7 `grep -o '"name": "browser_…"' rpc.jsonl` นับชื่อจากคำตอบ `tools/list` ด้วย (LAB 7 A ได้ `browser_click` 1 ทั้งที่ไม่มีการกด) → กรอง `"method": "tools/call"` ก่อน (ใช้กับ "คำสั่งที่ใช้บ่อย" ด้วย)
+   - LAB 2 `grep -c "### Snapshot" responses.txt` ไม่บอกว่าเป็นลิงก์หรือ inline → บอกค่า 3 + เพิ่ม `grep -o '### Snapshot\\n.......' lab2/rpc.jsonl` (ทดสอบแล้ว: `- [Snap` 1, ```` ```yaml ```` 2)
+   - LAB 6 โฟลเดอร์ผลของ AI ชื่อ `12_results-top3` → ใช้ glob `log/steps/*results*/`
+3. **✅ ผลที่ควรได้ ทุก LAB:** เปลี่ยนเป็นผลจริงของการทดสอบ (ตัดตอน) ตัวเลขทุกตัวตรวจกับไฟล์ใน `student/ws_after_labN/` · LAB 3 ตาราง ref ใช้ e735/e852 จริง · LAB 5 decision.json/act.txt ของนักศึกษา + ลำดับ tools/call จริง · LAB 6 run.log ทั้งไฟล์ (ตัด reason) + top3.json · LAB 7 run.log A/B, decision.json A, บรรทัด inject ใน prompt.txt, check_no_signin.txt ทั้งไฟล์
+4. **อธิบายส่วนที่ต่างจาก log อ้างอิง (แบบบท CLI):** LAB 4 id 9 vs 10 · LAB 5 validate 6 ข้อ vs 8 ข้อ ไม่มีเวลา/ต้นทุน LLM · LAB 6 top3 ไม่อยู่ใน run.log, ชื่อโฟลเดอร์ต่าง, top3 เหมือนการรันอ้างอิงเพราะห่าง ~1 ชม. 20 นาที · LAB 7 ตารางเทียบ (A 4 vs 6 tools/call เพราะ validate ก่อนวาดภาพ → ไม่มี page.png, snapshot 181→149 vs 253→70 เพราะส่วนดีลของ Google ต่างแบบ, ตำแหน่งปุ่ม inject, B 20 vs 21 calls) · ภาพ page.png/compare ยังเป็นของการรันอ้างอิง (ระบุไว้ใต้ภาพ)
+5. **หัวเอกสาร / ส่วน B:** บรรทัด `**พรอมต์ทดสอบแล้ว:**` (yolo1 sonnet, /workspace ว่าง, LAB 1→7, 2026-09-30) + ย่อหน้าต้นส่วน B (เวลา ~19 นาที $1.91) · เวลา LAB 6 เป็น "ทดสอบจริง 12 นาที"
+6. **ส่วน C เพิ่ม 3 แถว + ขยาย 1 แถว + ข้อควรรู้ 1 ข้อ:** `ref` แทน `target` (เจอจริง LAB 3) · ชื่อไฟล์หลักฐานไม่ตรงวิธีตรวจ · grep นับชื่อ tool เกินเพราะ tools/list · agent กดปุ่มดีล "Oct 15 to Oct 21" แทนวันในปฏิทินแต่ verify ผ่าน (AI เจอเองตอนทดสอบ LAB 6 ยืนยันจาก transcript: แก้ regex "exclude deal buttons" + ตรวจเป้าหมายก่อนหน้าซ้ำ) · snapshot หน้าเดียวกันยาวไม่เท่ากัน (253 vs 181)
+
+## ตรวจรอบสุดท้าย
+- `/tmp/chk_readme.py`: links 135 (relative มีจริงทุกอัน) · anchors 42 · fence/ตารางไม่พัง · ภาพที่ไม่ถูกอ้าง 0 · README 2,116 บรรทัด
+- grep email/token/password/API key/ชื่อบัญชีใน `01_playwright-mcp/` ทั้งโฟลเดอร์ (รวม log/): ไม่พบ มีแค่ชื่อ image สาธารณะ `tuchsanai/multi-account-devtool:2569_1` (ชื่อ repo บน Docker Hub ไม่ใช่บัญชีล็อกอิน คงไว้)
+- โฟลเดอร์ `01_playwright-mcp/` เหลือ `README.md`, `img/` (11 MB), `log/` (4.8 MB) · ลบ `.ipynb_checkpoints/` (สำเนา README เก่าของเฟส 4 ที่ JupyterLab สร้าง ไม่มีใครอ้าง) · ทุกไฟล์ใน img/ log/ ถูกอ้างตรง ๆ หรือผ่านลิงก์โฟลเดอร์
+- พรอมต์ใน README ปัจจุบันเทียบกับพรอมต์ที่รันจริง (`cmp`): ตรงทุก LAB (LAB 3 ตรงกับรอบ 2)
+
+## เก็บกวาด
+- ทุก LAB ปิด MCP เอง (`procs_after_labN.txt` ว่าง) · ตรวจสุดท้าย chromium/playwright-mcp = 0 process · ลบ `/tmp/labN.prompt.txt` และโฟลเดอร์ว่าง `/tmp/playwright-*` (จาก 12:16 ก่อนเฟส 5) ใน container
+- `/workspace` ใน container คงผลของนักศึกษาไว้ (lab1–5, log/, trip_agent.py, mcp-out/ 36 MB) · `/root/old_ws_backup/` มีของเฟส 1–2 + `lab3_try1/` · ไม่ได้ stop/rm container · ไม่ได้แตะ volume `ai-accounts`
+- ข้อสังเกตที่ยังไม่ได้แก้ (นอกขอบเขต): Haiku cost ต่อ step ไม่ถูกบันทึกเพราะพรอมต์ LAB 5/6 ไม่ได้สั่ง ถ้าอยากให้นักศึกษาเห็นต้นทุน ควรเพิ่ม "บันทึก total_cost_usd และเวลา LLM ลง decision.json" แล้วทดสอบใหม่

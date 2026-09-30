@@ -1,0 +1,80 @@
+{
+  "goal": "ตั้งต้นทางเป็น Suvarnabhumi Airport (BKK)",
+  "attempt": 2,
+  "url": "https://www.google.com/travel/flights?tfs=CBwQARoOagwIAhIIL20vMGZuMmdAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en",
+  "shown_refs": [
+    "e735",
+    "e748",
+    "e759",
+    "e768"
+  ],
+  "llm_answer": {
+    "action": "click",
+    "ref": "e759",
+    "value": "",
+    "reason": "คลิก Suvarnabhumi Airport (BKK) เพื่อตั้งเป็นต้นทาง"
+  },
+  "element_from_snapshot": {
+    "role": "option",
+    "name": "Suvarnabhumi Airport (BKK)",
+    "ref": "e759",
+    "box": [
+      480,
+      553,
+      448,
+      56
+    ],
+    "flags": [
+      "selected"
+    ],
+    "value": "",
+    "line": 61,
+    "text": "option \"Suvarnabhumi Airport (BKK)\" [selected] [ref=e759] [box=480,553,448,56]:"
+  },
+  "checks": [
+    {
+      "check": "action_in_allowlist",
+      "result": "pass",
+      "detail": "action='click' allowlist=['click', 'fill', 'press', 'stop']"
+    },
+    {
+      "check": "ref_format",
+      "result": "pass",
+      "detail": "ref='e759' pattern=^(f\\d+)?e\\d+$"
+    },
+    {
+      "check": "ref_in_latest_snapshot",
+      "result": "pass",
+      "detail": "ref 'e759' พบ ใน snapshot ล่าสุด"
+    },
+    {
+      "check": "name_not_denylisted",
+      "result": "pass",
+      "detail": "name จาก snapshot='Suvarnabhumi Airport (BKK)' denylist=book|sign in|log in|payment|select flight|select fare"
+    },
+    {
+      "check": "ref_in_shown_list",
+      "result": "pass",
+      "detail": "ref อยู่ในรายการที่ให้ LLM เห็น=True"
+    },
+    {
+      "check": "role_allowed",
+      "result": "pass",
+      "detail": "role=option allowed=['button', 'combobox', 'textbox', 'option']"
+    },
+    {
+      "check": "option_matches_goal",
+      "result": "pass",
+      "detail": "option/name='Suvarnabhumi Airport (BKK)'"
+    }
+  ],
+  "passed": true,
+  "overlay": {
+    "isError": false,
+    "result": "\"{\\\"placement\\\":\\\"left\\\",\\\"overlapping_elements\\\":0,\\\"label_box\\\":[191.2161620284267,564.5,183,33],\\\"ellipse\\\":{\\\"cx\\\":704,\\\"cy\\\":581,\\\"rx\\\":319.7838379715733,\\\"ry\\\":42.59797974644666}}\""
+  },
+  "overlay_removed": {
+    "isError": false,
+    "result": "true"
+  }
+}

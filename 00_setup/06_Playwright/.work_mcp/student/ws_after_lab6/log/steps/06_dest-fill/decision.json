@@ -1,0 +1,93 @@
+{
+  "goal": "ตั้งปลายทางเป็นเมือง Tokyo, Japan",
+  "attempt": 2,
+  "url": "https://www.google.com/travel/flights?tfs=CBwQARoJagcIARIDQktLQAFIAXABggELCP___________wGYAQI&tfu=KgIIAw&hl=en",
+  "shown_refs": [
+    "e965",
+    "e979",
+    "e987",
+    "e994",
+    "e1001",
+    "e1012"
+  ],
+  "llm_answer": {
+    "action": "fill",
+    "ref": "e965",
+    "value": "Tokyo",
+    "reason": "ช่อง combobox เปิดอยู่แล้ว พิมพ์ 'Tokyo' เพื่อให้ระบบแสดง Tokyo, Japan เป็น option"
+  },
+  "element_from_snapshot": {
+    "role": "combobox",
+    "name": "Where to?",
+    "ref": "e965",
+    "box": [
+      830,
+      448,
+      336,
+      48
+    ],
+    "flags": [
+      "expanded",
+      "active"
+    ],
+    "value": "",
+    "line": 50,
+    "text": "combobox \"Where to?\" [expanded] [active] [ref=e965] [box=830,448,336,48]"
+  },
+  "checks": [
+    {
+      "check": "action_in_allowlist",
+      "result": "pass",
+      "detail": "action='fill' allowlist=['click', 'fill', 'press', 'stop']"
+    },
+    {
+      "check": "ref_format",
+      "result": "pass",
+      "detail": "ref='e965' pattern=^(f\\d+)?e\\d+$"
+    },
+    {
+      "check": "ref_in_latest_snapshot",
+      "result": "pass",
+      "detail": "ref 'e965' พบ ใน snapshot ล่าสุด"
+    },
+    {
+      "check": "name_not_denylisted",
+      "result": "pass",
+      "detail": "name จาก snapshot='Where to?' denylist=book|sign in|log in|payment|select flight|select fare"
+    },
+    {
+      "check": "ref_in_shown_list",
+      "result": "pass",
+      "detail": "ref อยู่ในรายการที่ให้ LLM เห็น=True"
+    },
+    {
+      "check": "role_allowed",
+      "result": "pass",
+      "detail": "role=combobox allowed=['button', 'combobox', 'textbox', 'option']"
+    },
+    {
+      "check": "option_matches_goal",
+      "result": "pass",
+      "detail": "option/name='Where to?'"
+    },
+    {
+      "check": "fill_value_allowed",
+      "result": "pass",
+      "detail": "value='Tokyo' โค้ดกำหนด=Tokyo"
+    },
+    {
+      "check": "fill_target_role",
+      "result": "pass",
+      "detail": "role=combobox"
+    }
+  ],
+  "passed": true,
+  "overlay": {
+    "isError": false,
+    "result": "\"{\\\"placement\\\":\\\"above\\\",\\\"overlapping_elements\\\":1,\\\"label_box\\\":[878.5,392.05887450304573,239,33],\\\"ellipse\\\":{\\\"cx\\\":998,\\\"cy\\\":472,\\\"rx\\\":240.58787847867998,\\\"ry\\\":36.941125496954285}}\""
+  },
+  "overlay_removed": {
+    "isError": false,
+    "result": "true"
+  }
+}

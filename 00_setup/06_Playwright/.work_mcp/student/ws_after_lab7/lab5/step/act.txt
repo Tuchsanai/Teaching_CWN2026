@@ -1,0 +1,8 @@
+→ tools/call browser_click {"target": "e107"}
+isError: false
+await page.getByRole('combobox', { name: 'Change ticket type. Round trip' }).click();
+
+Verify (verify.yml):
+  PASS พบ option "One way" ที่ verify.yml:37: - option "One way" [ref=e541] [cursor=pointer] [box=480,492,138,48]
+  ref เดิม e107 ไม่อยู่ใน snapshot ใหม่แล้ว
+ผล: PASS

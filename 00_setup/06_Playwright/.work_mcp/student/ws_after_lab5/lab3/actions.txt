@@ -1,0 +1,90 @@
+#1 browser_navigate
+  arguments: {"url": "https://www.google.com/travel/flights?hl=en"}
+  code: ["await page.goto('https://www.google.com/travel/flights?hl=en');"]
+  isError: False
+  has_Snapshot: True
+
+#2 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#3 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#4 browser_click
+  arguments: {"element": "Change ticket type", "target": "e107"}
+  code: ["await page.getByRole('combobox', { name: 'Change ticket type. Round trip' }).click();"]
+  isError: False
+  has_Snapshot: True
+
+#5 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#6 browser_click
+  arguments: {"element": "One way", "target": "e541"}
+  code: ["await page.getByRole('option', { name: 'One way' }).click();"]
+  isError: False
+  has_Snapshot: True
+
+#7 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#8 browser_click
+  arguments: {"element": "Where from?", "target": "e637"}
+  code: ["await page.getByRole('combobox', { name: 'Where from?' }).click();"]
+  isError: False
+  has_Snapshot: True
+
+#9 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#10 browser_type
+  arguments: {"element": "origin input", "target": "e735", "text": "BKK"}
+  code: ["await page.getByRole('combobox', { name: 'Where else?' }).fill('BKK');"]
+  isError: False
+  has_Snapshot: False
+
+#11 browser_snapshot
+  arguments: {}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#12 browser_click
+  arguments: {"element": "Suvarnabhumi Airport (BKK)", "target": "e852"}
+  code: ["await page.getByRole('option', { name: 'Suvarnabhumi Airport (BKK)' }).click();"]
+  isError: False
+  has_Snapshot: True
+
+#13 browser_snapshot
+  arguments: {"boxes": true}
+  code: []
+  isError: False
+  has_Snapshot: True
+
+#14 browser_take_screenshot
+  arguments: {"type": "png", "scale": "device"}
+  code: ['await page.screenshot({']
+  isError: False
+  has_Snapshot: False
+
+#15 browser_close
+  arguments: {}
+  code: ['await page.close()']
+  isError: False
+  has_Snapshot: False
+

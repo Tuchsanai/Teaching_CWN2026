@@ -1,0 +1,77 @@
+{
+  "goal": "เปลี่ยนประเภทตั๋วเป็น One way (เปิดรายการ Change ticket type แล้วเลือก option One way)",
+  "attempt": 2,
+  "url": "https://www.google.com/travel/flights?hl=en",
+  "shown_refs": [
+    "e540",
+    "e541",
+    "e542"
+  ],
+  "llm_answer": {
+    "action": "click",
+    "ref": "e541",
+    "value": "",
+    "reason": "คลิกตัวเลือก One way เพื่อเปลี่ยนประเภทตั๋วจาก Round trip เป็น One way"
+  },
+  "element_from_snapshot": {
+    "role": "option",
+    "name": "One way",
+    "ref": "e541",
+    "box": [
+      480,
+      492,
+      138,
+      48
+    ],
+    "flags": [],
+    "value": "",
+    "line": 37,
+    "text": "option \"One way\" [ref=e541] [cursor=pointer] [box=480,492,138,48]"
+  },
+  "checks": [
+    {
+      "check": "action_in_allowlist",
+      "result": "pass",
+      "detail": "action='click' allowlist=['click', 'fill', 'press', 'stop']"
+    },
+    {
+      "check": "ref_format",
+      "result": "pass",
+      "detail": "ref='e541' pattern=^(f\\d+)?e\\d+$"
+    },
+    {
+      "check": "ref_in_latest_snapshot",
+      "result": "pass",
+      "detail": "ref 'e541' พบ ใน snapshot ล่าสุด"
+    },
+    {
+      "check": "name_not_denylisted",
+      "result": "pass",
+      "detail": "name จาก snapshot='One way' denylist=book|sign in|log in|payment|select flight|select fare"
+    },
+    {
+      "check": "ref_in_shown_list",
+      "result": "pass",
+      "detail": "ref อยู่ในรายการที่ให้ LLM เห็น=True"
+    },
+    {
+      "check": "role_allowed",
+      "result": "pass",
+      "detail": "role=option allowed=['button', 'combobox', 'textbox', 'option']"
+    },
+    {
+      "check": "option_matches_goal",
+      "result": "pass",
+      "detail": "option/name='One way'"
+    }
+  ],
+  "passed": true,
+  "overlay": {
+    "isError": false,
+    "result": "\"{\\\"placement\\\":\\\"left\\\",\\\"overlapping_elements\\\":0,\\\"label_box\\\":[255.41926419625645,499.5,183,33],\\\"ellipse\\\":{\\\"cx\\\":549,\\\"cy\\\":516,\\\"rx\\\":100.58073580374356,\\\"ry\\\":36.941125496954285}}\""
+  },
+  "overlay_removed": {
+    "isError": false,
+    "result": "true"
+  }
+}

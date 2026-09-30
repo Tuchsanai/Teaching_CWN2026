@@ -1,0 +1,7 @@
+งานสั้นสุดท้าย (เฟส 6): ใส่ภาพหน้าจอจริงจาก JupyterLab ลง 06_Playwright/01_playwright-mcp/README.md
+ภาพถูกถ่ายจาก Chrome ผ่าน SSH tunnel เข้า JupyterLab Terminal ของ container ทดสอบ (หลังรันพรอมต์นักศึกษาครบแล้ว) เปิดดูภาพด้วย Read ก่อน:
+1. img/jupyter-lab1-handshake.png — รัน `python3 lab1/hello.py | cut -c1-66` แล้ว grep "method" ใน lab1/rpc.jsonl เห็น serverInfo Playwright, tools: 25, exit code 0 และลำดับ initialize → notifications/initialized → tools/list → tools/call
+   ใส่ในส่วน ✅ ของ LAB 1 (ก่อนหรือหลังกล่องผลลัพธ์ แล้วแต่อ่านลื่น) คำบรรยาย `*ภาพจริง: รันโค้ดของ LAB 1 ใน Terminal ของ JupyterLab ...*`
+2. img/jupyter-lab6-runlog.png — `grep '→ PASS' log/run.log` ของ trip_agent.py ที่นักศึกษา (yolo1 sonnet) เขียนเอง: 11 step PASS + 3 อันดับพร้อมเลขบรรทัด (Hong Kong Express 7241 line 112, Vietjet 7346 line 142, THAI 11320 line 175)
+   ใส่ในส่วน ✅ ของ LAB 6 คำบรรยาย `*ภาพจริง: ...*`
+เขียน alt ภาษาไทยที่อธิบายภาพ ห้ามแก้ส่วนอื่น ตรวจว่าลิงก์ภาพมีจริง แล้วตอบสั้น ๆ ว่าใส่ที่บรรทัดไหน

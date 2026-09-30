@@ -1,0 +1,19 @@
+ทำงานใน /workspace · ใช้ Bash + Python มาตรฐานเท่านั้น (ห้ามติดตั้งอะไรเพิ่ม)
+เขียน Python เป็น MCP client เรียก /usr/bin/playwright-mcp ผ่าน stdio ห้ามเรียก tool ของ MCP playwright เองโดยตรง
+ใช้ /workspace/mcp_client.py เขียน /workspace/lab5/one_step.py ที่ทำ 1 step แบบ code-in-control บน https://www.google.com/travel/flights?hl=en แล้วรันจริง 1 ครั้ง
+เป้าหมายของ step: "เปิดรายการประเภทตั๋ว (Change ticket type) เพื่อจะเลือก One way" หลักฐานทั้งหมดใน lab5/step/ (JSON-RPC ของ step ลง lab5/step/rpc.jsonl)
+1. Observe: browser_navigate รอ 2 วินาที → browser_snapshot {"boxes": true} เก็บ YAML ลง snapshot.yml → ต่อทันที browser_take_screenshot {"type":"png","scale":"device"} ลง observe.png
+2. Decide: ตัด snapshot เหลือเฉพาะบรรทัด button/combobox/textbox/option ที่มีชื่อและ [ref=...] (ลบ [box=...] [cursor=pointer] ออก)
+   บรรทัดที่ชื่อมี ": " จะถูกครอบด้วย '...' เช่น - 'button "A: B" [ref=e5]' ให้ parser รองรับ
+   เขียน prompt.txt เป็น plain text ภาษาไทย: บทบาท (คุณไม่ได้กดเอง) + เป้าหมาย + snapshot ที่ตัดแล้ว + กติกา (เลือก ref จากรายการเท่านั้น, action = click/fill/press/stop) + รูปแบบคำตอบ JSON {action, ref, value, reason}
+   ส่ง prompt.txt ทาง stdin ให้ yolo1 -p --model haiku --effort low --output-format json --json-schema '<schema>' --no-session-persistence --strict-mcp-config --tools "" --disallowedTools mcp__playwright
+   (schema: action enum click/fill/press/stop, ref/value/reason เป็น string, required ครบ 4, additionalProperties false) แล้วอ่านคำตอบจาก field structured_output
+3. Validate: action อยู่ใน allowlist, ref ตรงรูปแบบ ^(f\d+)?e\d+$ (MCP รับ CSS selector ได้ จึงต้องกัน), ref มีใน snapshot ล่าสุด,
+   ชื่อ element จาก snapshot (ไม่ใช่จากคำตอบ LLM) ไม่ตรง denylist (book|sign in|log in|payment|select flight|select fare), role อยู่ใน 4 role ข้างบน — ไม่ผ่านให้หยุดโดยไม่เรียก tool
+   เขียนคำตอบ LLM + ผลตรวจทีละข้อ (pass/fail) ลง decision.json
+   ก่อนกด: browser_evaluate สร้าง overlay วงรีแดงล้อม element พอดี (จาก box) + กล่องข้อความ "Step 1 · click <ref>" วางในที่ว่างไม่บัง element
+   (สร้างด้วย document.createElement/createElementNS ห้ามใช้ innerHTML) → browser_take_screenshot ลง page.png → browser_evaluate ลบ overlay
+4. Act: browser_click {"target": "<ref>"}
+5. Verify: browser_snapshot {"boxes": true} เก็บ verify.yml ต้องมี option "One way"; เช็กด้วยว่า ref เดิมยังอยู่ใน snapshot ใหม่ไหม
+   เขียน act.txt: tools/call ที่ส่ง + isError + บรรทัด await page... + ผล verify พร้อมเลขบรรทัดหลักฐาน
+จบ: close แล้วสรุป 4 ช่วง (Observe / Decide / Validate→Act / Verify) ให้ดู

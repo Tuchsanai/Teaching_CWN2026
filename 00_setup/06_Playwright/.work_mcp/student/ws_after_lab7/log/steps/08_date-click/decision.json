@@ -1,0 +1,75 @@
+{
+  "goal": "เลือกวันเดินทาง October 15, 2026 ในช่อง Departure",
+  "attempt": 1,
+  "url": "https://www.google.com/travel/flights?tfs=CBwQARoXagcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en",
+  "shown_refs": [
+    "e1170"
+  ],
+  "llm_answer": {
+    "action": "click",
+    "ref": "e1170",
+    "value": "",
+    "reason": "คลิกช่อง Departure เพื่อเปิดปฏิทินเลือกวันเดินทาง"
+  },
+  "element_from_snapshot": {
+    "role": "textbox",
+    "name": "Departure",
+    "ref": "e1170",
+    "box": [
+      1116,
+      445,
+      308,
+      54
+    ],
+    "flags": [],
+    "value": "",
+    "line": 48,
+    "text": "textbox \"Departure\" [ref=e1170] [box=1116,445,308,54]"
+  },
+  "checks": [
+    {
+      "check": "action_in_allowlist",
+      "result": "pass",
+      "detail": "action='click' allowlist=['click', 'fill', 'press', 'stop']"
+    },
+    {
+      "check": "ref_format",
+      "result": "pass",
+      "detail": "ref='e1170' pattern=^(f\\d+)?e\\d+$"
+    },
+    {
+      "check": "ref_in_latest_snapshot",
+      "result": "pass",
+      "detail": "ref 'e1170' พบ ใน snapshot ล่าสุด"
+    },
+    {
+      "check": "name_not_denylisted",
+      "result": "pass",
+      "detail": "name จาก snapshot='Departure' denylist=book|sign in|log in|payment|select flight|select fare"
+    },
+    {
+      "check": "ref_in_shown_list",
+      "result": "pass",
+      "detail": "ref อยู่ในรายการที่ให้ LLM เห็น=True"
+    },
+    {
+      "check": "role_allowed",
+      "result": "pass",
+      "detail": "role=textbox allowed=['button', 'combobox', 'textbox', 'option']"
+    },
+    {
+      "check": "option_matches_goal",
+      "result": "pass",
+      "detail": "option/name='Departure'"
+    }
+  ],
+  "passed": true,
+  "overlay": {
+    "isError": false,
+    "result": "\"{\\\"placement\\\":\\\"right\\\",\\\"overlapping_elements\\\":0,\\\"label_box\\\":[1500.7888886054566,455.5,192,33],\\\"ellipse\\\":{\\\"cx\\\":1270,\\\"cy\\\":472,\\\"rx\\\":220.78888860545666,\\\"ry\\\":41.18376618407357}}\""
+  },
+  "overlay_removed": {
+    "isError": false,
+    "result": "true"
+  }
+}
