@@ -1,0 +1,8 @@
+ใช้ playwright-cli ผ่าน Bash เท่านั้น (ห้ามใช้ Playwright MCP) ทำงานใน /workspace เก็บผลใน /workspace/lab3/
+เป้าหมาย: เป็น "มือ" ด้วย ref ทีละคำสั่ง และตรวจผลด้วย snapshot ใหม่ทุกครั้ง บน https://www.google.com/travel/flights?hl=en
+1. open หน้านี้ (คุกกี้ → Reject all) แล้ว snapshot --filename=lab3/s1.yml
+2. click combobox "Change ticket type" (ref จาก s1) → snapshot lab3/s2.yml → click option "One way" (ref จาก s2) → snapshot lab3/s3.yml
+3. click combobox "Where from?" → snapshot → fill ช่องต้นทางที่ [expanded] ด้วย BKK → snapshot → click option "Suvarnabhumi Airport (BKK)"
+4. ถ่ายต่อกัน: snapshot --boxes --filename=lab3/final.yml และ screenshot --hires --filename=lab3/final.png
+กติกา: ใช้ ref จาก snapshot ล่าสุดเสมอ ห้ามเดา ref; ทุกคำสั่งตั้งแต่ open ให้ต่อท้าย 2>&1 | tee -a lab3/actions.txt (เก็บ output จริง ห้ามเขียนสรุปเองลงไฟล์)
+ตรวจ: final.yml ต้องมี combobox "Change ticket type. One way" และช่อง "Where from?" ที่มี BKK — แสดงบรรทัดที่พิสูจน์ แล้ว playwright-cli close

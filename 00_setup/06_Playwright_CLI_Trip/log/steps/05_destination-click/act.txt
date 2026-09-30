@@ -1,0 +1,9 @@
+$ playwright-cli click e868
+await page.getByRole('combobox', { name: 'Where to?' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoJagcIARIDQktLQAFIAXABggELCP___________wGYAQI&tfu=KgIIAw&hl=en
+exit code: 0
+
+$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ปลายทาง' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - combobox "Where to?" [expanded] [active] [ref=e965] [box=830,448,336,48]
+# ref e868 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

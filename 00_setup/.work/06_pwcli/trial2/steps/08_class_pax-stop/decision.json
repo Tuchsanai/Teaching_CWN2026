@@ -1,0 +1,34 @@
+{
+  "step": 8,
+  "goal_key": "class_pax",
+  "llm_model": "claude-haiku-4-5-20251001",
+  "llm_seconds": 8.0,
+  "llm_decision": {
+    "action": "stop",
+    "ref": "f1e821",
+    "value": "",
+    "reason": "ไม่สามารถบรรลุเป้าหมายได้จาก snapshot นี้ - ไม่มี element ที่ใช้เลือกหรือตรวจสอบชั้นโดยสาร (Economy) และจำนวนผู้โดยสาร (1 คน) ในหน้าปัจจุบัน เพียงแค่มีฟิลด์ \"Return\" สำหรับเลือกวันกลับเท่านั้น"
+  },
+  "validate": {
+    "verdict": "stop",
+    "checks": [
+      {
+        "check": "action in allowlist",
+        "pass": true,
+        "detail": "stop ∈ ['click', 'fill', 'press', 'stop']"
+      }
+    ]
+  },
+  "target": {
+    "role": "textbox",
+    "name": "Return",
+    "line": 63,
+    "box": [
+      1278,
+      445,
+      138,
+      54
+    ]
+  },
+  "result": "HALT"
+}

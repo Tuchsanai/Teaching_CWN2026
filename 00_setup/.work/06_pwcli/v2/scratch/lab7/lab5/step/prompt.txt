@@ -1,0 +1,41 @@
+เป้าหมาย: เปิดรายการประเภทตั๋ว (Change ticket type) เพื่อจะเลือก One way
+
+ด้านล่างคือรายการ element ที่ตัดมาจาก snapshot ของหน้า https://www.google.com/travel/flights?hl=en:
+        - button "Main menu" [ref=e6] [cursor=pointer]
+            - button "Skip to main content" [ref=e16]
+            - button "Accessibility feedback" [ref=e19]
+          - button "Change appearance" [ref=e72]
+        - button "Google apps" [ref=e81] [cursor=pointer]
+            - combobox "Change ticket type. Round trip" [ref=e107] [cursor=pointer]:
+            - button "1 passenger, change number of passengers." [ref=e113]:
+            - combobox "Change seating class. Economy" [ref=e126] [cursor=pointer]:
+                - combobox "Where from?" [ref=e136]: Bangkok
+              - combobox "Where to?" [active] [ref=e149]
+              - textbox "Departure" [ref=e168]
+              - textbox "Return" [ref=e172]
+        - button "Explore destinations" [ref=e176]:
+            - button "Explore deals with AI" [ref=e193]
+              - button "Learn more about this section" [ref=e203] [cursor=pointer]
+                  - button "Find flights from Bangkok (DMK) to Chiang Mai (CNX) from THB 2,490. Operated by Thai Lion Air. Oct 18 to Oct 27. Nonstop" [ref=e218] [cursor=pointer]:
+                  - button "Find flights from Bangkok (DMK) to Phuket (HKT) from THB 2,390. Operated by Thai Lion Air. Nov 5 to Nov 11. Nonstop" [ref=e234] [cursor=pointer]:
+                  - button "Find flights from Bangkok (BKK) to Singapore (SIN) from THB 5,741. Operated by Scoot. Nov 5 to Nov 11. Nonstop" [ref=e250] [cursor=pointer]:
+                - button "Explore more destinations from Bangkok" [ref=e266] [cursor=pointer]
+                - button "What are some good flight destinations from Thailand?" [ref=e372]
+                - button "How can I find last-minute flight deals?" [ref=e382]
+                - button "How can I find cheap flights for a weekend getaway?" [ref=e392]
+                - button "How can I find flight deals if my travel plans are flexible?" [ref=e402]
+                - button "How can I find cheap flights to anywhere?" [ref=e412]
+                - button "How can I get flight alerts for my trip?" [ref=e422]
+          - button "Language·English (United States)" [ref=e460]
+          - button "Location·Thailand" [ref=e466]
+          - button "Currency THB" [ref=e473]:
+            - button "International sites" [ref=e508]
+            - button "Explore flights" [ref=e520]
+
+กติกา:
+- เลือก ref จากรายการข้างบนเท่านั้น ห้ามคิด ref เอง
+- action ต้องเป็นหนึ่งใน click / fill / press / stop (stop = ไม่มี element ที่เหมาะสม)
+- ทำเพียง 1 การกระทำที่ใกล้เป้าหมายที่สุด
+
+ตอบเป็น JSON เท่านั้น รูปแบบ: {"action": "...", "ref": "...", "value": "...", "reason": "..."}
+(ถ้าไม่ใช้ value ให้เป็นสตริงว่าง)

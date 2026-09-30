@@ -1,0 +1,10 @@
+command: playwright-cli fill e965 Tokyo
+cli_ok: True
+--- cli output (tail) ---
+### Ran Playwright code
+```js
+await page.getByRole('combobox', { name: 'Where to?' }).fill('Tokyo');
+```
+
+--- verify after action ---
+NOT YET - destination dropdown is still open - an option must be clicked

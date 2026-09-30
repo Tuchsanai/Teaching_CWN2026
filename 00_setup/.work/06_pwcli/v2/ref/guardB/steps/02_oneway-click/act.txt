@@ -1,0 +1,9 @@
+$ playwright-cli click e542
+await page.getByRole('option', { name: 'One way' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoOagwIAhIIL20vMGZuMmdAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
+exit code: 0
+
+$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ประเภทตั๋ว' → ผ่าน ✅
+#   หลักฐาน verify.yml บรรทัด 31: - combobox "Change ticket type. One way" [active] [ref=e636] [cursor=pointer] [box=480,400,127,36]:
+# ref e542 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

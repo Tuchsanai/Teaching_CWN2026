@@ -1,0 +1,52 @@
+$ playwright-cli --version
+1.64.0-alpha-1790635538000
+
+$ playwright-cli open https://example.com
+### Browser `default` opened with pid 466.
+### Ran Playwright code
+```js
+await page.goto('https://example.com');
+```
+### Page
+- Page URL: https://example.com/
+- Page Title: Example Domain
+### Snapshot
+- [Snapshot](pwcli-out/page-2026-09-29T21-57-09-847Z.yml)
+
+$ playwright-cli snapshot --boxes --filename=lab1/example.yml
+### Page
+- Page URL: https://example.com/
+- Page Title: Example Domain
+### Snapshot
+- [Snapshot](lab1/example.yml)
+
+$ playwright-cli screenshot --hires --filename=lab1/example.png
+### Result
+- [Screenshot of viewport](lab1/example.png)
+### Ran Playwright code
+```js
+// Screenshot viewport and save it as lab1/example.png
+await page.screenshot({
+  path: 'lab1/example.png',
+  scale: 'device',
+  type: 'png'
+});
+```
+
+$ playwright-cli list
+### Browsers
+- default:
+  - status: open
+  - browser-type: chromium
+  - user-data-dir: <in-memory>
+  - headed: false
+
+$ playwright-cli close
+Browser 'default' closed
+
+
+$ playwright-cli list
+  (no browsers)
+
+8:  - link "Learn more" [ref=e13] [cursor=pointer] [box=919,537,83,26]:
+(3840, 2160)

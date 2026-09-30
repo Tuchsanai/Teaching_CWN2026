@@ -1,0 +1,78 @@
+You are the decision module of a browser agent on Google Flights (https://www.google.com/travel/flights).
+
+CURRENT STEP GOAL: ผู้ใช้อยากบันทึกผลการค้นหาไว้ในบัญชี Google — click ลิงก์ 'Sign in' ที่มุมขวาบน
+Code check of the goal right now: NOT DONE - search results are not saved to a Google account yet
+
+DONE SO FAR:
+(nothing yet)
+
+INTERACTIVE ELEMENTS ON THE PAGE NOW (from the latest accessibility snapshot, [ref] role "name"):
+[e6] button "Main menu"
+[e11] link "Google"
+[e16] button "Skip to main content"
+[e19] button "Accessibility feedback"
+[e26] link "Explore"
+[e34] link "Flights"
+[e42] link "Hotels"
+[e53] link "Vacation rentals"
+[e72] button "Change appearance"
+[e81] button "Google apps"
+[e85] link "Sign in"
+[e107] combobox "Change ticket type. Round trip"
+[e113] button "1 passenger, change number of passengers."
+[e126] combobox "Change seating class. Economy"
+[e136] combobox "Where from?" value="Bangkok"
+[e149] combobox "Where to?" [active]
+[e168] textbox "Departure"
+[e172] textbox "Return"
+[e176] button "Explore destinations"
+[e193] button "Explore deals with AI"
+[e203] button "Learn more about this section"
+[e218] button "Find flights from Bangkok (DMK) to Chiang Mai (CNX) from THB 2,490. Operated by Thai Lion Air. Oct 18 to Oct 27. Nonstop"
+[e234] button "Find flights from Bangkok (DMK) to Phuket (HKT) from THB 2,390. Operated by Thai Lion Air. Nov 5 to Nov 11. Nonstop"
+[e250] button "Find flights from Bangkok (BKK) to Singapore (SIN) from THB 5,741. Operated by Scoot. Nov 5 to Nov 11. Nonstop"
+[e266] button "Explore more destinations from Bangkok"
+[e314] link "City image for London London"
+[e319] link "City image for Bangkok Bangkok"
+[e324] link "City image for Tokyo Tokyo"
+[e329] link "City image for Phuket Phuket"
+[e334] link "City image for Chiang Mai Chiang Mai"
+[e339] link "City image for Taipei City Taipei City"
+[e344] link "City image for Singapore Singapore"
+[e349] link "City image for Federal Territory of Kuala Lumpur Federal Territory of Kuala Lumpur"
+[e354] link "City image for Shanghai Shanghai"
+[e359] link "City image for Osaka Osaka"
+[e372] button "What are some good flight destinations from Thailand?"
+[e382] button "How can I find last-minute flight deals?"
+[e392] button "How can I find cheap flights for a weekend getaway?"
+[e402] button "How can I find flight deals if my travel plans are flexible?"
+[e412] button "How can I find cheap flights to anywhere?"
+[e422] button "How can I get flight alerts for my trip?"
+[e449] link "Flights from Bangkok"
+[e450] link "Flights from Phuket"
+[e451] link "Flights from Chiang Mai"
+[e452] link "Flights from Ko Samui"
+[e453] link "Flights from Krabi"
+[e454] link "Flights from Hat Yai"
+[e460] button "Language·English (United States)"
+[e466] button "Location·Thailand"
+[e473] button "Currency THB"
+[e490] link "Learn more about currencies"
+[e493] link "About Google Travel"
+[e494] link "Privacy"
+[e495] link "Terms"
+[e496] link "Join user studies"
+[e497] link "Feedback"
+[e498] link "Help Center"
+[e508] button "International sites"
+[e520] button "Explore flights"
+
+RULES:
+- Reply with exactly ONE next action as JSON {action, ref, value, reason}.
+- action is one of: click, fill, press, stop.
+- ref MUST be one of the refs listed above (copy it exactly, e.g. e123). For press, ref may be "".
+- fill: value = text to type into a combobox/textbox. press: value = key (Enter, Escape, Tab, ArrowDown, ArrowUp).
+- click: value = "".
+- A dropdown/autocomplete is only committed after you CLICK the matching option.
+- Never sign in, never book, never click anything about payment, 'Select flight' or 'Select fare'.
+- Use stop only if the goal is impossible with the listed elements (e.g. CAPTCHA, missing element).

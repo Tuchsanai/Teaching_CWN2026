@@ -1,0 +1,10 @@
+ใช้ playwright-cli ผ่าน Bash เท่านั้น (ห้ามใช้ Playwright MCP) ทำงานใน /workspace เก็บผลใน /workspace/lab2/
+(ถ้ายังไม่มีคำสั่ง playwright-cli หรือ /workspace/.playwright/cli.config.json ให้ทำ LAB 1 ก่อน)
+เป้าหมาย: ดูว่า "ตา" ของ agent เห็นหน้า Google Flights อย่างไร
+1. playwright-cli open "https://www.google.com/travel/flights?hl=en" (ถ้ามีหน้าคุกกี้ให้กด Reject all)
+2. ถ่ายต่อกันทันที: snapshot --boxes --filename=lab2/flights.yml และ screenshot --hires --filename=lab2/flights.png
+3. grep -nE 'combobox|textbox|button "(Search|1 passenger)' lab2/flights.yml > lab2/form.txt
+4. playwright-cli find "ticket type" > lab2/find.txt
+5. partial snapshot: หา ref ของ element ที่ครอบฟอร์มค้นหา (บรรพบุรุษของ combobox "Where from?") แล้ว snapshot <ref> --filename=lab2/form-partial.yml
+6. playwright-cli close
+สรุป: จำนวนบรรทัด flights.yml เทียบกับ form-partial.yml และตาราง role / name / ref / box ของ element ในฟอร์ม (จาก form.txt)

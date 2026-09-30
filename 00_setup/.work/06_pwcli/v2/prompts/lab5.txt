@@ -1,0 +1,16 @@
+ใช้ Bash + Python มาตรฐานเท่านั้น (ห้ามใช้ Playwright MCP ห้ามติดตั้งอะไรเพิ่ม) cwd /workspace
+เขียน /workspace/lab5/one_step.py ที่ทำ 1 step แบบ code-in-control บน https://www.google.com/travel/flights?hl=en แล้วรันจริง 1 ครั้ง
+เป้าหมายของ step: "เปิดรายการประเภทตั๋ว (Change ticket type) เพื่อจะเลือก One way" — โค้ดเรียก playwright-cli ผ่าน subprocess ตามลำดับ:
+1. Observe: open URL → snapshot --boxes --filename=lab5/step/snapshot.yml → ต่อทันที screenshot --hires --filename=lab5/step/observe.png
+2. Decide: ตัด snapshot เหลือเฉพาะบรรทัด button/combobox/textbox/option ที่มีชื่อและ [ref=...] (ลบ [box=...] ออก)
+   เขียน lab5/step/prompt.txt เป็น plain text ภาษาไทย: เป้าหมาย + snapshot ที่ตัดแล้ว + กติกา (เลือก ref จากรายการเท่านั้น, action = click/fill/press/stop) + รูปแบบคำตอบ JSON {action, ref, value, reason}
+   ส่ง prompt.txt ทาง stdin ให้ yolo1 -p --model haiku --effort low --output-format json --json-schema '<schema>' --no-session-persistence --strict-mcp-config --tools ""
+   แล้วอ่านคำตอบจาก field structured_output
+3. Validate: action อยู่ใน allowlist, ref มีใน snapshot ล่าสุด, ชื่อ element ไม่ตรง denylist (book|sign in|payment|select flight|select fare) — ไม่ผ่านให้หยุดโดยไม่รันคำสั่ง
+   เขียนคำตอบ LLM + ผลตรวจทีละข้อ (pass/fail) ลง lab5/step/decision.json
+   ก่อนกด: ใช้ playwright-cli eval inject วงรีแดงล้อม element พอดี (จาก box) + กล่องข้อความ "Step 1 · click <ref>" วางในที่ว่างไม่บัง element (สร้างด้วย document.createElement/createElementNS ห้ามใช้ innerHTML)
+   → screenshot --hires --filename=lab5/step/page.png → ลบ overlay
+4. Act: playwright-cli click <ref>
+5. Verify: snapshot --boxes --filename=lab5/step/verify.yml ต้องมี option "One way"; เช็กด้วยว่า ref เดิมยังอยู่ใน snapshot ใหม่ไหม
+   เขียน lab5/step/act.txt: คำสั่งที่รัน + output ย่อ + ผล verify พร้อมบรรทัดที่เป็นหลักฐาน
+จบ: playwright-cli close แล้วสรุป 4 ช่วง (Observe / Decide / Validate→Act / Verify) ให้ดู

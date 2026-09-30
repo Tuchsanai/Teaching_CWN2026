@@ -1,0 +1,57 @@
+{
+  "step": 1,
+  "goal_key": "oneway",
+  "llm_model": "claude-haiku-4-5-20251001",
+  "llm_seconds": 8.5,
+  "llm_decision": {
+    "action": "click",
+    "ref": "e107",
+    "value": "",
+    "reason": "ต้องคลิก combobox \"Change ticket type\" (ref=e107) เพื่อเปิดรายการและหา option 'One way' เนื่องจากปัจจุบัน ticket type แสดง \"Round trip\" และยังไม่เห็น 'One way' option ใน snapshot"
+  },
+  "validate": {
+    "verdict": "ok",
+    "checks": [
+      {
+        "check": "action in allowlist",
+        "pass": true,
+        "detail": "click ∈ ['click', 'fill', 'press', 'stop']"
+      },
+      {
+        "check": "ref exists in latest snapshot",
+        "pass": true,
+        "detail": "e107"
+      },
+      {
+        "check": "element not in denylist",
+        "pass": true,
+        "detail": "combobox \"Change ticket type. Round trip\""
+      },
+      {
+        "check": "role is actionable",
+        "pass": true,
+        "detail": "combobox"
+      }
+    ]
+  },
+  "target": {
+    "role": "combobox",
+    "name": "Change ticket type. Round trip",
+    "line": 31,
+    "box": [
+      473,
+      400,
+      137,
+      36
+    ]
+  },
+  "act": {
+    "argv": [
+      "playwright-cli",
+      "click",
+      "e107"
+    ],
+    "exit_code": 0
+  },
+  "verify_after": "not yet"
+}

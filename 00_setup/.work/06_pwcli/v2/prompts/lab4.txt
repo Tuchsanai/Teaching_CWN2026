@@ -1,0 +1,8 @@
+ใช้ playwright-cli ผ่าน Bash เท่านั้น (ห้ามใช้ Playwright MCP) ทำงานใน /workspace เก็บผลใน /workspace/lab4/
+เป้าหมาย: พิสูจน์ว่า ref ใช้ได้กับ snapshot ล่าสุดเท่านั้น บน https://www.google.com/travel/flights?hl=en
+1. open (คุกกี้ → Reject all) → snapshot --filename=lab4/old.yml จด ref ของ combobox "Change ticket type" เป็น OLD
+2. click OLD → snapshot → click option "One way" ด้วย ref ใหม่
+3. click OLD อีกครั้ง เก็บ output และ exit code จริง
+4. ถ่ายต่อกัน: snapshot --boxes --filename=lab4/new.yml และ screenshot --hires --filename=lab4/new.png หา ref ใหม่ของ combobox ticket type เป็น NEW
+5. click NEW (ต้องสำเร็จ) แล้ว press Escape
+ทุกคำสั่งตั้งแต่ open ให้บันทึกคำสั่ง + output จริง + exit code ต่อท้าย lab4/stale.txt (ห้ามเขียนสรุปเองลงไฟล์); แสดงบรรทัด combobox ticket type ใน old.yml เทียบ new.yml แล้ว playwright-cli close

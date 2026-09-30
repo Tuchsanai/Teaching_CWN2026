@@ -1,0 +1,63 @@
+You are the decision module of a browser agent on Google Flights (https://www.google.com/travel/flights).
+Task overall: one-way, Economy, 1 adult, from Bangkok BKK to Tokyo, Japan, departure October 15, 2026. Search only.
+
+CURRENT STEP GOAL: Set the departure date to October 15, 2026: open the "Departure" field, click the day button for "October 15, 2026", then click the "Done" button to close the calendar.
+Code check of the goal right now: NOT DONE - Departure="", calendar_open=True (need "Oct 15" and calendar closed)
+
+DONE SO FAR:
+- [trip_type] click e107 (Change ticket type. Round trip)  -> goal not reached yet: ticket type combobox: not found / dropdown open
+- [trip_type] click e541 (One way)  -> goal reached
+- [origin] click e637 (Where from?)  -> goal not reached yet: origin combobox not labelled (origin dialog/dropdown still open)
+- [origin] click e759 (Suvarnabhumi Airport (BKK))  -> goal reached
+- [destination] click e868 (Where to?)  -> goal not reached yet: destination dropdown is still open - an option must be clicked
+- [destination] fill e965 (Where to?) value='Tokyo' -> goal not reached yet: destination dropdown is still open - an option must be clicked
+- [destination] click e1099 (Tokyo, Japan)  -> goal reached
+- step class_passengers: already done (class="Change seating class. Economy", passengers="1 passenger")
+- [date] click e1170 (Departure)  -> goal not reached yet: Departure="", calendar_open=True (need "Oct 15" and calendar closed)
+
+INTERACTIVE ELEMENTS ON THE PAGE NOW (from the latest accessibility snapshot, [ref] role "name"):
+[e1275] textbox "Departure" [active]
+[e1283] combobox "Select your ticket type. One way"
+[e2739] button "Thursday, October 1, 2026 , 8562 Thai baht"
+[e2742] button "Friday, October 2, 2026 , 7241 Thai baht"
+[e2745] button "Saturday, October 3, 2026 , 7245 Thai baht"
+[e2749] button "Sunday, October 4, 2026 , 7346 Thai baht"
+[e2752] button "Monday, October 5, 2026 , 7346 Thai baht"
+[e2755] button "Tuesday, October 6, 2026 , 7346 Thai baht"
+[e2758] button "Wednesday, October 7, 2026 , 7346 Thai baht"
+[e2761] button "Thursday, October 8, 2026 , 7346 Thai baht"
+[e2764] button "Friday, October 9, 2026 , 7346 Thai baht"
+[e2767] button "Saturday, October 10, 2026 , 7346 Thai baht"
+[e2771] button "Sunday, October 11, 2026 , 8436 Thai baht"
+[e2774] button "Monday, October 12, 2026 , 7346 Thai baht"
+[e2777] button "Tuesday, October 13, 2026 , 7346 Thai baht"
+[e2780] button "Wednesday, October 14, 2026 , 7346 Thai baht"
+[e2783] button "Thursday, October 15, 2026 , 7160 Thai baht"
+[e2786] button "Friday, October 16, 2026 , 7346 Thai baht"
+[e2789] button "Saturday, October 17, 2026 , 7346 Thai baht"
+[e2793] button "Sunday, October 18, 2026 , 7156 Thai baht"
+[e2796] button "Monday, October 19, 2026 , 7346 Thai baht"
+[e2799] button "Tuesday, October 20, 2026 , 7346 Thai baht"
+[e2802] button "Wednesday, October 21, 2026 , 7156 Thai baht"
+[e2805] button "Thursday, October 22, 2026 , 7160 Thai baht"
+[e2808] button "Friday, October 23, 2026 , 7241 Thai baht"
+[e2811] button "Saturday, October 24, 2026 , 7241 Thai baht"
+[e2815] button "Sunday, October 25, 2026 , 6880 Thai baht"
+[e2818] button "Monday, October 26, 2026 , 6880 Thai baht"
+[e2821] button "Tuesday, October 27, 2026 , 6880 Thai baht"
+[e2824] button "Wednesday, October 28, 2026 , 6880 Thai baht"
+[e2827] button "Thursday, October 29, 2026 , 6880 Thai baht"
+[e2830] button "Friday, October 30, 2026 , 7160 Thai baht"
+[e2833] button "Saturday, October 31, 2026 , 5861 Thai baht, Cheapest price"
+[e2647] button "Next"
+[e2656] button "Done."
+
+RULES:
+- Reply with exactly ONE next action as JSON {action, ref, value, reason}.
+- action is one of: click, fill, press, stop.
+- ref MUST be one of the refs listed above (copy it exactly, e.g. e123). For press, ref may be "".
+- fill: value = text to type into a combobox/textbox. press: value = key (Enter, Escape, Tab, ArrowDown, ArrowUp).
+- click: value = "".
+- A dropdown/autocomplete is only committed after you CLICK the matching option.
+- Never sign in, never book, never click anything about payment, 'Select flight' or 'Select fare'.
+- Use stop only if the goal is impossible with the listed elements (e.g. CAPTCHA, missing element).

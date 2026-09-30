@@ -1,0 +1,32 @@
+### Browser `default` opened with pid 1220.
+### Ran Playwright code
+```js
+await page.goto('https://www.google.com/travel/flights?hl=en');
+```
+### Page
+- Page URL: https://www.google.com/travel/flights?hl=en
+- Page Title: Find Cheap Flights Worldwide & Book Your Ticket - Google Flights
+### Snapshot
+- [Snapshot](pwcli-out/page-2026-09-29T21-39-39-610Z.yml)
+### Events
+- New console entries: pwcli-out/console-2026-09-29T21-39-38-579Z.log#L1-L3
+open https://www.google.com/travel/flights?hl=en -> await page.goto(...)
+snapshot lab3/s1.yml (no cookie dialog present; Reject all skipped)
+$ playwright-cli click e107
+await page.getByRole('combobox', { name: 'Change ticket type. Round trip' }).click();
+$ playwright-cli snapshot --filename=lab3/s2.yml
+$ playwright-cli click e541
+await page.getByRole('option', { name: 'One way' }).click();
+$ playwright-cli snapshot --filename=lab3/s3.yml
+$ playwright-cli click e637
+await page.getByRole('combobox', { name: 'Where from?' }).click();
+$ playwright-cli snapshot --filename=lab3/s4.yml
+$ playwright-cli fill e735 BKK
+await page.getByRole('combobox', { name: 'Where else?' }).fill('BKK');
+$ playwright-cli snapshot --filename=lab3/s5.yml
+$ playwright-cli click e852
+await page.getByRole('option', { name: 'Suvarnabhumi Airport (BKK)' }).click();
+$ playwright-cli snapshot --boxes --filename=lab3/final.yml
+$ playwright-cli screenshot --hires --filename=lab3/final.png
+await page.screenshot({
+$ playwright-cli close

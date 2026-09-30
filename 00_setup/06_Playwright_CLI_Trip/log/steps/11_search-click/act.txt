@@ -1,0 +1,9 @@
+$ playwright-cli click e2899
+await page.getByRole('button', { name: 'Search' }).click();
+- Page URL: https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+exit code: 0
+
+$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ค้นหา' → ผ่าน ✅
+#   หลักฐาน verify.yml บรรทัด 112: - link "From 7346 Thai baht. 1 stop flight with Vietjet. Leaves Suvarnabhumi Airport at 11:30 AM on Thursday, October 15 and arrives at Haneda Airport at 1:00 A
+# ref e2899 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

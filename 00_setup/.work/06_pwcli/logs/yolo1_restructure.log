@@ -1,0 +1,48 @@
+The rewrite of `06_Playwright_CLI_Trip` is finished. All 7 LAB prompts passed a final clean run with `yolo2 -p --model sonnet` in a fresh container from the LAB 03 image, which has no context from earlier runs.
+
+**What's in `06_Playwright_CLI_Trip` (8.0 MB total)**
+- **`README.md`** (1,767 lines) follows the new layout: Part A theory (A1–A10, each with a picture, a real example and a one-line "จำง่าย"), LAB 1–8, and Part C (common problems, commands, glossary).
+  - Every LAB has 🎯 💬 📖 🔍 ✅. The prompts are pasted in exactly as tested.
+  - LAB 6 walks through all 11 steps separately, each in 4 phases, plus the results step.
+  - All 23 in-page anchors and 91 local links resolve.
+- **`img/`** (5.0 MB): the 11 v2 concept images (compressed), plus 14 real compare images (screenshot on the left, the matching YAML lines on the right, same numbers and colours) and 2 images of LAB 5's `page.png`. Every image is used in the README.
+- **`log/`** (2.9 MB): 12 step folders from a run of the reference agent (`WORK/v2/agent.py`), each with 6 files, plus `run.log` and the guardrail test.
+
+**Prompt tests** (details in `WORK/prompt_tests.md`)
+- **First round:** everything passed, but it showed four things to fix in the prompts:
+  - **LAB 3–4:** the AI wrote its own summary into the log files instead of real output, so the prompts now require `tee`.
+  - **LAB 5:** the prompt now also saves a plain `observe.png` and asks for a snug ellipse.
+  - **LAB 6:** the result links on Google Flights have no `[ref]`, so the agent first extracted 0 flights. The prompt now says so.
+  - **LAB 7:** element names containing `: ` are wrapped in single quotes in the YAML, so the injected button never reached the LLM. The LAB 6 prompt now warns about this.
+- **Final round:** LAB 1–7 all passed. Times were 18 s, 20 s, 36 s, 34 s, 61 s, 466 s and 106 s. I stopped and restarted LAB 6 once because I added that quoting note mid-run.
+
+**Departure date:** the code ran on 2026-09-30 (Thai time) and calculated **2026-10-15**.
+
+**Top 3 flights** (Google's "Top flights" order, read from `snapshot.yml` lines 112/145/182):
+
+| # | Airline | Times | Duration / stops | Price |
+|---|---|---|---|---|
+| 1 | Vietjet | 11:30 AM → 1:00 AM (+1) Haneda | 11 hr 30 min, 1 stop | THB 7,346 |
+| 2 | THAI | 11:50 PM → 8:10 AM (+1) Narita | 6 hr 20 min, nonstop | THB 11,320 |
+| 3 | China Airlines | 10:50 AM → 8:55 PM Narita | 8 hr 5 min, 1 stop | THB 11,510 |
+
+These three are Google's ranking, not the three cheapest; the cheapest fare on the page was THB 7,160, which the README notes.
+
+**Findings from real runs, now in the README**
+- **ref format:** the first page opened has no prefix (`e13`). Each new page load adds a prefix: `f1e13`, `f2e13`, `f3e13`. An iframe gets its own number.
+- **Google Flights keeps the `e…` form** because it doesn't reload the page. The numbers still change when the form redraws (`e107` → `e634`).
+- **Prompt injection (LAB 7):**
+  - Round A: the LLM was fooled and chose "Sign in", and the code stopped it.
+  - Round B: the injected text did reach the LLM, but Haiku ignored it. That run ended on the 5‑tries limit, and the README says plainly that this doesn't prove the setup is safe.
+
+**Still open**
+- Nothing is committed.
+- `06_Playwright_CLI_Trip/.ipynb_checkpoints` still holds Jupyter's autosave of the old README. I left it; delete it if you want the folder to hold only README, img and log.
+- The LAB 6 step-by-step walkthrough uses the reference-agent run, not the `trip_agent.py` the AI wrote during testing. That run's summary table is also in the README. Refs differ slightly between the two runs (e.g. `e759` vs `e747`), and the README says so.
+- I tested with `yolo2` because `restructure.md` asks for it, even though my saved note says to use only yolo1 and cyolo1.
+
+**Cleanup**
+- All playwright-cli browsers are closed, and I didn't touch :9222, Xvfb, x11vnc or websockify.
+- I removed the 4 test containers that held copied yolo1/yolo2 logins, including the one left over from the interrupted earlier run. Its `/workspace` was saved first to `WORK/prev_container`.
+- The login files were unchanged in every container, so nothing needed copying back.
+EXIT=0

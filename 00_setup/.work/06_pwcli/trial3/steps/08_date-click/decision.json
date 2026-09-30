@@ -1,0 +1,57 @@
+{
+  "step": 8,
+  "goal_key": "date",
+  "llm_model": "claude-haiku-4-5-20251001",
+  "llm_seconds": 7.4,
+  "llm_decision": {
+    "action": "click",
+    "ref": "e1170",
+    "value": "",
+    "reason": "ไม่เห็นปุ่มวันที่ October 15, 2026 ในช่องนี้ จึงต้องคลิกที่ช่อง 'Departure' เพื่อเปิดปฏิทินและเลือกวันเดินทาง October 15, 2026"
+  },
+  "validate": {
+    "verdict": "ok",
+    "checks": [
+      {
+        "check": "action in allowlist",
+        "pass": true,
+        "detail": "click ∈ ['click', 'fill', 'press', 'stop']"
+      },
+      {
+        "check": "ref exists in latest snapshot",
+        "pass": true,
+        "detail": "e1170"
+      },
+      {
+        "check": "element not in denylist",
+        "pass": true,
+        "detail": "textbox \"Departure\""
+      },
+      {
+        "check": "role allowed for this step",
+        "pass": true,
+        "detail": "textbox ∈ ['button', 'combobox', 'option', 'textbox']"
+      }
+    ]
+  },
+  "target": {
+    "role": "textbox",
+    "name": "Departure",
+    "line": 48,
+    "box": [
+      1109,
+      445,
+      308,
+      54
+    ]
+  },
+  "act": {
+    "argv": [
+      "playwright-cli",
+      "click",
+      "e1170"
+    ],
+    "exit_code": 0
+  },
+  "verify_after": "not yet"
+}

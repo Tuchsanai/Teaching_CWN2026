@@ -1,0 +1,14 @@
+เป้าหมาย: เลือกประเภทตั๋วเป็น One way (ถ้ารายการยังไม่เปิดให้คลิกช่องประเภทตั๋วก่อน แล้วค่อยคลิก option One way)
+
+ด้านล่างคือรายการ element ที่ตัดมาจาก snapshot ของหน้า https://www.google.com/travel/flights?hl=en:
+- combobox "Change ticket type. Round trip" [ref=e107] [cursor=pointer]:
+
+กติกา:
+- เลือก ref จากรายการข้างบนเท่านั้น ห้ามคิด ref เอง
+- action ต้องเป็นหนึ่งใน click / fill / press / stop (stop = ไม่มี element ที่เหมาะสม หรือเป้าหมายสำเร็จแล้ว)
+- ห้ามใช้ fill (ไม่มีค่าที่อนุญาต)
+- ถ้าใช้ press ค่า value ต้องเป็น Enter หรือ Escape
+- ทำเพียง 1 การกระทำที่ใกล้เป้าหมายที่สุด
+
+ตอบเป็น JSON เท่านั้น รูปแบบ: {"action": "...", "ref": "...", "value": "...", "reason": "..."}
+(ถ้าไม่ใช้ value ให้เป็นสตริงว่าง)

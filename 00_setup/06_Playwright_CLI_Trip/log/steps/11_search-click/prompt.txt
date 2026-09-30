@@ -1,0 +1,54 @@
+[system]
+You are a web-action decider. Reply only with JSON that matches the given schema.
+
+[user]
+คุณคือผู้ตัดสินใจ action ถัดไป 1 action บนหน้าเว็บ (คุณไม่ได้กดเอง โค้ดจะตรวจแล้วกดให้)
+
+เป้าหมายของ step นี้:
+กดค้นหาเที่ยวบิน — ถ้าเห็นปุ่ม 'Done' ของปฏิทินให้ click ก่อน; ไม่อย่างนั้นให้ click ปุ่ม 'Search'
+
+สิ่งที่ทำไปแล้วใน step นี้:
+- click e2864 (button "Done. Search for one-way flights, departing on October 15, 2")
+
+หน้าเว็บตอนนี้ (snapshot ตัดเหลือเฉพาะ element ที่กดหรือกรอกได้ แต่ละตัวมี [ref=...]):
+- button "Main menu" [ref=e2865]
+- button "Skip to main content" [ref=e2867]
+- button "Accessibility feedback" [ref=e2868]
+- button "Change appearance" [ref=e2873]
+- button "Google apps" [ref=e2874]
+- combobox "Change ticket type. One way" [ref=e2877]:
+- button "1 passenger" [ref=e2878]:
+- combobox "Change seating class. Economy" [ref=e2879]:
+- combobox "Where from? Bangkok BKK" [ref=e2880]: Bangkok
+- button "Swap origin and destination." [ref=e2881]
+- combobox "Where to?" [ref=e2882]: Tokyo
+- textbox "Departure" [active] [ref=e2883]: Thu, Oct 15
+- button "Search" [ref=e2899]
+- button "Explore deals with AI" [ref=e2901]
+- button "Learn more about this section" [ref=e2904]
+- button "Find flights from Bangkok (DMK) to Chiang Mai (CNX) from THB 2,490. Operated by Thai Lion Air. Oct 18 to Oct 27. Nonstop" [ref=e2909]:
+- button "Find flights from Bangkok (DMK) to Phuket (HKT) from THB 2,390. Operated by Thai Lion Air. Nov 5 to Nov 11. Nonstop" [ref=e2910]:
+- button "Find flights from Bangkok (BKK) to Singapore (SIN) from THB 5,741. Operated by Scoot. Nov 5 to Nov 11. Nonstop" [ref=e2911]:
+- button "Explore more destinations from Bangkok" [ref=e2912]
+- button "What are some good flight destinations from Thailand?" [ref=e2942]
+- button "How can I find last-minute flight deals?" [ref=e2943]
+- button "How can I find cheap flights for a weekend getaway?" [ref=e2944]
+- button "How can I find flight deals if my travel plans are flexible?" [ref=e2945]
+- button "How can I find cheap flights to anywhere?" [ref=e2946]
+- button "How can I get flight alerts for my trip?" [ref=e2947]
+- button "Language·English (United States)" [ref=e2960]
+- button "Location·Thailand" [ref=e2961]
+- button "Currency THB" [ref=e2962]:
+- button "International sites" [ref=e2970]
+- button "Explore flights" [ref=e2971]
+
+กติกา:
+- เลือก ref ที่อยู่ใน snapshot ข้างบนเท่านั้น
+- action ได้แค่ click, fill, press, stop
+- fill ต้องใส่ value = ข้อความที่จะกรอก, press ต้องใส่ value = ชื่อปุ่ม เช่น Enter, click ให้ value = ""
+- ถ้าทำเป้าหมายจาก snapshot นี้ไม่ได้ ให้ตอบ action = stop พร้อมเหตุผล
+
+ตอบเป็น JSON อย่างเดียว: {"action": "...", "ref": "...", "value": "...", "reason": "..."}
+
+[json-schema]
+{"type": "object", "properties": {"action": {"type": "string", "enum": ["click", "fill", "press", "stop"]}, "ref": {"type": "string"}, "value": {"type": "string"}, "reason": {"type": "string"}}, "required": ["action", "ref", "value", "reason"], "additionalProperties": false}

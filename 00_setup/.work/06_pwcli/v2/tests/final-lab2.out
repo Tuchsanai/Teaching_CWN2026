@@ -1,0 +1,28 @@
+ทำครบทั้ง 6 ขั้นตอนแล้ว ผลอยู่ใน `/workspace/lab2/` ได้แก่ `flights.yml`, `flights.png`, `form.txt`, `find.txt` และ `form-partial.yml` ไม่มีหน้าคุกกี้ขึ้นมา จึงไม่ต้องกด Reject all
+
+**จำนวนบรรทัด**
+
+| ไฟล์ | บรรทัด |
+|---|---|
+| flights.yml (ทั้งหน้า) | 252 |
+| form-partial.yml (`snapshot e99`) | 23 |
+
+partial snapshot เล็กลงประมาณ 11 เท่า (เหลือราว 9% ของทั้งหน้า) ref ที่ใช้คือ `e99` เป็น `search "Flight"` ซึ่งเป็นบรรพบุรุษที่ครอบฟอร์มค้นหา (พบจาก `find "ticket type"` และยืนยันจากโครงสร้างใน flights.yml)
+
+**ตาราง element ในฟอร์ม** (box = x,y,w,h)
+
+| role | name | ref | box |
+|---|---|---|---|
+| combobox | Change ticket type. Round trip | e107 | 480,400,138,36 |
+| button | 1 passenger, change number of passengers. | e113 | 622,400,80,36 |
+| combobox | Change seating class. Economy | e126 | 707,400,103,36 |
+| combobox | Where from? (ค่า: Bangkok) | e136 | 480,444,282,56 |
+| combobox | Where to? (active) | e149 | 770,444,282,56 |
+| textbox | Departure | e168 | 1116,445,138,54 |
+| textbox | Return | e172 | 1285,445,138,54 |
+
+**ข้อสังเกต**
+- pattern `button "(Search|...` ใน grep ไม่พบปุ่ม Search เพราะยังไม่ได้กรอกปลายทาง ตอนนี้มีแค่ปุ่ม "Explore destinations" (e176) กับปุ่ม "Swap origin and destination." (disabled) ซึ่งไม่ตรง pattern
+- element ที่เป็นแค่ตกแต่งจะไม่มี ref เช่น `generic [aria-hidden]` ส่วนที่ agent คลิกหรือพิมพ์ได้จะมี ref ทุกตัว
+- ตัว `find "ticket type"` คืนเฉพาะกิ่งของต้นไม้ที่ตรงกับคำค้น (1 match) และไม่มี box
+rc=0 secs=20

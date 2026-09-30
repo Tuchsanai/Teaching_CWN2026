@@ -1,0 +1,77 @@
+[2026-09-30 04:23:50] ======================================================================
+[2026-09-30 04:23:50] today=2026-09-30 -> departure = 15th of next month = 2026-10-15 (October 15, 2026)
+[2026-09-30 04:23:50] task: One way | BKK -> Tokyo, Japan | Economy | 1 adult | October 15, 2026 | search only
+[2026-09-30 04:23:57] [open] PASS url=https://www.google.com/travel/flights?hl=en
+[2026-09-30 04:23:57] --- step trip_type: Set the ticket type to "One way" (open the ticket-type combobox, then click the "One way" option).
+[2026-09-30 04:23:57] [trip_type] asking LLM (8 candidates)
+[2026-09-30 04:24:03] [trip_type] decision={"action": "click", "ref": "e107", "value": "", "reason": "Open the ticket-type combobox to reveal the \"One way\" option"} validate=True (ok)
+[2026-09-30 04:24:06] [trip_type] action #1: playwright-cli click e107 -> ok
+[2026-09-30 04:24:10] [trip_type] verify: not yet - ticket type combobox: not found / dropdown open
+[2026-09-30 04:24:10] [trip_type] asking LLM (3 candidates)
+[2026-09-30 04:24:18] [trip_type] decision={"action": "click", "ref": "e541", "value": "", "reason": "Click the 'One way' option from the dropdown to set ticket type to one-way"} validate=True (ok)
+[2026-09-30 04:24:20] [trip_type] action #2: playwright-cli click e541 -> ok
+[2026-09-30 04:24:23] [trip_type] verify: PASS - ticket type = "Change ticket type. One way"
+[2026-09-30 04:24:23] [trip_type] => PASS: ticket type = "Change ticket type. One way"
+[2026-09-30 04:24:23] --- step origin: Set origin ("Where from?") to Suvarnabhumi Airport (BKK): open it, fill "BKK" into the text field, then click the option "Suvarnabhumi Airport (BKK)".
+[2026-09-30 04:24:24] [origin] asking LLM (7 candidates)
+[2026-09-30 04:24:33] [origin] decision={"action": "click", "ref": "e637", "value": "", "reason": "Open the origin combobox to enable typing and see airport options"} validate=True (ok)
+[2026-09-30 04:24:35] [origin] action #3: playwright-cli click e637 -> ok
+[2026-09-30 04:24:40] [origin] verify: not yet - origin combobox not labelled (origin dialog/dropdown still open)
+[2026-09-30 04:24:40] [origin] asking LLM (6 candidates)
+[2026-09-30 04:24:48] [origin] decision={"action": "click", "ref": "e759", "value": "", "reason": "Click the 'Suvarnabhumi Airport (BKK)' option to commit the origin selection. The dropdown is open and the option is available."} validate=True (ok)
+[2026-09-30 04:24:51] [origin] action #4: playwright-cli click e759 -> ok
+[2026-09-30 04:24:53] [origin] verify: PASS - origin = "Where from? Bangkok BKK"
+[2026-09-30 04:24:53] [origin] => PASS: origin = "Where from? Bangkok BKK"
+[2026-09-30 04:24:53] --- step destination: Set destination ("Where to?") to Tokyo, Japan: open it, fill "Tokyo", then CLICK the option "Tokyo, Japan". The step is done only when the dropdown is closed after choosing the option.
+[2026-09-30 04:24:54] [destination] asking LLM (7 candidates)
+[2026-09-30 04:25:04] [destination] decision={"action": "click", "ref": "e868", "value": "", "reason": "Open the 'Where to?' destination combobox to search for Tokyo, Japan"} validate=True (ok)
+[2026-09-30 04:25:06] [destination] action #5: playwright-cli click e868 -> ok
+[2026-09-30 04:25:11] [destination] verify: not yet - destination dropdown is still open - an option must be clicked
+[2026-09-30 04:25:11] [destination] asking LLM (9 candidates)
+[2026-09-30 04:25:20] [destination] decision={"action": "fill", "ref": "e965", "value": "Tokyo", "reason": "The destination combobox is open but 'Tokyo, Japan' is not yet visible in the options list. Typing 'Tokyo' will filter the dropdown to show the matching airport option."} validate=True (ok)
+[2026-09-30 04:25:21] [destination] action #6: playwright-cli fill e965 Tokyo -> ok
+[2026-09-30 04:25:26] [destination] verify: not yet - destination dropdown is still open - an option must be clicked
+[2026-09-30 04:25:26] [destination] asking LLM (9 candidates)
+[2026-09-30 04:25:34] [destination] decision={"action": "click", "ref": "e1099", "value": "", "reason": "Select 'Tokyo, Japan' option from the destination dropdown to complete the destination setup"} validate=True (ok)
+[2026-09-30 04:25:37] [destination] action #7: playwright-cli click e1099 -> ok
+[2026-09-30 04:25:39] [destination] verify: PASS - destination = "Where to?" value="Tokyo", dropdown closed
+[2026-09-30 04:25:39] [destination] => PASS: destination = "Where to?" value="Tokyo", dropdown closed
+[2026-09-30 04:25:39] --- step class_passengers: Make sure seating class is Economy and passengers is exactly 1 adult.
+[2026-09-30 04:25:41] [class_passengers] already satisfied -> SKIP (class="Change seating class. Economy", passengers="1 passenger")
+[2026-09-30 04:25:41] [class_passengers] => PASS (skip): class="Change seating class. Economy", passengers="1 passenger"
+[2026-09-30 04:25:41] --- step date: Set the departure date to October 15, 2026: open the "Departure" field, click the day button for "October 15, 2026", then click the "Done" button to close the calendar.
+[2026-09-30 04:25:42] [date] asking LLM (8 candidates)
+[2026-09-30 04:25:49] [date] decision={"action": "click", "ref": "e1170", "value": "", "reason": "Open the Departure date picker calendar to select October 15, 2026"} validate=True (ok)
+[2026-09-30 04:25:51] [date] action #8: playwright-cli click e1170 -> ok
+[2026-09-30 04:25:56] [date] verify: not yet - Departure="", calendar_open=True (need "Oct 15" and calendar closed)
+[2026-09-30 04:25:56] [date] asking LLM (35 candidates)
+[2026-09-30 04:26:05] [date] decision={"action": "click", "ref": "e2783", "value": "", "reason": "Click the 'Thursday, October 15, 2026' button to select the departure date"} validate=True (ok)
+[2026-09-30 04:26:08] [date] action #9: playwright-cli click e2783 -> ok
+[2026-09-30 04:26:12] [date] verify: not yet - Departure="Thu, Oct 15", calendar_open=True (need "Oct 15" and calendar closed)
+[2026-09-30 04:26:12] [date] asking LLM (36 candidates)
+[2026-09-30 04:26:24] [date] decision={"action": "click", "ref": "e2864", "value": "", "reason": "October 15, 2026 is already selected (shown as 'departure date' in e2857). Now close the calendar by clicking the Done button to complete the goal."} validate=True (ok)
+[2026-09-30 04:26:26] [date] action #10: playwright-cli click e2864 -> ok
+[2026-09-30 04:26:28] [date] verify: PASS - Departure="Thu, Oct 15", calendar closed
+[2026-09-30 04:26:28] [date] => PASS: Departure="Thu, Oct 15", calendar closed
+[2026-09-30 04:26:28] --- step search: Click the "Search" button to run the flight search.
+[2026-09-30 04:26:29] [search] asking LLM (3 candidates)
+[2026-09-30 04:26:38] [search] decision={"action": "click", "ref": "e2899", "value": "", "reason": "All flight search parameters are configured (one-way, BKK→Tokyo, Oct 15, 1 passenger, Economy). Click Search to execute the flight search."} validate=True (ok)
+[2026-09-30 04:26:41] [search] action #11: playwright-cli click e2899 -> ok
+[2026-09-30 04:26:43] [search] verify: PASS - results page, 18 flight links, url=https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+[2026-09-30 04:26:43] [search] => PASS: results page, 18 flight links, url=https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+[2026-09-30 04:26:45] browser closed (playwright-cli close)
+[2026-09-30 04:26:45] ======================================================================
+[2026-09-30 04:26:45] RESULT: PASS   actions used: 11/25   departure: October 15, 2026
+[2026-09-30 04:26:45] step              status       detail
+[2026-09-30 04:26:45] open              PASS         https://www.google.com/travel/flights?hl=en
+[2026-09-30 04:26:45] trip_type         PASS         ticket type = "Change ticket type. One way"
+[2026-09-30 04:26:45] origin            PASS         origin = "Where from? Bangkok BKK"
+[2026-09-30 04:26:45] destination       PASS         destination = "Where to?" value="Tokyo", dropdown closed
+[2026-09-30 04:26:45] class_passengers  PASS (skip)  class="Change seating class. Economy", passengers="1 passenger"
+[2026-09-30 04:26:45] date              PASS         Departure="Thu, Oct 15", calendar closed
+[2026-09-30 04:26:45] search            PASS         results page, 18 flight links, url=https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+[2026-09-30 04:26:45] results           PASS         3 flights extracted
+[2026-09-30 04:26:45] TOP 3 (from log/steps/*_results/snapshot.yml):
+[2026-09-30 04:26:45] #1 Vietjet | 11:30 AM – 1:00 AM+1 | 11 hr 30 min | 1 stop; 3 hr 30 min @ Tan Son Nhat International Airport in Ho Chi Minh City | THB 7,346 | snapshot.yml line 112 (price line 140)
+[2026-09-30 04:26:45] #2 THAI | 11:50 PM – 8:10 AM+1 | 6 hr 20 min | Nonstop | THB 11,320 | snapshot.yml line 145 (price line 172)
+[2026-09-30 04:26:45] #3 China Airlines | 10:50 AM – 8:55 PM | 8 hr 5 min | 1 stop; 1 hr @ Taiwan Taoyuan International Airport in Taipei City | THB 11,510 | snapshot.yml line 182 (price line 207)

@@ -1,0 +1,9 @@
+$ playwright-cli click e2864
+await page.getByRole('button', { name: 'Done. Search for one-way' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
+exit code: 0
+
+$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ค้นหา' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - textbox "Departure" [active] [ref=e2883] [box=1116,445,256,54]: Thu, Oct 15
+# ref e2864 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

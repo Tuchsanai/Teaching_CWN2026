@@ -1,0 +1,9 @@
+ใช้ Bash เท่านั้น (ห้ามใช้ Playwright MCP) ทำงานใน /workspace เก็บผลใน /workspace/lab1/
+1. ถ้ายังไม่มีคำสั่ง playwright-cli ให้สร้าง /usr/local/bin/playwright-cli (chmod +x) เนื้อหา 2 บรรทัด:
+   #!/bin/sh
+   exec node "$(npm root -g)/@playwright/mcp/node_modules/playwright-core/lib/tools/cli-client/cli.js" "$@"
+2. สร้าง /workspace/.playwright/cli.config.json: outputDir "/workspace/pwcli-out", browser.browserName "chromium",
+   browser.launchOptions.chromiumSandbox false, browser.contextOptions: viewport 1920x1080, deviceScaleFactor 2, locale "en-US"
+3. ทดสอบทีละคำสั่ง: playwright-cli --version → open https://example.com → snapshot --boxes --filename=lab1/example.yml
+   → screenshot --hires --filename=lab1/example.png → list → close → list
+เก็บคำสั่ง + output ทุกคำสั่งลง lab1/lab1.txt แล้วสรุปสั้น ๆ: เวอร์ชัน, บรรทัดของลิงก์ "Learn more" ใน example.yml, ขนาดภาพ example.png (px)
