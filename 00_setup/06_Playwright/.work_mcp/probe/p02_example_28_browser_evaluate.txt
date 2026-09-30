@@ -1,0 +1,15 @@
+### Result
+{
+  "x": 8,
+  "y": 8,
+  "width": 51.578125,
+  "height": 21,
+  "top": 8,
+  "right": 59.578125,
+  "bottom": 29,
+  "left": 8
+}
+### Ran Playwright code
+```js
+await page.locator('iframe').contentFrame().getByRole('button', { name: 'Inside' }).evaluate('(el) => el.getBoundingClientRect().toJSON()');
+```

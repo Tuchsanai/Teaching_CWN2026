@@ -1,0 +1,47 @@
+คุณคือผู้ตัดสินใจ action ถัดไป 1 action บนหน้าเว็บ (คุณไม่ได้กดเอง โค้ดจะตรวจแล้วกดให้)
+
+เป้าหมายของ step นี้:
+วันเดินทาง (Departure) ต้องเป็น October 15, 2026 — ถ้าเห็นปุ่มวันที่ October 15, 2026 ให้ click; ไม่อย่างนั้นให้ click ช่อง 'Departure' เพื่อเปิดปฏิทิน
+
+สิ่งที่ทำไปแล้วใน step นี้:
+(ยังไม่มี)
+
+หน้าเว็บตอนนี้ (snapshot ตัดเหลือเฉพาะ element ที่กดหรือกรอกได้ แต่ละตัวมี [ref=...]):
+- button "Main menu" [ref=e1148]
+- button "Skip to main content" [ref=e1150]
+- button "Accessibility feedback" [ref=e1151]
+- button "Change appearance" [ref=e1156]
+- button "Google apps" [ref=e1157]
+- combobox "Change ticket type. One way" [ref=e1160]:
+- button "1 passenger" [ref=e1161]:
+- combobox "Change seating class. Economy" [ref=e1162]:
+- combobox "Where from? Bangkok BKK" [ref=e1163]: Bangkok
+- button "Swap origin and destination." [ref=e1164]
+- combobox "Where to?" [active] [ref=e1167]: Tokyo
+- textbox "Departure" [ref=e1170]
+- button "Search" [ref=e1171]
+- button "Explore deals with AI" [ref=e1173]
+- button "Learn more about this section" [ref=e1176]
+- button "Find flights from Bangkok (DMK) to Chiang Mai (CNX) from THB 2,490. Operated by Thai Lion Air. Oct 18 to Oct 27. Nonstop" [ref=e1181]:
+- button "Find flights from Bangkok (DMK) to Phuket (HKT) from THB 2,390. Operated by Thai Lion Air. Nov 5 to Nov 11. Nonstop" [ref=e1182]:
+- button "Find flights from Bangkok (BKK) to Singapore (SIN) from THB 5,741. Operated by Scoot. Nov 5 to Nov 11. Nonstop" [ref=e1183]:
+- button "Explore more destinations from Bangkok" [ref=e1184]
+- button "What are some good flight destinations from Thailand?" [ref=e1214]
+- button "How can I find last-minute flight deals?" [ref=e1215]
+- button "How can I find cheap flights for a weekend getaway?" [ref=e1216]
+- button "How can I find flight deals if my travel plans are flexible?" [ref=e1217]
+- button "How can I find cheap flights to anywhere?" [ref=e1218]
+- button "How can I get flight alerts for my trip?" [ref=e1219]
+- button "Language·English (United States)" [ref=e1232]
+- button "Location·Thailand" [ref=e1233]
+- button "Currency THB" [ref=e1234]:
+- button "International sites" [ref=e1242]
+- button "Explore flights" [ref=e1243]
+
+กติกา:
+- เลือก ref ที่อยู่ใน snapshot ข้างบนเท่านั้น
+- action ได้แค่ click, fill, press, stop
+- fill ต้องใส่ value = ข้อความที่จะกรอก, press ต้องใส่ value = ชื่อปุ่ม เช่น Enter, click ให้ value = ""
+- ถ้าทำเป้าหมายจาก snapshot นี้ไม่ได้ หรือเป้าหมายสำเร็จแล้ว ให้ตอบ action = stop พร้อมเหตุผล
+
+ตอบเป็น JSON อย่างเดียว: {"action": "...", "ref": "...", "value": "...", "reason": "..."}

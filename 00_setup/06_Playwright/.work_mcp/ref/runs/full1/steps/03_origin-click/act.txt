@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e637"}
+← isError=false · 1.109s · 553 bytes
+await page.getByRole('combobox', { name: 'Where from?' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoOagwIAhIIL20vMGZuMmdAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-20-43-625Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ต้นทาง' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - combobox "Where else?" [expanded] [active] [ref=e735] [box=532,448,344,48]: Bangkok
+# ref e637 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

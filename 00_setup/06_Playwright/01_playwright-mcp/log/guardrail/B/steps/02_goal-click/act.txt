@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e542"}
+← isError=false · 1.111s · 463 bytes
+await page.getByRole('option', { name: 'One way' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoOagwIAhIIL20vMGZuMmdAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-23-34-976Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'เป้าหมายที่ส่งมา' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - combobox "Change ticket type. One way" [active] [ref=e636] [cursor=pointer] [box=480,400,127,36]:
+# ref e542 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

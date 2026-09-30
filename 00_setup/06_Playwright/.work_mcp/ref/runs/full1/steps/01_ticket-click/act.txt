@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e107"}
+← isError=false · 1.09s · 414 bytes
+await page.getByRole('combobox', { name: 'Change ticket type. Round trip' }).click();
+- Page URL: https://www.google.com/travel/flights?hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-20-21-854Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ประเภทตั๋ว' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - combobox [expanded] [aria-hidden] [ref=e537] [cursor=pointer] [box=480,400,138,36]:
+# ref e107 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

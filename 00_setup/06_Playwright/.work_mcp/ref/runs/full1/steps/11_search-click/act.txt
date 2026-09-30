@@ -1,0 +1,11 @@
+→ tools/call browser_click {"target": "e2899"}
+← isError=false · 1.53s · 488 bytes
+await page.getByRole('button', { name: 'Search' }).click();
+- Page URL: https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-22-25-508Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ค้นหา' → ผ่าน
+#   หลักฐาน verify.yml บรรทัด 112: - link "From 7241 Thai baht. 1 stop flight with Hong Kong Express. Leaves Suvarnabhumi Airport at 10:10 AM on Thursday, October 15 and arrives at Haneda Airport
+#   URL: https://www.google.com/travel/flights/search?tfs=CBwQAhojEgoyMDI2LTEwLTE1agcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&hl=en
+# ref e2899 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

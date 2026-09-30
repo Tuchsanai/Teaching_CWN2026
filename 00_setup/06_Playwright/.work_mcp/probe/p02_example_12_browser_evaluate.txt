@@ -1,0 +1,13 @@
+### Result
+{
+  "x": 918.609375,
+  "y": 537.1875,
+  "w": 82.765625,
+  "h": 25.59375,
+  "tag": "A",
+  "text": "Learn more"
+}
+### Ran Playwright code
+```js
+await page.getByRole('link', { name: 'Learn more' }).evaluate('(el) => { const r = el.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height, tag: el.tagName, text: el.textContent}; }');
+```

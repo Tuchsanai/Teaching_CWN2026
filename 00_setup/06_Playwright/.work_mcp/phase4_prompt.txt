@@ -1,0 +1,18 @@
+อ่าน 06_Playwright/.work_mcp/SPEC.md, notes.md, ภาพใน 06_Playwright/01_playwright-mcp/img/ (เปิดดูด้วย Read), log ใน 06_Playwright/01_playwright-mcp/log/ และต้นแบบ 06_Playwright/00_playwright-cli/README.md ให้ครบ แล้วทำ **เฟส 4 · เขียน 06_Playwright/01_playwright-mcp/README.md**
+
+โครง (ล้อบท CLI):
+- หัว: `# LAB 006-2 · Web Automation แบบ code-in-control ด้วย Playwright MCP` + ย่อหน้าสรุป, ต้องมีก่อน (LAB 03 + แนะนำบท ../00_playwright-cli), เวลา, ทำที่, แผนที่บทเรียน, สัญลักษณ์, หมายเหตุว่าผลมาจากการรันจริงเมื่อ 30 ก.ย. 2026
+- ส่วน A ทฤษฎี: A1 ใครคุมพวงมาลัย (เน้น "ใครถือ MCP client"), A2 MCP คืออะไร (host/client/server, stdio, JSON-RPC, handshake จริง, content blocks, isError), A3 **Playwright MCP vs Playwright CLI** (ตารางละเอียด + ตัวเลขวัดจริง + เมื่อไรใช้อะไร), A4 สามส่วนสามหน้าที่ + รายชื่อ tool ที่ใช้พร้อม argument จริง, A5 snapshot/ref ใน MCP, A6 ref เก่า, A7 Loop, A8 การตัดสินใจ prompt→JSON schema + ตัด snapshot (ตัวเลขจริง), A9 guardrail (แก่น validate จริงจากโค้ดอ้างอิง) + prompt injection, A10 หลักฐาน (รวม rpc.jsonl, วิธีวาดวงแดงผ่าน evaluate), A11 เว็บจริงพังได้อย่างไร + จริยธรรม, A12 ตาราง tool ที่ใช้บ่อย — ทุกหัวข้อจบด้วย "จำง่าย" และใช้ภาพแนวคิดที่สร้างไว้ให้ครบ
+- ส่วน B LAB 1–8 (🎯 💬 📖 🔍 ✅ + วิธีตรวจ) ล้อบท CLI แต่ใช้ MCP; ต้นแต่ละ LAB ใส่ภาพ labN-idea.png:
+  LAB 1 เตรียม MCP client (Python stdlib) + config + handshake + tools/list + example.com snapshot/screenshot → lab1/
+  LAB 2 ตา: snapshot Google Flights เทียบภาพจริง หา element ในฟอร์ม สังเกตโครง response → lab2/
+  LAB 3 มือ: click/type ด้วย ref + verify ด้วย snapshot ใหม่ → lab3/
+  LAB 4 ref เก่า: error จริงของ MCP → lab4/
+  LAB 5 ผู้ตัดสินใจ 1 step ครบ 4 ช่วง → lab5/step/
+  LAB 6 agent เต็ม trip_agent.py + เดินดูทีละ step (ใช้ log/steps/ พร้อม page.png และ compare)
+  LAB 7 guardrail A/B
+  LAB 8 checklist + คำถามทบทวน 5–6 ข้อพร้อมเฉลย (มีข้อ MCP vs CLI และ "ถ้าให้ yolo1 ใช้ MCP ตรง ๆ")
+  พรอมต์นักศึกษาต้องสั่งชัดว่า "เขียน Python เป็น MCP client เรียก /usr/bin/playwright-mcp ผ่าน stdio ห้ามเรียก tool ของ MCP playwright เองโดยตรง" และทำงานใน /workspace; LAB ถัดไปต่อยอดไฟล์ของ LAB ก่อน
+  ผลที่ควรได้ต้องมาจากไฟล์จริง (ตัดตอนได้ ห้ามแต่ง) ถ้ายังไม่มีผลจากพรอมต์นักศึกษา ให้ใช้ผลจากโค้ดอ้างอิงและระบุว่ามาจากโค้ดอ้างอิง (เฟส 5 จะแทนด้วยผลจริง)
+- ส่วน C ข้อควรรู้: ปัญหาที่เจอจริง/วิธีแก้, ข้อควรรู้อื่น ๆ, คำสั่งที่ใช้บ่อย, อภิธานศัพท์ (เพิ่ม MCP, JSON-RPC, stdio, host/client/server, tool, content block)
+ลิงก์ภาพ/ไฟล์ทั้งหมดเป็น relative และมีอยู่จริง (ตรวจด้วยสคริปต์), anchor ในแผนที่บทเรียนต้องชี้ถูก, ไม่มีข้อมูลส่วนตัว, markdown table ไม่พัง ความยาวใกล้เคียงบท CLI ตอบสรุปโครงสร้างและจำนวนบรรทัด

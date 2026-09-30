@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e868"}
+← isError=false · 1.102s · 460 bytes
+await page.getByRole('combobox', { name: 'Where to?' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoJagcIARIDQktLQAFIAXABggELCP___________wGYAQI&tfu=KgIIAw&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-21-07-102Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ปลายทาง' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
+#   สถานะหน้าใหม่: - combobox "Where to?" [expanded] [active] [ref=e965] [box=830,448,336,48]
+# ref e868 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

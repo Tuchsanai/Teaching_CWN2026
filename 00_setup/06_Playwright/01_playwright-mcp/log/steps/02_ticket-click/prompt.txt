@@ -1,0 +1,20 @@
+คุณคือผู้ตัดสินใจ action ถัดไป 1 action บนหน้าเว็บ (คุณไม่ได้กดเอง โค้ดจะตรวจแล้วกดให้)
+
+เป้าหมายของ step นี้:
+ประเภทตั๋วต้องเป็น 'One way' — ถ้าเห็น option 'One way' ให้ click; ถ้าไม่เห็น ให้ click combobox ประเภทตั๋ว (Change ticket type) เพื่อเปิดรายการ
+
+สิ่งที่ทำไปแล้วใน step นี้:
+- click e107 (combobox "Change ticket type. Round trip")
+
+หน้าเว็บตอนนี้ (snapshot ตัดเหลือเฉพาะ element ที่กดหรือกรอกได้ แต่ละตัวมี [ref=...]):
+- option "Round trip" [active] [selected] [ref=e540]
+- option "One way" [ref=e541]
+- option "Multi-city" [ref=e542]
+
+กติกา:
+- เลือก ref ที่อยู่ใน snapshot ข้างบนเท่านั้น
+- action ได้แค่ click, fill, press, stop
+- fill ต้องใส่ value = ข้อความที่จะกรอก, press ต้องใส่ value = ชื่อปุ่ม เช่น Enter, click ให้ value = ""
+- ถ้าทำเป้าหมายจาก snapshot นี้ไม่ได้ หรือเป้าหมายสำเร็จแล้ว ให้ตอบ action = stop พร้อมเหตุผล
+
+ตอบเป็น JSON อย่างเดียว: {"action": "...", "ref": "...", "value": "...", "reason": "..."}

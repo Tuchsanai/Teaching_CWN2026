@@ -1,0 +1,20 @@
+อ่าน 06_Playwright/.work_mcp/SPEC.md และ notes.md แล้วทำ **เฟส 3 · ภาพ** เท่านั้น ปลายทาง 06_Playwright/01_playwright-mcp/img/
+เปิดดูภาพทั้งหมดใน 06_Playwright/00_playwright-cli/img/ ก่อน (ใช้ Read) ให้สไตล์และคุณภาพสอดคล้องกัน
+ผู้ใช้ต้องการให้ใช้ **imagegen ของ cyolo1 สร้างรูปจำนวนมากพอให้เนื้อหาเข้าใจง่ายขึ้น** — ทุกหัวข้อทฤษฎีควรมีภาพประกอบ และทุก LAB ควรมีภาพแนวคิดอย่างน้อย 1 ภาพที่อธิบายว่า LAB นั้นทำอะไร
+
+A. ภาพแนวคิดด้วย cyolo1 + skill imagegen (ตามสกิล cyolo: `cd <โฟลเดอร์> && cyolo1 exec -m gpt-6-astra -c model_reasoning_effort="high" -o <outfile.txt> "<prompt>" < /dev/null` สั่งให้ใช้ skill imagegen และบันทึก PNG ลง path ที่กำหนด) — cyolo1 คนละบัญชีกับ yolo1 รันขนานได้ (ไม่เกิน 4 งานพร้อมกัน)
+   ข้อความในภาพเป็นไทยสั้น ๆ + ศัพท์อังกฤษ สะกดถูก ref/ชื่อ tool/ตัวเลขในภาพใช้ค่าจริงจาก notes/log เท่าที่ทำได้ พื้นหลังสว่าง อ่านง่าย
+   ทฤษฎี (concept-XX-*.png):
+   01 who-holds-the-client: ซ้าย LLM-in-control (Claude ถือ MCP tools เอง) vs ขวา code-in-control (โค้ดถือ MCP client, LLM แค่แนะนำ)
+   02 architecture: โค้ด Python (MCP client + ผู้คุม) ↔ stdio JSON-RPC ↔ Playwright MCP server ↔ Chromium; LLM ด้านข้างไม่มี tool ตอบ JSON; validator อนุญาตก่อน tools/call
+   03 mcp-basics: host / client / server / tool + JSON-RPC message (id, method, params, result)
+   04 mcp-handshake: initialize → notifications/initialized → tools/list → tools/call → result
+   05 mcp-vs-cli: playwright-cli (คำสั่ง shell → daemon) vs playwright-mcp (tool call → server) จุดต่างหลักตาม notes
+   06 snapshot-ref, 07 stale-ref, 08 loop (ชื่อ tool จริง), 09 decision-json, 10 trim-snapshot, 11 guardrail, 12 evidence-folder (มี rpc.jsonl), 13 red-circle (evaluate overlay → screenshot → ลบ), 14 flight-steps (แผน), 15 prompt-injection
+   ภาพ LAB (lab1-idea.png … lab7-idea.png): อธิบายเป้าหมายของ LAB แต่ละอันในภาพเดียว
+   เปิดตรวจทุกภาพเอง ถ้าสะกดผิด/ข้อมูลผิด/อ่านยาก ให้สร้างใหม่ (สูงสุด 2 ครั้งต่อภาพ) แล้วย่อขนาดให้เหมาะกับเว็บ (กว้าง ~1600px)
+B. ภาพ compare จากหน้าเว็บจริง (สร้างด้วยโค้ด + ภาพจริงจาก log/ หรือถ่ายใหม่ผ่าน MCP ใน container; วาดเป็น HTML แล้ว screenshot ผ่าน MCP ได้เพื่อฟอนต์ไทยครบ)
+   แบบเดียวกับ 00_playwright-cli/img/lab*-compare.png: ซ้าย = ภาพหน้าเว็บจริงมีกรอบสีตาม box + เลขวงกลม, ขวา = บรรทัด YAML จริงสีและเลขตรงกัน
+   ชุด: lab1-compare (example.com), lab2-compare (ฟอร์ม Google Flights), lab3-compare, lab4-compare, lab5-compare, lab6-sXX-compare ของ step สำคัญ, lab7-guardA-compare, lab7-guardB-compare และ crop ของ page.png ที่ README จะใช้
+C. บันทึกรายการภาพ + alt ภาษาไทย + ภาพไหนเป็นภาพแนวคิด (Imagegen) ภาพไหนเป็นภาพจริง ลง notes.md
+ปิดเบราว์เซอร์/โปรเซส MCP ที่เปิดเอง ห้ามลบ container

@@ -1,0 +1,30 @@
+### Page
+- Page URL: https://www.google.com/travel/flights?hl=en
+- Page Title: Find Cheap Flights Worldwide & Book Your Ticket - Google Flights
+### Snapshot
+```yaml
+- search "Flight" [ref=e99]:
+  - generic [ref=e101]:
+    - generic [ref=e102]:
+      - combobox "Change ticket type. Round trip" [ref=e107] [cursor=pointer]:
+        - generic [aria-hidden]:
+          - generic: Round trip
+      - button "1 passenger, change number of passengers." [ref=e113]:
+        - generic [ref=e116]: "1"
+      - combobox "Change seating class. Economy" [ref=e126] [cursor=pointer]:
+        - generic [aria-hidden]:
+          - generic: Economy
+    - generic [ref=e128]:
+      - generic [ref=e129]:
+        - generic [ref=e135]:
+          - combobox "Where from?" [ref=e136]: Bangkok
+          - generic [aria-hidden] [ref=e138]: Bangkok
+        - generic [ref=e142]:
+          - button "Swap origin and destination." [disabled]
+        - combobox "Where to?" [active] [ref=e149]
+      - generic [ref=e161]:
+        - textbox "Departure" [ref=e168]
+        - textbox "Return" [ref=e172]
+  - button "Explore destinations" [ref=e176]:
+    - generic [ref=e181]: Explore
+```

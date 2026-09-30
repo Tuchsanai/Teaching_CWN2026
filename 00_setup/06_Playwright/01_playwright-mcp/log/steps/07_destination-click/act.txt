@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e1099"}
+← isError=false · 1.095s · 480 bytes
+await page.getByRole('option', { name: 'Tokyo, Japan' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoXagcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-21-33-691Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ปลายทาง' → ผ่าน
+#   หลักฐาน verify.yml บรรทัด 46: - combobox "Where to?" [active] [ref=e1167] [box=770,444,282,56]: Tokyo
+# ref e1099 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้

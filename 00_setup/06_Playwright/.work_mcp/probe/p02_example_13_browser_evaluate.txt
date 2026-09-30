@@ -1,0 +1,15 @@
+### Result
+{
+  "x": 918.609375,
+  "y": 537.1875,
+  "width": 82.765625,
+  "height": 25.59375,
+  "top": 537.1875,
+  "right": 1001.375,
+  "bottom": 562.78125,
+  "left": 918.609375
+}
+### Ran Playwright code
+```js
+await page.getByRole('link', { name: 'Learn more' }).evaluate('(el) => el.getBoundingClientRect().toJSON()');
+```

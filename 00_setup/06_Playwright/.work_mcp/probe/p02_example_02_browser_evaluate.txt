@@ -1,0 +1,13 @@
+### Result
+{
+  "w": 1920,
+  "h": 1080,
+  "dpr": 2,
+  "lang": "en-US",
+  "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.8059.12 Safari/537.36",
+  "headless": true
+}
+### Ran Playwright code
+```js
+await page.evaluate('() => ({w: innerWidth, h: innerHeight, dpr: devicePixelRatio, lang: navigator.language, ua: navigator.userAgent, headless: /Headless/.test(navigator.userAgent)})');
+```

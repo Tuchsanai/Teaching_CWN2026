@@ -1,0 +1,10 @@
+→ tools/call browser_click {"target": "e759"}
+← isError=false · 1.115s · 475 bytes
+await page.getByRole('option', { name: 'Suvarnabhumi Airport (BKK)' }).click();
+- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoJagcIARIDQktLQAFIAXABggELCP___________wGYAQI&tfu=KgIIAw&hl=en
+- [Snapshot](mcp-out/page-2026-09-30T05-20-55-564Z.yml)
+
+→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
+# เป้าหมาย 'ต้นทาง' → ผ่าน
+#   หลักฐาน verify.yml บรรทัด 42: - combobox "Where from? Bangkok BKK" [active] [ref=e866] [box=480,444,282,56]: Bangkok
+# ref e759 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้
