@@ -1,8 +1,0 @@
-$ playwright-cli fill e965 Tokyo
-await page.getByRole('combobox', { name: 'Where to?' }).fill('Tokyo');
-exit code: 0
-
-$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
-# เป้าหมาย 'ปลายทาง' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
-#   สถานะหน้าใหม่: - combobox "Where to?" [expanded] [active] [ref=e965] [box=830,448,336,48]: Tokyo
-# ref e965 ใน snapshot ใหม่: ยังอยู่ (ใช้ได้เฉพาะเพราะ element เดิมยังไม่ถูก render ใหม่)

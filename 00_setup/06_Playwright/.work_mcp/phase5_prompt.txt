@@ -1,8 +1,0 @@
-อ่าน 06_Playwright/.work_mcp/SPEC.md, notes.md และ 06_Playwright/01_playwright-mcp/README.md แล้วทำ **เฟส 5 · ทดสอบพรอมต์แบบนักศึกษา**
-1. ใน container devtools-pwmcp-c34a6add ย้ายของเดิมใน /workspace (ถ้ามี) ไป /root/old_ws_backup ให้ /workspace สะอาดเหมือนนักศึกษาเริ่มใหม่
-2. ไล่ LAB 1 → 7 ต่อกันใน /workspace เดียว: คัดลอกกรอบพรอมต์ 💬 จาก README ทุกตัวอักษร (ดึงด้วยสคริปต์) แล้วรันใน container `cd /workspace && yolo1 -p --model sonnet --output-format json "<พรอมต์>" < /dev/null` ทีละ LAB ห้ามขนาน เก็บผลแต่ละ LAB ลง 06_Playwright/.work_mcp/student/labN.json + docker cp โฟลเดอร์ผลของ LAB กลับมาที่ student/
-3. ตรวจแต่ละ LAB ตาม ✅ และ "วิธีตรวจ" ใน README ด้วยคำสั่งจริง (อย่าเชื่อรายงานของ sub-agent) — ไม่ผ่านให้แก้พรอมต์ใน README แล้วรัน LAB นั้นใหม่ (สูงสุด 2 รอบต่อ LAB) บันทึกว่าแก้อะไรเพราะอะไร
-4. อัปเดต README: ✅ ผลที่ควรได้ ใช้ผลจริงจากการรันแบบนักศึกษา (ตัดตอน) ตัวเลขต้องตรงไฟล์จริง, เพิ่มปัญหาที่เจอจริงในส่วน C, ถ้าผลต่างจาก log อ้างอิงให้อธิบายสั้น ๆ แบบบท CLI, ระบุในหัวว่าพรอมต์ทดสอบแล้วด้วย yolo1 sonnet
-5. ตรวจรอบสุดท้าย: ลิงก์ relative มีจริงทุกอัน, grep ไม่มี email/token/รหัสผ่าน/ชื่อบัญชีจริงใน 01_playwright-mcp, โฟลเดอร์มีแค่ README.md img/ log/, ลบไฟล์ที่ README ไม่อ้าง
-6. รายงานเฟส 5 ต่อท้าย notes.md: PASS/FAIL ต่อ LAB, สิ่งที่แก้, เวลา/ต้นทุนรวม
-ปิดเบราว์เซอร์/โปรเซส MCP ทั้งหมดเมื่อจบ ห้ามลบ container

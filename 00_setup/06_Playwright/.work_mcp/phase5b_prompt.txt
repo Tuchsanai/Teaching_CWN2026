@@ -1,7 +1,0 @@
-ทำเฟส 5 ต่อจากเดิม (session ก่อนหน้าจบไปเพราะคุณสั่ง LAB 2 เป็น background task แล้วโหมด -p ปิด session)
-LAB 2 รอบแรกถูก kill กลางทาง (lab2.json ว่าง) ผู้ควบคุมลบ /workspace/lab2 แล้ว ให้รัน LAB 2 ใหม่ด้วย run_lab.sh 2 แบบ foreground ก่อน แล้วค่อยทำต่อ
-
-กติกาสำคัญสำหรับรอบนี้:
-- **ห้ามใช้ run_in_background หรือ background task ใด ๆ** ให้รัน `bash 06_Playwright/.work_mcp/student/run_lab.sh N` แบบ foreground ด้วย Bash timeout 600000 ms ถ้า LAB ไหนอาจนานเกิน 10 นาที (เช่น LAB 6) ให้เรียกผ่าน `timeout 1800 bash run_lab.sh 6` ใน foreground แบ่งเป็นหลายช่วงไม่ได้ ก็ให้รัน `nohup ... &` แล้ว poll ด้วย `sleep 240; tail runs.log` ซ้ำใน foreground จนเห็นบรรทัด END ของ LAB นั้น ห้ามจบ turn ระหว่างรอ
-- ตรวจ LAB 1 (ผ่านแล้วหรือยัง ดู lab1.txt ต้องมีคำสั่ง+output ตามที่ README ขอ ถ้าไม่ครบให้แก้พรอมต์แล้วรันใหม่) และ LAB 2 ตาม ✅/วิธีตรวจ แล้วไล่ LAB 3 → 7 ต่อ ตามข้อ 2–6 ของ phase5_prompt.txt เดิม (06_Playwright/.work_mcp/phase5_prompt.txt)
-- ทำให้ครบทุกข้อจนเสร็จ (อัปเดต README ด้วยผลจริงจากนักศึกษา, ตรวจลิงก์/ความเป็นส่วนตัว/ลบไฟล์ที่ไม่อ้าง, รายงานต่อท้าย notes.md) ก่อนจบ turn

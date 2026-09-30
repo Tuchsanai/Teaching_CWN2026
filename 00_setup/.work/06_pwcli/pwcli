@@ -1,4 +1,0 @@
-#!/bin/bash
-# playwright-cli bundled in @playwright/mcp; drop global MCP env so it launches its own browser
-exec env -u PLAYWRIGHT_MCP_CDP_ENDPOINT -u PLAYWRIGHT_MCP_OUTPUT_DIR -u PLAYWRIGHT_MCP_SECRETS_FILE DISPLAY=${DISPLAY:-:99} \
-  node "$(npm root -g)/@playwright/mcp/node_modules/playwright-core/lib/tools/cli-client/cli.js" "$@"
