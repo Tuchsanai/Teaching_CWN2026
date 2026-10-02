@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Write, Edit
 
 ไฟล์เดียวจบ — toolkit อยู่ในนี้ ไม่มีไฟล์ประกอบอื่น
 
-**Verified: Python 3.12.3 · vastai 1.8.2 · 2026-09-30** (ทดสอบซ้ำครบทุกเส้นทางบน 1.8.2 ด้วย 3 instance พร้อมกัน ค่าใช้จ่ายจริง ~$0.044 — ดูท้ายไฟล์) · รุ่นก่อน: vastai 1.5.5 · 2026-08-27
+**Verified: Python 3.12.3 · vastai 1.8.2 · 2026-09-30** · log watch + SSH ทุก endpoint ทดสอบจริง 2026-10-02 (deploy vLLM บน RTX 4090) (ทดสอบซ้ำครบทุกเส้นทางบน 1.8.2 ด้วย 3 instance พร้อมกัน ค่าใช้จ่ายจริง ~$0.044 — ดูท้ายไฟล์) · รุ่นก่อน: vastai 1.5.5 · 2026-08-27
 
 **ขั้นแรกสุดของทุก session — เช็คว่าติดตั้ง `vastai` แล้วหรือยัง แล้วแจ้งผู้ใช้ก่อนทำอย่างอื่น:**
 
@@ -60,6 +60,8 @@ override เฉพาะครั้งได้ทาง flag หรือ env:
 | `VAST_MAX_DPH` | `0.20` | เพดาน $/hr — แพงกว่านี้ต้องสั่ง `--max-dph` เอง (กันเผลอเช่า H100 ทั้งคืน) |
 | `VAST_MAX_INSTANCES` | `10` | เพดานจำนวนเครื่องพร้อมกัน |
 | `VAST_MAX_DESTROY` | `10` | เพดานเครื่องที่ลบได้ต่อคำสั่งเดียว |
+| `VAST_BLOCK_GEO` | `CN` | รหัสประเทศ (คั่นด้วย `,`) ที่ `plan`/`rent` **ไม่เลือก** เพราะ huggingface.co ถูก block — ตั้งว่าง หรือ `--allow-geo` เพื่อปิด |
+| `VAST_LOADING_GRACE` | `420` | ค้าง `loading` เกินกี่วินาทีถึงลบ+เปลี่ยนเครื่อง — image ใหญ่ (vLLM ~11 GB) ตั้ง `1000` |
 | `VAST_LABEL_PREFIX` | *(ว่าง)* | ตั้งเป็น prefix ของงาน → **ห้ามแตะ/ลบเครื่องที่ label ไม่ตรง** |
 
 **ตรวจ config ก่อนเริ่มงานเสมอ:**
@@ -104,7 +106,7 @@ cat > /tmp/vast.py <<'VASTPY'
 #!/usr/bin/env python3
 """vast.py — toolkit เดียวของ skill vastai (verified: Python 3.12.3 · vastai 1.8.2 · 2026-09-30)
 
-  plan|rent|create|status|stop|start|destroy|sweep|bill|run|push|pull|drift
+  plan|rent|create|status|stop|start|destroy|sweep|bill|run|push|pull|drift|watch
   template-search|template-show|template-create|template-update|template-delete
 
 อ่าน key จาก env VAST_API_KEY เท่านั้น · log ไป stderr · ผลลัพธ์ JSON ไป stdout
@@ -152,6 +154,28 @@ BASE_FILTER = "rentable=true verified=true reliability>0.99 direct_port_count>=4
 DEFAULT_IMAGE = "nvidia/cuda:12.4.1-runtime-ubuntu22.04"
 SSH_OPTS = ["-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null",
             "-o","ConnectTimeout=15","-o","LogLevel=ERROR"]
+# image บางตัว (เช่น vllm/vllm-openai) ทำ /root ให้ group/other เขียนได้ → sshd ปฏิเสธ key ("bad ownership or modes")
+SSH_FIX = ("(for i in 1 2 3 4 5 6 7 8 9; do chown root:root /root /root/.ssh /root/.ssh/authorized_keys; "
+           "chmod go-w /root; chmod 700 /root/.ssh; chmod 600 /root/.ssh/authorized_keys; sleep 10; done) >/dev/null 2>&1 &")
+DEFAULT_ONSTART = "env | grep _ >> /etc/environment; " + SSH_FIX
+# log watch: (regex, ความหมาย, scope) — scope "host" = เปลี่ยนเครื่องช่วยได้ · "image" = เปลี่ยนเครื่องไม่ช่วย ต้องแก้ image/คำสั่ง
+FATAL_LOG = [
+ (r"bad ownership or modes for (file|directory) /root", "sshd ปฏิเสธ key: permission /root ผิด", "image"),
+ (r"manifest unknown|pull access denied|repository does not exist|invalid reference format", "image/tag ผิด หรือเป็น private", "image"),
+ (r"no space left on device", "disk เต็ม (ตั้ง --disk ใหญ่ขึ้น)", "image"),
+ (r"nvidia-container-cli|unsatisfied condition: cuda|CUDA driver version is insufficient", "driver/CUDA ของ host ไม่พอกับ image", "host"),
+ # "Error response from daemon: No such container" ขึ้นปกติก่อน container ถูกสร้าง → ห้ามนับ
+ (r"OCI runtime (create|exec|start) failed|Error response from daemon: (?!No such container)|failed to register layer", "docker ของ host พัง", "host"),
+ (r"No CUDA GPUs are available|cudaErrorNoDevice|CUDA error: (unknown error|no CUDA-capable)", "GPU ไม่โผล่ใน container", "host"),
+ (r"GPU has fallen off the bus|NVRM: Xid|uncorrectable ECC", "GPU ของ host เสีย", "host"),
+ (r"(net/http|TLS handshake|i/o) timeout.*(registry|docker\.io|ghcr|nvcr)", "host ดึง image ไม่ไหว (เน็ต host มีปัญหา)", "host"),
+]
+APP_FATAL = [   # ใช้กับ log ของ server ที่ผู้ใช้รันเอง (watch --file)
+ (r"torch\.OutOfMemoryError|CUDA out of memory|insufficient (GPU )?memory|No available memory for the cache blocks", "VRAM ไม่พอ", "image"),
+ (r"Engine core initialization failed|EngineCore failed|Application startup failed|RuntimeError: |ValueError: |OSError: |ImportError|ModuleNotFoundError|Could not load (this )?library", "server init พัง", "image"),
+ (r"CUDA error: |cudaErrorIllegalAddress|NCCL error", "CUDA runtime error", "host"),
+ (r"^Killed$|exited with code -9|Out of memory: Killed process", "RAM ของเครื่องไม่พอ (OOM killer)", "host"),
+]
 
 # ===== .env — เก็บ "credential เท่านั้น" ================================================
 # หาไฟล์ตามลำดับนี้ อันแรกที่เจอชนะ (ไม่มี path ส่วนตัว hardcode ในสกิล):
@@ -220,6 +244,10 @@ HTTP_TIMEOUT  = _num("VAST_HTTP_TIMEOUT", 30, float)    # timeout ต่อ 1 re
 SEARCH_PASSES = max(2, _num("VAST_SEARCH_PASSES", 2, int))      # search offers ขนานกันกี่รอบ (ขั้นต่ำ 2)
 SEARCH_GAP    = max(3.0, _num("VAST_SEARCH_GAP", 3.0, float))  # แต่ละรอบเริ่มห่างกันกี่วินาที (ขั้นต่ำ 3)
 LABEL_PREFIX  = os.environ.get("VAST_LABEL_PREFIX", "") # ตั้งแล้วห้ามแตะเครื่องที่ label ไม่ตรง
+# ประเทศที่ huggingface.co ถูก block (CN: curl ได้ 000) → โหลดโมเดลไม่ได้/ต้องใช้ mirror ที่ช้าและพังกับ Xet
+# ตั้ง VAST_BLOCK_GEO="" เพื่อปิด หรือใส่ --allow-geo ต่อคำสั่ง
+BLOCK_GEO     = {x.strip().upper() for x in os.environ.get("VAST_BLOCK_GEO", "CN").split(",") if x.strip()}
+LOADING_GRACE = _num("VAST_LOADING_GRACE", 420, int)  # ค้าง loading นานเท่านี้ = ลบ (image ใหญ่ เช่น vLLM ~11 GB ให้ตั้ง 1000)
 SSH_KEY_ENV   = _keyfile()
 
 # ===== พื้นฐาน ===========================================================================
@@ -319,6 +347,13 @@ def rank3(offers, cap):
     for tag, o in picks:
         if g(o,OFFER,"id") not in seen: seen.add(g(o,OFFER,"id")); res.append((tag,o))
     return res
+
+def geo_ok(o, a):
+    """ตัด offer ในประเทศที่ BLOCK_GEO (default CN — HF ถูก block) · geolocation รูปแบบ "City, CC" หรือ ", CC"
+    ไม่รู้ประเทศ (ว่าง) = ให้ผ่าน · --allow-geo ปิดตัวกรองนี้"""
+    if getattr(a, "allow_geo", False) or not BLOCK_GEO: return True
+    cc = str(g(o,OFFER,"geo","") or "").rsplit(",", 1)[-1].strip().upper()
+    return cc not in BLOCK_GEO
 
 def cuda_compatible(o, minimum):
     """ตรวจ CUDA ฝั่ง client เพราะ server-side cuda_vers filter มี false negative บน RTX 5090."""
@@ -529,7 +564,31 @@ def reconcile(v, label, window=90, poll=10):
         if time.time()-t0 >= window: return None
         time.sleep(poll)
 
-def wait_for(v, iid, want, timeout=900, poll=8, grace=420):
+def scan(txt, pats):
+    """คืน (บรรทัด, ความหมาย, scope) ของ pattern fatal ตัวแรกที่เจอ"""
+    for line in str(txt or "").splitlines():
+        for rx, meaning, scope in pats:
+            if rx.search(line): return {"line": line.strip()[:240], "meaning": meaning, "scope": scope}
+    return None
+
+class LogWatch:
+    """สุ่มอ่าน Vast logs() (และ log ไฟล์ในเครื่องผ่าน SSH ถ้าให้ fetch มา) ทุก every วินาทีระหว่าง init
+    เจอ error ร้ายแรง = เลิกรอทันที ไม่ต้องรอจน timeout 420-900 s ทั้งที่เครื่องพังตั้งแต่นาทีแรก"""
+    def __init__(self, v, iid, every=20, patterns=FATAL_LOG, fetch=None):
+        self.v, self.iid, self.every, self.fetch = v, iid, every, fetch
+        self.pats = [(re.compile(p, re.I | re.M), m, sc) for p, m, sc in patterns]
+        self.last, self.hit, self.samples = 0.0, None, 0
+    def check(self, force=False):
+        if self.hit or (not force and time.time()-self.last < self.every): return self.hit
+        self.last = time.time(); self.samples += 1
+        try: txt = self.fetch() if self.fetch else self.v.logs(instance_id=self.iid, tail="200")
+        except Exception: return None          # อ่าน log ไม่ได้ชั่วคราว ≠ เครื่องพัง
+        self.hit = scan(txt, self.pats)
+        if self.hit: log("  ‼ log fatal [%s]: %s\n      %s" % (self.hit["scope"], self.hit["meaning"], self.hit["line"]))
+        return self.hit
+
+def wait_for(v, iid, want, timeout=900, poll=8, grace=None, watch=None):
+    grace = LOADING_GRACE if grace is None else grace
     t0, deadline, stuck, last = time.time(), time.time()+timeout, None, "<none>"
     row = {}
     while True:
@@ -537,6 +596,7 @@ def wait_for(v, iid, want, timeout=900, poll=8, grace=420):
         except Exception as e: log("  show_instance %s — ลองใหม่" % type(e).__name__)
         st = g(row,INST,"status")
         if st in want: return True, row, "ok"
+        if watch and watch.check(): return False, row, "log fatal: %s" % watch.hit["meaning"]
         if st in DEAD: return False, row, "instance %s" % st
         if st in TRANSIENT:
             stuck = stuck or time.time()
@@ -566,11 +626,46 @@ def sh(cmd, timeout=600):
     p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     return p.returncode, p.stdout, p.stderr
 
-def ssh_ready(host, port, key, tries=20, poll=10):
+def ssh_endpoints(row):
+    """ทุกทางที่ SSH ได้: direct (public_ip + 22/tcp) แล้ว proxy (sshN.vast.ai) — direct อาจใช้ได้ตอนสร้างแล้วตายทีหลัง"""
+    eps = []
+    ip = g(row,INST,"ip"); p = (g(row,INST,"ports",{}) or {}).get("22/tcp") or []
+    if ip and p and p[0].get("HostPort"): eps.append(("direct", ip, int(p[0]["HostPort"])))
+    host = g(row,INST,"ssh_host"); port = g(row,INST,"ssh_port")
+    if host and port and (host, int(port)) not in [(h, q) for _, h, q in eps]: eps.append(("proxy", host, int(port)))
+    return eps
+
+def ssh_probe(host, port, key, cmd="true", timeout=45):
+    rc, o_, e_ = sh(["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host, cmd], timeout)
+    return rc, o_.strip(), e_.strip()
+
+def ssh_check(row, key, tries=20, poll=10, watch=None):
+    """ทดสอบ SSH ทันทีหลังสร้างเครื่อง — ลองทุก endpoint ทุกรอบ จนกว่าจะมีอย่างน้อย 1 ทางใช้ได้
+    แล้วรันคำสั่งจริง (nvidia-smi) ไม่ใช่แค่ `true` · คืน dict รายงานผลแต่ละ endpoint + ทางที่เลือก"""
+    eps = ssh_endpoints(row); res = {"endpoints": {}, "chosen": None, "after_s": None}
+    if not eps: res["error"] = "ไม่มี ssh endpoint ใน instance row"; return res
+    for k in range(tries):
+        for name, h, p in eps:
+            rc, o_, e_ = ssh_probe(h, p, key, "nvidia-smi --query-gpu=name,memory.total --format=csv,noheader", 45)
+            res["endpoints"][name] = {"host": h, "port": p, "ok": rc == 0,
+                                      **({"gpu": o_.splitlines()[0][:80]} if rc == 0 and o_ else {"err": (e_ or o_)[-160:]})}
+        ok = [(n, h, p) for n, h, p in eps if res["endpoints"][n]["ok"]]
+        if ok:
+            res["chosen"] = {"name": ok[0][0], "host": ok[0][1], "port": ok[0][2]}; res["after_s"] = k*poll
+            for n, info in res["endpoints"].items():
+                log("  ssh %-6s %s:%s -> %s" % (n, info["host"], info["port"], "OK " + info.get("gpu","") if info["ok"] else "FAIL " + info.get("err","")[-80:]))
+            return res
+        if watch and k >= 1 and watch.check(force=True): break       # ssh พลาด → ดู log ว่าทำไม
+        time.sleep(poll)
+    res["after_s"] = tries*poll
+    return res
+
+def ssh_ready(host, port, key, tries=20, poll=10, watch=None):
     """running != ต่อ SSH ได้ — Vast apt-install sshd เข้า image ที่ไม่มี ต้องรออีก 10-20s"""
     for k in range(tries):
         if sh(["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host,"true"], 45)[0] == 0:
             return True, k*poll
+        if watch and k >= 1 and watch.check(force=True): return False, k*poll   # ssh พลาด → ดู log ว่าทำไม
         time.sleep(poll)
     return False, tries*poll
 
@@ -601,12 +696,19 @@ def need_key(a):
     return k
 
 def running_target(v, a):
+    """เลือก endpoint ที่ต่อได้จริงตอนนี้ (direct ก่อน แล้ว proxy) — direct ที่เคยใช้ได้อาจตายทีหลัง (เจอจริง)"""
     row = v.show_instance(id=a.id)
     if row is None: die("ไม่มี instance %s" % a.id)
     if g(row,INST,"status") != "running": die("instance %s = %r ไม่ใช่ running" % (a.id, g(row,INST,"status")))
-    h, p = ssh_target(row)
-    if not h: die("instance %s ยังไม่มี ssh_host/ssh_port" % a.id)
-    return h, p, need_key(a)
+    eps = ssh_endpoints(row); key = need_key(a)
+    if not eps: die("instance %s ยังไม่มี ssh_host/ssh_port" % a.id)
+    for _ in range(3):
+        for name, h, p in eps:
+            if ssh_probe(h, p, key, "true", 30)[0] == 0:
+                if name != eps[0][0]: log("  %s ต่อไม่ได้ → ใช้ %s %s:%s" % (eps[0][0], name, h, p))
+                return h, p, key
+        time.sleep(5)
+    die("instance %s ต่อ SSH ไม่ได้ทุก endpoint: %s" % (a.id, ", ".join("%s %s:%s" % e for e in eps)))
 
 # ===== subcommands =======================================================================
 def cmd_plan(a):
@@ -618,6 +720,8 @@ def cmd_plan(a):
     offers = search(v, q, a.disk)
     before_cuda = len(offers)
     offers = [o for o in offers if cuda_compatible(o, a.min_cuda)]
+    n = len(offers); offers = [o for o in offers if geo_ok(o, a)]
+    if n != len(offers): log("ตัด %d offers ในประเทศ %s (HF ถูก block — --allow-geo เพื่อรวม)" % (n-len(offers), ",".join(sorted(BLOCK_GEO))))
     log("CUDA >= %s: ผ่าน %d/%d offers หลังตรวจ cuda_max_good ฝั่ง client"
         % (a.min_cuda, len(offers), before_cuda))
     if template: offers=[o for o in offers if not template_offer_mismatches(template,o)]
@@ -708,24 +812,36 @@ def _env(s):
 
 def _settle(v, iid, a, t0=None):
     o = {"mode":"create","instance_id":iid,"ok":False}
+    watch = None if getattr(a, "no_watch", False) else LogWatch(v, iid, every=getattr(a, "watch_every", 20))
     try:
-        ok,row,why = wait_for(v, iid, UP, timeout=a.timeout)
+        ok,row,why = wait_for(v, iid, UP, timeout=a.timeout, watch=watch)
         o["status"] = g(row,INST,"status")
         if not ok:
             o["reason"] = why
+            if watch and watch.hit: o["fatal_log"] = watch.hit
             log("ยังไม่ running: %s — ทำต่อ: destroy --id %s --yes แล้วเลือก offer ใหม่" % (why,iid))
-            out(o); return 1
+            out(o); return 3 if (watch and watch.hit) else 1
         host,port = ssh_target(row)
         o.update({"ok":True,"gpu":g(row,INST,"gpu"),"gpu_ram_mib":g(row,INST,"gpu_ram"),
                   "dph_total":gf(row,INST,"price"),"rates":rates(row),"ssh_url":v.ssh_url(id=iid),
                   "ssh_host":host,"ssh_port":port,"label":g(row,INST,"label"),"image":g(row,INST,"image"),
                   "seconds_to_running": round(time.time()-t0,1) if t0 else None})
         key = a.key or SSH_KEY_ENV
-        if key and host:
-            r_,w_ = ssh_ready(host,port,key); o["ssh_ready"]=r_; o["ssh_ready_after_s"]=w_
-            if not r_: o["ok"]=False; o["reason"]="running แต่ต่อ SSH ไม่ได้"
+        if key and host:                    # ทดสอบ SSH ทันที: ทุก endpoint + รันคำสั่งจริง
+            chk = ssh_check(row, key, watch=watch); o["ssh"] = chk
+            o["ssh_ready"] = bool(chk["chosen"]); o["ssh_ready_after_s"] = chk["after_s"]
+            if chk["chosen"]:
+                o["ssh_host"], o["ssh_port"] = chk["chosen"]["host"], chk["chosen"]["port"]; host, port = o["ssh_host"], o["ssh_port"]
+                seen = (chk["endpoints"][chk["chosen"]["name"]].get("gpu") or "")
+                want = str(g(row,INST,"gpu") or "").replace("RTX ","")
+                if want and want not in seen:
+                    o["ok"]=False; o["reason"]="GPU ในเครื่อง (%s) ไม่ตรง offer (%s)" % (seen, g(row,INST,"gpu"))
+            else:
+                o["ok"]=False; o["reason"]="running แต่ต่อ SSH ไม่ได้ทุก endpoint"
+                if watch and watch.hit: o["fatal_log"]=watch.hit; o["reason"]="log fatal: %s" % watch.hit["meaning"]
+        if watch: o["log_samples"] = watch.samples
         log("RUNNING %s %s  ssh -p %s root@%s  ($%.4f/hr)" % (iid,o["gpu"],port,host,o["dph_total"]))
-        out(o); return 0 if o["ok"] else 1
+        out(o); return 0 if o["ok"] else (3 if o.get("fatal_log") else 1)
     except Exception as e:
         o["reason"]="exception หลัง create: %s" % type(e).__name__; o["error"]=http_err(e)
         log("‼ instance %s ถูกสร้างแล้วและกำลังคิดเงิน — ตรวจด้วย sweep" % iid); out(o); return 1
@@ -738,20 +854,91 @@ def cmd_rent(a):
     preflight(v, a.label, a.max_instances, a.max_dph)   # guard ที่ไม่ขึ้นกับ offer → fail ทันที ไม่วนลอง offer
     q = build_query(a); log("query: %s" % q)
     pool = [o for o in search(v, q, a.disk)
-            if cuda_compatible(o, a.min_cuda) and gf(o,OFFER,"price",9e9) <= a.max_dph]
-    if not pool: die("ไม่มี offer <= $%.2f/hr ที่ตรงเกณฑ์" % a.max_dph)
+            if cuda_compatible(o, a.min_cuda) and geo_ok(o, a) and gf(o,OFFER,"price",9e9) <= a.max_dph]
+    if not pool: die("ไม่มี offer <= $%.2f/hr ที่ตรงเกณฑ์ (ตัดประเทศ %s แล้ว — --allow-geo เพื่อรวม)" % (a.max_dph, ",".join(sorted(BLOCK_GEO)) or "-"))
     cand = sorted(pool, key=lambda o: (gf(o,OFFER,"reliability") < 0.995,
                                        gf(o,OFFER,"price",9e9), -gf(o,OFFER,"inet")))[:a.tries]
+    failed = []
     for n, o in enumerate(cand, 1):
         a.offer_id, a.machine_id, a.expect_dph = g(o,OFFER,"id"), g(o,OFFER,"machine"), gf(o,OFFER,"price")
         log("ลอง #%d offer %s %s %s $%.4f/hr rel %.4f net %d" % (n, a.offer_id, g(o,OFFER,"gpu"),
             g(o,OFFER,"geo","-"), a.expect_dph, gf(o,OFFER,"reliability"), gf(o,OFFER,"inet")))
+        buf = io.StringIO(); real = sys.stdout; sys.stdout = buf     # จับ JSON ของ create เพื่ออ่าน fatal_log
         try:
-            return cmd_create(a)
+            rc = cmd_create(a)
         except SystemExit:
+            sys.stdout = real
             if by_label(v, a.label): die("มีเครื่อง label %r เกิดแล้ว — หยุดลองต่อ ตรวจด้วย sweep" % a.label)
-            log("offer %s ใช้ไม่ได้ → ลองตัวถัดไป" % a.offer_id)
-    die("ลองครบ %d offers แล้วไม่สำเร็จ และไม่มีเครื่องเกิด — rent ใหม่อีกรอบ" % len(cand))
+            log("offer %s ใช้ไม่ได้ → ลองตัวถัดไป" % a.offer_id); continue
+        finally:
+            sys.stdout = real
+        res = {}
+        for line in buf.getvalue().splitlines():
+            try: res = json.loads(line)
+            except ValueError: pass
+        if rc == 0 or a.no_replace:
+            out(res); return rc
+        # เครื่องเกิดแล้วแต่ใช้ไม่ได้ (log fatal / ค้าง / ssh ไม่ติด) → ลบเครื่องที่เพิ่งสร้างเอง แล้วลองเครื่องถัดไป
+        bad = [g(i,INST,"id") for i in by_label(v, a.label)]
+        for iid in bad:
+            try: v.destroy_instance(id=iid)
+            except Exception as e: log("destroy %s: %s" % (iid, http_err(e)))
+            log("ลบเครื่องเสีย %s -> %s" % (iid, "หายแล้ว" if verify_gone(v, iid) else "‼ ยังเห็นอยู่"))
+        failed.append({"offer_id": a.offer_id, "instance_id": res.get("instance_id"), "reason": res.get("reason"),
+                       "fatal_log": res.get("fatal_log")})
+        if by_label(v, a.label): die("ลบเครื่อง label %r ไม่หมด — ตรวจด้วย sweep" % a.label)
+        fl = res.get("fatal_log") or {}
+        if fl.get("scope") == "image":
+            out({"mode":"rent","ok":False,"failed":failed})
+            die("error ระดับ image (%s) — เปลี่ยนเครื่องไม่ช่วย แก้ image/onstart แล้ว rent ใหม่" % fl.get("meaning"), 3)
+        log("เครื่องเสีย (%s) → ลบแล้ว ลอง offer ถัดไป" % res.get("reason"))
+    out({"mode":"rent","ok":False,"failed":failed})
+    die("ลองครบ %d offers แล้วไม่สำเร็จ — เครื่องที่เสียถูกลบหมดแล้ว · rent ใหม่อีกรอบ" % len(cand))
+
+def cmd_watch(a):
+    """เฝ้า init ของ server ที่รันเองในเครื่อง: สุ่มอ่าน Vast logs + ไฟล์ log (ผ่าน SSH) ทุก --every วินาที
+    ready (regex ใน log / --probe rc 0) → exit 0 · fatal → exit 3 (+ --destroy-on-fatal ลบเครื่องให้) · timeout → exit 1"""
+    v = client(); host, port, key = running_target(v, a)
+    pats = FATAL_LOG + APP_FATAL + [(x, "ผู้ใช้กำหนด (--fatal)", "image") for x in (a.fatal or [])]
+    ssh = ["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host]
+    rnow = sh(ssh+["date +%s"], 60)[1].strip(); t_remote = int(rnow) if rnow.isdigit() else 0
+    def fetch():
+        txt = v.logs(instance_id=a.id, tail="200") or ""
+        if a.file:                   # log ไฟล์เก่า (mtime ก่อนเริ่ม watch) อาจมี error ของรอบก่อน → ไม่นับ
+            r = sh(ssh+["stat -c %%Y %s 2>/dev/null; tail -n %d %s 2>/dev/null" % (a.file, a.lines, a.file)], 60)[1]
+            h, _, body = r.partition("\n")
+            if h.strip().isdigit() and int(h) >= t_remote: txt += "\n" + body
+        return txt
+    w = LogWatch(v, a.id, every=0, patterns=pats, fetch=fetch)
+    ready_rx = re.compile(a.ready, re.M) if a.ready else None
+    t0 = time.time(); last_line = ""
+    # log เก่าของรอบก่อนยังค้างอยู่จนกว่า process ใหม่จะ truncate ไฟล์ → นับ ready เฉพาะเมื่อไฟล์ถูกแก้หลังเริ่ม watch (t_remote)
+    while time.time()-t0 < a.timeout:
+        hit = w.check(force=True)
+        if hit: break
+        txt = sh(ssh+["stat -c %%Y %s 2>/dev/null; tail -n %d %s 2>/dev/null" % (a.file, a.lines, a.file)], 60)[1] if a.file else ""
+        head, _, txt = txt.partition("\n")
+        fresh = (not a.file) or (head.strip().isdigit() and int(head) >= t_remote)
+        tail = (txt.strip().splitlines() or [""])[-1][:150]
+        if tail != last_line: log("  [%3ds] %s" % (time.time()-t0, tail)); last_line = tail
+        if (ready_rx and fresh and ready_rx.search(txt)) or (a.probe and sh(ssh+[a.probe], 60)[0] == 0):
+            out({"mode":"watch","id":a.id,"ready":True,"seconds":round(time.time()-t0),"samples":w.samples}); return 0
+        # "[s]erver.py" กัน pgrep เจอ shell ของ ssh เองที่มีข้อความ pattern อยู่ใน command line
+        if a.alive:
+            rc_ = sh(ssh+["pgrep -f %s >/dev/null" % json.dumps("[%s]%s" % (a.alive[0], a.alive[1:]))], 60)[0]
+            if rc_ == 255:                  # ssh ต่อไม่ได้ ≠ process ตาย (เจอจริง: direct port ตายกลางทาง) → หา endpoint ใหม่
+                log("  ssh หลุด (rc 255) → เลือก endpoint ใหม่"); host, port, key = running_target(v, a)
+                ssh[:] = ["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host]; time.sleep(a.every); continue
+        if a.alive and rc_ == 1:
+            w.hit = {"line": tail, "meaning": "process %r ไม่อยู่แล้ว (ตายระหว่าง init)" % a.alive, "scope": "image"}; break
+        time.sleep(a.every)
+    o = {"mode":"watch","id":a.id,"ready":False,"seconds":round(time.time()-t0),"samples":w.samples,
+         "fatal_log":w.hit,"reason":"log fatal" if w.hit else "timeout %ds" % a.timeout}
+    if w.hit and a.destroy_on_fatal:   # flag นี้คือการอนุญาตล่วงหน้าของผู้ใช้ให้ลบเครื่องที่ init พัง
+        try: v.destroy_instance(id=a.id)
+        except Exception as e: log("destroy: %s" % http_err(e))
+        o["destroyed"] = verify_gone(v, a.id); log("ลบเครื่อง %s -> %s" % (a.id, o["destroyed"]))
+    out(o); return 3 if w.hit else 1
 
 def cmd_life(a):
     v = client()
@@ -1007,6 +1194,7 @@ def main():
         if name == "plan":
             q.add_argument("--gpu"); q.add_argument("--num-gpus", type=int, default=1)
             q.add_argument("--min-cuda", default="12.4"); q.add_argument("--min-inet", type=int, default=500)
+            q.add_argument("--allow-geo", action="store_true", help="ไม่ตัดประเทศใน VAST_BLOCK_GEO")
             q.add_argument("--min-gpu-ram", type=int, help="หน่วย GB"); q.add_argument("--extra-query", default="")
             q.add_argument("--template-id",type=int,help="ใช้ disk ขั้นต่ำและ template_hash จาก template นี้")
         else:
@@ -1014,18 +1202,30 @@ def main():
             q.add_argument("--expect-dph", type=float); q.add_argument("--yes", action="store_true")
             q.add_argument("--template-id",type=int); q.add_argument("--template-hash")
             q.add_argument("--runtype", default="ssh_direct", choices=sorted(RUNTYPE))
-            q.add_argument("--onstart-cmd", default="env | grep _ >> /etc/environment;")
+            q.add_argument("--onstart-cmd", default=DEFAULT_ONSTART)
+            q.add_argument("--no-watch", action="store_true"); q.add_argument("--watch-every", type=int, default=20)
             q.add_argument("--env", default=""); q.add_argument("--max-instances", type=int, default=MAX_INSTANCES)
     q = s.add_parser("rent"); q.add_argument("--label", required=True)
     q.add_argument("--gpu"); q.add_argument("--num-gpus", type=int, default=1)
     q.add_argument("--min-cuda", default="12.4"); q.add_argument("--min-inet", type=int, default=500)
+    q.add_argument("--allow-geo", action="store_true", help="ไม่ตัดประเทศใน VAST_BLOCK_GEO")
     q.add_argument("--min-gpu-ram", type=int, help="หน่วย GB"); q.add_argument("--extra-query", default="")
     q.add_argument("--image", default=DEFAULT_IMAGE); q.add_argument("--disk", type=float, default=40)
     q.add_argument("--max-dph", type=float, default=MAX_DPH); q.add_argument("--key", default=None)
     q.add_argument("--timeout", type=int, default=900); q.add_argument("--tries", type=int, default=5)
     q.add_argument("--runtype", default="ssh_direct", choices=sorted(RUNTYPE))
-    q.add_argument("--onstart-cmd", default="env | grep _ >> /etc/environment;")
+    q.add_argument("--onstart-cmd", default=DEFAULT_ONSTART)
     q.add_argument("--env", default=""); q.add_argument("--max-instances", type=int, default=MAX_INSTANCES)
+    q.add_argument("--no-watch", action="store_true", help="ไม่ต้องสุ่มอ่าน log ระหว่าง init")
+    q.add_argument("--watch-every", type=int, default=20, help="อ่าน log ทุกกี่วินาที")
+    q.add_argument("--no-replace", action="store_true", help="เครื่องเสียแล้วไม่ต้องลบ+เปลี่ยนเครื่องให้")
+    q = s.add_parser("watch"); q.add_argument("--id", type=int, required=True)
+    q.add_argument("--file", help="log ไฟล์ในเครื่อง เช่น /workspace/server.log"); q.add_argument("--lines", type=int, default=300)
+    q.add_argument("--ready", help="regex ใน log = พร้อม"); q.add_argument("--probe", help="คำสั่งในเครื่อง rc 0 = พร้อม")
+    q.add_argument("--fatal", action="append", help="regex fatal เพิ่มเติม"); q.add_argument("--every", type=int, default=15)
+    q.add_argument("--alive", help="pattern ของ process (pgrep -f) ที่ต้องยังอยู่ เช่น server.py — หายไป = fatal")
+    q.add_argument("--timeout", type=int, default=1800); q.add_argument("--destroy-on-fatal", action="store_true")
+    q.add_argument("--key", default=None)
     for name in ("status","stop","start"):
         q = s.add_parser(name); q.add_argument("--id", type=int, required=True)
         q.add_argument("--timeout", type=int, default=420)
@@ -1074,7 +1274,7 @@ def main():
     a = p.parse_args()
     return {"env":cmd_env,"keys":cmd_keys,"plan":cmd_plan,"rent":cmd_rent,"create":cmd_create,"status":cmd_life,"stop":cmd_life,"start":cmd_life,"bill":cmd_bill,
             "destroy":cmd_destroy,"sweep":cmd_sweep,"run":cmd_run,"push":cmd_xfer,"pull":cmd_xfer,
-            "drift":cmd_drift,"template-search":cmd_template_search,"template-show":cmd_template_show,
+            "drift":cmd_drift,"watch":cmd_watch,"template-search":cmd_template_search,"template-show":cmd_template_show,
             "template-create":cmd_template_create,"template-update":cmd_template_update,
             "template-delete":cmd_template_delete}[a.action](a)
 
@@ -1096,7 +1296,7 @@ python /tmp/vast.py env            # ต้องเห็น env_file_exists:tr
 |--:|:--|:--|:--|
 | 0 | `python /tmp/vast.py env && python /tmp/vast.py keys` | `env_file_exists:true` · `VAST_API_KEY:<set …>` · `ssh_key_readable:true` · `registered:true` | ตั้งค่าใน `.env` ให้ครบ แล้ว `keys --attach` (ดูหัวไฟล์) |
 | 1 | `python /tmp/vast.py sweep` | จำนวนเครื่อง + เครดิต > ค่าใช้จ่ายที่คาด × 2 | เครดิตไม่พอ → หยุด แจ้งผู้ใช้ |
-| 2 | `python /tmp/vast.py rent --label <unique> [--gpu RTX_4090] [--min-gpu-ram 24] [--max-dph 0.45]` | เลือก offer ดีสุดเอง + create + wait running + SSH → `{"ok":true,"instance_id":N,"ssh_ready":true,"chosen":{…}}` — ของจริง **41–96 s** | `ไม่มี offer <= $X` → ผ่อนเกณฑ์อื่นหรือรายงานผู้ใช้ · ลองครบ `--tries` แล้ว offer หายหมด → `rent` ใหม่อีกรอบ · `"ok":false`+`reason` → ดูตาราง state machine |
+| 2 | `python /tmp/vast.py rent --label <unique> [--gpu RTX_4090] [--min-gpu-ram 24] [--max-dph 0.45]` | เลือก offer ดีสุดเอง + create + wait running + SSH (+ เฝ้า log, เครื่องเสีย = ลบ+เปลี่ยนเครื่องเอง — RUNBOOK 1b) → `{"ok":true,"instance_id":N,"ssh_ready":true,"chosen":{…}}` — ของจริง **41–96 s** | `ไม่มี offer <= $X` → ผ่อนเกณฑ์อื่นหรือรายงานผู้ใช้ · ลองครบ `--tries` แล้ว offer หายหมด → `rent` ใหม่อีกรอบ · `"ok":false`+`reason` → ดูตาราง state machine |
 | 3 | (ทางเลือก) `plan` + `create --offer-id …` | ใช้เมื่อผู้ใช้อยากเลือก offer เองเท่านั้น | |
 | 5 | `python /tmp/vast.py run --id N --cmd "nvidia-smi"` | ชื่อ GPU + VRAM **ตรงกับ offer** | ดู error playbook |
 
@@ -1138,6 +1338,56 @@ python /tmp/vast.py template-delete --id N --yes
 merge ทุก field ก่อน PUT และอ่านกลับ verify · output ไม่คืน `env`, docker login, onstart หรือ readme เพราะอาจมี secret ·
 สร้าง instance จาก template ยังต้อง `plan` ราคา offer และถามยืนยันค่าใช้จ่ายเหมือน create ปกติ
 โดย `create` ต้องรับทั้ง `--template-id` และ `--template-hash` เพื่อยืนยันว่า hash ไม่เปลี่ยน, disk พอ และ offer compatible
+
+# RUNBOOK 1b — LOG WATCH (สุ่มอ่าน log ระหว่าง init → เจอ error ลบ+หาเครื่องใหม่เอง)
+
+`rent`/`create` **เฝ้า log ให้อัตโนมัติ** ระหว่างรอ `running` และรอ SSH: อ่าน `logs(tail=200)` ทุก `--watch-every` วินาที (default 20)
+แล้วเทียบกับ `FATAL_LOG` (ใน SDK CONTRACT) — เจอเมื่อไหร่เลิกรอทันที ไม่ต้องเสียเงินรอ timeout 420–900 s
+
+| scope ของ pattern | ตัวอย่าง | `rent` ทำอะไร |
+|:--|:--|:--|
+| `host` — เครื่องนี้เสีย | `Error response from daemon` · `nvidia-container-cli` · `No CUDA GPUs` · `Xid` · pull timeout | **ลบเครื่องที่เพิ่งสร้าง (verify หาย) → ลอง offer ถัดไป** |
+| `image` — เปลี่ยนเครื่องไม่ช่วย | `bad ownership or modes … /root` · `manifest unknown` · `no space left` | ลบเครื่อง แล้ว**หยุด** exit 3 พร้อม `fatal_log` → แก้ image/onstart/disk |
+
+เครื่องที่ค้าง/SSH ไม่ติดโดยไม่มี fatal log ก็ถูกลบ+เปลี่ยนเครื่องเหมือน `host` · ปิดด้วย `--no-replace` (เก็บเครื่องไว้ debug) หรือ `--no-watch`
+การลบในเส้นทางนี้ = ลบเฉพาะเครื่องที่ `rent` **เพิ่งสร้างเองในคำสั่งเดียวกัน** (label เดียวกัน) จึงไม่ต้องถามผู้ใช้
+
+**init ของ server ที่รันเองหลัง SSH ได้** (โหลดโมเดล, vLLM, pip install) ใช้ `watch`:
+
+```bash
+python /tmp/vast.py watch --id N --file /workspace/server.log \
+    --ready "Application startup complete" --probe "curl -sf localhost:8000/health" --alive server.py \
+    --every 15 --timeout 1800 [--fatal "regex เพิ่ม"] [--destroy-on-fatal]
+```
+
+อ่านทั้ง Vast logs + `tail` ของไฟล์ผ่าน SSH ทุก `--every` วินาที เทียบ `FATAL_LOG + APP_FATAL` (OOM, `Engine core initialization failed`,
+`RuntimeError:`, `CUDA error:`, OOM killer …) · ready → exit 0 · fatal → exit 3 พร้อม `fatal_log{line,meaning,scope}` · timeout → exit 1
+`--destroy-on-fatal` = ผู้ใช้อนุญาตล่วงหน้าให้ลบเครื่องเมื่อ init พัง (ไม่ใส่ = รายงานอย่างเดียว) · scope `host` → `rent` label ใหม่ได้เลย ·
+scope `image` → แก้โค้ด/ค่าก่อน (เช่น VRAM ไม่พอ: ลด `max_model_len`/`gpu_memory_utilization`) ไม่ใช่เปลี่ยนเครื่อง
+
+# บทเรียน deploy model server บน Vast (vLLM, 2026-10-02 · RTX 4090 · 1 เครื่อง ~1 ชม. · จ่ายจริง ~$0.47)
+
+ลำดับที่ได้ผล — แต่ละขั้น **verify ก่อนไปต่อ**:
+
+1. `rent --gpu … --min-inet … --max-dph … --disk <image×2 + model + 10> --env "-p 8000:8000"` → ดู `ssh.endpoints` ว่า direct/proxy ผ่านทั้งคู่
+2. `push` server + start script → รัน start แบบ detach: `(setsid nohup bash start.sh > start.log 2>&1 < /dev/null &)` (ไม่งั้น ssh ค้างรอ)
+3. `watch --file server.log --ready "Application startup complete" --alive server.py` — init ของ vLLM ~45–50 s หลังโหลด model เสร็จ
+4. ทดสอบจากนอกเครื่องที่ `http://<public_ip>:<HostPort ของ 8000/tcp>` (ดูจาก `ports` ของ instance) + endpoint สำรอง (tunnel)
+5. **soak test** (รันชุดทดสอบซ้ำ ≥5 รอบ) ดู VRAM ใน `/health` — ผ่านรอบแรกไม่ได้แปลว่าไม่ OOM รอบที่ 5
+
+**เลือกประเทศที่เข้า HF ได้** — `rent` ตัด `CN` ให้อัตโนมัติ (`VAST_BLOCK_GEO`) · หลังเช่าเช็คทันที `curl -s -o /dev/null -w "%{http_code}" https://huggingface.co` ต้องได้ 200
+
+image `vllm/vllm-openai:*` ~11 GB pull 7 นาทีบนเครื่องเน็ต 2 Gbps (ตั้ง `VAST_LOADING_GRACE=1000`) · ใช้ tag ที่ pin commit · cu129 ต้องการ driver CUDA ≥ 12.9 (`--min-cuda 12.9`)
+
+**โมเดลที่ weight เกือบเต็ม VRAM** (เช่น 20 GiB บน 24 GB): ต้นทุนหลักคือการลองผิดลองถูกเรื่อง memory — ปรับทีละค่าแล้ว `watch` ทุกครั้ง
+
+| อาการใน log | ปรับ |
+|:--|:--|
+| OOM ตอน profiling / `cutlass … Error Internal` หลัง OOM | `max_num_batched_tokens`↓, `max_num_seqs=1`, `enforce_eager=True` |
+| `… KV cache is needed, which is larger than the available KV cache memory` | `max_model_len`↓ (log บอกค่าที่พอ) หรือ util↑ |
+| OOM **ระหว่างใช้งาน** หลังผ่านไปหลาย request | util↓ เหลือ ≥ 5–7% นอก vLLM · งานที่รันเองนอก vLLM (head/post-process) ย้ายไป CPU · `gc.collect()+empty_cache()` |
+
+ถ้าต้อง trade-off มากขนาดนี้ ให้เสนอผู้ใช้ GPU ที่ VRAM ใหญ่ขึ้น (เช่น 32/48 GB) เทียบราคาด้วย `plan` ก่อนเสียเวลาจูน
 
 # RUNBOOK 2 — STOP / START (verify จริงทุกครั้ง อย่าเชื่อ return value)
 
@@ -1270,6 +1520,19 @@ create ──► None(provisioning) ──► created/loading ──► running 
 | 25 ✅ | template ที่ `template-update` แล้ว ได้ `hash_id` ใหม่ | Vast ออก hash ใหม่ทุก update | `plan --template-id` ใหม่หลัง update ทุกครั้ง — `create` ด้วย hash เก่าจะถูกปฏิเสธ ("template hash เปลี่ยนแล้ว") |
 | 26 ✅ | ยอดใน `bill` ของเครื่องที่ลบแล้วยังเพิ่มขึ้น | billing ฝั่ง Vast settle ช้า/ปัดเวลา | `show_invoices_v1()['current']` / `sweep` ยืนยันว่าไม่มีอะไรคิดเงินอยู่ แล้วรัน `bill` ซ้ำภายหลัง |
 | 27 ✅ | `plan --template-id` ของ template ที่มี `cuda_max_good` ส่ง `cuda_vers` ไป server | `template_query_parts` แปลง filter ตรง ๆ (ชน #23) | แก้แล้ว: ข้าม `cuda_max_good` ใน query แล้วตรวจฝั่ง client ใน `template_offer_mismatches` |
+| 28 ✅ | `running` แล้วแต่ SSH ไม่ติด, `logs()` มี `Authentication refused: bad ownership or modes for file /root/.ssh/authorized_keys` | image (เช่น `vllm/vllm-openai`) ทำ `/root` ให้ group/other เขียนได้ → sshd ปฏิเสธ key; เดิม `rent` รอเงียบ ๆ ~10 นาที | onstart default มี `SSH_FIX` (chown/chmod `/root` `.ssh` ซ้ำ 90 s) แล้ว · `LogWatch` จับ pattern นี้ได้ใน ≤20 s (scope `image`) |
+| 30 ✅ | `watch` รอต่อทั้งที่ server ตายแล้วด้วย `OSError: Could not load this library: …libtorchcodec_image.so` | pattern ไม่ครอบคลุม `OSError`/`Application startup failed` และไม่ได้เช็คว่า process ยังอยู่ | เพิ่ม pattern + `--alive <pgrep pattern>` · (ต้นเหตุ: `vllm/vllm-openai:cu129-nightly` มี torchcodec ที่ build กับ CUDA 13 → `pip uninstall -y torchcodec` ถ้าไม่ใช้ audio) |
+| 31 ✅ | direct SSH/port (`public_ip:HostPort`) ใช้ได้ตอนสร้าง แล้ว **timeout กลางทาง ~10 นาที** ก่อนกลับมาเอง ขณะที่ proxy `sshN.vast.ai` ยังใช้ได้ | network ของ host หลุดชั่วคราว (instance ยัง `running`) | หลังสร้างเครื่อง `ssh_check` ทดสอบ **ทุก endpoint** + รัน `nvidia-smi` จริง แล้วรายงานผลแต่ละทาง · `run`/`push`/`pull`/`watch` เลือก endpoint ที่ต่อได้ตอนนั้น (direct → proxy) · บริการ HTTP ให้มีทางสำรอง เช่น `cloudflared tunnel --url http://localhost:PORT` |
+| 32 ✅ | `watch --alive` รายงาน "process ตาย" ทั้งที่ server ยังรันอยู่ | ssh rc 255 (ต่อไม่ได้) ถูกนับเหมือน `pgrep` rc 1 | แก้แล้ว: rc 255 → หา endpoint ใหม่, นับว่าตายเฉพาะ rc 1 · pattern `[s]erver.py` กัน pgrep เจอ shell ของตัวเอง |
+| 33 ✅ | `watch` รายงาน ready ภายใน 13 s หลัง restart (ยังไม่พร้อมจริง) / เจอ fatal ของรอบก่อน | อ่านเจอ `Application startup complete`/error ที่ค้างใน log เก่า ก่อน process ใหม่ truncate ไฟล์ | แก้แล้ว: นับ log ไฟล์เฉพาะเมื่อ mtime ≥ เวลาเริ่ม watch (เวลาฝั่ง remote) |
+| 34 ✅ | `rent` ลบเครื่องดี ๆ ทิ้งเพราะ log มี `Error response from daemon: No such container: C.<id>` | บรรทัดนี้ขึ้นปกติก่อน container ถูกสร้าง | แก้แล้ว: pattern docker ใช้ `(?!No such container)` — **pattern ใหม่ทุกตัวต้องลองกับ log ของเครื่องที่ปกติก่อน** |
+| 35 ✅ | โมเดล NVFP4 บน RTX 4090 (Ada) / โมเดลที่ weight เกือบเต็ม VRAM: OOM ตอน profiling, KV ไม่พอ, OOM สะสมระหว่างใช้งาน | NVFP4 native ต้อง Blackwell → vLLM fallback Marlin W4A16 (ใช้ได้ แต่ช้ากว่า) · weight 20 GiB บน 24 GB เหลือ ~2 GiB · ของนอก budget vLLM (CUDA ctx, head ที่รันเอง, triton autotune) โตเรื่อย ๆ | ดู "บทเรียน deploy" ด้านล่าง: ลด `max_model_len`/`max_num_batched_tokens`, `max_num_seqs=1`, `enforce_eager`, เว้น util ≥ 5–7%, งานเสริมย้ายไป CPU, เช็ค `/health` VRAM หลัง soak test |
+| 36 ✅ | `vllm/vllm-openai:cu129-nightly` import vllm พัง `OSError: Could not load this library: …libtorchcodec_image.so` | torchcodec ใน image build กับ CUDA 13; vllm จับแค่ ImportError | `pip uninstall -y torchcodec` (ถ้าไม่ใช้ audio) ก่อนสตาร์ท |
+| 37 ✅ | request ที่มีรูปใหญ่: `vLLM returned 819 positions for 2076 tokens` | ตั้ง `mm_processor_kwargs.max_pixels` ให้ vLLM ฝั่งเดียว แต่ HF processor ที่ใช้นับ token ไม่ได้จำกัด | ย่อรูปก่อนส่งให้ทั้งสองฝั่ง (หรือตั้งค่าเดียวกันทั้งคู่) |
+| 38 ✅ | `curl` ไฟล์เดียวจาก HF ได้ ~7.6 MB/s แต่ `snapshot_download` + `HF_HUB_ENABLE_HF_TRANSFER=1` โหลด 23 GB ใน ~7.5 นาที (~50 MB/s) | single stream ถูกจำกัดต่อ connection | วัดความเร็วด้วยเครื่องมือที่จะใช้จริง (hf_transfer/หลาย connection) ก่อนตัดสินใจเปลี่ยนเครื่อง |
+| 39 ✅ | เครื่องในจีน (`geolocation` ลงท้าย `, CN`) `curl https://huggingface.co/...` ได้ `000` · `hf-mirror.com` ใช้ได้แต่ Xet ตอบ `401 Unauthorized … cas-server.xethub.hf.co` และ HTTP ได้แค่ ~17 MB/s | HF ถูก block ในจีน; `inet_down` ที่ประกาศ (2212 Mbps) ไม่ช่วย | `plan`/`rent` **ตัดประเทศใน `VAST_BLOCK_GEO` (default `CN`) ให้แล้ว** · ถ้าจำเป็นต้องใช้: `--allow-geo` + `HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1` · pull Docker Hub ในจีนก็ช้า (vLLM 11 GB ~13 นาที) |
+| 40 ✅ | `rent` ลบเครื่องที่ยัง pull image vLLM อยู่ เพราะค้าง `loading` เกิน 420 s | image ~11 GB ใช้เวลาเกิน grace | ตั้ง `VAST_LOADING_GRACE=1000` สำหรับ image ใหญ่ · ดู `status_msg` (`Pulling from …`/`Download complete`) แยกจากเครื่องค้างจริง |
+| 29 ✅ | รอ `running`/SSH จน timeout ทั้งที่เครื่องพังตั้งแต่นาทีแรก | ไม่ได้ดู log ระหว่างรอ | `rent`/`create` สุ่มอ่าน log ทุก 20 s (`LogWatch`) · `watch` สำหรับ init ของ server เอง · ดู RUNBOOK 1b |
 
 ---
 
