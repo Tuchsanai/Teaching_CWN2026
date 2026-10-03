@@ -20,7 +20,10 @@ MAX_SIDE = int(os.environ.get("CLEF_MAX_IMAGE_SIDE", "1024"))
 clef = ClefVLLM(MODEL_DIR,
                 max_model_len=int(os.environ.get("CLEF_MAX_MODEL_LEN", "16384")),
                 gpu_memory_utilization=float(os.environ.get("CLEF_GPU_UTIL", "0.85")),
-                max_images=int(os.environ.get("CLEF_MAX_IMAGES", "4")))
+                max_images=int(os.environ.get("CLEF_MAX_IMAGES", "4")),
+                # server ทำทีละ request (lock) — default max_num_seqs=256 ทำให้ state ของ linear-attention
+                # ตอน profile cudagraph จองเกิน 12 GiB จน OOM บน 32 GB
+                max_num_seqs=int(os.environ.get("CLEF_MAX_NUM_SEQS", "4")))
 lock = threading.Lock()
 app = FastAPI(title="clef-NVFP4")
 
