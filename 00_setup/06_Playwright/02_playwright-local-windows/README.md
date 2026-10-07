@@ -28,11 +28,11 @@
 
 ## LAB 1 · พรอมต์รวม: ตรวจและอัปเดตเครื่องมือ
 
-![LAB 1 พรอมต์ ตรวจและอัปเดตเครื่องมือ Playwright ทั้งหมด 5 ขั้น ถามผมก่อนอัปเดต ผลที่ได้คือเช็กลิสต์ 5 ขั้นและตารางก่อนหลัง](img/lab1-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 1 ไว้ในช่องข้อความ กรอบสีแดง](img/lab1-paste.png)
 
 🎯 สั่ง Claude Code ให้ทำงานทั้งบทด้วยพรอมต์เดียว แล้วดูว่า AI ทำอะไรในแต่ละขั้น
 
-💬 **พรอมต์** (คัดลอกทั้งกรอบไปวางใน `claude` ที่โฟลเดอร์ของบทนี้)
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ช่วยตรวจสอบและอัปเดตเครื่องมือสำหรับใช้ Playwright MCP ทดสอบเว็บ บน Windows ตามขั้นตอนนี้
@@ -126,9 +126,9 @@
 
 ## LAB 2 · ตรวจเวอร์ชัน
 
-![LAB 2 พรอมต์ ตรวจเวอร์ชันทุกเครื่องมือ สรุปเป็นตาราง ห้ามติดตั้งอะไร ผลที่ได้คือตารางสถานะ ล่าสุดแล้ว ต้องอัปเดต ยังไม่ได้ติดตั้ง](img/lab2-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 2 ไว้ในช่องข้อความ กรอบสีแดง](img/lab2-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ตรวจเวอร์ชันเครื่องมือสำหรับ Playwright บนเครื่องนี้ (อ่านอย่างเดียว ห้ามติดตั้งหรือแก้อะไร)
@@ -158,9 +158,9 @@
 
 ## LAB 3 · ติดตั้ง Playwright
 
-![LAB 3 พรอมต์ ติดตั้ง Playwright ในโฟลเดอร์ lab พร้อมเบราว์เซอร์ทดสอบ ผลที่ได้คือ Chromium Firefox WebKit พร้อมใช้](img/lab3-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 3 ไว้ในช่องข้อความ กรอบสีแดง](img/lab3-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ในโฟลเดอร์ lab ติดตั้ง Playwright Test ให้หน่อย
@@ -183,9 +183,9 @@
 
 ## LAB 4 · เขียนและรัน test
 
-![LAB 4 พรอมต์ เขียน test 3 ข้อ รันทุกเบราว์เซอร์ แล้วเปิดรายงาน ผลที่ได้คือ 15 passed บน 5 เบราว์เซอร์](img/lab4-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 4 ไว้ในช่องข้อความ กรอบสีแดง](img/lab4-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ในโฟลเดอร์ lab ช่วยเขียน test ไว้ใน tests/example.spec.ts 3 ข้อ บนเว็บ https://playwright.dev
@@ -214,11 +214,11 @@
 
 ## LAB 5 · ติดตั้งปลั๊กอิน Playwright ใน Chrome
 
-![LAB 5 พรอมต์ เปิดหน้า Playwright Extension ใน Chrome Web Store ให้หน่อย ผลที่ได้คือปุ่ม Add to Chrome ที่วงสีแดงไว้](img/lab5-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 5 ไว้ในช่องข้อความ กรอบสีแดง](img/lab5-paste.png)
 
 🎯 ปลั๊กอินนี้ทำให้ Claude **ใช้ Chrome ตัวจริงของเรา** ได้ ขั้นนี้ **เรากดติดตั้งเอง** ด้วยมือ แล้วค่อยให้ Claude ตรวจ
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 เปิดหน้า Playwright Extension ใน Chrome Web Store ให้หน่อย
@@ -252,9 +252,9 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ## LAB 6 · ตรวจ Playwright MCP
 
-![LAB 6 พรอมต์ ตรวจว่า Playwright MCP ใช้ได้จริง ไม่ใช่แค่ Connected ผลที่ได้คือปลั๊กอินใน Chrome พร้อมและเปิดเว็บได้จริง](img/lab6-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 6 ไว้ในช่องข้อความ กรอบสีแดง](img/lab6-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ตรวจว่า Playwright MCP ใน Claude Code ใช้งานได้จริง
@@ -276,9 +276,9 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ## LAB 7 · ให้ AI ใช้เว็บจริง: ค้นหาใน Google
 
-![LAB 7 พรอมต์ เปิด google.co.th ในแท็บใหม่ ค้นหา Playwright MCP แล้วจับภาพ ผลที่ได้คือหน้าค้นหาบนแท็บใหม่ ไม่แตะแท็บเดิม](img/lab7-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 7 ไว้ในช่องข้อความ กรอบสีแดง](img/lab7-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ใช้ Playwright MCP เปิด https://www.google.co.th ในแท็บใหม่ ค้นหาคำว่า "Playwright MCP"
@@ -299,9 +299,9 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ## LAB 8 · สรุปก่อน/หลัง
 
-![LAB 8 พรอมต์ ตรวจซ้ำ เทียบก่อนหลัง และบอกสิ่งที่ผมต้องทำเอง ผลที่ได้คือตารางก่อนหลังและรายการสิ่งที่ต้องทำเอง](img/lab8-prompt.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 8 ไว้ในช่องข้อความ กรอบสีแดง](img/lab8-paste.png)
 
-💬 **พรอมต์**
+💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
 ตรวจเวอร์ชันอีกครั้ง บันทึกเป็น log\versions-after.md
@@ -342,7 +342,7 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 02_playwright-local-windows/
 ├─ README.md
 ├─ check-versions.ps1          # ตรวจเวอร์ชัน (อ่านอย่างเดียว) → ตาราง
-├─ img/                        # intro-* / lab*-prompt (cyolo imagegen) · ภาพหน้าจอจริงที่วงสีแดงไว้
+├─ img/                        # intro-* (cyolo imagegen) · lab*-paste (หน้าต่าง Claude Code จริง) · ภาพหน้าจอจริงที่วงสีแดงไว้
 ├─ log/                        # ตาราง before/after, error จริง, brief ของภาพ
 └─ lab/
    ├─ install-demo.ps1         # ติดตั้ง + รัน test (มี -IPv4)
