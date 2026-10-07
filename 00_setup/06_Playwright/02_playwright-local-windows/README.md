@@ -39,8 +39,7 @@
 ทุกค่าที่รายงานต้องมาจากคำสั่งที่รันจริง ห้ามตอบจากความจำ
 
 ขั้นที่ 1: ตรวจเวอร์ชันที่ติดตั้งอยู่ เทียบกับเวอร์ชันล่าสุด (อ่านอย่างเดียว ห้ามติดตั้งหรือแก้อะไร)
-ถ้าในโฟลเดอร์นี้มี check-versions.ps1 ให้รัน powershell -ExecutionPolicy Bypass -File .\check-versions.ps1 -Out log\versions-before.md
-ถ้าไม่มี ให้ตรวจทีละรายการ
+ตรวจทีละรายการ ดังนี้
 
 1. Node.js
    * ที่ติดตั้งอยู่: node -v และ winget list --id OpenJS.NodeJS (ดูว่า id เป็น OpenJS.NodeJS.LTS หรือ OpenJS.NodeJS)
@@ -82,7 +81,8 @@
 * เบราว์เซอร์ของ Playwright: npx playwright install
   ถ้าขึ้น "Download failure" หรือ "timed out after 30000ms" ให้วินิจฉัยก่อนด้วย
   curl.exe -4 และ curl.exe -6 ไปที่ https://cdn.playwright.dev ถ้า IPv4 ได้แต่ IPv6 timeout
-  ให้รันใหม่โดยตั้ง NODE_OPTIONS=--require=<path>\ipv4-only.cjs (มีใน lab/) แล้วลบ NODE_OPTIONS ออกหลังใช้
+  ให้บังคับ Node ใช้ IPv4 (เช่น preload สคริปต์ให้ dns.lookup ใช้ family 4 ผ่าน NODE_OPTIONS) แล้วลองใหม่
+  และลบ NODE_OPTIONS ออกหลังใช้
 * Chrome: winget upgrade --id Google.Chrome
   ถ้า winget ไม่รู้จัก Chrome ให้แจ้งผมให้เปิด chrome://settings/help เอง
 * Edge: winget upgrade --id Microsoft.Edge
@@ -103,12 +103,12 @@
 * ดูว่ามี MCP หรือปลั๊กอินอื่นที่ใช้งานเบราว์เซอร์ซ้ำซ้อนกันอยู่หรือไม่ ถ้ามีให้แจ้ง
 
 ขั้นที่ 5: ทดสอบหลังอัปเดต
-* รันขั้นที่ 1 ซ้ำ (บันทึกเป็น log\versions-after.md) แล้วแสดงตารางเทียบ ก่อน/หลัง อัปเดต
+* รันขั้นที่ 1 ซ้ำ แล้วแสดงตารางเทียบ ก่อน/หลัง อัปเดต
 * ใช้ Playwright MCP เปิด https://www.google.co.th ใน "แท็บใหม่" (browser_tabs new) ค้นหาคำว่า Playwright MCP
   แล้วจับภาพหน้าผลการค้นหา เพื่อยืนยันว่าใช้งานได้ ถ้าเจอ CAPTCHA ให้หยุดแล้วบอกผม ห้ามพยายามผ่าน
   ถ้าใช้โหมด --extension ห้ามใช้หรืออ่านแท็บเดิมที่ผมเปิดไว้ (อาจเป็นอีเมลหรือบัญชีส่วนตัว)
   และก่อนเก็บภาพลงโปรเจกต์ ให้เบลอข้อมูลส่วนตัว เช่น รูปโปรไฟล์ / ชื่อบัญชี
-  ถ้า MCP ใน Claude ใช้ไม่ได้ ให้รัน node lab\mcp-smoke-test.mjs เพื่อแยกว่าเสียที่ server หรือที่ config/extension
+  ถ้า MCP ใน Claude ใช้ไม่ได้ ให้ทดสอบ @playwright/mcp แยกจาก Claude (รัน server เองแล้วสั่งเปิดเว็บ) เพื่อดูว่าเสียที่ server หรือที่ config/extension
   ถ้ามี console error ให้ดูว่ามาจาก chrome-extension:// (ส่วนขยายอื่น) หรือจากหน้าเว็บจริง
 * สรุปว่ารายการไหนอัปเดตสำเร็จ รายการไหนล้มเหลว (แนบ error จริงมาด้วย)
   และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ท Claude หรือรีสตาร์ทเบราว์เซอร์
@@ -132,12 +132,13 @@
 
 ```text
 ตรวจเวอร์ชันเครื่องมือสำหรับ Playwright บนเครื่องนี้ (อ่านอย่างเดียว ห้ามติดตั้งหรือแก้อะไร)
-รัน powershell -ExecutionPolicy Bypass -File .\check-versions.ps1 -Out log\versions-before.md
+ตรวจ Node.js, npm, Playwright MCP, Playwright, Google Chrome, Microsoft Edge และ Claude Code
+เทียบกับเวอร์ชันล่าสุดจากแหล่งจริง (npm view, nodejs.org, หน้าเวอร์ชันของ Chrome) ห้ามตอบจากความจำ
 แล้วสรุปเป็นตาราง: รายการ | ที่ติดตั้ง | ล่าสุด | สถานะ
 อธิบายสั้น ๆ ด้วยภาษาง่าย ๆ ว่ารายการไหนต้องอัปเดต และทำไม
 ```
 
-✅ **ผลจริง** ([log/versions-before.md](log/versions-before.md))
+✅ **ผลจริง**
 
 | รายการ | ที่ติดตั้ง | ล่าสุด | สถานะ |
 |---|---|---|---|
@@ -163,11 +164,11 @@
 💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
-ในโฟลเดอร์ lab ติดตั้ง Playwright Test ให้หน่อย
+สร้างโฟลเดอร์ lab แล้วติดตั้ง Playwright Test ในนั้นให้หน่อย
 1. ติดตั้ง @playwright/test เวอร์ชันล่าสุด
 2. ติดตั้งเบราว์เซอร์ทดสอบด้วย npx playwright install
 ถ้าดาวน์โหลดเบราว์เซอร์ไม่ผ่าน ให้หาสาเหตุก่อน (ลอง curl.exe -4 และ curl.exe -6 ไปที่ https://cdn.playwright.dev)
-ถ้า IPv6 ใช้ไม่ได้ ให้ใช้ lab\ipv4-only.cjs ผ่าน NODE_OPTIONS แล้วลองใหม่
+ถ้า IPv6 ใช้ไม่ได้ ให้บังคับ Node ใช้ IPv4 แล้วลองใหม่
 แล้วเปิดโฟลเดอร์ที่เก็บเบราว์เซอร์ทดสอบให้ผมดูใน File Explorer
 ```
 
@@ -176,7 +177,7 @@
 ![File Explorer เปิดโฟลเดอร์ ms-playwright มีโฟลเดอร์ chromium-1243 firefox-1543 webkit-2359 วงสีแดงไว้](img/lab3-browsers-folder.png)
 
 👀 **สังเกต**
-- ครั้งแรก Firefox / WebKit **ดาวน์โหลดไม่ผ่าน** Claude ตรวจแล้วพบว่าเน็ตทาง IPv6 ของเครื่องนี้ใช้ไม่ได้ จึงบังคับใช้ IPv4 แล้วโหลดเสร็จใน 20 วินาที ([log](log/ipv6-download-failure.txt))
+- ครั้งแรก Firefox / WebKit **ดาวน์โหลดไม่ผ่าน** Claude ตรวจแล้วพบว่าเน็ตทาง IPv6 ของเครื่องนี้ใช้ไม่ได้ จึงบังคับใช้ IPv4 แล้วโหลดเสร็จใน 20 วินาที
 - เบราว์เซอร์ทดสอบเก็บไว้ที่เดียว ทุกโปรเจกต์ในเครื่องใช้ร่วมกันได้
 
 ---
@@ -202,7 +203,7 @@
 |---|---|---|
 | ![หน้าแรก playwright.dev วงปุ่ม Search มุมขวาบน](img/lab4-step-1.png) | ![ช่องค้นหาพิมพ์ locator วงผลลัพธ์แรก Locators](img/lab4-step-2.png) | ![หน้า Locators วงหัวข้อใหญ่ Locators](img/lab4-step-3.png) |
 
-✅ **ผลจริง: 15 passed** (3 test × 5 เบราว์เซอร์ · ไฟล์ test: [lab/tests/example.spec.ts](lab/tests/example.spec.ts))
+✅ **ผลจริง: 15 passed** (3 test × 5 เบราว์เซอร์)
 
 ![รายงาน HTML ของ Playwright วงตัวเลข Passed 15 รายการ test ทุกข้อผ่านบน chromium firefox webkit Google Chrome Microsoft Edge](img/lab4-html-report.png)
 
@@ -260,7 +261,7 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 ตรวจว่า Playwright MCP ใน Claude Code ใช้งานได้จริง
 1. รัน claude mcp list และดูว่า playwright ใช้โหมดไหน
 2. ใช้ Playwright MCP เปิด https://playwright.dev ในแท็บใหม่ แล้วจับภาพหน้าจอ
-3. ถ้าใช้ไม่ได้ ให้รัน node lab\mcp-smoke-test.mjs เพื่อดูว่าเสียที่ตัว MCP หรือที่ปลั๊กอิน
+3. ถ้าใช้ไม่ได้ ให้ทดสอบ Playwright MCP แยกจาก Claude (รัน server เองแล้วสั่งเปิดเว็บ) เพื่อดูว่าเสียที่ตัว MCP หรือที่ปลั๊กอิน
 บอกผมว่าต้องทำอะไรเองบ้าง
 ```
 
@@ -270,7 +271,7 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 👀 **สังเกต**
 - ตอนยังไม่ได้ทำ LAB 5 `claude mcp list` ก็ขึ้น **Connected** แต่เปิดเว็บไม่ได้ (ไม่มีปลั๊กอิน) → **Connected ≠ ใช้ได้** ต้องลองเปิดเว็บจริงทุกครั้ง
-- `mcp-smoke-test.mjs` ทดสอบตัว MCP แยกจากปลั๊กอิน ได้ `RESULT: PASS` ช่วยบอกว่าปัญหาอยู่ที่ปลั๊กอินอย่างเดียว ([log](log/mcp-smoke-test.txt))
+- Claude ทดสอบตัว MCP แยกจากปลั๊กอินได้ `RESULT: PASS` จึงรู้ว่าปัญหาอยู่ที่ปลั๊กอินอย่างเดียว
 
 ---
 
@@ -304,12 +305,12 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
 ```text
-ตรวจเวอร์ชันอีกครั้ง บันทึกเป็น log\versions-after.md
+ตรวจเวอร์ชันอีกครั้ง (รายการเดียวกับ LAB 2)
 แล้วแสดงตารางเทียบ ก่อน/หลัง พร้อมบอกว่าอะไรสำเร็จ อะไรล้มเหลว (แนบ error จริง)
 และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ทโปรแกรม หรือคำสั่งที่ต้องใช้สิทธิ์ Administrator
 ```
 
-✅ **ผลจริง** ([before](log/versions-before.md) · [after](log/versions-after.md))
+✅ **ผลจริง**
 
 | รายการ | ก่อน | หลัง | ผล |
 |---|---|---|---|
@@ -330,9 +331,9 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 | อาการ | 💬 พรอมต์ |
 |---|---|
-| ดาวน์โหลดเบราว์เซอร์ไม่ผ่าน | `npx playwright install ดาวน์โหลดไม่ผ่าน ช่วยหาสาเหตุด้วย curl.exe -4 และ -6 ไปที่ cdn.playwright.dev ถ้า IPv6 ใช้ไม่ได้ให้ใช้ lab\ipv4-only.cjs แล้วลองใหม่` |
+| ดาวน์โหลดเบราว์เซอร์ไม่ผ่าน | `npx playwright install ดาวน์โหลดไม่ผ่าน ช่วยหาสาเหตุด้วย curl.exe -4 และ -6 ไปที่ cdn.playwright.dev ถ้า IPv6 ใช้ไม่ได้ให้บังคับ Node ใช้ IPv4 แล้วลองใหม่` |
 | test ล้ม | `test ล้ม ช่วยเปิดภาพหน้าจอตอนล้มใน test-results ดูว่าหน้าเว็บจริงเป็นอย่างไร แล้วบอกผมว่าควรแก้ test หรือแก้เว็บ` |
-| Connected แต่เปิดเว็บไม่ได้ | `Playwright MCP ขึ้น Connected แต่เปิดเว็บไม่ได้ ช่วยรัน node lab\mcp-smoke-test.mjs แล้วบอกว่าเสียที่ MCP หรือที่ปลั๊กอิน` |
+| Connected แต่เปิดเว็บไม่ได้ | `Playwright MCP ขึ้น Connected แต่เปิดเว็บไม่ได้ ช่วยทดสอบ Playwright MCP แยกจาก Claude แล้วบอกว่าเสียที่ MCP หรือที่ปลั๊กอิน` |
 | ติดตั้งปลั๊กอินแล้วยังหาไม่เจอ | `ผมติดตั้ง Playwright Extension และรีสตาร์ท Chrome แล้ว ช่วยตรวจโฟลเดอร์ปลั๊กอินบนดิสก์ และเวลาเริ่มของ Chrome ว่ารีสตาร์ทจริงหรือยัง` |
 | อัปเดต Chrome แล้วเลขไม่เปลี่ยน | `ผมอัปเดต Chrome แล้ว ช่วยตรวจเวอร์ชันจาก registry และไฟล์ chrome.exe และดูว่า Google Updater ตรวจอัปเดตล่าสุดเมื่อไร` |
 
@@ -340,15 +341,6 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ```text
 02_playwright-local-windows/
-├─ README.md
-├─ check-versions.ps1          # ตรวจเวอร์ชัน (อ่านอย่างเดียว) → ตาราง
-├─ img/                        # intro-* (cyolo imagegen) · lab*-paste (หน้าต่าง Claude Code จริง) · ภาพหน้าจอจริงที่วงสีแดงไว้
-├─ log/                        # ตาราง before/after, error จริง, brief ของภาพ
-└─ lab/
-   ├─ install-demo.ps1         # ติดตั้ง + รัน test (มี -IPv4)
-   ├─ ipv4-only.cjs            # แก้ปัญหา IPv6
-   ├─ playwright.config.ts     # 5 เบราว์เซอร์
-   ├─ tests/example.spec.ts    # 3 test บน playwright.dev
-   ├─ capture-steps.mjs        # ทำภาพทีละขั้นพร้อมวงสีแดง (img/lab4-step-*.png)
-   └─ mcp-smoke-test.mjs       # ทดสอบ Playwright MCP โดยไม่ผ่าน Claude
+├─ README.md     # บทเรียน + พรอมต์ทุก LAB
+└─ img/          # ภาพประกอบ
 ```
