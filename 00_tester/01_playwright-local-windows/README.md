@@ -294,7 +294,6 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 👀 **สังเกต**
 - ครั้งแรก Claude ไปโผล่ที่ **แท็บ Gmail** ของเรา (ปลั๊กอินใช้แท็บจริงที่เราแชร์ให้) Claude จึงหยุด ไม่อ่าน ไม่จับภาพ แล้วเปิดแท็บใหม่แทน → พรอมต์ต้องสั่ง **"แท็บใหม่"** เสมอ
 - AI เห็นชื่อและอีเมลบัญชี Google ของเราได้ ภาพที่จะแชร์ต้องเบลอก่อน
-- ✅✅ หน้าผลค้นหามาจากปลั๊กอินอื่นใน Chrome ของเรา ไม่ใช่ของ Google
 
 ---
 
@@ -340,7 +339,7 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 ### ไฟล์ในบทนี้
 
 ```text
-02_playwright-local-windows/
+01_playwright-local-windows/
 ├─ README.md     # บทเรียน + พรอมต์ทุก LAB
 └─ img/          # ภาพประกอบ
 ```
