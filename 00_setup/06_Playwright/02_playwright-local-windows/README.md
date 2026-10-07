@@ -32,7 +32,7 @@
 
 🎯 สั่ง Claude Code ให้ทำงานทั้งบทด้วยพรอมต์เดียว แล้วดูว่า AI ทำอะไรในแต่ละขั้น
 
-💬 **พรอมต์ v2** (ปรับจากการทดสอบจริง 7 ต.ค. 2026 · คัดลอกทั้งกรอบไปวางใน `claude` ที่โฟลเดอร์ของบทนี้)
+💬 **พรอมต์** (คัดลอกทั้งกรอบไปวางใน `claude` ที่โฟลเดอร์ของบทนี้)
 
 ```text
 ช่วยตรวจสอบและอัปเดตเครื่องมือสำหรับใช้ Playwright MCP ทดสอบเว็บ บน Windows ตามขั้นตอนนี้
@@ -114,98 +114,12 @@
   และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ท Claude หรือรีสตาร์ทเบราว์เซอร์
 ```
 
-📖 **v1 → v2 เปลี่ยนอะไร และทำไม** (ทุกข้อมาจากสิ่งที่เจอจริงในบทนี้)
+💡 **พรอมต์ที่ดีมี 4 อย่าง** (ใช้ได้กับทุกงาน)
 
-| จุดที่แก้ | v1 | v2 | เจอที่ไหน |
-|---|---|---|---|
-| Node.js | เทียบกับ LTS เสมอ · `winget upgrade --id OpenJS.NodeJS.LTS` | ดู id ที่ติดตั้งจริงก่อน เทียบกับสายเดียวกัน · ถ้า winget ไม่มีรุ่นใหม่ให้หยุด | เครื่องใช้สาย Current (`OpenJS.NodeJS`) · [log/update-node.txt](log/update-node.txt) |
-| ดาวน์โหลดเบราว์เซอร์ | ไม่ได้พูดถึงกรณีล้ม | ขั้นวินิจฉัย `curl -4/-6` + ทางแก้ `ipv4-only.cjs` | [LAB 3](#lab-3--ติดตั้ง-playwright) |
-| Chrome | `winget upgrade --id Google.Chrome` | ตรวจก่อนว่า winget รู้จัก Chrome ไหม | `No installed package found` |
-| Claude Code | ไม่มีแหล่ง "ล่าสุด" | `npm view @anthropic-ai/claude-code version` | – |
-| `claude mcp list` | Connected = ใช้ได้ | Connected ≠ ใช้ได้ ต้องทดสอบจริง | [LAB 6](#lab-6--ตรวจ-playwright-mcp) |
-| config | `.mcp.json` หรือ `claude_desktop_config.json` | เพิ่ม `~/.claude.json` (user scope) ซึ่งเป็นที่อยู่จริง | [LAB 6](#lab-6--ตรวจ-playwright-mcp) |
-| ส่วนขยาย | "Playwright MCP Bridge" ดูที่ `chrome://extensions` | "Playwright Extension" + id + ตรวจโฟลเดอร์บนดิสก์ | AI เปิด `chrome://` จาก command line ไม่ได้ · [LAB 5](#lab-5--ติดตั้งปลั๊กอิน-playwright-ใน-chrome) |
-| รีสตาร์ท Chrome | เชื่อคำบอก | ตรวจเวลาเริ่มของ process หลัก | ปิดหน้าต่างแล้ว Chrome ยังรันเบื้องหลัง |
-| ทดสอบ MCP | เปิด example.com ในแท็บที่ MCP ถืออยู่ | เปิด google.co.th ใน **แท็บใหม่** + ค้นหา + หยุดถ้าเจอ CAPTCHA + เบลอข้อมูลส่วนตัว + smoke test แยกปัญหา + แยก console error ของส่วนขยาย | [LAB 6](#lab-6--ตรวจ-playwright-mcp), [LAB 7](#lab-7--ให้-ai-ใช้เว็บจริง-ค้นหาใน-google) |
-
-<details>
-<summary>พรอมต์ v1 (ต้นฉบับ ก่อนทดสอบจริง) สำหรับเปรียบเทียบ</summary>
-
-```text
-ช่วยตรวจสอบและอัปเดตเครื่องมือสำหรับใช้ Playwright MCP ทดสอบเว็บ บน Windows ตามขั้นตอนนี้
-ขั้นที่ 1: ตรวจเวอร์ชันที่ติดตั้งอยู่ เทียบกับเวอร์ชันล่าสุด
-รันคำสั่งเพื่อดูเวอร์ชันปัจจุบันและเวอร์ชันล่าสุดของแต่ละรายการ
-
-1. Node.js
-   * ที่ติดตั้งอยู่: node -v
-   * ล่าสุด: ดูรุ่น LTS ล่าสุดจาก https://nodejs.org/dist/index.json
-2. npm
-   * ที่ติดตั้งอยู่: npm -v
-   * ล่าสุด: npm view npm version
-3. Playwright MCP (@playwright/mcp)
-   * ที่ติดตั้งอยู่: npm ls -g @playwright/mcp และดูเวอร์ชันใน npx cache ด้วย
-   * ล่าสุด: npm view @playwright/mcp version
-4. Playwright และเบราว์เซอร์ของ Playwright
-   * ที่ติดตั้งอยู่: npx playwright --version และ npx playwright install --list
-   * ล่าสุด: npm view playwright version
-5. Google Chrome
-   * ที่ติดตั้งอยู่: reg query "HKCU\Software\Google\Chrome\BLBeacon" /v version
-   * ล่าสุด: https://versionhistory.googleapis.com/v1/chrome/platforms/win64/channels/stable/versions
-6. Microsoft Edge
-   * ที่ติดตั้งอยู่: reg query "HKCU\Software\Microsoft\Edge\BLBeacon" /v version
-   * ล่าสุด: winget upgrade --id Microsoft.Edge (ดูว่ามีรุ่นใหม่หรือไม่)
-7. Claude Code
-   * ที่ติดตั้งอยู่: claude --version
-8. ถ้าในโฟลเดอร์ปัจจุบันมี package.json ให้ตรวจ @playwright/test ด้วย npm outdated
-
-ขั้นที่ 2: สรุปผลเป็นตาราง
-คอลัมน์: รายการ | เวอร์ชันที่ติดตั้ง | เวอร์ชันล่าสุด | สถานะ (ล่าสุดแล้ว / ต้องอัปเดต / ยังไม่ได้ติดตั้ง)
-แสดงตารางให้ดูก่อน และถามยืนยันก่อนเริ่มอัปเดต
-ขั้นที่ 3: อัปเดตเฉพาะรายการที่ไม่ใช่เวอร์ชันล่าสุด
-
-* Node.js: winget upgrade --id OpenJS.NodeJS.LTS
-* npm: npm install -g npm@latest
-* @playwright/mcp: npm install -g @playwright/mcp@latest
-ถ้าเรียกใช้ผ่าน npx ให้ล้าง cache ที่ %LocalAppData%\npm-cache\_npx
-เพื่อให้ npx ดึง @latest มาใหม่
-* เบราว์เซอร์ของ Playwright: npx playwright install
-* @playwright/test ในโปรเจกต์: npm install -D @playwright/test@latest
-แล้วรัน npx playwright install
-* Chrome: winget upgrade --id Google.Chrome
-ถ้าไม่ได้ ให้แจ้งผมให้เปิด chrome://settings/help
-* Edge: winget upgrade --id Microsoft.Edge
-* Claude Code: claude update
-ถ้าคำสั่งใดต้องใช้สิทธิ์ Administrator หรือรันไม่ผ่าน ให้หยุดแล้วบอกคำสั่งที่ผมต้องรันเอง ห้ามข้าม
-
-ขั้นที่ 4: ตรวจปลั๊กอินและการตั้งค่าที่เกี่ยวข้อง
-
-* รัน claude mcp list แล้วดูว่า playwright ขึ้นสถานะ connected หรือไม่
-* เปิดไฟล์ config ของ MCP (.mcp.json หรือ claude_desktop_config.json) แล้วตรวจว่า
-args ใช้ @playwright/mcp@latest และค่า --browser ตรงกับเบราว์เซอร์ที่ติดตั้งไว้
-* ถ้าใช้โหมด --extension ให้ตรวจว่ามี Chrome extension "Playwright MCP Bridge"
-และเป็นเวอร์ชันล่าสุดหรือไม่ (ดูได้ที่ chrome://extensions)
-* ดูว่ามี MCP หรือปลั๊กอินอื่นที่ใช้งานเบราว์เซอร์ซ้ำซ้อนกันอยู่หรือไม่ ถ้ามีให้แจ้ง
-
-ขั้นที่ 5: ทดสอบหลังอัปเดต
-
-* รันขั้นที่ 1 ซ้ำ แล้วแสดงตารางเทียบ ก่อน/หลัง อัปเดต
-* ใช้ Playwright MCP เปิด https://example.com แล้วจับภาพหน้าจอ เพื่อยืนยันว่าใช้งานได้
-* สรุปว่ารายการไหนอัปเดตสำเร็จ รายการไหนล้มเหลว (แนบ error มาด้วย)
-และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ท Claude หรือรีสตาร์ทเบราว์เซอร์
-```
-
-</details>
-
-📖 **โครงของพรอมต์ที่ดี** (ใช้ซ้ำกับงานอื่นได้)
-
-| ส่วนของพรอมต์ | ทำไมต้องมี |
-|---|---|
-| ระบุ **คำสั่งที่ใช้ตรวจ** ทุกรายการ | AI ไม่ต้องเดา ผลตรวจซ้ำได้ |
-| บอก **แหล่ง "ล่าสุด"** (URL / `npm view`) | กันไม่ให้ AI ตอบจากความจำที่เก่า |
-| **ตารางก่อน แล้วถามยืนยัน** | คนตัดสินใจก่อนแก้ระบบ |
-| "อัปเดตเฉพาะรายการที่ไม่ใช่ล่าสุด" | ลดความเสี่ยง ไม่แตะของที่ดีอยู่แล้ว |
-| "ต้องใช้ Admin หรือรันไม่ผ่าน → หยุดแล้วบอกคำสั่ง ห้ามข้าม" | กัน AI วนลองวิธีแปลก ๆ หรือรายงานว่าสำเร็จทั้งที่ไม่สำเร็จ |
-| ขั้นทดสอบ + ตาราง **ก่อน/หลัง** | มีหลักฐานว่าทำได้จริง |
+1. 📋 **บอกให้ชัดว่าจะตรวจอะไร** → AI ไม่ต้องเดา
+2. ✋ **ให้ถามก่อนลงมือ** → เราเป็นคนตัดสินใจ
+3. 🛑 **ทำไม่ได้ ให้หยุดแล้วบอก** → ไม่แอบข้าม ไม่ลองมั่ว
+4. ✅ **ขอหลักฐาน** → ตารางก่อน/หลัง และภาพหน้าจอ
 
 
 ---
@@ -259,7 +173,7 @@ args ใช้ @playwright/mcp@latest และค่า --browser ตรงก�
 
 ✅ **ผลจริง** เบราว์เซอร์ทดสอบ 3 ตัว (วงสีแดง) อยู่ในโฟลเดอร์ `ms-playwright` ของเครื่อง
 
-![File Explorer เปิดโฟลเดอร์ ms-playwright มีโฟลเดอร์ chromium-1243 firefox-1543 webkit-2359 วงสีแดงไว้](img/lab3-browsers-folder.jpg)
+![File Explorer เปิดโฟลเดอร์ ms-playwright มีโฟลเดอร์ chromium-1243 firefox-1543 webkit-2359 วงสีแดงไว้](img/lab3-browsers-folder.png)
 
 👀 **สังเกต**
 - ครั้งแรก Firefox / WebKit **ดาวน์โหลดไม่ผ่าน** Claude ตรวจแล้วพบว่าเน็ตทาง IPv6 ของเครื่องนี้ใช้ไม่ได้ จึงบังคับใช้ IPv4 แล้วโหลดเสร็จใน 20 วินาที ([log](log/ipv6-download-failure.txt))
@@ -290,7 +204,7 @@ args ใช้ @playwright/mcp@latest และค่า --browser ตรงก�
 
 ✅ **ผลจริง: 15 passed** (3 test × 5 เบราว์เซอร์ · ไฟล์ test: [lab/tests/example.spec.ts](lab/tests/example.spec.ts))
 
-![รายงาน HTML ของ Playwright วงตัวเลข Passed 15 รายการ test ทุกข้อผ่านบน chromium firefox webkit Google Chrome Microsoft Edge](img/cu-04-html-report.jpg)
+![รายงาน HTML ของ Playwright วงตัวเลข Passed 15 รายการ test ทุกข้อผ่านบน chromium firefox webkit Google Chrome Microsoft Edge](img/lab4-html-report.png)
 
 👀 **สังเกต**
 - Playwright กด พิมพ์ และตรวจผล **เหมือนคนทำ** แต่ทำพร้อมกัน 5 เบราว์เซอร์ใน 11 วินาที
@@ -313,13 +227,13 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 **① กดปุ่ม "เพิ่มใน Chrome"** (Add to Chrome)
 
-![หน้า Chrome Web Store ของ Playwright Extension วงปุ่มสีน้ำเงิน เพิ่มใน Chrome](img/lab5-step-1-store.jpg)
+![หน้า Chrome Web Store ของ Playwright Extension วงปุ่มสีน้ำเงิน เพิ่มใน Chrome](img/lab5-step-1-store.png)
 
 **② หน้าต่างยืนยันจะเด้งขึ้นมุมบน กด "เพิ่มส่วนขยาย"** (Add extension)
 
 **③ ปุ่มเปลี่ยนเป็น "นำออกจาก Chrome"** (Remove from Chrome) = ติดตั้งสำเร็จแล้ว
 
-![หน้า Chrome Web Store หลังติดตั้ง ปุ่มเปลี่ยนเป็น Remove from Chrome วงสีแดงไว้](img/lab5-step-3-installed.jpg)
+![หน้า Chrome Web Store หลังติดตั้ง ปุ่มเปลี่ยนเป็น นำออกจาก Chrome วงสีแดงไว้](img/lab5-step-3-installed.png)
 
 **④ ให้ Claude ตรวจซ้ำ**
 
