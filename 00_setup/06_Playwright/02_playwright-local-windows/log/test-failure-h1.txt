@@ -1,0 +1,16 @@
+# test แรกล้ม 5/15 (2026-10-07) — test เขียนผิดจากหน้าเว็บจริง ไม่ใช่ Playwright พัง
+
+    Error: expect(locator).toHaveText(expected) failed
+    Locator: getByRole('heading', { level: 1 })
+    Expected: "Example Domain"
+    Timeout: 5000ms
+    Error: element(s) not found
+    > 6 |   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Example Domain');
+
+  5 failed
+  10 passed (10.5s)
+
+# ตรวจหน้าเว็บจริง (curl https://example.com) — ปัจจุบันไม่มี <h1> แล้ว มีแค่ <title> กับ <p>
+<title>Example Domain</title> ... <body><p>This domain is for use in documentation examples without needing permission. ...</p>
+
+# แก้ test ให้ตรงกับหน้าเว็บ: ตรวจ <p> แทน <h1>
