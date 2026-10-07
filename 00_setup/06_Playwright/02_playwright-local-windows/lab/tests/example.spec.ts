@@ -1,23 +1,23 @@
 import { test, expect } from '@playwright/test';
 
-// 1) เปิดเว็บ แล้วตรวจ title + ข้อความบนหน้า
-test('example.com shows Example Domain', async ({ page }) => {
-  await page.goto('https://example.com');
-  await expect(page).toHaveTitle(/Example Domain/);
-  // หน้า example.com ปัจจุบันไม่มี <h1> แล้ว มีแค่ย่อหน้า <p> (ดู log/test-failure-h1.txt)
-  await expect(page.getByText('This domain is for use in documentation examples')).toBeVisible();
-});
-
-// 2) คลิกลิงก์ แล้วตรวจว่าไปหน้าใหม่ถูกต้อง
-test('playwright.dev Get started opens Installation', async ({ page }) => {
+// 1) เปิดเว็บ แล้วตรวจหัวเรื่องของหน้า
+test('playwright.dev home page', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  await page.getByRole('link', { name: 'Get started' }).click();
-  await expect(page).toHaveURL(/.*intro/);
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  await expect(page).toHaveTitle(/Playwright/);
+  await expect(page.getByRole('link', { name: 'Get started' })).toBeVisible();
 });
 
-// 3) จับภาพหน้าจอเก็บเป็นหลักฐาน แยกไฟล์ตามเบราว์เซอร์
-test('save screenshot of example.com', async ({ page }, testInfo) => {
-  await page.goto('https://example.com');
-  await page.screenshot({ path: `screenshots/example-${testInfo.project.name.replace(/\s+/g, '-')}.png` });
+// 2) ค้นหาข้อมูลในเว็บ: พิมพ์ "locator" ในช่องค้นหา แล้วเปิดผลลัพธ์
+test('search docs for locator', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  await page.getByRole('button', { name: 'Search' }).click();
+  await page.getByPlaceholder('Search docs').fill('locator');
+  await page.getByRole('option', { name: /Locators/ }).first().click();
+  await expect(page.getByRole('heading', { name: 'Locators', level: 1 })).toBeVisible();
+});
+
+// 3) จับภาพหน้าแรกเก็บเป็นหลักฐาน แยกไฟล์ตามเบราว์เซอร์
+test('save screenshot of playwright.dev', async ({ page }, testInfo) => {
+  await page.goto('https://playwright.dev/');
+  await page.screenshot({ path: `screenshots/playwright-dev-${testInfo.project.name.replace(/\s+/g, '-')}.png` });
 });

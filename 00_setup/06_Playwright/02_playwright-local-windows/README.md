@@ -1,105 +1,34 @@
-# LAB 006-0 · ติดตั้ง Playwright บนเครื่อง Windows (local) พร้อมทดสอบ
+# LAB 006-0 · ติดตั้ง Playwright บน Windows ด้วยพรอมต์ (Copy & Paste)
 
-บทนี้ติดตั้งและตรวจเครื่องมือ Playwright **บนเครื่อง Windows ของเราเอง** (ไม่ใช่ใน container) ให้พร้อมใช้ 2 แบบ
-1. **Playwright Test** เขียน test เป็นโค้ดแล้วรันด้วย `npx playwright test` บนเบราว์เซอร์ 5 ตัว
-2. **Playwright MCP** ให้ Claude Code สั่งเบราว์เซอร์ได้เอง
+บทนี้ **ไม่ต้องพิมพ์คำสั่งเอง** แค่คัดลอกพรอมต์ไปวางใน Claude Code แล้วให้ AI ตรวจ ติดตั้ง และทดสอบให้
+หน้าที่ของเราคือ **อ่านผล และกดยืนยัน**
 
-ทุกขั้นตอนขับเคลื่อนด้วย **พรอมต์เดียว** (ดู [LAB 1](#lab-1--พรอมต์หลัก-ตรวจและอัปเดตเครื่องมือ)) ที่สั่ง Claude Code ให้ตรวจเวอร์ชัน → สรุปเป็นตาราง → ถามก่อนอัปเดต → ตรวจ MCP → ทดสอบ
+## Playwright คืออะไร?
 
-**ต้องมีก่อน:** Windows 10/11 · [Node.js](https://nodejs.org) (มี `npm` มาด้วย) · Google Chrome หรือ Microsoft Edge · Claude Code (`claude --version`)
-**ต่อด้วย:** [LAB 006 · Playwright CLI](../00_playwright-cli/README.md) และ [LAB 006-2 · Playwright MCP](../01_playwright-mcp/README.md)
-**เวลา:** ทฤษฎี ~15 นาที · LAB ~45 นาที
-**ทดสอบจริง:** 7 ต.ค. 2026 บน Windows 11 · Node v26.7.0 · npm 12.2.0 · `@playwright/test` 1.63.0 · `@playwright/mcp` 0.0.83 · Claude Code 2.1.292
-ภาพหน้าจอจริงทุกภาพจับด้วย **computer use** (Claude จับภาพหน้าต่าง PowerShell / Chrome บนเครื่องจริง) ส่วนภาพแนวคิดสร้างด้วย `cyolo` (Codex imagegen) จาก [log/imagegen-brief.md](log/imagegen-brief.md)
+![Playwright คือหุ่นยนต์ผู้ช่วยที่ใช้เว็บแทนเรา เปิดเว็บ คลิกปุ่ม พิมพ์ข้อความ และตรวจว่าถูกไหม](img/intro-01-what-is-playwright.png)
 
-### แผนที่บทเรียน
+## ทำไมต้องใช้ Playwright?
 
-| ส่วน | ได้เรียนอะไร | ไฟล์ที่เกี่ยวข้อง |
-|---|---|---|
-| [A · ทฤษฎี](#ส่วน-a--ทฤษฎี) | ชั้นของเครื่องมือ, Test vs MCP, กายวิภาคไฟล์ test, โหมด `--extension`, npx cache | – |
-| [LAB 1](#lab-1--พรอมต์หลัก-ตรวจและอัปเดตเครื่องมือ) พรอมต์หลัก | พรอมต์ 5 ขั้นสำหรับ Claude Code | – |
-| [LAB 2](#lab-2--ตรวจเวอร์ชัน-ขั้นที่-1--2) ตรวจเวอร์ชัน | ขั้นที่ 1–2 ด้วยสคริปต์อ่านอย่างเดียว | [`check-versions.ps1`](check-versions.ps1), [`log/versions-before.md`](log/versions-before.md) |
-| [LAB 3](#lab-3--ติดตั้ง-playwright-test-ในโปรเจกต์) ติดตั้ง | `npm install -D @playwright/test` + `npx playwright install` | [`lab/install-demo.ps1`](lab/install-demo.ps1), [`lab/ipv4-only.cjs`](lab/ipv4-only.cjs) |
-| [LAB 4](#lab-4--เขียนและรัน-test) เขียน + รัน test | 3 test × 5 เบราว์เซอร์, HTML report, test ที่ล้มจริง | [`lab/tests/example.spec.ts`](lab/tests/example.spec.ts), [`lab/playwright.config.ts`](lab/playwright.config.ts) |
-| [LAB 5](#lab-5--ตรวจ-playwright-mcp-ขั้นที่-4--5) ตรวจ MCP | `claude mcp list`, config, extension, smoke test, ค้นหาบน google.co.th | [`lab/mcp-smoke-test.mjs`](lab/mcp-smoke-test.mjs) |
-| [LAB 6](#lab-6--สรุปก่อนหลัง-และสิ่งที่ต้องทำเอง) สรุป | ตารางก่อน/หลัง, อะไรสำเร็จ/ล้มเหลว, สิ่งที่ต้องทำเอง | [`log/versions-after.md`](log/versions-after.md) |
-| [C · ข้อควรรู้](#ส่วน-c--ข้อควรรู้) | ปัญหาที่เจอจริง 3 เรื่อง, คำสั่งที่ใช้บ่อย | [`log/`](log/) |
+![เปรียบเทียบ ทดสอบเว็บเองทีละเบราว์เซอร์ใช้เวลาหลายชั่วโมงและพลาดได้ กับให้ Playwright ตรวจพร้อมกันหลายเบราว์เซอร์ในไม่กี่วินาที และให้ AI ใช้เว็บแทนเราได้](img/intro-02-why-playwright.png)
 
-**สัญลักษณ์:** 🎯 เป้าหมาย · 💬 พรอมต์ · 📖 คำอธิบาย · 📸 ภาพจริงจาก computer use · ✅ ผลที่ควรได้
+## ติดตั้งบน Windows ต้องลงอะไรบ้าง?
+
+![5 ขั้นติดตั้งบน Windows: Node.js เครื่องยนต์, Playwright ตัวหุ่นยนต์, เบราว์เซอร์ทดสอบ, Playwright MCP สายเชื่อมกับ Claude, Playwright Extension ปลั๊กอินใน Chrome](img/intro-03-install-on-windows.png)
+
+## เรียนบทนี้ยังไง?
+
+![Copy พรอมต์ แล้ว Paste ใน Claude Code จากนั้น Claude ตรวจและถามก่อนติดตั้ง สุดท้ายได้ผลพร้อมภาพหน้าจอ](img/intro-04-copy-paste-flow.png)
+
+**ต้องมี:** เครื่อง Windows 10/11 ที่ติดตั้ง Claude Code แล้ว · เปิด `claude` ในโฟลเดอร์ของบทนี้
+
+**เลือกเรียนได้ 2 แบบ:** วาง **LAB 1** พรอมต์เดียวจบทั้งบท หรือทำ **ทีละขั้น** ตั้งแต่ LAB 2 → LAB 8
+แต่ละ LAB มี 💬 พรอมต์ให้คัดลอก · ✅ ผลจริงที่ได้ · 👀 สิ่งที่ควรสังเกต
 
 ---
 
-## ส่วน A · ทฤษฎี
+## LAB 1 · พรอมต์รวม: ตรวจและอัปเดตเครื่องมือ
 
-### A1 · ชั้นของเครื่องมือ
-
-![ชั้นของเครื่องมือจากล่างขึ้นบน Windows 11, Node.js + npm, แพ็กเกจ @playwright/test และ @playwright/mcp, เบราว์เซอร์ของ Playwright และเบราว์เซอร์ในเครื่อง, บนสุดคือผู้ใช้เขียน test หรือสั่งผ่าน Claude Code](img/concept-01-stack.png)
-*ภาพแนวคิด (cyolo / Codex imagegen)*
-
-| ชั้น | คืออะไร | ตรวจด้วย | อยู่ที่ไหน |
-|---|---|---|---|
-| Node.js + npm | runtime ที่ Playwright ทำงานอยู่ | `node -v`, `npm -v` | `C:\Program Files\nodejs` |
-| `@playwright/test` | test runner + Playwright library (ติดตั้ง **ต่อโปรเจกต์**) | `npx playwright --version` | `<project>\node_modules` |
-| `@playwright/mcp` | MCP server ที่ Claude Code เรียกใช้ (ปกติเรียกผ่าน `npx` ไม่ต้องติดตั้ง global) | `npm view @playwright/mcp version` | `%LocalAppData%\npm-cache\_npx\<hash>` |
-| เบราว์เซอร์ของ Playwright | Chromium / Firefox / WebKit รุ่นที่ **ตรงกับ** เวอร์ชัน Playwright | `npx playwright install --list` | `%LocalAppData%\ms-playwright` |
-| เบราว์เซอร์ในเครื่อง | Chrome / Edge ตัวจริงที่เราใช้ทุกวัน (ใช้ผ่าน `channel: 'chrome'` / `'msedge'`) | `reg query ...\BLBeacon /v version` | `C:\Program Files\...` |
-
-> **จำง่าย:** แพ็กเกจกับเบราว์เซอร์ของ Playwright ต้องเวอร์ชัน "คู่กัน" อัปเดต `@playwright/test` เมื่อไร ต้องรัน `npx playwright install` ตามทุกครั้ง
-
-### A2 · Playwright Test กับ Playwright MCP ต่างกันอย่างไร
-
-![เปรียบเทียบ ซ้าย Playwright Test ไฟล์ spec รันด้วย npx playwright test ได้ผลผ่าน/ไม่ผ่านและ HTML report ขวา Playwright MCP Claude Code เรียก tools/call browser_navigate ได้ screenshot ล่างคือ engine เดียวกัน](img/concept-02-test-vs-mcp.png)
-*ภาพแนวคิด (cyolo / Codex imagegen)*
-
-| | Playwright Test | Playwright MCP |
-|---|---|---|
-| ใครตัดสินใจว่าจะกดอะไร | **โค้ด** ที่เราเขียน (`page.click(...)`) | **LLM** (Claude) เลือก tool เอง |
-| ผลลัพธ์ | ผ่าน / ไม่ผ่าน + HTML report + trace | ข้อความ snapshot + screenshot ในแชท |
-| เหมาะกับ | regression test, CI, งานที่ต้องได้ผลเหมือนเดิมทุกครั้ง | สำรวจเว็บ, ช่วยเขียน test, งานที่มีคนเฝ้า |
-| ติดตั้ง | `npm install -D @playwright/test` ในโปรเจกต์ | ลงทะเบียนใน Claude Code: `claude mcp add playwright -- npx -y @playwright/mcp@latest` |
-
-### A3 · กายวิภาคไฟล์ test
-
-![โค้ด test 5 บรรทัด พร้อมป้าย test() คือ 1 กรณีทดสอบ, page คือแท็บใหม่ที่สะอาด, goto คือเปิดเว็บ, expect คือตรวจผลและรอให้อัตโนมัติ](img/concept-05-test-anatomy.png)
-*ภาพแนวคิด (cyolo / Codex imagegen) โค้ดจริงอยู่ใน [lab/tests/example.spec.ts](lab/tests/example.spec.ts)*
-
-- `test('ชื่อ', async ({ page }) => {...})` = 1 กรณีทดสอบ · `page` คือแท็บใหม่ใน **browser context สะอาด** (ไม่มี cookie / ล็อกอิน) สร้างใหม่ทุก test
-- `await page.goto(url)` เปิดเว็บ · `page.getByRole(...)`, `page.getByText(...)` คือ **locator** หา element แบบที่คนมองเห็น
-- `await expect(...).toHaveTitle(...)` / `.toBeVisible()` คือ **web-first assertion** ที่ **รอ** ให้เงื่อนไขจริงได้เอง (ค่าเริ่มต้น 5 วินาที) ไม่ต้องใส่ `sleep`
-- `playwright.config.ts` กำหนด **projects** = รัน test ชุดเดียวกันบนหลายเบราว์เซอร์ บทนี้ใช้ 5 ตัว: `chromium`, `firefox`, `webkit` (ของ Playwright) + `Google Chrome`, `Microsoft Edge` (ของเครื่อง)
-
-### A4 · Playwright MCP มี 2 โหมด
-
-![ซ้าย โหมดค่าเริ่มต้นเปิดเบราว์เซอร์แยกใหม่ profile สะอาด ไม่มีล็อกอิน ขวา โหมด --extension ต่อเข้า Chrome จริงผ่านส่วนขยาย เห็นแท็บที่ล็อกอินไว้ ป้ายเตือน AI เห็นบัญชีที่ล็อกอินอยู่ ใช้อย่างระวัง](img/concept-06-extension-mode.png)
-*ภาพแนวคิด (cyolo / Codex imagegen) ชื่อส่วนขยายจริงใน Chrome Web Store คือ **"Playwright Extension"** (เดิมชื่อ Playwright MCP Bridge)*
-
-| โหมด | args | ข้อดี | ต้องระวัง |
-|---|---|---|---|
-| ค่าเริ่มต้น | `@playwright/mcp@latest --browser chrome` | แยกจากเบราว์เซอร์ที่เราใช้, ไม่เห็นบัญชีเรา | ต้องล็อกอินเองถ้าเว็บต้องการ |
-| `--isolated` | เพิ่ม `--isolated` | profile อยู่ในหน่วยความจำ ปิดแล้วหายหมด | – |
-| `--extension` | `@playwright/mcp@latest --extension` | ใช้แท็บที่ล็อกอินไว้แล้วได้เลย | **ต้องติดตั้งส่วนขยายใน Chrome ก่อน** · AI เห็นทุกบัญชีที่ล็อกอิน |
-
-### A5 · ทำไม `npx ...@latest` อาจไม่ใช่ล่าสุด
-
-![npx -y @playwright/mcp@latest ถ้ามีใน npm-cache/_npx แล้วอาจใช้ของเก่า ล้างโฟลเดอร์ _npx แล้ว npx จะดึงเวอร์ชันล่าสุดจาก registry ใหม่](img/concept-04-npx-cache.png)
-*ภาพแนวคิด (cyolo / Codex imagegen)*
-
-`npx` เก็บแพ็กเกจที่เคยดึงไว้ใน `%LocalAppData%\npm-cache\_npx\<hash>` ถ้าเวอร์ชันใน cache ยังตรงกับ `@latest` ก็ใช้ต่อ แต่บางครั้งค้างของเก่า (เช่นตอน Claude Code เปิดค้างไว้) วิธีบังคับให้ดึงใหม่คือปิด Claude Code แล้วล้างโฟลเดอร์ `_npx`
-
-```powershell
-Remove-Item -Recurse -Force "$env:LocalAppData\npm-cache\_npx"
-```
-
-### A6 · ลำดับงาน 5 ขั้น
-
-![flow 5 ขั้น 1 ตรวจเวอร์ชัน 2 ตารางสรุปและถามยืนยัน 3 อัปเดตเฉพาะที่เก่า 4 ตรวจ MCP config และ extension 5 ทดสอบ example.com และตารางก่อนหลัง](img/concept-03-update-flow.png)
-*ภาพแนวคิด (cyolo / Codex imagegen)*
-
-ขั้นที่ 2 สำคัญที่สุด: **หยุดถามก่อนอัปเดต** เพราะการอัปเดต Node / เบราว์เซอร์กระทบทุกโปรเจกต์ในเครื่อง และบางคำสั่งต้องใช้สิทธิ์ Administrator
-
----
-
-## LAB 1 · พรอมต์หลัก: ตรวจและอัปเดตเครื่องมือ
+![LAB 1 พรอมต์ ตรวจและอัปเดตเครื่องมือ Playwright ทั้งหมด 5 ขั้น ถามผมก่อนอัปเดต ผลที่ได้คือเช็กลิสต์ 5 ขั้นและตารางก่อนหลัง](img/lab1-prompt.png)
 
 🎯 สั่ง Claude Code ให้ทำงานทั้งบทด้วยพรอมต์เดียว แล้วดูว่า AI ทำอะไรในแต่ละขั้น
 
@@ -190,14 +119,14 @@ Remove-Item -Recurse -Force "$env:LocalAppData\npm-cache\_npx"
 | จุดที่แก้ | v1 | v2 | เจอที่ไหน |
 |---|---|---|---|
 | Node.js | เทียบกับ LTS เสมอ · `winget upgrade --id OpenJS.NodeJS.LTS` | ดู id ที่ติดตั้งจริงก่อน เทียบกับสายเดียวกัน · ถ้า winget ไม่มีรุ่นใหม่ให้หยุด | เครื่องใช้สาย Current (`OpenJS.NodeJS`) · [log/update-node.txt](log/update-node.txt) |
-| ดาวน์โหลดเบราว์เซอร์ | ไม่ได้พูดถึงกรณีล้ม | ขั้นวินิจฉัย `curl -4/-6` + ทางแก้ `ipv4-only.cjs` | [LAB 3](#lab-3--ติดตั้ง-playwright-test-ในโปรเจกต์) |
+| ดาวน์โหลดเบราว์เซอร์ | ไม่ได้พูดถึงกรณีล้ม | ขั้นวินิจฉัย `curl -4/-6` + ทางแก้ `ipv4-only.cjs` | [LAB 3](#lab-3--ติดตั้ง-playwright) |
 | Chrome | `winget upgrade --id Google.Chrome` | ตรวจก่อนว่า winget รู้จัก Chrome ไหม | `No installed package found` |
 | Claude Code | ไม่มีแหล่ง "ล่าสุด" | `npm view @anthropic-ai/claude-code version` | – |
-| `claude mcp list` | Connected = ใช้ได้ | Connected ≠ ใช้ได้ ต้องทดสอบจริง | [LAB 5.2](#52--connected-ไม่ได้แปลว่าใช้งานได้) |
-| config | `.mcp.json` หรือ `claude_desktop_config.json` | เพิ่ม `~/.claude.json` (user scope) ซึ่งเป็นที่อยู่จริง | [LAB 5.1](#51--claude-mcp-list-และ-config) |
-| ส่วนขยาย | "Playwright MCP Bridge" ดูที่ `chrome://extensions` | "Playwright Extension" + id + ตรวจโฟลเดอร์บนดิสก์ | AI เปิด `chrome://` จาก command line ไม่ได้ · [LAB 5.4](#54--ติดตั้ง-playwright-extension-แล้วทดสอบผ่าน-claude-code) |
+| `claude mcp list` | Connected = ใช้ได้ | Connected ≠ ใช้ได้ ต้องทดสอบจริง | [LAB 6](#lab-6--ตรวจ-playwright-mcp) |
+| config | `.mcp.json` หรือ `claude_desktop_config.json` | เพิ่ม `~/.claude.json` (user scope) ซึ่งเป็นที่อยู่จริง | [LAB 6](#lab-6--ตรวจ-playwright-mcp) |
+| ส่วนขยาย | "Playwright MCP Bridge" ดูที่ `chrome://extensions` | "Playwright Extension" + id + ตรวจโฟลเดอร์บนดิสก์ | AI เปิด `chrome://` จาก command line ไม่ได้ · [LAB 5](#lab-5--ติดตั้งปลั๊กอิน-playwright-ใน-chrome) |
 | รีสตาร์ท Chrome | เชื่อคำบอก | ตรวจเวลาเริ่มของ process หลัก | ปิดหน้าต่างแล้ว Chrome ยังรันเบื้องหลัง |
-| ทดสอบ MCP | เปิด example.com ในแท็บที่ MCP ถืออยู่ | เปิด google.co.th ใน **แท็บใหม่** + ค้นหา + หยุดถ้าเจอ CAPTCHA + เบลอข้อมูลส่วนตัว + smoke test แยกปัญหา + แยก console error ของส่วนขยาย | [LAB 5.3](#53--smoke-test-แบบไม่พึ่ง-claude), [LAB 5.5](#55--ทดสอบกับเว็บจริง-googlecoth) |
+| ทดสอบ MCP | เปิด example.com ในแท็บที่ MCP ถืออยู่ | เปิด google.co.th ใน **แท็บใหม่** + ค้นหา + หยุดถ้าเจอ CAPTCHA + เบลอข้อมูลส่วนตัว + smoke test แยกปัญหา + แยก console error ของส่วนขยาย | [LAB 6](#lab-6--ตรวจ-playwright-mcp), [LAB 7](#lab-7--ให้-ai-ใช้เว็บจริง-ค้นหาใน-google) |
 
 <details>
 <summary>พรอมต์ v1 (ต้นฉบับ ก่อนทดสอบจริง) สำหรับเปรียบเทียบ</summary>
@@ -281,409 +210,231 @@ args ใช้ @playwright/mcp@latest และค่า --browser ตรงก�
 
 ---
 
-## LAB 2 · ตรวจเวอร์ชัน (ขั้นที่ 1 + 2)
+## LAB 2 · ตรวจเวอร์ชัน
 
-🎯 รู้สถานะเครื่องก่อนแตะอะไร
+![LAB 2 พรอมต์ ตรวจเวอร์ชันทุกเครื่องมือ สรุปเป็นตาราง ห้ามติดตั้งอะไร ผลที่ได้คือตารางสถานะ ล่าสุดแล้ว ต้องอัปเดต ยังไม่ได้ติดตั้ง](img/lab2-prompt.png)
 
-ขั้นที่ 1–2 ของพรอมต์ถูกรวมไว้ใน [`check-versions.ps1`](check-versions.ps1) (**อ่านอย่างเดียว** ไม่ติดตั้งอะไร) ใช้รันเองได้โดยไม่ต้องมี AI
+💬 **พรอมต์**
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\check-versions.ps1 -Out log\versions-before.md
+```text
+ตรวจเวอร์ชันเครื่องมือสำหรับ Playwright บนเครื่องนี้ (อ่านอย่างเดียว ห้ามติดตั้งหรือแก้อะไร)
+รัน powershell -ExecutionPolicy Bypass -File .\check-versions.ps1 -Out log\versions-before.md
+แล้วสรุปเป็นตาราง: รายการ | ที่ติดตั้ง | ล่าสุด | สถานะ
+อธิบายสั้น ๆ ด้วยภาษาง่าย ๆ ว่ารายการไหนต้องอัปเดต และทำไม
 ```
 
-✅ ผลจริงก่อนเริ่ม ([log/versions-before.md](log/versions-before.md))
+✅ **ผลจริง** ([log/versions-before.md](log/versions-before.md))
 
-| รายการ | ที่ติดตั้ง | ล่าสุด | สถานะ | หมายเหตุ |
-|---|---|---|---|---|
-| Node.js | v26.7.0 | v26.10.0 | ต้องอัปเดต | สาย Current (winget: OpenJS.NodeJS) · LTS ล่าสุด v24.21.0 |
-| npm | 12.2.0 | 12.2.0 | ล่าสุดแล้ว | |
-| @playwright/mcp (global) | – | 0.0.83 | ยังไม่ได้ติดตั้ง | ไม่ติดตั้ง global ก็ได้ ถ้าเรียกผ่าน npx |
-| @playwright/mcp (npx cache) | 0.0.83 | 0.0.83 | ล่าสุดแล้ว | `%LocalAppData%\npm-cache\_npx` |
-| @playwright/test (lab) | – | 1.63.0 | ยังไม่ได้ติดตั้ง | |
-| เบราว์เซอร์ของ Playwright | chromium-1243, chromium_headless_shell-1243 | (ตาม playwright ในโปรเจกต์) | – | ยังไม่มี firefox / webkit |
-| Google Chrome | 154.0.8037.98 | 155.0.8059.40 | ต้องอัปเดต | |
-| Microsoft Edge | 154.0.4258.62 | 154.0.4258.62 | ล่าสุดแล้ว | ล่าสุด = จาก winget upgrade |
-| Claude Code | 2.1.292 | 2.1.292 | ล่าสุดแล้ว | |
+| รายการ | ที่ติดตั้ง | ล่าสุด | สถานะ |
+|---|---|---|---|
+| Node.js | v26.7.0 | v26.10.0 | ต้องอัปเดต |
+| npm | 12.2.0 | 12.2.0 | ล่าสุดแล้ว |
+| Playwright MCP | 0.0.83 | 0.0.83 | ล่าสุดแล้ว |
+| Playwright Test (lab) | – | 1.63.0 | ยังไม่ได้ติดตั้ง |
+| เบราว์เซอร์ของ Playwright | Chromium | – | ยังไม่มี Firefox / WebKit |
+| Google Chrome | 154.0.8037.98 | 155.0.8059.40 | ต้องอัปเดต |
+| Microsoft Edge | 154.0.4258.62 | 154.0.4258.62 | ล่าสุดแล้ว |
+| Claude Code | 2.1.292 | 2.1.292 | ล่าสุดแล้ว |
 
-📖 จุดที่ต้องตีความ ไม่ใช่แค่เทียบตัวเลข
-- **Node.js** มี 2 สาย: LTS (เลขคู่ เสถียร) กับ Current (ใหม่สุด) ต้องเทียบ **กับสายที่ติดตั้งอยู่** v26.7.0 ใหม่กว่า LTS v24.21.0 แต่เก่ากว่า Current v26.10.0
-- **`@playwright/mcp` ไม่มีแบบ global ไม่ใช่ปัญหา** ถ้า Claude Code เรียกผ่าน `npx -y @playwright/mcp@latest` ให้ดูเวอร์ชันใน npx cache แทน
-- **Chrome** อัปเดตตัวเองเมื่อรีสตาร์ท เลขใน registry อาจตามหลังจนกว่าจะปิด/เปิด Chrome
+👀 **สังเกต**
+- LAB นี้ **ดูอย่างเดียว** ยังไม่มีอะไรถูกติดตั้ง
+- Node.js มี 2 สาย (LTS กับ Current) Claude ต้องเทียบกับสายที่เราใช้อยู่ ไม่ใช่สายไหนก็ได้
 
 ---
 
-## LAB 3 · ติดตั้ง Playwright Test ในโปรเจกต์
+## LAB 3 · ติดตั้ง Playwright
 
-🎯 ได้โปรเจกต์ [`lab/`](lab/) ที่มี `@playwright/test` และเบราว์เซอร์ครบ 3 engine
+![LAB 3 พรอมต์ ติดตั้ง Playwright ในโฟลเดอร์ lab พร้อมเบราว์เซอร์ทดสอบ ผลที่ได้คือ Chromium Firefox WebKit พร้อมใช้](img/lab3-prompt.png)
 
-คำสั่งทั้งหมดอยู่ใน [`lab/install-demo.ps1`](lab/install-demo.ps1) (แสดงทุกคำสั่งบนจอ หยุดรอระหว่างขั้นได้ด้วย `-PauseSec`)
-
-```powershell
-cd lab
-npm init -y                               # สร้าง package.json
-npm install -D @playwright/test@latest    # ติดตั้ง test runner (devDependency)
-npx playwright --version                  # Version 1.63.0
-npx playwright install                    # ดาวน์โหลด Chromium / Firefox / WebKit ที่คู่กับเวอร์ชันนี้
-npx playwright install --list             # ดูว่าเบราว์เซอร์อยู่ที่ไหน ใครอ้างถึง
-```
-
-> 💡 เริ่มโปรเจกต์ใหม่จากศูนย์ใช้ `npm init playwright@latest` ได้เลย (ถามคำถามแล้วสร้าง config + ตัวอย่าง test ให้) บทนี้ทำทีละคำสั่งเพื่อให้เห็นแต่ละขั้น
-
-📸 **ติดตั้ง `@playwright/test`** (computer use จับหน้าต่าง PowerShell จริง)
-
-![หน้าต่าง PowerShell รัน node -v ได้ v26.7.0, npm -v ได้ 12.2.0, npm init -y สร้าง package.json, npm install -D @playwright/test@latest added 3 packages found 0 vulnerabilities](img/cu-01-npm-install.jpg)
-
-📸 **`npx playwright install --list`** หลังติดตั้งเบราว์เซอร์
-
-![ผล npx playwright install --list แสดง Playwright version 1.63.0 มี chromium-1243, chromium_headless_shell-1243, ffmpeg-1011, firefox-1543, webkit-2359, winldd-1007 ใน ms-playwright และรายการ References ที่อ้างถึง](img/cu-02-browsers-list.jpg)
-
-📖 อ่านผล `--list` ให้เป็น
-- **Browsers** = โฟลเดอร์ใน `%LocalAppData%\ms-playwright` (ใช้ร่วมกันทุกโปรเจกต์ในเครื่อง ไม่ได้อยู่ใน `node_modules`)
-- **References** = ใครบ้างที่ใช้เบราว์เซอร์ชุดนั้น: โปรเจกต์ `lab` ของเรา และ **npx cache ของ `@playwright/mcp`** (มี Playwright 1.64.0-alpha ของตัวเอง) แปลว่า MCP กับ test ของเราใช้ Playwright คนละเวอร์ชันได้
-
-### ⚠️ ปัญหาที่เจอจริง: `npx playwright install` → `Download failure`
-
-ครั้งแรกที่รัน Firefox และ WebKit ดาวน์โหลดไม่ได้ (log เต็ม: [log/ipv6-download-failure.txt](log/ipv6-download-failure.txt))
+💬 **พรอมต์**
 
 ```text
-Error: Request to https://cdn.playwright.dev/.../firefox-win64.zip timed out after 30000ms
-Failed to install browsers
-Error: Failed to download Firefox 155.0 (playwright firefox v1543), caused by
-Error: Download failure, code=1
+ในโฟลเดอร์ lab ติดตั้ง Playwright Test ให้หน่อย
+1. ติดตั้ง @playwright/test เวอร์ชันล่าสุด
+2. ติดตั้งเบราว์เซอร์ทดสอบด้วย npx playwright install
+ถ้าดาวน์โหลดเบราว์เซอร์ไม่ผ่าน ให้หาสาเหตุก่อน (ลอง curl.exe -4 และ curl.exe -6 ไปที่ https://cdn.playwright.dev)
+ถ้า IPv6 ใช้ไม่ได้ ให้ใช้ lab\ipv4-only.cjs ผ่าน NODE_OPTIONS แล้วลองใหม่
+แล้วเปิดโฟลเดอร์ที่เก็บเบราว์เซอร์ทดสอบให้ผมดูใน File Explorer
 ```
 
-**วินิจฉัยทีละขั้น**
+✅ **ผลจริง** เบราว์เซอร์ทดสอบ 3 ตัว (วงสีแดง) อยู่ในโฟลเดอร์ `ms-playwright` ของเครื่อง
 
-| ทดสอบ | ผล | สรุป |
-|---|---|---|
-| `curl.exe -4 https://cdn.playwright.dev/...` | 206 ใน 1.2 วินาที | เน็ตปกติ ทาง IPv4 |
-| `curl.exe -6 https://cdn.playwright.dev/...` | timeout 15 วินาที | **IPv6 ไปไม่ถึง** |
-| `dns.lookup(..., {family: 6})` ใน Node | ได้ `2603:1061:...` | DNS ให้ที่อยู่ IPv6 มา |
-| ตัวดาวน์โหลดของ Playwright | เรียง IPv6 ก่อน → ค้าง → timeout | ต้นเหตุ |
+![File Explorer เปิดโฟลเดอร์ ms-playwright มีโฟลเดอร์ chromium-1243 firefox-1543 webkit-2359 วงสีแดงไว้](img/lab3-browsers-folder.jpg)
 
-ลองแล้ว **ไม่หาย**: `NODE_OPTIONS=--dns-result-order=ipv4first`, `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=600000`, ใช้ Node 24 LTS
-
-**วิธีแก้ที่ได้ผล:** preload สคริปต์ [`lab/ipv4-only.cjs`](lab/ipv4-only.cjs) ที่บังคับ DNS lookup ของ Node ให้ตอบแค่ IPv4
-
-```powershell
-$env:NODE_OPTIONS = "--require=$PWD\ipv4-only.cjs"
-npx playwright install        # Firefox + WebKit เสร็จใน 19.6 วินาที
-Remove-Item Env:NODE_OPTIONS  # ใช้เสร็จแล้วลบออก
-```
-
-หรือรัน `.\install-demo.ps1 -IPv4` ซึ่งตั้งค่านี้ให้ เครื่องที่ IPv6 ใช้ได้ปกติ **ไม่ต้องใช้** วิธีนี้
+👀 **สังเกต**
+- ครั้งแรก Firefox / WebKit **ดาวน์โหลดไม่ผ่าน** Claude ตรวจแล้วพบว่าเน็ตทาง IPv6 ของเครื่องนี้ใช้ไม่ได้ จึงบังคับใช้ IPv4 แล้วโหลดเสร็จใน 20 วินาที ([log](log/ipv6-download-failure.txt))
+- เบราว์เซอร์ทดสอบเก็บไว้ที่เดียว ทุกโปรเจกต์ในเครื่องใช้ร่วมกันได้
 
 ---
 
 ## LAB 4 · เขียนและรัน test
 
-🎯 รัน test 3 กรณี บน 5 เบราว์เซอร์ = 15 test ให้ผ่านทั้งหมด
+![LAB 4 พรอมต์ เขียน test 3 ข้อ รันทุกเบราว์เซอร์ แล้วเปิดรายงาน ผลที่ได้คือ 15 passed บน 5 เบราว์เซอร์](img/lab4-prompt.png)
 
-[`lab/tests/example.spec.ts`](lab/tests/example.spec.ts)
-
-```ts
-import { test, expect } from '@playwright/test';
-
-// 1) เปิดเว็บ แล้วตรวจ title + ข้อความบนหน้า
-test('example.com shows Example Domain', async ({ page }) => {
-  await page.goto('https://example.com');
-  await expect(page).toHaveTitle(/Example Domain/);
-  await expect(page.getByText('This domain is for use in documentation examples')).toBeVisible();
-});
-
-// 2) คลิกลิงก์ แล้วตรวจว่าไปหน้าใหม่ถูกต้อง
-test('playwright.dev Get started opens Installation', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-  await page.getByRole('link', { name: 'Get started' }).click();
-  await expect(page).toHaveURL(/.*intro/);
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-});
-
-// 3) จับภาพหน้าจอเก็บเป็นหลักฐาน แยกไฟล์ตามเบราว์เซอร์
-test('save screenshot of example.com', async ({ page }, testInfo) => {
-  await page.goto('https://example.com');
-  await page.screenshot({ path: `screenshots/example-${testInfo.project.name.replace(/\s+/g, '-')}.png` });
-});
-```
-
-```powershell
-npx playwright test                         # รันทุก test ทุกเบราว์เซอร์ (headless)
-npx playwright test --project=chromium      # เฉพาะเบราว์เซอร์เดียว
-npx playwright test --headed                # เปิดหน้าต่างให้เห็น
-npx playwright test --ui                    # UI mode ดูทีละขั้น ย้อนเวลาได้
-npx playwright show-report                  # เปิด HTML report
-```
-
-📸 **ผลรัน: 15 passed (10.7s)**
-
-![ผล npx playwright test Running 15 tests using 15 workers ทุกบรรทัดขึ้น ok บน chromium firefox webkit Google Chrome Microsoft Edge สรุป 15 passed 10.7s](img/cu-03-test-15-passed.jpg)
-
-📸 **HTML report** (`npx playwright show-report`)
-
-![Playwright Test Report ใน Chrome All 15 Passed 15 Failed 0 รายการ test แต่ละตัวมีป้ายชื่อเบราว์เซอร์ chromium firefox webkit Google Chrome](img/cu-04-html-report.jpg)
-
-✅ วิธีตรวจ
-- ทุกบรรทัดขึ้น `ok` และสรุป `15 passed`
-- มีไฟล์ `lab/screenshots/example-<เบราว์เซอร์>.png` ครบ 5 ไฟล์
-- `Google Chrome` / `Microsoft Edge` ผ่านได้แปลว่า Playwright เรียกเบราว์เซอร์จริงในเครื่องได้ (`channel`)
-
-### 📖 บทเรียนจริง: test ล้มเพราะ "หน้าเว็บเปลี่ยน" ไม่ใช่ Playwright พัง
-
-เวอร์ชันแรกของ test ข้อ 1 ตรวจ `<h1>Example Domain</h1>` แล้ว **ล้ม 5 จาก 15** ([log/test-failure-h1.txt](log/test-failure-h1.txt))
+💬 **พรอมต์**
 
 ```text
-Error: expect(locator).toHaveText(expected) failed
-Locator: getByRole('heading', { level: 1 })
-Expected: "Example Domain"
-Error: element(s) not found
-  5 failed
-  10 passed (10.5s)
+ในโฟลเดอร์ lab ช่วยเขียน test ไว้ใน tests/example.spec.ts 3 ข้อ บนเว็บ https://playwright.dev
+1. เปิดหน้าแรก แล้วตรวจว่ามีปุ่ม Get started
+2. กดปุ่ม Search พิมพ์คำว่า locator แล้วเปิดผลลัพธ์ "Locators" ตรวจว่าเจอหัวข้อ Locators
+3. จับภาพหน้าแรกเก็บไว้ในโฟลเดอร์ screenshots
+ให้รันบน 5 เบราว์เซอร์: chromium, firefox, webkit, Google Chrome, Microsoft Edge
+แล้วเปิดรายงาน HTML ให้ดู ถ้ามี test ล้ม ให้ดูภาพหน้าจอตอนล้มก่อน แล้วบอกผมว่าควรแก้อะไร
 ```
 
-![ภาพที่ Playwright จับไว้ตอน test ล้ม หน้า example.com ปัจจุบันมีแค่ย่อหน้าข้อความ ไม่มีหัวข้อ h1](img/run-02-test-failed-example-com.png)
-*ภาพอัตโนมัติจาก `screenshot: 'only-on-failure'` ใน config*
+🤖 **Playwright ทำอะไรใน test ข้อ 2** (วงสีแดง = จุดที่ Playwright กด / ตรวจ)
 
-ตรวจหน้าจริงด้วย `curl https://example.com` พบว่าปัจจุบันมีแค่ `<title>` กับ `<p>` **ไม่มี `<h1>` แล้ว** จึงแก้ test ให้ตรวจข้อความใน `<p>` แทน
-→ เมื่อ test ล้ม ให้ดู **screenshot / trace ก่อน** ว่าหน้าเว็บจริงเป็นอย่างไร แล้วค่อยตัดสินว่าแก้ test หรือแก้เว็บ
+| ① เปิดเว็บ แล้วกด **Search** | ② พิมพ์ `locator` แล้วกดผลลัพธ์ **Locators** | ③ ตรวจว่าเจอหัวข้อ **Locators** |
+|---|---|---|
+| ![หน้าแรก playwright.dev วงปุ่ม Search มุมขวาบน](img/lab4-step-1.png) | ![ช่องค้นหาพิมพ์ locator วงผลลัพธ์แรก Locators](img/lab4-step-2.png) | ![หน้า Locators วงหัวข้อใหญ่ Locators](img/lab4-step-3.png) |
+
+✅ **ผลจริง: 15 passed** (3 test × 5 เบราว์เซอร์ · ไฟล์ test: [lab/tests/example.spec.ts](lab/tests/example.spec.ts))
+
+![รายงาน HTML ของ Playwright วงตัวเลข Passed 15 รายการ test ทุกข้อผ่านบน chromium firefox webkit Google Chrome Microsoft Edge](img/cu-04-html-report.jpg)
+
+👀 **สังเกต**
+- Playwright กด พิมพ์ และตรวจผล **เหมือนคนทำ** แต่ทำพร้อมกัน 5 เบราว์เซอร์ใน 11 วินาที
+- ใช้ playwright.dev ไม่ใช้ Google เพราะการเขียน test ไปค้น Google ซ้ำ ๆ จะโดน CAPTCHA และผิดเงื่อนไขการใช้งาน
 
 ---
 
-## LAB 5 · ตรวจ Playwright MCP (ขั้นที่ 4 + 5)
+## LAB 5 · ติดตั้งปลั๊กอิน Playwright ใน Chrome
 
-🎯 ยืนยันว่า Claude Code ใช้ Playwright MCP ได้จริง ไม่ใช่แค่ "Connected"
+![LAB 5 พรอมต์ เปิดหน้า Playwright Extension ใน Chrome Web Store ให้หน่อย ผลที่ได้คือปุ่ม Add to Chrome ที่วงสีแดงไว้](img/lab5-prompt.png)
 
-### 5.1 · `claude mcp list` และ config
+🎯 ปลั๊กอินนี้ทำให้ Claude **ใช้ Chrome ตัวจริงของเรา** ได้ ขั้นนี้ **เรากดติดตั้งเอง** ด้วยมือ แล้วค่อยให้ Claude ตรวจ
 
-```text
-> claude mcp list
-playwright: npx -y @playwright/mcp@latest --extension - √ Connected
-kokoro-tts: ssh ... - × Failed to connect
-```
-
-config อยู่ใน **user scope** `%USERPROFILE%\.claude.json` (ไม่ใช่ `.mcp.json` ของโปรเจกต์ และ `claude_desktop_config.json` ไม่มี playwright)
-
-```json
-"mcpServers": {
-  "playwright": {
-    "type": "stdio",
-    "command": "npx",
-    "args": ["-y", "@playwright/mcp@latest", "--extension"],
-    "env": {}
-  }
-}
-```
-
-| ตรวจ | ผล |
-|---|---|
-| args ใช้ `@playwright/mcp@latest` | ✅ |
-| `--browser` | ไม่ได้ระบุ (โหมด `--extension` ใช้ Chrome ที่มีส่วนขยาย) |
-| MCP อื่นที่คุมเบราว์เซอร์ซ้ำ | Claude in Chrome (ส่วนขยาย) และ Claude Browser ในแอป desktop ทำงานคล้ายกัน ระวังสั่งงานผิดตัว |
-
-### 5.2 · "Connected" ไม่ได้แปลว่าใช้งานได้
-
-เมื่อให้ Claude เรียก `browser_navigate` ไปที่ example.com ผ่าน MCP ตัวนี้ ได้ error จริง
+💬 **พรอมต์**
 
 ```text
-Error: Playwright Extension not found in "C:\Users\<user>\AppData\Local\Google\Chrome\User Data".
-Install it from https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm,
-or set the PLAYWRIGHT_MCP_EXECUTABLE_PATH environment variable to use a browser at a custom location.
+เปิดหน้า Playwright Extension ใน Chrome Web Store ให้หน่อย
+https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm
 ```
 
-📖 `claude mcp list` แค่ตรวจว่า **server เริ่มและตอบ handshake ได้** แต่โหมด `--extension` ต้องมีส่วนขยาย **Playwright Extension** ใน Chrome ด้วย ซึ่งไม่ได้ติดตั้งไว้
-วิธีแก้ (เลือกอย่างใดอย่างหนึ่ง)
-1. ติดตั้งส่วนขยายจาก Chrome Web Store (ลิงก์ใน error) แล้ว **รีสตาร์ท Chrome และ Claude Code**
-2. ไม่ใช้ `--extension`: `claude mcp remove playwright -s user` แล้ว `claude mcp add playwright -s user -- npx -y @playwright/mcp@latest --browser chrome`
+**① กดปุ่ม "เพิ่มใน Chrome"** (Add to Chrome)
 
-### 5.3 · Smoke test แบบไม่พึ่ง Claude
+![หน้า Chrome Web Store ของ Playwright Extension วงปุ่มสีน้ำเงิน เพิ่มใน Chrome](img/lab5-step-1-store.jpg)
 
-[`lab/mcp-smoke-test.mjs`](lab/mcp-smoke-test.mjs) spawn `@playwright/mcp` เอง คุย JSON-RPC ผ่าน stdio (`initialize` → `tools/list` → `browser_navigate` → `browser_take_screenshot`) ใช้แยกปัญหาว่า "MCP server เสีย" หรือ "config/ส่วนขยายเสีย"
+**② หน้าต่างยืนยันจะเด้งขึ้นมุมบน กด "เพิ่มส่วนขยาย"** (Add extension)
 
-```powershell
-cd lab
-node mcp-smoke-test.mjs --browser chrome      # เพิ่ม --headed ถ้าอยากเห็นหน้าต่าง
-```
+**③ ปุ่มเปลี่ยนเป็น "นำออกจาก Chrome"** (Remove from Chrome) = ติดตั้งสำเร็จแล้ว
 
-✅ ผลจริง ([log/mcp-smoke-test.txt](log/mcp-smoke-test.txt))
+![หน้า Chrome Web Store หลังติดตั้ง ปุ่มเปลี่ยนเป็น Remove from Chrome วงสีแดงไว้](img/lab5-step-3-installed.jpg)
+
+**④ ให้ Claude ตรวจซ้ำ**
 
 ```text
-spawn: npx -y @playwright/mcp@latest --browser chrome --isolated --output-dir ...\lab\mcp-output --headless
-server: Playwright 1.64.0-alpha-1790635538000
-tools: 25 ตัว
-- Page URL: https://example.com/
-- Page Title: Example Domain
-screenshot: ...\lab\mcp-output\mcp-example.png
-RESULT: PASS
+ผมติดตั้ง Playwright Extension แล้ว ช่วยตรวจว่าติดตั้งจริงใน Chrome โปรไฟล์ Default หรือยัง
+(ดูโฟลเดอร์ Extensions\mmlmfjhmonkocbjadbfplnigmagldckm บนดิสก์) และบอกเวอร์ชัน
 ```
 
-![ภาพหน้าจอ example.com ที่ Playwright MCP จับได้ ข้อความ This domain is for use in documentation examples](img/mcp-example-com.png)
-*ภาพจาก `browser_take_screenshot` ของ Playwright MCP*
+✅ **ผลจริง:** `installed: Playwright Extension v0.4.0`
 
-📖 สรุป: **ตัว MCP server ทำงานได้** (0.0.83, 25 tools, เปิดเว็บและจับภาพได้) ปัญหาอยู่ที่ส่วนขยายที่โหมด `--extension` ต้องใช้เท่านั้น
-> ⚠️ `browser_take_screenshot` ที่ใส่ `filename` แบบ relative จะบันทึกที่ **cwd ของ server** ไม่ใช่ `--output-dir` สคริปต์จึงส่ง path เต็มไป
+⚠️ **ระวัง 2 เรื่อง** (เจอจริงตอนทำบทนี้)
+- ต้องติดตั้งใน **Chrome ตัวจริง** ไม่ใช่แผงเบราว์เซอร์ในแอป Claude (หน้าตาเหมือน Chrome แต่เป็นคนละตัว)
+- ถ้าต้องรีสตาร์ท Chrome ให้ **ปิดให้หมดจริง ๆ** (กดขวาไอคอน Chrome มุมขวาล่าง → ออก) แค่กด ✕ ปิดหน้าต่าง Chrome ยังทำงานอยู่เบื้องหลัง
 
-### 5.4 · ติดตั้ง Playwright Extension แล้วทดสอบผ่าน Claude Code
+---
 
-ขั้นตอนนี้ใช้เวลาหลายรอบกว่าจะผ่าน เพราะติดตั้ง **ผิดเบราว์เซอร์** วิธีตรวจที่เชื่อถือได้คือดูโฟลเดอร์บนดิสก์ ไม่ใช่ดูว่า "กดติดตั้งแล้ว"
+## LAB 6 · ตรวจ Playwright MCP
 
-```powershell
-$p = "$env:LocalAppData\Google\Chrome\User Data\Default\Extensions\mmlmfjhmonkocbjadbfplnigmagldckm"
-Test-Path $p                                   # ต้องได้ True
-Get-ChildItem $p                               # โฟลเดอร์เวอร์ชัน เช่น 0.4.0_0
-```
+![LAB 6 พรอมต์ ตรวจว่า Playwright MCP ใช้ได้จริง ไม่ใช่แค่ Connected ผลที่ได้คือปลั๊กอินใน Chrome พร้อมและเปิดเว็บได้จริง](img/lab6-prompt.png)
 
-| รอบ | สิ่งที่ทำ | ผลตรวจ | ทำไมยังไม่ผ่าน |
-|---|---|---|---|
-| 1 | "ติดตั้งแล้ว" | ไม่มีโฟลเดอร์ส่วนขยาย, `Secure Preferences` มี id แต่ค่าเป็น `{}` | ติดตั้งไม่สำเร็จในโปรไฟล์ Default |
-| 2 | "รีสตาร์ท Chrome" (ปิดหน้าต่าง) | process หลักของ Chrome เริ่มตั้งแต่ 07:01 ยังอยู่ | ปิดหน้าต่างแล้ว Chrome **ยังรันอยู่เบื้องหลัง** |
-| 3 | `chrome://restart` | process หลักยังเป็นตัวเดิม (07:01) | พิมพ์ใน **เบราว์เซอร์อื่น** (เช่นแผงเบราว์เซอร์ในแอป Claude) ไม่ใช่ Chrome จริง |
-| 4 | ปิด Chrome ทั้งหมด (`Stop-Process chrome`) แล้วเปิดใหม่ | `Secure Preferences` เขียนใหม่ แต่ id ยังเป็น `{}` | ยืนยันว่าส่วนขยายไม่เคยติดตั้งใน Chrome จริง |
-| 5 | ติดตั้งจาก Chrome Web Store **ใน Chrome จริง** โปรไฟล์ Default | `installed: Playwright Extension v0.4.0` | ✅ ผ่าน |
-
-วิธีดูว่า Chrome รีสตาร์ทจริงหรือยัง
-
-```powershell
-Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" |
-  Where-Object { $_.CommandLine -notmatch '--type=' } |     # เฉพาะ process หลัก
-  Select-Object ProcessId, CreationDate                     # เวลาเริ่มต้องเป็นเวลาหลังรีสตาร์ท
-```
-
-✅ ผลจริงจาก Claude Code (`browser_navigate` ผ่าน MCP โหมด `--extension`)
+💬 **พรอมต์**
 
 ```text
-### Ran Playwright code
-await page.goto('https://example.com');
-### Page
-- Page URL: https://example.com/
-- Page Title: Example Domain
-- Console: 1 errors, 0 warnings
+ตรวจว่า Playwright MCP ใน Claude Code ใช้งานได้จริง
+1. รัน claude mcp list และดูว่า playwright ใช้โหมดไหน
+2. ใช้ Playwright MCP เปิด https://playwright.dev ในแท็บใหม่ แล้วจับภาพหน้าจอ
+3. ถ้าใช้ไม่ได้ ให้รัน node lab\mcp-smoke-test.mjs เพื่อดูว่าเสียที่ตัว MCP หรือที่ปลั๊กอิน
+บอกผมว่าต้องทำอะไรเองบ้าง
 ```
 
-![หน้า example.com ที่เปิดใน Chrome จริงผ่าน Playwright Extension มุมขวาบนมีไอคอน Adobe Acrobat ซึ่งเป็นส่วนขยายในโปรไฟล์ของผู้ใช้](img/mcp-extension-example-com.png)
-*ภาพจาก `browser_take_screenshot` ผ่านส่วนขยาย ไอคอน Adobe Acrobat มุมขวาบนคือส่วนขยายของผู้ใช้เอง ยืนยันว่าเป็น Chrome จริง ไม่ใช่เบราว์เซอร์แยก*
+✅ **ผลจริง** Claude เปิด playwright.dev ใน Chrome ของเราได้
 
-📖 **`Console: 1 errors` ไม่ได้มาจาก example.com** แต่มาจากส่วนขยายอื่นในโปรไฟล์ (TrafficLight, `chrome-extension://cfnpidif.../searchAnalyzer.js` → `Search engine null is not supported`)
-โหมด `--extension` ใช้โปรไฟล์จริง **ส่วนขยายทุกตัวจึงทำงานบนหน้าเว็บด้วย** ทั้งแทรกไอคอน แทรกสคริปต์ และเขียน console ถ้าต้องการผลที่สะอาดและทำซ้ำได้ ให้ใช้โหมดค่าเริ่มต้นหรือ `--isolated` แทน
+![หน้า playwright.dev ที่ Claude เปิดผ่าน Playwright MCP ใน Chrome จริง](img/mcp-extension-playwright-dev.png)
 
-### 5.5 · ทดสอบกับเว็บจริง: google.co.th
+👀 **สังเกต**
+- ตอนยังไม่ได้ทำ LAB 5 `claude mcp list` ก็ขึ้น **Connected** แต่เปิดเว็บไม่ได้ (ไม่มีปลั๊กอิน) → **Connected ≠ ใช้ได้** ต้องลองเปิดเว็บจริงทุกครั้ง
+- `mcp-smoke-test.mjs` ทดสอบตัว MCP แยกจากปลั๊กอิน ได้ `RESULT: PASS` ช่วยบอกว่าปัญหาอยู่ที่ปลั๊กอินอย่างเดียว ([log](log/mcp-smoke-test.txt))
 
-🎯 example.com เป็นหน้านิ่งที่ไม่มีอะไรให้กด ลองให้ Claude ทำงานแบบผู้ใช้จริง: เปิด Google → พิมพ์คำค้น → Enter → จับภาพผล
+---
 
-💬 **พรอมต์** (วางใน `claude` หลังติดตั้ง Playwright Extension แล้ว)
+## LAB 7 · ให้ AI ใช้เว็บจริง: ค้นหาใน Google
+
+![LAB 7 พรอมต์ เปิด google.co.th ในแท็บใหม่ ค้นหา Playwright MCP แล้วจับภาพ ผลที่ได้คือหน้าค้นหาบนแท็บใหม่ ไม่แตะแท็บเดิม](img/lab7-prompt.png)
+
+💬 **พรอมต์**
 
 ```text
 ใช้ Playwright MCP เปิด https://www.google.co.th ในแท็บใหม่ ค้นหาคำว่า "Playwright MCP"
-แล้วจับภาพหน้าผลการค้นหา ห้ามใช้แท็บเดิมที่ผมเปิดไว้ ถ้าเจอ CAPTCHA ให้หยุดแล้วบอกผม
+แล้วจับภาพหน้าผลการค้นหา ห้ามใช้หรืออ่านแท็บเดิมที่ผมเปิดไว้
+ถ้าเจอ CAPTCHA ให้หยุดแล้วบอกผม และก่อนเก็บภาพให้เบลอรูปโปรไฟล์ / ชื่อบัญชี
 ```
 
-✅ ผลจริง (เรียก tool ตามลำดับ)
+✅ **ผลจริง**
 
-| # | tool | ผล |
-|---|---|---|
-| 1 | `browser_navigate` → google.co.th | ⚠️ **Page URL: `https://mail.google.com/mail/u/0/` (Gmail)** แท็บที่ MCP ถืออยู่คือแท็บ Gmail ของผู้ใช้ หยุดทันที ไม่จับภาพ ไม่อ่านหน้า |
-| 2 | `browser_tabs {action: "new", url: "https://www.google.co.th"}` | เปิดแท็บใหม่ → ถูก redirect ไป `https://www.google.com/` (Google ทำแบบนี้กับทุกคนแล้ว) |
-| 3 | `browser_type {target: "e43", text: "Playwright MCP", submit: true}` | ❌ `Ref e43 not found in the current page snapshot` (ref เก่า: ส่วนขยายต่อใหม่ แท็บถูกรีเซ็ต) |
-| 4 | `browser_snapshot` → `browser_tabs new` อีกครั้ง | ได้ ref ใหม่ `combobox "Search" [ref=e42]` |
-| 5 | `browser_type {target: "e42", ..., submit: true}` | ✅ `Page Title: Playwright MCP - Google Search` ไม่เจอ CAPTCHA |
-| 6 | `browser_take_screenshot` | ✅ บันทึกภาพ แล้วเบลอรูปโปรไฟล์ก่อนเก็บลง `img/` |
+![หน้าผลค้นหา Google คำว่า Playwright MCP รูปโปรไฟล์มุมขวาบนเบลอแล้ว](img/mcp-extension-google-search.png)
 
-โค้ดที่ MCP รันจริงในขั้นที่ 5
-
-```js
-await page.getByRole('combobox', { name: 'Search' }).fill('Playwright MCP');
-await page.getByRole('combobox', { name: 'Search' }).press('Enter');
-```
-
-![หน้าผลค้นหา Google คำว่า Playwright MCP ผลแรกคือ playwright.dev และ github.com/microsoft/playwright-mcp หน้าหัวข้อแต่ละผลมีเครื่องหมายถูกสีเขียวสองอันที่ส่วนขยาย TrafficLight แทรกเข้ามา มุมขวาบนรูปโปรไฟล์ถูกเบลอ](img/mcp-extension-google-search.png)
-*ภาพจาก `browser_take_screenshot` โหมด `--extension` (รูปโปรไฟล์มุมขวาบนเบลอแล้ว)*
-
-📖 สิ่งที่เห็นจากเว็บจริง ซึ่ง example.com ไม่มีทางให้เห็น
-
-| สังเกต | ความหมาย |
-|---|---|
-| navigate ครั้งแรกไปโผล่ที่ **Gmail** | โหมด `--extension` ควบคุม **แท็บจริงที่แชร์ให้ส่วนขยาย** AI เห็นอีเมลได้ทันที ต้องสั่งให้ใช้แท็บใหม่เสมอ |
-| snapshot มี `button "Google Account: <ชื่อ> (<อีเมล>)"` | ข้อมูลบัญชีเข้า context ของ LLM ทุกครั้งที่ snapshot ระวังก่อนแชร์ log / ภาพ |
-| ✅✅ หน้าชื่อผลค้นหาทุกอัน | ส่วนขยาย TrafficLight แทรก element ลงหน้า → snapshot / ภาพไม่ตรงกับที่ผู้ใช้ทั่วไปเห็น |
-| ref `e43` ใช้ไม่ได้ในรอบถัดไป | ref ผูกกับ snapshot ล่าสุดเท่านั้น หน้าเปลี่ยน / ต่อใหม่ = ต้อง snapshot ใหม่ (ทฤษฎีเดียวกับบท [01_playwright-mcp](../01_playwright-mcp/README.md)) |
-| google.co.th → google.com | อย่าเขียน test ที่ตรวจ URL ตรงตัวกับเว็บที่เราไม่ได้คุม |
-
-> ⚠️ ใช้ Google เป็นเว็บทดลองได้ แต่ **อย่าเขียน automated test ไปค้นหา Google ซ้ำ ๆ** (ขัดเงื่อนไขการใช้งานและจะโดน CAPTCHA) test ใน [LAB 4](#lab-4--เขียนและรัน-test) จึงยังใช้ example.com และ playwright.dev
+👀 **สังเกต**
+- ครั้งแรก Claude ไปโผล่ที่ **แท็บ Gmail** ของเรา (ปลั๊กอินใช้แท็บจริงที่เราแชร์ให้) Claude จึงหยุด ไม่อ่าน ไม่จับภาพ แล้วเปิดแท็บใหม่แทน → พรอมต์ต้องสั่ง **"แท็บใหม่"** เสมอ
+- AI เห็นชื่อและอีเมลบัญชี Google ของเราได้ ภาพที่จะแชร์ต้องเบลอก่อน
+- ✅✅ หน้าผลค้นหามาจากปลั๊กอินอื่นใน Chrome ของเรา ไม่ใช่ของ Google
 
 ---
 
-## LAB 6 · สรุปก่อน/หลัง และสิ่งที่ต้องทำเอง
+## LAB 8 · สรุปก่อน/หลัง
 
-ตาราง ก่อน/หลัง ([before](log/versions-before.md) · [after](log/versions-after.md))
+![LAB 8 พรอมต์ ตรวจซ้ำ เทียบก่อนหลัง และบอกสิ่งที่ผมต้องทำเอง ผลที่ได้คือตารางก่อนหลังและรายการสิ่งที่ต้องทำเอง](img/lab8-prompt.png)
 
-| รายการ | ก่อน | หลัง | ล่าสุด | ผล |
-|---|---|---|---|---|
-| Node.js | v26.7.0 | v26.7.0 | v26.10.0 | ❌ winget ยังไม่มีรุ่นใหม่ ([log/update-node.txt](log/update-node.txt)) |
-| npm | 12.2.0 | 12.2.0 | 12.2.0 | ✅ ล่าสุดแล้ว |
-| @playwright/mcp (npx) | 0.0.83 | 0.0.83 | 0.0.83 | ✅ ล่าสุดแล้ว |
-| @playwright/test (lab) | – | **1.63.0** | 1.63.0 | ✅ ติดตั้งใหม่ |
-| เบราว์เซอร์ Playwright | chromium | **chromium, firefox-1543, webkit-2359** | – | ✅ ติดตั้งเพิ่ม (ใช้ `-IPv4`) |
-| Google Chrome | 154.0.8037.98 | 154.0.8037.98 | 155.0.8059.40 | ⚠️ ต้องอัปเดตเอง |
-| Microsoft Edge | 154.0.4258.62 | 154.0.4258.62 | 154.0.4258.62 | ✅ ล่าสุดแล้ว |
-| Claude Code | 2.1.292 | 2.1.292 | 2.1.292 | ✅ ล่าสุดแล้ว |
-| Playwright Extension | ไม่มี | **0.4.0** | – | ✅ ติดตั้งแล้ว MCP `--extension` เปิด example.com ได้ ([LAB 5.4](#54--ติดตั้ง-playwright-extension-แล้วทดสอบผ่าน-claude-code)) |
-
-**ล้มเหลว + error**
+💬 **พรอมต์**
 
 ```text
-> winget upgrade --id OpenJS.NodeJS -e
-No available upgrade found.
-No newer package versions are available from the configured sources.
-
-> winget upgrade --id Google.Chrome
-No installed package found matching input criteria.
+ตรวจเวอร์ชันอีกครั้ง บันทึกเป็น log\versions-after.md
+แล้วแสดงตารางเทียบ ก่อน/หลัง พร้อมบอกว่าอะไรสำเร็จ อะไรล้มเหลว (แนบ error จริง)
+และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ทโปรแกรม หรือคำสั่งที่ต้องใช้สิทธิ์ Administrator
 ```
 
-**สิ่งที่ต้องทำเอง**
-1. **Chrome** เปิด `chrome://settings/help` ให้อัปเดตเป็น 155 แล้วกด Relaunch (Chrome ตัวนี้ไม่ได้ติดตั้งผ่าน winget จึงอัปเดตด้วย winget ไม่ได้)
-2. **Node.js 26.10** รอ winget มีรุ่นใหม่ (`winget upgrade --id OpenJS.NodeJS`) หรือดาวน์โหลด MSI จาก nodejs.org แล้วติดตั้งเอง (ต้องใช้สิทธิ์ Administrator)
-3. ~~**Playwright Extension**~~ ✅ ติดตั้งแล้ว (v0.4.0) ต้องติดตั้งใน **Chrome จริง โปรไฟล์ Default** และตรวจด้วยโฟลเดอร์บนดิสก์ ดู [LAB 5.4](#54--ติดตั้ง-playwright-extension-แล้วทดสอบผ่าน-claude-code)
+✅ **ผลจริง** ([before](log/versions-before.md) · [after](log/versions-after.md))
+
+| รายการ | ก่อน | หลัง | ผล |
+|---|---|---|---|
+| Playwright Test (lab) | – | 1.63.0 | ✅ ติดตั้งใหม่ |
+| เบราว์เซอร์ Playwright | Chromium | Chromium, Firefox, WebKit | ✅ ติดตั้งเพิ่ม |
+| Playwright Extension | ไม่มี | 0.4.0 | ✅ ใช้งานได้ |
+| npm · Playwright MCP · Edge · Claude Code | ล่าสุด | ล่าสุด | ✅ ไม่ต้องทำอะไร |
+| Node.js | v26.7.0 | v26.7.0 | ❌ winget ยังไม่มีรุ่น 26.10 |
+| Google Chrome | 154 | 154 | ⚠️ ต้องอัปเดตเอง |
+
+📝 **สิ่งที่ต้องทำเอง**
+1. Chrome: เปิด `chrome://settings/help` **ใน Chrome ตัวจริง** แล้วกด Relaunch
+2. Node.js: รอ winget มีรุ่นใหม่ หรือติดตั้งจาก nodejs.org เอง (ต้องใช้สิทธิ์ Administrator)
 
 ---
 
-## ส่วน C · ข้อควรรู้
+## ถ้าเจอปัญหา: คัดลอกพรอมต์นี้
 
-### ปัญหาที่เจอจริง
-
-| อาการ | สาเหตุ | แก้ |
-|---|---|---|
-| `npx playwright install` → `Download failure, code=1` / `timed out after 30000ms` | เครือข่ายให้ DNS IPv6 แต่ IPv6 ใช้ไม่ได้ | `NODE_OPTIONS=--require=ipv4-only.cjs` ([LAB 3](#lab-3--ติดตั้ง-playwright-test-ในโปรเจกต์)) |
-| test ล้ม `element(s) not found` | หน้าเว็บจริงเปลี่ยน (example.com ไม่มี `<h1>` แล้ว) | ดู screenshot ตอนล้ม แล้วแก้ locator |
-| `claude mcp list` ขึ้น Connected แต่ใช้ไม่ได้ | โหมด `--extension` ไม่มีส่วนขยายใน Chrome | ติดตั้งส่วนขยาย หรือเอา `--extension` ออก |
-| ติดตั้งส่วนขยาย + รีสตาร์ทแล้ว ยัง `Playwright Extension not found` | ติดตั้ง/รีสตาร์ทใน **เบราว์เซอร์อื่น** หรือ Chrome ยังรันเบื้องหลัง | ตรวจโฟลเดอร์ `Default\Extensions\mmlmfjhmonkocbjadbfplnigmagldckm` และเวลาเริ่มของ process หลัก ([LAB 5.4](#54--ติดตั้ง-playwright-extension-แล้วทดสอบผ่าน-claude-code)) |
-| `Console: 1 errors` บนหน้าที่ไม่มี error | ส่วนขยายอื่นในโปรไฟล์จริงแทรกสคริปต์ (โหมด `--extension`) | อ่าน log ว่ามาจาก `chrome-extension://...` หรือไม่ ใช้ `--isolated` ถ้าต้องการหน้าสะอาด |
-| เปิด PowerShell ด้วย `Start-Process powershell` แล้วไปเปิดใน Windows Terminal | Windows 11 ตั้ง Terminal เป็นค่าเริ่มต้น | ใช้ `Start-Process conhost.exe -ArgumentList "powershell ..."` ถ้าต้องการหน้าต่างแบบเก่า |
-| ภาษาไทยเพี้ยนในหน้าต่าง PowerShell 5.1 | code page ไม่ใช่ UTF-8 | `chcp 65001` และบันทึกสคริปต์ `.ps1` เป็น UTF-8 **with BOM** |
-| `winget upgrade --id OpenJS.NodeJS.LTS` บนเครื่องที่ใช้สาย Current | id คนละตัว จะติดตั้ง LTS เพิ่ม | ดู `winget list --id OpenJS.NodeJS` ก่อนว่าใช้ id ไหน |
-
-### คำสั่งที่ใช้บ่อย
-
-| ต้องการ | คำสั่ง |
+| อาการ | 💬 พรอมต์ |
 |---|---|
-| ตรวจทุกอย่าง | `powershell -ExecutionPolicy Bypass -File .\check-versions.ps1` |
-| อัปเดต Playwright ในโปรเจกต์ | `npm install -D @playwright/test@latest; npx playwright install` |
-| ลบเบราว์เซอร์ที่ไม่มีใครใช้แล้ว | `npx playwright uninstall` |
-| ติดตั้งเฉพาะ Chromium | `npx playwright install chromium` |
-| อัด test จากการคลิกจริง | `npx playwright codegen https://example.com` |
-| เพิ่ม Playwright MCP ให้ Claude Code | `claude mcp add playwright -s user -- npx -y @playwright/mcp@latest --browser chrome` |
-| ดู MCP ทั้งหมด | `claude mcp list` |
-| ล้าง npx cache | `Remove-Item -Recurse -Force "$env:LocalAppData\npm-cache\_npx"` |
+| ดาวน์โหลดเบราว์เซอร์ไม่ผ่าน | `npx playwright install ดาวน์โหลดไม่ผ่าน ช่วยหาสาเหตุด้วย curl.exe -4 และ -6 ไปที่ cdn.playwright.dev ถ้า IPv6 ใช้ไม่ได้ให้ใช้ lab\ipv4-only.cjs แล้วลองใหม่` |
+| test ล้ม | `test ล้ม ช่วยเปิดภาพหน้าจอตอนล้มใน test-results ดูว่าหน้าเว็บจริงเป็นอย่างไร แล้วบอกผมว่าควรแก้ test หรือแก้เว็บ` |
+| Connected แต่เปิดเว็บไม่ได้ | `Playwright MCP ขึ้น Connected แต่เปิดเว็บไม่ได้ ช่วยรัน node lab\mcp-smoke-test.mjs แล้วบอกว่าเสียที่ MCP หรือที่ปลั๊กอิน` |
+| ติดตั้งปลั๊กอินแล้วยังหาไม่เจอ | `ผมติดตั้ง Playwright Extension และรีสตาร์ท Chrome แล้ว ช่วยตรวจโฟลเดอร์ปลั๊กอินบนดิสก์ และเวลาเริ่มของ Chrome ว่ารีสตาร์ทจริงหรือยัง` |
+| อัปเดต Chrome แล้วเลขไม่เปลี่ยน | `ผมอัปเดต Chrome แล้ว ช่วยตรวจเวอร์ชันจาก registry และไฟล์ chrome.exe และดูว่า Google Updater ตรวจอัปเดตล่าสุดเมื่อไร` |
 
-### โครงไฟล์ของบทนี้
+### ไฟล์ในบทนี้
 
 ```text
 02_playwright-local-windows/
 ├─ README.md
-├─ check-versions.ps1          # ขั้นที่ 1–2 (อ่านอย่างเดียว) → ตาราง
-├─ img/                        # concept-*.png (cyolo imagegen) · cu-*.jpg (computer use) · mcp-/run- (Playwright)
-├─ log/                        # versions-before/after, transcript, error จริง, brief ของภาพ
+├─ check-versions.ps1          # ตรวจเวอร์ชัน (อ่านอย่างเดียว) → ตาราง
+├─ img/                        # intro-* / lab*-prompt (cyolo imagegen) · ภาพหน้าจอจริงที่วงสีแดงไว้
+├─ log/                        # ตาราง before/after, error จริง, brief ของภาพ
 └─ lab/
-   ├─ install-demo.ps1         # ติดตั้ง + รัน test (มี -IPv4, -PauseSec)
+   ├─ install-demo.ps1         # ติดตั้ง + รัน test (มี -IPv4)
    ├─ ipv4-only.cjs            # แก้ปัญหา IPv6
-   ├─ playwright.config.ts     # 5 projects
-   ├─ tests/example.spec.ts    # 3 test
-   └─ mcp-smoke-test.mjs       # ทดสอบ Playwright MCP ผ่าน JSON-RPC
+   ├─ playwright.config.ts     # 5 เบราว์เซอร์
+   ├─ tests/example.spec.ts    # 3 test บน playwright.dev
+   ├─ capture-steps.mjs        # ทำภาพทีละขั้นพร้อมวงสีแดง (img/lab4-step-*.png)
+   └─ mcp-smoke-test.mjs       # ทดสอบ Playwright MCP โดยไม่ผ่าน Claude
 ```
