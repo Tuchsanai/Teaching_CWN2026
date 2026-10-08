@@ -1,0 +1,7 @@
+เปิดเว็บโหมดฝังบั๊ก: ในโฟลเดอร์ spa รันใน PowerShell  $env:BUG_MODE=1; docker compose up -d
+รอจน healthy แล้วเช็กว่าหน้าเว็บมี data-bug-mode="1"
+1. ในโฟลเดอร์ e2e รัน npx playwright test แล้ว npm run test:gif (ต้องได้ GIF + MP4 ของ test ที่ล้มด้วย)
+2. บอกว่า test ไหนล้ม ล้มเพราะอะไร ดู GIF ประกอบ (ห้ามแก้ test ห้ามแก้เว็บ)
+3. เขียนรายงานบั๊กแบบ tester เป็นตาราง: DEF | TC | ระดับ | ขั้นตอนทำซ้ำ | ผลที่คาดหวัง | ผลจริง | GIF | MP4
+4. ตอนนี้ค่อยเปิด spa/BUGS.md แล้วเทียบ: บั๊กที่ฝัง | test ที่จับได้ | จับได้ไหม
+5. เปิดเว็บกลับโหมดปกติ: $env:BUG_MODE=0; docker compose up -d แล้วเช็ก data-bug-mode="0"

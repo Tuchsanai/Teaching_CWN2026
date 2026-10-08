@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sabai-db
+    environment:
+      POSTGRES_USER: spa
+      POSTGRES_PASSWORD: spa
+      POSTGRES_DB: spa
+      TZ: Asia/Bangkok
+    volumes:
+      - sabai-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spa -d spa"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sabai-web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://spa:spa@db:5432/spa
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      TZ: Asia/Bangkok
+      ALLOW_TEST_RESET: "1"
+      BUG_MODE: ${BUG_MODE:-0}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  sabai-db-data:

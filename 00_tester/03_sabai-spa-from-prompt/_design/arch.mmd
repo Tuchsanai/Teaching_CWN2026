@@ -1,0 +1,42 @@
+flowchart LR
+  subgraph PC["💻 คอมพิวเตอร์ของเรา · Windows"]
+    direction TB
+    U["👩 ลูกค้า / นักศึกษา<br/>เบราว์เซอร์ Chrome · Edge"]
+    PW["🤖 Playwright (e2e/)<br/>Chromium · Firefox · WebKit<br/>→ GIF + MP4 + TEST-REPORT.md"]
+    CC["🧠 Claude Code<br/>+ Playwright MCP"]
+  end
+
+  subgraph DK["🐳 Docker Desktop · docker compose (spa/)"]
+    direction LR
+    subgraph WEB["📦 sabai-web · Next.js 15 · พอร์ต 3000"]
+      direction TB
+      PG["🖥️ หน้าเว็บ 17 หน้า<br/>/ · /services · /book · /mood · /quiz<br/>/skin · /therapists · /gift-cards · /wallet · /account …"]
+      AI["✨ ทำงานในเบราว์เซอร์ (กฎตายตัว)<br/>วิเคราะห์ผิว canvas · chatbot 3 ภาษา<br/>ก่อน/หลัง CSS filter · เพลง Web Audio"]
+      API["⚙️ API 22 เส้น /api/…<br/>bookings · quote · availability · auth<br/>wallet · courses · giftcards · transport"]
+      RULE["📏 กฎร้าน lib/rules.ts<br/>ราคา · ส่วนลด · แต้ม · ระดับ · ค่ารถ"]
+      TEST["🧪 สำหรับ test<br/>/api/health · /api/test/reset (ล็อกวันที่)<br/>BUG_MODE=0/1 · data-testid"]
+    end
+    subgraph DB["📦 sabai-db · PostgreSQL 16 (ไม่เปิดพอร์ตออกนอก)"]
+      direction TB
+      T["🗂️ 15 ตาราง<br/>users · sessions · bookings · booking_resources<br/>services · therapists · reviews · rooms · hotels<br/>courses · gift_cards · waist_measurements · …"]
+      V[("💾 volume<br/>sabai-db-data")]
+    end
+  end
+
+  U -- "http://localhost:3000" --> PG
+  PW -- "คลิก / พิมพ์ / ตรวจผล" --> PG
+  PW -- "reset · health · API test" --> TEST
+  CC -. "สั่งงาน / เดินดูเว็บ" .-> PW
+  PG --> AI
+  PG -- "fetch JSON" --> API
+  API --> RULE
+  API -- "SQL (ไลบรารี pg)" --> T
+  TEST --> T
+  T --- V
+
+  classDef pc fill:#EAF2FF,stroke:#3B6FD8,color:#16233F
+  classDef web fill:#FFF1F4,stroke:#D9577A,color:#3A1220
+  classDef db fill:#E9F7EF,stroke:#2F8F5B,color:#0F3320
+  class U,PW,CC pc
+  class PG,AI,API,RULE,TEST web
+  class T,V db
