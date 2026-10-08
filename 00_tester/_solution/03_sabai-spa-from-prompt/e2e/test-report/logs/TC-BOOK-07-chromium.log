@@ -1,0 +1,7 @@
+2026-10-08T05:03:56.391Z  POST /api/bookings {"service":"thai-massage","people":1,"therapistId":null,"transport":true,"hotelId":6,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Mei","guestPhone":"0812345678","date":"2026-10-21","time":"20:00"}
+  → HTTP 400
+  {"ok":false,"error":"TRANSPORT_TOO_FAR","message":"ไม่มีบริการรับส่งสำหรับระยะนี้"}
+
+2026-10-08T05:03:57.242Z  GET /api/transport?hotelId=4&people=5
+  → HTTP 200
+  {"ok":true,"available":true,"hotel":{"id":4,"name":"Chatuchak Park Hotel"},"people":5,"distanceKm":12,"cars":2,"feePerCar":300,"fee":600}

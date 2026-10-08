@@ -1,0 +1,11 @@
+2026-10-08T05:09:06.171Z  GET /api/config
+  → HTTP 200
+  {"ok":true,"now":"2026-10-08T03:00:00.000Z","today":"2026-10-08","bookable":{"from":"2026-10-09","to":"2026-11-07"},"open":"10:00","close":"22:00","slotMinutes":30,"phone":"02-123-4567","hotels":[{"id":1,"name":"Sukhumvit Garden Hotel","nameZh":"素坤逸花园酒店","distanceKm":3},{"id":2,"name":"Lumphini Park View Hotel","nameZh":"伦披尼公园景观酒店","distanceKm":5},{"id":3,"name":"Siam Square Boutique Hotel","nameZh":"暹罗广场精品酒店","distanceKm":5.1},{"id":4,"name":"Chatuchak Park Hotel","nameZh":"乍都乍公园酒店","distanceKm":12},{"id":5,"name":"Chao Phraya Riverside Hotel","nameZh":"湄南河畔酒店","distanceKm":15},{"id":6,"name":"Bang Na Lakeside Hotel","nameZh":"邦纳湖畔酒店","distanceKm":15.1},{"id":7,"name":"Suvarnabhumi Airport Hotel","nameZh":"素万那普机场酒店","distanceKm":20}]}
+
+2026-10-08T05:09:06.185Z  POST /api/bookings {"service":"thai-massage","people":1,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Mei","guestPhone":"0812345678","date":"2026-10-08","time":"10:00"}
+  → HTTP 400
+  {"ok":false,"error":"DATE_OUT_OF_RANGE","message":"จองได้ตั้งแต่พรุ่งนี้ถึง 30 วันข้างหน้าเท่านั้น"}
+
+2026-10-08T05:09:06.193Z  POST /api/bookings {"service":"thai-massage","people":1,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Mei","guestPhone":"0812345678","date":"2026-11-08","time":"10:00"}
+  → HTTP 400
+  {"ok":false,"error":"DATE_OUT_OF_RANGE","message":"จองได้ตั้งแต่พรุ่งนี้ถึง 30 วันข้างหน้าเท่านั้น"}

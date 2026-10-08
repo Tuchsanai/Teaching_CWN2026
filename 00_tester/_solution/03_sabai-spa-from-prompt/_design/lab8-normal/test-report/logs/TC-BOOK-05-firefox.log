@@ -1,0 +1,19 @@
+2026-10-08T04:44:01.480Z  POST /api/bookings {"service":"aroma-oil","people":2,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Mei","guestPhone":"0812345678","date":"2026-10-10","time":"18:00"}
+  → HTTP 409
+  {"ok":false,"error":"SLOT_TAKEN","message":"เวลานี้ถูกจองแล้ว"}
+
+2026-10-08T04:44:01.499Z  POST /api/bookings {"service":"aroma-oil","people":2,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Block","guestPhone":"0812345678","date":"2026-10-24","time":"18:00"}
+  → HTTP 201
+  {"ok":true,"booking":{"id":54,"code":"SB00054","service":"aroma-oil","date":"2026-10-24","time":"18:00","endTime":"19:30","people":2,"kind":"couple","therapists":[1,2],"room":"couple-suite","quote":{"unitPrice":1500,"people":2,"subtotal":3000,"groupDiscount":0,"memberDiscountType":null,"tier":null,"tierPct":0,"tierDiscount":0,"birthdayDiscount":0,"courseCovered":0,"maxRedeemSets":0,"redeemSets":0,"pointsUsed":0,"pointsDiscount":0,"servicesNet":3000,"transportRequested":false,"transportOk":true,"distanceKm":null,"cars":0,"transportFee":0,"total":3000,"giftUsed":0,"due":3000,"pointsEarned":0}}}
+
+2026-10-08T04:44:01.513Z  POST /api/bookings {"service":"aroma-oil","people":2,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Mei","guestPhone":"0812345678","date":"2026-10-24","time":"18:00"}
+  → HTTP 409
+  {"ok":false,"error":"SLOT_TAKEN","message":"เวลานี้ถูกจองแล้ว"}
+
+2026-10-08T04:44:01.530Z  POST /api/bookings {"service":"aroma-oil","people":2,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Couple 1","guestPhone":"0812345678","date":"2026-10-24","time":"19:30"}
+  → HTTP 201
+  {"ok":true,"booking":{"id":55,"code":"SB00055","service":"aroma-oil","date":"2026-10-24","time":"19:30","endTime":"21:00","people":2,"kind":"couple","therapists":[1,2],"room":"couple-suite","quote":{"unitPrice":1500,"people":2,"subtotal":3000,"groupDiscount":0,"memberDiscountType":null,"tier":null,"tierPct":0,"tierDiscount":0,"birthdayDiscount":0,"courseCovered":0,"maxRedeemSets":0,"redeemSets":0,"pointsUsed":0,"pointsDiscount":0,"servicesNet":3000,"transportRequested":false,"transportOk":true,"distanceKm":null,"cars":0,"transportFee":0,"total":3000,"giftUsed":0,"due":3000,"pointsEarned":0}}}
+
+2026-10-08T04:44:01.542Z  POST /api/bookings {"service":"aroma-oil","people":2,"therapistId":null,"transport":false,"hotelId":null,"redeemSets":0,"useBirthday":false,"payWith":"cash","giftCode":null,"source":"web","guestName":"Couple 2","guestPhone":"0812345678","date":"2026-10-24","time":"19:30"}
+  → HTTP 409
+  {"ok":false,"error":"SLOT_TAKEN","message":"เวลานี้ถูกจองแล้ว"}
