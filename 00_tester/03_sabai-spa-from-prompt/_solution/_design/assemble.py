@@ -98,7 +98,7 @@ for k in ['LAB7_RESULT', 'LAB8_RESULT', 'LAB9_RESULT']:
     p = os.path.join(D, f'{k}.md')
     if os.path.exists(p): fill(k, open(p, encoding='utf-8').read())
 
-open(os.path.join(D, '..', '..', '..', '03_sabai-spa-from-prompt', 'README.md'), 'w', encoding='utf-8').write(md)
+open(os.path.join(D, '..', '..', 'README.md'), 'w', encoding='utf-8').write(md)
 left = re.findall(r'\{\{\w+\}\}', md)
 imgs = set(re.findall(r'\]\((img/[^)]+)\)', md))
 missing = [i for i in imgs if not os.path.exists(os.path.join(D, '..', i))]
