@@ -1,4 +1,4 @@
-# BRIEF · LAB 006-2 · เว็บ Wellness Spa จากพรอมต์ล้วน → ทดสอบด้วย Playwright
+# BRIEF · บท 03 · เว็บ Wellness Spa จากพรอมต์ล้วน → ทดสอบด้วย Playwright
 
 (paths below are as seen from the remote box; on Windows the same folder is
 `C:\Users\oishi\Documents\GitHub\CWN\Teaching\00_tester\03_sabai-spa-from-prompt`)

@@ -2,7 +2,7 @@
 อ่าน: BRIEF.md, yolo2-learning.md (แผนของคุณเอง), PROMPTS.md (พรอมต์ฉบับจริง), README ของบท 02 (/root/workspace/CWN/Teaching/00_tester/02_petshop-playwright-docker/README.md = ต้นแบบสไตล์)
 และผลจริงที่นักศึกษาจำลองทำไว้แล้ว: ../USER-STORIES.md, ../REQUIREMENTS.md, ../BUILD-PROMPT.md · รายชื่อรูปใน ../img/ (ดูรูปได้) และ ../assets/
 เขียน readme-part1.md = README ภาษาไทยตั้งแต่ต้นจนจบ LAB 4 ได้แก่
-- หัวเรื่อง "# LAB 006-2 · สร้างเว็บสปาจากพรอมต์ล้วน แล้วทดสอบด้วย Playwright (Copy & Paste)" + 2 บรรทัดนำ
+- หัวเรื่อง "# สร้างเว็บสปาจากพรอมต์ล้วน แล้วทดสอบด้วย Playwright (Copy & Paste)" + 2 บรรทัดนำ
 - ส่วนนำด้วยรูป intro-01..05 (ไม่ต้องใช้ intro-05 ตรงนี้ถ้าเหมาะกับ LAB 9 มากกว่า), ตาราง "เรียนจบได้อะไร", "ในโฟลเดอร์มีอะไร" + concept-25-folder-grows
 - 🎓 พื้นฐาน (ดูรูปเป็นหลัก ข้อความใต้รูปไม่เกิน 2 บรรทัด): concept-01..08, intro-04, concept-09/10/11 (ทำเป็นตาราง 3 รูป), concept-16, concept-19
 - 🧰 ก่อนเริ่ม (checklist ตารางแบบบท 02: Windows + Claude Code, Docker Desktop, ทำบท 01/02 แล้ว, เปิด Claude Code ในโฟลเดอร์นี้, ปิด petshop บท 02)

@@ -1,4 +1,4 @@
-# LAB 006-0 · ติดตั้ง Playwright บน Windows ด้วยพรอมต์ (Copy & Paste)
+# ติดตั้ง Playwright บน Windows ด้วยพรอมต์ (Copy & Paste)
 
 บทนี้ **ไม่ต้องพิมพ์คำสั่งเอง** แค่คัดลอกพรอมต์ไปวางใน Claude Code แล้วให้ AI ตรวจ ติดตั้ง และทดสอบให้
 หน้าที่ของเราคือ **อ่านผล และกดยืนยัน**
@@ -21,7 +21,7 @@
 
 **ต้องมี:** เครื่อง Windows 10/11 ที่ติดตั้ง Claude Code แล้ว · เปิด `claude` ในโฟลเดอร์ของบทนี้
 
-**เลือกเรียนได้ 2 แบบ:** วาง **LAB 1** พรอมต์เดียวจบทั้งบท หรือทำ **ทีละขั้น** ตั้งแต่ LAB 2 → LAB 8
+**เลือกเรียนได้ 2 แบบ:** วาง **LAB 1** พรอมต์เดียวจบทั้งบท หรือทำ **ทีละขั้น** ตั้งแต่ LAB 2 → LAB 5
 แต่ละ LAB มี 💬 พรอมต์ให้คัดลอก · ✅ ผลจริงที่ได้ · 👀 สิ่งที่ควรสังเกต
 
 ---
@@ -155,9 +155,22 @@
 - LAB นี้ **ดูอย่างเดียว** ยังไม่มีอะไรถูกติดตั้ง
 - Node.js มี 2 สาย (LTS กับ Current) Claude ต้องเทียบกับสายที่เราใช้อยู่ ไม่ใช่สายไหนก็ได้
 
+📝 **รายการที่ต้องอัปเดต ทำเอง**
+1. Chrome: เปิด `chrome://settings/help` **ใน Chrome ตัวจริง** แล้วกด Relaunch
+2. Node.js: รอ winget มีรุ่นใหม่ หรือติดตั้งจาก nodejs.org เอง (ต้องใช้สิทธิ์ Administrator)
+
 ---
 
-## LAB 3 · ติดตั้ง Playwright
+## LAB 3 · ติดตั้ง Playwright และเบราว์เซอร์ทดสอบ
+
+🤔 **ทำไมต้องติดตั้งเบราว์เซอร์ทดสอบ ในเมื่อเครื่องมี Chrome อยู่แล้ว?**
+
+![ทำไมต้องติดตั้งเบราว์เซอร์ทดสอบ: ครบ 3 ค่าย, รุ่นตรงกับ Playwright, แยกจาก Chrome ของเรา และ npm install ไม่ได้โหลดเบราว์เซอร์มาให้](img/lab3-why-test-browsers.png)
+
+1. **ครบ 3 ค่าย** ผู้ใช้จริงเปิดเว็บด้วย Chrome/Edge, Firefox และ Safari ซึ่งใช้เครื่องยนต์คนละตัว เว็บที่ใช้ได้บนตัวหนึ่งอาจพังบนอีกตัว ส่วน Safari ลงบน Windows ไม่ได้ จึงต้องใช้ WebKit ของ Playwright แทน
+2. **รุ่นตรงกับ Playwright** Playwright แต่ละรุ่นผูกกับเบราว์เซอร์รุ่นที่ทดสอบมาแล้ว ทุกเครื่องในห้องจึงได้ผลเหมือนกัน ไม่ขึ้นกับว่าใครอัปเดต Chrome ไปถึงรุ่นไหน
+3. **แยกจาก Chrome ของเรา** เบราว์เซอร์ทดสอบเปิดแบบสะอาดทุกครั้ง ไม่มีบัญชี คุกกี้ หรือส่วนขยายของเรามาปน
+4. **`npm install` ไม่ได้โหลดเบราว์เซอร์มาให้** ต้องรัน `npx playwright install` แยกอีกครั้ง บทถัดไป (ทดสอบเว็บร้านอาหารสัตว์) จะใช้เบราว์เซอร์ชุดนี้
 
 ![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 3 ไว้ในช่องข้อความ กรอบสีแดง](img/lab3-paste.png)
 
@@ -182,40 +195,9 @@
 
 ---
 
-## LAB 4 · เขียนและรัน test
+## LAB 4 · ติดตั้งปลั๊กอิน Playwright ใน Chrome
 
 ![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 4 ไว้ในช่องข้อความ กรอบสีแดง](img/lab4-paste.png)
-
-💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
-
-```text
-ในโฟลเดอร์ lab ช่วยเขียน test ไว้ใน tests/example.spec.ts 3 ข้อ บนเว็บ https://playwright.dev
-1. เปิดหน้าแรก แล้วตรวจว่ามีปุ่ม Get started
-2. กดปุ่ม Search พิมพ์คำว่า locator แล้วเปิดผลลัพธ์ "Locators" ตรวจว่าเจอหัวข้อ Locators
-3. จับภาพหน้าแรกเก็บไว้ในโฟลเดอร์ screenshots
-ให้รันบน 5 เบราว์เซอร์: chromium, firefox, webkit, Google Chrome, Microsoft Edge
-แล้วเปิดรายงาน HTML ให้ดู ถ้ามี test ล้ม ให้ดูภาพหน้าจอตอนล้มก่อน แล้วบอกผมว่าควรแก้อะไร
-```
-
-🤖 **Playwright ทำอะไรใน test ข้อ 2** (วงสีแดง = จุดที่ Playwright กด / ตรวจ)
-
-| ① เปิดเว็บ แล้วกด **Search** | ② พิมพ์ `locator` แล้วกดผลลัพธ์ **Locators** | ③ ตรวจว่าเจอหัวข้อ **Locators** |
-|---|---|---|
-| ![หน้าแรก playwright.dev วงปุ่ม Search มุมขวาบน](img/lab4-step-1.png) | ![ช่องค้นหาพิมพ์ locator วงผลลัพธ์แรก Locators](img/lab4-step-2.png) | ![หน้า Locators วงหัวข้อใหญ่ Locators](img/lab4-step-3.png) |
-
-✅ **ผลจริง: 15 passed** (3 test × 5 เบราว์เซอร์)
-
-![รายงาน HTML ของ Playwright วงตัวเลข Passed 15 รายการ test ทุกข้อผ่านบน chromium firefox webkit Google Chrome Microsoft Edge](img/lab4-html-report.png)
-
-👀 **สังเกต**
-- Playwright กด พิมพ์ และตรวจผล **เหมือนคนทำ** แต่ทำพร้อมกัน 5 เบราว์เซอร์ใน 11 วินาที
-- ใช้ playwright.dev ไม่ใช้ Google เพราะการเขียน test ไปค้น Google ซ้ำ ๆ จะโดน CAPTCHA และผิดเงื่อนไขการใช้งาน
-
----
-
-## LAB 5 · ติดตั้งปลั๊กอิน Playwright ใน Chrome
-
-![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 5 ไว้ในช่องข้อความ กรอบสีแดง](img/lab5-paste.png)
 
 🎯 ปลั๊กอินนี้ทำให้ Claude **ใช้ Chrome ตัวจริงของเรา** ได้ ขั้นนี้ **เรากดติดตั้งเอง** ด้วยมือ แล้วค่อยให้ Claude ตรวจ
 
@@ -228,13 +210,13 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 **① กดปุ่ม "เพิ่มใน Chrome"** (Add to Chrome)
 
-![หน้า Chrome Web Store ของ Playwright Extension วงปุ่มสีน้ำเงิน เพิ่มใน Chrome](img/lab5-step-1-store.png)
+![หน้า Chrome Web Store ของ Playwright Extension วงปุ่มสีน้ำเงิน เพิ่มใน Chrome](img/lab4-step-1-store.png)
 
 **② หน้าต่างยืนยันจะเด้งขึ้นมุมบน กด "เพิ่มส่วนขยาย"** (Add extension)
 
 **③ ปุ่มเปลี่ยนเป็น "นำออกจาก Chrome"** (Remove from Chrome) = ติดตั้งสำเร็จแล้ว
 
-![หน้า Chrome Web Store หลังติดตั้ง ปุ่มเปลี่ยนเป็น นำออกจาก Chrome วงสีแดงไว้](img/lab5-step-3-installed.png)
+![หน้า Chrome Web Store หลังติดตั้ง ปุ่มเปลี่ยนเป็น นำออกจาก Chrome วงสีแดงไว้](img/lab4-step-3-installed.png)
 
 **④ ให้ Claude ตรวจซ้ำ**
 
@@ -251,33 +233,9 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ---
 
-## LAB 6 · ตรวจ Playwright MCP
+## LAB 5 · ให้ AI ใช้เว็บจริง: ค้นหาใน Google
 
-![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 6 ไว้ในช่องข้อความ กรอบสีแดง](img/lab6-paste.png)
-
-💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
-
-```text
-ตรวจว่า Playwright MCP ใน Claude Code ใช้งานได้จริง
-1. รัน claude mcp list และดูว่า playwright ใช้โหมดไหน
-2. ใช้ Playwright MCP เปิด https://playwright.dev ในแท็บใหม่ แล้วจับภาพหน้าจอ
-3. ถ้าใช้ไม่ได้ ให้ทดสอบ Playwright MCP แยกจาก Claude (รัน server เองแล้วสั่งเปิดเว็บ) เพื่อดูว่าเสียที่ตัว MCP หรือที่ปลั๊กอิน
-บอกผมว่าต้องทำอะไรเองบ้าง
-```
-
-✅ **ผลจริง** Claude เปิด playwright.dev ใน Chrome ของเราได้
-
-![หน้า playwright.dev ที่ Claude เปิดผ่าน Playwright MCP ใน Chrome จริง](img/mcp-extension-playwright-dev.png)
-
-👀 **สังเกต**
-- ตอนยังไม่ได้ทำ LAB 5 `claude mcp list` ก็ขึ้น **Connected** แต่เปิดเว็บไม่ได้ (ไม่มีปลั๊กอิน) → **Connected ≠ ใช้ได้** ต้องลองเปิดเว็บจริงทุกครั้ง
-- Claude ทดสอบตัว MCP แยกจากปลั๊กอินได้ `RESULT: PASS` จึงรู้ว่าปัญหาอยู่ที่ปลั๊กอินอย่างเดียว
-
----
-
-## LAB 7 · ให้ AI ใช้เว็บจริง: ค้นหาใน Google
-
-![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 7 ไว้ในช่องข้อความ กรอบสีแดง](img/lab7-paste.png)
+![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 5 ไว้ในช่องข้อความ กรอบสีแดง](img/lab5-paste.png)
 
 💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
 
@@ -297,41 +255,11 @@ https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadb
 
 ---
 
-## LAB 8 · สรุปก่อน/หลัง
-
-![หน้าต่าง Claude Code เซสชันใหม่ วางพรอมต์ของ LAB 8 ไว้ในช่องข้อความ กรอบสีแดง](img/lab8-paste.png)
-
-💬 **คัดลอกพรอมต์นี้** (กดปุ่ม Copy มุมขวาของกรอบ)
-
-```text
-ตรวจเวอร์ชันอีกครั้ง (รายการเดียวกับ LAB 2)
-แล้วแสดงตารางเทียบ ก่อน/หลัง พร้อมบอกว่าอะไรสำเร็จ อะไรล้มเหลว (แนบ error จริง)
-และสิ่งที่ผมต้องทำเอง เช่น รีสตาร์ทโปรแกรม หรือคำสั่งที่ต้องใช้สิทธิ์ Administrator
-```
-
-✅ **ผลจริง**
-
-| รายการ | ก่อน | หลัง | ผล |
-|---|---|---|---|
-| Playwright Test (lab) | – | 1.63.0 | ✅ ติดตั้งใหม่ |
-| เบราว์เซอร์ Playwright | Chromium | Chromium, Firefox, WebKit | ✅ ติดตั้งเพิ่ม |
-| Playwright Extension | ไม่มี | 0.4.0 | ✅ ใช้งานได้ |
-| npm · Playwright MCP · Edge · Claude Code | ล่าสุด | ล่าสุด | ✅ ไม่ต้องทำอะไร |
-| Node.js | v26.7.0 | v26.7.0 | ❌ winget ยังไม่มีรุ่น 26.10 |
-| Google Chrome | 154 | 154 | ⚠️ ต้องอัปเดตเอง |
-
-📝 **สิ่งที่ต้องทำเอง**
-1. Chrome: เปิด `chrome://settings/help` **ใน Chrome ตัวจริง** แล้วกด Relaunch
-2. Node.js: รอ winget มีรุ่นใหม่ หรือติดตั้งจาก nodejs.org เอง (ต้องใช้สิทธิ์ Administrator)
-
----
-
 ## ถ้าเจอปัญหา: คัดลอกพรอมต์นี้
 
 | อาการ | 💬 พรอมต์ |
 |---|---|
 | ดาวน์โหลดเบราว์เซอร์ไม่ผ่าน | `npx playwright install ดาวน์โหลดไม่ผ่าน ช่วยหาสาเหตุด้วย curl.exe -4 และ -6 ไปที่ cdn.playwright.dev ถ้า IPv6 ใช้ไม่ได้ให้บังคับ Node ใช้ IPv4 แล้วลองใหม่` |
-| test ล้ม | `test ล้ม ช่วยเปิดภาพหน้าจอตอนล้มใน test-results ดูว่าหน้าเว็บจริงเป็นอย่างไร แล้วบอกผมว่าควรแก้ test หรือแก้เว็บ` |
 | Connected แต่เปิดเว็บไม่ได้ | `Playwright MCP ขึ้น Connected แต่เปิดเว็บไม่ได้ ช่วยทดสอบ Playwright MCP แยกจาก Claude แล้วบอกว่าเสียที่ MCP หรือที่ปลั๊กอิน` |
 | ติดตั้งปลั๊กอินแล้วยังหาไม่เจอ | `ผมติดตั้ง Playwright Extension และรีสตาร์ท Chrome แล้ว ช่วยตรวจโฟลเดอร์ปลั๊กอินบนดิสก์ และเวลาเริ่มของ Chrome ว่ารีสตาร์ทจริงหรือยัง` |
 | อัปเดต Chrome แล้วเลขไม่เปลี่ยน | `ผมอัปเดต Chrome แล้ว ช่วยตรวจเวอร์ชันจาก registry และไฟล์ chrome.exe และดูว่า Google Updater ตรวจอัปเดตล่าสุดเมื่อไร` |
