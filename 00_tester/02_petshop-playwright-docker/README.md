@@ -34,8 +34,6 @@
 
 ## 🐳 เว็บอยู่ใน "กล่อง" Docker
 
-![Image คือสูตรและวัตถุดิบ (docker build) ส่วน Container คือร้านที่เปิดขายจริง (docker run) ที่ localhost:3000](img/concept-01-image-vs-container.jpg)
-
 - **Image** = สูตรอาหาร + วัตถุดิบ (สร้างด้วย `docker build`)
 - **Container** = ร้านที่เปิดขายจริง (เปิดด้วย `docker run`) เข้าได้ที่ `http://localhost:3000`
 - ข้อดี: **เครื่องไหนเปิดก็เหมือนกัน** ทุกคนในห้องได้เว็บหน้าตาเดียวกัน ผลทดสอบเหมือนกัน
