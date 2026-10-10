@@ -1,0 +1,11 @@
+# TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250
+# project: firefox · status: failed
+
+[2026-10-10T14:28:58.424Z] (U06) POST /api/auth/login {"email":"vipa@sabai.test","password":"Vipa@2026"}
+    → 200 {"ok":true,"user":{"id":6,"name":"คุณวิภา","email":"vipa@sabai.test","role":"customer"}}
+[2026-10-10T14:28:58.430Z] (U06) POST /api/price {"type":"single","serviceCode":"S01","people":1,"date":"2026-10-20","time":"10:00","redeemBlocks":2}
+    → 422 {"error":"POINTS_NOT_ENOUGH","message":"แต้มไม่พอแลก"}
+[2026-10-10T14:29:02.370Z] (U04) POST /api/auth/login {"email":"fon@sabai.test","password":"Fon@2026"}
+    → 200 {"ok":true,"user":{"id":4,"name":"คุณฝน","email":"fon@sabai.test","role":"customer"}}
+[2026-10-10T14:29:02.376Z] (U04) POST /api/price {"type":"single","serviceCode":"S01","people":1,"date":"2026-10-20","time":"10:00","redeemBlocks":3}
+    → 422 {"error":"POINTS_NOT_ENOUGH","message":"แต้มไม่พอแลก"}

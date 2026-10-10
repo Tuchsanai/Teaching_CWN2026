@@ -1,0 +1,9 @@
+# TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน
+# project: firefox · status: passed
+
+[2026-10-10T14:27:03.383Z] (U08) POST /api/auth/login {"email":"liwei@sabai.test","password":"LiWei@2026"}
+    → 200 {"ok":true,"user":{"id":8,"name":"Mr. Li Wei","email":"liwei@sabai.test","role":"customer"}}
+[2026-10-10T14:27:03.392Z] (U08) POST /api/bookings {"type":"group","serviceCode":"S01","people":6,"date":"2026-10-13","time":"10:00","quotedTotal":5400}
+    → 409 {"error":"SLOT_TAKEN","message":"เวลานี้ถูกจองแล้ว"}
+[2026-10-10T14:27:08.045Z] (U08) POST /api/bookings {"type":"group","serviceCode":"S01","people":6,"date":"2026-10-13","time":"11:30","quotedTotal":5400}
+    → 201 {"bookingId":15,"code":"B15","status":"confirmed","total":5400,"totalLabel":"฿5,400","therapists":["T01","T02","T03","T04","T05","T06"],"therapistNames":["พี่สมศรี","พี่มาลี","พี่บุญมี","พี่จันทร์เพ็ญ","พี่ทองใบ","พี่ดวงใจ"],"message":"จองสำเร็จ! รหัสการจอง B15","detail":"นวดไทย 60 นาที · 13 ต.ค. 2026 11:30–12:30 · ยอด ฿5,400","quote":{"service":{"code":"S01","name":"นวดไทย 60 นาที","durationMin":60,"herbs":["ไพล","ตะไคร้"]},"type":"group","people":6,"date":"2026-10-13","time":"11:30","endTime":"12:30","whenLabel":"13 ต.ค. 2026 11:30–12:30","gross":6000,"discountKind":"group","discountPct":10,

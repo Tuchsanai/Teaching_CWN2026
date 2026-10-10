@@ -1,0 +1,1484 @@
+npm notice run sabai-e2e@1.0.0 npx
+npm notice run playwright test
+
+Running 114 tests using 1 worker
+
+  ok   1 [api] › tests\fixtures.ts:169:3 › TC-BOOK-06 จองพร้อมกัน 2 คำขอ รอบ/นักบำบัดเดียวกัน @BOOK @P1 (411ms)
+  ok   2 [api] › tests\fixtures.ts:169:3 › TC-SEC-01 เรียก API ที่ต้อง login โดยไม่ login @SEC @P1 (329ms)
+  ok   3 [api] › tests\fixtures.ts:169:3 › TC-SEC-02 รูป before/after เปิดได้เฉพาะเจ้าของ @SEC @P1 (294ms)
+  ok   4 [api] › tests\fixtures.ts:169:3 › TC-SEC-03 ลูกค้าเรียก API หลังร้าน @SEC @P1 (240ms)
+  x    5 [api] › tests\fixtures.ts:169:3 › TC-SEC-04 ออกจากระบบแล้วใช้ cookie เดิม @SEC @P2 (252ms)
+  x    6 [api] › tests\fixtures.ts:169:3 › TC-SEC-05 ล็อกอินแล้วแต่ใช้ของคนอื่น: ยกเลิกนัดคนอื่น · จองด้วยคอร์สคนอื่น @SEC @P1 (417ms)
+  ok   7 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น @BOOK @P1 (4.2s)
+  ok   8 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31 @BOOK @P1 (1.4s)
+  x    9 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 (2.7s)
+  ok  10 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี) @BOOK @P1 (4.2s)
+  ok  11 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม "ยืนยันการจอง") @BOOK @P1 (4.1s)
+  x   12 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 (1.5m)
+  ok  13 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7 @BOOK @P1 (2.5s)
+  ok  14 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน @BOOK @P1 (6.3s)
+  ok  15 [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน) @BOOK @P2 (12.2s)
+  ok  16 [chromium] › tests\fixtures.ts:169:3 › TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง @CXL @P1 (2.7s)
+  ok  17 [chromium] › tests\fixtures.ts:169:3 › TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้ @CXL @P1 (1.9s)
+  ok  18 [chromium] › tests\fixtures.ts:169:3 › TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร @CXL @P2 (7.2s)
+  ok  19 [chromium] › tests\fixtures.ts:169:3 › TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด @CRS @P1 (6.1s)
+  ok  20 [chromium] › tests\fixtures.ts:169:3 › TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง @CRS @P1 (2.8s)
+  ok  21 [chromium] › tests\fixtures.ts:169:3 › TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย @CRS @P1 (8.2s)
+  ok  22 [chromium] › tests\fixtures.ts:169:3 › TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ @GC @P1 (4.8s)
+  ok  23 [chromium] › tests\fixtures.ts:169:3 › TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย @GC @P1 (11.8s)
+  ok  24 [chromium] › tests\fixtures.ts:169:3 › TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ @GC @P1 (7.7s)
+  x   25 [chromium] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 (19.0s)
+  ok  26 [chromium] › tests\fixtures.ts:169:3 › TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า @I18N @P2 (1.7s)
+  ok  27 [chromium] › tests\fixtures.ts:169:3 › TC-MEM-01 ค่าขอบระดับสมาชิก @MEM @P1 (4.7s)
+  ok  28 [chromium] › tests\fixtures.ts:169:3 › TC-MEM-02 ข้อความ "อีก ฿X ถึง …" ห้ามติดลบ @MEM @P2 (3.6s)
+  x   29 [chromium] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 (17.6s)
+  x   30 [chromium] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 (10.8s)
+  ok  31 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป @PRICE @P1 (12.7s)
+  ok  32 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด @PRICE @P1 (10.4s)
+  ok  33 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2 @PRICE @P1 (12.0s)
+  x   34 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 (7.1s)
+  ok  35 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม @PRICE @P1 (6.9s)
+  ok  36 [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ @PRICE @P1 (12.1s)
+  ok  37 [chromium] › tests\fixtures.ts:169:3 › TC-TH-01 ตัวกรอง "4.5 ดาวขึ้นไป" + การแสดงคะแนน @TH @P3 (464ms)
+  ok  38 [chromium] › tests\fixtures.ts:169:3 › TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม. @TRN @P1 (1.8s)
+  ok  39 [chromium] › tests\fixtures.ts:169:3 › TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4) @TRN @P1 (1.6s)
+  x   40 [chromium] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 (24.5s)
+  ok  41 [chromium] › tests\fixtures.ts:169:3 › TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px @UI @P2 (676ms)
+  ok  42 [chromium] › tests\fixtures.ts:169:3 › TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง @UI @P1 (1.8s)
+  ok  43 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น @BOOK @P1 (4.4s)
+  ok  44 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31 @BOOK @P1 (1.5s)
+  x   45 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 (2.7s)
+  ok  46 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี) @BOOK @P1 (4.6s)
+  ok  47 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม "ยืนยันการจอง") @BOOK @P1 (4.0s)
+  x   48 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 (1.5m)
+  ok  49 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7 @BOOK @P1 (3.2s)
+  ok  50 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน @BOOK @P1 (6.2s)
+  ok  51 [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน) @BOOK @P2 (12.2s)
+  ok  52 [firefox] › tests\fixtures.ts:169:3 › TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง @CXL @P1 (2.7s)
+  ok  53 [firefox] › tests\fixtures.ts:169:3 › TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้ @CXL @P1 (2.0s)
+  ok  54 [firefox] › tests\fixtures.ts:169:3 › TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร @CXL @P2 (7.3s)
+  ok  55 [firefox] › tests\fixtures.ts:169:3 › TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด @CRS @P1 (6.0s)
+  ok  56 [firefox] › tests\fixtures.ts:169:3 › TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง @CRS @P1 (2.9s)
+  ok  57 [firefox] › tests\fixtures.ts:169:3 › TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย @CRS @P1 (8.2s)
+  ok  58 [firefox] › tests\fixtures.ts:169:3 › TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ @GC @P1 (5.0s)
+  ok  59 [firefox] › tests\fixtures.ts:169:3 › TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย @GC @P1 (11.7s)
+  ok  60 [firefox] › tests\fixtures.ts:169:3 › TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ @GC @P1 (7.7s)
+  x   61 [firefox] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 (18.8s)
+  ok  62 [firefox] › tests\fixtures.ts:169:3 › TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า @I18N @P2 (3.0s)
+  ok  63 [firefox] › tests\fixtures.ts:169:3 › TC-MEM-01 ค่าขอบระดับสมาชิก @MEM @P1 (5.0s)
+  ok  64 [firefox] › tests\fixtures.ts:169:3 › TC-MEM-02 ข้อความ "อีก ฿X ถึง …" ห้ามติดลบ @MEM @P2 (3.8s)
+  x   65 [firefox] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 (17.1s)
+  x   66 [firefox] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 (11.6s)
+  ok  67 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป @PRICE @P1 (11.0s)
+  ok  68 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด @PRICE @P1 (8.1s)
+  ok  69 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2 @PRICE @P1 (11.9s)
+  x   70 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 (6.9s)
+  ok  71 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม @PRICE @P1 (7.1s)
+  ok  72 [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ @PRICE @P1 (12.2s)
+  ok  73 [firefox] › tests\fixtures.ts:169:3 › TC-TH-01 ตัวกรอง "4.5 ดาวขึ้นไป" + การแสดงคะแนน @TH @P3 (610ms)
+  ok  74 [firefox] › tests\fixtures.ts:169:3 › TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม. @TRN @P1 (2.0s)
+  ok  75 [firefox] › tests\fixtures.ts:169:3 › TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4) @TRN @P1 (1.6s)
+  x   76 [firefox] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 (24.5s)
+  ok  77 [firefox] › tests\fixtures.ts:169:3 › TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px @UI @P2 (2.5s)
+  ok  78 [firefox] › tests\fixtures.ts:169:3 › TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง @UI @P1 (2.0s)
+  ok  79 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น @BOOK @P1 (5.4s)
+  ok  80 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31 @BOOK @P1 (1.9s)
+  x   81 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 (3.6s)
+  ok  82 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี) @BOOK @P1 (5.5s)
+  ok  83 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม "ยืนยันการจอง") @BOOK @P1 (6.0s)
+  x   84 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 (1.5m)
+  ok  85 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7 @BOOK @P1 (2.9s)
+  ok  86 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน @BOOK @P1 (8.0s)
+  ok  87 [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน) @BOOK @P2 (15.9s)
+  ok  88 [webkit] › tests\fixtures.ts:169:3 › TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง @CXL @P1 (2.9s)
+  ok  89 [webkit] › tests\fixtures.ts:169:3 › TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้ @CXL @P1 (2.2s)
+  ok  90 [webkit] › tests\fixtures.ts:169:3 › TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร @CXL @P2 (9.3s)
+  ok  91 [webkit] › tests\fixtures.ts:169:3 › TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด @CRS @P1 (7.3s)
+  ok  92 [webkit] › tests\fixtures.ts:169:3 › TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง @CRS @P1 (3.1s)
+  ok  93 [webkit] › tests\fixtures.ts:169:3 › TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย @CRS @P1 (8.9s)
+  ok  94 [webkit] › tests\fixtures.ts:169:3 › TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ @GC @P1 (8.9s)
+  ok  95 [webkit] › tests\fixtures.ts:169:3 › TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย @GC @P1 (14.8s)
+  ok  96 [webkit] › tests\fixtures.ts:169:3 › TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ @GC @P1 (9.4s)
+  x   97 [webkit] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 (20.4s)
+  ok  98 [webkit] › tests\fixtures.ts:169:3 › TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า @I18N @P2 (2.3s)
+  ok  99 [webkit] › tests\fixtures.ts:169:3 › TC-MEM-01 ค่าขอบระดับสมาชิก @MEM @P1 (5.0s)
+  ok 100 [webkit] › tests\fixtures.ts:169:3 › TC-MEM-02 ข้อความ "อีก ฿X ถึง …" ห้ามติดลบ @MEM @P2 (3.9s)
+  x  101 [webkit] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 (20.4s)
+  x  102 [webkit] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 (10.7s)
+  ok 103 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป @PRICE @P1 (16.9s)
+  ok 104 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด @PRICE @P1 (13.4s)
+  ok 105 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2 @PRICE @P1 (14.7s)
+  x  106 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 (9.0s)
+  ok 107 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม @PRICE @P1 (8.7s)
+  ok 108 [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ @PRICE @P1 (15.9s)
+  ok 109 [webkit] › tests\fixtures.ts:169:3 › TC-TH-01 ตัวกรอง "4.5 ดาวขึ้นไป" + การแสดงคะแนน @TH @P3 (1.3s)
+  ok 110 [webkit] › tests\fixtures.ts:169:3 › TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม. @TRN @P1 (2.2s)
+  ok 111 [webkit] › tests\fixtures.ts:169:3 › TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4) @TRN @P1 (1.6s)
+  x  112 [webkit] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 (25.6s)
+  ok 113 [webkit] › tests\fixtures.ts:169:3 › TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px @UI @P2 (1.5s)
+  ok 114 [webkit] › tests\fixtures.ts:169:3 › TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง @UI @P1 (1.9s)
+
+
+  1) [api] › tests\fixtures.ts:169:3 › TC-SEC-04 ออกจากระบบแล้วใช้ cookie เดิม @SEC @P2 › GET /api/me ด้วย cookie เดิม → 401 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 200
+
+       at security.api.spec.ts:78
+
+      76 |     const ctx = await request.newContext({ baseURL, storageState: state });
+      77 |     const old = new Api(ctx, 'cookie เดิมของ U01', api.log);
+    > 78 |     expect.soft((await old.get('/api/me')).status).toBe(401);
+         |                                                    ^
+      79 |     await ctx.dispose();
+      80 |   });
+      81 | });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\security.api.spec.ts:78:52
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\security.api.spec.ts:75:3
+
+    attachment #1: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\security.api-TC-SEC-04-ออกจากระบบแล้วใช้-cookie-เดิม-api\attachments\api-log-f016f9cdc75df3da26f3954370639e1dd74c1634.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\security.api-TC-SEC-04-ออกจากระบบแล้วใช้-cookie-เดิม-api\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\security.api-TC-SEC-04-ออกจากระบบแล้วใช้-cookie-เดิม-api\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\security.api-TC-SEC-04-ออกจากระบบแล้วใช้-cookie-เดิม-api\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [api] › tests\fixtures.ts:169:3 › TC-SEC-05 ล็อกอินแล้วแต่ใช้ของคนอื่น: ยกเลิกนัดคนอื่น · จองด้วยคอร์สคนอื่น @SEC @P1 › U04 POST /api/bookings แบบคอร์สด้วย C01 (ของ U01) 20 ต.ค. 11:00 → 403/404 
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected value: 422
+    Received array: [403, 404]
+
+       at security.api.spec.ts:91
+
+      89 |   });
+      90 |   await S('U04 POST /api/bookings แบบคอร์สด้วย C01 (ของ U01) 20 ต.ค. 11:00 → 403/404', async () => {
+    > 91 |     expect.soft([403, 404]).toContain((await u04.post('/api/bookings', courseBooking({ coursePurchaseId: c01?.id }))).status);
+         |                             ^
+      92 |   });
+      93 |   await S('หลังรีโหลด: B05 ยัง "ยืนยัน" · Wallet U01 ยัง "เหลือ 7 จาก 11 ครั้ง" · ไม่มีนัดใหม่ 20 ต.ค. 11:00', async () => {
+      94 |     expect.soft(await statusOf(u01, 'B05')).toBe('confirmed');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\security.api.spec.ts:91:29
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\security.api.spec.ts:90:3
+
+    attachment #1: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\security.api-TC-SEC-05-ล็อ-8ea66-คนอื่น-·-จองด้วยคอร์สคนอื่น-api\attachments\api-log-2c063cab0180e60d47e4f19894e665c2c3a3dbb2.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\security.api-TC-SEC-05-ล็อ-8ea66-คนอื่น-·-จองด้วยคอร์สคนอื่น-api\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\security.api-TC-SEC-05-ล็อ-8ea66-คนอื่น-·-จองด้วยคอร์สคนอื่น-api\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\security.api-TC-SEC-05-ล็อ-8ea66-คนอื่น-·-จองด้วยคอร์สคนอื่น-api\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+
+    Error: จำนวนรอบ S01
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 23
+    Received: 22
+
+       at book.spec.ts:74
+
+      72 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      73 |     const s = await slotsOnPage();
+    > 74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+         |                                           ^
+      75 |     expect.soft(s[0]).toBe('10:00');
+      76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+      77 |     expect.soft(s).not.toContain('09:30');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:74:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "21:00"
+    Received: "20:30"
+
+       at book.spec.ts:76
+
+      74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+      75 |     expect.soft(s[0]).toBe('10:00');
+    > 76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+         |                                  ^
+      77 |     expect.soft(s).not.toContain('09:30');
+      78 |     expect.soft(s).not.toContain('21:30');
+      79 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:76:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: จำนวนรอบ S02
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 22
+    Received: 21
+
+       at book.spec.ts:85
+
+      83 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      84 |     const s = await slotsOnPage();
+    > 85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+         |                                           ^
+      86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:85:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20:30"
+    Received: "20:00"
+
+       at book.spec.ts:86
+
+      84 |     const s = await slotsOnPage();
+      85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+    > 86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+         |                                  ^
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+      89 |     const anon = await api.anon();
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:86:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-chromium\attachments\api-log-f7fa0f4d12ed79d27b7a7064307e48119e5a3df1.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 › หน้าเว็บ: จองคู่ 2 คน 20:30 → ✅ ราคา ฿2,520 
+
+    Test timeout of 90000ms exceeded.
+
+    Error: locator.click: Test timeout of 90000ms exceeded.
+    Call log:
+      - waiting for getByTestId('book-slot-20:30')
+
+
+      231 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '2');
+      232 |   await page.getByTestId('book-date').fill(o.date);
+    > 233 |   await page.getByTestId(`book-slot-${o.time}`).click();
+          |                                                 ^
+      234 |   if (o.therapist) await page.getByTestId('book-therapist').selectOption(o.therapist);
+      235 |   await page.getByTestId('book-next-2').click();
+      236 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+        at bookStep2 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:233:49)
+        at bookToStep3 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:242:3)
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:154:5
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:153:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-chromium\attachments\api-log-ba33cb78dec2d7d688729418c73bea6abfe08190.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 › มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft toBeVisible" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:96
+
+      94 |   });
+      95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+    > 96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+         |                                                                ^
+      97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+      98 |   });
+      99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:96:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    Error: expect(locator).not.toHaveText(expected) failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected pattern: not /^\s*$/
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft not toHaveText" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:97
+
+       95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+       96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+    >  97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+          |                                                                    ^
+       98 |   });
+       99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+      100 |     await toSummary(page);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:97:68
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 › U05 (100 แต้ม) แลก 1 ก้อน → ฿1,000 − 5% − ฿50 = ฿900 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 900
+    Received: 902.5
+
+       at member.spec.ts:52
+
+      50 |     await bookToStep3(page, s01);
+      51 |     await page.getByTestId('book-points').selectOption('1');
+    > 52 |     expect.soft(await quoteTotal(page)).toBe(900);
+         |                                         ^
+      53 |   });
+      54 |   await S('U06 (199 แต้ม) แลก 2 ก้อน → ❌', async () => {
+      55 |     await logoutUI(page); await loginUI(page, 'U06');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:52:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:48:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-chromium\attachments\api-log-eb25a92c8976f5ccd7d532bb448695802f01448e.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 › หลังรีโหลด /account ของ U01: แต้ม 99 + floor(950 ÷ 100) = 108 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('account-points')
+    Expected: "108"
+    Received: "109"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('account-points') with timeout 7000ms
+      - waiting for getByTestId('account-points')
+        18 × locator resolved to <div class="value" data-points="109" data-testid="account-points">109 แต้ม</div>
+           - unexpected value "109"
+
+
+       at member.spec.ts:94
+
+      92 |     await loginUI(page, 'U01');
+      93 |     await open(page, '/account');
+    > 94 |     await expect.soft(page.getByTestId('account-points')).toHaveAttribute('data-points', '108');
+         |                                                           ^
+      95 |   });
+      96 | });
+      97 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:94:59
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:90:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--chromium\attachments\api-log-41f7c817130100429dcf9a7fb4a4716ec1ad3614.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 › ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที) 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:66
+
+      64 |   });
+      65 |   await S('ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที)', async () => {
+    > 66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+         |                                         ^
+      67 |     await toSummary(page);
+      68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:66:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:68
+
+      66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+      67 |     await toSummary(page);
+    > 68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+         |                                                      ^
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+      70 |   });
+      71 |   await S('ยืนยัน → หลังรีโหลด /account แต้มเหลือ 50', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:68:54
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 › กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที) 
+
+    Error: ต้องไปขั้น 4 ไม่ได้
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('book-summary')
+    Expected: 0
+    Received: 1
+    Timeout:  7000ms
+
+    Call log:
+      - ต้องไปขั้น 4 ไม่ได้ getByTestId('book-summary') with timeout 7000ms
+      - waiting for getByTestId('book-summary')
+        18 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+       at transport.spec.ts:48
+
+      46 |   await S('กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)', async () => {
+      47 |     await page.getByTestId('book-next-3').click();
+    > 48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+         |                                                                                ^
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:48:80
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('book-step-indicator')
+    Expected: "3"
+    Received: "4"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('book-step-indicator') with timeout 7000ms
+      - waiting for getByTestId('book-step-indicator')
+        18 × locator resolved to <p data-step="4" class="muted small" data-testid="book-step-indicator">ขั้นที่ 4 จาก 4</p>
+           - unexpected value "4"
+
+
+       at transport.spec.ts:49
+
+      47 |     await page.getByTestId('book-next-3').click();
+      48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+    > 49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+         |                                                                ^
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+      52 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:49:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveCount" locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ }) with timeout 7000ms
+      - waiting for locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at transport.spec.ts:51
+
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+    > 51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+         |                                                               ^
+      52 |   });
+      53 | });
+      54 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:51:63
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-chromium\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+
+    Error: จำนวนรอบ S01
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 23
+    Received: 22
+
+       at book.spec.ts:74
+
+      72 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      73 |     const s = await slotsOnPage();
+    > 74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+         |                                           ^
+      75 |     expect.soft(s[0]).toBe('10:00');
+      76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+      77 |     expect.soft(s).not.toContain('09:30');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:74:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "21:00"
+    Received: "20:30"
+
+       at book.spec.ts:76
+
+      74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+      75 |     expect.soft(s[0]).toBe('10:00');
+    > 76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+         |                                  ^
+      77 |     expect.soft(s).not.toContain('09:30');
+      78 |     expect.soft(s).not.toContain('21:30');
+      79 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:76:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: จำนวนรอบ S02
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 22
+    Received: 21
+
+       at book.spec.ts:85
+
+      83 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      84 |     const s = await slotsOnPage();
+    > 85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+         |                                           ^
+      86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:85:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20:30"
+    Received: "20:00"
+
+       at book.spec.ts:86
+
+      84 |     const s = await slotsOnPage();
+      85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+    > 86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+         |                                  ^
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+      89 |     const anon = await api.anon();
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:86:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-firefox\attachments\api-log-5feaae919b841c6759b250e64c8ad5babc9085c4.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-firefox\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 › หน้าเว็บ: จองคู่ 2 คน 20:30 → ✅ ราคา ฿2,520 
+
+    Test timeout of 90000ms exceeded.
+
+    Error: locator.click: Test timeout of 90000ms exceeded.
+    Call log:
+      - waiting for getByTestId('book-slot-20:30')
+
+
+      231 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '2');
+      232 |   await page.getByTestId('book-date').fill(o.date);
+    > 233 |   await page.getByTestId(`book-slot-${o.time}`).click();
+          |                                                 ^
+      234 |   if (o.therapist) await page.getByTestId('book-therapist').selectOption(o.therapist);
+      235 |   await page.getByTestId('book-next-2').click();
+      236 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+        at bookStep2 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:233:49)
+        at bookToStep3 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:242:3)
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:154:5
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:153:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-firefox\attachments\api-log-400a0e7ff71c8fa850facecf534c2268720ba8fd.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-firefox\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [firefox] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 › มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft toBeVisible" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:96
+
+      94 |   });
+      95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+    > 96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+         |                                                                ^
+      97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+      98 |   });
+      99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:96:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    Error: expect(locator).not.toHaveText(expected) failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected pattern: not /^\s*$/
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft not toHaveText" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:97
+
+       95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+       96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+    >  97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+          |                                                                    ^
+       98 |   });
+       99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+      100 |     await toSummary(page);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:97:68
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-firefox\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [firefox] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 › U05 (100 แต้ม) แลก 1 ก้อน → ฿1,000 − 5% − ฿50 = ฿900 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 900
+    Received: 902.5
+
+       at member.spec.ts:52
+
+      50 |     await bookToStep3(page, s01);
+      51 |     await page.getByTestId('book-points').selectOption('1');
+    > 52 |     expect.soft(await quoteTotal(page)).toBe(900);
+         |                                         ^
+      53 |   });
+      54 |   await S('U06 (199 แต้ม) แลก 2 ก้อน → ❌', async () => {
+      55 |     await logoutUI(page); await loginUI(page, 'U06');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:52:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:48:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-firefox\attachments\api-log-2ab01c0da0f7dea36636e56bb3aa85ab389a40e1.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-firefox\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [firefox] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 › หลังรีโหลด /account ของ U01: แต้ม 99 + floor(950 ÷ 100) = 108 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('account-points')
+    Expected: "108"
+    Received: "109"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('account-points') with timeout 7000ms
+      - waiting for getByTestId('account-points')
+        18 × locator resolved to <div class="value" data-points="109" data-testid="account-points">109 แต้ม</div>
+           - unexpected value "109"
+
+
+       at member.spec.ts:94
+
+      92 |     await loginUI(page, 'U01');
+      93 |     await open(page, '/account');
+    > 94 |     await expect.soft(page.getByTestId('account-points')).toHaveAttribute('data-points', '108');
+         |                                                           ^
+      95 |   });
+      96 | });
+      97 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:94:59
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:90:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--firefox\attachments\api-log-b38e78cbd7dec0cd173e8157b8b4a6e43b3991b3.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--firefox\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 › ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที) 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:66
+
+      64 |   });
+      65 |   await S('ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที)', async () => {
+    > 66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+         |                                         ^
+      67 |     await toSummary(page);
+      68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:66:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:68
+
+      66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+      67 |     await toSummary(page);
+    > 68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+         |                                                      ^
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+      70 |   });
+      71 |   await S('ยืนยัน → หลังรีโหลด /account แต้มเหลือ 50', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:68:54
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-firefox\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [firefox] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 › กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที) 
+
+    Error: ต้องไปขั้น 4 ไม่ได้
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('book-summary')
+    Expected: 0
+    Received: 1
+    Timeout:  7000ms
+
+    Call log:
+      - ต้องไปขั้น 4 ไม่ได้ getByTestId('book-summary') with timeout 7000ms
+      - waiting for getByTestId('book-summary')
+        18 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+       at transport.spec.ts:48
+
+      46 |   await S('กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)', async () => {
+      47 |     await page.getByTestId('book-next-3').click();
+    > 48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+         |                                                                                ^
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:48:80
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('book-step-indicator')
+    Expected: "3"
+    Received: "4"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('book-step-indicator') with timeout 7000ms
+      - waiting for getByTestId('book-step-indicator')
+        17 × locator resolved to <p data-step="4" class="muted small" data-testid="book-step-indicator">ขั้นที่ 4 จาก 4</p>
+           - unexpected value "4"
+
+
+       at transport.spec.ts:49
+
+      47 |     await page.getByTestId('book-next-3').click();
+      48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+    > 49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+         |                                                                ^
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+      52 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:49:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveCount" locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ }) with timeout 7000ms
+      - waiting for locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at transport.spec.ts:51
+
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+    > 51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+         |                                                               ^
+      52 |   });
+      53 | });
+      54 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:51:63
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-firefox\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+
+    Error: จำนวนรอบ S01
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 23
+    Received: 22
+
+       at book.spec.ts:74
+
+      72 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      73 |     const s = await slotsOnPage();
+    > 74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+         |                                           ^
+      75 |     expect.soft(s[0]).toBe('10:00');
+      76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+      77 |     expect.soft(s).not.toContain('09:30');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:74:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "21:00"
+    Received: "20:30"
+
+       at book.spec.ts:76
+
+      74 |     expect.soft(s.length, 'จำนวนรอบ S01').toBe(23);
+      75 |     expect.soft(s[0]).toBe('10:00');
+    > 76 |     expect.soft(s[s.length - 1]).toBe('21:00');
+         |                                  ^
+      77 |     expect.soft(s).not.toContain('09:30');
+      78 |     expect.soft(s).not.toContain('21:30');
+      79 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:76:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:69:3
+
+    Error: จำนวนรอบ S02
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 22
+    Received: 21
+
+       at book.spec.ts:85
+
+      83 |     await expect(page.getByTestId('book-slot-10:00')).toBeVisible();
+      84 |     const s = await slotsOnPage();
+    > 85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+         |                                           ^
+      86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:85:43
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20:30"
+    Received: "20:00"
+
+       at book.spec.ts:86
+
+      84 |     const s = await slotsOnPage();
+      85 |     expect.soft(s.length, 'จำนวนรอบ S02').toBe(22);
+    > 86 |     expect.soft(s[s.length - 1]).toBe('20:30');
+         |                                  ^
+      87 |   });
+      88 |   await S('ยิงจอง S01 เวลา 10:15 → 4xx และไม่บันทึก (หลังรีโหลด)', async () => {
+      89 |     const anon = await api.anon();
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:86:34
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:80:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-webkit\attachments\api-log-7c57b45521454b4da7daa59aa081ea5d9594821d.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-webkit\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-03-รอบเวลา-เวลาปิดร้าน-เวลาไม่ตรงรอบ-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 › หน้าเว็บ: จองคู่ 2 คน 20:30 → ✅ ราคา ฿2,520 
+
+    Test timeout of 90000ms exceeded.
+
+    Error: locator.click: Test timeout of 90000ms exceeded.
+    Call log:
+      - waiting for getByTestId('book-slot-20:30')
+
+
+      231 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '2');
+      232 |   await page.getByTestId('book-date').fill(o.date);
+    > 233 |   await page.getByTestId(`book-slot-${o.time}`).click();
+          |                                                 ^
+      234 |   if (o.therapist) await page.getByTestId('book-therapist').selectOption(o.therapist);
+      235 |   await page.getByTestId('book-next-2').click();
+      236 |   await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+        at bookStep2 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:233:49)
+        at bookToStep3 (C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\fixtures.ts:242:3)
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:154:5
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\book.spec.ts:153:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-webkit\attachments\api-log-6214765a9f002c7807615522335bfd87b05a4a9a.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-webkit\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\book-TC-BOOK-07-จองคู่-Couple-Suite-จำนวนคน-ห้องเต็ม-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [webkit] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 › มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft toBeVisible" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:96
+
+      94 |   });
+      95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+    > 96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+         |                                                                ^
+      97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+      98 |   });
+      99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:96:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    Error: expect(locator).not.toHaveText(expected) failed
+
+    Locator: getByTestId('book-giftcard-error')
+    Expected pattern: not /^\s*$/
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft not toHaveText" getByTestId('book-giftcard-error') with timeout 7000ms
+      - waiting for getByTestId('book-giftcard-error')
+
+
+       at giftcard.spec.ts:97
+
+       95 |   await S('มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4', async () => {
+       96 |     await expect.soft(page.getByTestId('book-giftcard-error')).toBeVisible();
+    >  97 |     await expect.soft(page.getByTestId('book-giftcard-error')).not.toHaveText(/^\s*$/);
+          |                                                                    ^
+       98 |   });
+       99 |   await S('ใบสรุปไม่มีบรรทัด Gift Card และยอด ฿1,000', async () => {
+      100 |     await toSummary(page);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:97:68
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\giftcard.spec.ts:95:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-webkit\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\giftcard-TC-GC-04-รหัสบัตรที่ไม่มีจริงในหน้าจอง-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [webkit] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 › U05 (100 แต้ม) แลก 1 ก้อน → ฿1,000 − 5% − ฿50 = ฿900 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 900
+    Received: 902.5
+
+       at member.spec.ts:52
+
+      50 |     await bookToStep3(page, s01);
+      51 |     await page.getByTestId('book-points').selectOption('1');
+    > 52 |     expect.soft(await quoteTotal(page)).toBe(900);
+         |                                         ^
+      53 |   });
+      54 |   await S('U06 (199 แต้ม) แลก 2 ก้อน → ❌', async () => {
+      55 |     await logoutUI(page); await loginUI(page, 'U06');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:52:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:48:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-webkit\attachments\api-log-641cfd6ad9aee48b67641503093b436622b09002.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-webkit\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-03-แลกแต้ม-99-100-199-250-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [webkit] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 › หลังรีโหลด /account ของ U01: แต้ม 99 + floor(950 ÷ 100) = 108 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('account-points')
+    Expected: "108"
+    Received: "109"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('account-points') with timeout 7000ms
+      - waiting for getByTestId('account-points')
+        17 × locator resolved to <div class="value" data-points="109" data-testid="account-points">109 แต้ม</div>
+           - unexpected value "109"
+
+
+       at member.spec.ts:94
+
+      92 |     await loginUI(page, 'U01');
+      93 |     await open(page, '/account');
+    > 94 |     await expect.soft(page.getByTestId('account-points')).toHaveAttribute('data-points', '108');
+         |                                                           ^
+      95 |   });
+      96 | });
+      97 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:94:59
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\member.spec.ts:90:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: api-log (text/plain) ────────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--webkit\attachments\api-log-98c565f2195454478a94606ceeaa2b79d006fd02.log
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--webkit\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\member-TC-MEM-04-ได้แต้มหลังร้านกด-ใช้บริการเสร็จ--webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 › ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที) 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:66
+
+      64 |   });
+      65 |   await S('ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที)', async () => {
+    > 66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+         |                                         ^
+      67 |     await toSummary(page);
+      68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:66:41
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3800
+    Received: 3810
+
+       at price.spec.ts:68
+
+      66 |     expect.soft(await quoteTotal(page)).toBe(3800);
+      67 |     await toSummary(page);
+    > 68 |     expect.soft(await amount(page, 'summary-total')).toBe(3800);
+         |                                                      ^
+      69 |     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+      70 |   });
+      71 |   await S('ยืนยัน → หลังรีโหลด /account แต้มเหลือ 50', async () => {
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:68:54
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\price.spec.ts:65:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-webkit\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\price-TC-PRICE-04-ลำดับคิดราคาเต็ม-กลุ่ม-→-แลกแต้ม-→-ค่ารถ-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [webkit] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 › กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที) 
+
+    Error: ต้องไปขั้น 4 ไม่ได้
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('book-summary')
+    Expected: 0
+    Received: 1
+    Timeout:  7000ms
+
+    Call log:
+      - ต้องไปขั้น 4 ไม่ได้ getByTestId('book-summary') with timeout 7000ms
+      - waiting for getByTestId('book-summary')
+        17 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+       at transport.spec.ts:48
+
+      46 |   await S('กด "ถัดไป" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)', async () => {
+      47 |     await page.getByTestId('book-next-3').click();
+    > 48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+         |                                                                                ^
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:48:80
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('book-step-indicator')
+    Expected: "3"
+    Received: "4"
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveAttribute" getByTestId('book-step-indicator') with timeout 7000ms
+      - waiting for getByTestId('book-step-indicator')
+        17 × locator resolved to <p data-step="4" class="muted small" data-testid="book-step-indicator">ขั้นที่ 4 จาก 4</p>
+           - unexpected value "4"
+
+
+       at transport.spec.ts:49
+
+      47 |     await page.getByTestId('book-next-3').click();
+      48 |     await expect.soft(page.getByTestId('book-summary'), 'ต้องไปขั้น 4 ไม่ได้').toHaveCount(0);
+    > 49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+         |                                                                ^
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+      51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+      52 |   });
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:49:64
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "soft toHaveCount" locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ }) with timeout 7000ms
+      - waiting for locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]').filter({ hasText: /ระยะ|โรงแรม/ })
+        17 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at transport.spec.ts:51
+
+      49 |     await expect.soft(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
+      50 |     const msg = page.locator('[data-testid="book-error-message"], [data-testid="book-quote-error-message"]');
+    > 51 |     await expect.soft(msg.filter({ hasText: /ระยะ|โรงแรม/ })).toHaveCount(1);
+         |                                                               ^
+      52 |   });
+      53 | });
+      54 |
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:51:63
+        at C:\Users\oishi\AppData\Local\Temp\claude\C--Users-oishi-Documents-GitHub-CWN-Teaching-00-tester\f46b9f0e-15a3-4c5f-a271-9b382d5ab13b\scratchpad\w\e2e\tests\transport.spec.ts:46:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-webkit\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-report\artifacts\transport-TC-TRN-03-ติ๊ก-ต-5269a-รับส่ง-แต่ไม่ใส่ระยะ-โรงแรม-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23 failed
+    [api] › tests\fixtures.ts:169:3 › TC-SEC-04 ออกจากระบบแล้วใช้ cookie เดิม @SEC @P2 ─────────────
+    [api] › tests\fixtures.ts:169:3 › TC-SEC-05 ล็อกอินแล้วแต่ใช้ของคนอื่น: ยกเลิกนัดคนอื่น · จองด้วยคอร์สคนอื่น @SEC @P1 
+    [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+    [chromium] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 
+    [chromium] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 ──────────
+    [chromium] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 ─────────
+    [chromium] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 ───
+    [chromium] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 
+    [chromium] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 
+    [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+    [firefox] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 
+    [firefox] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 ───────────
+    [firefox] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 ──────────
+    [firefox] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 ────
+    [firefox] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 
+    [firefox] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 
+    [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ @BOOK @P1 
+    [webkit] › tests\fixtures.ts:169:3 › TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม @BOOK @P1 
+    [webkit] › tests\fixtures.ts:169:3 › TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง @GC @P2 ────────────
+    [webkit] › tests\fixtures.ts:169:3 › TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250 @MEM @P1 ───────────
+    [webkit] › tests\fixtures.ts:169:3 › TC-MEM-04 ได้แต้มหลังร้านกด "ใช้บริการเสร็จ" @MEM @P1 ─────
+    [webkit] › tests\fixtures.ts:169:3 › TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ @PRICE @P1 
+    [webkit] › tests\fixtures.ts:169:3 › TC-TRN-03 ติ๊ก "ต้องการรถรับส่ง" แต่ไม่ใส่ระยะ/โรงแรม @TRN @P2 
+  91 passed (17.8m)

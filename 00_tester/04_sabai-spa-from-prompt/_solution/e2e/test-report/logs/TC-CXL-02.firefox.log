@@ -1,0 +1,11 @@
+# TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้
+# project: firefox · status: passed
+
+[2026-10-10T14:27:23.522Z] (reset) POST /api/test/reset {"now":"2026-10-10T10:01:00+07:00"}
+    → 200 {"ok":true,"now":"2026-10-10T10:01:00+07:00"}
+[2026-10-10T14:27:24.784Z] (U01) POST /api/auth/login {"email":"nida@sabai.test","password":"Nida@2026"}
+    → 200 {"ok":true,"user":{"id":1,"name":"คุณนิดา","email":"nida@sabai.test","role":"customer"}}
+[2026-10-10T14:27:24.790Z] (U01) POST /api/bookings/B05/cancel
+    → 422 {"error":"CANCEL_TOO_LATE","message":"เหลือเวลาน้อยกว่า 24 ชม. ยกเลิกเองไม่ได้ กรุณาโทรหาร้าน","phone":"02-123-4567"}
+[2026-10-10T14:27:25.056Z] (reset) POST /api/test/reset {"now":"2026-10-10T10:00:00+07:00"}
+    → 200 {"ok":true,"now":"2026-10-10T10:00:00+07:00"}

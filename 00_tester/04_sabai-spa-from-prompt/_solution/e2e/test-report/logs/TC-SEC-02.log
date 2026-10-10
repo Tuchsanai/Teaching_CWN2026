@@ -1,0 +1,13 @@
+# TC-SEC-02 รูป before/after เปิดได้เฉพาะเจ้าของ
+# project: api · status: passed
+
+[2026-10-10T14:37:26.479Z] (ไม่ล็อกอิน) GET /api/photos/1
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:37:26.530Z] (U04) POST /api/auth/login {"email":"fon@sabai.test","password":"Fon@2026"}
+    → 200 {"ok":true,"user":{"id":4,"name":"คุณฝน","email":"fon@sabai.test","role":"customer"}}
+[2026-10-10T14:37:26.535Z] (U04) GET /api/photos/1
+    → 403 {"error":"FORBIDDEN","message":"ไม่มีสิทธิ์เข้าถึง"}
+[2026-10-10T14:37:26.586Z] (U01) POST /api/auth/login {"email":"nida@sabai.test","password":"Nida@2026"}
+    → 200 {"ok":true,"user":{"id":1,"name":"คุณนิดา","email":"nida@sabai.test","role":"customer"}}
+[2026-10-10T14:37:26.591Z] (U01) GET /api/photos/1
+    → 200 <image/webp 28793 bytes>

@@ -1,0 +1,21 @@
+# TC-SEC-01 เรียก API ที่ต้อง login โดยไม่ login
+# project: api · status: passed
+
+[2026-10-10T14:09:58.425Z] (ไม่ล็อกอิน) GET /api/me
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:09:58.428Z] (ไม่ล็อกอิน) GET /api/me/bookings
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:09:58.431Z] (ไม่ล็อกอิน) GET /api/wallet
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:09:58.434Z] (ไม่ล็อกอิน) POST /api/bookings/B05/cancel
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:09:58.438Z] (ไม่ล็อกอิน) POST /api/bookings {"type":"course","serviceCode":"K01","people":1,"date":"2026-10-20","time":"11:00","quotedTotal":0,"contactName":"ไม่ล็อกอิน","contactPhone":"0812345678"}
+    → 401 {"error":"LOGIN_REQUIRED","message":"กรุณาเข้าสู่ระบบ"}
+[2026-10-10T14:09:58.489Z] (U01) POST /api/auth/login {"email":"nida@sabai.test","password":"Nida@2026"}
+    → 200 {"ok":true,"user":{"id":1,"name":"คุณนิดา","email":"nida@sabai.test","role":"customer"}}
+[2026-10-10T14:09:58.496Z] (U01) GET /api/me/bookings
+    → 200 {"bookings":[{"id":5,"code":"B05","serviceCode":"S05","serviceName":"นวดเท้า","type":"single","people":1,"date":"2026-10-11","dateLabel":"11 ต.ค. 2026","time":"10:00","endTime":"11:00","therapists":["พี่จันทร์เพ็ญ"],"status":"confirmed","statusLabel":"ยืนยัน","total":760,"totalLabel":"฿760","viaCourse":false,"canCancel":true,"cancelBlockedReason":null},{"id":6,"code":"B06","serviceCode":"S01","serviceName":"นวดไทย 60 นาที","type":"single","people":1,"date":"2026-10-10","dateLabel":"10 ต.ค. 2026","time":"15:00","endTime":"16:00","therapists":["พี่มาลี"],"status":"confirmed","statusLabel":"ยืนยั
+[2026-10-10T14:09:58.549Z] (owner) POST /api/auth/login {"email":"owner@sabai.test","password":"Owner@2026"}
+    → 200 {"ok":true,"user":{"id":9,"name":"คุณจันทร์ (เจ้าของร้าน)","email":"owner@sabai.test","role":"owner"}}
+[2026-10-10T14:09:58.554Z] (owner) GET /api/admin/bookings?date=2026-10-20
+    → 200 {"date":"2026-10-20","today":"2026-10-10","bookings":[]}

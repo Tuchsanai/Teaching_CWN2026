@@ -1,3 +1,15 @@
 node_modules/
-test-results/
-playwright-report/
+# ของเดิม (ผู้เรียน LAB 11): test-report/artifacts/ และ test-report/html/ ทั้งโฟลเดอร์
+# ใน _solution ปล่อยให้เก็บเฉพาะภาพตอนล้ม + error-context + หน้า html หลัก (ไฟล์เล็ก) ส่วน trace.zip / video.webm ยังไม่เก็บ
+test-report/artifacts/**
+!test-report/artifacts/**/
+!test-report/artifacts/.last-run.json
+!test-report/artifacts/**/test-failed-*.png
+!test-report/artifacts/**/error-context.md
+test-report/html/**
+!test-report/html/**/
+!test-report/html/index.html
+!test-report/html/data/*.md
+!test-report/html/data/*.png
+# รันใหม่จะได้ MP4 ทุกข้อ (หลายสิบ MB) ไม่ต้องเก็บ
+test-report/videos/

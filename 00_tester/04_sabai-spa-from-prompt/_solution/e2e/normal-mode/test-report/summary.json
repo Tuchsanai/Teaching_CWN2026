@@ -1,0 +1,867 @@
+{
+  "projects": {
+    "chromium": {
+      "at": "2026-10-10T14:15:59.685Z",
+      "gif": true,
+      "results": {
+        "TC-BOOK-01": {
+          "status": "passed",
+          "duration": 7020,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น"
+        },
+        "TC-BOOK-02": {
+          "status": "passed",
+          "duration": 2817,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31"
+        },
+        "TC-BOOK-03": {
+          "status": "passed",
+          "duration": 5439,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ"
+        },
+        "TC-BOOK-04": {
+          "status": "passed",
+          "duration": 6957,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี)"
+        },
+        "TC-BOOK-05": {
+          "status": "passed",
+          "duration": 6525,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม \"ยืนยันการจอง\")"
+        },
+        "TC-BOOK-07": {
+          "status": "passed",
+          "duration": 8486,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม"
+        },
+        "TC-BOOK-08": {
+          "status": "passed",
+          "duration": 4703,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7"
+        },
+        "TC-BOOK-09": {
+          "status": "passed",
+          "duration": 8657,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน"
+        },
+        "TC-BOOK-10": {
+          "status": "passed",
+          "duration": 17988,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน)"
+        },
+        "TC-CXL-01": {
+          "status": "passed",
+          "duration": 4322,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง"
+        },
+        "TC-CXL-02": {
+          "status": "passed",
+          "duration": 3698,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้"
+        },
+        "TC-CXL-03": {
+          "status": "passed",
+          "duration": 10997,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร"
+        },
+        "TC-CRS-01": {
+          "status": "passed",
+          "duration": 8136,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด"
+        },
+        "TC-CRS-02": {
+          "status": "passed",
+          "duration": 4933,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง"
+        },
+        "TC-CRS-03": {
+          "status": "passed",
+          "duration": 11389,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย"
+        },
+        "TC-GC-01": {
+          "status": "passed",
+          "duration": 10999,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ"
+        },
+        "TC-GC-02": {
+          "status": "passed",
+          "duration": 14527,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย"
+        },
+        "TC-GC-03": {
+          "status": "passed",
+          "duration": 10140,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ"
+        },
+        "TC-GC-04": {
+          "status": "failed",
+          "duration": 23061,
+          "errors": [
+            "Error: expect(locator).toBeVisible() failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected: visible\nTimeout: 7000ms\nError: element(s) not found",
+            "Error: expect(locator).not.toHaveText(expected) failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected pattern: not /^\\s*$/\nTimeout: 7000ms\nError: element(s) not found"
+          ],
+          "failedSteps": [
+            "มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4"
+          ],
+          "title": "TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง"
+        },
+        "TC-I18N-01": {
+          "status": "passed",
+          "duration": 3817,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า"
+        },
+        "TC-MEM-01": {
+          "status": "passed",
+          "duration": 9008,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-01 ค่าขอบระดับสมาชิก"
+        },
+        "TC-MEM-02": {
+          "status": "passed",
+          "duration": 6970,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-02 ข้อความ \"อีก ฿X ถึง …\" ห้ามติดลบ"
+        },
+        "TC-MEM-03": {
+          "status": "passed",
+          "duration": 23107,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250"
+        },
+        "TC-MEM-04": {
+          "status": "passed",
+          "duration": 5815,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-04 ได้แต้มหลังร้านกด \"ใช้บริการเสร็จ\""
+        },
+        "TC-PRICE-01": {
+          "status": "passed",
+          "duration": 18619,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป"
+        },
+        "TC-PRICE-02": {
+          "status": "passed",
+          "duration": 15603,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด"
+        },
+        "TC-PRICE-03": {
+          "status": "passed",
+          "duration": 16321,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2"
+        },
+        "TC-PRICE-04": {
+          "status": "passed",
+          "duration": 10146,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ"
+        },
+        "TC-PRICE-05": {
+          "status": "passed",
+          "duration": 9331,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม"
+        },
+        "TC-PRICE-06": {
+          "status": "passed",
+          "duration": 17585,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ"
+        },
+        "TC-TH-01": {
+          "status": "passed",
+          "duration": 1747,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TH-01 ตัวกรอง \"4.5 ดาวขึ้นไป\" + การแสดงคะแนน"
+        },
+        "TC-TRN-01": {
+          "status": "passed",
+          "duration": 7487,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม."
+        },
+        "TC-TRN-02": {
+          "status": "passed",
+          "duration": 3554,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4)"
+        },
+        "TC-TRN-03": {
+          "status": "failed",
+          "duration": 29258,
+          "errors": [
+            "Error: ต้องไปขั้น 4 ไม่ได้\n\nexpect(locator).toHaveCount(expected) failed\n\nLocator:  getByTestId('book-summary')\nExpected: 0",
+            "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  getByTestId('book-step-indicator')\nExpected: \"3\"\nReceived: \"4\"\nTimeout:  7000ms",
+            "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('[data-testid=\"book-error-message\"], [data-testid=\"book-quote-error-message\"]').filter({ hasText: /ระยะ|โรงแรม/ })\nExpected: 1\nReceived: 0\nTimeout:  7000ms"
+          ],
+          "failedSteps": [
+            "กด \"ถัดไป\" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)"
+          ],
+          "title": "TC-TRN-03 ติ๊ก \"ต้องการรถรับส่ง\" แต่ไม่ใส่ระยะ/โรงแรม"
+        },
+        "TC-UI-01": {
+          "status": "passed",
+          "duration": 3413,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px"
+        },
+        "TC-UI-02": {
+          "status": "passed",
+          "duration": 3276,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง"
+        }
+      }
+    },
+    "api": {
+      "at": "2026-10-10T14:15:59.685Z",
+      "gif": true,
+      "results": {
+        "TC-BOOK-06": {
+          "status": "passed",
+          "duration": 374,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-06 จองพร้อมกัน 2 คำขอ รอบ/นักบำบัดเดียวกัน"
+        },
+        "TC-SEC-01": {
+          "status": "passed",
+          "duration": 309,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-SEC-01 เรียก API ที่ต้อง login โดยไม่ login"
+        },
+        "TC-SEC-02": {
+          "status": "passed",
+          "duration": 288,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-SEC-02 รูป before/after เปิดได้เฉพาะเจ้าของ"
+        },
+        "TC-SEC-03": {
+          "status": "passed",
+          "duration": 253,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-SEC-03 ลูกค้าเรียก API หลังร้าน"
+        },
+        "TC-SEC-04": {
+          "status": "failed",
+          "duration": 245,
+          "errors": [
+            "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 401\nReceived: 200"
+          ],
+          "failedSteps": [
+            "GET /api/me ด้วย cookie เดิม → 401"
+          ],
+          "title": "TC-SEC-04 ออกจากระบบแล้วใช้ cookie เดิม"
+        },
+        "TC-SEC-05": {
+          "status": "failed",
+          "duration": 417,
+          "errors": [
+            "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: 422\nReceived array: [403, 404]"
+          ],
+          "failedSteps": [
+            "U04 POST /api/bookings แบบคอร์สด้วย C01 (ของ U01) 20 ต.ค. 11:00 → 403/404"
+          ],
+          "title": "TC-SEC-05 ล็อกอินแล้วแต่ใช้ของคนอื่น: ยกเลิกนัดคนอื่น · จองด้วยคอร์สคนอื่น"
+        }
+      }
+    },
+    "firefox": {
+      "at": "2026-10-10T14:09:55.728Z",
+      "gif": false,
+      "results": {
+        "TC-BOOK-01": {
+          "status": "passed",
+          "duration": 3547,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น"
+        },
+        "TC-BOOK-02": {
+          "status": "passed",
+          "duration": 1463,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31"
+        },
+        "TC-BOOK-03": {
+          "status": "passed",
+          "duration": 2604,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ"
+        },
+        "TC-BOOK-04": {
+          "status": "passed",
+          "duration": 4101,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี)"
+        },
+        "TC-BOOK-05": {
+          "status": "passed",
+          "duration": 4064,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม \"ยืนยันการจอง\")"
+        },
+        "TC-BOOK-07": {
+          "status": "passed",
+          "duration": 6187,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม"
+        },
+        "TC-BOOK-08": {
+          "status": "passed",
+          "duration": 2545,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7"
+        },
+        "TC-BOOK-09": {
+          "status": "passed",
+          "duration": 6154,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน"
+        },
+        "TC-BOOK-10": {
+          "status": "passed",
+          "duration": 12124,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน)"
+        },
+        "TC-CXL-01": {
+          "status": "passed",
+          "duration": 3093,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง"
+        },
+        "TC-CXL-02": {
+          "status": "passed",
+          "duration": 2040,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้"
+        },
+        "TC-CXL-03": {
+          "status": "passed",
+          "duration": 7166,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร"
+        },
+        "TC-CRS-01": {
+          "status": "passed",
+          "duration": 5973,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด"
+        },
+        "TC-CRS-02": {
+          "status": "passed",
+          "duration": 2884,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง"
+        },
+        "TC-CRS-03": {
+          "status": "passed",
+          "duration": 8157,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย"
+        },
+        "TC-GC-01": {
+          "status": "passed",
+          "duration": 4674,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ"
+        },
+        "TC-GC-02": {
+          "status": "passed",
+          "duration": 11721,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย"
+        },
+        "TC-GC-03": {
+          "status": "passed",
+          "duration": 7629,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ"
+        },
+        "TC-GC-04": {
+          "status": "failed",
+          "duration": 18837,
+          "errors": [
+            "Error: expect(locator).toBeVisible() failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected: visible\nTimeout: 7000ms\nError: element(s) not found",
+            "Error: expect(locator).not.toHaveText(expected) failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected pattern: not /^\\s*$/\nTimeout: 7000ms\nError: element(s) not found"
+          ],
+          "failedSteps": [
+            "มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4"
+          ],
+          "title": "TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง"
+        },
+        "TC-I18N-01": {
+          "status": "passed",
+          "duration": 3347,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า"
+        },
+        "TC-MEM-01": {
+          "status": "passed",
+          "duration": 4982,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-01 ค่าขอบระดับสมาชิก"
+        },
+        "TC-MEM-02": {
+          "status": "passed",
+          "duration": 2181,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-02 ข้อความ \"อีก ฿X ถึง …\" ห้ามติดลบ"
+        },
+        "TC-MEM-03": {
+          "status": "passed",
+          "duration": 16901,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250"
+        },
+        "TC-MEM-04": {
+          "status": "passed",
+          "duration": 3618,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-04 ได้แต้มหลังร้านกด \"ใช้บริการเสร็จ\""
+        },
+        "TC-PRICE-01": {
+          "status": "passed",
+          "duration": 13089,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป"
+        },
+        "TC-PRICE-02": {
+          "status": "passed",
+          "duration": 10339,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด"
+        },
+        "TC-PRICE-03": {
+          "status": "passed",
+          "duration": 11888,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2"
+        },
+        "TC-PRICE-04": {
+          "status": "passed",
+          "duration": 6726,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ"
+        },
+        "TC-PRICE-05": {
+          "status": "passed",
+          "duration": 6994,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม"
+        },
+        "TC-PRICE-06": {
+          "status": "passed",
+          "duration": 12402,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ"
+        },
+        "TC-TH-01": {
+          "status": "passed",
+          "duration": 592,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TH-01 ตัวกรอง \"4.5 ดาวขึ้นไป\" + การแสดงคะแนน"
+        },
+        "TC-TRN-01": {
+          "status": "passed",
+          "duration": 1931,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม."
+        },
+        "TC-TRN-02": {
+          "status": "passed",
+          "duration": 1555,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4)"
+        },
+        "TC-TRN-03": {
+          "status": "failed",
+          "duration": 24468,
+          "errors": [
+            "Error: ต้องไปขั้น 4 ไม่ได้\n\nexpect(locator).toHaveCount(expected) failed\n\nLocator:  getByTestId('book-summary')\nExpected: 0",
+            "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  getByTestId('book-step-indicator')\nExpected: \"3\"\nReceived: \"4\"\nTimeout:  7000ms",
+            "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('[data-testid=\"book-error-message\"], [data-testid=\"book-quote-error-message\"]').filter({ hasText: /ระยะ|โรงแรม/ })\nExpected: 1\nReceived: 0\nTimeout:  7000ms"
+          ],
+          "failedSteps": [
+            "กด \"ถัดไป\" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)"
+          ],
+          "title": "TC-TRN-03 ติ๊ก \"ต้องการรถรับส่ง\" แต่ไม่ใส่ระยะ/โรงแรม"
+        },
+        "TC-UI-01": {
+          "status": "passed",
+          "duration": 2285,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px"
+        },
+        "TC-UI-02": {
+          "status": "passed",
+          "duration": 2039,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง"
+        }
+      }
+    },
+    "webkit": {
+      "at": "2026-10-10T14:09:55.728Z",
+      "gif": false,
+      "results": {
+        "TC-BOOK-01": {
+          "status": "passed",
+          "duration": 5494,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-01 จองคิวจนจบ (E2E) แบบไม่ล็อกอิน 4 ขั้น"
+        },
+        "TC-BOOK-02": {
+          "status": "passed",
+          "duration": 1854,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-02 ช่วงวันที่จองได้ +0 / +1 / +30 / +31"
+        },
+        "TC-BOOK-03": {
+          "status": "passed",
+          "duration": 3495,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-03 รอบเวลา + เวลาปิดร้าน + เวลาไม่ตรงรอบ"
+        },
+        "TC-BOOK-04": {
+          "status": "passed",
+          "duration": 5469,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-04 จองซ้อน นักบำบัด (ซ้อนท้าย / ซ้อนกลาง / ต่อกันพอดี)"
+        },
+        "TC-BOOK-05": {
+          "status": "passed",
+          "duration": 5837,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-05 กดยืนยันซ้ำ (ดับเบิลแตะปุ่ม \"ยืนยันการจอง\")"
+        },
+        "TC-BOOK-07": {
+          "status": "passed",
+          "duration": 7605,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-07 จองคู่ Couple Suite: จำนวนคน + ห้องเต็ม"
+        },
+        "TC-BOOK-08": {
+          "status": "passed",
+          "duration": 2896,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-08 จำนวนคนจองกลุ่ม 2 / 3 / 6 / 7"
+        },
+        "TC-BOOK-09": {
+          "status": "passed",
+          "duration": 7782,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-09 กลุ่มต้องมีนักบำบัดว่างเท่าจำนวนคน"
+        },
+        "TC-BOOK-10": {
+          "status": "passed",
+          "duration": 15939,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-BOOK-10 ข้อมูลติดต่อว่าง (ไม่ล็อกอิน)"
+        },
+        "TC-CXL-01": {
+          "status": "passed",
+          "duration": 2859,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-01 ยกเลิกเมื่อเหลือ 24:00 ชม. พอดี + รอบกลับมาว่าง"
+        },
+        "TC-CXL-02": {
+          "status": "passed",
+          "duration": 2112,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-02 ยกเลิกเมื่อเหลือ 23:59 ชม. และนัดวันนี้"
+        },
+        "TC-CXL-03": {
+          "status": "passed",
+          "duration": 9495,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CXL-03 ยกเลิกนัดที่แลกแต้ม + จ่ายด้วย Gift Card → คืนแต้ม/คืนยอดบัตร"
+        },
+        "TC-CRS-01": {
+          "status": "passed",
+          "duration": 7272,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-01 จองด้วยคอร์สแล้วครั้งลด"
+        },
+        "TC-CRS-02": {
+          "status": "passed",
+          "duration": 3496,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-02 ยกเลิกนัดคอร์ส → คืนครั้ง"
+        },
+        "TC-CRS-03": {
+          "status": "passed",
+          "duration": 9104,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-CRS-03 คอร์สเหลือ 0 / หมดอายุ / วันสุดท้าย"
+        },
+        "TC-GC-01": {
+          "status": "passed",
+          "duration": 8853,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-01 มูลค่าบัตร ฿499 / ฿500 / ฿10,000 / ฿10,001 + วันหมดอายุ"
+        },
+        "TC-GC-02": {
+          "status": "passed",
+          "duration": 14536,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-02 บัตรหมดอายุ / บัตรวันสุดท้าย"
+        },
+        "TC-GC-03": {
+          "status": "passed",
+          "duration": 9369,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-GC-03 ใช้บัตรบางส่วน → ยอดคงเหลือ"
+        },
+        "TC-GC-04": {
+          "status": "failed",
+          "duration": 20085,
+          "errors": [
+            "Error: expect(locator).toBeVisible() failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected: visible\nTimeout: 7000ms\nError: element(s) not found",
+            "Error: expect(locator).not.toHaveText(expected) failed\n\nLocator: getByTestId('book-giftcard-error')\nExpected pattern: not /^\\s*$/\nTimeout: 7000ms\nError: element(s) not found"
+          ],
+          "failedSteps": [
+            "มีข้อความแจ้งว่าใช้บัตรไม่ได้ ก่อนไปขั้น 4"
+          ],
+          "title": "TC-GC-04 รหัสบัตรที่ไม่มีจริงในหน้าจอง"
+        },
+        "TC-I18N-01": {
+          "status": "passed",
+          "duration": 2314,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-I18N-01 เลือก 中文 แล้วไม่มีอักษรไทย + จำภาษาเมื่อเปลี่ยนหน้า"
+        },
+        "TC-MEM-01": {
+          "status": "passed",
+          "duration": 5080,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-01 ค่าขอบระดับสมาชิก"
+        },
+        "TC-MEM-02": {
+          "status": "passed",
+          "duration": 3895,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-02 ข้อความ \"อีก ฿X ถึง …\" ห้ามติดลบ"
+        },
+        "TC-MEM-03": {
+          "status": "passed",
+          "duration": 19720,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-03 แลกแต้ม 99 / 100 / 199 / 250"
+        },
+        "TC-MEM-04": {
+          "status": "passed",
+          "duration": 3481,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-MEM-04 ได้แต้มหลังร้านกด \"ใช้บริการเสร็จ\""
+        },
+        "TC-PRICE-01": {
+          "status": "passed",
+          "duration": 16996,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-01 ส่วนลดกลุ่ม 10% เมื่อ 4 คนขึ้นไป"
+        },
+        "TC-PRICE-02": {
+          "status": "passed",
+          "duration": 13506,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-02 ส่วนลด % ไม่ซ้อน: กลุ่ม 4 คน + Gold · กลุ่ม 4 คน + เดือนเกิด"
+        },
+        "TC-PRICE-03": {
+          "status": "passed",
+          "duration": 15351,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-03 ส่วนลดเดือนเกิด 20%: ชนะระดับ · นอกเดือน · ครั้งที่ 2"
+        },
+        "TC-PRICE-04": {
+          "status": "passed",
+          "duration": 8770,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-04 ลำดับคิดราคาเต็ม: กลุ่ม → แลกแต้ม → ค่ารถ"
+        },
+        "TC-PRICE-05": {
+          "status": "passed",
+          "duration": 8651,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-05 ยอดในหน้าสรุป = ยอดที่บันทึก · ส่งยอดปลอม"
+        },
+        "TC-PRICE-06": {
+          "status": "passed",
+          "duration": 15653,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-PRICE-06 แพ็กเกจ Bangkok Relax ราคา × คน รวมรถ · ไม่มีส่วนลดใด ๆ"
+        },
+        "TC-TH-01": {
+          "status": "passed",
+          "duration": 1312,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TH-01 ตัวกรอง \"4.5 ดาวขึ้นไป\" + การแสดงคะแนน"
+        },
+        "TC-TRN-01": {
+          "status": "passed",
+          "duration": 2119,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-01 ค่าขอบระยะทาง 5.0 / 5.1 / 15.0 / 15.1 กม."
+        },
+        "TC-TRN-02": {
+          "status": "passed",
+          "duration": 1544,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-TRN-02 จำนวนคัน = ปัดขึ้น(คน ÷ 4)"
+        },
+        "TC-TRN-03": {
+          "status": "failed",
+          "duration": 26057,
+          "errors": [
+            "Error: ต้องไปขั้น 4 ไม่ได้\n\nexpect(locator).toHaveCount(expected) failed\n\nLocator:  getByTestId('book-summary')\nExpected: 0",
+            "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  getByTestId('book-step-indicator')\nExpected: \"3\"\nReceived: \"4\"\nTimeout:  7000ms",
+            "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('[data-testid=\"book-error-message\"], [data-testid=\"book-quote-error-message\"]').filter({ hasText: /ระยะ|โรงแรม/ })\nExpected: 1\nReceived: 0\nTimeout:  7000ms"
+          ],
+          "failedSteps": [
+            "กด \"ถัดไป\" → ยังอยู่ขั้น 3 และมีข้อความให้ใส่ระยะทาง/เลือกโรงแรม (ทันที)"
+          ],
+          "title": "TC-TRN-03 ติ๊ก \"ต้องการรถรับส่ง\" แต่ไม่ใส่ระยะ/โรงแรม"
+        },
+        "TC-UI-01": {
+          "status": "passed",
+          "duration": 1544,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-01 ไม่มีเลื่อนข้างที่จอ 375px"
+        },
+        "TC-UI-02": {
+          "status": "passed",
+          "duration": 2054,
+          "errors": [],
+          "failedSteps": [],
+          "title": "TC-UI-02 เซลฟี่ไม่ออกจากเครื่อง"
+        }
+      }
+    }
+  }
+}

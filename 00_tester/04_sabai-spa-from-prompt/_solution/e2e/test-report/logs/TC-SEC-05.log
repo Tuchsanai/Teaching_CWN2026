@@ -1,0 +1,21 @@
+# TC-SEC-05 ล็อกอินแล้วแต่ใช้ของคนอื่น: ยกเลิกนัดคนอื่น · จองด้วยคอร์สคนอื่น
+# project: api · status: failed
+
+[2026-10-10T14:37:27.603Z] (U01) POST /api/auth/login {"email":"nida@sabai.test","password":"Nida@2026"}
+    → 200 {"ok":true,"user":{"id":1,"name":"คุณนิดา","email":"nida@sabai.test","role":"customer"}}
+[2026-10-10T14:37:27.656Z] (U04) POST /api/auth/login {"email":"fon@sabai.test","password":"Fon@2026"}
+    → 200 {"ok":true,"user":{"id":4,"name":"คุณฝน","email":"fon@sabai.test","role":"customer"}}
+[2026-10-10T14:37:27.663Z] (U01) GET /api/wallet
+    → 200 {"courses":[{"id":1,"code":"C01","total":11,"used":4,"reserved":0,"remaining":7,"purchasedOn":"2026-08-01","expiresOn":"2027-01-28","expiresLabel":"28 ม.ค. 2027","daysLeft":110,"expired":false,"usable":true,"remainingLabel":"เหลือ 7 จาก 11 ครั้ง"}],"waist":[{"date":"2026-08-05","cm":82,"courseId":1},{"date":"2026-08-19","cm":81,"courseId":1},{"date":"2026-09-02","cm":79.5,"courseId":1},{"date":"2026-09-23","cm":78,"courseId":1}],"waistReducedCm":4,"photos":[{"id":1,"courseId":1,"phase":"before","url":"/api/photos/1"},{"id":2,"courseId":1,"phase":"after","url":"/api/photos/2"}]}
+[2026-10-10T14:37:27.669Z] (U04) POST /api/bookings/B05/cancel
+    → 403 {"error":"FORBIDDEN","message":"ไม่มีสิทธิ์เข้าถึง"}
+[2026-10-10T14:37:27.675Z] (U04) POST /api/bookings {"type":"course","serviceCode":"K01","people":1,"date":"2026-10-20","time":"11:00","quotedTotal":0,"coursePurchaseId":1}
+    → 422 {"error":"COURSE_UNAVAILABLE","message":"ใช้คอร์สนี้ไม่ได้ (เหลือ 0 ครั้งหรือหมดอายุ)"}
+[2026-10-10T14:37:27.682Z] (U01) GET /api/me/bookings
+    → 200 {"bookings":[{"id":5,"code":"B05","serviceCode":"S05","serviceName":"นวดเท้า","type":"single","people":1,"date":"2026-10-11","dateLabel":"11 ต.ค. 2026","time":"10:00","endTime":"11:00","therapists":["พี่จันทร์เพ็ญ"],"status":"confirmed","statusLabel":"ยืนยัน","total":760,"totalLabel":"฿760","viaCourse":false,"canCancel":true,"cancelBlockedReason":null},{"id":6,"code":"B06","serviceCode":"S01","serviceName":"นวดไทย 60 นาที","type":"single","people":1,"date":"2026-10-10","dateLabel":"10 ต.ค. 2026","time":"15:00","endTime":"16:00","therapists":["พี่มาลี"],"status":"confirmed","statusLabel":"ยืนยั
+[2026-10-10T14:37:27.687Z] (U01) GET /api/wallet
+    → 200 {"courses":[{"id":1,"code":"C01","total":11,"used":4,"reserved":0,"remaining":7,"purchasedOn":"2026-08-01","expiresOn":"2027-01-28","expiresLabel":"28 ม.ค. 2027","daysLeft":110,"expired":false,"usable":true,"remainingLabel":"เหลือ 7 จาก 11 ครั้ง"}],"waist":[{"date":"2026-08-05","cm":82,"courseId":1},{"date":"2026-08-19","cm":81,"courseId":1},{"date":"2026-09-02","cm":79.5,"courseId":1},{"date":"2026-09-23","cm":78,"courseId":1}],"waistReducedCm":4,"photos":[{"id":1,"courseId":1,"phase":"before","url":"/api/photos/1"},{"id":2,"courseId":1,"phase":"after","url":"/api/photos/2"}]}
+[2026-10-10T14:37:27.742Z] (owner) POST /api/auth/login {"email":"owner@sabai.test","password":"Owner@2026"}
+    → 200 {"ok":true,"user":{"id":9,"name":"คุณจันทร์ (เจ้าของร้าน)","email":"owner@sabai.test","role":"owner"}}
+[2026-10-10T14:37:27.748Z] (owner) GET /api/admin/bookings?date=2026-10-20
+    → 200 {"date":"2026-10-20","today":"2026-10-10","bookings":[]}

@@ -1,68 +1,118 @@
-# CLAUDE.md — สบายใจ สปา + ชุดทดสอบ Playwright
+# CLAUDE.md · บท 04 สบายใจ สปา (ทดสอบเว็บ)
+
+โฟลเดอร์นี้เป็นงาน **ทดสอบ** เว็บ สบายใจ สปา: เอกสารความต้องการ → แผนทดสอบ → ชุดทดสอบ Playwright (`e2e/`)
+
+## ข้อห้าม (สำคัญ)
+- **ห้ามแก้โค้ดใน `web/` และ `db/`** — เราเป็นผู้ทดสอบ ถ้าเว็บผิดให้บันทึกเป็นบั๊ก ไม่ใช่แก้เว็บ
+- **ห้ามเปิด `web/BUGS.md` และ `_solution/`** (เฉลยบั๊ก) จนกว่าพรอมต์จะอนุญาต
+- ห้ามแก้ "ผลที่คาดหวัง" ใน test ให้ตรงกับที่เว็บแสดง — ค่าคาดหวังมาจาก `TEST-PLAN.md` เท่านั้น
+- ห้ามแตะ container อื่นนอกจาก `sabai-web`, `sabai-db` (container ที่จับพอร์ตชน เช่น `petshop` ให้ **stop** ได้อย่างเดียว ห้ามลบ)
 
 ## โครงสร้างโฟลเดอร์
 
 ```
-03_sabai-spa-from-prompt/
-├─ REQUIREMENTS.md, USER-STORIES.md   ความต้องการ (FR / BR / NFR / US)
-├─ TEST-PLAN.md                       แผนทดสอบ: รหัส TC-xxx, โมดูล, ระดับ P1–P3, ผลที่คาดหวัง, เกณฑ์ผ่าน
-├─ spa/                               เว็บที่ถูกทดสอบ (Next.js + PostgreSQL ใน Docker) — ห้ามแก้โค้ดในนี้
-│  └─ SPEC.md                         หน้าเว็บ, data-testid, ข้อความ error, API — แหล่งอ้างอิงเดียวของ selector
-└─ e2e/                               โปรเจกต์ Playwright (TypeScript)
-   ├─ package.json                    scripts: test, test:gif, report
-   ├─ playwright.config.ts            chromium / firefox / webkit · 1280x800 · th-TH · Asia/Bangkok · GIF=1 → อัดวิดีโอ + slowMo 650 (chromium)
-   ├─ global-setup.ts                 เช็ก /api/health แล้ว POST /api/test/reset {now: 2026-10-08T10:00:00+07:00} ครั้งเดียว
-   ├─ tests/fixtures.ts               test (ป้ายชื่อ + วงแดงตรงจุดคลิก + ค้างเฟรมท้าย ในโหมด GIF), open(), loginByApi(), createUser(), bookingDate(), ApiLog
-   ├─ tests/ready.setup.ts            project "setup": เช็กว่าเว็บพร้อม (ไม่ reset) — มีไว้ให้ time-travel รันเป็น teardown
-   ├─ tests/NN-<โมดูล>.spec.ts         test case ตาม TEST-PLAN.md (01-home … 13-mobile) รันขนานบน chromium / firefox / webkit
-   ├─ tests/90-time-travel.serial.spec.ts  TC ที่ต้องย้ายเวลาเว็บ (TC-BOOK-03, TC-MEM-04, TC-DASH-02) — project "time-travel" รันทีละข้อบน chromium หลัง 3 เบราว์เซอร์จบ แล้ว reset กลับ R0
-   ├─ reporters/tester-report.ts      วิดีโอ → test-report/gifs/<TC>.gif + videos/<TC>.mp4 (ffmpeg) และเขียน test-report/TEST-REPORT.md
-   └─ test-report/                    ผลลัพธ์: TEST-REPORT.md, gifs/, videos/, logs/, failures/
+w/
+├─ REQUIREMENTS.md  USER-STORIES.md  DESIGN.md   ← ความต้องการของร้าน [D]
+├─ TEST-DATA.md      ← seed (U01–U08, S01–S07, B01–B13, GC01–GC05 …) + ค่าขอบ E01–E90 · วันล็อก TODAY=2026-10-10T10:00:00+07:00
+├─ EXPLORATION.md    ← ผลสำรวจเว็บ 3 ทาง (ร้าน/AI/เว็บจริง) + คำถามส่วน F · รูปใน exploration/
+├─ TEST-PLAN.md      ← แผนทดสอบ 42 TC (หัวข้อ 5) + เกณฑ์ผ่าน (หัวข้อ 6)
+├─ PLAN-REVIEW.md    ← รีวิวแผน
+├─ db/               ← compose ฐานข้อมูล (ห้ามแก้)
+├─ web/              ← โค้ดเว็บ Next.js (ห้ามแก้) · web/SPEC.md = API + data-testid (อ่านได้)
+└─ e2e/              ← ชุดทดสอบ Playwright (TypeScript)
+   ├─ playwright.config.ts   ← chromium / firefox / webkit + project "api" · th-TH · Asia/Bangkok · workers 1
+   ├─ global-setup.ts        ← เช็ก /api/health แล้ว POST /api/test/reset ครั้งเดียว · อ่าน data-bug-mode
+   ├─ plan-cases.json        ← 42 TC ที่ดึงจาก TEST-PLAN.md (npm run plan)
+   ├─ tests/
+   │  ├─ fixtures.ts         ← tc() ตั้งชื่อ/tag/annotation · reset ก่อนทุก test · api log · GIF/MP4 · ตัวช่วยจองคิว
+   │  ├─ book.spec.ts  price.spec.ts  transport.spec.ts  member.spec.ts  course.spec.ts
+   │  ├─ cancel.spec.ts  giftcard.spec.ts  therapist.spec.ts  i18n.spec.ts  ui.spec.ts
+   │  └─ book.api.spec.ts  security.api.spec.ts   ← TC ที่ยิง API อย่างเดียว (รันใน project "api")
+   ├─ fixtures/selfie-test.png   ← รูปทดสอบ > 50 KB (TC-UI-02)
+   ├─ triage.json            ← การจำแนกข้อที่ล้ม: เว็บผิด / แผนผิด / test เขียนผิด
+   ├─ index.html             ← รายงานหน้าเดียว (ดับเบิลคลิกเปิดได้)
+   ├─ scripts/               ← build-report.mjs · index-reporter.mjs · run-gif.mjs · extract-plan.mjs
+   └─ test-report/           ← gifs/<TC>.gif · videos/<TC>.mp4 · logs/<TC>.log · summary.json · history.json · html/
 ```
 
-## เปิดเว็บ (PowerShell)
+## เปิดฐานข้อมูล + เว็บ (PowerShell, ที่โฟลเดอร์ `w/`)
 
 ```powershell
-cd spa
-docker compose up -d --build          # เปิดแบบปกติ (BUG_MODE=0)
-curl.exe http://localhost:3000/api/health   # ต้องได้ {"ok":true,"db":true}
+# หยุด container อื่นที่จับพอร์ต 3000 / 5433 (stop อย่างเดียว)
+docker ps --format "{{.Names}} {{.Ports}}"
+docker stop petshop                                   # ถ้ามี
 
-# เปิดโหมดฝังบั๊กสำหรับฝึก
-$env:BUG_MODE = "1"; docker compose up -d --build
-# กลับโหมดปกติ
-$env:BUG_MODE = "0"; docker compose up -d --build
-Remove-Item Env:BUG_MODE
+# network ร่วม + ฐานข้อมูล (รอ healthy)
+docker network inspect sabai-net *> $null; if (-not $?) { docker network create sabai-net }
+docker compose -f db/compose.yaml up -d
+docker inspect -f "{{.State.Health.Status}}" sabai-db
 
-docker compose down                   # ปิดเว็บ (ข้อมูล DB ยังอยู่ใน volume)
+# เว็บ (รอ healthy) แล้วเช็ก
+docker compose -f web/compose.yaml up -d --build
+docker inspect -f "{{.State.Health.Status}}" sabai-web
+Invoke-RestMethod http://localhost:3000/api/health    # ok=True db=True
+
+# รีเซ็ตข้อมูลทดสอบ + ล็อกวันนี้
+Invoke-RestMethod -Method Post http://localhost:3000/api/test/reset -ContentType "application/json" -Body '{"now":"2026-10-10T10:00:00+07:00"}'
 ```
 
-ตรวจโหมดที่รันอยู่: `<html data-bug-mode="0|1">` (รายงานใน TEST-REPORT.md แสดงให้อัตโนมัติ)
+### BUG_MODE (เปิด/ปิดบั๊กที่ตั้งใจใส่)
 
-## รัน test (PowerShell)
+```powershell
+$env:BUG_MODE = "1"; docker compose -f web/compose.yaml up -d --force-recreate   # เปิดโหมดบั๊ก
+$env:BUG_MODE = "0"; docker compose -f web/compose.yaml up -d --force-recreate   # ปิด (ปกติ)
+# ตรวจโหมด: <html data-bug-mode="0|1"> — รายงาน e2e/index.html แสดงป้ายโหมดให้อัตโนมัติ
+(Invoke-WebRequest http://localhost:3000).Content -match 'data-bug-mode="(\d)"' | Out-Null; $Matches[1]
+```
+
+## รันชุดทดสอบ (PowerShell, ที่ `w/e2e`)
 
 ```powershell
 cd e2e
-npm install                           # ครั้งแรก (@playwright/test ล็อกที่ 1.63.0 ให้ตรงกับเบราว์เซอร์ที่ติดตั้งไว้)
-npx playwright test                   # 3 เบราว์เซอร์พร้อมกัน
-npx playwright test -g "TC-HOME-01"   # รันข้อเดียว
-npm run test:gif                      # chromium (+ time-travel) อัดวิดีโอทุก test → GIF + MP4 (ต้องมี ffmpeg ใน PATH) ใช้เวลาราว 8 นาที
-npm run report                        # เปิดรายงาน HTML ของ Playwright
+npm install
+npx playwright install                 # chromium firefox webkit
+npx playwright test                    # 3 เบราว์เซอร์ + project api → สร้าง index.html ใหม่อัตโนมัติ
+npm run test:gif                       # chromium แบบช้า + อัดวิดีโอ → test-report/gifs/*.gif, videos/*.mp4 (ต้องมี ffmpeg)
+npx playwright test --grep "@P1"       # เฉพาะ P1 · --grep "@BOOK" เฉพาะโมดูล · --grep "TC-GC-02" ข้อเดียว
+npx playwright test --project=webkit   # เบราว์เซอร์เดียว
+npm run report                         # สร้าง index.html ใหม่หลังแก้ triage.json (ไม่ต้องรัน test ซ้ำ)
+npx playwright show-report test-report/html
 ```
+
+- `GIF=1` ตั้งผ่าน `npm run test:gif` (ใช้ได้ทั้ง PowerShell/bash) · ถ้าจะตั้งเอง: `$env:GIF="1"; npx playwright test --project=chromium; Remove-Item Env:GIF`
+- รันทีละ test (`workers: 1`) เพราะทุก TC ต้อง reset ฐานข้อมูลก่อน และ TC-CXL-02 เลื่อนนาฬิกาของทั้งระบบ → 3 เบราว์เซอร์รันพร้อมกันจะชนข้อมูลกัน
 
 ## วิธีเขียน test ใหม่
 
-1. ชื่อ test ขึ้นต้นด้วยรหัส TC จาก `TEST-PLAN.md` ตามด้วยสิ่งที่ทดสอบ เช่น `'TC-BOOK-01 จองคิวเดี่ยวจนจบ (Guest)'`
-2. ใส่ `tag: ['@<โมดูล>', '@P1|@P2|@P3']` ตามคอลัมน์ "โมดูล" และ "ระดับ" เช่น `['@BOOK', '@P1']`
-3. ใส่ `annotation: { type: 'expected', description: '<ผลที่คาดหวังจาก TEST-PLAN.md>' }` — reporter เอาไปใส่ในรายงานและ DEF-xxx
-4. หา element ด้วย `page.getByTestId('...')` ตามที่เขียนใน `spa/SPEC.md` §3 เท่านั้น ห้ามเดา selector (CSS / XPath / ข้อความ)
-5. import จาก `./fixtures` เสมอ (`import { test, expect, open } from './fixtures'`) ไม่ใช่จาก `@playwright/test` — ไม่งั้นจะไม่มีป้ายชื่อ/วงแดงใน GIF
-6. เปิดหน้าด้วย `await open(page, '/path')` (รอ `html[data-ready="true"]`)
-7. ห้าม reset ใน test — `global-setup.ts` reset ครั้งเดียว เพราะ 3 เบราว์เซอร์รันพร้อมกัน
-   - จองคิว: ใช้วันจาก `bookingDate(browserName, DAY.<TC>)` (แต่ละเบราว์เซอร์ได้ช่วงวันของตัวเอง แต่ละ TC ได้วันของตัวเอง) กันจองชนกัน
-   - ต้องการสมาชิกที่แก้ข้อมูลได้: `createMember(page.request, { totalSpent, points, course })` (อีเมลไม่ซ้ำ ตั้งค่าด้วย /api/test/user) แทนการแก้ nida / ton / new
-   - อ่านผู้ใช้ seed อย่างเดียวได้: `loginByApi(page.request, 'nida')` · อ่านคิว seed 2026-10-09 / 10-10 ได้ แต่ห้ามจองทับวันนั้น
-   - TC ที่ต้อง reset ด้วยเวลาอื่น (R(…)) หรือแก้ผู้ใช้ seed ตัวจริง → เขียนใน `tests/90-time-travel.serial.spec.ts` เท่านั้น (รันหลังทุกเบราว์เซอร์จบ)
-   - บันทึกข้อมูลที่ปรับจากแผน / ค่าที่ "ต้องถาม" ด้วย `note('…')` หรือ `note('…', 'ต้องถาม')` → ไปอยู่ในรายงาน
-8. เรียก API ด้วย fixture `apiLog` (`await apiLog.call(page.request, 'POST', '/api/...', body)`) — บันทึก request / status / body ให้อัตโนมัติ → `test-report/logs/<TC>-<browser>.log`
-9. TC ที่เปิดหน้าเว็บต้องได้ทั้ง `test-report/gifs/<TC>.gif` และ `test-report/videos/<TC>.mp4` จาก `npm run test:gif` — ตรวจทุกครั้งหลังเพิ่ม test
-10. รัน `npx playwright test` ให้ผ่านทั้ง 3 เบราว์เซอร์ (ถ้าล้มเพราะเว็บมีบั๊กจริง ให้ปล่อยให้ล้มและดู DEF-xxx ใน TEST-REPORT.md อย่าแก้ test ให้ผ่าน)
+1. เพิ่มแถว TC ใน `TEST-PLAN.md` หัวข้อ 5 (ID · โมดูล · สิ่งที่ทดสอบ · … · ระดับ · ผลที่คาดหวัง · ที่มา) แล้วรัน `npm run plan` → `plan-cases.json`
+   - ถ้าเป็น TC ที่ยิง API อย่างเดียว เพิ่ม ID ใน `API_ONLY` ของ `scripts/extract-plan.mjs` และเขียนในไฟล์ `*.api.spec.ts`
+2. เขียนในไฟล์ของโมดูล (`tests/<โมดูล>.spec.ts`) ด้วย `tc('<ID>', ...)` — ชื่อ test, tag `@<โมดูล>` `@P1|P2|P3` และ annotation ผลที่คาดหวัง/ที่มา มาจากแผนให้เอง
+
+```ts
+import { tc, test, expect, loginUI, bookToStep3, quoteTotal, toSummary, amount } from './fixtures';
+const S = test.step;
+
+tc('TC-PRICE-99', async ({ page, api }) => {
+  await S('U01 จอง S01 20 ต.ค. 10:00', async () => {
+    await loginUI(page, 'U01');
+    await bookToStep3(page, { service: 'S01', type: 'single', date: '2026-10-20', time: '10:00' });
+  });
+  await S('ยอด ฿950 (฿1,000 − 5% Gold)', async () => {
+    expect.soft(await quoteTotal(page)).toBe(950);        // ตัวเลขจากแผน ไม่ใช่จากที่เว็บแสดง
+    await toSummary(page);
+    expect.soft(await amount(page, 'summary-total')).toBe(950);
+  });
+  await S('หลังรีโหลด: ตรวจที่บันทึกจริง', async () => {
+    const rows = await api.adminBookings('2026-10-20');   // owner GET /api/admin/bookings (ถูกบันทึก log)
+    expect.soft(rows.length).toBe(1);
+  });
+});
+```
+
+กติกา:
+- หา element ด้วย `getByTestId` จาก `web/SPEC.md` หัวข้อ 8 (หรือที่เห็นบนหน้า) · เงินอ่านจาก `data-amount`
+- แบ่งขั้นตอนภาษาไทยด้วย `test.step` · ตรวจด้วย `expect.soft` (ล้มจุดเดียวยังตรวจจุดอื่นต่อ)
+- ไม่ต้อง reset เอง — fixture `resetDb` reset ให้ทุก test · ถ้าเลื่อนนาฬิกา (`api.reset(now)`) ต้อง reset กลับใน `finally`
+- ค่าที่ "ถูกบันทึก" (นัด แต้ม ครั้งคอร์ส ยอดบัตร) ต้องตรวจหลังรีโหลด/GET ใหม่เสมอ
+- ราคาบนหน้าจอมาจาก `/api/price` แบบไม่พร้อมกัน → อ่านด้วย `quoteTotal()` / `settle()` ที่รอให้หน้าเว็บคิดเสร็จ (ไม่ได้รอค่าที่อยากได้)
+- test ล้ม → ดูภาพ/GIF ก่อน แล้วจำแนกใน `e2e/triage.json` (`เว็บผิด` / `แผนผิด` / `test เขียนผิด`) → `npm run report` · แก้ได้เฉพาะ test ที่เขียนผิดจริง

@@ -1,247 +1,288 @@
-import { test as base, expect, type Page, type Locator, type APIRequestContext, type APIResponse, type TestInfo } from '@playwright/test';
+import { test as base, expect, request, type APIRequestContext, type Page, type TestInfo } from '@playwright/test';
+import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { join } from 'node:path';
 
-const GIF = !!process.env.GIF;
+// ---------- ข้อมูลจากแผน (plan-cases.json สร้างจาก TEST-PLAN.md หัวข้อ 5 ด้วย npm run plan) ----------
+export type PlanCase = {
+  id: string; module: string; moduleCode: string; what: string; refs: string; technique: string;
+  priority: 'P1' | 'P2' | 'P3'; data: string; expected: string; source: string; apiOnly: boolean;
+};
+const ROOT = join(__dirname, '..');
+export const CASES: Record<string, PlanCase> = Object.fromEntries(
+  (JSON.parse(readFileSync(join(ROOT, 'plan-cases.json'), 'utf8')) as PlanCase[]).map((c) => [c.id, c]),
+);
+export const REPORT_DIR = join(ROOT, 'test-report');
+export const GIF = process.env.GIF === '1';
 
-// โหมด GIF: ป้ายชื่อ test มุมซ้ายล่าง + วงแดงตรงจุดคลิก เพื่อให้คนดู GIF ตามขั้นตอนได้
-const overlayScript = (caption: string) => `
-  (() => {
+// วันล็อกจาก TEST-DATA.md
+export const TODAY = '2026-10-10T10:00:00+07:00';
+
+// ผู้ใช้ seed (TEST-DATA.md U01–U08 · owner จาก SPEC หัวข้อ 7)
+export const USERS = {
+  U01: { email: 'nida@sabai.test', password: 'Nida@2026', name: 'คุณนิดา' },
+  U02: { email: 'ton@sabai.test', password: 'Ton@2026', name: 'คุณต้น' },
+  U03: { email: 'may@sabai.test', password: 'May@2026', name: 'คุณเมย์' },
+  U04: { email: 'fon@sabai.test', password: 'Fon@2026', name: 'คุณฝน' },
+  U05: { email: 'prae@sabai.test', password: 'Prae@2026', name: 'น้องแพร' },
+  U06: { email: 'vipa@sabai.test', password: 'Vipa@2026', name: 'คุณวิภา' },
+  U07: { email: 'kan@sabai.test', password: 'Kan@2026', name: 'คุณกานต์' },
+  U08: { email: 'liwei@sabai.test', password: 'LiWei@2026', name: 'Mr. Li Wei' },
+  owner: { email: 'owner@sabai.test', password: 'Owner@2026', name: 'owner' },
+} as const;
+export type UserKey = keyof typeof USERS;
+
+// ---------- API client ที่บันทึก log ทุกคำขอ ----------
+export class Api {
+  constructor(public ctx: APIRequestContext, public who: string, private log: string[]) {}
+  private write(method: string, url: string, body: unknown, status: number, res: string) {
+    const b = body === undefined ? '' : ' ' + JSON.stringify(body);
+    this.log.push(`[${new Date().toISOString()}] (${this.who}) ${method} ${url}${b}\n    → ${status} ${res.slice(0, 600)}`);
+  }
+  async get(url: string) {
+    const r = await this.ctx.get(url);
+    const text = await r.text();
+    this.write('GET', url, undefined, r.status(), r.headers()['content-type']?.includes('json') ? text : `<${r.headers()['content-type']} ${text.length} bytes>`);
+    return { status: r.status(), json: safeJson(text), headers: r.headers() };
+  }
+  async post(url: string, data?: unknown) {
+    const r = await this.ctx.post(url, data === undefined ? {} : { data });
+    const text = await r.text();
+    this.write('POST', url, data, r.status(), text);
+    return { status: r.status(), json: safeJson(text) };
+  }
+}
+function safeJson(t: string) { try { return JSON.parse(t); } catch { return null; } }
+
+type ApiFactory = {
+  anon: () => Promise<Api>;
+  as: (u: UserKey) => Promise<Api>;
+  reset: (now?: string) => Promise<void>;
+  /** ตารางคิวของวัน (owner GET /api/admin/bookings) */
+  adminBookings: (date: string) => Promise<any[]>;
+  log: string[];
+};
+
+// ---------- ป้ายชื่อ test มุมซ้ายล่าง + วงแดงตรงจุดคลิก (ใส่เฉพาะตอนอัดหลักฐาน) ----------
+function overlayScript(label: string) {
+  return `(() => {
+    const LABEL = ${JSON.stringify(label)};
     const add = () => {
-      if (document.getElementById('__pw-caption')) return;
-      const bar = document.createElement('div');
-      bar.id = '__pw-caption';
-      bar.textContent = ${JSON.stringify('🎬 ' + caption)};
-      bar.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:2147483647;pointer-events:none;' +
-        'background:rgba(46,33,24,.92);color:#fff;font:700 20px/1.4 "Noto Sans Thai","Leelawadee UI",sans-serif;' +
-        'padding:10px 20px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:80vw';
-      document.documentElement.appendChild(bar);
-      const css = document.createElement('style');
-      css.textContent = '@keyframes __pwr{from{transform:translate(-50%,-50%) scale(.3);opacity:1}to{transform:translate(-50%,-50%) scale(1.6);opacity:0}}';
-      document.documentElement.appendChild(css);
-      document.addEventListener('mousedown', (e) => {
-        const dot = document.createElement('div');
-        dot.style.cssText = 'position:fixed;z-index:2147483647;pointer-events:none;width:60px;height:60px;' +
-          'border:4px solid #ff2d2d;border-radius:50%;left:' + e.clientX + 'px;top:' + e.clientY + 'px;' +
-          'animation:__pwr .7s ease-out forwards';
-        document.documentElement.appendChild(dot);
-        setTimeout(() => dot.remove(), 800);
-      }, true);
+      if (!document.body || document.getElementById('__pw_label')) return;
+      const d = document.createElement('div'); d.id = '__pw_label'; d.textContent = LABEL;
+      Object.assign(d.style, { position: 'fixed', left: '8px', bottom: '8px', zIndex: '2147483647', background: 'rgba(17,24,39,.85)',
+        color: '#fff', font: '600 15px/1.35 system-ui, "Noto Sans Thai", sans-serif', padding: '6px 12px', borderRadius: '6px',
+        pointerEvents: 'none', maxWidth: '75vw', boxShadow: '0 2px 8px rgba(0,0,0,.35)' });
+      document.body.appendChild(d);
     };
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
+    document.addEventListener('DOMContentLoaded', add); setInterval(add, 300);
+    window.addEventListener('mousedown', (e) => {
+      const c = document.createElement('div');
+      Object.assign(c.style, { position: 'fixed', left: (e.clientX - 20) + 'px', top: (e.clientY - 20) + 'px', width: '40px', height: '40px',
+        border: '4px solid #e11d48', borderRadius: '50%', background: 'rgba(225,29,72,.18)', zIndex: '2147483647', pointerEvents: 'none',
+        transition: 'opacity .6s, transform .6s' });
+      (document.body || document.documentElement).appendChild(c);
+      setTimeout(() => { c.style.opacity = '0'; c.style.transform = 'scale(1.5)'; }, 900);
+      setTimeout(() => c.remove(), 1600);
+    }, true);
   })();`;
+}
 
-export const test = base.extend<{ page: Page; apiLog: ApiLog }>({
-  page: async ({ page }, use, testInfo) => {
-    if (GIF) await page.addInitScript(overlayScript(testInfo.title));
-    await use(page);
-    if (GIF) await page.waitForTimeout(2500); // ค้างเฟรมสุดท้าย 2.5 วินาที ให้ GIF จบที่ผลลัพธ์
+export function tcId(info: TestInfo) { return info.title.split(' ')[0]; }
+
+function convertVideo(webm: string, id: string) {
+  const vdir = join(REPORT_DIR, 'videos'); const gdir = join(REPORT_DIR, 'gifs');
+  mkdirSync(vdir, { recursive: true }); mkdirSync(gdir, { recursive: true });
+  const mp4 = join(vdir, `${id}.mp4`); const gif = join(gdir, `${id}.gif`);
+  const a = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', mp4]);
+  const b = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-vf',
+    'fps=5,scale=800:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', gif]);
+  if (a.status !== 0 || b.status !== 0) throw new Error(`ffmpeg ล้ม: ${a.stderr} ${b.stderr}`);
+  return { mp4, gif };
+}
+
+export const test = base.extend<{ api: ApiFactory; resetDb: void }>({
+  // ทุก TC เริ่มจาก POST /api/test/reset (แผนหัวข้อ 5) · reset ไม่สำเร็จ = "ไม่ได้รัน" (หัวข้อ 6.1)
+  resetDb: [async ({ baseURL }, use, info) => {
+    const ctx = await request.newContext({ baseURL });
+    const r = await ctx.post('/api/test/reset', { data: { now: TODAY } });
+    await ctx.dispose();
+    if (!r.ok()) info.skip(true, `ไม่ได้รัน: reset ไม่สำเร็จ ${r.status()}`);
+    await use();
+  }, { auto: true }],
+
+  api: async ({ baseURL }, use, info) => {
+    const log: string[] = [];
+    const ctxs: APIRequestContext[] = [];
+    const make = async (who: string) => {
+      const ctx = await request.newContext({ baseURL, extraHTTPHeaders: { 'accept-language': 'th-TH' } });
+      ctxs.push(ctx); return new Api(ctx, who, log);
+    };
+    const as = async (u: UserKey) => {
+      const a = await make(u);
+      const r = await a.post('/api/auth/login', { email: USERS[u].email, password: USERS[u].password });
+      expect(r.status, `login ${u}`).toBe(200);
+      return a;
+    };
+    let owner: Api | undefined;
+    const f: ApiFactory = {
+      log,
+      anon: () => make('ไม่ล็อกอิน'),
+      as,
+      reset: async (now = TODAY) => { const a = await make('reset'); const r = await a.post('/api/test/reset', { now }); expect(r.status).toBe(200); },
+      adminBookings: async (date) => {
+        owner ??= await as('owner');
+        const r = await owner.get(`/api/admin/bookings?date=${date}`);
+        expect(r.status, 'owner อ่านตารางคิว').toBe(200);
+        return r.json.bookings as any[];
+      },
+    };
+    await use(f);
+    for (const c of ctxs) await c.dispose();
+    if (log.length) {
+      const dir = join(REPORT_DIR, 'logs'); mkdirSync(dir, { recursive: true });
+      const id = tcId(info);
+      const file = join(dir, `${id}${info.project.name === 'api' ? '' : '.' + info.project.name}.log`);
+      writeFileSync(file, `# ${info.title}\n# project: ${info.project.name} · status: ${info.status}\n\n${log.join('\n')}\n`);
+      await info.attach('api-log', { path: file, contentType: 'text/plain' });
+    }
   },
-  // log ของ API (request / HTTP status / body) แนบให้อัตโนมัติเมื่อ test จบ แม้ test จะล้ม
-  apiLog: async ({}, use, testInfo) => {
-    const log = new ApiLog(testInfo);
-    await use(log);
-    if (log.size) await log.save();
+
+  page: async ({ page }, use, info) => {
+    if (GIF) await page.addInitScript(overlayScript(`${info.title} · ${info.project.name}`));
+    trackPrice(page);
+    await use(page);
+    const video = page.video();
+    if (GIF && video && info.project.name === 'chromium') {
+      await page.close();
+      const webm = await video.path();
+      if (existsSync(webm)) convertVideo(webm, tcId(info));
+    }
   },
 });
-
-/** บันทึกหมายเหตุลงรายงาน (type "note") หรือค่าที่ "ต้องถาม" พร้อมค่าที่เว็บแสดงจริง */
-export function note(text: string, kind: 'note' | 'ต้องถาม' = 'note') {
-  test.info().annotations.push({ type: kind, description: text });
-}
-
 export { expect };
 
-/** เปิดหน้าแล้วรอจนเว็บโหลดข้อมูลเสร็จ (<html data-ready="true">) */
+/** ประกาศ test ตามรหัส TC: ชื่อขึ้นต้นด้วยรหัส · tag โมดูล + ระดับ · annotation ผลที่คาดหวัง/ที่มา */
+export function tc(id: string, body: Parameters<typeof test>[2]) {
+  const c = CASES[id];
+  if (!c) throw new Error(`ไม่มี ${id} ในแผน`);
+  test(`${id} ${c.what}`, {
+    tag: [`@${c.moduleCode}`, `@${c.priority}`],
+    annotation: [
+      { type: 'ผลที่คาดหวัง', description: c.expected },
+      { type: 'ที่มา', description: c.source },
+      { type: 'ข้อมูล', description: c.data },
+    ],
+  }, body);
+}
+
+// ---------- ตัวช่วยหน้าเว็บ ----------
 export async function open(page: Page, path: string) {
   await page.goto(path);
-  await page.locator('html[data-ready="true"]').waitFor({ state: 'attached' });
+  await page.locator('html[data-ready="true"]').waitFor({ timeout: 15_000 });
 }
 
-/** ผู้ใช้ seed (SPEC §6.1) รหัสผ่านเดียวกันทุกคน */
-export const PASSWORD = 'Sabai1234!';
-export const USERS = {
-  nida: 'nida@sabai.test',
-  ton: 'ton@sabai.test',
-  new: 'new@sabai.test',
-} as const;
-
-/** login ผ่าน API — ส่ง page.request เพื่อให้ cookie sabai_session ใช้กับหน้าเว็บใน browser เดียวกัน */
-export async function loginByApi(request: APIRequestContext, who: keyof typeof USERS | string, password = PASSWORD) {
-  const email = who in USERS ? USERS[who as keyof typeof USERS] : who;
-  const res = await request.post('/api/auth/login', { data: { email, password } });
-  expect(res.status(), await res.text()).toBe(200);
-  return (await res.json()).user;
+export async function loginUI(page: Page, u: UserKey) {
+  await open(page, '/login');
+  await page.getByTestId('login-email').fill(USERS[u].email);
+  await page.getByTestId('login-password').fill(USERS[u].password);
+  await page.getByTestId('login-submit').click();
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 15_000 });
+  await page.locator('html[data-ready="true"]').waitFor();
 }
 
-/** อีเมลไม่ซ้ำ (3 เบราว์เซอร์รันพร้อมกัน จึงห้ามใช้อีเมลตายตัวกับการสมัครใหม่) */
-export function uniqueEmail(tag = 'tester') {
-  return `${tag}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@sabai.test`;
+export async function logoutUI(page: Page) {
+  await page.request.post('/api/auth/logout');
+  await page.context().clearCookies({ name: 'sabai_session' });
 }
 
-/** สร้างสมาชิกใหม่ผ่าน API (และ login ให้ context นั้นทันที) */
-export async function createUser(request: APIRequestContext, opts: { name?: string; birthMonth?: number } = {}) {
-  const user = { name: opts.name ?? 'นักทดสอบ', email: uniqueEmail(), password: 'Test12345', birthMonth: opts.birthMonth ?? 5 };
-  const res = await request.post('/api/auth/register', { data: user });
-  expect(res.status(), await res.text()).toBe(201);
-  return user;
+/** เงินจาก data-amount (บาท) */
+export async function amount(page: Page, testId: string) {
+  const v = await page.getByTestId(testId).getAttribute('data-amount');
+  return v === null ? NaN : Number(v);
 }
 
-/** ตั้งค่าสมาชิกด้วย POST /api/test/user (U{…} ใน TEST-PLAN) */
-export async function setMember(
-  request: APIRequestContext,
-  email: string,
-  patch: { totalSpent?: number; points?: number; birthMonth?: number; birthdayUsedYear?: number | null; coursePurchasedOn?: string; courseUsed?: number },
-) {
-  const res = await request.post('/api/test/user', { data: { email, ...patch } });
-  expect(res.status(), await res.text()).toBe(200);
-  return res.json();
-}
+export type BookOpts = {
+  type?: 'single' | 'couple' | 'group' | 'package' | 'course';
+  service?: string; people?: number; date: string; time: string; therapist?: string;
+};
 
-/**
- * "ร่างโคลน" ของผู้ใช้ seed: สมัครสมาชิกใหม่อีเมลไม่ซ้ำ (login ให้ context นั้นทันที) แล้วตั้งยอด/แต้ม/คอร์สให้เหมือนผู้ใช้ใน TEST-PLAN
- * ใช้แทนการแก้ nida / ton / new ตรง ๆ เพราะ 3 เบราว์เซอร์รันพร้อมกัน — ถ้าแก้คนเดียวกันผลจะชนกัน
- */
-export async function createMember(
-  request: APIRequestContext,
-  opts: { totalSpent?: number; points?: number; birthMonth?: number; course?: { used?: number; purchasedOn?: string } } = {},
-) {
-  const user = await createUser(request, { birthMonth: opts.birthMonth ?? 5 });
-  if (opts.course) {
-    const c = await request.post('/api/courses');
-    expect(c.status(), await c.text()).toBe(201);
+/** ขั้น 1 → 2 (เลือกแบบ บริการ จำนวนคน แล้วกดถัดไป) */
+export async function bookStep1(page: Page, o: Omit<BookOpts, 'date' | 'time'>) {
+  const q = new URLSearchParams();
+  if (o.service) q.set('service', o.service);
+  if (o.type) q.set('type', o.type);
+  if (o.people) q.set('people', String(o.people));
+  await open(page, `/book?${q}`);
+  if (o.type) await page.getByTestId(`book-type-label-${o.type}`).click();
+  if (o.service && o.type !== 'package' && o.type !== 'course') {
+    const sel = page.getByTestId('book-service');
+    if (await sel.isVisible()) await sel.selectOption(o.service);
   }
-  await setMember(request, user.email, {
-    totalSpent: opts.totalSpent ?? 0,
-    points: opts.points ?? 0,
-    ...(opts.course?.used !== undefined ? { courseUsed: opts.course.used } : {}),
-    ...(opts.course?.purchasedOn ? { coursePurchasedOn: opts.course.purchasedOn } : {}),
-  });
-  return user;
+  if (o.people) {
+    const ppl = page.getByTestId('book-people');
+    if (await ppl.isVisible() && await ppl.isEditable()) await ppl.fill(String(o.people));
+  }
+  await page.getByTestId('book-next-1').click();
 }
 
-/** ข้อมูลของนิดา (Gold ฿12,400 · 124 แต้ม) / ต้น (Platinum ฿30,000 · 250 แต้ม) ตาม SPEC §6.1 */
-export const NIDA_LIKE = { totalSpent: 12400, points: 124 };
-export const TON_LIKE = { totalSpent: 30000, points: 250 };
-
-/**
- * วันจองแยกตามเบราว์เซอร์ + ตาม TC กันจองชนกันตอนรันพร้อมกัน (reset ครั้งเดียวใน global-setup)
- * today = 2026-10-08 → จองได้ 2026-10-09 ถึง 2026-11-07
- * 2026-10-09 ถึง 10-13 ไม่ใช้จองจริง (10-09/10-10 มีคิว seed และใช้ตรวจแบบอ่านอย่างเดียว, 10-11/10-13 ใช้ใน TC-BOOK-02)
- * chromium = 10-14…10-21 · firefox = 10-22…10-29 · webkit = 10-30…11-06
- */
-export const DAY = { BOOK01: 0, MOB01: 0, BOOK04: 1, BOOK05: 2, API02: 3, MEM: 4, WAL: 5, GIFT: 6, BOOK07: 7 } as const;
-const BROWSER_INDEX: Record<string, number> = { chromium: 0, firefox: 1, webkit: 2 };
-export function bookingDate(browserName: string, slot = 0) {
-  const d = new Date('2026-10-14T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + (BROWSER_INDEX[browserName] ?? 0) * 8 + slot);
-  return d.toISOString().slice(0, 10);
+/** ขั้น 2 → 3 (วัน รอบ นักบำบัด แล้วกดถัดไป) */
+export async function bookStep2(page: Page, o: BookOpts) {
+  await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '2');
+  await page.getByTestId('book-date').fill(o.date);
+  await page.getByTestId(`book-slot-${o.time}`).click();
+  if (o.therapist) await page.getByTestId('book-therapist').selectOption(o.therapist);
+  await page.getByTestId('book-next-2').click();
+  await expect(page.getByTestId('book-step-indicator')).toHaveAttribute('data-step', '3');
 }
 
-/** แปลง "฿1,234" / "-฿40" / "−฿40" / "+7" → ตัวเลข (ติดลบได้) · "ฟรี" / "Free" → 0 */
-export function money(text: string | null) {
-  const s = (text ?? '').trim();
-  if (/^(ฟรี|Free|免费)$/.test(s)) return 0;
-  const n = Number(s.replace(/[^\d]/g, ''));
-  return /^[-−]/.test(s) ? -n : n;
-}
-/** ตัวเลขในข้อความ (เดิม) */
-export function baht(text: string | null) {
-  return Number((text ?? '').replace(/[^\d]/g, ''));
+/** เปิด /book แล้วเดินถึงขั้น 3 */
+export async function bookToStep3(page: Page, o: BookOpts) {
+  await bookStep1(page, o);
+  await bookStep2(page, o);
 }
 
-/** รอให้ข้อความของ element แปลงเป็นตัวเลขได้ตามที่คาด (ราคา/แต้มอัปเดตหลังเรียก /api/quote) */
-export async function expectMoney(locator: Locator, value: number, message?: string) {
-  await expect.poll(async () => money(await locator.textContent()), { message: message ?? String(locator) }).toBe(value);
+export async function fillContact(page: Page, name: string, phone: string) {
+  await page.getByTestId('book-contact-name').fill(name);
+  await page.getByTestId('book-contact-phone').fill(phone);
 }
 
-/* ---------- หน้า /book ---------- */
-
-/** เลือกวันในปฏิทิน (กดเดือนถัดไปจนเจอวันนั้น) */
-export async function pickDate(page: Page, date: string) {
-  const day = page.getByTestId(`cal-day-${date}`);
-  for (let i = 0; i < 3 && !(await day.isVisible()); i++) await page.getByTestId('cal-next').click();
-  await day.click();
+// นับคำขอ /api/price ที่ยังไม่ตอบ — ใช้รอให้ราคาบนหน้าจออัปเดตหลังติ๊ก/เลือกตัวเลือก
+const pending = new WeakMap<Page, number>();
+export function trackPrice(page: Page) {
+  pending.set(page, 0);
+  const isPrice = (u: string) => u.includes('/api/price');
+  page.on('request', (r) => { if (isPrice(r.url())) pending.set(page, (pending.get(page) ?? 0) + 1); });
+  const done = (r: { url(): string }) => { if (isPrice(r.url())) pending.set(page, Math.max(0, (pending.get(page) ?? 1) - 1)); };
+  page.on('requestfinished', done); page.on('requestfailed', done);
 }
 
-/** ตั้งจำนวนคนในช่อง booking-people */
-export async function setPeople(page: Page, n: number) {
-  const box = page.getByTestId('booking-people');
-  await box.fill(String(n));
-  await expect(box).toHaveValue(String(n));
-}
-
-/** เลือกรอบเวลา เช่น "10:00" */
-export function slot(page: Page, time: string) {
-  return page.getByTestId(`slot-${time.replace(':', '-')}`);
-}
-
-/** จองผ่าน /book แบบลูกค้าทั่วไปหรือสมาชิก (หน้าต้องเปิด /book อยู่แล้ว) */
-export async function fillBooking(page: Page, o: { service?: string; people?: number; date: string; time: string; guest?: boolean }) {
-  if (o.service) await page.getByTestId(`service-option-${o.service}`).click();
-  if (o.people) await setPeople(page, o.people);
-  await pickDate(page, o.date);
-  await slot(page, o.time).click();
-  if (o.guest) {
-    await page.getByTestId('booking-guest-name').fill('Mei');
-    await page.getByTestId('booking-guest-phone').fill('0812345678');
+/** รอจนไม่มี /api/price ค้าง และตัวเลขบนจอไม่เปลี่ยน 2 รอบติด (ไม่ได้รอ "ค่าที่อยากได้" — แค่รอให้หน้าเว็บคิดเสร็จ) */
+export async function settle(page: Page, read?: () => Promise<unknown>) {
+  await page.waitForTimeout(250);
+  let prev = read ? await read() : undefined; let stable = 0;
+  for (let i = 0; i < 40 && stable < 2; i++) {
+    await page.waitForTimeout(200);
+    const cur = read ? await read() : undefined;
+    stable = (pending.get(page) ?? 0) === 0 && cur === prev ? stable + 1 : 0;
+    prev = cur;
   }
 }
 
-export const GUEST = { guestName: 'Mei', guestPhone: '0812345678' };
-
-/** body ของ POST /api/bookings (ค่า default ตาม SPEC §5) */
-export function bookingBody(o: Record<string, unknown>) {
-  return {
-    service: 'thai-massage', people: 1, therapistId: null, transport: false, hotelId: null, redeemSets: 0,
-    useBirthday: false, payWith: 'cash', giftCode: null, source: 'web', ...GUEST, ...o,
+/** ยอดสุทธิขั้น 3 (ราคามาจาก /api/price) เป็นตัวเลขบาท */
+export async function quoteTotal(page: Page) {
+  const el = page.getByTestId('book-quote-total');
+  await expect(el).toBeVisible();
+  const read = async () => {
+    const m = (await el.innerText()).replace(/,/g, '').match(/฿\s*([\d.]+)/);
+    return m ? Number(m[1]) : NaN;
   };
+  await settle(page, read);
+  return read();
 }
 
-/** สถานะของรอบเวลาจาก GET /api/availability */
-export async function slotStatus(request: APIRequestContext, q: { service: string; date: string; people?: number; therapistId?: number }, time: string) {
-  const qs = new URLSearchParams({ service: q.service, date: q.date, people: String(q.people ?? 1) });
-  if (q.therapistId) qs.set('therapistId', String(q.therapistId));
-  const r = await (await request.get(`/api/availability?${qs}`)).json();
-  return (r.slots as { time: string; status: string }[]).find((s) => s.time === time)?.status;
-}
-
-/** หน่วงให้คนดู GIF อ่านผลทัน (ไม่มีผลตอนรันปกติ) */
-export async function pause(page: Page, ms = 1200) {
-  if (GIF) await page.waitForTimeout(ms);
-}
-
-/** ตัวอักษรไทย (ไม่นับเครื่องหมาย ฿ U+0E3F ซึ่งใช้ทุกภาษา) */
-export const THAI = /[\u0E01-\u0E3A\u0E40-\u0E5B]/;
-
-/** เปิดแชท — ปุ่ม chat-toggle มีแอนิเมชันลอยขึ้นลงตลอดเวลา (ตั้งใจออกแบบ) จึงกดแบบไม่รอให้นิ่ง */
-export async function openChat(page: Page) {
-  await page.getByTestId('chat-toggle').click({ force: true });
-  await expect(page.getByTestId('chat-panel')).toBeVisible();
-}
-
-/**
- * เก็บหลักฐานของ TC ที่เรียก API (TEST-PLAN §7): request, HTTP status และ response body ทุกครั้ง
- * แนบเป็น attachment ชื่อ "api-log" → reporter เขียนเป็น test-report/logs/<TC>-<browser>.log
- */
-export class ApiLog {
-  private lines: string[] = [];
-  constructor(private testInfo: TestInfo) {}
-  get size() {
-    return this.lines.length;
-  }
-  async record(method: string, url: string, res: APIResponse, extra = '') {
-    const body = await res.text();
-    this.lines.push(`${new Date().toISOString()}  ${method} ${url}${extra ? `  [${extra}]` : ''}\n  → HTTP ${res.status()}\n  ${body}\n`);
-    return body;
-  }
-  /** ส่ง request แล้วบันทึกทันที คืน { status, body(JSON) } */
-  async call(request: APIRequestContext, method: 'GET' | 'POST', url: string, data?: unknown, extra = '') {
-    const res = method === 'GET' ? await request.get(url) : await request.post(url, { data: data ?? {} });
-    const text = await this.record(method, `${url}${data ? ` ${JSON.stringify(data)}` : ''}`, res, extra);
-    let body: any = null;
-    try { body = JSON.parse(text); } catch { /* not JSON */ }
-    return { status: res.status(), body };
-  }
-  async save() {
-    await this.testInfo.attach('api-log', { body: this.lines.join('\n'), contentType: 'text/plain' });
-  }
+export async function toSummary(page: Page) {
+  await settle(page);
+  await page.getByTestId('book-next-3').click();
+  await expect(page.getByTestId('book-summary')).toBeVisible();
 }

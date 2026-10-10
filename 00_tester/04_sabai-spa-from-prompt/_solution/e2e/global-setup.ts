@@ -1,34 +1,28 @@
-import type { FullConfig } from '@playwright/test';
+import { request, type FullConfig } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
-/** เวลาที่ล็อกไว้ของทุก test (R0 ใน TEST-PLAN.md): today = 2026-10-08 (พฤ.) จองได้ 2026-10-09 ถึง 2026-11-07 */
-export const FIXED_NOW = '2026-10-08T10:00:00+07:00';
+// วันล็อกจาก TEST-DATA.md: TODAY=2026-10-10T10:00:00+07:00
+export const TODAY = '2026-10-10T10:00:00+07:00';
 
-// reset แค่ครั้งเดียวตรงนี้ — ห้าม reset ใน test เพราะ chromium / firefox / webkit รันพร้อมกัน
 export default async function globalSetup(config: FullConfig) {
-  const baseURL = (config.projects[0].use.baseURL as string) ?? 'http://localhost:3000';
+  const baseURL = (config.projects[1]?.use?.baseURL as string) ?? 'http://localhost:3000';
+  const api = await request.newContext({ baseURL });
 
-  const health = await fetch(`${baseURL}/api/health`).catch(() => null);
-  const body = health ? await health.json().catch(() => null) : null;
-  if (!health?.ok || !body?.db) {
-    throw new Error(
-      `\n❌ เว็บสปายังไม่พร้อมที่ ${baseURL} (${health ? `HTTP ${health.status} db=${body?.db}` : 'เชื่อมต่อไม่ได้'})\n` +
-        `   วิธีเปิด (PowerShell):\n` +
-        `     cd spa\n` +
-        `     docker compose up -d --build\n` +
-        `   แล้วรอจน http://localhost:3000/api/health ตอบ {"ok":true,"db":true} จึงรัน test ใหม่\n`,
-    );
+  // Entry EN-3: /api/health ต้องเป็น {"ok":true,"db":true} ตรงตัว
+  const h = await api.get('/api/health', { timeout: 10_000 }).catch((e) => { throw new Error(`เว็บไม่ตอบ ${baseURL}/api/health: ${e.message}`); });
+  const body = await h.text();
+  if (h.status() !== 200 || body.replace(/\s/g, '') !== '{"ok":true,"db":true}') {
+    throw new Error(`ยังเริ่มทดสอบไม่ได้ (EN-3): /api/health ตอบ ${h.status()} ${body}`);
   }
 
-  const reset = await fetch(`${baseURL}/api/test/reset`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ now: FIXED_NOW }),
-  });
-  const data = await reset.json().catch(() => null);
-  if (!reset.ok || !data?.ok || data.today !== '2026-10-08') {
-    throw new Error(
-      `❌ reset ไม่สำเร็จ (HTTP ${reset.status}) — ตรวจว่า spa/docker-compose.yml ตั้ง ALLOW_TEST_RESET: "1" ` +
-        `แล้วรัน docker compose up -d ใหม่ · คำตอบ: ${JSON.stringify(data)}`,
-    );
-  }
+  // reset ครั้งเดียวก่อนเริ่ม (แต่ละ test ยัง reset ของตัวเองอีกครั้งตามแผนหัวข้อ 5)
+  const r = await api.post('/api/test/reset', { data: { now: TODAY } });
+  if (!r.ok()) throw new Error(`POST /api/test/reset ไม่สำเร็จ: ${r.status()} ${await r.text()}`);
+
+  // อ่านโหมดบั๊กจาก <html data-bug-mode> ไว้แสดงในรายงาน
+  const html = await (await api.get('/')).text();
+  const bugMode = html.match(/data-bug-mode="(\d)"/)?.[1] ?? '?';
+  mkdirSync('test-report', { recursive: true });
+  writeFileSync('test-report/meta.json', JSON.stringify({ bugMode, health: body, today: TODAY, startedAt: new Date().toISOString() }, null, 2));
+  await api.dispose();
 }

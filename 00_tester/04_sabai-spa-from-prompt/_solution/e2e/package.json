@@ -1,16 +1,17 @@
 {
-  "name": "sabai-spa-e2e",
+  "name": "sabai-e2e",
   "private": true,
-  "type": "module",
+  "version": "1.0.0",
+  "description": "ชุดทดสอบ Playwright จาก TEST-PLAN.md (สบายใจ สปา)",
   "scripts": {
     "test": "playwright test",
-    "test:gif": "cross-env GIF=1 playwright test --project=chromium",
-    "report": "playwright show-report"
+    "test:gif": "node scripts/run-gif.mjs",
+    "test:p1": "playwright test --grep @P1",
+    "report": "node scripts/build-report.mjs",
+    "plan": "node scripts/extract-plan.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
-    "@types/node": "^26.6.4",
-    "cross-env": "^10.1.0",
-    "typescript": "^7.0.2"
+    "@types/node": "^22.0.0"
   }
 }

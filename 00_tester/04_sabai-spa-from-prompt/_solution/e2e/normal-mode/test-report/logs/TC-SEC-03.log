@@ -1,0 +1,13 @@
+# TC-SEC-03 ลูกค้าเรียก API หลังร้าน
+# project: api · status: passed
+
+[2026-10-10T14:09:59.087Z] (U01) POST /api/auth/login {"email":"nida@sabai.test","password":"Nida@2026"}
+    → 200 {"ok":true,"user":{"id":1,"name":"คุณนิดา","email":"nida@sabai.test","role":"customer"}}
+[2026-10-10T14:09:59.091Z] (U01) GET /api/admin/bookings?date=2026-10-12
+    → 403 {"error":"FORBIDDEN","message":"ไม่มีสิทธิ์เข้าถึง"}
+[2026-10-10T14:09:59.097Z] (U01) POST /api/admin/bookings/B06/complete {}
+    → 403 {"error":"FORBIDDEN","message":"ไม่มีสิทธิ์เข้าถึง"}
+[2026-10-10T14:09:59.102Z] (U01) GET /api/me/bookings
+    → 200 {"bookings":[{"id":5,"code":"B05","serviceCode":"S05","serviceName":"นวดเท้า","type":"single","people":1,"date":"2026-10-11","dateLabel":"11 ต.ค. 2026","time":"10:00","endTime":"11:00","therapists":["พี่จันทร์เพ็ญ"],"status":"confirmed","statusLabel":"ยืนยัน","total":760,"totalLabel":"฿760","viaCourse":false,"canCancel":true,"cancelBlockedReason":null},{"id":6,"code":"B06","serviceCode":"S01","serviceName":"นวดไทย 60 นาที","type":"single","people":1,"date":"2026-10-10","dateLabel":"10 ต.ค. 2026","time":"15:00","endTime":"16:00","therapists":["พี่มาลี"],"status":"confirmed","statusLabel":"ยืนยั
+[2026-10-10T14:09:59.106Z] (U01) GET /api/me
+    → 200 {"id":1,"name":"คุณนิดา","email":"nida@sabai.test","phone":"081-111-0001","role":"customer","lang":"th","birthMonth":3,"points":99,"maxRedeemBlocks":0,"birthdayThisMonth":"none","tier":"gold","tierLabel":"Gold","tierPct":5,"lifetimeSpend":12400,"nextTier":"platinum","remainingToNext":17600,"tierMessage":"อีก ฿17,600 ถึง Platinum"}
