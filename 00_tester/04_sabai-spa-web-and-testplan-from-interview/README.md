@@ -107,7 +107,7 @@
 **ตอนเริ่ม โฟลเดอร์นี้มีแค่**
 
 ```text
-04_sabai-spa-from-prompt/
+04_sabai-spa-web-and-testplan-from-interview/
 ├─ README.md     📖 บทเรียน + พรอมต์ทุก LAB (บันทึกสัมภาษณ์ = input เดียว อยู่ในพรอมต์ LAB 1)
 ├─ img/          🖼️ รูปประกอบบทเรียน (ไม่ได้ใช้เป็น input)
 └─ _solution/    🔑 เฉลย = ผลจากการรันพรอมต์ในหน้านี้จริงทุก LAB (ห้ามเปิดก่อนจบ)
@@ -981,7 +981,7 @@
 **ก่อนเริ่ม** (มีให้แค่นี้)
 
 ```text
-04_sabai-spa-from-prompt/
+04_sabai-spa-web-and-testplan-from-interview/
 ├─ README.md     # บทเรียน + พรอมต์ทุก LAB (บันทึกสัมภาษณ์อยู่ในพรอมต์ LAB 1)
 ├─ img/          # รูปประกอบบทเรียน
 └─ _solution/    # 🔑 เฉลย: ไฟล์ทั้งหมดด้านล่างจากการรันจริง + คู่มือผู้สอน
@@ -990,7 +990,7 @@
 **หลังจบทุก LAB** (สร้างจากพรอมต์ทั้งหมด)
 
 ```text
-04_sabai-spa-from-prompt/
+04_sabai-spa-web-and-testplan-from-interview/
 ├─ USER-STORIES.md       # LAB 1
 ├─ REQUIREMENTS.md       # LAB 2  FR / BR / NFR
 ├─ DESIGN.md             # LAB 3  Architecture · Use Case · Flowchart · ERD · Sequence
