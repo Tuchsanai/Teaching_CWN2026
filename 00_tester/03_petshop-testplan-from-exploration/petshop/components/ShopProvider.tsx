@@ -222,7 +222,6 @@ export function ShopProvider({
     (slug: string) => {
       const next = wishlistRef.current.filter((s) => s !== slug);
       commitWishlist(next);
-      // Training bug #2: with BUG_MODE the header badge is not decreased until reload.
       if (!bugMode) setWishlistBadge(next.length);
     },
     [bugMode, commitWishlist],

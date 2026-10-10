@@ -78,7 +78,6 @@ export interface ShipInput {
   postcode: string;
 }
 
-/** Training bug #3 (BUG_MODE): phone validation accepts 9 digits. */
 export function isValidPhone(phone: string, bugMode = false): boolean {
   const re = bugMode ? /^0\d{8,9}$/ : /^0\d{9}$/;
   return re.test(phone.trim());

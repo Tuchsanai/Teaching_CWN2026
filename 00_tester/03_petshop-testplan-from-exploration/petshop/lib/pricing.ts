@@ -87,7 +87,6 @@ export function normalizeCode(code: string | null | undefined): string {
 
 /**
  * Evaluate a coupon code against priced cart lines.
- * `bugMode` (training bug #1): PAW10 gives 1% instead of 10%.
  */
 export function evaluateCoupon(
   rawCode: string,
