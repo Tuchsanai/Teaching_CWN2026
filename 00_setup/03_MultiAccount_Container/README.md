@@ -11,22 +11,22 @@ LAB นี้ให้ Docker image หนึ่งตัวที่เปิ�
 
 ## เลือกเส้นทาง
 
-LAB นี้มี **2 ส่วน ให้เลือกทำส่วนใดส่วนหนึ่ง** แล้วมาบรรจบกันที่ขั้นที่ 3–5 เหมือนกัน
+LAB นี้มี **2 เส้นทาง ให้เลือกทำเส้นทางเดียว** แล้วมาบรรจบกันที่ขั้นที่ 3–5 เหมือนกัน
 
-- **ส่วนที่ 1 · เส้นทาง A (ใช้ image สำเร็จรูป):** ดึง image `tuchsanai/multi-account-devtool:2569_1` ที่อบไว้แล้วมารัน → ตรวจว่ามี skill ครบ → ใช้งานได้ทันที
-- **ส่วนที่ 2 · เส้นทาง B (build image เอง):** ให้ AI ปรับ Dockerfile ตามสเปก `prompt_multi_account.md` แล้ว build / ทดสอบเอง เพื่อเรียนรู้ว่า image หลายบัญชีถูกอบขึ้นมาอย่างไร
-
-![LAB 03 มี 2 เส้นทาง: A ใช้ image สำเร็จรูปด้วย docker run, B build เองจาก prompt_multi_account.md แล้วมาบรรจบที่ขั้นตรวจใน JupyterLab, ล็อกอิน และทดสอบ skill + MCP](img/mad-concept-00-two-paths.png)
-*ภาพแนวคิด (Imagegen): 2 เส้นทางของ LAB 03*
+- **เส้นทาง A · ใช้ image สำเร็จรูป (ขั้นที่ 1):** ดึง image `tuchsanai/multi-account-devtool:2569_1` ที่อบไว้แล้วมารัน → ตรวจว่ามี skill ครบ → ใช้งานได้ทันที
+- **เส้นทาง B · build image เอง (ขั้นที่ 2):** ให้ AI ปรับ Dockerfile ตามสเปก `prompt_multi_account.md` แล้ว build / ทดสอบเอง เพื่อเรียนรู้ว่า image หลายบัญชีถูกอบขึ้นมาอย่างไร
 
 | เส้นทาง | เหมาะกับ | ทำขั้นที่ |
 |---|---|---|
-| **A · ใช้ image สำเร็จรูป** (~5 นาที) | อยากใช้ทันที | [1](#ขั้นที่-1--เปิด-container-สำเร็จรูป-5-นาที) → [3](#ขั้นที่-3--ตรวจใน-jupyterlab-5-นาที) → 4 → 5 |
-| **B · build image เอง** (~45 นาที) | อยากเรียนวิธีอบ image | [2](#ขั้นที่-2--ทางเลือก-build-image-เอง-45-นาที) → [3](#ขั้นที่-3--ตรวจใน-jupyterlab-5-นาที) → 4 → 5 |
+| **A · ใช้ image สำเร็จรูป** (~5 นาที) | อยากใช้ทันที | [1](#ขั้นที่-1--เส้นทาง-a-เปิด-container-สำเร็จรูป-5-นาที) → [3](#ขั้นที่-3--ตรวจใน-jupyterlab-5-นาที) → 4 → 5 |
+| **B · build image เอง** (~45 นาที) | อยากเรียนวิธีอบ image | [2](#ขั้นที่-2--เส้นทาง-b-build-image-เอง-45-นาที) → [3](#ขั้นที่-3--ตรวจใน-jupyterlab-5-นาที) → 4 → 5 |
 
 สัญลักษณ์: 🖥️ = พิมพ์ใน shell · 💬 = วางในช่องสนทนา AI (กรอบ `text` คือพรอมต์ ให้คัดลอกทั้งกรอบ)
 
-## ขั้นที่ 1 · เปิด container สำเร็จรูป (~5 นาที)
+## ขั้นที่ 1 · เส้นทาง A: เปิด container สำเร็จรูป (~5 นาที)
+
+![เส้นทาง A: ดึง image สำเร็จรูปจาก Docker Hub ด้วย docker run แล้วตรวจเวอร์ชัน, playwright MCP และ skill ถ้าไม่มี skill ให้แจ้งผู้ใช้](img/mad-concept-00a-path-a.png)
+*ภาพแนวคิด (Imagegen): เส้นทาง A · ใช้ image สำเร็จรูป*
 
 💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
 
@@ -77,7 +77,10 @@ for i in 1 2 3 4 5; do printf "yolo$i/skills -> %s\n" "$(readlink $B/.Claude/yol
 
 > **เลือกทางเดียว:** `docker run` ข้างบนใช้ volume `ai-accounts` ส่วน `docker compose` (ขั้นที่ 2) ใช้ `multiaccountdevtool_ai-accounts` → ล็อกอินไม่แชร์กัน และชื่อ container ซ้ำกัน (`multi-account-devtool`) จึงรันพร้อมกันไม่ได้
 
-## ขั้นที่ 2 · (ทางเลือก) build image เอง (~45 นาที)
+## ขั้นที่ 2 · เส้นทาง B: build image เอง (~45 นาที)
+
+![เส้นทาง B: คัดลอก 00_Devtool_Container เป็น MultiAccountDevtool ให้ AI ปรับ Dockerfile ตาม prompt_multi_account.md แล้ว docker build ทดสอบ และเขียนรายงาน](img/mad-concept-00b-path-b.png)
+*ภาพแนวคิด (Imagegen): เส้นทาง B · build image เอง*
 
 ```text
 03_MultiAccount_Container/
