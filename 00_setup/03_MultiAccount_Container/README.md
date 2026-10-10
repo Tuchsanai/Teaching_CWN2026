@@ -11,6 +11,14 @@ LAB นี้ให้ Docker image หนึ่งตัวที่เปิ�
 
 ## เลือกเส้นทาง
 
+LAB นี้มี **2 ส่วน ให้เลือกทำส่วนใดส่วนหนึ่ง** แล้วมาบรรจบกันที่ขั้นที่ 3–5 เหมือนกัน
+
+- **ส่วนที่ 1 · เส้นทาง A (ใช้ image สำเร็จรูป):** ดึง image `tuchsanai/multi-account-devtool:2569_1` ที่อบไว้แล้วมารัน → ตรวจว่ามี skill ครบ → ใช้งานได้ทันที
+- **ส่วนที่ 2 · เส้นทาง B (build image เอง):** ให้ AI ปรับ Dockerfile ตามสเปก `prompt_multi_account.md` แล้ว build / ทดสอบเอง เพื่อเรียนรู้ว่า image หลายบัญชีถูกอบขึ้นมาอย่างไร
+
+![LAB 03 มี 2 เส้นทาง: A ใช้ image สำเร็จรูปด้วย docker run, B build เองจาก prompt_multi_account.md แล้วมาบรรจบที่ขั้นตรวจใน JupyterLab, ล็อกอิน และทดสอบ skill + MCP](img/mad-concept-00-two-paths.png)
+*ภาพแนวคิด (Imagegen): 2 เส้นทางของ LAB 03*
+
 | เส้นทาง | เหมาะกับ | ทำขั้นที่ |
 |---|---|---|
 | **A · ใช้ image สำเร็จรูป** (~5 นาที) | อยากใช้ทันที | [1](#ขั้นที่-1--เปิด-container-สำเร็จรูป-5-นาที) → [3](#ขั้นที่-3--ตรวจใน-jupyterlab-5-นาที) → 4 → 5 |
@@ -40,8 +48,19 @@ docker run -dit --name multi-account-devtool --hostname multi-account-devtool --
 docker exec multi-account-devtool bash -lc \
 'for a in yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf "%-7s " $a; $a --version | tail -1; done; cyolo1 mcp list'
 
-5. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
-   สรุป port ที่ใช้ และ URL ของ JupyterLab
+5. ตรวจ skill ส่วนกลาง (สำคัญ ห้ามข้าม):
+
+docker exec multi-account-devtool bash -lc \
+'B=$HOME/ai-accounts; for t in .Claude .Codex; do echo "== $t/shared/skills"; ls -1 $B/$t/shared/skills 2>/dev/null || echo "(ไม่มีโฟลเดอร์)"; done
+for i in 1 2 3 4 5; do printf "yolo$i/skills -> %s\n" "$(readlink $B/.Claude/yolo$i/skills)"; printf "cyolo$i/skills/shared-check -> %s\n" "$(readlink $B/.Codex/cyolo$i/skills/shared-check)"; done'
+
+   ต้องเห็น `shared-check` ทั้งใน `.Claude/shared/skills` และ `.Codex/shared/skills`
+   และทุก `yoloN/skills` ชี้ไป `../shared/skills` ทุก `cyoloN/skills/shared-check` ชี้ไป shared
+   ถ้าไม่มี skill หรือลิงก์ใดขาด ให้แจ้งฉันชัด ๆ ว่า "ยังไม่ได้ติดตั้ง skill" พร้อมบอกว่าขาดอะไรที่บัญชีไหน
+   แล้วรอฉันตัดสินใจ (วิธีแก้ที่แนะนำ: `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ)
+   ห้ามสร้างหรือคัดลอก skill เองโดยไม่ถาม และห้ามแสดงรหัสใน SKILL.md
+6. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
+   สรุป port ที่ใช้ URL ของ JupyterLab และผลตรวจ skill (มีครบ / ขาดอะไร)
 ```
 
 | ตัวแปร | ค่าเริ่มต้น | ใช้ทำอะไร |
@@ -49,7 +68,9 @@ docker exec multi-account-devtool bash -lc \
 | `<SSH_PORT>` | `2223` | `ssh root@localhost -p <SSH_PORT>` (password `passwd`) |
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 
-**ผลที่ควรได้:** 10 บรรทัดเวอร์ชัน (`yolo1`–`5` = Claude Code, `cyolo1`–`5` = codex-cli) และ `cyolo1 mcp list` มี `playwright` (ครั้งแรกต้อง pull image อาจนานหลายนาที)
+**ผลที่ควรได้:** 10 บรรทัดเวอร์ชัน (`yolo1`–`5` = Claude Code, `cyolo1`–`5` = codex-cli), `cyolo1 mcp list` มี `playwright` และผลตรวจ skill ว่า **มี `shared-check` ครบทั้ง 10 บัญชี** (ครั้งแรกต้อง pull image อาจนานหลายนาที)
+
+> **ทำไม skill สำคัญ:** ขั้นที่ 5 และ LAB ถัดไปใช้ skill จาก `shared` ถ้า AI แจ้งว่ายังไม่ได้ติดตั้ง skill อย่าเพิ่งไปขั้นต่อไป ให้รัน `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ ถ้ายังขาดอยู่ ให้ลบ container แล้วรันขั้นที่ 1 ใหม่ (ห้ามลบ volume `ai-accounts`)
 
 ![Terminal ใน JupyterLab แสดงเวอร์ชันของ yolo1-5 และ cyolo1-5](img/mad-jupyter-versions.png)
 *ภาพจริง: รันคำสั่งเดียวกันใน Terminal ของ JupyterLab*
