@@ -1,6 +1,6 @@
 # REVIEW-V3 — README.md บท 03 (report-only)
 
-ตรวจ `03_petshop-testplan-from-exploration/README.md` (671 บรรทัด) เทียบสไตล์กับ `02_petshop-playwright-docker/README.md`
+ตรวจ `03_petshop-testplan-from-exploration/README.md` (671 บรรทัด) เทียบสไตล์กับ `02_petshop-test-from-plan/README.md`
 ไม่ได้แก้ไฟล์ใด ๆ ใน repo · เลขบรรทัดอ้างอิง README.md ณ เวลาตรวจ (2026-10-10)
 
 ## สรุปภาพรวม
@@ -23,13 +23,13 @@
 
 ### H1. LAB 7: reporter บท 02 ไม่ได้สร้าง `e2e/index.html` (ชื่อไฟล์ผิด)
 
-ตรวจแล้ว `../02_petshop-playwright-docker/e2e/reporters/` มีแค่ `tester-report.ts` ซึ่งสร้าง `e2e/test-report/TEST-REPORT.md` + GIF/MP4 (README บท 02 บรรทัด 152, 503)
+ตรวจแล้ว `../02_petshop-test-from-plan/e2e/reporters/` มีแค่ `tester-report.ts` ซึ่งสร้าง `e2e/test-report/TEST-REPORT.md` + GIF/MP4 (README บท 02 บรรทัด 152, 503)
 ส่วน `index.html` ที่ตัดสินผลตามเกณฑ์และอ่าน `triage.json` มาจาก `_solution/e2e/reporters/html-report.ts` ซึ่ง **เป็นของใหม่ในบท 03**
 ผลคือพรอมต์ "รายงาน e2e/index.html แบบบท 02" ไม่มีต้นแบบให้ Claude คัดลอก และถ้าผู้เรียนไม่มีบท 02 เลยก็ไม่มีอะไรบอกว่ารายงานควรหน้าตาแบบไหน
 
 **บรรทัด 462–463** เปลี่ยนจาก
 ```
-5. ทำ GIF หลักฐาน และรายงาน e2e/index.html แบบบท 02 (ถ้ามีโฟลเดอร์ e2e จากบท 02 ที่ ../02_petshop-playwright-docker/e2e ให้ใช้ reporter เดิมได้)
+5. ทำ GIF หลักฐาน และรายงาน e2e/index.html แบบบท 02 (ถ้ามีโฟลเดอร์ e2e จากบท 02 ที่ ../02_petshop-test-from-plan/e2e ให้ใช้ reporter เดิมได้)
    รายงานต้องตัดสินผลตามเกณฑ์ในหัวข้อ 6 ของแผนเรา
 ```
 เป็น
@@ -38,16 +38,16 @@
    - กล่องสรุป "ผ่านเกณฑ์ / ไม่ผ่านเกณฑ์" ตัดสินตามเกณฑ์ในหัวข้อ 6 ของ TEST-PLAN.md แยกทีละเบราว์เซอร์
    - ตารางทุก test case: รหัส · สิ่งที่ทดสอบ · ระดับ · เทคนิค · ที่มา · ผลแต่ละเบราว์เซอร์ · ลิงก์ภาพ/GIF
    - ข้อที่ล้มให้แสดงการจำแนก (เว็บผิด / แผนผิด / test เขียนผิด) ซึ่งอ่านจากไฟล์ e2e/triage.json
-   (ถ้ามี ../02_petshop-playwright-docker/e2e ให้ยืม helper และตัวทำ GIF จาก reporters/tester-report.ts ได้ แต่ห้ามคัดลอก test ของบท 02)
+   (ถ้ามี ../02_petshop-test-from-plan/e2e ให้ยืม helper และตัวทำ GIF จาก reporters/tester-report.ts ได้ แต่ห้ามคัดลอก test ของบท 02)
 ```
 
 **บรรทัด 103** เปลี่ยนจาก
 ```
-| ☐ | (แนะนำ) ทำ **บท 02** แล้ว | LAB 7 ใช้ reporter จาก `../02_petshop-playwright-docker/e2e` ได้ |
+| ☐ | (แนะนำ) ทำ **บท 02** แล้ว | LAB 7 ใช้ reporter จาก `../02_petshop-test-from-plan/e2e` ได้ |
 ```
 เป็น
 ```
-| ☐ | (แนะนำ) ทำ **บท 02** แล้ว | LAB 7 ยืม helper และตัวทำ GIF จาก `../02_petshop-playwright-docker/e2e` ได้ (ไม่มีก็ทำได้ ช้ากว่าเล็กน้อย) |
+| ☐ | (แนะนำ) ทำ **บท 02** แล้ว | LAB 7 ยืม helper และตัวทำ GIF จาก `../02_petshop-test-from-plan/e2e` ได้ (ไม่มีก็ทำได้ ช้ากว่าเล็กน้อย) |
 ```
 
 **บรรทัด 495** เปลี่ยนจาก
@@ -137,7 +137,7 @@
 ```
 เป็น
 ```
-ถ้ามีไฟล์ ../02_petshop-playwright-docker/TEST-PLAN.md ให้ดูรูปแบบตารางจากไฟล์นั้น แต่ห้ามลอกเนื้อหา (คนละแผน)
+ถ้ามีไฟล์ ../02_petshop-test-from-plan/TEST-PLAN.md ให้ดูรูปแบบตารางจากไฟล์นั้น แต่ห้ามลอกเนื้อหา (คนละแผน)
 ห้ามเปิดโฟลเดอร์ _solution · ห้ามเพิ่มฟีเจอร์ที่ไม่มีใน EXPLORATION.md · ถ้าไม่แน่ใจว่าเรื่องไหนควรอยู่ในขอบเขต ให้ถามผมก่อน
 ```
 

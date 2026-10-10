@@ -488,7 +488,7 @@ test('TC-MY-02 ซื้อครบ ฿999 แต่เลือกส่งด
 ### ไฟล์ในบทนี้
 
 ```text
-02_petshop-playwright-docker/
+02_petshop-test-from-plan/
 ├─ README.md                 # บทเรียน + พรอมต์ทุก LAB
 ├─ TEST-PLAN.md              # แผนการทดสอบ 40 test case
 ├─ CLAUDE.md                 # คู่มือให้ Claude

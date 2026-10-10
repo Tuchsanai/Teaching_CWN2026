@@ -154,7 +154,7 @@
 
 ```text
 สร้างโฟลเดอร์ e2e/ เป็นโปรเจกต์ Playwright (TypeScript) สำหรับทดสอบ http://localhost:3000 ห้ามแก้โค้ดใน spa/
-(ถ้ามีโฟลเดอร์ ..\02_petshop-playwright-docker\e2e ให้ดูเป็นแบบอย่างได้ แต่ห้ามแก้ไฟล์ในนั้น)
+(ถ้ามีโฟลเดอร์ ..\02_petshop-test-from-plan\e2e ให้ดูเป็นแบบอย่างได้ แต่ห้ามแก้ไฟล์ในนั้น)
 0. เช็กก่อน: node -v, ffmpeg -version, /api/health · ถ้าไม่มี ffmpeg ให้บอกวิธีติดตั้งบน Windows แล้วทำต่อได้ (GIF จะข้ามไป)
 1. package.json: @playwright/test, cross-env, typescript · scripts: test, test:gif (cross-env GIF=1 ... --project=chromium), report
 2. playwright.config.ts: chromium/firefox/webkit, viewport 1280x800, locale th-TH, timezoneId Asia/Bangkok,

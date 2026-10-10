@@ -1,5 +1,5 @@
 บทบาท: ผู้เขียน README ส่วนที่ 2 (ห้ามแก้ไฟล์อื่นนอกจาก readme-part2.md ในโฟลเดอร์นี้)
-อ่าน: BRIEF.md, PROMPTS.md (พรอมต์ฉบับจริง), yolo1-prompts.md (ส่วน G, H), yolo2-learning.md (ส่วน 3), README ของบท 02 (/root/workspace/CWN/Teaching/00_tester/02_petshop-playwright-docker/README.md = ต้นแบบสไตล์) และรายชื่อรูปใน ../img/ (ดูรูปได้)
+อ่าน: BRIEF.md, PROMPTS.md (พรอมต์ฉบับจริง), yolo1-prompts.md (ส่วน G, H), yolo2-learning.md (ส่วน 3), README ของบท 02 (/root/workspace/CWN/Teaching/00_tester/02_petshop-test-from-plan/README.md = ต้นแบบสไตล์) และรายชื่อรูปใน ../img/ (ดูรูปได้)
 เขียน readme-part2.md = README ภาษาไทยตั้งแต่ LAB 5 ถึงท้ายบท ได้แก่
 - LAB 5 เดินดูเว็บ (concept-12-site-map) · LAB 6 TEST-PLAN (concept-13, concept-14, concept-20, concept-23, concept-24) · LAB 7 สร้างหุ่นยนต์ทดสอบ (concept-28-gif-mp4) · LAB 8 รันครบ 3 เบราว์เซอร์ + GIF + MP4 + รายงาน (concept-27, concept-26, concept-15) · LAB 9 จับบั๊ก (intro-05-bug-hunt-spa, concept-17)
   แต่ละ LAB: 🎯 1 บรรทัด · รูปการ์ตูน · 💬 พรอมต์ (คัดลอกจาก PROMPTS.md ตรงตัวอักษร ในกรอบ ```text) · ✅ ผลจริง = placeholder {{LAB5_RESULT}} … {{LAB9_RESULT}} (ผู้สอนเติมหลังรันจริง) · 👀 สังเกต 2 ข้อ

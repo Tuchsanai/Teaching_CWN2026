@@ -1,5 +1,5 @@
 บทบาท: ผู้เขียน README ส่วนที่ 1 (ห้ามแก้ไฟล์อื่นนอกจาก readme-part1.md ในโฟลเดอร์นี้)
-อ่าน: BRIEF.md, yolo2-learning.md (แผนของคุณเอง), PROMPTS.md (พรอมต์ฉบับจริง), README ของบท 02 (/root/workspace/CWN/Teaching/00_tester/02_petshop-playwright-docker/README.md = ต้นแบบสไตล์)
+อ่าน: BRIEF.md, yolo2-learning.md (แผนของคุณเอง), PROMPTS.md (พรอมต์ฉบับจริง), README ของบท 02 (/root/workspace/CWN/Teaching/00_tester/02_petshop-test-from-plan/README.md = ต้นแบบสไตล์)
 และผลจริงที่นักศึกษาจำลองทำไว้แล้ว: ../USER-STORIES.md, ../REQUIREMENTS.md, ../BUILD-PROMPT.md · รายชื่อรูปใน ../img/ (ดูรูปได้) และ ../assets/
 เขียน readme-part1.md = README ภาษาไทยตั้งแต่ต้นจนจบ LAB 4 ได้แก่
 - หัวเรื่อง "# สร้างเว็บสปาจากพรอมต์ล้วน แล้วทดสอบด้วย Playwright (Copy & Paste)" + 2 บรรทัดนำ

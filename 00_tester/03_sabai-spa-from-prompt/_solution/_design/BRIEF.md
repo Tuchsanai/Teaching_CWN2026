@@ -10,8 +10,8 @@
 
 ## ต้นแบบที่ต้องอ่านก่อน (สไตล์ต้องเหมือนกัน)
 - /root/workspace/CWN/Teaching/00_tester/01_playwright-local-windows/README.md
-- /root/workspace/CWN/Teaching/00_tester/02_petshop-playwright-docker/README.md  ← สำคัญที่สุด (รูปแบบ LAB, ตาราง ✅ ผลจริง, 👀 สังเกต, รูปการ์ตูนน่ารัก)
-- /root/workspace/CWN/Teaching/00_tester/02_petshop-playwright-docker/TEST-PLAN.md, CLAUDE.md, e2e/ (reporter ที่ทำ GIF+MP4+TEST-REPORT.md)
+- /root/workspace/CWN/Teaching/00_tester/02_petshop-test-from-plan/README.md  ← สำคัญที่สุด (รูปแบบ LAB, ตาราง ✅ ผลจริง, 👀 สังเกต, รูปการ์ตูนน่ารัก)
+- /root/workspace/CWN/Teaching/00_tester/02_petshop-test-from-plan/TEST-PLAN.md, CLAUDE.md, e2e/ (reporter ที่ทำ GIF+MP4+TEST-REPORT.md)
 - รูปการ์ตูนใน 02/img/concept-*.jpg : เด็กผู้ชายผมน้ำตาล เสื้อฮู้ดสีน้ำเงิน + หุ่นยนต์สีขาวหน้าจอฟ้า, ข้อความภาษาไทยในรูป, 3:2
 
 ## หลักการใหญ่ของบทนี้ (ผู้สอนสั่ง)
