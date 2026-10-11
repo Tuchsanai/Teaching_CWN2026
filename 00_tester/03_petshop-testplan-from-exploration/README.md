@@ -98,7 +98,7 @@
 |---|---|---|
 | ☐ | Windows 10/11 + **Claude Code** | เปิด Claude Code ได้ |
 | ☐ | **Docker Desktop** เปิดอยู่ (ไอคอนวาฬมุมขวาล่าง) | ไอคอนวาฬไม่หมุน |
-| ☐ | ทำ **บท 01** แล้ว (มี Node.js + เบราว์เซอร์ของ Playwright) | ดูบท `01_playwright-local-windows` |
+| ☐ | ทำ **บท 01** แล้ว (มี Node.js + เบราว์เซอร์ของ Playwright) | ดูบท `01_playwright-install` |
 | ☐ | Claude Code ต่อ **Playwright MCP** ไว้แล้ว | พิมพ์ `/mcp` เห็น `playwright` |
 | ☐ | (แนะนำ) ทำ **บท 02** แล้ว | LAB 7 ยืม helper และตัวทำ GIF จาก `../02_petshop-test-from-plan/e2e` ได้ (ไม่มีก็ทำได้ ช้ากว่าเล็กน้อย) |
 | ☐ | เปิด Claude Code ใน **โฟลเดอร์นี้** | ชื่อโฟลเดอร์ขึ้นที่แถบด้านบน |
