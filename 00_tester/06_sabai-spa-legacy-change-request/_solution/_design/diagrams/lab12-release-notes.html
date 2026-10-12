@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;background:#e9e4da;font-family:'Noto Sans Thai','Leelawadee UI',sans-serif;color:#1f2937}
+.wrap{padding:36px 40px 40px}
+.cap{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.cap h1{font-size:26px;color:#7c2d12;font-weight:800}
+.cap span{font-size:15px;color:#6b7280}
+.paper{background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.12);padding:34px 46px 30px;position:relative}
+.file{position:absolute;top:12px;right:18px;font:13px Consolas,monospace;color:#9ca3af}
+h2{font-size:24px;font-weight:800;margin-bottom:10px}
+p{font-size:15.5px;line-height:1.65;margin:6px 0}
+table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:14.5px}
+th,td{border:1px solid #d1d5db;padding:6px 10px;text-align:left;vertical-align:top;line-height:1.5}
+th{background:#f3f4f6;font-weight:700}
+h3{font-size:19px;font-weight:800;margin:20px 0 6px;border-bottom:2px solid #e5e7eb;padding-bottom:4px}
+.sub{font-weight:700;font-size:15.5px;margin-top:10px}
+ul{margin:4px 0 4px 22px;font-size:15px;line-height:1.6}
+.mark{position:relative;outline:3px solid #dc2626;outline-offset:6px;border-radius:6px;margin:14px 0 10px;padding:2px 4px}
+.n{position:absolute;left:-44px;top:-6px;width:30px;height:30px;border-radius:50%;background:#dc2626;color:#fff;font:700 18px 'Segoe UI',Arial;display:flex;align-items:center;justify-content:center}
+.gap{color:#9ca3af;font-size:14px;text-align:center;margin:12px 0;letter-spacing:2px}
+.note{font-size:13.5px;color:#6b7280;margin-top:8px}
+.legend{margin-top:18px;background:#1e1e1e;color:#e5e7eb;border-radius:8px;padding:14px 20px;font-size:15px;line-height:1.7}
+.legend b{color:#e8b86d}
+.legend .c{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#dc2626;color:#fff;font:700 13px Arial;align-items:center;justify-content:center;margin-right:6px}
+</style></head><body><div class="wrap">
+<div class="cap"><h1>LAB 12 · RELEASE-NOTES.md ถึงคุณจันทร์ (ภาษาคน) — สบายใจ สปา (ระบบเดิม)</h1><span>รันจริง 12 ต.ค. 2026 · คัดบางส่วน</span></div>
+<div class="paper"><div class="file">RELEASE-NOTES.md · 166 บรรทัด</div>
+<h2>บันทึกการปรับปรุงระบบจองคิว · สบายใจ สปา · รอบตุลาคม 2569</h2>
+<p>เรียน คุณจันทร์ และคณะกรรมการตรวจรับ</p>
+<p>ทีมดูแลระบบปรับปรุงระบบจองคิวตามหนังสือขอเปลี่ยนแปลงทั้ง 5 ฉบับ (CR-01 ถึง CR-05) เสร็จแล้ว ทุกเรื่องทดสอบผ่านบนเครื่องทดสอบ และพร้อมให้ร้านลองกดตรวจเองตาม "ใบตรวจรับ" (UAT-CHECKLIST.md)</p>
+<table><tr><th>ฉบับ</th><th>เรื่อง</th><th>สถานะ</th><th>มีผลเมื่อไร</th></tr>
+<tr><td>CR-01</td><td>ลูกค้าเลื่อนนัดเองได้</td><td>เสร็จ รอร้านตรวจรับ</td><td>ทันทีที่ขึ้นระบบใหม่</td></tr>
+<tr><td>CR-02</td><td>ส่วนลดกลุ่มแบบขั้นบันได</td><td>เสร็จ รอร้านตรวจรับ</td><td>การจองที่ทำตั้งแต่ <b>1 พ.ย. 2569 เวลา 00:00 น.</b></td></tr>
+<tr><td>CR-03</td><td>กันลูกค้าคนเดียวกันจองซ้ำ (เรื่องร้องเรียน)</td><td>เสร็จ รอร้านตรวจรับ</td><td>ทันทีที่ขึ้นระบบใหม่</td></tr>
+<tr><td>CR-04</td><td>วันหยุดร้าน</td><td>เสร็จบางส่วน (ส่วนที่ร้านเพิ่ม/ลบวันหยุดเองยังไม่ทำ)</td><td>ทันทีที่ขึ้นระบบใหม่ (ต้องขึ้นก่อน 23 ต.ค. 2569)</td></tr>
+<tr><td>CR-05</td><td>รายงานยอดสำหรับเจ้าของร้าน</td><td>เสร็จ รอร้านตรวจรับ</td><td>ทันทีที่ขึ้นระบบใหม่</td></tr></table>
+<p>ข้อมูลลูกค้า นัด คอร์ส บัตรของขวัญ และแต้มที่มีอยู่เดิม <b>ไม่หาย</b> ทีมซ้อมขั้นตอนขึ้นระบบและขั้นตอนย้อนกลับบนข้อมูลจริงแล้ว</p>
+
+<h3>CR-01 · ลูกค้าเลื่อนนัดเองได้</h3>
+<div class="mark"><span class="n">1</span><div class="sub">ลูกค้าเห็นอะไร</div>
+<ul><li>กดปุ่ม "เลื่อนนัด" → เลือกวันใหม่ → ระบบแสดงเฉพาะรอบที่ "นักบำบัดคนเดิม" ว่าง → กด "ยืนยันเลื่อนนัด" → ขึ้นข้อความ เช่น "เลื่อนนัด B05 เป็น 12 ต.ค. 2026 10:00 แล้ว"</li>
+<li>ถ้าเลื่อนไม่ได้ จะขึ้นเหตุผลเป็นภาษาของลูกค้า (ไทย อังกฤษ จีน) เช่น เหลือเวลาไม่ถึง 24 ชั่วโมง (พร้อมเบอร์ร้าน) · วันที่ร้านหยุด · นอกเดือนเกิด</li></ul></div>
+<div class="mark"><span class="n">2</span><div class="sub">ร้านต้องทำอะไร</div>
+<ul><li>ไม่ต้องทำอะไรเพิ่ม · ตารางคิวหลังร้านจะแสดงเวลาใหม่ทันที</li>
+<li>ร้านยังเลื่อนให้ลูกค้าด้วยวิธีเดิม (ยกเลิกแล้วจองให้ใหม่) ตามที่ขอไว้</li>
+<li>ข้อควรรู้: ระบบไม่เก็บประวัติว่านัดนี้เคยอยู่เวลาไหนมาก่อน</li></ul></div>
+<div class="gap">· · · CR-02 ถึง CR-05 (หัวข้อเดียวกัน) · เรื่องที่รอร้านยืนยัน · · ·</div>
+
+<div class="mark"><span class="n">3</span><h3 style="margin-top:4px">เรื่องที่ยังไม่ได้แก้ (คัด 6 ข้อ)</h3>
+<table><tr><th>#</th><th>เรื่อง</th><th>ผลกระทบกับร้าน</th><th>ข้อเสนอ</th></tr>
+<tr><td>1</td><td>ลูกค้าพิมพ์รหัสบัตรของขวัญผิด หน้าจองไม่เตือน (ข้อความขึ้นแวบเดียวแล้วหาย)</td><td>มาถึงร้านต้องจ่ายเต็ม → อาจร้องเรียน</td><td>ออกหนังสือขอแก้</td></tr>
+<tr><td>2</td><td>ลูกค้าที่ไม่ได้เป็นสมาชิกใส่เบอร์โทรเป็นตัวอักษร (เช่น "abc") ก็จองได้</td><td>ติดต่อลูกค้าไม่ได้ · กันจองซ้ำ (CR-03) ใช้ไม่ได้</td><td>ร้านบอกรูปแบบเบอร์ที่รับ แล้วออกหนังสือขอแก้</td></tr>
+<tr><td>3</td><td>เจ้าของร้านยกเลิกนัดของลูกค้าได้ผ่านช่องทางลับ แม้หน้าหลังร้านไม่มีปุ่ม</td><td>ยกเลิกช่วงใกล้เวลานัดไม่ได้ · ไม่มีบันทึกว่าใครยกเลิก</td><td>ร้านตัดสินแล้วทำเป็นปุ่มหลังร้าน</td></tr>
+<tr><td>4</td><td>กด "ออกจากระบบ" แล้ว การเข้าระบบที่ถูกคัดลอกไว้ยังใช้ต่อได้อีก 7 วัน</td><td>ความเสี่ยงด้านความปลอดภัยบัญชี (ต่ำ)</td><td>แก้ในรอบถัดไป</td></tr>
+<tr><td>14</td><td>CR-04 ส่วนที่ร้านเพิ่ม/ลบวันหยุดเองในหน้าหลังร้าน</td><td>ต้องแจ้งทีมทุกครั้งที่จะเพิ่มวันหยุด</td><td>ทำในรอบถัดไปตามที่ร้านตกลง</td></tr>
+<tr><td>16</td><td>(ของใหม่ใน CR-01 · พบตอนเตรียมใบตรวจรับ) เปลี่ยนวันเร็วมากในกล่องเลื่อนนัด แล้วเลือกวันร้านหยุด อาจเห็นปุ่มรอบเวลาของวันแรกค้าง</td><td>กดยืนยันแล้วระบบไม่ยอม นัดไม่เปลี่ยน แต่ลูกค้าอาจงง</td><td>แก้ในรอบถัดไป</td></tr></table>
+<div class="note">ทุกข้อในตารางนี้ไม่ได้แก้ในรอบนี้ เพราะยังไม่มีหนังสือขอแก้</div></div>
+</div>
+<div class="legend"><b>อ่านเลขในภาพ</b> &nbsp; <span class="c">1</span>ลูกค้าเห็นอะไร = สิ่งที่ลูกค้าจะเจอบนหน้าเว็บ &nbsp; <span class="c">2</span>ร้านต้องทำอะไร = งานของพนักงาน &nbsp; <span class="c">3</span>เรื่องที่ยังไม่แก้ = บอกตรง ๆ ไม่ซ่อน · เขียนเป็นภาษาคน ไม่มีชื่อไฟล์/โค้ด</div>
+</div></body></html>

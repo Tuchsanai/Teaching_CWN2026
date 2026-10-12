@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>three-eyes-db</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .tbl { display: grid; grid-template-columns: 158px repeat(4, 1fr); gap: 10px; margin-top: 28px; }
+  .h { background: var(--bg); border: 2px solid var(--bd); border-radius: 18px 18px 10px 10px; padding: 14px 14px 12px; }
+  .h .t { display: flex; align-items: center; gap: 10px; }
+  .h .emo { font-size: 30px; line-height: 1; font-family: "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+  .h b { font-size: 23px; color: var(--c); line-height: 1.25; }
+  .h div.s { font-size: 14.5px; color: var(--ink); margin-top: 6px; }
+  .rl { background: #fbf6e6; border: 1.5px solid #ead9a8; border-radius: 12px; padding: 10px 12px; font-weight: 800; color: var(--leaf); font-size: 16.5px; display: flex; align-items: center; line-height: 1.35; }
+  .c { background: #fff; border: 1.5px solid var(--bd); border-radius: 12px; padding: 11px 13px; font-size: 15.5px; line-height: 1.5; }
+  .c .pill { font-size: 12.5px; color: var(--c); padding: 1px 7px; margin: 2px 0; }
+  .yes { color: var(--green); font-weight: 700; }
+  .no { color: var(--slate); font-weight: 700; }
+  .warn { color: #b45309; }
+  .big { font-weight: 800; color: var(--c); font-size: 17px; }
+  .ex { grid-column: 1 / -1; display: grid; grid-template-columns: 158px repeat(4, 1fr); gap: 10px; margin-top: 8px; }
+  .ex .rl { background: #fff4e6; border-color: #f8b07a; color: var(--orange); }
+  .ex .c { border-style: dashed; }
+  .mark { font-weight: 800; }
+  * { font-variant-ligatures: none; }
+</style>
+</head>
+<body>
+  <h1>4 แหล่งความจริงของระบบเดิม</h1>
+  <p class="sub">3 ตาจากบท 05 (REA · อ่าน repo · เอกสาร) + ตาที่ 4 คือฐานข้อมูล · เอาคำตอบมาเทียบกันก่อนเชื่อ</p>
+
+  <div class="tbl">
+    <div></div>
+    <div class="h s"><div class="t"><span class="emo">🔦</span><b>REA</b></div><div class="s">grey-box · bundle + HAR + เบราว์เซอร์</div></div>
+    <div class="h b"><div class="t"><span class="emo">📖</span><b>อ่าน repo</b></div><div class="s">white-box · source ครบ</div></div>
+    <div class="h g"><div class="t"><span class="emo">🗄️</span><b>schema DB</b></div><div class="s">psql <span style="font-family:var(--mono)">\dt</span> · <span style="font-family:var(--mono)">\d</span> ตาราง</div></div>
+    <div class="h y"><div class="t"><span class="emo">📜</span><b>SPEC เก่า</b></div><div class="s">เอกสารที่ผู้รับเหมาส่งมอบ</div></div>
+
+    <div class="rl">ต้องมี source ไหม</div>
+    <div class="c s"><span class="no">❌ ไม่ต้อง</span> · ใช้ของที่ build แล้ว / เว็บที่รันอยู่</div>
+    <div class="c b"><span class="yes">✅ ต้องมี</span> · repo ครบ</div>
+    <div class="c g"><span class="no">❌ ไม่ต้อง</span> · ต่อฐานข้อมูลได้ก็พอ</div>
+    <div class="c y"><span class="no">❌ ไม่ต้อง</span> · อ่านเอกสาร</div>
+
+    <div class="rl">เห็นอะไร</div>
+    <div class="c s">หน้าเว็บ · endpoint ที่เบราว์เซอร์เรียก · สัญญา API จาก HAR (method · body · status)</div>
+    <div class="c b">ทุกบรรทัดที่เขียนไว้ · <span style="white-space:nowrap">กฎฝั่งเซิร์ฟเวอร์</span> · ใครเรียกใคร</div>
+    <div class="c g">กฎที่ DB บังคับเอง แม้โค้ดลืมตรวจ (CHECK · EXCLUDE · FK)</div>
+    <div class="c y">สิ่งที่ร้าน "ตั้งใจ" ไว้ตอนส่งมอบ · ศัพท์ของร้าน</div>
+
+    <div class="rl">ไม่เห็น / ระวัง</div>
+    <div class="c s warn">กฎฝั่งเซิร์ฟเวอร์ · ฐานข้อมูล · <span style="white-space:nowrap">ชื่อถูกย่อ (minified)</span> · ไม่เจอ ≠ ไม่มี</div>
+    <div class="c b warn">ไม่บอกว่าส่วนไหนใช้งานจริง · <span style="white-space:nowrap">คอมเมนต์อาจเก่า</span></div>
+    <div class="c g warn">ไม่บอกเหตุผลทางธุรกิจ · <span style="white-space:nowrap">REA ไม่อ่าน Postgres</span></div>
+    <div class="c y warn">อาจไม่ตรงโค้ด · ห้าม AI ตัดสินเองว่าฝั่งไหนถูก → ถามร้าน</div>
+
+    <div class="rl">ตัวเลขจริง<br>ของสบายใจ สปา</div>
+    <div class="c s">endpoint จาก <span style="font-family:var(--mono)">fetch</span> <span class="big">9</span> จาก <span class="big">25</span> route<br>HAR เส้นทางจอง <span class="big">7</span> endpoint</div>
+    <div class="c b">route ใน <span class="pill">web/app/api/</span> <span class="big">25</span> ตัว<br>ตามได้ถึง <span style="font-family:var(--mono)">file:line</span></div>
+    <div class="c g"><span class="big">19</span> ตาราง · CHECK <span class="big">51</span><br>EXCLUDE <span class="big">2</span> (ห้ามเวลาซ้อน)</div>
+    <div class="c y"><span class="pill">web/SPEC.md</span> ฉบับส่งมอบ<br>ไม่ตรงโค้ดหลายจุด → <span class="pill">SPEC-GAPS.md</span></div>
+
+    <div class="rl">เครื่องมือ</div>
+    <div class="c s"><span class="pill">rea-lab:6.4.0</span> <span class="pill">record-har.mjs</span></div>
+    <div class="c b">Claude Code (Explore) · <span class="pill">grep</span></div>
+    <div class="c g"><span class="pill">docker exec … psql</span></div>
+    <div class="c y">อ่าน + จดเป็น "คำถามถึงร้าน"</div>
+
+    <div class="ex">
+      <div class="rl">ตัวอย่าง:<br>"รับกลุ่ม 8 คน"</div>
+      <div class="c s"><span class="mark">🤷 ไม่รู้</span> · เห็นแค่หน้าจองบอก <span style="white-space:nowrap">3–6 คน</span> ไม่รู้ว่า DB จะว่าอย่างไร</div>
+      <div class="c b"><span class="mark">✏️ แก้ได้</span> · เปลี่ยนค่าสูงสุดของกลุ่มในโค้ด 1 บรรทัด</div>
+      <div class="c g"><span class="mark" style="color:var(--red)">⛔ ปฏิเสธ</span> · CHECK <span style="font-family:var(--mono)">party_size &lt;= 6</span> → ต้องมี migration</div>
+      <div class="c y"><span class="mark">❓ ถามร้าน</span> · 7 คนขึ้นไปให้โทรหาร้าน ยังใช้อยู่ไหม</div>
+    </div>
+  </div>
+
+  <div class="bar">🎯 ตรงกัน = มั่นใจ · ไม่ตรง = เจอเรื่องต้องถาม · แก้แค่โค้ดตามที่ตาเดียวเห็น = เสี่ยงพัง</div>
+</body>
+</html>

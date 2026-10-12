@@ -1,0 +1,1340 @@
+diff --git a/tests/exam2/golden/cancel-B05-at-0959.json b/tests/exam2/golden/cancel-B05-at-0959.json
+new file mode 100644
+index 0000000..048059f
+--- /dev/null
++++ b/tests/exam2/golden/cancel-B05-at-0959.json
+@@ -0,0 +1,5 @@
++{
++  "canCancel": true,
++  "status": 200,
++  "error": null
++}
+diff --git a/tests/exam2/golden/cancel-B05-at-1000.json b/tests/exam2/golden/cancel-B05-at-1000.json
+new file mode 100644
+index 0000000..048059f
+--- /dev/null
++++ b/tests/exam2/golden/cancel-B05-at-1000.json
+@@ -0,0 +1,5 @@
++{
++  "canCancel": true,
++  "status": 200,
++  "error": null
++}
+diff --git a/tests/exam2/golden/cancel-B05-at-1001.json b/tests/exam2/golden/cancel-B05-at-1001.json
+new file mode 100644
+index 0000000..b0d699a
+--- /dev/null
++++ b/tests/exam2/golden/cancel-B05-at-1001.json
+@@ -0,0 +1,5 @@
++{
++  "canCancel": false,
++  "status": 422,
++  "error": "CANCEL_TOO_LATE"
++}
+diff --git a/tests/exam2/golden/giftcards-at-1009.json b/tests/exam2/golden/giftcards-at-1009.json
+new file mode 100644
+index 0000000..637c6bc
+--- /dev/null
++++ b/tests/exam2/golden/giftcards-at-1009.json
+@@ -0,0 +1,32 @@
++{
++  "SABAI-GC-2000": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 2000,
++    "expiresOn": "2027-10-01"
++  },
++  "SABAI-GC-PART": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 1250,
++    "expiresOn": "2027-06-15"
++  },
++  "SABAI-GC-LAST": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 500,
++    "expiresOn": "2026-10-10"
++  },
++  "SABAI-GC-EXP": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 1000,
++    "expiresOn": "2026-10-09"
++  },
++  "SABAI-GC-ZERO": {
++    "status": 200,
++    "gcStatus": "empty",
++    "balance": 0,
++    "expiresOn": "2027-09-01"
++  }
++}
+diff --git a/tests/exam2/golden/giftcards-at-1010.json b/tests/exam2/golden/giftcards-at-1010.json
+new file mode 100644
+index 0000000..63fd581
+--- /dev/null
++++ b/tests/exam2/golden/giftcards-at-1010.json
+@@ -0,0 +1,32 @@
++{
++  "SABAI-GC-2000": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 2000,
++    "expiresOn": "2027-10-01"
++  },
++  "SABAI-GC-PART": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 1250,
++    "expiresOn": "2027-06-15"
++  },
++  "SABAI-GC-LAST": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 500,
++    "expiresOn": "2026-10-10"
++  },
++  "SABAI-GC-EXP": {
++    "status": 200,
++    "gcStatus": "expired",
++    "balance": 1000,
++    "expiresOn": "2026-10-09"
++  },
++  "SABAI-GC-ZERO": {
++    "status": 200,
++    "gcStatus": "empty",
++    "balance": 0,
++    "expiresOn": "2027-09-01"
++  }
++}
+diff --git a/tests/exam2/golden/giftcards-at-1011.json b/tests/exam2/golden/giftcards-at-1011.json
+new file mode 100644
+index 0000000..ce04416
+--- /dev/null
++++ b/tests/exam2/golden/giftcards-at-1011.json
+@@ -0,0 +1,32 @@
++{
++  "SABAI-GC-2000": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 2000,
++    "expiresOn": "2027-10-01"
++  },
++  "SABAI-GC-PART": {
++    "status": 200,
++    "gcStatus": "ok",
++    "balance": 1250,
++    "expiresOn": "2027-06-15"
++  },
++  "SABAI-GC-LAST": {
++    "status": 200,
++    "gcStatus": "expired",
++    "balance": 500,
++    "expiresOn": "2026-10-10"
++  },
++  "SABAI-GC-EXP": {
++    "status": 200,
++    "gcStatus": "expired",
++    "balance": 1000,
++    "expiresOn": "2026-10-09"
++  },
++  "SABAI-GC-ZERO": {
++    "status": 200,
++    "gcStatus": "empty",
++    "balance": 0,
++    "expiresOn": "2027-09-01"
++  }
++}
+diff --git a/tests/exam2/golden/slots-P01-2026-10-10.json b/tests/exam2/golden/slots-P01-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-P01-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-P01-2026-10-11.json b/tests/exam2/golden/slots-P01-2026-10-11.json
+new file mode 100644
+index 0000000..3024c29
+--- /dev/null
++++ b/tests/exam2/golden/slots-P01-2026-10-11.json
+@@ -0,0 +1,29 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-12:00:1:T01T02T06",
++    "10:30-12:30:1:T01T02T06",
++    "11:00-13:00:1:T01T02T06",
++    "11:30-13:30:1:T01T02T06",
++    "12:00-14:00:1:T01T02T06",
++    "12:30-14:30:1:T01T02T06",
++    "13:00-15:00:1:T01T02T06",
++    "13:30-15:30:1:T01T02T06",
++    "14:00-16:00:1:T01T02T06",
++    "14:30-16:30:1:T01T02T06",
++    "15:00-17:00:1:T01T02T06",
++    "15:30-17:30:1:T01T02T06",
++    "16:00-18:00:1:T01T02T06",
++    "16:30-18:30:1:T01T02T06",
++    "17:00-19:00:1:T01T02T06",
++    "17:30-19:30:1:T01T02T06",
++    "18:00-20:00:1:T01T02T06",
++    "18:30-20:30:1:T01T02T06",
++    "19:00-21:00:1:T01T02T06",
++    "19:30-21:30:1:T01T02T06",
++    "20:00-22:00:1:T01T02T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-P01-2026-10-12.json b/tests/exam2/golden/slots-P01-2026-10-12.json
+new file mode 100644
+index 0000000..3024c29
+--- /dev/null
++++ b/tests/exam2/golden/slots-P01-2026-10-12.json
+@@ -0,0 +1,29 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-12:00:1:T01T02T06",
++    "10:30-12:30:1:T01T02T06",
++    "11:00-13:00:1:T01T02T06",
++    "11:30-13:30:1:T01T02T06",
++    "12:00-14:00:1:T01T02T06",
++    "12:30-14:30:1:T01T02T06",
++    "13:00-15:00:1:T01T02T06",
++    "13:30-15:30:1:T01T02T06",
++    "14:00-16:00:1:T01T02T06",
++    "14:30-16:30:1:T01T02T06",
++    "15:00-17:00:1:T01T02T06",
++    "15:30-17:30:1:T01T02T06",
++    "16:00-18:00:1:T01T02T06",
++    "16:30-18:30:1:T01T02T06",
++    "17:00-19:00:1:T01T02T06",
++    "17:30-19:30:1:T01T02T06",
++    "18:00-20:00:1:T01T02T06",
++    "18:30-20:30:1:T01T02T06",
++    "19:00-21:00:1:T01T02T06",
++    "19:30-21:30:1:T01T02T06",
++    "20:00-22:00:1:T01T02T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-P01-2026-11-09.json b/tests/exam2/golden/slots-P01-2026-11-09.json
+new file mode 100644
+index 0000000..3024c29
+--- /dev/null
++++ b/tests/exam2/golden/slots-P01-2026-11-09.json
+@@ -0,0 +1,29 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-12:00:1:T01T02T06",
++    "10:30-12:30:1:T01T02T06",
++    "11:00-13:00:1:T01T02T06",
++    "11:30-13:30:1:T01T02T06",
++    "12:00-14:00:1:T01T02T06",
++    "12:30-14:30:1:T01T02T06",
++    "13:00-15:00:1:T01T02T06",
++    "13:30-15:30:1:T01T02T06",
++    "14:00-16:00:1:T01T02T06",
++    "14:30-16:30:1:T01T02T06",
++    "15:00-17:00:1:T01T02T06",
++    "15:30-17:30:1:T01T02T06",
++    "16:00-18:00:1:T01T02T06",
++    "16:30-18:30:1:T01T02T06",
++    "17:00-19:00:1:T01T02T06",
++    "17:30-19:30:1:T01T02T06",
++    "18:00-20:00:1:T01T02T06",
++    "18:30-20:30:1:T01T02T06",
++    "19:00-21:00:1:T01T02T06",
++    "19:30-21:30:1:T01T02T06",
++    "20:00-22:00:1:T01T02T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-P01-2026-11-10.json b/tests/exam2/golden/slots-P01-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-P01-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S01-2026-10-10.json b/tests/exam2/golden/slots-S01-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S01-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S01-2026-10-11.json b/tests/exam2/golden/slots-S01-2026-10-11.json
+new file mode 100644
+index 0000000..4840b7b
+--- /dev/null
++++ b/tests/exam2/golden/slots-S01-2026-10-11.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T05T06",
++    "10:30-11:30:1:T01T02T03T05T06",
++    "11:00-12:00:1:T01T02T03T04T05T06",
++    "11:30-12:30:1:T01T02T03T04T05T06",
++    "12:00-13:00:1:T01T02T03T04T05T06",
++    "12:30-13:30:1:T01T02T03T04T05T06",
++    "13:00-14:00:1:T01T02T03T04T05T06",
++    "13:30-14:30:1:T01T02T03T04T05T06",
++    "14:00-15:00:1:T01T02T03T04T05T06",
++    "14:30-15:30:1:T01T02T03T04T05T06",
++    "15:00-16:00:1:T01T02T03T04T05T06",
++    "15:30-16:30:1:T01T02T03T04T05T06",
++    "16:00-17:00:1:T01T02T03T04T05T06",
++    "16:30-17:30:1:T01T02T03T04T05T06",
++    "17:00-18:00:1:T01T02T03T04T05T06",
++    "17:30-18:30:1:T01T02T03T04T05T06",
++    "18:00-19:00:1:T01T02T03T04T05T06",
++    "18:30-19:30:1:T01T02T03T04T05T06",
++    "19:00-20:00:1:T01T02T03T04T05T06",
++    "19:30-20:30:1:T01T02T03T04T05T06",
++    "20:00-21:00:1:T01T02T03T04T05T06",
++    "20:30-21:30:1:T01T02T03T04T05T06",
++    "21:00-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S01-2026-10-12.json b/tests/exam2/golden/slots-S01-2026-10-12.json
+new file mode 100644
+index 0000000..2de3748
+--- /dev/null
++++ b/tests/exam2/golden/slots-S01-2026-10-12.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T04T05T06",
++    "10:30-11:30:1:T01T02T03T04T05T06",
++    "11:00-12:00:1:T01T02T03T04T05T06",
++    "11:30-12:30:1:T01T02T03T04T05T06",
++    "12:00-13:00:1:T01T02T03T04T05T06",
++    "12:30-13:30:1:T01T02T03T04T05T06",
++    "13:00-14:00:1:T01T02T03T04T05T06",
++    "13:30-14:30:1:T01T02T04T05T06",
++    "14:00-15:00:1:T01T02T04T05T06",
++    "14:30-15:30:1:T01T02T04T05T06",
++    "15:00-16:00:1:T01T02T03T04T05T06",
++    "15:30-16:30:1:T01T02T03T04T05T06",
++    "16:00-17:00:1:T01T02T03T04T05T06",
++    "16:30-17:30:1:T01T02T03T04T05T06",
++    "17:00-18:00:1:T01T02T03T04T05T06",
++    "17:30-18:30:1:T01T02T03T04T05T06",
++    "18:00-19:00:1:T01T02T03T04T05T06",
++    "18:30-19:30:1:T01T02T03T04T05T06",
++    "19:00-20:00:1:T01T02T03T04T05T06",
++    "19:30-20:30:1:T01T02T03T04T05T06",
++    "20:00-21:00:1:T01T02T03T04T05T06",
++    "20:30-21:30:1:T01T02T03T04T05T06",
++    "21:00-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S01-2026-11-09.json b/tests/exam2/golden/slots-S01-2026-11-09.json
+new file mode 100644
+index 0000000..c966cf7
+--- /dev/null
++++ b/tests/exam2/golden/slots-S01-2026-11-09.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T04T05T06",
++    "10:30-11:30:1:T01T02T03T04T05T06",
++    "11:00-12:00:1:T01T02T03T04T05T06",
++    "11:30-12:30:1:T01T02T03T04T05T06",
++    "12:00-13:00:1:T01T02T03T04T05T06",
++    "12:30-13:30:1:T01T02T03T04T05T06",
++    "13:00-14:00:1:T01T02T03T04T05T06",
++    "13:30-14:30:1:T01T02T03T04T05T06",
++    "14:00-15:00:1:T01T02T03T04T05T06",
++    "14:30-15:30:1:T01T02T03T04T05T06",
++    "15:00-16:00:1:T01T02T03T04T05T06",
++    "15:30-16:30:1:T01T02T03T04T05T06",
++    "16:00-17:00:1:T01T02T03T04T05T06",
++    "16:30-17:30:1:T01T02T03T04T05T06",
++    "17:00-18:00:1:T01T02T03T04T05T06",
++    "17:30-18:30:1:T01T02T03T04T05T06",
++    "18:00-19:00:1:T01T02T03T04T05T06",
++    "18:30-19:30:1:T01T02T03T04T05T06",
++    "19:00-20:00:1:T01T02T03T04T05T06",
++    "19:30-20:30:1:T01T02T03T04T05T06",
++    "20:00-21:00:1:T01T02T03T04T05T06",
++    "20:30-21:30:1:T01T02T03T04T05T06",
++    "21:00-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S01-2026-11-10.json b/tests/exam2/golden/slots-S01-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S01-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S02-2026-10-10.json b/tests/exam2/golden/slots-S02-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S02-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S02-2026-10-11.json b/tests/exam2/golden/slots-S02-2026-10-11.json
+new file mode 100644
+index 0000000..2f02d40
+--- /dev/null
++++ b/tests/exam2/golden/slots-S02-2026-10-11.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T02T03T05T06",
++    "10:30-12:00:1:T01T02T03T05T06",
++    "11:00-12:30:1:T01T02T03T04T05T06",
++    "11:30-13:00:1:T01T02T03T04T05T06",
++    "12:00-13:30:1:T01T02T03T04T05T06",
++    "12:30-14:00:1:T01T02T03T04T05T06",
++    "13:00-14:30:1:T01T02T03T04T05T06",
++    "13:30-15:00:1:T01T02T03T04T05T06",
++    "14:00-15:30:1:T01T02T03T04T05T06",
++    "14:30-16:00:1:T01T02T03T04T05T06",
++    "15:00-16:30:1:T01T02T03T04T05T06",
++    "15:30-17:00:1:T01T02T03T04T05T06",
++    "16:00-17:30:1:T01T02T03T04T05T06",
++    "16:30-18:00:1:T01T02T03T04T05T06",
++    "17:00-18:30:1:T01T02T03T04T05T06",
++    "17:30-19:00:1:T01T02T03T04T05T06",
++    "18:00-19:30:1:T01T02T03T04T05T06",
++    "18:30-20:00:1:T01T02T03T04T05T06",
++    "19:00-20:30:1:T01T02T03T04T05T06",
++    "19:30-21:00:1:T01T02T03T04T05T06",
++    "20:00-21:30:1:T01T02T03T04T05T06",
++    "20:30-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S02-2026-10-12.json b/tests/exam2/golden/slots-S02-2026-10-12.json
+new file mode 100644
+index 0000000..7d3a75e
+--- /dev/null
++++ b/tests/exam2/golden/slots-S02-2026-10-12.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T02T03T04T05T06",
++    "10:30-12:00:1:T01T02T03T04T05T06",
++    "11:00-12:30:1:T01T02T03T04T05T06",
++    "11:30-13:00:1:T01T02T03T04T05T06",
++    "12:00-13:30:1:T01T02T03T04T05T06",
++    "12:30-14:00:1:T01T02T03T04T05T06",
++    "13:00-14:30:1:T01T02T04T05T06",
++    "13:30-15:00:1:T01T02T04T05T06",
++    "14:00-15:30:1:T01T02T04T05T06",
++    "14:30-16:00:1:T01T02T04T05T06",
++    "15:00-16:30:1:T01T02T03T04T05T06",
++    "15:30-17:00:1:T01T02T03T04T05T06",
++    "16:00-17:30:1:T01T02T03T04T05T06",
++    "16:30-18:00:1:T01T02T03T04T05T06",
++    "17:00-18:30:1:T01T02T03T04T05T06",
++    "17:30-19:00:1:T01T02T03T04T05T06",
++    "18:00-19:30:1:T01T02T03T04T05T06",
++    "18:30-20:00:1:T01T02T03T04T05T06",
++    "19:00-20:30:1:T01T02T03T04T05T06",
++    "19:30-21:00:1:T01T02T03T04T05T06",
++    "20:00-21:30:1:T01T02T03T04T05T06",
++    "20:30-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S02-2026-11-09.json b/tests/exam2/golden/slots-S02-2026-11-09.json
+new file mode 100644
+index 0000000..c141d92
+--- /dev/null
++++ b/tests/exam2/golden/slots-S02-2026-11-09.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T02T03T04T05T06",
++    "10:30-12:00:1:T01T02T03T04T05T06",
++    "11:00-12:30:1:T01T02T03T04T05T06",
++    "11:30-13:00:1:T01T02T03T04T05T06",
++    "12:00-13:30:1:T01T02T03T04T05T06",
++    "12:30-14:00:1:T01T02T03T04T05T06",
++    "13:00-14:30:1:T01T02T03T04T05T06",
++    "13:30-15:00:1:T01T02T03T04T05T06",
++    "14:00-15:30:1:T01T02T03T04T05T06",
++    "14:30-16:00:1:T01T02T03T04T05T06",
++    "15:00-16:30:1:T01T02T03T04T05T06",
++    "15:30-17:00:1:T01T02T03T04T05T06",
++    "16:00-17:30:1:T01T02T03T04T05T06",
++    "16:30-18:00:1:T01T02T03T04T05T06",
++    "17:00-18:30:1:T01T02T03T04T05T06",
++    "17:30-19:00:1:T01T02T03T04T05T06",
++    "18:00-19:30:1:T01T02T03T04T05T06",
++    "18:30-20:00:1:T01T02T03T04T05T06",
++    "19:00-20:30:1:T01T02T03T04T05T06",
++    "19:30-21:00:1:T01T02T03T04T05T06",
++    "20:00-21:30:1:T01T02T03T04T05T06",
++    "20:30-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S02-2026-11-10.json b/tests/exam2/golden/slots-S02-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S02-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S03-2026-10-10.json b/tests/exam2/golden/slots-S03-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S03-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S03-2026-10-11.json b/tests/exam2/golden/slots-S03-2026-10-11.json
+new file mode 100644
+index 0000000..a14cb1a
+--- /dev/null
++++ b/tests/exam2/golden/slots-S03-2026-10-11.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T05T06",
++    "10:30-11:30:1:T01T02T05T06",
++    "11:00-12:00:1:T01T02T05T06",
++    "11:30-12:30:1:T01T02T05T06",
++    "12:00-13:00:1:T01T02T05T06",
++    "12:30-13:30:1:T01T02T05T06",
++    "13:00-14:00:1:T01T02T05T06",
++    "13:30-14:30:1:T01T02T05T06",
++    "14:00-15:00:1:T01T02T05T06",
++    "14:30-15:30:1:T01T02T05T06",
++    "15:00-16:00:1:T01T02T05T06",
++    "15:30-16:30:1:T01T02T05T06",
++    "16:00-17:00:1:T01T02T05T06",
++    "16:30-17:30:1:T01T02T05T06",
++    "17:00-18:00:1:T01T02T05T06",
++    "17:30-18:30:1:T01T02T05T06",
++    "18:00-19:00:1:T01T02T05T06",
++    "18:30-19:30:1:T01T02T05T06",
++    "19:00-20:00:1:T01T02T05T06",
++    "19:30-20:30:1:T01T02T05T06",
++    "20:00-21:00:1:T01T02T05T06",
++    "20:30-21:30:1:T01T02T05T06",
++    "21:00-22:00:1:T01T02T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S03-2026-10-12.json b/tests/exam2/golden/slots-S03-2026-10-12.json
+new file mode 100644
+index 0000000..a14cb1a
+--- /dev/null
++++ b/tests/exam2/golden/slots-S03-2026-10-12.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T05T06",
++    "10:30-11:30:1:T01T02T05T06",
++    "11:00-12:00:1:T01T02T05T06",
++    "11:30-12:30:1:T01T02T05T06",
++    "12:00-13:00:1:T01T02T05T06",
++    "12:30-13:30:1:T01T02T05T06",
++    "13:00-14:00:1:T01T02T05T06",
++    "13:30-14:30:1:T01T02T05T06",
++    "14:00-15:00:1:T01T02T05T06",
++    "14:30-15:30:1:T01T02T05T06",
++    "15:00-16:00:1:T01T02T05T06",
++    "15:30-16:30:1:T01T02T05T06",
++    "16:00-17:00:1:T01T02T05T06",
++    "16:30-17:30:1:T01T02T05T06",
++    "17:00-18:00:1:T01T02T05T06",
++    "17:30-18:30:1:T01T02T05T06",
++    "18:00-19:00:1:T01T02T05T06",
++    "18:30-19:30:1:T01T02T05T06",
++    "19:00-20:00:1:T01T02T05T06",
++    "19:30-20:30:1:T01T02T05T06",
++    "20:00-21:00:1:T01T02T05T06",
++    "20:30-21:30:1:T01T02T05T06",
++    "21:00-22:00:1:T01T02T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S03-2026-11-09.json b/tests/exam2/golden/slots-S03-2026-11-09.json
+new file mode 100644
+index 0000000..a14cb1a
+--- /dev/null
++++ b/tests/exam2/golden/slots-S03-2026-11-09.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T05T06",
++    "10:30-11:30:1:T01T02T05T06",
++    "11:00-12:00:1:T01T02T05T06",
++    "11:30-12:30:1:T01T02T05T06",
++    "12:00-13:00:1:T01T02T05T06",
++    "12:30-13:30:1:T01T02T05T06",
++    "13:00-14:00:1:T01T02T05T06",
++    "13:30-14:30:1:T01T02T05T06",
++    "14:00-15:00:1:T01T02T05T06",
++    "14:30-15:30:1:T01T02T05T06",
++    "15:00-16:00:1:T01T02T05T06",
++    "15:30-16:30:1:T01T02T05T06",
++    "16:00-17:00:1:T01T02T05T06",
++    "16:30-17:30:1:T01T02T05T06",
++    "17:00-18:00:1:T01T02T05T06",
++    "17:30-18:30:1:T01T02T05T06",
++    "18:00-19:00:1:T01T02T05T06",
++    "18:30-19:30:1:T01T02T05T06",
++    "19:00-20:00:1:T01T02T05T06",
++    "19:30-20:30:1:T01T02T05T06",
++    "20:00-21:00:1:T01T02T05T06",
++    "20:30-21:30:1:T01T02T05T06",
++    "21:00-22:00:1:T01T02T05T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S03-2026-11-10.json b/tests/exam2/golden/slots-S03-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S03-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S04-2026-10-10.json b/tests/exam2/golden/slots-S04-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S04-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S04-2026-10-11.json b/tests/exam2/golden/slots-S04-2026-10-11.json
+new file mode 100644
+index 0000000..e80b284
+--- /dev/null
++++ b/tests/exam2/golden/slots-S04-2026-10-11.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T03T05",
++    "10:30-12:00:1:T01T03T05",
++    "11:00-12:30:1:T01T03T05",
++    "11:30-13:00:1:T01T03T05",
++    "12:00-13:30:1:T01T03T05",
++    "12:30-14:00:1:T01T03T05",
++    "13:00-14:30:1:T01T03T05",
++    "13:30-15:00:1:T01T03T05",
++    "14:00-15:30:1:T01T03T05",
++    "14:30-16:00:1:T01T03T05",
++    "15:00-16:30:1:T01T03T05",
++    "15:30-17:00:1:T01T03T05",
++    "16:00-17:30:1:T01T03T05",
++    "16:30-18:00:1:T01T03T05",
++    "17:00-18:30:1:T01T03T05",
++    "17:30-19:00:1:T01T03T05",
++    "18:00-19:30:1:T01T03T05",
++    "18:30-20:00:1:T01T03T05",
++    "19:00-20:30:1:T01T03T05",
++    "19:30-21:00:1:T01T03T05",
++    "20:00-21:30:1:T01T03T05",
++    "20:30-22:00:1:T01T03T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S04-2026-10-12.json b/tests/exam2/golden/slots-S04-2026-10-12.json
+new file mode 100644
+index 0000000..8eec13a
+--- /dev/null
++++ b/tests/exam2/golden/slots-S04-2026-10-12.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T03T05",
++    "10:30-12:00:1:T01T03T05",
++    "11:00-12:30:1:T01T03T05",
++    "11:30-13:00:1:T01T03T05",
++    "12:00-13:30:1:T01T03T05",
++    "12:30-14:00:1:T01T03T05",
++    "13:00-14:30:1:T01T05",
++    "13:30-15:00:1:T01T05",
++    "14:00-15:30:1:T01T05",
++    "14:30-16:00:1:T01T05",
++    "15:00-16:30:1:T01T03T05",
++    "15:30-17:00:1:T01T03T05",
++    "16:00-17:30:1:T01T03T05",
++    "16:30-18:00:1:T01T03T05",
++    "17:00-18:30:1:T01T03T05",
++    "17:30-19:00:1:T01T03T05",
++    "18:00-19:30:1:T01T03T05",
++    "18:30-20:00:1:T01T03T05",
++    "19:00-20:30:1:T01T03T05",
++    "19:30-21:00:1:T01T03T05",
++    "20:00-21:30:1:T01T03T05",
++    "20:30-22:00:1:T01T03T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S04-2026-11-09.json b/tests/exam2/golden/slots-S04-2026-11-09.json
+new file mode 100644
+index 0000000..e80b284
+--- /dev/null
++++ b/tests/exam2/golden/slots-S04-2026-11-09.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T03T05",
++    "10:30-12:00:1:T01T03T05",
++    "11:00-12:30:1:T01T03T05",
++    "11:30-13:00:1:T01T03T05",
++    "12:00-13:30:1:T01T03T05",
++    "12:30-14:00:1:T01T03T05",
++    "13:00-14:30:1:T01T03T05",
++    "13:30-15:00:1:T01T03T05",
++    "14:00-15:30:1:T01T03T05",
++    "14:30-16:00:1:T01T03T05",
++    "15:00-16:30:1:T01T03T05",
++    "15:30-17:00:1:T01T03T05",
++    "16:00-17:30:1:T01T03T05",
++    "16:30-18:00:1:T01T03T05",
++    "17:00-18:30:1:T01T03T05",
++    "17:30-19:00:1:T01T03T05",
++    "18:00-19:30:1:T01T03T05",
++    "18:30-20:00:1:T01T03T05",
++    "19:00-20:30:1:T01T03T05",
++    "19:30-21:00:1:T01T03T05",
++    "20:00-21:30:1:T01T03T05",
++    "20:30-22:00:1:T01T03T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S04-2026-11-10.json b/tests/exam2/golden/slots-S04-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S04-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S05-2026-10-10.json b/tests/exam2/golden/slots-S05-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S05-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S05-2026-10-11.json b/tests/exam2/golden/slots-S05-2026-10-11.json
+new file mode 100644
+index 0000000..381698c
+--- /dev/null
++++ b/tests/exam2/golden/slots-S05-2026-10-11.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T06",
++    "10:30-11:30:1:T01T02T03T06",
++    "11:00-12:00:1:T01T02T03T04T06",
++    "11:30-12:30:1:T01T02T03T04T06",
++    "12:00-13:00:1:T01T02T03T04T06",
++    "12:30-13:30:1:T01T02T03T04T06",
++    "13:00-14:00:1:T01T02T03T04T06",
++    "13:30-14:30:1:T01T02T03T04T06",
++    "14:00-15:00:1:T01T02T03T04T06",
++    "14:30-15:30:1:T01T02T03T04T06",
++    "15:00-16:00:1:T01T02T03T04T06",
++    "15:30-16:30:1:T01T02T03T04T06",
++    "16:00-17:00:1:T01T02T03T04T06",
++    "16:30-17:30:1:T01T02T03T04T06",
++    "17:00-18:00:1:T01T02T03T04T06",
++    "17:30-18:30:1:T01T02T03T04T06",
++    "18:00-19:00:1:T01T02T03T04T06",
++    "18:30-19:30:1:T01T02T03T04T06",
++    "19:00-20:00:1:T01T02T03T04T06",
++    "19:30-20:30:1:T01T02T03T04T06",
++    "20:00-21:00:1:T01T02T03T04T06",
++    "20:30-21:30:1:T01T02T03T04T06",
++    "21:00-22:00:1:T01T02T03T04T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S05-2026-10-12.json b/tests/exam2/golden/slots-S05-2026-10-12.json
+new file mode 100644
+index 0000000..68abfc5
+--- /dev/null
++++ b/tests/exam2/golden/slots-S05-2026-10-12.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T04T06",
++    "10:30-11:30:1:T01T02T03T04T06",
++    "11:00-12:00:1:T01T02T03T04T06",
++    "11:30-12:30:1:T01T02T03T04T06",
++    "12:00-13:00:1:T01T02T03T04T06",
++    "12:30-13:30:1:T01T02T03T04T06",
++    "13:00-14:00:1:T01T02T03T04T06",
++    "13:30-14:30:1:T01T02T04T06",
++    "14:00-15:00:1:T01T02T04T06",
++    "14:30-15:30:1:T01T02T04T06",
++    "15:00-16:00:1:T01T02T03T04T06",
++    "15:30-16:30:1:T01T02T03T04T06",
++    "16:00-17:00:1:T01T02T03T04T06",
++    "16:30-17:30:1:T01T02T03T04T06",
++    "17:00-18:00:1:T01T02T03T04T06",
++    "17:30-18:30:1:T01T02T03T04T06",
++    "18:00-19:00:1:T01T02T03T04T06",
++    "18:30-19:30:1:T01T02T03T04T06",
++    "19:00-20:00:1:T01T02T03T04T06",
++    "19:30-20:30:1:T01T02T03T04T06",
++    "20:00-21:00:1:T01T02T03T04T06",
++    "20:30-21:30:1:T01T02T03T04T06",
++    "21:00-22:00:1:T01T02T03T04T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S05-2026-11-09.json b/tests/exam2/golden/slots-S05-2026-11-09.json
+new file mode 100644
+index 0000000..7db84d2
+--- /dev/null
++++ b/tests/exam2/golden/slots-S05-2026-11-09.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T01T02T03T04T06",
++    "10:30-11:30:1:T01T02T03T04T06",
++    "11:00-12:00:1:T01T02T03T04T06",
++    "11:30-12:30:1:T01T02T03T04T06",
++    "12:00-13:00:1:T01T02T03T04T06",
++    "12:30-13:30:1:T01T02T03T04T06",
++    "13:00-14:00:1:T01T02T03T04T06",
++    "13:30-14:30:1:T01T02T03T04T06",
++    "14:00-15:00:1:T01T02T03T04T06",
++    "14:30-15:30:1:T01T02T03T04T06",
++    "15:00-16:00:1:T01T02T03T04T06",
++    "15:30-16:30:1:T01T02T03T04T06",
++    "16:00-17:00:1:T01T02T03T04T06",
++    "16:30-17:30:1:T01T02T03T04T06",
++    "17:00-18:00:1:T01T02T03T04T06",
++    "17:30-18:30:1:T01T02T03T04T06",
++    "18:00-19:00:1:T01T02T03T04T06",
++    "18:30-19:30:1:T01T02T03T04T06",
++    "19:00-20:00:1:T01T02T03T04T06",
++    "19:30-20:30:1:T01T02T03T04T06",
++    "20:00-21:00:1:T01T02T03T04T06",
++    "20:30-21:30:1:T01T02T03T04T06",
++    "21:00-22:00:1:T01T02T03T04T06"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S05-2026-11-10.json b/tests/exam2/golden/slots-S05-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S05-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S06-2026-10-10.json b/tests/exam2/golden/slots-S06-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S06-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S06-2026-10-11.json b/tests/exam2/golden/slots-S06-2026-10-11.json
+new file mode 100644
+index 0000000..f48782a
+--- /dev/null
++++ b/tests/exam2/golden/slots-S06-2026-10-11.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T03",
++    "10:30-11:30:1:T03",
++    "11:00-12:00:1:T03T04",
++    "11:30-12:30:1:T03T04",
++    "12:00-13:00:1:T03T04",
++    "12:30-13:30:1:T03T04",
++    "13:00-14:00:1:T03T04",
++    "13:30-14:30:1:T03T04",
++    "14:00-15:00:1:T03T04",
++    "14:30-15:30:1:T03T04",
++    "15:00-16:00:1:T03T04",
++    "15:30-16:30:1:T03T04",
++    "16:00-17:00:1:T03T04",
++    "16:30-17:30:1:T03T04",
++    "17:00-18:00:1:T03T04",
++    "17:30-18:30:1:T03T04",
++    "18:00-19:00:1:T03T04",
++    "18:30-19:30:1:T03T04",
++    "19:00-20:00:1:T03T04",
++    "19:30-20:30:1:T03T04",
++    "20:00-21:00:1:T03T04",
++    "20:30-21:30:1:T03T04",
++    "21:00-22:00:1:T03T04"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S06-2026-10-12.json b/tests/exam2/golden/slots-S06-2026-10-12.json
+new file mode 100644
+index 0000000..9cc2f04
+--- /dev/null
++++ b/tests/exam2/golden/slots-S06-2026-10-12.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T03T04",
++    "10:30-11:30:1:T03T04",
++    "11:00-12:00:1:T03T04",
++    "11:30-12:30:1:T03T04",
++    "12:00-13:00:1:T03T04",
++    "12:30-13:30:1:T03T04",
++    "13:00-14:00:1:T03T04",
++    "13:30-14:30:1:T04",
++    "14:00-15:00:1:T04",
++    "14:30-15:30:1:T04",
++    "15:00-16:00:1:T03T04",
++    "15:30-16:30:1:T03T04",
++    "16:00-17:00:1:T03T04",
++    "16:30-17:30:1:T03T04",
++    "17:00-18:00:1:T03T04",
++    "17:30-18:30:1:T03T04",
++    "18:00-19:00:1:T03T04",
++    "18:30-19:30:1:T03T04",
++    "19:00-20:00:1:T03T04",
++    "19:30-20:30:1:T03T04",
++    "20:00-21:00:1:T03T04",
++    "20:30-21:30:1:T03T04",
++    "21:00-22:00:1:T03T04"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S06-2026-11-09.json b/tests/exam2/golden/slots-S06-2026-11-09.json
+new file mode 100644
+index 0000000..37328a5
+--- /dev/null
++++ b/tests/exam2/golden/slots-S06-2026-11-09.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T03T04",
++    "10:30-11:30:1:T03T04",
++    "11:00-12:00:1:T03T04",
++    "11:30-12:30:1:T03T04",
++    "12:00-13:00:1:T03T04",
++    "12:30-13:30:1:T03T04",
++    "13:00-14:00:1:T03T04",
++    "13:30-14:30:1:T03T04",
++    "14:00-15:00:1:T03T04",
++    "14:30-15:30:1:T03T04",
++    "15:00-16:00:1:T03T04",
++    "15:30-16:30:1:T03T04",
++    "16:00-17:00:1:T03T04",
++    "16:30-17:30:1:T03T04",
++    "17:00-18:00:1:T03T04",
++    "17:30-18:30:1:T03T04",
++    "18:00-19:00:1:T03T04",
++    "18:30-19:30:1:T03T04",
++    "19:00-20:00:1:T03T04",
++    "19:30-20:30:1:T03T04",
++    "20:00-21:00:1:T03T04",
++    "20:30-21:30:1:T03T04",
++    "21:00-22:00:1:T03T04"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S06-2026-11-10.json b/tests/exam2/golden/slots-S06-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S06-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S07-2026-10-10.json b/tests/exam2/golden/slots-S07-2026-10-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S07-2026-10-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-S07-2026-10-11.json b/tests/exam2/golden/slots-S07-2026-10-11.json
+new file mode 100644
+index 0000000..f38847e
+--- /dev/null
++++ b/tests/exam2/golden/slots-S07-2026-10-11.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T05",
++    "10:30-11:30:1:T05",
++    "11:00-12:00:1:T04T05",
++    "11:30-12:30:1:T04T05",
++    "12:00-13:00:1:T04T05",
++    "12:30-13:30:1:T04T05",
++    "13:00-14:00:1:T04T05",
++    "13:30-14:30:1:T04T05",
++    "14:00-15:00:1:T04T05",
++    "14:30-15:30:1:T04T05",
++    "15:00-16:00:1:T04T05",
++    "15:30-16:30:1:T04T05",
++    "16:00-17:00:1:T04T05",
++    "16:30-17:30:1:T04T05",
++    "17:00-18:00:1:T04T05",
++    "17:30-18:30:1:T04T05",
++    "18:00-19:00:1:T04T05",
++    "18:30-19:30:1:T04T05",
++    "19:00-20:00:1:T04T05",
++    "19:30-20:30:1:T04T05",
++    "20:00-21:00:1:T04T05",
++    "20:30-21:30:1:T04T05",
++    "21:00-22:00:1:T04T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S07-2026-10-12.json b/tests/exam2/golden/slots-S07-2026-10-12.json
+new file mode 100644
+index 0000000..88ba27d
+--- /dev/null
++++ b/tests/exam2/golden/slots-S07-2026-10-12.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T04T05",
++    "10:30-11:30:1:T04T05",
++    "11:00-12:00:1:T04T05",
++    "11:30-12:30:1:T04T05",
++    "12:00-13:00:1:T04T05",
++    "12:30-13:30:1:T04T05",
++    "13:00-14:00:1:T04T05",
++    "13:30-14:30:1:T04T05",
++    "14:00-15:00:1:T04T05",
++    "14:30-15:30:1:T04T05",
++    "15:00-16:00:1:T04T05",
++    "15:30-16:30:1:T04T05",
++    "16:00-17:00:1:T04T05",
++    "16:30-17:30:1:T04T05",
++    "17:00-18:00:1:T04T05",
++    "17:30-18:30:1:T04T05",
++    "18:00-19:00:1:T04T05",
++    "18:30-19:30:1:T04T05",
++    "19:00-20:00:1:T04T05",
++    "19:30-20:30:1:T04T05",
++    "20:00-21:00:1:T04T05",
++    "20:30-21:30:1:T04T05",
++    "21:00-22:00:1:T04T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S07-2026-11-09.json b/tests/exam2/golden/slots-S07-2026-11-09.json
+new file mode 100644
+index 0000000..88ba27d
+--- /dev/null
++++ b/tests/exam2/golden/slots-S07-2026-11-09.json
+@@ -0,0 +1,31 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:00:1:T04T05",
++    "10:30-11:30:1:T04T05",
++    "11:00-12:00:1:T04T05",
++    "11:30-12:30:1:T04T05",
++    "12:00-13:00:1:T04T05",
++    "12:30-13:30:1:T04T05",
++    "13:00-14:00:1:T04T05",
++    "13:30-14:30:1:T04T05",
++    "14:00-15:00:1:T04T05",
++    "14:30-15:30:1:T04T05",
++    "15:00-16:00:1:T04T05",
++    "15:30-16:30:1:T04T05",
++    "16:00-17:00:1:T04T05",
++    "16:30-17:30:1:T04T05",
++    "17:00-18:00:1:T04T05",
++    "17:30-18:30:1:T04T05",
++    "18:00-19:00:1:T04T05",
++    "18:30-19:30:1:T04T05",
++    "19:00-20:00:1:T04T05",
++    "19:30-20:30:1:T04T05",
++    "20:00-21:00:1:T04T05",
++    "20:30-21:30:1:T04T05",
++    "21:00-22:00:1:T04T05"
++  ]
++}
+diff --git a/tests/exam2/golden/slots-S07-2026-11-10.json b/tests/exam2/golden/slots-S07-2026-11-10.json
+new file mode 100644
+index 0000000..ef8fa0f
+--- /dev/null
++++ b/tests/exam2/golden/slots-S07-2026-11-10.json
+@@ -0,0 +1,7 @@
++{
++  "status": 422,
++  "error": "DATE_OUT_OF_RANGE",
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": []
++}
+diff --git a/tests/exam2/golden/slots-couple-S02-2026-10-17.json b/tests/exam2/golden/slots-couple-S02-2026-10-17.json
+new file mode 100644
+index 0000000..57a3720
+--- /dev/null
++++ b/tests/exam2/golden/slots-couple-S02-2026-10-17.json
+@@ -0,0 +1,30 @@
++{
++  "status": 200,
++  "error": null,
++  "min": "2026-10-11",
++  "max": "2026-11-09",
++  "slots": [
++    "10:00-11:30:1:T01T02T03T04T05T06",
++    "10:30-12:00:1:T01T02T03T04T05T06",
++    "11:00-12:30:1:T01T02T03T04T05T06",
++    "11:30-13:00:1:T01T02T03T04T05T06",
++    "12:00-13:30:1:T01T02T03T04T05T06",
++    "12:30-14:00:1:T01T02T03T04T05T06",
++    "13:00-14:30:1:T01T02T03T04T05T06",
++    "13:30-15:00:1:T01T02T03T04T05T06",
++    "14:00-15:30:1:T01T02T03T04T05T06",
++    "14:30-16:00:1:T01T02T03T04T05T06",
++    "15:00-16:30:1:T01T02T03T04T05T06",
++    "15:30-17:00:1:T01T02T03T04T05T06",
++    "16:00-17:30:1:T01T02T03T04T05T06",
++    "16:30-18:00:1:T01T02T03T04T05T06",
++    "17:00-18:30:1:T01T02T03T04T05T06",
++    "17:30-19:00:1:T01T02T03T04T05T06",
++    "18:00-19:30:0:T03T04T05T06",
++    "18:30-20:00:0:T03T04T05T06",
++    "19:00-20:30:0:T03T04T05T06",
++    "19:30-21:00:0:T03T04T05T06",
++    "20:00-21:30:0:T03T04T05T06",
++    "20:30-22:00:1:T01T02T03T04T05T06"
++  ]
++}
+diff --git a/tests/exam2/run.mjs b/tests/exam2/run.mjs
+new file mode 100644
+index 0000000..3f4b9b9
+--- /dev/null
++++ b/tests/exam2/run.mjs
+@@ -0,0 +1,67 @@
++// EX2 (ชุด B) golden master: GET /api/slots ทุกบริการ · ยกเลิกนัดขอบ 24 ชม. · สถานะบัตรของขวัญขอบวันหมดอายุ
++//   node tests/exam2/run.mjs            ตรวจกับ golden (exit 0 = ตรงทั้งหมด)
++//   node tests/exam2/run.mjs --record   บันทึก golden ใหม่ (รันกับระบบตั้งต้นเท่านั้น)
++import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
++import { fileURLToPath } from "node:url";
++import { dirname, join } from "node:path";
++
++const BASE = (process.env.BASE_URL || "http://localhost:4000").replace(/\/$/, "");
++const GOLDEN = join(dirname(fileURLToPath(import.meta.url)), "golden");
++const RECORD = process.argv.includes("--record");
++const NOW = "2026-10-10T10:00:00+07:00";
++
++async function call(method, path, body, cookie) {
++  const headers = { "Content-Type": "application/json", "Accept-Language": "th" };
++  if (cookie) headers.Cookie = cookie;
++  const r = await fetch(BASE + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
++  const set = r.headers.get("set-cookie");
++  const text = await r.text();
++  let json; try { json = JSON.parse(text); } catch { json = { raw: text }; }
++  return { status: r.status, json, set };
++}
++const reset = async (now = NOW) => { const r = await call("POST", "/api/test/reset", { now }); if (r.status !== 200) { console.error("reset failed"); process.exit(2); } };
++const login = async (email, password) => (await call("POST", "/api/auth/login", { email, password })).set.match(/sabai_session=[^;]*/)[0];
++
++const SERVICES = [["S01", "single"], ["S02", "single"], ["S03", "single"], ["S04", "single"], ["S05", "single"], ["S06", "single"], ["S07", "single"], ["P01", "package"]];
++const DATES = ["2026-10-10", "2026-10-11", "2026-10-12", "2026-11-09", "2026-11-10"];
++const slim = (r) => ({ status: r.status, error: r.json.error ?? null, min: r.json.min ?? null, max: r.json.max ?? null,
++  slots: (r.json.slots ?? []).map((s) => `${s.time}-${s.endTime}:${s.available ? 1 : 0}:${s.therapists.map((t) => t.code).join("")}`) });
++
++const CASES = {};
++for (const [svc, type] of SERVICES) for (const date of DATES) CASES[`slots-${svc}-${date}`] = async () => { await reset(); return slim(await call("GET", `/api/slots?service=${svc}&date=${date}&type=${type}&people=1`)); };
++CASES["slots-couple-S02-2026-10-17"] = async () => { await reset(); return slim(await call("GET", "/api/slots?service=S02&date=2026-10-17&type=couple&people=2")); };
++for (const [label, now] of [["0959", "2026-10-10T09:59:00+07:00"], ["1000", "2026-10-10T10:00:00+07:00"], ["1001", "2026-10-10T10:01:00+07:00"]]) {
++  CASES[`cancel-B05-at-${label}`] = async () => {
++    await reset(now);
++    const ck = await login("nida@sabai.test", "Nida@2026");
++    const list = await call("GET", "/api/me/bookings", undefined, ck);
++    const can = list.json.bookings.find((b) => b.code === "B05")?.canCancel ?? null;
++    const r = await call("POST", "/api/bookings/5/cancel", {}, ck);
++    return { canCancel: can, status: r.status, error: r.json.error ?? null };
++  };
++}
++for (const [label, now] of [["1009", "2026-10-09T10:00:00+07:00"], ["1010", NOW], ["1011", "2026-10-11T10:00:00+07:00"]]) {
++  CASES[`giftcards-at-${label}`] = async () => {
++    await reset(now);
++    const out = {};
++    for (const code of ["SABAI-GC-2000", "SABAI-GC-PART", "SABAI-GC-LAST", "SABAI-GC-EXP", "SABAI-GC-ZERO"]) {
++      const r = await call("GET", `/api/giftcards/${code}`);
++      out[code] = { status: r.status, gcStatus: r.json.status ?? null, balance: r.json.balance ?? null, expiresOn: r.json.expiresOn ?? null };
++    }
++    return out;
++  };
++}
++
++let fails = 0;
++mkdirSync(GOLDEN, { recursive: true });
++for (const [name, fn] of Object.entries(CASES)) {
++  const actual = await fn();
++  const file = join(GOLDEN, `${name}.json`);
++  if (RECORD) { writeFileSync(file, JSON.stringify(actual, null, 2) + "\n"); continue; }
++  const expected = JSON.parse(readFileSync(file, "utf8"));
++  if (JSON.stringify(expected) === JSON.stringify(actual)) console.log("ok  ", name);
++  else { fails++; console.log("DIFF", name, "\n  expected", JSON.stringify(expected).slice(0, 200), "\n  actual  ", JSON.stringify(actual).slice(0, 200)); }
++}
++await reset();
++console.log(RECORD ? `recorded ${Object.keys(CASES).length}` : `${Object.keys(CASES).length - fails}/${Object.keys(CASES).length} match`);
++process.exit(fails ? 1 : 0);

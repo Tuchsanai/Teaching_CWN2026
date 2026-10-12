@@ -1,0 +1,13 @@
+diff --git a/web/lib/rules/pricing.ts b/web/lib/rules/pricing.ts
+index df6b50b..9f96223 100644
+--- a/web/lib/rules/pricing.ts
++++ b/web/lib/rules/pricing.ts
+@@ -65,7 +65,7 @@ export function calcPrice(input: PriceInput): PriceOutcome {
+   const best = bestPercent(input);
+ 
+   // ② ส่วนลด % → ③ หักแลกแต้ม
+-  const discountAmount = percentOf(gross, best.pct);
++  const discountAmount = percentOf(gross - redeemPoints(input.type === "course" ? 0 : input.redeemBlocks, input.points, gross).discount, best.pct);
+   const r = redeemPoints(input.type === "course" ? 0 : input.redeemBlocks, input.points, gross - discountAmount);
+   const pointsRedeemed = r.blocks * 100;
+   const pointsDiscount = r.discount;

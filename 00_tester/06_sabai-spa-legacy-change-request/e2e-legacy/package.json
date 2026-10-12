@@ -1,0 +1,16 @@
+{
+  "name": "sabai-legacy-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ชุดทดสอบ Playwright ของระบบจองคิว (ส่งมอบพร้อมระบบ)",
+  "scripts": {
+    "test": "playwright test",
+    "test:p1": "playwright test --grep @P1",
+    "test:all": "playwright test --project=api --project=chromium --project=firefox --project=webkit",
+    "report": "playwright show-report test-report/html"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.0.0"
+  }
+}

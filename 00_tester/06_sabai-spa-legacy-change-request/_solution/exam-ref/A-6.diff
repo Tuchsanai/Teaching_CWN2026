@@ -1,0 +1,264 @@
+diff --git a/web/app/api/admin/services/[code]/route.ts b/web/app/api/admin/services/[code]/route.ts
+new file mode 100644
+index 0000000..484dad0
+--- /dev/null
++++ b/web/app/api/admin/services/[code]/route.ts
+@@ -0,0 +1,20 @@
++import { query } from "@/lib/db.ts";
++import { ApiError, handle, json, readJson } from "@/lib/server/http.ts";
++import { getSession } from "@/lib/session.ts";
++
++export const dynamic = "force-dynamic";
++
++/** POST /api/admin/services/:code {active: true|false} — เจ้าของร้านเปิด/ปิดบริการ (EX-A6) */
++export async function POST(req: Request, ctx: { params: Promise<{ code: string }> }) {
++  return handle(async () => {
++    const s = await getSession();
++    if (!s) throw new ApiError(401, "LOGIN_REQUIRED");
++    if (s.role !== "owner") throw new ApiError(403, "FORBIDDEN");
++    const { code } = await ctx.params;
++    const body = await readJson(req);
++    if (typeof body.active !== "boolean") throw new ApiError(422, "BAD_REQUEST", { field: "active" });
++    const r = await query("UPDATE service SET active = $1 WHERE code = $2 RETURNING code, active", [body.active, String(code).toUpperCase()]);
++    if (!r.rows[0]) throw new ApiError(404, "NOT_FOUND");
++    return json(r.rows[0]);
++  });
++}
+diff --git a/web/app/api/mood/route.ts b/web/app/api/mood/route.ts
+index 94e4673..9dcd65b 100644
+--- a/web/app/api/mood/route.ts
++++ b/web/app/api/mood/route.ts
+@@ -13,6 +13,8 @@ export async function GET(req: Request) {
+     const lang = await getLang(sp.get("lang"));
+     const rec = recommendForMood(mood, lang);
+     const all = await listServices(lang);
+-    return json({ ...rec, services: rec.services.map((c) => all.find((s) => s.code === c)!) });
++    // EX-A6: ไม่แนะนำบริการที่ปิด
++    const services = rec.services.map((c) => all.find((s) => s.code === c)).filter((s) => s !== undefined);
++    return json({ ...rec, services });
+   });
+ }
+diff --git a/web/app/api/quiz/route.ts b/web/app/api/quiz/route.ts
+index ccf822a..262a91d 100644
+--- a/web/app/api/quiz/route.ts
++++ b/web/app/api/quiz/route.ts
+@@ -20,8 +20,9 @@ export async function POST(req: Request) {
+     const body = await readJson(req);
+     const lang = await getLang(body.lang);
+     if (!validateAnswers(body.answers)) throw new ApiError(422, "BAD_REQUEST", { field: "answers" });
+-    const r = quizResult(body.answers, lang);
+-    const svc = (await listServices(lang)).find((s) => s.code === r.code)!;
++    const all = await listServices(lang);
++    const r = quizResult(body.answers, lang, new Set(all.map((s) => s.code)));
++    const svc = all.find((s) => s.code === r.code)!;
+     return json({ code: r.code, name: svc.name, price: svc.price, image: svc.image, reason: r.reason });
+   });
+ }
+diff --git a/web/lib/bot/chat.ts b/web/lib/bot/chat.ts
+index f5c486d..b175223 100644
+--- a/web/lib/bot/chat.ts
++++ b/web/lib/bot/chat.ts
+@@ -10,6 +10,7 @@ import type { Session } from "../session.ts";
+ import { availableSlots, buildQuote, createBooking, parseBookingInput } from "../server/booking.ts";
+ import { getPool } from "../db.ts";
+ import { ApiError, errorBody } from "../server/http.ts";
++import { activeServiceCodes } from "../server/catalog.ts";
+ 
+ export interface ChatState {
+   step: "idle" | "service" | "date" | "time" | "contact" | "confirm";
+@@ -65,6 +66,11 @@ const R = {
+     en: "Sabai Jai Spa is open every day 10:00–22:00 (sessions must end by 22:00). Call " + SHOP_PHONE,
+     zh: "舒心水疗每天营业 10:00–22:00（服务须在 22:00 前结束）。电话 " + SHOP_PHONE,
+   },
++  unavailable: {
++    th: "ขออภัยค่ะ บริการนี้ปิดให้บริการชั่วคราว เลือกบริการอื่นได้เลยค่ะ",
++    en: "Sorry, this service is temporarily unavailable. Please choose another service.",
++    zh: "抱歉，该服务暂停提供，请选择其他服务。",
++  },
+   help: {
+     th: "สอบถามได้เลยค่ะ เช่น \"ร้านเปิดกี่โมง\" \"นวดไทยราคาเท่าไหร่\" หรือพิมพ์ \"จอง\" เพื่อจองคิว",
+     en: "Ask me e.g. \"What time do you open?\", \"How much is Thai massage?\" or type \"book\" to make a booking.",
+@@ -133,7 +139,7 @@ function fill(s: string, vars: Record<string, string | number>): string {
+ }
+ 
+ async function priceReply(code: string | null, lang: Lang): Promise<string> {
+-  const r = await query("SELECT * FROM service ORDER BY id", [], getPool());
++  const r = await query("SELECT * FROM service WHERE active ORDER BY id", [], getPool());
+   const row = (s: Record<string, unknown>) => {
+     const name = pickName(s, lang);
+     const price = formatBaht(toSatang(s.price as string));
+@@ -190,6 +196,9 @@ export async function chat(message: string, prev: ChatState | null, session: Ses
+   const state: ChatState = prev && prev.step ? { ...prev } : { step: "idle" };
+   const { today } = await clock();
+   const range = bookableRange(today);
++  const active = await activeServiceCodes();
++  // EX-A6: บริการที่ปิดอยู่ ตอบว่าปิดชั่วคราว ไม่แนะนำ/ไม่จอง
++  const detect = (s: string) => detectService(s);
+   const out = (reply: string, s: ChatState, extra?: Partial<ChatReply>): ChatReply => ({ reply, lang, state: s, ...extra });
+ 
+   if (state.step !== "idle" && has(lower, W.cancel)) return out(R.cancelled[lang], { step: "idle" });
+@@ -202,8 +211,9 @@ export async function chat(message: string, prev: ChatState | null, session: Ses
+ 
+   // ── อยู่ระหว่างจอง: ตีความข้อความเป็นคำตอบของขั้นนั้น ──
+   if (state.step === "service") {
+-    const code = detectService(lower);
++    const code = detect(lower);
+     if (!code) return out(R.askService[lang], state);
++    if (!active.has(code)) return out(R.unavailable[lang], state);
+     if (code === "P01" || code === "K01") return out(R.webOnly[lang], { step: "idle" });
+     return askDate({ ...state, serviceCode: code });
+   }
+@@ -269,12 +279,15 @@ export async function chat(message: string, prev: ChatState | null, session: Ses
+ 
+   // ── คำถามทั่วไป ──
+   if (has(lower, W.book)) {
+-    const code = detectService(lower);
++    const code = detect(lower);
++    if (code && !active.has(code)) return out(R.unavailable[lang], { step: "service" });
+     if (code === "P01" || code === "K01") return out(R.webOnly[lang], { step: "idle" });
+     if (code) return askDate({ step: "date", serviceCode: code });
+     return out(R.askService[lang], { step: "service" });
+   }
+-  if (has(lower, W.price)) return out(await priceReply(detectService(lower), lang), { step: "idle" });
++  const asked = detect(lower);
++  if (asked && !active.has(asked)) return out(R.unavailable[lang], { step: "idle" });
++  if (has(lower, W.price)) return out(await priceReply(asked, lang), { step: "idle" });
+   if (has(lower, W.hours)) return out(R.hours[lang], { step: "idle" });
+   return out(R.help[lang], { step: "idle" });
+ 
+diff --git a/web/lib/bot/quiz.ts b/web/lib/bot/quiz.ts
+index e328759..0899485 100644
+--- a/web/lib/bot/quiz.ts
++++ b/web/lib/bot/quiz.ts
+@@ -107,12 +107,14 @@ export function validateAnswers(a: unknown): a is QuizAnswers {
+ }
+ 
+ /** กฎตายตัวตามลำดับ */
+-export function quizResult(a: QuizAnswers, lang: Lang): { code: string; reason: string } {
++export function quizResult(a: QuizAnswers, lang: Lang, active?: Set<string>): { code: string; reason: string } {
+   let key: string;
+   if (a.goal === "shape") key = "K01";
+   else if (a.goal === "beauty") key = "S07";
+   else if (a.stay === "hotel" || a.time === "120") key = "P01";
+   else if (a.goal === "pain") key = a.pressure === "soft" ? "S03" : "S02";
+   else key = "S04";
++  // EX-A6: บริการที่ปิดชั่วคราวห้ามแนะนำ → ใช้ตัวถัดไปที่ใกล้เคียง
++  if (active && !active.has(key)) key = ["S02", "S04", "S01"].find((k) => active.has(k)) ?? key;
+   return { code: RESULTS[key].code, reason: RESULTS[key].reason[lang] };
+ }
+diff --git a/web/lib/server/booking.ts b/web/lib/server/booking.ts
+index 52e5b75..9730dc4 100644
+--- a/web/lib/server/booking.ts
++++ b/web/lib/server/booking.ts
+@@ -104,7 +104,7 @@ export interface Quote {
+ /** ตรวจกฎทั้งหมดแล้วคิดราคา · lock=true ล็อกแถวลูกค้า/คอร์ส/บัตร (ใช้ตอนจองจริง) */
+ export async function buildQuote(db: Db, input: BookingInput, session: Session | null, today: string, lang: Lang, lock = false): Promise<Quote> {
+   const service = await getServiceByCode(input.serviceCode, db);
+-  if (!service || !kindMatches(input.type, service.kind)) throw new ApiError(422, "SERVICE_INVALID");
++  if (!service || !service.active || !kindMatches(input.type, service.kind)) throw new ApiError(422, "SERVICE_INVALID");
+ 
+   const partyErr = checkParty(input.type, input.people);
+   if (partyErr) throw new ApiError(422, partyErr);
+@@ -309,7 +309,7 @@ export async function availableSlots(params: { serviceCode: string; date: string
+   const { today } = await clock();
+   const db = getPool();
+   const service = await getServiceByCode(params.serviceCode, db);
+-  if (!service || !kindMatches(params.type, service.kind)) throw new ApiError(422, "SERVICE_INVALID");
++  if (!service || !service.active || !kindMatches(params.type, service.kind)) throw new ApiError(422, "SERVICE_INVALID");
+   const partyErr = checkParty(params.type, params.people);
+   if (partyErr) throw new ApiError(422, partyErr);
+   if (!isDateString(params.date)) throw new ApiError(422, "BAD_REQUEST", { field: "date" });
+diff --git a/web/lib/server/catalog.ts b/web/lib/server/catalog.ts
+index ef5b4d2..01b723e 100644
+--- a/web/lib/server/catalog.ts
++++ b/web/lib/server/catalog.ts
+@@ -13,6 +13,7 @@ export interface ServiceRow {
+   duration_min: number;
+   price: string;
+   includes_transport: boolean;
++  active: boolean;
+ }
+ 
+ export interface ServiceView {
+@@ -24,6 +25,7 @@ export interface ServiceView {
+   price: number;
+   priceSatang: number;
+   includesTransport: boolean;
++  active: boolean;
+   herbs: string[];
+   image: string;
+ }
+@@ -42,8 +44,14 @@ export async function getHerbs(serviceId: number, lang: Lang, db?: Db): Promise<
+   return r.rows.map((h) => pickName(h, lang));
+ }
+ 
+-export async function listServices(lang: Lang): Promise<ServiceView[]> {
+-  const s = await query<ServiceRow>("SELECT * FROM service ORDER BY id");
++export async function activeServiceCodes(db?: Db): Promise<Set<string>> {
++  const r = await query<{ code: string }>("SELECT code FROM service WHERE active", [], db);
++  return new Set(r.rows.map((x) => x.code));
++}
++
++/** EX-A6: ลูกค้าเห็นเฉพาะบริการที่เปิด */
++export async function listServices(lang: Lang, includeInactive = false): Promise<ServiceView[]> {
++  const s = await query<ServiceRow>(`SELECT * FROM service ${includeInactive ? "" : "WHERE active"} ORDER BY id`);
+   const h = await query(
+     `SELECT sh.service_id, h.* FROM service_herb sh JOIN herb h ON h.id = sh.herb_id ORDER BY sh.service_id, sh.sort_order`,
+   );
+@@ -56,6 +64,7 @@ export async function listServices(lang: Lang): Promise<ServiceView[]> {
+     price: toSatang(row.price) / 100,
+     priceSatang: toSatang(row.price),
+     includesTransport: row.includes_transport,
++    active: row.active,
+     herbs: h.rows.filter((x) => x.service_id === row.id).map((x) => pickName(x, lang)),
+     image: `/assets/svc-${row.code.toLowerCase()}.webp`,
+   }));
+diff --git a/db/init/01-schema.sql b/db/init/01-schema.sql
+index 76df326..32554d1 100644
+--- a/db/init/01-schema.sql
++++ b/db/init/01-schema.sql
+@@ -39,7 +39,8 @@ CREATE TABLE service (
+   kind               VARCHAR(10) NOT NULL CHECK (kind IN ('single','package','course')),
+   duration_min       SMALLINT NOT NULL CHECK (duration_min > 0),
+   price              NUMERIC(10,2) NOT NULL CHECK (price >= 0),
+-  includes_transport BOOLEAN NOT NULL DEFAULT FALSE
++  includes_transport BOOLEAN NOT NULL DEFAULT FALSE,
++  active             BOOLEAN NOT NULL DEFAULT TRUE
+ );
+ 
+ CREATE TABLE herb (
+diff --git a/db/init/02-seed.sql b/db/init/02-seed.sql
+index 970df9b..fb17a8a 100644
+--- a/db/init/02-seed.sql
++++ b/db/init/02-seed.sql
+@@ -26,6 +26,9 @@ INSERT INTO service (id, code, name_th, name_en, name_zh, kind, duration_min, pr
+  (8, 'P01', 'แพ็กเกจ Bangkok Relax', 'Bangkok Relax Package', '曼谷放松套餐',  'package', 120, 2900.00, TRUE),
+  (9, 'K01', 'คอร์สกระชับสัดส่วน 10 แถม 1', 'Body Contouring Course', '塑形疗程', 'course', 60, 15000.00, FALSE);
+ 
++-- EX-A6: S03 ปิดชั่วคราว (ให้ติดตั้งใหม่/reset ได้ผลเดียวกับ migrations/001)
++UPDATE service SET active = FALSE WHERE code = 'S03';
++
+ -- ── สมุนไพร (FR-31 ห้ามว่าง) ────────────────────────────────────────────────
+ INSERT INTO herb (id, name_th, name_en, name_zh) VALUES
+  (1,  'ไพล',           'Plai (Thai ginger)', '泰国姜'),
+diff --git a/db/migrations/001_service_active.down.sql b/db/migrations/001_service_active.down.sql
+new file mode 100644
+index 0000000..7652db2
+--- /dev/null
++++ b/db/migrations/001_service_active.down.sql
+@@ -0,0 +1,4 @@
++-- ถอยกลับ EX-A6 · ข้อมูลที่หาย: สถานะเปิด/ปิดของทุกบริการ (ทุกบริการกลับเป็น "เปิด")
++BEGIN;
++ALTER TABLE service DROP COLUMN IF EXISTS active;
++COMMIT;
+diff --git a/db/migrations/001_service_active.sql b/db/migrations/001_service_active.sql
+new file mode 100644
+index 0000000..78378d3
+--- /dev/null
++++ b/db/migrations/001_service_active.sql
+@@ -0,0 +1,5 @@
++-- EX-A6 · ปิดบริการชั่วคราว (S03 ประคบสมุนไพร) · รันซ้ำได้ (idempotent)
++BEGIN;
++ALTER TABLE service ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
++UPDATE service SET active = FALSE WHERE code = 'S03' AND active;
++COMMIT;
