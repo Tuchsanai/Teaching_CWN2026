@@ -1,0 +1,75 @@
+{
+  "operation": "analyze_javascript_application",
+  "evidence_id": "ev_ca3bd3085624d0621d2b77dce9df66ca2d6dcad910c073a986a72872b23af92f",
+  "input": "/work/.next/static",
+  "files": 21,
+  "node_kinds": {
+    "endpoint": 9,
+    "unknown": 10,
+    "javascript-asset": 21,
+    "javascript-module": 19,
+    "artifact": 1,
+    "storage": 3
+  },
+  "edges": 68,
+  "coverage": {
+    "application": "partial",
+    "semantic": "partial"
+  },
+  "endpoints": [
+    {
+      "value": "a",
+      "mechanism": "call:Uv.delete"
+    },
+    {
+      "value": "/api/auth/login",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "/api/auth/logout",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "/api/auth/register",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "/api/coupons/validate",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "/api/orders",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "/api/products",
+      "mechanism": "call:fetch"
+    },
+    {
+      "value": "b",
+      "mechanism": "call:Uv.delete"
+    },
+    {
+      "value": "c",
+      "mechanism": "call:e.get"
+    }
+  ],
+  "storage": [
+    {
+      "kind": "local-storage",
+      "name": null,
+      "mechanism": "call:window.localStorage.removeItem"
+    },
+    {
+      "kind": "local-storage",
+      "name": null,
+      "mechanism": "call:window.localStorage.getItem"
+    },
+    {
+      "kind": "local-storage",
+      "name": null,
+      "mechanism": "call:window.localStorage.setItem"
+    }
+  ],
+  "limitations": 16
+}
