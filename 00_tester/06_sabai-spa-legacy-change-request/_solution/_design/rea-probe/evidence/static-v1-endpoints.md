@@ -1,0 +1,52 @@
+## endpoint ที่ REA กู้ได้ (จากโค้ดฝั่งเบราว์เซอร์)
+- c  (call:e.get @ chunks/polyfills-42372ed130431b0a.js)
+- /api/auth/logout  (call:fetch @ chunks/app/layout-a97cb37b93e372f4.js)
+- /api/price  (call:fetch @ chunks/app/book/page-9a898da259b34563.js)
+- a  (call:Uv.delete @ chunks/polyfills-42372ed130431b0a.js)
+- a  (call:r.delete @ chunks/polyfills-42372ed130431b0a.js)
+- a  (call:get @ chunks/polyfills-42372ed130431b0a.js)
+- /api/auth/login  (call:fetch @ chunks/app/login/page-47ae529c1984e3d3.js)
+- /api/bookings  (call:fetch @ chunks/app/book/page-9a898da259b34563.js)
+- /api/test/reset  (call:fetch @ chunks/app/admin/page-dadae58f822605e0.js)
+- /api/chat  (call:fetch @ chunks/app/chat/page-0b73a8abeea42996.js)
+- /api/courses  (call:fetch @ chunks/app/wallet/page-fae3da03df857b03.js)
+- /api/quiz  (call:fetch @ chunks/app/quiz/page-cd45195efb6b8e9c.js)
+- /api/giftcards  (call:fetch @ chunks/app/giftcard/page-4312d11baf132502.js)
+- b  (call:Uv.delete @ chunks/polyfills-42372ed130431b0a.js)
+- b  (call:e.delete @ chunks/polyfills-42372ed130431b0a.js)
+- b  (call:r.delete @ chunks/polyfills-42372ed130431b0a.js)
+
+## route ฝั่งเซิร์ฟเวอร์ที่เห็นจากชื่อไฟล์ chunks/app/api/**/route-*.js (25)
+- /api/admin/bookings
+- /api/admin/bookings/[id]/complete
+- /api/auth/login
+- /api/auth/logout
+- /api/bookings
+- /api/bookings/[id]/cancel
+- /api/chat
+- /api/courses
+- /api/giftcards
+- /api/giftcards/[code]
+- /api/health
+- /api/hotels
+- /api/me
+- /api/me/bookings
+- /api/mood
+- /api/photos/[id]
+- /api/price
+- /api/quiz
+- /api/services
+- /api/slots
+- /api/test/reset
+- /api/test/today
+- /api/therapists
+- /api/transport
+- /api/wallet
+
+## ไฟล์ที่ REA วิเคราะห์ไม่ครบ (unknown 6)
+- chunks/polyfills-42372ed130431b0a.js
+- chunks/framework-4a99af1472046e21.js
+- chunks/4bd1b696-f785427dddbba9fb.js
+- chunks/main-da2acdc03425d21d.js
+- chunks/1255-5cd2fe06309409a0.js
+- chunks/main-da2acdc03425d21d.js

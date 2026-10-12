@@ -1,0 +1,18 @@
+{
+  "browser": { "mode": "launch", "executable_path": "/ms-playwright/chromium-1243/chrome-linux64/chrome" },
+  "start_url": { "url": "http://host.docker.internal:3000/services" },
+  "actions": [
+    { "step_id": "open-book-S01", "action": "click", "locator": { "kind": "css", "selector": "[data-testid='service-book-S01']" }, "timeout_ms": 10000 },
+    { "step_id": "step1-next", "action": "click", "locator": { "kind": "css", "selector": "[data-testid='book-next-1']" }, "timeout_ms": 10000 },
+    { "step_id": "pick-date", "action": "fill", "locator": { "kind": "css", "selector": "[data-testid='book-date']" }, "value": { "source": "literal", "value": "2026-10-12" }, "timeout_ms": 10000 },
+    { "step_id": "slots-ready", "action": "wait_for", "locator": { "kind": "css", "selector": "[data-testid='book-slot-15:00']" }, "state": "visible", "timeout_ms": 10000 },
+    { "step_id": "pick-1500", "action": "click", "locator": { "kind": "css", "selector": "[data-testid='book-slot-15:00']" }, "timeout_ms": 10000 },
+    { "step_id": "step2-next", "action": "click", "locator": { "kind": "css", "selector": "[data-testid='book-next-2']" }, "timeout_ms": 10000 },
+    { "step_id": "contact-name", "action": "fill", "locator": { "kind": "css", "selector": "[data-testid='book-contact-name']" }, "value": { "source": "literal", "value": "REA Scenario" }, "timeout_ms": 10000 },
+    { "step_id": "contact-phone", "action": "fill", "locator": { "kind": "css", "selector": "[data-testid='book-contact-phone']" }, "value": { "source": "literal", "value": "081-555-0202" }, "timeout_ms": 10000 },
+    { "step_id": "quote-ready", "action": "wait_for", "locator": { "kind": "css", "selector": "[data-testid='summary-amount-total'], [data-testid='book-quote-total']" }, "state": "visible", "timeout_ms": 10000 },
+    { "step_id": "step3-next", "action": "click", "locator": { "kind": "css", "selector": "[data-testid='book-next-3']" }, "timeout_ms": 10000 },
+    { "step_id": "summary-ready", "action": "wait_for", "locator": { "kind": "css", "selector": "[data-testid='summary-amount-total']" }, "state": "visible", "timeout_ms": 10000 }
+  ],
+  "capture": { "at_end": ["dom", "screenshot", "url"], "events": ["network", "console", "page-errors"] }
+}

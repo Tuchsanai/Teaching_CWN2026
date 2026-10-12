@@ -1,0 +1,11 @@
+diff --git a/web/lib/rules/points.ts b/web/lib/rules/points.ts
+index 0b8a43c..53844b1 100644
+--- a/web/lib/rules/points.ts
++++ b/web/lib/rules/points.ts
+@@ -27,5 +27,5 @@ export interface EarnInput {
+ 
+ /** ฐานแต้ม = ยอดหลังส่วนลดและแต้ม ไม่รวมค่ารถ − ส่วนที่จ่ายด้วย Gift Card (A8, T16) */
+ export function earnBase(b: EarnInput): number {
+-  return Math.max(0, b.gross - b.discountAmount - b.pointsDiscount - b.giftcardPaid);
++  return Math.max(0, b.gross - b.pointsDiscount - b.giftcardPaid);
+ }

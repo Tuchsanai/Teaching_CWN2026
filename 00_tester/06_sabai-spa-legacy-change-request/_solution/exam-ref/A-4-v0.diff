@@ -1,0 +1,175 @@
+diff --git a/web/lib/i18n.ts b/web/lib/i18n.ts
+index 40ed56c..62c7ee3 100644
+--- a/web/lib/i18n.ts
++++ b/web/lib/i18n.ts
+@@ -1,5 +1,11 @@
+ // 3 ภาษา ไทย / English / 中文 (FR-24, NFR-06) · ภาษาที่เลือกเก็บใน cookie `lang`
+ 
++import { FEE_PER_VEHICLE, FREE_KM_TENTHS, MAX_KM_TENTHS, SEATS_PER_VEHICLE } from "./rules/transport.ts";
++
++const FREE_KM = FREE_KM_TENTHS / 10;
++const MAX_KM = MAX_KM_TENTHS / 10;
++const FEE = (FEE_PER_VEHICLE / 100).toLocaleString("en-US");
++
+ export type Lang = "th" | "en" | "zh";
+ export const LANGS: Lang[] = ["th", "en", "zh"];
+ export const LANG_COOKIE = "lang";
+@@ -226,7 +232,7 @@ const D = {
+ 
+   // ── รถรับส่ง ──
+   "transport.title": { th: "รถรับส่งโรงแรม", en: "Hotel shuttle", zh: "酒店接送" },
+-  "transport.rule": { th: "≤ 5 กม. ฟรี · มากกว่า 5 ถึง 15 กม. ฿300 ต่อคัน · คันละไม่เกิน 4 คน · เกิน 15 กม. ไม่รับ", en: "≤ 5 km free · over 5 up to 15 km ฿300 per vehicle · max 4 people per vehicle · over 15 km not served", zh: "≤5公里免费 · 5–15公里每车 300 泰铢 · 每车最多4人 · 超过15公里不接送" },
++  "transport.rule": { th: `≤ ${FREE_KM} กม. ฟรี · มากกว่า ${FREE_KM} ถึง ${MAX_KM} กม. ฿${FEE} ต่อคัน · คันละไม่เกิน ${SEATS_PER_VEHICLE} คน · เกิน ${MAX_KM} กม. ไม่รับ`, en: `≤ ${FREE_KM} km free · over ${FREE_KM} up to ${MAX_KM} km ฿${FEE} per vehicle · max ${SEATS_PER_VEHICLE} people per vehicle · over ${MAX_KM} km not served`, zh: `≤${FREE_KM}公里免费 · ${FREE_KM}–${MAX_KM}公里每车 ${FEE} 泰铢 · 每车最多${SEATS_PER_VEHICLE}人 · 超过${MAX_KM}公里不接送` },
+   "transport.calc": { th: "คำนวณค่ารถ", en: "Calculate", zh: "计算" },
+   "transport.fee": { th: "ค่ารถ {f}", en: "Shuttle fee {f}", zh: "接送费 {f}" },
+   "transport.vehicles": { th: "{v} คัน", en: "{v} vehicle(s)", zh: "{v} 辆" },
+diff --git a/web/lib/rules/transport.ts b/web/lib/rules/transport.ts
+index 37a03c7..c898e78 100644
+--- a/web/lib/rules/transport.ts
++++ b/web/lib/rules/transport.ts
+@@ -1,8 +1,8 @@
+-// BR-17 ค่ารถ ≤ 5 กม. ฟรี · > 5 ถึง ≤ 15 กม. ฿300/คัน · > 15 กม. ไม่รับ · BR-18 คันละไม่เกิน 4 คน
++// BR-17 ค่ารถ ≤ 7 กม. ฟรี · > 7 ถึง ≤ 15 กม. ฿350/คัน (EX-A4) · > 15 กม. ไม่รับ · BR-18 คันละไม่เกิน 4 คน
+ 
+-export const FREE_KM_TENTHS = 50;
++export const FREE_KM_TENTHS = 70;
+ export const MAX_KM_TENTHS = 150;
+-export const FEE_PER_VEHICLE = 300_00;
++export const FEE_PER_VEHICLE = 350_00;
+ export const SEATS_PER_VEHICLE = 4;
+ 
+ export function vehiclesFor(people: number): number {
+diff --git a/web/scripts/check-rules.mjs b/web/scripts/check-rules.mjs
+index 22f7cff..0abe7e2 100644
+--- a/web/scripts/check-rules.mjs
++++ b/web/scripts/check-rules.mjs
+@@ -547,11 +547,11 @@ T("E73", "BR-17 5.0 กม. ฟรี", async (ck) => {
+   ck.eq((await tr({ hotel: "H02", people: 1 })).json.fee, 0, "ค่ารถ");
+   ck.eq((await guest().post("/api/price", { type: "single", serviceCode: "S01", date: "2026-10-20", time: "10:00", hotelCode: "H02" })).json.transportFee, 0, "ในใบสรุป");
+ });
+-T("E74", "BR-17 5.1 กม. ฿300", async (ck) => ck.eq((await tr({ hotel: "H03", people: 1 })).json.fee, 300, "ค่ารถ"));
+-T("E75", "BR-17 12 กม. ฿300", async (ck) => ck.eq((await tr({ hotel: "H04", people: 1 })).json.fee, 300, "ค่ารถ"));
+-T("E76", "BR-17 15.0 กม. ฿300", async (ck) => {
+-  ck.eq((await tr({ hotel: "H05", people: 1 })).json.fee, 300, "ค่ารถ");
+-  ck.eq((await tr({ distance: "15.0", people: 1 })).json.fee, 300, "พิมพ์ 15.0 เอง");
++T("E74", "BR-17 5.1 กม. ฿0", async (ck) => ck.eq((await tr({ hotel: "H03", people: 1 })).json.fee, 0, "ค่ารถ"));
++T("E75", "BR-17 12 กม. ฿350", async (ck) => ck.eq((await tr({ hotel: "H04", people: 1 })).json.fee, 350, "ค่ารถ"));
++T("E76", "BR-17 15.0 กม. ฿350", async (ck) => {
++  ck.eq((await tr({ hotel: "H05", people: 1 })).json.fee, 350, "ค่ารถ");
++  ck.eq((await tr({ distance: "15.0", people: 1 })).json.fee, 350, "พิมพ์ 15.0 เอง");
+ });
+ T("E77", "BR-17 15.1 กม. นอกพื้นที่", async (ck) => {
+   const r = await tr({ hotel: "H06", people: 1 });
+@@ -565,16 +565,16 @@ T("E78", "BR-18 3 / 4 / 5 คน 12 กม.", async (ck) => {
+   const a = (await tr({ hotel: "H04", people: 3 })).json;
+   const b = (await tr({ hotel: "H04", people: 4 })).json;
+   const c = (await tr({ hotel: "H04", people: 5 })).json;
+-  ck.eq([a.vehicles, a.fee], [1, 300], "3 คน");
+-  ck.eq([b.vehicles, b.fee], [1, 300], "4 คน");
+-  ck.eq([c.vehicles, c.fee], [2, 600], "5 คน");
++  ck.eq([a.vehicles, a.fee], [1, 350], "3 คน");
++  ck.eq([b.vehicles, b.fee], [1, 350], "4 คน");
++  ck.eq([c.vehicles, c.fee], [2, 700], "5 คน");
+   const p = await (await login("U08")).post("/api/price", grp(5, { hotelCode: "H04" }));
+-  ck.eq([p.json.vehicles, p.json.transportFee], [2, 600], "ใบสรุปกลุ่ม 5 คน");
++  ck.eq([p.json.vehicles, p.json.transportFee], [2, 700], "ใบสรุปกลุ่ม 5 คน");
+ });
+-T("E79", "BR-18 6 คน 12 กม. ฿6,000", async (ck) => {
++T("E79", "BR-18 6 คน 12 กม. ฿6,100", async (ck) => {
+   const r = await quoteAndBook(await login("U08"), grp(6, { hotelCode: "H04" }), ck, "E79");
+-  ck.eq(r.quote.json.transportFee, 600, "ค่ารถ 2 คัน");
+-  ck.eq(r.quote.json.total, 6000, "ยอด");
++  ck.eq(r.quote.json.transportFee, 700, "ค่ารถ 2 คัน");
++  ck.eq(r.quote.json.total, 6100, "ยอด");
+ });
+ T("E80", "BR-18 5 คน 5.0 กม.", async (ck) => {
+   const r = (await tr({ hotel: "H02", people: 5 })).json;
+@@ -600,18 +600,18 @@ T("E83", "BR-19 15.1 กม.", async (ck) => {
+ T("E84", "BR-20 กลุ่ม 4 + Gold ฿3,600", async (ck) => ck.eq((await quoteAndBook(await login("U01"), grp(4), ck, "E84")).quote.json.total, 3600, "ยอด"));
+ T("E85", "BR-20 กลุ่ม 4 + Platinum ฿3,600", async (ck) => ck.eq((await quoteAndBook(await login("U02"), grp(4, { date: "2026-11-02" }), ck, "E85")).quote.json.total, 3600, "ยอด"));
+ T("E86", "BR-20 กลุ่ม 4 + เดือนเกิด ฿3,200", async (ck) => ck.eq((await quoteAndBook(await login("U02"), grp(4, { date: "2026-10-31", useBirthday: true }), ck, "E86")).quote.json.total, 3200, "ยอด"));
+-T("E87", "BR-20 กลุ่ม 4 + แต้ม 200 + รถ 12 กม. ฿3,800", async (ck) => {
++T("E87", "BR-20 กลุ่ม 4 + แต้ม 200 + รถ 12 กม. ฿3,850", async (ck) => {
+   const u = await login("U04");
+   const r = await quoteAndBook(u, grp(4, { redeemBlocks: 2, hotelCode: "H04" }), ck, "E87");
+-  ck.eq(r.quote.json.total, 3800, "ยอด");
++  ck.eq(r.quote.json.total, 3850, "ยอด");
+   ck.eq((await u.get("/api/me")).json.points, 50, "แต้มเหลือ");
+ });
+ T("E88", "BR-20 E87 + GC01", async (ck) => {
+   const u = await login("U04");
+   const r = await quoteAndBook(u, grp(4, { redeemBlocks: 2, hotelCode: "H04", giftCardCode: "SABAI-GC-2000" }), ck, "E88");
+-  ck.eq(r.quote.json.total, 3800, "ยอดสุทธิ");
++  ck.eq(r.quote.json.total, 3850, "ยอดสุทธิ");
+   ck.eq(r.quote.json.giftcardPaid, 2000, "ใช้บัตร");
+-  ck.eq(r.quote.json.otherPaid, 1800, "จ่ายเพิ่ม");
++  ck.eq(r.quote.json.otherPaid, 1850, "จ่ายเพิ่ม");
+   ck.eq(r.quote.json.pointsToEarn, 15, "แต้มที่จะได้");
+   ck.eq((await u.get("/api/giftcards/SABAI-GC-2000")).json.balance, 0, "บัตรเหลือ");
+   if (r.booking?.status === 201) {
+diff --git a/e2e-legacy/tests/price.spec.ts b/e2e-legacy/tests/price.spec.ts
+index 7251964..939344e 100644
+--- a/e2e-legacy/tests/price.spec.ts
++++ b/e2e-legacy/tests/price.spec.ts
+@@ -62,10 +62,10 @@ tc('TC-PRICE-04', async ({ page }) => {
+     await page.getByTestId('book-transport').check();
+     await page.getByTestId('book-hotel').selectOption('H04');
+   });
+-  await S('ยอด ฿4,000 − ฿400 − ฿100 + ฿300 = ฿3,800 · บรรทัดค่ารถ "1 คัน" (ทันที)', async () => {
+-    expect.soft(await quoteTotal(page)).toBe(3800);
++  await S('ยอด ฿4,000 − ฿400 − ฿100 + ฿350 = ฿3,850 · บรรทัดค่ารถ "1 คัน" (ทันที)', async () => {
++    expect.soft(await quoteTotal(page)).toBe(3850);
+     await toSummary(page);
+-    expect.soft(await amount(page, 'summary-total')).toBe(3800);
++    expect.soft(await amount(page, 'summary-total')).toBe(3850);
+     await expect.soft(page.getByTestId('summary-line-transport')).toContainText('1 คัน');
+   });
+   await S('ยืนยัน → หลังรีโหลด /account แต้มเหลือ 50', async () => {
+@@ -79,20 +79,20 @@ tc('TC-PRICE-04', async ({ page }) => {
+ tc('TC-PRICE-05', async ({ page, api }) => {
+   await loginUI(page, 'U01');
+   let code = '';
+-  await S('U01 (Gold) S04 22 ต.ค. 13:00 + รถ H04 → ใบสรุป ฿2,200', async () => {
++  await S('U01 (Gold) S04 22 ต.ค. 13:00 + รถ H04 → ใบสรุป ฿2,250', async () => {
+     await bookToStep3(page, { service: 'S04', type: 'single', date: '2026-10-22', time: '13:00' });
+     await page.getByTestId('book-transport').check();
+     await page.getByTestId('book-hotel').selectOption('H04');
+-    expect.soft(await quoteTotal(page)).toBe(2200);
++    expect.soft(await quoteTotal(page)).toBe(2250);
+     await toSummary(page);
+-    expect.soft(await amount(page, 'summary-total')).toBe(2200);
++    expect.soft(await amount(page, 'summary-total')).toBe(2250);
+   });
+-  await S('ยืนยัน → นัดที่บันทึก = ฿2,200 (หลังรีโหลด /api/me/bookings)', async () => {
++  await S('ยืนยัน → นัดที่บันทึก = ฿2,250 (หลังรีโหลด /api/me/bookings)', async () => {
+     await page.getByTestId('book-confirm').click();
+     code = (await page.getByTestId('booking-confirmation').innerText()).match(/B\d+/)?.[0] ?? '';
+     const u01 = await api.as('U01');
+     const list = (await u01.get('/api/me/bookings')).json.bookings as any[];
+-    expect.soft(list.find((b) => b.code === code)?.total, `นัด ${code}`).toBe(2200);
++    expect.soft(list.find((b) => b.code === code)?.total, `นัด ${code}`).toBe(2250);
+   });
+   await S('ยิง /api/bookings ด้วย quotedTotal = 1 → 409 (ทันที) และไม่มีนัดใหม่ (หลังรีโหลด)', async () => {
+     const u01 = await api.as('U01');
+diff --git a/e2e-legacy/tests/transport.spec.ts b/e2e-legacy/tests/transport.spec.ts
+index e3ff88f..50af728 100644
+--- a/e2e-legacy/tests/transport.spec.ts
++++ b/e2e-legacy/tests/transport.spec.ts
+@@ -14,7 +14,7 @@ async function calc(page: import('@playwright/test').Page, o: { distance?: strin
+ 
+ tc('TC-TRN-01', async ({ page }) => {
+   await open(page, '/transport');
+-  for (const [d, fee] of [['5.0', 0], ['5.1', 300], ['15.0', 300]] as const) {
++  for (const [d, fee] of [['5.0', 0], ['5.1', 0], ['15.0', 350]] as const) {
+     await S(`ระยะ ${d} กม. 1 คน → ฿${fee}`, async () => {
+       await calc(page, { distance: d, people: 1 });
+       await expect.soft(page.getByTestId('transport-fee')).toHaveAttribute('data-amount', String(fee));
+@@ -28,7 +28,7 @@ tc('TC-TRN-01', async ({ page }) => {
+ 
+ tc('TC-TRN-02', async ({ page }) => {
+   await open(page, '/transport');
+-  for (const [n, cars, fee] of [[4, 1, 300], [5, 2, 600]] as const) {
++  for (const [n, cars, fee] of [[4, 1, 350], [5, 2, 700]] as const) {
+     await S(`H04 12 กม. ${n} คน → ${cars} คัน ฿${fee}`, async () => {
+       await calc(page, { hotel: 'H04', people: n });
+       await expect.soft(page.getByTestId('transport-vehicles')).toContainText(String(cars));

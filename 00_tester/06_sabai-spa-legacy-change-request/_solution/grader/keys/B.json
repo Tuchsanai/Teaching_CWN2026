@@ -1,0 +1,50 @@
+{
+  "_note": "คีย์ตรวจอัตโนมัติชุด B (ที่มา EXAM-KEY §2–§9) · regex ไม่สนตัวพิมพ์",
+  "mutants": ["M1", "M6", "M8", "M9"],
+  "prodData": "prod-data-B.sql",
+  "ex1": {
+    "B1": { "parts": [{ "w": 0.8, "file": ["web/lib/server/booking\\.ts"], "all": ["refund"], "any": ["point_txn", "points_redeemed", "cancelBooking"], "min": 1 }] },
+    "B2": { "parts": [{ "w": 0.8, "file": ["db/init/02-seed\\.sql", "web/compose\\.yaml", "web/Dockerfile", "web/lib/server/testmode\\.ts"], "all": ["02-seed"], "any": ["dbinit", "additional_contexts", "COPY", "SEED_SQL_PATH"], "min": 1 }] },
+    "B3": { "parts": [{ "w": 0.8, "file": ["web/lib/server/booking\\.ts"], "all": ["reserved_sessions|createBooking", "used_sessions|completeBooking"] }] },
+    "B4": { "parts": [{ "w": 0.8, "file": ["web/lib/server/booking\\.ts"], "all": ["birthday"], "any": ["yearMonth", "<=", "เดือน", "month"], "min": 1 }] },
+    "B5": { "parts": [{ "w": 0.8, "file": ["web/lib/session\\.ts"], "all": ["HMAC|sha-?256|SESSION_SECRET", "7\\s*(วัน|day)|MAX_AGE|604800"] }] },
+    "B6": { "parts": [{ "w": 0.8, "file": ["web/lib/rules/overlap\\.ts", "web/lib/server/booking\\.ts"], "all": ["id\\s*(น้อย|ต่ำ)|lowest|smallest|ascending|sort|ORDER BY"], "any": ["freeTherapists", "ว่าง|free"], "min": 1 }] },
+    "B7": { "parts": [{ "w": 0.8, "file": ["db/init/02-seed\\.sql"], "all": ["T01|สมศรี", "T05|ทองใบ"] }] },
+    "B8": { "parts": [{ "w": 0.8, "file": ["web/lib/rules/rating\\.ts"], "any": ["ratingTenths", "floor", "ปัด", "round"], "min": 1 }] },
+    "B9": { "parts": [{ "w": 0.8, "file": ["web/lib/config\\.ts"], "any": ["reset", "today", "app_setting|นาฬิกา|clock", "login|บัญชีทดสอบ|admin|ปุ่ม"], "min": 3 }] },
+    "B10": { "parts": [{ "w": 0.8, "file": ["web/lib/db\\.ts"], "all": ["สตางค์|satang", "toSatang|fromSatang"] }] }
+  },
+  "ex3": [
+    { "id": 1, "label": "fitsDay / buildSlots ไม่มีพารามิเตอร์วัน", "re": ["fitsDay|buildSlots"] },
+    { "id": 2, "label": "isValidStartTime / SLOT_INVALID", "re": ["isValidStartTime|SLOT_INVALID"] },
+    { "id": 3, "label": "availableSlots", "re": ["availableSlots"] },
+    { "id": 4, "label": "CLOSE_MIN ค่าเดียวทั้งระบบ", "re": ["CLOSE_MIN"] },
+    { "id": 5, "label": "ข้อความเวลาเปิดใน bot/chat.ts", "re": ["chat\\.ts|แชท|chatbot"] },
+    { "id": 6, "label": "i18n footer.hours / home.subtitle", "re": ["footer\\.hours|home\\.subtitle"] },
+    { "id": 7, "label": "E20 / TC-BOOK-07 (17 ต.ค. = เสาร์)", "re": ["\\bE20\\b|TC-BOOK-07"] },
+    { "id": 8, "label": "เวลาทำงานนักบำบัด", "re": ["(นักบำบัด|หมอนวด|therapist)[\\s\\S]{0,200}(เวลาทำงาน|กะ|shift|working|ทำงานถึง)|(เวลาทำงาน|กะ|shift|working)[\\s\\S]{0,200}(นักบำบัด|หมอนวด|therapist)"] },
+    { "id": 9, "label": "availableSlots ค้นถึง 23:59", "re": ["23:59"] },
+    { "id": 10, "label": "วันในสัปดาห์ตามเวลาไทย", "re": ["Asia/Bangkok|timezone|time zone|เขตเวลา|เวลาไทย|\\bTZ\\b|UTC"] }
+  ],
+  "ex4": {
+    "mustChange": ["E42", "E43", "E44", "E87", "E88", "E89", "TC-MEM-03", "TC-PRICE-04", "TC-CXL-03"],
+    "forbidden": ["E41", "E45"]
+  },
+  "ex5": { "setupOnly": ["E39", "E40", "E88", "TC-MEM-04"] },
+  "files": [
+    { "item": 1, "commit": "EX1", "path": "exam/Q1.json" },
+    { "item": 2, "commit": "EX2", "path": "tests/exam2/run.mjs" },
+    { "item": 2, "commit": "EX2", "path": "tests/exam2/golden", "dir": true },
+    { "item": 2, "commit": "EX2", "path": "tests/exam2/README.md" },
+    { "item": 3, "commit": "EX3", "path": "exam/IMPACT.md" },
+    { "item": 4, "commit": "EX4", "path": "exam/ORACLE-CHANGES.md" },
+    { "item": 5, "commit": "EX5-red", "path": "exam/EX5-EVIDENCE.json" },
+    { "item": 5, "commit": "EX5", "path": "exam/BUGFIX.md" },
+    { "item": 6, "commit": "EX6", "path": "db/migrations", "dir": true },
+    { "item": 6, "commit": "EX6", "path": "exam/MIGRATION.md" },
+    { "item": 7, "commit": "EX7", "path": "exam/EX7-STEPS.md", "optional": true },
+    { "item": 8, "commit": "EX8", "path": "tests/smoke.mjs" },
+    { "item": 8, "commit": "EX8", "path": "exam/REGRESSION.md" },
+    { "item": 8, "commit": "EX8", "path": "RELEASE-NOTES.md" }
+  ]
+}

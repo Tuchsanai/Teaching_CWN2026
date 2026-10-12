@@ -1,0 +1,210 @@
+diff --git a/web/app/api/admin/bookings/route.ts b/web/app/api/admin/bookings/route.ts
+index d88b263..c78e44b 100644
+--- a/web/app/api/admin/bookings/route.ts
++++ b/web/app/api/admin/bookings/route.ts
+@@ -12,9 +12,9 @@ export async function GET(req: Request) {
+     const s = await getSession();
+     if (!s) throw new ApiError(401, "LOGIN_REQUIRED");
+     if (s.role !== "owner") throw new ApiError(403, "FORBIDDEN");
+-    const { today } = await clock();
++    const { now, today } = await clock();
+     const date = new URL(req.url).searchParams.get("date") ?? today;
+     if (!isDateString(date)) throw new ApiError(422, "BAD_REQUEST", { field: "date" });
+-    return json({ date, today, bookings: await queueForDate(date, await getLang()) });
++    return json({ date, today, bookings: await queueForDate(date, await getLang(), now) });
+   });
+ }
+diff --git a/web/app/api/test/today/route.ts b/web/app/api/test/today/route.ts
+index bbc518c..7a31852 100644
+--- a/web/app/api/test/today/route.ts
++++ b/web/app/api/test/today/route.ts
+@@ -1,7 +1,9 @@
+ import { clock } from "@/lib/clock.ts";
+ import { config } from "@/lib/config.ts";
+ import { bangkokIso } from "@/lib/server/testmode.ts";
+-import { json } from "@/lib/server/http.ts";
++import { ApiError, handle, json, readJson } from "@/lib/server/http.ts";
++import { parseClockValue } from "@/lib/clock.ts";
++import { query } from "@/lib/db.ts";
+ 
+ export const dynamic = "force-dynamic";
+ 
+@@ -11,3 +13,16 @@ export async function GET() {
+   const { now, today } = await clock();
+   return json({ now: bangkokIso(now), today });
+ }
++
++/** POST /api/test/today {now} — EX-B5 test seam: เลื่อนนาฬิการะบบโดยไม่ reset ข้อมูล (โหมดทดสอบเท่านั้น) */
++export async function POST(req: Request) {
++  if (!config.allowTestReset) return new Response("Not Found", { status: 404 });
++  return handle(async () => {
++    const body = await readJson(req);
++    const at = typeof body.now === "string" ? parseClockValue(body.now) : null;
++    if (!at) throw new ApiError(422, "BAD_REQUEST", { field: "now" });
++    await query("UPDATE app_setting SET value = $1 WHERE key = 'test_today'", [bangkokIso(at)]);
++    const { now, today } = await clock();
++    return json({ ok: true, now: bangkokIso(now), today });
++  });
++}
+diff --git a/web/components/AdminQueue.tsx b/web/components/AdminQueue.tsx
+index aebff03..51545ce 100644
+--- a/web/components/AdminQueue.tsx
++++ b/web/components/AdminQueue.tsx
+@@ -18,6 +18,7 @@ interface Row {
+   totalLabel: string;
+   viaCourse: boolean;
+   pointsEarned: number;
++  canComplete: boolean;
+ }
+ 
+ /** หลังร้าน (D3): ตารางคิว · กด "ใช้บริการเสร็จ" ให้แต้ม (BR-09) ตัดครั้งคอร์ส (D5) บันทึกรอบเอว (FR-16) */
+@@ -111,7 +112,7 @@ export function AdminQueue({ initialDate, today, allowReset }: { initialDate: st
+                             data-testid={`admin-waist-${r.code}`}
+                           />
+                         )}
+-                        <button type="button" className="btn btn-sm" onClick={() => complete(r)} data-testid={`admin-complete-${r.code}`}>
++                        <button type="button" className="btn btn-sm" onClick={() => complete(r)} disabled={!r.canComplete} data-testid={`admin-complete-${r.code}`}>
+                           {t("admin.complete")}
+                         </button>
+                       </div>
+diff --git a/web/lib/i18n.ts b/web/lib/i18n.ts
+index 40ed56c..c2d62f1 100644
+--- a/web/lib/i18n.ts
++++ b/web/lib/i18n.ts
+@@ -314,6 +314,7 @@ const D = {
+   "err.LOGIN_REQUIRED": { th: "กรุณาเข้าสู่ระบบ", en: "Please log in", zh: "请登录" },
+   "err.LOGIN_FAILED": { th: "อีเมลหรือรหัสผ่านไม่ถูกต้อง", en: "Incorrect email or password", zh: "邮箱或密码错误" },
+   "err.FORBIDDEN": { th: "ไม่มีสิทธิ์เข้าถึง", en: "Access denied", zh: "无权访问" },
++  "err.NOT_STARTED": { th: "ยังไม่ถึงเวลานัด กดเสร็จไม่ได้", en: "This appointment has not started yet", zh: "预约时间未到，无法完成" },
+   "err.NOT_FOUND": { th: "ไม่พบข้อมูล", en: "Not found", zh: "未找到" },
+   "err.NOT_CONFIRMED": { th: "นัดนี้ไม่ได้อยู่ในสถานะยืนยัน", en: "This appointment is not confirmed", zh: "此预约不是已确认状态" },
+   "err.SERVER": { th: "ระบบขัดข้อง กรุณาลองใหม่", en: "Something went wrong, please try again", zh: "系统错误，请重试" },
+diff --git a/web/lib/rules/complete.ts b/web/lib/rules/complete.ts
+new file mode 100644
+index 0000000..16bfa7e
+--- /dev/null
++++ b/web/lib/rules/complete.ts
+@@ -0,0 +1,7 @@
++// EX-B5 กด "ใช้บริการเสร็จ" ได้เมื่อเวลาปัจจุบันของระบบ ≥ เวลาเริ่มนัด + COMPLETE_AFTER_MIN นาที
++
++export const COMPLETE_AFTER_MIN = 30;
++
++export function canComplete(nowMs: number, startMs: number): boolean {
++  return nowMs >= startMs + COMPLETE_AFTER_MIN * 60_000;
++}
+diff --git a/web/lib/rules/index.ts b/web/lib/rules/index.ts
+index 78f78ed..6fec588 100644
+--- a/web/lib/rules/index.ts
++++ b/web/lib/rules/index.ts
+@@ -11,5 +11,6 @@ export * from "./transport.ts";
+ export * from "./course.ts";
+ export * from "./giftcard.ts";
+ export * from "./cancel.ts";
++export * from "./complete.ts";
+ export * from "./rating.ts";
+ export * from "./pricing.ts";
+diff --git a/web/lib/server/admin.ts b/web/lib/server/admin.ts
+index 32dc807..5997cd6 100644
+--- a/web/lib/server/admin.ts
++++ b/web/lib/server/admin.ts
+@@ -2,10 +2,11 @@
+ import { query, toSatang } from "../db.ts";
+ import { pickName, t, type Lang } from "../i18n.ts";
+ import { formatBaht } from "../money.ts";
++import { canComplete } from "../rules/complete.ts";
+ import { bangkokTime, toInstant } from "../rules/time.ts";
+ import { therapistName } from "./catalog.ts";
+ 
+-export async function queueForDate(date: string, lang: Lang) {
++export async function queueForDate(date: string, lang: Lang, now: Date = new Date()) {
+   const r = await query(
+     `SELECT b.*, s.code AS service_code, s.name_th, s.name_en, s.name_zh, c.name AS customer_name,
+             COALESCE(json_agg(json_build_object('code', t.code, 'name', t.name, 'name_en', t.name_en, 'name_zh', t.name_zh) ORDER BY t.id)
+@@ -36,5 +37,6 @@ export async function queueForDate(date: string, lang: Lang) {
+     totalLabel: formatBaht(toSatang(b.total_amount)),
+     viaCourse: !!b.course_purchase_id,
+     pointsEarned: b.points_earned,
++    canComplete: b.status === "confirmed" && canComplete(now.getTime(), new Date(b.start_at).getTime()),
+   }));
+ }
+diff --git a/web/lib/server/booking.ts b/web/lib/server/booking.ts
+index 52e5b75..87f0666 100644
+--- a/web/lib/server/booking.ts
++++ b/web/lib/server/booking.ts
+@@ -7,6 +7,7 @@ import { formatDate, pickName, t, type Lang } from "../i18n.ts";
+ import { formatBaht, toBaht } from "../money.ts";
+ import { birthdayEligible } from "../rules/birthday.ts";
+ import { canCancel } from "../rules/cancel.ts";
++import { canComplete } from "../rules/complete.ts";
+ import { canUseCourse, courseRemaining } from "../rules/course.ts";
+ import { bookableRange, isBookableDate } from "../rules/dates.ts";
+ import { giftCardStatus } from "../rules/giftcard.ts";
+@@ -499,6 +500,8 @@ export async function completeBooking(bookingId: number, waistCm: number | null,
+     const b = r.rows[0];
+     if (!b) throw new ApiError(404, "NOT_FOUND");
+     if (b.status !== "confirmed") throw new ApiError(422, "NOT_CONFIRMED");
++    // EX-B5: ห้ามกดเสร็จก่อนถึงเวลานัด (ใช้นาฬิการะบบ clock() เดียวกับกฎเวลาอื่น)
++    if (!canComplete(now.getTime(), new Date(b.start_at).getTime())) throw new ApiError(422, "NOT_STARTED");
+ 
+     let earned = 0;
+     if (b.customer_id && !b.course_purchase_id) {
+diff --git a/web/scripts/check-rules.mjs b/web/scripts/check-rules.mjs
+index 22f7cff..e9425fa 100644
+--- a/web/scripts/check-rules.mjs
++++ b/web/scripts/check-rules.mjs
+@@ -331,13 +331,13 @@ T("E39", "BR-09 B05 เสร็จ ได้ 7 แต้ม", async (ck) => {
+   const r = await owner.post("/api/admin/bookings/5/complete", {});
+   ck.eq(r.json.pointsEarned, 7, "แต้มที่ได้");
+   ck.eq((await (await login("U01")).get("/api/me")).json.points, 106, "แต้มรวม");
+-});
++}, { now: "2026-10-11T10:30:00+07:00" });
+ T("E40", "BR-09 ได้แต้มหลังร้านกดเสร็จ", async (ck) => {
+   const u = await login("U01");
+   ck.eq((await u.get("/api/me")).json.points, 99, "ก่อน");
+   await (await login("OWNER")).post("/api/admin/bookings/B05/complete", {});
+   ck.eq((await u.get("/api/me")).json.points, 106, "หลัง");
+-});
++}, { now: "2026-10-11T10:30:00+07:00" });
+ 
+ const s05 = (extra = {}) => ({ type: "single", serviceCode: "S05", date: "2026-10-20", time: "10:00", ...extra });
+ T("E41", "BR-10 แต้ม 99 แลกไม่ได้", async (ck) => {
+@@ -615,6 +615,8 @@ T("E88", "BR-20 E87 + GC01", async (ck) => {
+   ck.eq(r.quote.json.pointsToEarn, 15, "แต้มที่จะได้");
+   ck.eq((await u.get("/api/giftcards/SABAI-GC-2000")).json.balance, 0, "บัตรเหลือ");
+   if (r.booking?.status === 201) {
++    // EX-B5: เลื่อนนาฬิกาไปถึงเวลานัด (ไม่ reset เพราะจะลบนัดที่เพิ่งจอง)
++    await guest().post("/api/test/today", { now: "2026-10-16T10:30:00+07:00" });
+     const done = await (await login("OWNER")).post(`/api/admin/bookings/${r.booking.json.bookingId}/complete`, {});
+     ck.eq(done.json.pointsEarned, 15, "แต้มที่ได้จริงหลังเสร็จ");
+   }
+diff --git a/e2e-legacy/tests/member.spec.ts b/e2e-legacy/tests/member.spec.ts
+index 1ab364a..151c0ca 100644
+--- a/e2e-legacy/tests/member.spec.ts
++++ b/e2e-legacy/tests/member.spec.ts
+@@ -75,6 +75,8 @@ tc('TC-MEM-03', async ({ page, api }) => {
+ });
+ 
+ tc('TC-MEM-04', async ({ page, api }) => {
++  // EX-B5: กดเสร็จได้เมื่อถึงเวลานัด B06 (15:00) + 30 นาที → ตั้งนาฬิกาก่อน (ค่าคาดหวังเดิม)
++  await api.reset('2026-10-10T15:30:00+07:00');
+   await S('ก่อนกด: แต้ม U01 = 99', async () => {
+     const u01 = await api.as('U01');
+     expect.soft((await u01.get('/api/me')).json.points).toBe(99);
+diff --git a/tests/exam5/complete-future.mjs b/tests/exam5/complete-future.mjs
+new file mode 100644
+index 0000000..d830958
+--- /dev/null
++++ b/tests/exam5/complete-future.mjs
+@@ -0,0 +1,12 @@
++// EX5-red (ชุด B): ทำซ้ำเรื่องร้องเรียน — กดเสร็จนัดสัปดาห์หน้า (B02 17 ต.ค.) ตอน "วันนี้" ของ seed ต้องไม่ได้
++const BASE = (process.env.BASE_URL || "http://localhost:4000").replace(/\/$/, "");
++const post = (p, b, ck) => fetch(BASE + p, { method: "POST", headers: { "Content-Type": "application/json", ...(ck ? { Cookie: ck } : {}) }, body: JSON.stringify(b ?? {}) });
++await post("/api/test/reset", {});
++const lr = await post("/api/auth/login", { email: "owner@sabai.test", password: "Owner@2026" });
++const ck = lr.headers.get("set-cookie").match(/sabai_session=[^;]*/)[0];
++const r = await post("/api/admin/bookings/2/complete", {}, ck);
++const j = await r.json();
++await post("/api/test/reset", {});
++const ok = r.status === 422 && j.error === "NOT_STARTED";
++console.log(ok ? "PASS" : `FAIL: complete B02 → ${r.status} ${j.error ?? ""}`);
++process.exit(ok ? 0 : 1);

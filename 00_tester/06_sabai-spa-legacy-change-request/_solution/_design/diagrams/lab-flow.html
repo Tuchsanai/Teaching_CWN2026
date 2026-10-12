@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>lab-flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .nw { white-space: nowrap; }
+  .emo { font-family: "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+  .top { display: grid; grid-template-columns: 1fr 360px; gap: 18px; margin-top: 26px; }
+  .start { border: 2px dashed #cdbb85; border-radius: 18px; padding: 14px 20px; background: #fff; display: flex; align-items: center; gap: 16px; }
+  .start .emo { font-size: 38px; }
+  .start .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .start .pill { color: var(--leaf); font-size: 13.5px; }
+  .start .t { font-size: 17px; font-weight: 700; }
+  .start .m { font-size: 14px; color: var(--grey); margin-top: 4px; }
+  .lab0 { border: 2px solid var(--slate-bd); background: var(--slate-bg); border-radius: 18px; padding: 14px 18px; }
+  .lab0 .hd { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; }
+  .lab0 .num { background: var(--slate); }
+  .lab0 .d { font-size: 14.5px; margin-top: 6px; }
+  .lab0 .pill { color: var(--slate); font-size: 12.5px; }
+  .down { text-align: center; color: var(--grey); font-size: 24px; line-height: 1; margin: 8px 0 6px; }
+  .cols { display: grid; grid-template-columns: minmax(0,1fr) 22px minmax(0,1fr) 22px minmax(0,0.95fr) 22px minmax(0,1.5fr) 22px minmax(0,1fr); align-items: stretch; }
+  .arr { display: flex; align-items: center; justify-content: center; color: var(--grey); font-size: 20px; }
+  .col { background: var(--bg); border: 2px solid var(--bd); border-radius: 20px; padding: 12px 10px 12px; }
+  .col > .hd { display: flex; align-items: center; gap: 8px; padding: 2px 4px 10px; }
+  .col > .hd .num { background: var(--c); }
+  .col > .hd .emo { font-size: 24px; }
+  .col > .hd b { color: var(--c); font-size: 19px; line-height: 1.2; display: block; }
+  .col > .hd small { color: var(--c); font-size: 13.5px; font-weight: 600; }
+  .lab { position: relative; background: #fff; border: 1.5px solid var(--bd); border-radius: 13px; padding: 9px 10px 9px; margin-top: 8px; }
+  .lab .t { display: flex; align-items: flex-start; gap: 8px; }
+  .lab .n { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--c); color: #fff; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+  .lab .name { font-size: 14px; font-weight: 700; line-height: 1.35; padding-top: 2px; }
+  .lab .pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .lab .pill { color: var(--c); font-size: 11.5px; padding: 0 6px; border-width: 1.2px; }
+  .lab .ed { position: absolute; top: -9px; right: 8px; font-size: 12px; background: #fff; border: 1.5px solid var(--bd); border-radius: 999px; padding: 0 6px; line-height: 1.5; color: var(--c); font-weight: 700; }
+  .cr { font-family: var(--mono); font-size: 12px; font-weight: 700; color: #fff; background: var(--c); border-radius: 6px; padding: 0 6px; margin-right: 2px; }
+  .order { font-size: 12.5px; color: var(--c); font-weight: 600; margin: -4px 4px 2px; }
+  .legend { margin-top: 14px; font-size: 14.5px; color: var(--grey); }
+</style>
+</head>
+<body>
+  <h1>เส้นทาง 12 LAB</h1>
+  <p class="sub">แต่ละ LAB = พรอมต์ copy &amp; paste → ได้ไฟล์ไว้ใช้ LAB ถัดไป · ✏️ = แก้ repo เดิม (8 จาก 12 LAB)</p>
+
+  <div class="top">
+    <div class="start">
+      <span class="emo">🗂️</span>
+      <div>
+        <div class="t">ตอนเริ่มมีระบบเดิมที่ได้รับมอบ</div>
+        <div class="pills"><span class="pill">web/</span><span class="pill">db/</span><span class="pill">e2e-legacy/</span><span class="pill">CHANGE-REQUESTS/</span><span class="pill">tools/</span></div>
+        <div class="m">โค้ด + SPEC เก่า + ชุดทดสอบที่ส่งมอบ + หนังสือ CR 5 ฉบับ · มีข้อมูลลูกค้าอยู่แล้ว</div>
+      </div>
+    </div>
+    <div class="lab0">
+      <div class="hd"><span class="num">0</span>เช็กเครื่อง <span class="emo">⚙️</span></div>
+      <div class="d">Docker · Node · <span class="nw">พอร์ตที่ Windows จอง</span><br><span class="nw">เว็บ 4000 ·</span> <span class="nw">DB 5433</span> · <span class="pill">rea-lab:6.4.0</span></div>
+    </div>
+  </div>
+  <div class="down">↓</div>
+
+  <div class="cols">
+    <div class="col g">
+      <div class="hd"><span class="num">1</span><span class="emo">📦</span><div><b>รับมอบ</b><small>LAB 1–2</small></div></div>
+      <div class="lab"><div class="t"><span class="n">1</span><span class="name"><span class="nw">รันชุดที่ส่งมอบเอง ·</span> <span class="nw">ตรวจคำอ้าง</span></span></div>
+        <div class="pills"><span class="pill">HANDOVER-CHECK.md</span></div></div>
+      <div class="lab"><div class="t"><span class="n">2</span><span class="name">REA มองแบบ <span class="nw">black-box ·</span> <span class="nw">bundle + HAR</span></span></div>
+        <div class="pills"><span class="pill">docs/REA-INVENTORY.md</span></div></div>
+    </div>
+    <div class="arr">→</div>
+    <div class="col y">
+      <div class="hd"><span class="num">2</span><span class="emo">🧭</span><div><b>เข้าใจ</b><small>LAB 3–4</small></div></div>
+      <div class="lab"><div class="t"><span class="n">3</span><span class="name">Agent อ่าน <span class="nw">repo + DB →</span> <span class="nw">แผนที่ระบบ</span></span></div>
+        <div class="pills"><span class="pill">SYSTEM-MAP.md</span><span class="pill">docs/SPEC-GAPS.md</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">4</span><span class="name"><span class="nw">CLAUDE.md +</span> <span class="nw">รั้วกันแก้</span></span></div>
+        <div class="pills"><span class="pill">CLAUDE.md</span><span class="pill">.claude/settings.json</span></div></div>
+    </div>
+    <div class="arr">→</div>
+    <div class="col b">
+      <div class="hd"><span class="num">3</span><span class="emo">🕸️</span><div><b>ตาข่าย</b><small>LAB 5</small></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">5</span><span class="name"><span class="nw">seam นาฬิกา ·</span> <span class="nw">golden master ·</span> <span class="nw">ล็อก UI ·</span> <span class="nw">mutant</span></span></div>
+        <div class="pills"><span class="pill">tests/golden/</span><span class="pill">e2e-cr/</span><span class="pill">KNOWN-ISSUES.md</span></div></div>
+    </div>
+    <div class="arr">→</div>
+    <div class="col o">
+      <div class="hd"><span class="num">4</span><span class="emo">📨</span><div><b style="font-size:17px;white-space:nowrap">Change Request</b><small>LAB 6–10</small></div></div>
+      <div class="order"><span class="nw">เรียงเล็ก → ใหญ่:</span> <span class="nw">กฎ → บั๊ก → schema → ฟีเจอร์ → รายงาน</span></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">6</span><span class="name"><span class="cr">CR-02</span> <span class="nw">เปลี่ยนกฎ ·</span> <span class="nw">มีวันเริ่มใช้</span></span></div>
+        <div class="pills"><span class="pill">docs/impact/CR-02.md</span><span class="pill">tests/cr02.mjs</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">7</span><span class="name"><span class="cr">CR-03</span> <span class="nw">บั๊กจากเรื่องร้องเรียน</span></span></div>
+        <div class="pills"><span class="pill">tests/cr03.mjs</span><span class="pill">e2e-cr/tests/cr03.spec.ts</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">8</span><span class="name"><span class="cr">CR-04</span> <span class="nw">วันหยุดร้าน ·</span> <span class="nw">migration</span></span></div>
+        <div class="pills"><span class="pill">db/migrations/001_*.sql</span><span class="pill">docs/MIGRATION-RUNBOOK.md</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">9</span><span class="name"><span class="cr">CR-01</span> <span class="nw">ฟีเจอร์ใหม่ ·</span> <span class="nw">เลื่อนนัดเอง</span></span></div>
+        <div class="pills"><span class="pill">tests/cr01.mjs</span><span class="pill">e2e-cr/tests/cr01.spec.ts</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">10</span><span class="name"><span class="cr">CR-05</span> <span class="nw">รายงานยอด + CSV</span></span></div>
+        <div class="pills"><span class="pill">tests/cr05.mjs</span><span class="pill">e2e-cr/tests/cr05.spec.ts</span></div></div>
+    </div>
+    <div class="arr">→</div>
+    <div class="col p">
+      <div class="hd"><span class="num">5</span><span class="emo">✍️</span><div><b>ส่งมอบ</b><small>LAB 11–12</small></div></div>
+      <div class="lab"><div class="t"><span class="n">11</span><span class="name"><span class="nw">regression เต็ม</span> <span class="nw">3 เบราว์เซอร์ +</span> <span class="nw">REA เทียบเวอร์ชัน</span></span></div>
+        <div class="pills"><span class="pill">REGRESSION-REPORT.md</span><span class="pill">docs/TRACEABILITY.md</span></div></div>
+      <div class="lab"><span class="ed">✏️</span><div class="t"><span class="n">12</span><span class="name"><span class="nw">ส่งมอบ +</span> <span class="nw">ซ้อมถอยกลับ</span></span></div>
+        <div class="pills"><span class="pill">tests/smoke.mjs</span><span class="pill">RELEASE-NOTES.md</span><span class="pill">UAT-CHECKLIST.md</span></div></div>
+    </div>
+  </div>
+
+  <div class="bar">🎯 ทำตามที่ขอ ≠ ของเดิมไม่พัง ≠ ส่งมอบได้ · ทุก CR วนรอบ: ถาม → impact → แดงก่อน → แก้ → regression → โยงกลับ</div>
+</body>
+</html>

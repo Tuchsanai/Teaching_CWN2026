@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>overview-5-phases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  h1 { text-align: center; font-size: 38px; }
+  .sub { text-align: center; }
+  .row { display: flex; align-items: stretch; gap: 0; margin-top: 30px; }
+  .arrow { flex: none; width: 30px; display: flex; align-items: center; justify-content: center; color: var(--grey); font-size: 24px; }
+  .ph {
+    flex: 1; background: var(--bg); border: 2px solid var(--bd); border-radius: 20px;
+    padding: 22px 12px 18px; display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .ph .num { background: var(--c); width: 46px; height: 46px; font-size: 22px; }
+  .ph .emo { font-size: 46px; line-height: 1; margin-top: 14px; font-family: "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+  .ph .name { color: var(--c); font-size: 25px; font-weight: 800; margin-top: 10px; line-height: 1.25; }
+  .ph .lab { margin-top: 8px; padding: 2px 16px; border: 1.5px solid var(--bd); border-radius: 999px; background: #fff; color: var(--c); font-weight: 700; font-size: 17px; }
+  .ph .what { margin-top: 12px; font-size: 15.5px; line-height: 1.45; color: var(--ink); min-height: 68px; }
+  .ph .files { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .ph .pill { color: var(--c); font-size: 13.5px; }
+  .crs { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 8px; }
+  .crs span { font-family: var(--mono); font-size: 12px; font-weight: 700; color: #fff; background: var(--c); border-radius: 6px; padding: 1px 6px; }
+  .lab0 { margin-top: 18px; display: flex; justify-content: center; }
+  .lab0 div { font-size: 16px; color: var(--slate); background: #fff; border: 1.5px dashed var(--slate-bd); border-radius: 12px; padding: 6px 16px; }
+  .lab0 b { color: var(--ink); }
+  .bar { text-align: center; }
+</style>
+</head>
+<body>
+  <h1 class="center">รับมอบ → เข้าใจ → ตาข่าย → Change Request → ส่งมอบ</h1>
+  <p class="sub">ระบบ "สบายใจ สปา" ใช้งานจริงและมีข้อมูลลูกค้าอยู่แล้ว · ทีมเดิมหมดสัญญา · เรา + Claude Code รับหนังสือขอเปลี่ยนแปลง 5 ฉบับ</p>
+
+  <div class="lab0"><div>⚙️ <b>LAB 0</b> เช็กเครื่อง + พอร์ตที่ Windows จอง (เว็บ <b>4000</b> · ฐานข้อมูล <b>5433</b>) ก่อนเริ่มทุกช่วง</div></div>
+
+  <div class="row">
+    <div class="ph g">
+      <span class="num">1</span>
+      <div class="emo">📦</div>
+      <div class="name">รับมอบ</div>
+      <div class="lab">LAB 1–2</div>
+      <div class="what">รันชุดที่ส่งมอบเอง<br>คำอ้าง ≠ หลักฐาน<br>REA มองแบบ black-box</div>
+      <div class="files"><span class="pill">HANDOVER-CHECK.md</span><span class="pill">REA-INVENTORY.md</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="ph y">
+      <span class="num">2</span>
+      <div class="emo">🧭</div>
+      <div class="name">เข้าใจ</div>
+      <div class="lab">LAB 3–4</div>
+      <div class="what">อ่าน repo + DB + เทียบ REA<br>ตั้งกติกาให้ Agent</div>
+      <div class="files"><span class="pill">SYSTEM-MAP.md</span><span class="pill">CLAUDE.md</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="ph b">
+      <span class="num">3</span>
+      <div class="emo">🕸️</div>
+      <div class="name">ตาข่าย</div>
+      <div class="lab">LAB 5</div>
+      <div class="what">ล็อกพฤติกรรมเดิมก่อนแตะ<br>ทำพังเองเพื่อวัดตาข่าย</div>
+      <div class="files"><span class="pill">tests/golden/</span><span class="pill">e2e-cr/</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="ph o">
+      <span class="num">4</span>
+      <div class="emo">📨</div>
+      <div class="name" style="font-size:21px;white-space:nowrap;padding-top:4px">Change Request</div>
+      <div class="lab">LAB 6–10</div>
+      <div class="what">ถาม → impact → แดงก่อน<br>→ แก้ → โยงกลับ
+        <div class="crs"><span>CR-02</span><span>CR-03</span><span>CR-04</span><span>CR-01</span><span>CR-05</span></div>
+      </div>
+      <div class="files"><span class="pill">docs/impact/</span><span class="pill">tests/cr0N.mjs</span></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="ph p">
+      <span class="num">5</span>
+      <div class="emo">✍️</div>
+      <div class="name">ส่งมอบ</div>
+      <div class="lab">LAB 11–12</div>
+      <div class="what">regression 3 เบราว์เซอร์<br>ซ้อมถอยกลับ · ตรวจรับ</div>
+      <div class="files"><span class="pill">REGRESSION-REPORT.md</span><span class="pill">RELEASE-NOTES.md</span></div>
+    </div>
+  </div>
+
+  <div class="bar">🎯 ทำตามที่ขอ ≠ ของเดิมไม่พัง ≠ ส่งมอบได้ · แต่ละช่วงต้องมีหลักฐานของตัวเอง</div>
+</body>
+</html>
