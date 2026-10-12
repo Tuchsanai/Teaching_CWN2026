@@ -1,0 +1,40 @@
+healthy: false
+environment_healthy: false
+scope:
+  mode: audit-wide
+  clients: []
+  providers: []
+  skill: false
+  target: null
+scope_checks[6]:
+  - name: node
+    ok: true
+    classification: healthy
+    detail: 24.20.0
+  - name: host
+    ok: true
+    classification: healthy
+    detail: ubuntu 24.04
+  - name: hopper
+    ok: false
+    classification: missing_analysis_engine
+    remediation: "Run rea setup to install Hopper, or set HOPPER_LAUNCHER_PATH."
+  - name: ghidra
+    ok: false
+    classification: missing_analysis_engine
+    detail: GHIDRA_INSTALL_DIR is not set
+    remediation: Set GHIDRA_INSTALL_DIR to an extracted Ghidra 12.1.x release directory.
+  - name: ida-registration
+    ok: false
+    classification: missing_analysis_engine
+    detail: IDA MCP registration is not configured.
+    remediation: Set REA_IDA_MCP_CONFIG to your upstream IDA MCP registration JSON; see docs/ida-provider.md.
+  - name: "skill:identity"
+    ok: false
+    classification: config_drift
+    detail: Installed REA skill identity is missing.
+    remediation: Run rea setup to update the installed REA skill.
+informational_checks: []
+providerInspections[2]:
+  - id: ghidra
+    configured: false

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>three-eyes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .tbl { display: grid; grid-template-columns: 170px repeat(3, 1fr); gap: 10px; margin-top: 28px; }
+  .h { background: var(--bg); border: 2px solid var(--bd); border-radius: 18px 18px 10px 10px; padding: 14px 16px; }
+  .h .t { display: flex; align-items: center; gap: 10px; }
+  .h .num { background: var(--c); }
+  .h b { font-size: 24px; color: var(--c); line-height: 1.3; }
+  .h div.s { font-size: 15px; color: var(--ink); margin-top: 4px; }
+  .rl { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; font-weight: 800; color: var(--navy); font-size: 17px; display: flex; align-items: center; }
+  .c { background: #fff; border: 1.5px solid var(--bd); border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.5; }
+  .c .pill { font-size: 13px; color: var(--c); padding: 1px 8px; margin: 2px 0; }
+  .yes { color: var(--green); font-weight: 700; }
+  .no { color: var(--slate); font-weight: 700; }
+  .warn { color: #b45309; }
+</style>
+</head>
+<body>
+  <h1>3 ตา มองระบบเดิม</h1>
+  <p class="sub">ระบบ legacy ไม่มีใครเล่าให้ฟังครบ · มองจาก 3 มุม แล้วเอาคำตอบมาเทียบกัน</p>
+
+  <div class="tbl">
+    <div></div>
+    <div class="h s"><div class="t"><span class="num">1</span><b>Black-box</b></div><div class="s">เดินเว็บ + Playwright + HAR</div></div>
+    <div class="h p"><div class="t"><span class="num">2</span><b>Grey-box</b></div><div class="s">REA ส่อง bundle / HAR / เบราว์เซอร์</div></div>
+    <div class="h b"><div class="t"><span class="num">3</span><b>White-box</b></div><div class="s">อ่าน source + <span style="font-family:var(--mono)">CLAUDE.md</span></div></div>
+
+    <div class="rl">ต้องมี source ไหม</div>
+    <div class="c s"><span class="no">❌ ไม่ต้อง</span> · ใช้แค่เว็บที่รันอยู่</div>
+    <div class="c p"><span class="no">❌ ไม่ต้อง</span> · ใช้ไฟล์ที่ build / ที่รันอยู่</div>
+    <div class="c b"><span class="yes">✅ ต้องมี</span> · repo ครบ</div>
+
+    <div class="rl">เห็นอะไร</div>
+    <div class="c s">หน้าจอ · ข้อความ · ยอดเงิน<br>คำขอ / คำตอบ API ใน HAR</div>
+    <div class="c p">endpoint · โมดูล · storage ที่ซ่อนใน bundle<br>เส้นทางที่เว็บเรียกจริงตอนรัน</div>
+    <div class="c b">ตรรกะจริงทีละบรรทัด<br>ชื่อฟังก์ชัน · ค่าคงที่ · คอมเมนต์</div>
+
+    <div class="rl">พิสูจน์อะไรไม่ได้</div>
+    <div class="c s warn">ทำไมถึงคำนวณแบบนั้น<br>ทางที่เราไม่ได้เดิน</div>
+    <div class="c p warn">ชื่อถูกย่อ (minified) · บางข้อเป็นแค่การอนุมาน ต้องยืนยันด้วยการรัน</div>
+    <div class="c b warn">โค้ดตรงกับกฎธุรกิจไหม<br>เอกสาร / คอมเมนต์อาจเก่าแล้ว</div>
+
+    <div class="rl">เครื่องมือ</div>
+    <div class="c s"><span class="pill">Playwright</span> <span class="pill">session.har</span><br>เดินเว็บเอง + จดผล</div>
+    <div class="c p"><span class="pill">analyze-javascript-application</span><br><span class="pill">inspect-web-network-capture</span></div>
+    <div class="c b"><span class="pill">CLAUDE.md</span> <span class="pill">grep</span><br>ให้ Claude อ่าน repo + อธิบาย</div>
+
+    <div class="rl">ใช้ตอนไหน</div>
+    <div class="c s">มีแค่เว็บ ไม่มีโค้ด<br>เก็บผลจริงไว้เทียบ ก่อน–หลังแก้</div>
+    <div class="c p">ได้แค่ของที่ส่งมอบ<br>เทียบ 2 เวอร์ชันที่ build แล้ว</div>
+    <div class="c b">มี repo ครบ<br>ก่อนแก้ต้องรู้ว่ากระทบตรงไหน</div>
+  </div>
+
+  <div class="bar">🎯 เอา 3 ตามาเทียบกัน (triangulate) · ตรงกัน = มั่นใจ · ไม่ตรง = เจอเรื่องต้องถาม</div>
+</body>
+</html>

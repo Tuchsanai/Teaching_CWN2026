@@ -1,0 +1,127 @@
+{
+  "duration_ms": 1140,
+  "completeness": {
+    "status": "incomplete",
+    "equality_eligible": false,
+    "missing_sections": [
+      "events"
+    ],
+    "truncated_sections": []
+  },
+  "steps": [
+    {
+      "step_id": "scenario_start",
+      "status": "completed",
+      "elapsed_ms": 505,
+      "after_url": "http://pawpantry:3051/"
+    },
+    {
+      "step_id": "home-ready",
+      "status": "completed",
+      "elapsed_ms": 49,
+      "after_url": "http://pawpantry:3051/"
+    },
+    {
+      "step_id": "search-fill",
+      "status": "completed",
+      "elapsed_ms": 16,
+      "after_url": "http://pawpantry:3051/"
+    },
+    {
+      "step_id": "search-submit",
+      "status": "completed",
+      "elapsed_ms": 51,
+      "after_url": "http://pawpantry:3051/"
+    },
+    {
+      "step_id": "results-ready",
+      "status": "completed",
+      "elapsed_ms": 33,
+      "after_url": "http://pawpantry:3051/products?q=%E0%B9%81%E0%B8%8B%E0%B8%A5%E0%B8%A1%E0%B8%AD%E0%B8%99"
+    },
+    {
+      "step_id": "open-product",
+      "status": "completed",
+      "elapsed_ms": 49,
+      "after_url": "http://pawpantry:3051/products?q=%E0%B9%81%E0%B8%8B%E0%B8%A5%E0%B8%A1%E0%B8%AD%E0%B8%99"
+    },
+    {
+      "step_id": "add-to-cart",
+      "status": "completed",
+      "elapsed_ms": 70,
+      "after_url": "http://pawpantry:3051/products/lickable-salmon-treat"
+    },
+    {
+      "step_id": "open-cart",
+      "status": "completed",
+      "elapsed_ms": 45,
+      "after_url": "http://pawpantry:3051/products/lickable-salmon-treat"
+    },
+    {
+      "step_id": "coupon-fill",
+      "status": "completed",
+      "elapsed_ms": 35,
+      "after_url": "http://pawpantry:3051/cart"
+    },
+    {
+      "step_id": "coupon-apply",
+      "status": "completed",
+      "elapsed_ms": 34,
+      "after_url": "http://pawpantry:3051/cart"
+    },
+    {
+      "step_id": "coupon-message",
+      "status": "completed",
+      "elapsed_ms": 114,
+      "after_url": "http://pawpantry:3051/cart"
+    }
+  ],
+  "event_kinds": {
+    "request": 84,
+    "network-content": 168,
+    "response": 84,
+    "request-finished": 63,
+    "console": 1,
+    "request-failed": 21
+  },
+  "api_calls": [
+    {
+      "method": "POST",
+      "url": "http://pawpantry:3051/api/coupons/validate",
+      "bodies": [
+        {
+          "phase": "request",
+          "state": "captured",
+          "text": "{\"code\":\"PAW10\",\"items\":[{\"slug\":\"lickable-salmon-treat\",\"size\":\"4 ซอง\",\"qty\":1}]}"
+        },
+        {
+          "phase": "response",
+          "state": "captured",
+          "text": "{\"ok\":true,\"code\":\"PAW10\",\"discount\":6,\"freeShipping\":false,\"message\":\"ใช้คูปอง PAW10 แล้ว\"}"
+        }
+      ]
+    }
+  ],
+  "final_storage": {
+    "cookies": [],
+    "local_storage": [
+      {
+        "name": "pp-recent",
+        "value_state": "hashed",
+        "value_sha256": "122f7dc3246a4c30f1bc84a1e525807d97d8a5bf97431e99438f8b8db0c5955e"
+      },
+      {
+        "name": "pp-cart",
+        "value_state": "hashed",
+        "value_sha256": "5312f9b30d7f162b621a37905e4f1aaa0fa978a8da58169e3b08bad7cf894d58"
+      },
+      {
+        "name": "pp-coupon",
+        "value_state": "hashed",
+        "value_sha256": "60d4b509c8342058a288e14bd64706c3691d6057766f1a90ff1f0b72d2926acb"
+      }
+    ],
+    "session_storage": []
+  },
+  "final_accessibility_excerpt": "complementary:\n      - heading \"สรุปคำสั่งซื้อ\" [level=2]\n      - text: โค้ดส่วนลด\n      - textbox \"โค้ดส่วนลด\":\n        - /placeholder: เช่น PAW10\n      - button \"ใช้โค้ด\"\n      - alert: ใช้คูปอง PAW10 แล้ว\n      - button \"นำคูปอง PAW10 ออก\"\n      - term: ยอดรวมสินค้า\n      - definition: ฿69\n      - term: ส่วนลด PAW10\n      - definition: \"-฿6\"\n      - term: ค่าจัดส่ง\n      - definition: ฿50\n      - term: ยอดชำระทั้งหมด\n      - definition: ฿113\n      - button \"ดำเนินการชำระเงิน →\"\n      - paragraph: ค่าจัดส่งแบบปกติ ฿50 · ส่งฟรีเมื่อซื้อครบ ฿999\n    - paragraph: 🎁 ซื้อคู่กันคุ้มกว่า\n    - heading \"มักซื้อคู่กับสินค้าในตะกร้า\" [level=2]\n    - article:\n      - text: 🐱 แมวโต 🌾 เกรนฟรี\n      - button \"เพิ่ม แมวโต เป็ดเกรนฟรี ในรายการโปรด\"\n      - text: อาหารเม็ด ★ 4.9\n      - heading \"แมวโต เป็ดเกรนฟรี\" [level=3]:\n        - link \"แมวโต เป็ดเกรนฟรี\":\n          - /url: /products/duck-grainf"
+}

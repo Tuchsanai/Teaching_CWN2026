@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>oracle-badges-e</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .r { --c: #b91c1c; --bg: #fdf0f0; --bd: #f2a3a3; }
+  .groups { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 24px; }
+  .grp { border-radius: 22px; padding: 14px 14px 16px; display: flex; flex-direction: column; }
+  .grp.should { background: #f4fbf6; border: 2px dashed #9fd9b4; }
+  .grp.does { background: #f3f7ff; border: 2px dashed #a9c3f5; }
+  .grp .gh { font-size: 21px; font-weight: 800; color: var(--navy); padding: 2px 6px 12px; display: flex; justify-content: space-between; align-items: baseline; }
+  .grp .gh small { font-size: 14.5px; font-weight: 600; color: var(--grey); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; }
+  .bd { background: var(--bg); border: 2px solid var(--bd); border-radius: 18px; padding: 16px 15px; position: relative; display: flex; flex-direction: column; }
+  .tag { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 26px; color: #fff; background: var(--c); border-radius: 12px; padding: 2px 14px; align-self: flex-start; }
+  .new { position: absolute; top: 14px; right: 14px; background: var(--orange); color: #fff; font-weight: 800; font-size: 14px; border-radius: 999px; padding: 2px 12px; }
+  .bd .nm { font-size: 23px; font-weight: 800; color: var(--c); margin-top: 8px; }
+  .bd .lb { font-size: 13.5px; color: var(--grey); font-weight: 700; margin-top: 8px; }
+  .bd .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+  .bd .pill { color: var(--c); font-size: 12.5px; padding: 1px 7px; }
+  .bd .tx { font-size: 14.5px; }
+  .ex { background: #fff; border-radius: 12px; padding: 10px 12px; margin-top: 10px; font-size: 15px; line-height: 1.5; flex: 1; }
+  .ex .k { font-size: 13px; font-weight: 700; color: var(--grey); }
+  .tr { margin-top: 10px; font-weight: 700; font-size: 15px; color: var(--c); }
+  .meter { height: 9px; border-radius: 9px; background: #e5e7eb; margin-top: 8px; overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--c); }
+  .rule { margin-top: 20px; background: #fff7ed; border: 2px solid var(--orange-bd); border-radius: 18px; padding: 14px 20px; }
+  .rule .h { font-weight: 800; color: var(--orange); font-size: 19px; }
+  .steps { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; font-size: 16px; }
+  .steps .s { background: #fff; border: 1.5px solid var(--orange-bd); border-radius: 12px; padding: 6px 12px; }
+  .steps .pill { font-size: 13px; color: var(--orange); padding: 0 7px; }
+  .steps .ar { color: var(--grey); font-size: 18px; }
+</style>
+</head>
+<body>
+  <h1>ผลที่คาดหวังมาจากไหน? 4 ป้าย + [E] ใหม่</h1>
+  <p class="sub">ต่อจากบท 04 · บทนี้อ่านระบบได้ จึงมีหลักฐานจากระบบ [E] เพิ่ม · [A] คำอ้างของ AI หรือทีมเก่า ใช้ชี้เป้าเท่านั้น · ทุกผลที่คาดหวังต้องติดป้ายที่มา</p>
+
+  <div class="groups">
+    <div class="grp should">
+      <div class="gh">✅ เชื่อได้ว่าระบบ "ควร" ทำ <small>ใช้เป็นผลที่คาดหวังได้</small></div>
+      <div class="pair">
+        <div class="bd g">
+          <span class="tag">[D]</span>
+          <div class="nm">ร้าน / ทีม</div>
+          <div class="lb">ที่มา</div>
+          <div class="pills"><span class="pill">TEST-DATA.md</span><span class="pill">คำตอบร้านใน CR</span></div>
+          <div class="ex"><div class="k">ตัวอย่าง</div>"คูปอง PAW10 ลด 10%"</div>
+          <div class="tr">เชื่อได้สูงสุด · ชนะทุกป้าย</div>
+          <div class="meter"><i style="width:100%"></i></div>
+        </div>
+        <div class="bd y">
+          <span class="tag">[R]</span>
+          <div class="nm">กฎทั่วไป</div>
+          <div class="lb">ที่มา</div>
+          <div class="tx">คณิตศาสตร์ · สามัญสำนึก</div>
+          <div class="ex"><div class="k">ตัวอย่าง</div>"ราคา × จำนวน = ยอดของแถวนั้น"</div>
+          <div class="tr">ดี แต่ต้องเขียนเหตุผล</div>
+          <div class="meter"><i style="width:75%"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="grp does">
+      <div class="gh">🔎 เชื่อได้ว่าระบบ "ทำอยู่" <small>ยังไม่ได้แปลว่าถูก</small></div>
+      <div class="pair">
+        <div class="bd b">
+          <span class="tag">[E]</span><span class="new">ใหม่</span>
+          <div class="nm">หลักฐานระบบ</div>
+          <div class="lb">ที่มา</div>
+          <div class="pills"><span class="pill">SYSTEM-MAP.md</span><span class="pill">API-INVENTORY.md</span><span class="pill">golden/</span></div>
+          <div class="ex"><div class="k">ตัวอย่าง</div>"HAR: หน้า checkout ยิง POST /api/orders" · golden master ยอดที่ระบบคิดตอนนี้<br><span class="muted">[E?] = REA อนุมาน ต้องยืนยันด้วยการรัน</span></div>
+          <div class="tr">ล็อกได้ว่า "ทำ" ไม่ใช่ว่า "ควร"</div>
+          <div class="meter"><i style="width:50%"></i></div>
+        </div>
+        <div class="bd r">
+          <span class="tag">[O]</span>
+          <div class="nm">หน้าจอ</div>
+          <div class="lb">ที่มา</div>
+          <div class="tx">สิ่งที่เห็นบนเว็บตอนเดินเอง</div>
+          <div class="ex"><div class="k">ตัวอย่าง</div>"ข้อความบนปุ่มยืนยันสั่งซื้อ"</div>
+          <div class="tr">ต่ำสุด · เว็บอาจผิดอยู่แล้ว</div>
+          <div class="meter"><i style="width:22%"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="h">⚠️ เมื่อ [E] ขัด [D]</div>
+    <div class="steps">
+      <span class="s">จด "ผู้ต้องสงสัยบั๊ก"</span><span class="ar">→</span>
+      <span class="s">test คู่: <span class="pill">legacy-quirk</span> ล็อกค่าปัจจุบัน + <span class="pill">test.fail</span> ตาม [D]</span><span class="ar">→</span>
+      <span class="s">บันทึกใน <span class="pill">BASELINE.md</span></span><span class="ar">→</span>
+      <span class="s">ถามร้าน</span>
+    </div>
+  </div>
+
+  <div class="bar">🎯 [E] ขัด [D] = ผู้ต้องสงสัยบั๊ก · [D] ชนะ · ล็อกพฤติกรรมเดิม ≠ ยอมรับว่าถูก</div>
+</body>
+</html>

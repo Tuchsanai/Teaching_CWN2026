@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>rea-architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .grid { display: grid; grid-template-columns: 250px 64px 1fr 64px 250px; row-gap: 26px; margin-top: 28px; }
+  .box { background: var(--bg); border: 2px solid var(--bd); border-radius: 18px; padding: 18px; }
+  .hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .hd .num { background: var(--c); }
+  .hd b { color: var(--c); font-size: 21px; line-height: 1.3; }
+  .hd small { display: block; color: var(--grey); font-size: 14px; font-weight: 400; }
+  .who { background: #fff; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-weight: 700; font-size: 17px; }
+  .who span { display: block; font-weight: 400; font-size: 14px; color: var(--grey); }
+  .bubble { position: relative; background: #fff; border: 2px solid var(--c); border-radius: 14px; padding: 10px 12px; font-size: 16px; margin-top: 14px; }
+  .bubble::before { content: ""; position: absolute; top: -12px; left: 28px; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 12px solid var(--c); }
+  .via { font-size: 14px; color: var(--grey); margin-top: 12px; }
+  .via .pill { font-size: 13px; color: var(--c); }
+
+  .conn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--slate); font-size: 14px; font-weight: 700; text-align: center; }
+  .conn .arr { font-size: 34px; line-height: 1; color: #64748b; }
+
+  .rea { position: relative; }
+  .rea .tag { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .rea .tag .pill { color: var(--purple); }
+  .docker { position: absolute; top: -18px; right: 18px; background: #fff8e1; border: 2px solid var(--yellow-bd); border-radius: 12px; padding: 4px 12px; font-size: 15px; font-weight: 700; color: #8a5a00; }
+  .docker code { font-family: var(--mono); font-size: 14px; }
+  .prov { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pv { background: #fff; border: 1.5px solid var(--purple-bd); border-left: 6px solid var(--purple); border-radius: 12px; padding: 9px 12px; }
+  .pv b { display: block; font-size: 16px; line-height: 1.35; }
+  .pv .pill { font-size: 12.5px; color: var(--purple); margin-top: 6px; padding: 1px 8px; }
+  .off { margin-top: 10px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 8px 12px; background: #f8fafc; color: #94a3b8; font-size: 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .off .x { flex: none; background: #e2e8f0; color: #64748b; border-radius: 8px; padding: 2px 10px; font-weight: 700; font-size: 14px; }
+
+  .tg { background: #fff; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: 15px; }
+  .tg:last-child { margin-bottom: 0; }
+  .tg b { display: block; font-size: 16px; }
+  .tg .pill { font-size: 13px; color: var(--green); margin-top: 4px; }
+  .tg .nt { display: block; font-size: 12.5px; color: var(--grey); line-height: 1.35; margin-top: 2px; }
+  .tg .nt code { font-family: var(--mono); font-size: 11.5px; color: var(--slate); }
+
+  .back { grid-column: 1 / 2; position: relative; }
+  .back svg { position: absolute; left: 0; top: -26px; width: 314px; height: calc(100% + 26px); overflow: visible; }
+  .back .lbl { position: absolute; left: 0; right: 0; top: 34%; text-align: center; }
+  .back .lbl span { background: #fff; color: var(--orange); font-weight: 800; font-size: 16px; padding: 2px 6px; }
+  .ev { grid-column: 3 / 6; }
+  .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .f { background: #fff; border-radius: 12px; padding: 9px 12px; border: 1.5px solid var(--orange-bd); }
+  .f .pill { color: var(--orange); font-size: 14px; }
+  .f div { font-size: 15px; margin-top: 5px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <h1>REA ทำงานยังไง</h1>
+  <p class="sub">Agent ไม่เดาเอง · ส่งคำถามให้ REA ไปส่องของที่ส่งมอบ/ที่รันอยู่ แล้วได้คำตอบกลับมาเป็นหลักฐาน</p>
+
+  <div class="grid">
+    <!-- ① ผู้ถาม -->
+    <div class="box b">
+      <div class="hd"><span class="num">1</span><b>ผู้ถาม</b></div>
+      <div class="who">🧑 เรา (ผู้เรียน)<span>ตั้งคำถาม · ตัดสินใจ</span></div>
+      <div class="who">🤖 Claude Code<span>agent เลือกเครื่องมือให้</span></div>
+      <div class="bubble">"เว็บนี้มี API อะไรบ้าง ใครเรียกตัวไหน?"</div>
+      <div class="via">เรียกผ่าน <span class="pill">MCP tool</span> หรือ <span class="pill">rea &lt;คำสั่ง&gt;</span></div>
+    </div>
+
+    <div class="conn"><span class="arr">➜</span>ถาม</div>
+
+    <!-- ② REA -->
+    <div class="box p rea">
+      <div class="docker">🐳 รันใน Docker: <code>rea-lab:6.4.0</code></div>
+      <div class="hd"><span class="num">2</span><b>REA<small>Reverse Engineer Anything · <span style="font-family:var(--mono)">rea-agents</span> 6.4.0</small></b></div>
+      <div class="tag"><span class="pill">MCP server</span><span class="pill">CLI: rea</span><span class="pill">skill: reverse-engineer-anything</span></div>
+      <div class="prov">
+        <div class="pv"><b>JavaScript / bundle analyzer</b><span class="pill">analyze-javascript-application</span></div>
+        <div class="pv"><b>Playwright scenario</b><span class="pill">capture-browser-scenario</span></div>
+        <div class="pv" style="grid-column:1 / -1"><b>HAR reader</b><span class="pill">inspect-web-network-capture</span></div>
+      </div>
+      <div class="off"><span>Ghidra · Hopper · IDA · Android · .NET · firmware</span><span class="x">ไม่ใช้ในคอร์สนี้</span></div>
+    </div>
+
+    <div class="conn"><span class="arr">➜</span>ส่อง<br><span style="font-weight:400;font-size:13px;white-space:nowrap">อ่าน<br>อย่างเดียว</span></div>
+
+    <!-- เป้าหมาย -->
+    <div class="box g">
+      <div class="hd"><b>ของที่ส่อง<small>ของที่ส่งมอบ / ที่รันอยู่</small></b></div>
+      <div class="tg"><b>📦 bundle ที่ build แล้ว</b><span class="pill">.next/static</span></div>
+      <div class="tg"><b>🌐 เว็บที่รันอยู่</b><span class="pill">localhost:4000</span><small class="nt">เบราว์เซอร์ / Playwright บนเครื่อง</small><span class="pill">http://petshop:3000</span><small class="nt">REA ใน container ผ่าน network <code>pawpantry05_default</code></small></div>
+      <div class="tg"><b>🧾 บันทึกเครือข่าย (HAR)</b><span class="pill">session.har</span></div>
+    </div>
+
+    <!-- ③ Evidence กลับไปหา agent -->
+    <div class="back">
+      <svg viewBox="0 0 314 200" preserveAspectRatio="none">
+        <path d="M314 120 H125 V14" fill="none" stroke="#ea580c" stroke-width="5" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <svg style="width:40px;height:30px;left:105px;top:-34px" viewBox="0 0 40 30"><path d="M20 0 L40 30 H0 Z" fill="#ea580c"/></svg>
+      <div class="lbl"><span>ตอบกลับ</span></div>
+    </div>
+    <div class="box o ev">
+      <div class="hd"><span class="num">3</span><b>Evidence (หลักฐาน) · ทุกคำตอบมีช่องเหล่านี้</b></div>
+      <div class="fields">
+        <div class="f"><span class="pill">subject + SHA-256</span><div>วิเคราะห์ไฟล์ไหน ตัวไหนแน่</div></div>
+        <div class="f"><span class="pill">provider</span><div>เครื่องมือตัวไหนเป็นคนตอบ</div></div>
+        <div class="f"><span class="pill">authority</span><div>static · runtime · inference · unknown</div></div>
+        <div class="f"><span class="pill">confidence</span><div>มั่นใจแค่ไหน</div></div>
+        <div class="f"><span class="pill">limitations</span><div>ยังมองไม่เห็นอะไร</div></div>
+        <div class="f"><span class="pill">locations</span><div>เจอที่ไฟล์ / ตำแหน่งไหน</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">🎯 Agent ถาม → REA ตอบเป็นหลักฐาน → Agent คิดต่อ / ทดสอบ</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>lab-flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .top { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; margin-top: 26px; }
+  .start { display: flex; flex-direction: column; justify-content: center; border: 2px dashed #a3acb9; border-radius: 18px; padding: 16px 20px; background: #fafbfc; }
+  .start .t { font-weight: 800; color: var(--navy); font-size: 19px; }
+  .start .pills { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+  .start .pill { color: var(--slate); font-size: 14px; }
+  .start .note { font-size: 14.5px; color: var(--grey); margin-top: 8px; }
+  .prep { display: flex; flex-direction: column; gap: 10px; }
+  .box0 { border: 2px solid var(--slate-bd); border-radius: 16px; padding: 11px 16px; background: var(--slate-bg); }
+  .box0 .h { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--ink); }
+  .box0 .num { background: var(--slate); width: 32px; height: 32px; font-size: 16px; }
+  .box0 .d { font-size: 14.5px; margin-top: 5px; color: var(--ink); }
+  .box0 .pill { font-size: 13px; color: var(--slate); padding: 1px 8px; }
+  .down { text-align: center; color: var(--grey); font-size: 24px; line-height: 1; margin: 8px 0 6px; }
+  .cols { display: flex; gap: 0; align-items: stretch; }
+  .arrow { flex: none; width: 20px; display: flex; align-items: center; justify-content: center; color: var(--grey); font-size: 20px; }
+  .col { flex: 1; background: var(--bg); border: 2px solid var(--bd); border-radius: 18px; padding: 14px 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .col .head { display: flex; align-items: center; gap: 9px; padding: 0 4px 2px; }
+  .col .head .num { background: var(--c); }
+  .col .head b { color: var(--c); font-size: 21px; line-height: 1.2; display: block; }
+  .col .head span.l { color: var(--c); font-size: 14px; font-weight: 600; }
+  .lab { background: #fff; border: 1.5px solid var(--bd); border-radius: 13px; padding: 10px 11px; }
+  .lab .t { display: flex; gap: 8px; align-items: flex-start; }
+  .lab .n { flex: none; min-width: 30px; height: 30px; border-radius: 8px; background: var(--c); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .lab .tt { font-size: 15.5px; font-weight: 700; line-height: 1.35; }
+  .lab .k { font-size: 13px; color: var(--grey); font-weight: 600; margin-top: 1px; }
+  .lab .outs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .lab .pill { color: var(--c); font-size: 12.5px; padding: 1px 7px; }
+  .edit { color: var(--orange); }
+  .bar { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+  .bar small { font-size: 15.5px; font-weight: 600; color: #334e8a; }
+</style>
+</head>
+<body>
+  <h1>เส้นทาง LAB 0–10</h1>
+  <p class="sub">แต่ละ LAB = พรอมต์ copy &amp; paste 1 ชุด → ได้ไฟล์ไว้ใช้ LAB ถัดไป · 🔍 อ่าน/ส่อง · ✏️ แก้ repo</p>
+
+  <div class="top">
+    <div class="start">
+      <div class="t">📦 ตอนเริ่มมี (ทีมเก่าทิ้งไว้)</div>
+      <div class="pills">
+        <span class="pill">petshop/</span><span class="pill">e2e-legacy/</span><span class="pill">rea/</span>
+        <span class="pill">TEST-DATA.md</span><span class="pill">HANDOVER-NOTES.md</span>
+      </div>
+      <div class="note">repo ระบบเดิม · ชุดเทสต์เก่า · เครื่องมือ REA · ข้อมูลร้าน [D] · เอกสารส่งมอบ 1 หน้า</div>
+    </div>
+    <div class="prep">
+      <div class="box0">
+        <div class="h">🧰 ก่อนเข้าคลาส</div>
+        <div class="d">build image <span class="pill">rea-lab:6.4.0</span> ในเทอร์มินัลเอง</div>
+      </div>
+      <div class="box0">
+        <div class="h"><span class="num">0</span>เช็กเครื่อง 🔍</div>
+        <div class="d">Docker · พอร์ตที่ Windows จอง · เว็บ <span class="pill">localhost:4000</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="down">↓</div>
+
+  <div class="cols">
+    <div class="col g">
+      <div class="head"><span class="num">1</span><div><b>เข้าใจ</b><span class="l">LAB 1–3</span></div></div>
+      <div class="lab"><div class="t"><span class="n">1</span><div><div class="tt">อ่าน repo → แผนที่</div><div class="k">🔍 white-box</div></div></div>
+        <div class="outs"><span class="pill">CODEBASE-MAP.md</span><span class="pill">CLAUDE.md</span></div></div>
+      <div class="lab"><div class="t"><span class="n">2</span><div><div class="tt">REA ส่อง build</div><div class="k">🔍 grey-box · static</div></div></div>
+        <div class="outs"><span class="pill">SYSTEM-MAP.md</span><span class="pill">out/v1/</span></div></div>
+      <div class="lab"><div class="t"><span class="n">3</span><div><div class="tt">HAR + scenario</div><div class="k">🔍 runtime</div></div></div>
+        <div class="outs"><span class="pill">API-INVENTORY.md</span></div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col y">
+      <div class="head"><span class="num">2</span><div><b>ล็อก</b><span class="l">LAB 4</span></div></div>
+      <div class="lab"><div class="t"><span class="n">4</span><div><div class="tt">characterization + suite เดิม 3 เบราว์เซอร์</div><div class="k edit">✏️ เพิ่ม test</div></div></div>
+        <div class="outs"><span class="pill">BASELINE.md</span><span class="pill">tests/new/char-*</span><span class="pill">golden/</span></div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col b">
+      <div class="head"><span class="num">3</span><div><b>แก้บั๊ก</b><span class="l">LAB 5–6</span></div></div>
+      <div class="lab"><div class="t"><span class="n">5</span><div><div class="tt">BUG-01 ทำซ้ำ + <span style="white-space:nowrap">หาต้นเหตุ</span></div><div class="k edit">✏️ test แดง</div></div></div>
+        <div class="outs"><span class="pill">BUG-01.md</span><span class="pill">tests/new/bug01-*</span></div></div>
+      <div class="lab"><div class="t"><span class="n">6</span><div><div class="tt">แก้ BUG-01 <span style="white-space:nowrap">ที่ต้นเหตุ</span></div><div class="k edit">✏️ แก้โค้ดแอป</div></div></div>
+        <div class="outs"><span class="pill">petshop/</span><span class="pill">BUG-01.md</span></div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col o">
+      <div class="head"><span class="num">4</span><div><b>ฟีเจอร์</b><span class="l">LAB 7–8</span></div></div>
+      <div class="lab"><div class="t"><span class="n">7</span><div><div class="tt">CR-01 ถามร้าน + impact + test แดง</div><div class="k edit">✏️ เพิ่ม test</div></div></div>
+        <div class="outs"><span class="pill">CR-01.md</span><span class="pill">tests/new/cr01-*</span></div></div>
+      <div class="lab"><div class="t"><span class="n">8</span><div><div class="tt">ทำ CR-01 + regression ☕</div><div class="k edit">✏️ แก้โค้ดแอป</div></div></div>
+        <div class="outs"><span class="pill">petshop/</span><span class="pill">CR-01.md</span></div></div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="col p">
+      <div class="head"><span class="num">5</span><div><b>พิสูจน์</b><span class="l">LAB 9–10</span></div></div>
+      <div class="lab"><div class="t"><span class="n">9</span><div><div class="tt">พิสูจน์ว่าแก้แค่ที่ตั้งใจ + ส่งมอบ</div><div class="k">🔍 SHA-256 · REA</div></div></div>
+        <div class="outs"><span class="pill">CHANGE-PROOF.md</span><span class="pill">CHANGE-REPORT.md</span><span class="pill">out/v2/</span></div></div>
+      <div class="lab"><div class="t"><span class="n">10</span><div><div class="tt">ฝึกเดี่ยว PR-1 <span style="white-space:nowrap">ครบวงจร</span></div><div class="k edit">✏️ แก้โค้ดแอป</div></div></div>
+        <div class="outs"><span class="pill">tests/new/pr1-*</span><span class="pill">CHANGE-REPORT.md</span></div></div>
+    </div>
+  </div>
+
+  <div class="bar"><span>✏️ แก้ repo 6 จาก 10 LAB</span><small>เพิ่ม test ในชุดเดิม LAB 4 · 5 · 7 &nbsp;|&nbsp; แก้โค้ดแอป LAB 6 · 8 · 10</small></div>
+</body>
+</html>

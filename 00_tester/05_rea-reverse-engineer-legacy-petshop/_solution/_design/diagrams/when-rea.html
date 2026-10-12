@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>when-rea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="house.css">
+<style>
+  .start { margin: 26px 0 0; width: 470px; text-align: center; background: var(--navy); color: #fff; border-radius: 999px; padding: 10px 20px; font-weight: 700; font-size: 19px; }
+  .flow { display: grid; grid-template-columns: 470px 120px 1fr; margin-top: 0; }
+  .vline { grid-column: 1; height: 34px; position: relative; }
+  .vline::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 6px; border-left: 2.5px solid #94a3b8; }
+  .vline::after { content: "▼"; position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); color: #94a3b8; font-size: 13px; }
+  .vline span { position: absolute; left: calc(50% + 12px); top: 4px; font-size: 14px; font-weight: 700; color: var(--slate); }
+  .q { grid-column: 1; background: #fff; border: 2.5px solid var(--navy); border-radius: 16px; padding: 14px 18px; display: flex; gap: 12px; align-items: center; }
+  .q .num { background: var(--navy); }
+  .q .tx { font-weight: 700; font-size: 18.5px; color: var(--navy); line-height: 1.4; }
+  .q .tx small { display: block; font-weight: 500; font-size: 14.5px; color: var(--grey); }
+  .yes { grid-column: 2; display: flex; align-items: center; position: relative; }
+  .yes::before { content: ""; position: absolute; left: 6px; right: 12px; top: 50%; border-top: 2.5px solid var(--green); }
+  .yes::after { content: "▶"; position: absolute; right: 2px; top: 50%; transform: translateY(-52%); color: var(--green); font-size: 14px; }
+  .yes span { position: relative; margin: 0 auto 34px; color: var(--green); font-weight: 800; font-size: 15px; background: #fff; padding: 0 4px; }
+  .a { grid-column: 3; background: var(--bg); border: 2px solid var(--bd); border-radius: 16px; padding: 12px 18px; }
+  .a .h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .a b { color: var(--c); font-size: 20px; }
+  .a .eye { font-size: 13.5px; font-weight: 700; color: var(--c); background: #fff; border: 1.5px solid var(--bd); border-radius: 999px; padding: 1px 11px; white-space: nowrap; }
+  .a .d { font-size: 15px; margin-top: 3px; }
+  .a .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; align-items: center; }
+  .a .pill { color: var(--c); font-size: 13px; padding: 1px 8px; }
+  .a .lab { font-size: 13.5px; font-weight: 700; color: var(--grey); margin-left: auto; }
+  .end { grid-column: 1; text-align: center; background: var(--slate-bg); border: 2px dashed var(--slate-bd); border-radius: 14px; padding: 10px 14px; font-size: 16px; color: var(--slate); font-weight: 600; }
+</style>
+</head>
+<body>
+  <h1>ใช้ REA เมื่อไร? ผังตัดสินใจ 4 ขั้น</h1>
+  <p class="sub">ถามทีละข้อจากบนลงล่าง · ข้อแรกที่ตอบ "ใช่" คือเครื่องมือที่ควรเริ่ม</p>
+
+  <div class="start">อยากรู้ว่าระบบเดิมทำอะไร</div>
+  <div class="flow">
+    <div class="vline"></div>
+
+    <div class="q"><span class="num">1</span><div class="tx">มี source ครบ และเชื่อได้ว่าตรงกับที่ deploy?</div></div>
+    <div class="yes"><span>ใช่</span></div>
+    <div class="a b"><div class="h"><b>อ่าน repo เลย · ข้าม REA</b><span class="eye">White-box</span></div>
+      <div class="d">skill ของ REA เองบอกให้ข้าม เมื่อเป็นการอ่านสถาปัตยกรรมจาก source ปกติ</div>
+      <div class="pills"><span class="pill">Claude Code อ่าน repo</span><span class="pill">CLAUDE.md</span><span class="pill">grep</span><span class="lab">LAB 1</span></div></div>
+
+    <div class="vline"><span>ไม่</span></div>
+
+    <div class="q"><span class="num">2</span><div class="tx">มีแค่ไฟล์ที่ build แล้ว?<small>เช่น .next/static ที่ส่งมอบมา ไม่มี source</small></div></div>
+    <div class="yes"><span>ใช่</span></div>
+    <div class="a p"><div class="h"><b>REA ส่อง build (static)</b><span class="eye">Grey-box</span></div>
+      <div class="d">กู้ endpoint · โมดูล · storage แล้วตามรอยว่าใครเรียกฟีเจอร์นั้น</div>
+      <div class="pills"><span class="pill">analyze-javascript-application</span><span class="pill">trace-application-feature</span><span class="lab">LAB 2</span></div></div>
+
+    <div class="vline"><span>ไม่</span></div>
+
+    <div class="q"><span class="num">3</span><div class="tx">อยากเห็นตอนรันจริง?<small>API ที่เรียกจริง · ชื่อ key ใน localStorage</small></div></div>
+    <div class="yes"><span>ใช่</span></div>
+    <div class="a g"><div class="h"><b>HAR / scenario (runtime)</b><span class="eye">Black + Grey-box</span></div>
+      <div class="d">HAR = อ่านประวัติแบบ offline ไม่ยิงซ้ำ · scenario = REA ขับเบราว์เซอร์ (มีผลข้างเคียง)</div>
+      <div class="pills"><span class="pill">inspect-web-network-capture</span><span class="pill">capture-browser-scenario</span><span class="lab">LAB 3</span></div></div>
+
+    <div class="vline"><span>ไม่</span></div>
+
+    <div class="q"><span class="num">4</span><div class="tx">มี source แต่ไม่แน่ใจว่า build ตรงกับ source?</div></div>
+    <div class="yes"><span>ใช่</span></div>
+    <div class="a o"><div class="h"><b>เทียบ source กับ bundle</b><span class="eye">Grey-box</span></div>
+      <div class="d">ไฟล์ไหนตรง · ไฟล์ไหนหาคู่ไม่เจอ · ใช้คู่กับ SHA-256 ของ source</div>
+      <div class="pills"><span class="pill">import-reference-source</span><span class="pill">compare-source-to-bundle</span><span class="lab">LAB 9</span></div></div>
+
+    <div class="vline"><span>ไม่</span></div>
+    <div class="end">ยังไม่แน่ใจ → ใช้ 3 ตาเทียบกัน (triangulate)</div>
+  </div>
+
+  <div class="bar">🎯 REA = ตาสำหรับของที่ส่งมอบ / รันอยู่ · มี source ครบ → อ่าน repo ก่อน</div>
+</body>
+</html>
