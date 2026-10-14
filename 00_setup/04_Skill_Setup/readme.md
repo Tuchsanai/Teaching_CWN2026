@@ -6,8 +6,8 @@ LAB นี้ไม่ต้องพิมพ์คำสั่ง — แค�
 **ต้องมีก่อน:** [LAB 03](../03_MultiAccount_Container/README.md) — container `multi-account-devtool` กำลังรัน และล็อกอิน `yolo1` กับ `cyolo1` แล้ว (LAB 03 ขั้นที่ 4)
 **เวลา:** ~15 นาที
 
-![4 ขั้น: เปิดโฟลเดอร์ skill บน Windows, ลากวางใน JupyterLab ที่ .Claude/shared/skills, ทำซ้ำที่ .Codex/shared/skills, ทดสอบด้วย yolo1 และ cyolo1](image/skill-steps-overview.png)
-*ภาพแนวคิด (Imagegen ด้วย cyolo): ภาพรวม 4 ขั้น*
+![5 ขั้น: 1 เตรียมโฟลเดอร์ skill บน Windows, 2 เปิดปลายทางที่ 1 .Claude/shared/skills ใน JupyterLab, 3 ลากวางทีละโฟลเดอร์, 4 ทำซ้ำที่ปลายทางที่ 2 .Codex/shared/skills, 5 ทดสอบด้วย yolo1 และ cyolo1 ได้รหัส SHARED_SKILL_OK](image/skill-steps-overview.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo): ภาพรวม 5 ขั้น ตรงกับหัวข้อขั้นที่ 1–5 ด้านล่าง — ซ้าย = บน Windows, ขวา = ใน container*
 
 ## skill ที่จะติดตั้ง
 
@@ -87,6 +87,11 @@ LAB นี้ไม่ต้องพิมพ์คำสั่ง — แค�
 
 > ทำไมต้องวาง 2 ที่: Claude Code (`yolo`) กับ Codex (`cyolo`) อ่าน skill คนละโฟลเดอร์
 
+**ผลที่ควรได้หลังลากวางครบทั้ง 2 ที่:** ปลายทางทั้งสองมี 4 โฟลเดอร์เหมือนกัน
+
+![หลังลากวางครบ: .Claude/shared/skills และ .Codex/shared/skills ต่างมี cyolo shared-check vastai yolo ครบ](image/skill-4b-both-after.png)
+*ภาพจริงจาก JupyterLab วางคู่กัน: ซ้าย = ปลายทางที่ 1 (Claude Code · yolo1–5), ขวา = ปลายทางที่ 2 (Codex · cyolo1–5) — ครบแล้วไปขั้นที่ 5 ได้เลย*
+
 ## ขั้นที่ 5 · ทดสอบว่าบัญชีโหลด skill แล้ว
 
 **5.0 · เปิด Terminal ที่ `/workspace`** — Terminal ของ JupyterLab จะเปิดในโฟลเดอร์ที่แถบไฟล์ด้านซ้ายกำลังเปิดอยู่
@@ -94,7 +99,16 @@ LAB นี้ไม่ต้องพิมพ์คำสั่ง — แค�
 
 > ถ้าเผลอเปิด Terminal ตอนแถบไฟล์ยังอยู่ที่ `skills` แล้ว `yolo1` ถามว่า **"Is this a project you created or one you trust?"** ให้เลือก **No, exit** แล้วกลับไปทำข้อ 5.0 ใหม่ (อย่าให้ AI ทำงานในโฟลเดอร์ skill)
 
-**5.1 · Claude Code (`yolo1`)** — พิมพ์ `yolo1` กด Enter แล้วพิมพ์ถาม:
+**5.1 · Claude Code (`yolo1`)** — พิมพ์ `yolo1` กด Enter
+
+**ก. เช็คด้วยคำสั่ง `/skills`** — พิมพ์ `/skills` กด Enter จะเปิดรายการ skill ทั้งหมดของบัญชี
+
+![yolo1 พิมพ์ /skills แสดงรายการ 17 skills ด้านล่างมี cyolo shared-check vastai yolo ระบุว่า user](image/skill-5a-yolo1-skills-cmd.png)
+*ภาพจริง: skill ที่เราลากวางอยู่ล่างสุด ป้าย **`user`** — `cyolo` `shared-check` `vastai` `yolo` ครบ 4 ตัว (ตัวที่เป็น `claude.ai sync` คือ skill ที่บัญชีดึงมาเอง ไม่เกี่ยวกับ LAB นี้) · กด **Esc** เพื่อปิด*
+
+> เปิด `yolo1` ค้างไว้ตั้งแต่ก่อนลากวาง? พิมพ์ `/reload-skills` เพื่อโหลด skill ใหม่โดยไม่ต้องปิดเปิด
+
+**ข. ถามให้ใช้ skill จริง** — พิมพ์ถาม:
 
 ```text
 คุณมี skill ชื่อ yolo, cyolo, vastai, shared-check ไหม ตอบเป็นตาราง: skill | มี/ไม่มี | ทำอะไร (สั้น ๆ)
@@ -118,7 +132,17 @@ LAB นี้ไม่ต้องพิมพ์คำสั่ง — แค�
 
 > ถ้าขึ้นหน้าต่าง **Update available** (Codex ใน image เก่ากว่าเวอร์ชันล่าสุด) จะกด **Update now** หรือ **Esc** (ข้าม) ก็ได้ — ภาพในหน้านี้ถ่ายหลังอัปเดตเป็น v0.162.1 แล้ว ถ้าลบ container แล้วสร้างใหม่จาก image จะกลับเป็นเวอร์ชันใน image
 
-แล้วถาม 2 ข้อความเดียวกับ 5.1
+**ก. เช็คด้วยคำสั่ง `/skills`** — พิมพ์ `/skills` กด Enter → เลือก **1. List skills** (หรือพิมพ์ `$` ในช่องพิมพ์เพื่อเปิดรายการเลย)
+
+![cyolo1 พิมพ์ /skills ขึ้นเมนู Skills: 1. List skills, 2. Enable/Disable Skills และ Tip: press $ to open this list directly](image/skill-6a-cyolo1-skills-menu.png)
+*ภาพจริง: เมนู `/skills` ของ Codex — `List skills` = ดูรายการ, `Enable/Disable Skills` = เปิด/ปิด skill*
+
+รายการของ Codex มี skill ในตัวอีกหลายตัว ให้**พิมพ์ชื่อต่อจาก `$` เพื่อค้นหาทีละตัว** — `$yolo` · `$cyolo` · `$vastai` · `$shared` (ลบข้อความเดิมก่อนพิมพ์ตัวถัดไป) ต้องเจอครบทั้ง 4 ตัว:
+
+![ค้นหาใน Codex ทีละตัว: $yolo เจอ yolo, $cyolo เจอ cyolo, $vastai เจอ vastai, $shared เจอ shared-check พร้อมคำอธิบายภาษาไทยจาก SKILL.md](image/skill-6b-cyolo1-skills-search.png)
+*ภาพจริงจาก `cyolo1`: คำอธิบายภาษาไทยที่ขึ้นมาคือข้อความใน `SKILL.md` ที่เราลากวาง = Codex อ่าน skill จาก `.Codex/shared/skills` ได้จริง · ลบข้อความแล้วกด **Esc** เพื่อปิด*
+
+**ข. ถามให้ใช้ skill จริง** — ถาม 2 ข้อความเดียวกับ 5.1 ข้อ ข
 
 ![cyolo1 ตอบตารางว่ามี yolo cyolo vastai shared-check ครบ และ shared-check ได้รหัส SHARED_SKILL_OK-codex-...](image/skill-7-cyolo1-test.png)
 *ภาพจริง (`cyolo1` · Codex v0.162.1): ตาราง "มี" ครบ 4 ตัว และได้รหัส `SHARED_SKILL_OK-codex-…` (รหัสของ Codex ต่างจาก Claude เป็นเรื่องปกติ — คนละไฟล์ shared)* · เสร็จแล้วพิมพ์ `/quit` เพื่อออก
@@ -136,15 +160,17 @@ LAB นี้ไม่ต้องพิมพ์คำสั่ง — แค�
 
 | ทดสอบ | ผลที่ควรได้ | ✓ |
 |---|---|---|
+| `yolo1` พิมพ์ `/skills` | เห็น cyolo, shared-check, vastai, yolo ป้าย `user` | ☐ |
 | `yolo1` ถาม 4 skill | ตาราง "มี" ครบ yolo, cyolo, vastai, shared-check | ☐ |
 | `yolo1` ใช้ shared-check | `SHARED_SKILL_OK-claude-…` | ☐ |
+| `cyolo1` พิมพ์ `/skills` → List skills (ค้นด้วย `$`) | เจอ cyolo, yolo, vastai, shared-check | ☐ |
 | `cyolo1` ถาม 4 skill | ตาราง "มี" ครบ | ☐ |
 | `cyolo1` ใช้ shared-check | `SHARED_SKILL_OK-codex-…` | ☐ |
 | (ไม่บังคับ) `yolo1` → `cyolo1` | `PONG` | ☐ |
 
 ## ไม่เห็น skill? ตรวจตามนี้
 
-1. **ปิดแล้วเปิดบัญชีใหม่** — skill ถูกโหลดตอนเปิดบัญชี ถ้าเปิด `yolo1` ค้างไว้ก่อนลากวาง ให้ `/exit` แล้วเปิดใหม่
+1. **ปิดแล้วเปิดบัญชีใหม่** — skill ถูกโหลดตอนเปิดบัญชี ถ้าเปิด `yolo1` ค้างไว้ก่อนลากวาง ให้พิมพ์ `/reload-skills` หรือ `/exit` แล้วเปิดใหม่ แล้วเช็คด้วย `/skills` อีกครั้ง
 2. **วางถูกที่ไหม** — ดูแถบบนของ JupyterLab ต้องเป็น `.Claude / shared / skills` หรือ `.Codex / shared / skills` เท่านั้น
 3. **ซ้อนกันหรือเปล่า** — เปิดโฟลเดอร์ `yolo` แล้วต้องเห็น `SKILL.md` ทันที ถ้าเห็นโฟลเดอร์ `yolo` ซ้อนอีกชั้น ให้ลบชั้นนอกแล้วลากใหม่
 4. **โฟลเดอร์ว่าง** — ถ้าข้างในไม่มี `SKILL.md` (มักเกิดจากลากหลายอันพร้อมกัน) ให้คลิกขวา → **Delete** แล้วลากใหม่ทีละอัน
