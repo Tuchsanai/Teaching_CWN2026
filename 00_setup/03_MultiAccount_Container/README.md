@@ -81,7 +81,7 @@ docker exec multi-account-devtool bash -lc \
 | `<SSH_PORT>` | `2223` | `ssh root@localhost -p <SSH_PORT>` (password `passwd`) |
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 
-**ผลที่ควรได้:** 10 บรรทัดเวอร์ชัน (`yolo1`–`5` = Claude Code, `cyolo1`–`5` = codex-cli), `cyolo1 mcp list` มี `playwright` และผลตรวจ skill ว่า **มี `shared-check` ครบทั้ง 10 บัญชี** (ครั้งแรกต้อง pull image อาจนานหลายนาที)
+**ผลที่ควรได้:** สรุปภาษาไทยที่มี port SSH / Jupyter, URL `http://localhost:<JUPYTER_PORT>/lab`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ) และผลตรวจ skill **`vastai` `yolo` `cyolo` เป็น `OK` ครบทั้ง 6 บรรทัด** (`.Claude` และ `.Codex`) ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / skill ขาด) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
 
 > **ทำไม skill สำคัญ:** ขั้นที่ 5 และ LAB ถัดไปใช้ skill จาก `shared` ถ้า AI แจ้งว่ายังไม่ได้ติดตั้ง skill อย่าเพิ่งไปขั้นต่อไป ให้รัน `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ ถ้ายังขาดอยู่ ให้ลบ container แล้วรันขั้นที่ 1 ใหม่ (ห้ามลบ volume `ai-accounts`)
 
