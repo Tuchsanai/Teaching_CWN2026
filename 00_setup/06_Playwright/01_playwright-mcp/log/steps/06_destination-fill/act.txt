@@ -1,8 +1,0 @@
-→ tools/call browser_type {"target": "e965", "text": "Tokyo"}
-← isError=false · 0.021s · 181 bytes
-await page.getByRole('combobox', { name: 'Where to?' }).fill('Tokyo');
-
-→ tools/call browser_snapshot {"boxes": true}   # verify (เก็บเป็น verify.yml)
-# เป้าหมาย 'ปลายทาง' → ยังไม่ถึง → วนรอบใหม่ (observe ใหม่)
-#   สถานะหน้าใหม่: - combobox "Where to?" [expanded] [active] [ref=e965] [box=830,448,336,48]: Tokyo
-# ref e965 ใน snapshot ใหม่: ยังอยู่

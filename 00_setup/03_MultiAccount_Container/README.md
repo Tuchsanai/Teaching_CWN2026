@@ -31,6 +31,7 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
 
 ```text
+
 เตรียม container `multi-account-devtool`:
 
 1. ถ้ามี container `multi-account-devtool` อยู่แล้ว ให้ลบด้วย `docker rm -f multi-account-devtool`
@@ -43,10 +44,7 @@ docker run -dit --name multi-account-devtool --hostname multi-account-devtool --
   -v ai-accounts:/root/ai-accounts \
   tuchsanai/multi-account-devtool:2569_1
 
-4. รอจน `docker logs multi-account-devtool` มีบรรทัด `jupyter lab :8888` แล้วตรวจ:
-
-docker exec multi-account-devtool bash -lc \
-'for a in yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf "%-7s " $a; $a --version | tail -1; done; cyolo1 mcp list'
+4. รอจน `docker logs multi-account-devtool` มีบรรทัด `jupyter lab :8888` 
 
 5. ตรวจ skill ส่วนกลาง (สำคัญ ห้ามข้าม):
 
@@ -57,10 +55,9 @@ for i in 1 2 3 4 5; do printf "yolo$i/skills -> %s\n" "$(readlink $B/.Claude/yol
    ต้องเห็น `shared-check` ทั้งใน `.Claude/shared/skills` และ `.Codex/shared/skills`
    และทุก `yoloN/skills` ชี้ไป `../shared/skills` ทุก `cyoloN/skills/shared-check` ชี้ไป shared
    ถ้าไม่มี skill หรือลิงก์ใดขาด ให้แจ้งฉันชัด ๆ ว่า "ยังไม่ได้ติดตั้ง skill" พร้อมบอกว่าขาดอะไรที่บัญชีไหน
-   แล้วรอฉันตัดสินใจ (วิธีแก้ที่แนะนำ: `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ)
-   ห้ามสร้างหรือคัดลอก skill เองโดยไม่ถาม และห้ามแสดงรหัสใน SKILL.md
 6. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
    สรุป port ที่ใช้ URL ของ JupyterLab และผลตรวจ skill (มีครบ / ขาดอะไร)
+
 ```
 
 | ตัวแปร | ค่าเริ่มต้น | ใช้ทำอะไร |

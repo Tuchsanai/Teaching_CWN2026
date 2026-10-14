@@ -1,9 +1,0 @@
-$ playwright-cli click e2783
-await page.getByRole('button', { name: 'Thursday, October 15, 2026 ,' }).click();
-- Page URL: https://www.google.com/travel/flights?tfs=CBwQARoXagcIARIDQktLcgwIAxIIL20vMDdkZmtAAUgBcAGCAQsI____________AZgBAg&tfu=KgIIAw&hl=en
-exit code: 0
-
-$ playwright-cli snapshot --boxes   # verify (เก็บเป็น verify.yml)
-# เป้าหมาย 'วันเดินทาง' → ผ่าน ✅
-#   หลักฐาน verify.yml บรรทัด 56: - textbox "Departure" [active] [ref=e1275] [box=1116,445,256,54]: Thu, Oct 15
-# ref e2783 ใน snapshot ใหม่: ไม่มีแล้ว → ใช้ต่อไม่ได้
