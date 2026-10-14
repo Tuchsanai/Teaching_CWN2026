@@ -36,27 +36,43 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 
 1. ถ้ามี container `multi-account-devtool` อยู่แล้ว ให้ลบด้วย `docker rm -f multi-account-devtool`
    (ห้ามลบ volume `ai-accounts` เพราะเก็บการล็อกอินของทุกบัญชีไว้)
+
 2. ตรวจ port <SSH_PORT>=2223 และ <JUPYTER_PORT>=8886 ถ้าชน ให้ใช้ port ว่างถัดไป
-3. รัน:
+
+3. ตรวจว่ามีไฟล์ `.env` ในโฟลเดอร์ปัจจุบันหรือไม่
+   - ถ้ามี: ให้เติม `--env-file <path เต็มของ .env>` ในคำสั่งข้อ 4
+     ห้ามแสดงค่าใน .env แสดงได้เฉพาะชื่อตัวแปร
+   - ถ้าไม่มี: ให้ตัดบรรทัด `--env-file` ออกแล้วรันต่อได้ แต่ต้องแจ้งเตือนฉันเป็นภาษาไทยว่า
+     "⚠️ ไม่พบไฟล์ .env ในโฟลเดอร์ปัจจุบัน — container จะไม่มี environment variable ที่ต้องใช้
+      กรุณาสร้างไฟล์ .env (เช่น API key ต่าง ๆ) แล้วรัน prompt นี้ใหม่"
+
+4. รัน:
 
 docker run -dit --name multi-account-devtool --hostname multi-account-devtool --privileged \
   -p <SSH_PORT>:22 -p <JUPYTER_PORT>:8888 \
+  --env-file <ENV_FILE> \
   -v ai-accounts:/root/ai-accounts \
   tuchsanai/multi-account-devtool:2569_1
 
-4. รอจน `docker logs multi-account-devtool` มีบรรทัด `jupyter lab :8888` 
+5. รอจน `docker logs multi-account-devtool` มีบรรทัดที่มีข้อความ `jupyter lab :8888`
 
-5. ตรวจ skill ส่วนกลาง (สำคัญ ห้ามข้าม):
+6. ตรวจ skill `vastai` `yolo` `cyolo` (สำคัญ ห้ามข้าม):
 
 docker exec multi-account-devtool bash -lc \
-'B=$HOME/ai-accounts; for t in .Claude .Codex; do echo "== $t/shared/skills"; ls -1 $B/$t/shared/skills 2>/dev/null || echo "(ไม่มีโฟลเดอร์)"; done
-for i in 1 2 3 4 5; do printf "yolo$i/skills -> %s\n" "$(readlink $B/.Claude/yolo$i/skills)"; printf "cyolo$i/skills/shared-check -> %s\n" "$(readlink $B/.Codex/cyolo$i/skills/shared-check)"; done'
+'B=$HOME/ai-accounts; for t in .Claude .Codex; do for s in vastai yolo cyolo; do [ -d $B/$t/shared/skills/$s ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
 
-   ต้องเห็น `shared-check` ทั้งใน `.Claude/shared/skills` และ `.Codex/shared/skills`
-   และทุก `yoloN/skills` ชี้ไป `../shared/skills` ทุก `cyoloN/skills/shared-check` ชี้ไป shared
-   ถ้าไม่มี skill หรือลิงก์ใดขาด ให้แจ้งฉันชัด ๆ ว่า "ยังไม่ได้ติดตั้ง skill" พร้อมบอกว่าขาดอะไรที่บัญชีไหน
-6. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
-   สรุป port ที่ใช้ URL ของ JupyterLab และผลตรวจ skill (มีครบ / ขาดอะไร)
+   ถ้ามี MISSING แม้แต่ตัวเดียว ให้แจ้งเตือนฉันเป็นภาษาไทยอย่างชัดเจนว่า
+   "⚠️ ยังไม่ได้ติดตั้ง skill — กรุณาติดตั้ง skill ต่อไปนี้ก่อนใช้งาน: <รายชื่อที่ขาด>"
+   ห้ามแสดงรหัสหรือเนื้อหาใน SKILL.md
+   และห้ามติดตั้ง skill เอง ให้แจ้งเตือนอย่างเดียว
+
+7. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
+   สรุปผลเป็นภาษาไทย โดยเรียงดังนี้:
+   - ถ้ามีคำเตือน (ไม่พบ .env หรือ skill ขาด) ให้แสดงคำเตือนไว้บนสุดของสรุป ก่อนข้อมูลอื่น
+   - port ที่ใช้ (SSH / Jupyter)
+   - URL ของ JupyterLab
+   - สถานะ .env (ใช้ / ไม่พบ)
+   - ผลตรวจ skill (มีครบ / ขาดอะไร)
 
 ```
 
