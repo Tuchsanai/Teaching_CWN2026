@@ -123,8 +123,8 @@ docker exec multi-account-devtool bash -lc \
 
 ## ขั้นที่ 2 · เส้นทาง B: build image เอง (~45 นาที)
 
-![เส้นทาง B: คัดลอก 00_Devtool_Container เป็น MultiAccountDevtool ให้ AI ปรับ Dockerfile ตาม prompt_multi_account.md แล้ว docker build ทดสอบ และเขียนรายงาน](img/mad-concept-00b-path-b.png)
-*ภาพแนวคิด (Imagegen): เส้นทาง B · build image เอง*
+![เส้นทาง B: 0 ตรวจของเดิมใน MultiAccountDevtool ถ้าตรงสเปกครบข้ามไป build ถ้าขาดบางข้อไปปรับไฟล์ Dockerfile installer start.sh docker-compose.yaml แล้ว build + push ทดสอบจริง PASS/FAIL/SKIP เขียนรายงาน 3 ไฟล์ แล้วหยุดรอล็อกอิน](img/mad-concept-04-path-b-flow.png)
+*ภาพแนวคิด (Imagegen): เส้นทาง B · ลำดับขั้น 0 → 4 ในพรอมต์ (ตรงสเปกครบแล้วข้ามข้อ 1 ได้)*
 
 ```text
 03_MultiAccount_Container/
@@ -141,11 +141,18 @@ docker exec multi-account-devtool bash -lc \
 ภารกิจ: build image `tuchsanai/multi-account-devtool:2569_1` ที่มีระบบหลายบัญชีตาม ./prompt_multi_account.md แล้วทดสอบจนผ่าน
 
 ## ขอบเขต
-- ทำงานใน floder ./MultiAccountDevtool เท่านั้น 
+- ทำงานในโฟลเดอร์ ./MultiAccountDevtool เท่านั้น
 - ห้ามแก้ ./00_Devtool_Container ห้ามเปิดโฟลเดอร์อื่นเพื่อหาเฉลย ห้ามเดา env/path/flag
 - ./prompt_multi_account.md คือสเปก: ทุกข้อใน "เป้าหมาย" "กติกา" "ทดสอบ" "รายงาน" ต้องเป็นจริงใน image
   ส่วน "ข้อเท็จจริงจากการทดลอง" ให้ตรวจกับเวอร์ชันจริง (--help / docs) ถ้าต่างให้ทำตามของจริงแล้วบันทึกในรายงาน
 - ความสามารถเดิมต้องอยู่ครบ: sshd (password + key Devtool_SSH), Docker-in-Docker, JupyterLab
+
+## 0. ตรวจของเดิมก่อน
+ถ้ามี ./MultiAccountDevtool อยู่แล้ว ให้ตรวจ Dockerfile, start.sh, docker-compose.yaml และ installer
+เทียบกับสเปก ./prompt_multi_account.md และเงื่อนไขในข้อ 1
+- ตรงครบทุกข้อ → ข้ามข้อ 1 ไปข้อ 2 (build) ได้เลย และบอกฉันว่าข้ามเพราะอะไร
+- ขาดหรือไม่ตรงบางข้อ → แก้เฉพาะส่วนที่ขาดในข้อ 1 แล้วระบุว่าแก้อะไร
+- ยังไม่มีโฟลเดอร์ → คัดลอกจาก ./00_Devtool_Container แล้วทำข้อ 1 ตามปกติ
 
 ## 1. ปรับไฟล์
 - Dockerfile
@@ -216,13 +223,21 @@ MultiAccountDevtool/
 
 ## ขั้นที่ 3 · ตรวจใน JupyterLab (~5 นาที)
 
-เปิด http://localhost:<JUPYTER_PORT>/lab (ค่าเริ่มต้น http://localhost:8886/lab) → **+ → Terminal** แล้ววาง:
+ตรวจว่า image พร้อมใช้ **ก่อนล็อกอิน**: มีครบ 10 คำสั่ง, skill ชี้ไป `shared` และ MCP `playwright` พร้อมใช้
+
+🖥️ เปิด http://localhost:<JUPYTER_PORT>/lab (ค่าเริ่มต้น http://localhost:8886/lab) → **+ → Terminal** แล้ววาง:
 
 ```bash
 for a in yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf "%-7s " $a; $a --version; done
 ls -l ~/ai-accounts/.Claude/yolo1/skills ~/ai-accounts/.Codex/cyolo1/skills/
 cyolo1 mcp list
 ```
+
+| คำสั่ง | ควรเห็น |
+|---|---|
+| `for ... --version` | เวอร์ชันครบ 10 บรรทัด (`yolo1..5` = Claude Code, `cyolo1..5` = Codex) |
+| `ls -l ...skills` | `yolo1/skills` → `../shared/skills` และ `cyolo1/skills/shared-check` → `shared` |
+| `cyolo1 mcp list` | `playwright` สถานะ `enabled` |
 
 ![yolo1/skills ชี้ไป ../shared/skills, cyolo1/skills/shared-check ชี้ไป shared และ cyolo1 mcp list เห็น playwright](img/mad-jupyter-shared-links.png)
 *ภาพจริง: skill ชี้ไป `shared` และ `playwright` สถานะ `enabled` ตั้งแต่ก่อนล็อกอิน*
@@ -231,12 +246,17 @@ cyolo1 mcp list
 
 ## ขั้นที่ 4 · ล็อกอิน (~15 นาที)
 
-🖥️ Terminal ใน JupyterLab ล็อกอินอย่างน้อย 4 บัญชี:
+![ขั้นที่ 4: yolo1 พิมพ์ yolo1 เลือก Claude account with subscription กด Authorize ในเบราว์เซอร์ /exit แล้ว auth status ได้ loggedIn true ส่วน cyolo1 login --device-auth เปิด URL ใส่ code แล้ว login status ได้ Logged in using ChatGPT ล็อกอินเก็บใน volume ai-accounts](img/mad-concept-06-step4-login.png)
+*ภาพแนวคิด (Imagegen): ล็อกอิน yolo1 + cyolo1 แล้วตรวจสถานะ ล็อกอินเก็บใน volume จึงไม่หายเมื่อสร้าง container ใหม่*
 
-- `yolo1` → เลือก **Claude account with subscription** → ยืนยันในเบราว์เซอร์ → `/exit`
-- `yolo2` → ทำเหมือน `yolo1`
-- `cyolo1 login --device-auth` → เปิด URL ในเบราว์เซอร์ ใส่ code
-- `cyolo2 login --device-auth` → ทำเหมือน `cyolo1`
+🖥️ ใน Terminal ของ JupyterLab ล็อกอินอย่างน้อย **yolo 1 บัญชี และ cyolo 1 บัญชี**:
+
+| บัญชี | ล็อกอิน | ตรวจ → ควรเห็น |
+|---|---|---|
+| `yolo1` | พิมพ์ `yolo1` → เลือก **Claude account with subscription** → ยืนยันในเบราว์เซอร์ → `/exit` | `yolo1 auth status \| grep loggedIn` → `"loggedIn": true` |
+| `cyolo1` | `cyolo1 login --device-auth` → เปิด URL ในเบราว์เซอร์ → ใส่ code | `cyolo1 login status` → `Logged in using ChatGPT` |
+
+มีหลายบัญชี? ล็อกอินเพิ่มที่ `yolo2..5` / `cyolo2..5` ด้วยวิธีเดียวกัน
 
 ภาพหน้าจอทีละขั้น: [LAB 02 · 3.1 Claude Code](../02_Setup_Multi_Account/README.md#31--claude-code-yolo1) · [LAB 02 · 3.2 Codex](../02_Setup_Multi_Account/README.md#32--codex-cyolo1) · คู่มือเต็ม: [login-guide.md](MultiAccountDevtool/login-guide.md)
 
@@ -244,25 +264,53 @@ cyolo1 mcp list
 
 ## ขั้นที่ 5 · ทดสอบ skill และ MCP ข้ามบัญชี (~20 นาที)
 
-🖥️ เปิด Claude Code ใน container ด้วยบัญชีที่ล็อกอินแล้ว:
+![ขั้นที่ 5: ตรวจล็อกอิน yolo1-5 และ cyolo1-5 ถ้าไม่มีเลยแจ้งให้ล็อกอินอย่างน้อย 1 บัญชี ถ้าฝั่งเดียวทดสอบบัญชีนั้น ถ้าทั้งสองฝั่งเลือก yolo 1 บัญชีและ cyolo 1 บัญชี รันทดสอบ skill shared-check และ MCP playwright ค้น Google Flights แล้วเก็บภาพใน evidence](img/mad-concept-05-step5-test-accounts.png)
+*ภาพแนวคิด (Imagegen): ตรวจล็อกอิน → เลือกบัญชี → ทดสอบ skill/MCP → เก็บหลักฐาน*
+
+**ทำอะไร:** AI ตรวจว่าบัญชีไหนล็อกอินแล้ว → เลือก yolo 1 บัญชี + cyolo 1 บัญชี → ให้แต่ละบัญชีเรียก skill `shared-check` และใช้ MCP `playwright` ค้นเที่ยวบินบน Google Flights (ค้นหาอย่างเดียว ไม่จอง ไม่ชำระเงิน) → เก็บภาพและสรุปผล
+
+พรอมต์มี 2 ส่วน:
+- **เหนือเส้น `====`** = งานของเซสชันที่คุณเปิด: ตรวจล็อกอิน เลือกบัญชี สั่งรัน และสรุปผลรวม
+- **ใต้เส้น `====`** = งานที่แต่ละบัญชีทำ: รายงาน config root, เรียก `shared-check`, ค้นเที่ยวบินด้วย `playwright`, ถ่ายภาพ 3 ภาพ
+
+🖥️ **1.** ใน Terminal ของ JupyterLab ดูว่าบัญชีไหนล็อกอินแล้ว:
 
 ```bash
 cd /workspace
-yolo1
+for a in yolo1 yolo2 yolo3 yolo4 yolo5; do printf "%-7s " $a; $a auth status 2>/dev/null | grep -q '"loggedIn": true' && echo "✅ ล็อกอินแล้ว" || echo "—"; done
+for a in cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf "%-7s " $a; $a login status 2>&1 | grep -q '^Logged in' && echo "✅ ล็อกอินแล้ว" || echo "—"; done
 ```
 
-💬 วางพรอมต์นี้ในเซสชัน `yolo1` (ค้นหาเที่ยวบินอย่างเดียว ไม่จอง ไม่ชำระเงิน):
+แล้วเปิดบัญชีที่ขึ้น ✅ มา 1 บัญชี เช่น `yolo1` หรือ `cyolo1` ถ้าไม่มี ✅ เลย ให้กลับไป[ขั้นที่ 4](#ขั้นที่-4--ล็อกอิน-15-นาที)
+
+💬 **2.** วางพรอมต์นี้ในเซสชันนั้น:
 
 ```text
-ฉันล็อกอิน yolo1 yolo2 cyolo1 cyolo2 แล้ว ทดสอบ skill/MCP ส่วนกลางข้ามบัญชีต่อจากเซสชันนี้
-1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง ~/verify-prompt.txt
-2. รันทีละบัญชีจาก shell: yolo1 -p "$(cat ~/verify-prompt.txt)", yolo2 เช่นเดียวกัน,
-   cyolo1 exec --skip-git-repo-check "$(cat ~/verify-prompt.txt)", cyolo2 เช่นเดียวกัน
-   รันแบบ foreground ทีละบัญชี (ไม่ใช้ background) timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
-3. คัดลอกภาพ screenshot ที่แต่ละบัญชีรายงานไปเป็น ./evidence/<บัญชี>/1-open.png, 2-search.png, 3-results.png
-   พร้อม log คำตอบเป็น ./evidence/<บัญชี>/run.log ห้ามแก้ไฟล์ตั้งค่า
-4. สรุปตารางรวม บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
-   บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
+ทดสอบ skill/MCP ส่วนกลางด้วยบัญชีที่ล็อกอินแล้ว
+
+1. ตรวจการล็อกอินทุกบัญชี (ห้ามแสดง token หรืออีเมล):
+   yolo1..yolo5   : yoloN auth status    → ล็อกอินแล้วเมื่อมี "loggedIn": true
+   cyolo1..cyolo5 : cyoloN login status  → ล็อกอินแล้วเมื่อขึ้น "Logged in"
+   แสดงตาราง บัญชี | ล็อกอินแล้ว?
+
+2. เลือกบัญชีที่จะทดสอบ:
+   - ฝั่ง yolo เลือกบัญชีแรกที่ล็อกอินแล้ว 1 บัญชี และฝั่ง cyolo เลือกบัญชีแรกที่ล็อกอินแล้ว 1 บัญชี
+   - ถ้าล็อกอินแค่ฝั่งเดียว ให้ทดสอบเฉพาะบัญชีนั้น และบอกว่าอีกฝั่งข้ามเพราะยังไม่ล็อกอิน
+   - ถ้ายังไม่ล็อกอินเลยสักบัญชี ให้แจ้งฉันว่า
+     "⚠️ ยังไม่มีบัญชีที่ล็อกอิน — กรุณาล็อกอินอย่างน้อย 1 บัญชีใน Terminal ของ JupyterLab:
+      yolo1 (เลือก Claude account with subscription แล้ว /exit) หรือ cyolo1 login --device-auth"
+     แล้วหยุดรอ ห้ามล็อกอินแทนฉัน
+
+3. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง ~/verify-prompt.txt แล้วรันกับบัญชีที่เลือกทีละบัญชี
+   (foreground timeout บัญชีละ 15 นาที):
+   yoloN  -p "$(cat ~/verify-prompt.txt)"
+   cyoloN exec --skip-git-repo-check "$(cat ~/verify-prompt.txt)"
+
+4. เก็บผลของแต่ละบัญชีไว้ที่ ./evidence/<บัญชี>/ : 1-open.png 2-search.png 3-results.png run.log
+   ห้ามแก้ไฟล์ตั้งค่า
+
+5. สรุปตาราง บัญชี | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | PASS/FAIL/SKIP
+   ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
 ====
 ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
 
@@ -285,16 +333,21 @@ yolo1
    - เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
 ```
 
-อยากทดสอบทีละบัญชี → คัดลอกเฉพาะข้อความใต้ `====` ไปวางในบัญชีนั้น
-**ไฟล์ที่ได้:** `/workspace/evidence/<บัญชี>/1-open.png`, `2-search.png`, `3-results.png`, `run.log`
+> อยากทดสอบบัญชีเดียวด้วยมือ → คัดลอกเฉพาะข้อความใต้ `====` ไปวางในเซสชันของบัญชีนั้น
 
-ภาพจริงของ `yolo1` จาก Playwright MCP (29 ก.ย. 2026):
+**ผลที่ควรได้:**
+- ไฟล์ `/workspace/evidence/<บัญชี>/1-open.png`, `2-search.png`, `3-results.png`, `run.log` ของทุกบัญชีที่ทดสอบ
+- ตารางสรุปที่แต่ละบัญชีได้รหัส `SHARED_SKILL_OK-<claude|codex>-…`, เรียก tool ของ `playwright` จริง และเป็น **PASS** (ฝั่งที่ยังไม่ล็อกอิน = SKIP)
+- ถ้าทดสอบหลายบัญชีของ CLI เดียวกัน รหัสต้องตรงกัน = skill มาจาก `shared` จริง (รหัสของเครื่องคุณจะต่างจากตัวอย่าง)
+
+### ตัวอย่างผลจริง (29 ก.ย. 2026 · รอบนั้นทดสอบ 4 บัญชี)
+
+ภาพของ `yolo1` จาก Playwright MCP:
 
 | 1-open · เปิดหน้าเว็บได้ | 2-search · กรอกเงื่อนไขครบ | 3-results · รายการเที่ยวบินจริง |
 |---|---|---|
 | ![yolo1 เปิดหน้า Google Flights](img/mad-web-yolo1-1-open.png) | ![yolo1 กรอก One way, Economy, BKK ไป Tokyo ก่อนกด Search](img/mad-web-yolo1-2-search.png) | ![yolo1 ผลค้นหา อันดับแรก Vietjet THB 7,346](img/mad-web-yolo1-3-results.png) |
 
-ผลการรันจริง:
 | บัญชี | รหัส shared-check | รหัสตรงกับบัญชี CLI เดียวกัน? | MCP | อันดับ 1 | ผล |
 |---|---|---|---|---|---|
 | yolo1 | `SHARED_SKILL_OK-claude-…` | ✓ (= yolo2) | playwright | Vietjet THB 7,346 | **PASS** |
@@ -302,33 +355,41 @@ yolo1
 | cyolo1 | `SHARED_SKILL_OK-codex-…` | ✓ (= cyolo2) | playwright | Vietjet THB 7,346 | **PASS** |
 | cyolo2 | `SHARED_SKILL_OK-codex-…` | ✓ (= cyolo1) | playwright | Vietjet THB 7,346 | **PASS** |
 
-**อ่านผล:** CLI เดียวกันได้รหัสเดียวกัน = skill มาจาก `shared` จริง และทุกบัญชีใช้ MCP `playwright` ใน image ได้ (รหัสของเครื่องคุณจะต่างจากนี้)
-
-ภาพของบัญชีอื่น: [yolo2](img/mad-web-yolo2-3-results.png) · [cyolo1](img/mad-web-cyolo1-3-results.png) · [cyolo2](img/mad-web-cyolo2-3-results.png)
+ภาพผลค้นหาของบัญชีอื่น: [yolo2](img/mad-web-yolo2-3-results.png) · [cyolo1](img/mad-web-cyolo1-3-results.png) · [cyolo2](img/mad-web-cyolo2-3-results.png)
 
 ## ข้อควรรู้
 
 - ทุกบัญชีเป็นผู้ใช้ Linux เดียวกัน (`root`) → แยกแค่โฟลเดอร์ config ไม่ใช่ OS isolation
-- `docker compose down -v` (หรือลบ volume) = ล็อกอินหายทุกบัญชี ใช้ `docker compose down` เฉย ๆ
+- ล็อกอินเก็บอยู่ใน volume → ลบ volume (`docker compose down -v` หรือ `docker volume rm`) = ล็อกอินหายทุกบัญชี
 - password `passwd` และ key `Devtool_SSH/devtoolSSH` ใช้ใน lab เท่านั้น ห้ามเปิดพอร์ตออก internet
 - อย่า mount ไฟล์ `.env` ส่วนตัวที่มี token เข้า container ที่ให้ AI ทดสอบ
 - ราคาและลำดับเที่ยวบินเปลี่ยนตามวันเวลาที่ค้นหา
 
 ## คำสั่งที่ใช้บ่อย
 
+🖥️ บนเครื่อง · เส้นทาง A (`docker run`)
+
 ```bash
-# 🖥️ บนเครื่อง — เส้นทาง A · docker run
-docker logs -f multi-account-devtool      # ดู log ตอน start
-docker stop multi-account-devtool         # หยุด
-docker start multi-account-devtool        # เริ่มใหม่
-docker rm -f multi-account-devtool        # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
+docker logs -f multi-account-devtool        # ดู log ตอน start
+docker stop multi-account-devtool           # หยุด
+docker start multi-account-devtool          # เริ่มใหม่
+docker rm -f multi-account-devtool          # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
 docker exec -it multi-account-devtool bash  # เข้า shell ใน container
-# 🖥️ บนเครื่อง — เส้นทาง B · docker compose ในโฟลเดอร์ MultiAccountDevtool/
-docker compose up -d          # เริ่ม
-docker compose logs -f        # ดู log ตอน start
-docker compose down           # หยุด (ล็อกอินยังอยู่)
-# 🖥️ ใน container
-yolo1 auth status             # สถานะล็อกอิน Claude
-cyolo1 mcp list               # ตรวจ MCP ของ Codex
-ai-accounts-setup             # รัน installer ซ้ำ (ไม่ทับของเดิม)
+```
+
+🖥️ บนเครื่อง · เส้นทาง B (`docker compose` ในโฟลเดอร์ `MultiAccountDevtool/`)
+
+```bash
+docker compose up -d      # เริ่ม
+docker compose logs -f    # ดู log ตอน start
+docker compose down       # หยุด (ล็อกอินยังอยู่)
+```
+
+🖥️ ใน container
+
+```bash
+yolo1 auth status         # สถานะล็อกอิน Claude
+cyolo1 login status       # สถานะล็อกอิน Codex
+cyolo1 mcp list           # ตรวจ MCP ของ Codex
+ai-accounts-setup         # รัน installer ซ้ำ (ไม่ทับของเดิม)
 ```
