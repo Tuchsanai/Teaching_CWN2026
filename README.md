@@ -83,3 +83,55 @@ docker exec multi-account-devtool bash -lc \
 | `<SSH_KEY_DIR>` | `./Devtool_SSH` | โฟลเดอร์ key สำเร็จรูปของ lab → mount เป็น `/etc/devtools/ssh` (อ่านอย่างเดียว) ให้ container ใส่ public key ใน `authorized_keys` |
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 
+## เข้าใช้งาน container ที่ `<WORKDIR>`
+
+💬 วางพรอมต์นี้ใน **Claude Code** หลังเปิด container แล้ว → Claude จะเลือกวิธีเข้าที่ใช้ได้ (SSH ก่อน ถ้าไม่ได้ใช้ `docker exec`) และรันทุกคำสั่งใน container
+
+```text
+
+ตัวแปร: <WORKDIR>=/workspace
+
+เป้าหมาย: เข้าไปทำงานใน container `multi-account-devtool` ที่โฟลเดอร์ <WORKDIR>
+
+ขั้นที่ 1 — เช็กว่า container รันอยู่
+  ใช้ `docker ps` ถ้าไม่เจอ ให้เตือน "⚠️ container ยังไม่รัน — เตรียม container ก่อน" แล้วหยุด
+  (ห้ามสร้างหรือลบ container เอง)
+
+ขั้นที่ 2 — เตรียมค่า
+  <SSH_PORT> = ผลของ `docker port multi-account-devtool 22` (ปกติคือ 2223)
+  <KEY>      = path เต็มของ `Devtool_SSH/devtoolSSH` ในโฟลเดอร์ปัจจุบัน (ห้ามแสดงเนื้อหา key)
+
+ขั้นที่ 3 — ลองเข้า container (ต้องได้ผลลัพธ์เป็น <WORKDIR>)
+  วิธี A: SSH ด้วย key  (ลองวิธีนี้ก่อน)
+    ssh -i "<KEY>" -p <SSH_PORT> -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -o LogLevel=ERROR root@localhost "mkdir -p <WORKDIR> && cd <WORKDIR> && pwd"
+  วิธี B: docker exec  (ใช้เมื่อวิธี A ไม่ได้)
+    docker exec multi-account-devtool bash -lc "mkdir -p <WORKDIR> && cd <WORKDIR> && pwd"
+
+  - ถ้าวิธี A ไม่ได้ ให้บอกสาเหตุสั้น ๆ แล้วใช้วิธี B
+  - ถ้าสาเหตุคือ UNPROTECTED PRIVATE KEY FILE ให้บอกคำสั่งแก้ (Windows: icacls / Mac-Linux: chmod 600) แต่ไม่ต้องรันเอง
+  - ถ้าไม่ได้ทั้ง 2 วิธี ให้เตือนแล้วหยุด
+  - ห้ามพิมพ์ password แทนฉัน
+
+ขั้นที่ 4 — ทำงานทุกอย่างใน container
+  นับจากนี้ ทุกคำสั่งที่ฉันสั่ง (ติดตั้ง / รันโค้ด / git / สร้างหรือแก้ไฟล์) ต้องรันใน container ที่ <WORKDIR> เท่านั้น ห้ามรันบนเครื่องตัวเอง
+  วิธี A: ssh -i "<KEY>" -p <SSH_PORT> -o BatchMode=yes -o LogLevel=ERROR root@localhost "cd <WORKDIR> && <คำสั่ง>"
+  วิธี B: docker exec -w <WORKDIR> multi-account-devtool bash -lc '<คำสั่ง>'
+  - สร้างหรือแก้ไฟล์ใน container ด้วย heredoc หรือ `docker cp`
+  - ถ้าวิธีที่ใช้อยู่เกิดล้มเหลวกลางทาง ให้สลับไปใช้อีกวิธี
+
+ขั้นที่ 5 — สรุปผลเป็นภาษาไทย
+  - คำเตือน (ถ้ามี) ไว้บนสุด
+  - วิธีที่ใช้ (A หรือ B) และ <WORKDIR>
+  - คำสั่งสำหรับให้ฉันเข้า shell เอง:
+      วิธี A: ssh -t -i "<KEY>" -p <SSH_PORT> root@localhost "cd <WORKDIR> && exec bash -l"
+      วิธี B: docker exec -it -w <WORKDIR> multi-account-devtool bash -l
+
+```
+
+| ตัวแปร | ค่าเริ่มต้น | ใช้ทำอะไร |
+|---|---|---|
+| `<WORKDIR>` | `/workspace` | โฟลเดอร์ทำงานใน container (สร้างให้อัตโนมัติถ้ายังไม่มี) |
+| `<SSH_PORT>` | `2223` | อ่านจาก `docker port multi-account-devtool 22` |
+| `<KEY>` | `./Devtool_SSH/devtoolSSH` | private key สำหรับวิธี A |
+
+> 💡 ใน Git Bash ให้ใส่ `MSYS_NO_PATHCONV=1` หน้า `docker exec -w ...` ไม่งั้นจะ error `Cwd must be an absolute path` (PowerShell ไม่มีปัญหานี้)
