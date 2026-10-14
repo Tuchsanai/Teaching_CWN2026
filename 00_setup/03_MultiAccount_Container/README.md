@@ -138,55 +138,53 @@ docker exec multi-account-devtool bash -lc \
 💬 เปิด Claude Code ใน VS Code **บนเครื่องตัวเอง** (ไม่ใช่ใน container) โดยให้โฟลเดอร์งานคือ `03_MultiAccount_Container` แล้ววาง:
 
 ```text
-ภารกิจ: ปรับ Dockerfile และ docker-compose.yaml ใน ./MultiAccountDevtool ให้ image ใหม่รองรับเงื่อนไขทั้งหมดใน ./prompt_multi_account.md
-ตั้งแต่ตอน build แล้ว build / รัน / ทดสอบจริงจนผ่าน ทำงานเฉพาะใน ./MultiAccountDevtool ห้ามแก้ไฟล์นอกโฟลเดอร์นี้
-ถ้ายังไม่มี ./MultiAccountDevtool ให้คัดลอกจาก ./00_Devtool_Container ก่อน (cp -r ./00_Devtool_Container ./MultiAccountDevtool) ห้ามแก้ ./00_Devtool_Container
+ภารกิจ: build image `tuchsanai/multi-account-devtool:2569_1` ที่มีระบบหลายบัญชีตาม ./prompt_multi_account.md แล้วทดสอบจนผ่าน
 
-## อ่านก่อน
-- ./prompt_multi_account.md = สเปก ทุกข้อใน "เป้าหมาย" "กติกา" "ทดสอบ" "รายงาน" ต้องเป็นจริงใน image ใหม่
-  ข้อ "ข้อเท็จจริงจากการทดลอง" ให้ตรวจกับเวอร์ชันที่ติดตั้งจริง (--help, official docs) ถ้าต่างให้ทำตามของจริงและบันทึกในรายงาน
-- ./MultiAccountDevtool/ = สำเนาของ devtools เดิม (คัดลอกจาก ./00_Devtool_Container ข้างบน) เก็บความสามารถเดิมให้ครบ: sshd (password + key Devtool_SSH), Docker-in-Docker, JupyterLab
-- ห้ามเปิดโฟลเดอร์อื่นเพื่อหาเฉลย ห้ามเดา env/path/flag
+## ขอบเขต
+- ทำงานใน floder ./MultiAccountDevtool เท่านั้น 
+- ห้ามแก้ ./00_Devtool_Container ห้ามเปิดโฟลเดอร์อื่นเพื่อหาเฉลย ห้ามเดา env/path/flag
+- ./prompt_multi_account.md คือสเปก: ทุกข้อใน "เป้าหมาย" "กติกา" "ทดสอบ" "รายงาน" ต้องเป็นจริงใน image
+  ส่วน "ข้อเท็จจริงจากการทดลอง" ให้ตรวจกับเวอร์ชันจริง (--help / docs) ถ้าต่างให้ทำตามของจริงแล้วบันทึกในรายงาน
+- ความสามารถเดิมต้องอยู่ครบ: sshd (password + key Devtool_SSH), Docker-in-Docker, JupyterLab
 
-## สิ่งที่ต้องอยู่ใน image
-1. Dockerfile
-   - Claude Code ด้วย curl -fsSL https://claude.ai/install.sh | bash และ Codex ด้วย npm install -g @openai/codex
-   - claude และ codex ต้องใช้ได้ทั้งใน JupyterLab Terminal, SSH และ docker exec: symlink เข้า /usr/local/bin ห้ามพึ่ง .bashrc
-   - @playwright/mcp ติดตั้ง global แบบ pin เวอร์ชัน แล้วติดตั้ง Chromium + system deps ครั้งเดียวด้วย playwright ที่อยู่ในแพ็กเกจ @playwright/mcp
-     (--with-deps chromium) ให้เวอร์ชันตรงกัน เก็บ browser ที่ PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-   - installer ระบบหลายบัญชี + wrapper yolo1..5 / cyolo1..5 อยู่ใน /usr/local/bin (อยู่ใน PATH อยู่แล้ว ไม่ต้องแก้ .bashrc)
-2. installer (เช่น /usr/local/bin/ai-accounts-setup) ทำตามสเปกทุกข้อ: BASE_PATH="$HOME/ai-accounts" กำหนดที่เดียว
-   รันซ้ำได้ ไม่ทับ credential/config/รหัสสุ่ม shared-check เดิม ห้ามมี credential ใน shared
-3. start.sh: คงพฤติกรรมเดิม + เรียก installer ทุกครั้งที่ container start
-   (volume ใหม่ได้โครงและรหัสสุ่มของตัวเอง volume เดิมล็อกอินยังอยู่) เก็บ log ไว้ใน /var/log
-4. docker-compose.yaml (ปรับจาก docker-compose.yml เดิม):
-   - image: tuchsanai/multi-account-devtool:2569_1 และ build: .
-   - ports "${SSH_PORT:-2223}:22" และ "${JUPYTER_PORT:-8886}:8888" (ไม่ชน devtools จาก LAB 01)
-   - named volume สำหรับ /root/ai-accounts (ล็อกอินอยู่รอดเมื่อสร้าง container ใหม่) + volume ของ Docker-in-Docker
-     + ./workspace:/workspace + ./Devtool_SSH:/etc/devtools/ssh
-   - env_file ต้องเป็น required: false และเปลี่ยน path ได้ด้วยตัวแปร ห้ามโหลดไฟล์ .env ส่วนตัวเข้า container ทดสอบ
+## 1. ปรับไฟล์
+- Dockerfile
+  - ติดตั้ง Claude Code (curl -fsSL https://claude.ai/install.sh | bash) และ Codex (npm install -g @openai/codex)
+  - @playwright/mcp แบบ pin เวอร์ชัน + Chromium ด้วย playwright ในแพ็กเกจเดียวกัน (--with-deps chromium)
+    เก็บที่ PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+  - claude, codex, installer และ wrapper yolo1..5 / cyolo1..5 อยู่ใน /usr/local/bin
+    → ใช้ได้ทั้ง JupyterLab Terminal, SSH, docker exec โดยไม่แก้ .bashrc
+- installer (/usr/local/bin/ai-accounts-setup): ทำตามสเปก กำหนด BASE_PATH="$HOME/ai-accounts" ที่เดียว
+  รันซ้ำได้โดยไม่ทับ credential/config/รหัสสุ่ม shared-check เดิม และไม่มี credential ใน shared
+- start.sh: คงของเดิม + เรียก installer ทุกครั้งที่ container start (เก็บ log ใน /var/log)
+- docker-compose.yaml (ปรับจาก docker-compose.yml เดิม)
+  - image: tuchsanai/multi-account-devtool:2569_1 + build: .
+  - ports "${SSH_PORT:-2223}:22" และ "${JUPYTER_PORT:-8886}:8888"
+  - named volume ให้ /root/ai-accounts และ Docker-in-Docker
+    + ./workspace:/workspace + ./Devtool_SSH:/etc/devtools/ssh
+  - env_file แบบ required: false เปลี่ยน path ได้ด้วยตัวแปร (ห้ามโหลด .env ส่วนตัวเข้า container ทดสอบ)
 
-## build (รันใน ./MultiAccountDevtool)
+## 2. build และ push (รันใน ./MultiAccountDevtool)
 docker build -t tuchsanai/multi-account-devtool:2569_1 .
 docker tag tuchsanai/multi-account-devtool:2569_1 tuchsanai/multi-account-devtool:latest
 docker push tuchsanai/multi-account-devtool:2569_1
-ถ้า push ไม่ผ่านเพราะยังไม่ docker login หรือไม่มีสิทธิ์ ให้รายงานแล้วข้าม ห้ามขอรหัสผ่านหรือ token
+push ไม่ผ่าน (ยังไม่ docker login / ไม่มีสิทธิ์) ให้รายงานแล้วข้าม ห้ามขอรหัสผ่านหรือ token
 
-## รันและทดสอบจริง
-- รัน container ทดสอบด้วย docker compose -p <ชื่อทดสอบ> โดยตั้ง CONTAINER_NAME และพอร์ตที่ยังว่าง
-  ห้ามลบ หยุด หรือทับ container/image อื่นที่มีอยู่ (เช่น devtools)
-- ทำทุกข้อในหัวข้อ "ทดสอบ" ของสเปกใน container จริง บันทึก PASS/FAIL/SKIP ตามจริง แล้วเพิ่ม:
-  claude/codex/yolo1/cyolo1 อยู่ใน PATH ทั้ง docker exec, SSH และ JupyterLab Terminal
-  installer รอบ 2 ไม่ทำลายของเดิม (เทียบ checksum รวมรหัส shared-check)
-  docker compose up --force-recreate แล้วของใน volume เดิมยังอยู่
-  skill ใหม่ใน shared เห็นโดยไม่รัน installer ซ้ำ (ทดสอบแล้วลบออก)
-  สั่ง Playwright MCP ตามคำสั่งใน shared/mcp/mcp.json ผ่าน stdio: initialize → tools/list → เปิด https://example.com → screenshot
-  JupyterLab /lab ตอบ 200 และ SSH ด้วย key Devtool_SSH/devtoolSSH ได้
-- อะไรที่ต้องล็อกอิน = SKIP ห้ามล็อกอินแทนฉัน
+## 3. ทดสอบใน container จริง
+รันด้วย docker compose -p <ชื่อทดสอบ> โดยตั้ง CONTAINER_NAME และพอร์ตที่ยังว่าง
+ห้ามลบ หยุด หรือทับ container/image อื่น ทำทุกข้อใน "ทดสอบ" ของสเปก และเพิ่ม:
+- claude / codex / yolo1 / cyolo1 เรียกได้ทั้ง docker exec, SSH, JupyterLab Terminal
+- installer รอบ 2 ไม่ทำลายของเดิม (เทียบ checksum รวมรหัส shared-check)
+- docker compose up --force-recreate แล้วของใน volume ยังอยู่
+- เพิ่ม skill ใหม่ใน shared แล้วทุกบัญชีเห็นโดยไม่รัน installer ซ้ำ (ทดสอบเสร็จลบออก)
+- Playwright MCP ตาม shared/mcp/mcp.json ผ่าน stdio: initialize → tools/list → เปิด https://example.com → screenshot
+- JupyterLab /lab ตอบ 200 และ ssh -i Devtool_SSH/devtoolSSH เข้าได้
+บันทึก PASS/FAIL/SKIP ตามจริง อะไรที่ต้องล็อกอิน = SKIP ห้ามล็อกอินแทนฉัน
 
-## รายงาน (ห้ามมี secret อีเมล token หรือรหัสสุ่ม shared-check) ใน ./MultiAccountDevtool
-setup-report.md, login-guide.md, checklist.md ตามหัวข้อ "รายงาน" ของสเปก
-เสร็จแล้วสรุปเป็นตาราง PASS/FAIL/SKIP พร้อมชื่อ container ทดสอบ พอร์ต image ID และผล push
+## 4. รายงาน
+เขียน setup-report.md, login-guide.md, checklist.md ใน ./MultiAccountDevtool ตามหัวข้อ "รายงาน" ของสเปก
+(ห้ามมี secret อีเมล token หรือรหัสสุ่ม shared-check)
+สรุปเป็นตาราง PASS/FAIL/SKIP + ชื่อ container ทดสอบ พอร์ต image ID และผล push
 ปล่อย container ทดสอบไว้ให้ฉันล็อกอิน แล้วหยุด ห้ามทำขั้นถัดไปเอง
 ```
 
