@@ -83,8 +83,3 @@ docker exec multi-account-devtool bash -lc \
 | `<SSH_KEY_DIR>` | `./Devtool_SSH` | โฟลเดอร์ key สำเร็จรูปของ lab → mount เป็น `/etc/devtools/ssh` (อ่านอย่างเดียว) ให้ container ใส่ public key ใน `authorized_keys` |
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 
-**ผลที่ควรได้:** สรุปภาษาไทยที่มี port SSH / Jupyter, URL `http://localhost:<JUPYTER_PORT>/lab`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ), สถานะ SSH key (`SSH_KEY_OK`) และผลตรวจ skill **`vastai` `yolo` `cyolo` เป็น `OK` ครบทั้ง 6 บรรทัด** (`.Claude` และ `.Codex`) ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / ไม่พบ `Devtool_SSH` / key ใช้ไม่ได้ / skill ขาด) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
-
-> **ไฟล์ env:** ตัวอย่างอยู่ที่ [`00_resource/.env_example`](00_resource/.env_example) — คัดลอกมาไว้ในโฟลเดอร์ที่เปิด Claude Code แล้วเปลี่ยนชื่อเป็น `.env` และใส่ค่าจริง (`.env` ถูก `.gitignore` ไว้แล้ว ไม่ถูก commit)
-
-รายละเอียดเต็ม (build image เอง, ล็อกอินแต่ละบัญชี, ทดสอบ) ดู [LAB 03 · Multi-Account Container](00_setup/03_MultiAccount_Container/README.md)
