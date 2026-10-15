@@ -18,13 +18,13 @@
 
 | `MODEL` | HF repo | ไฟล์ `.ninfer` | `LLM_MODEL` (ชื่อใน API) | ขนาดไฟล์ | VRAM ที่ใช้ (ประมาณ) | จุดเด่น |
 |---|---|---|---|---|---|---|
-| `qwen3.8-27b-nvfp4` ⭐ | `neroued/Qwen3.8-27B-nvfp4-NInfer` | `qwen3_8_27b_nvfp4.ninfer` | `qwen3.8-27b` | 22.1 GiB | **20.7 GB (วัดจริง)** | รุ่นใหม่สุด แม่นสุด (GPQA 90.4) · ค่าที่ทดสอบใน LAB |
+| `qwen3.8-27b-nvfp4` ⭐ | `neroued/Qwen3.8-27B-nvfp4-NInfer` | `qwen3_8_27b_nvfp4.ninfer` | `qwen3.8-27b` | 22.1 GiB | **20.7–24.4 GB (วัดจริง 2 ครั้ง)** | รุ่นใหม่สุด แม่นสุด (GPQA 90.4) · ค่าที่ทดสอบใน LAB |
 | `qwen3.8-27b` | `neroued/Qwen3.8-27B-NInfer` | `qwen3_8_27b.ninfer` | `qwen3.8-27b` | 19.0 GiB | ~18 GB | รุ่นใหม่ ไฟล์เล็กกว่า (Q4/Q5) |
 | `qwen3.6-27b` | `neroued/Qwen3.6-27B-NInfer` | `qwen3_6_27b.ninfer` | `qwen3.6-27b` | 16.3 GiB | ~15 GB | เล็กสุด โหลดเร็วสุด |
 | `qwen3.6-27b-nvfp4` | `neroued/Qwen3.6-27B-nvfp4-NInfer` | `qwen3_6_27b_nvfp4.ninfer` | `qwen3.6-27b` | 17.1 GiB | ~16 GB | prefill เร็ว (NVFP4 บน Blackwell) |
 | `qwen3.6-35b-a3b` | `neroued/Qwen3.6-35B-A3B-NInfer` | `qwen3_6_35b_a3b.ninfer` | `qwen3.6-35b-a3b` | 21.2 GiB | ~20 GB | MoE (ใช้งานจริงทีละ 3B) **ตอบเร็วสุด** |
 
-- VRAM ≈ น้ำหนักโมเดล (ไม่รวมส่วน Vision ที่ไม่ได้โหลด) + KV cache ของ `--max-context 16384` · ตัวเลข "ประมาณ" คำนวณจากค่าจริงของ qwen3.8-27b-nvfp4 (ไฟล์ 22.1 GiB → ใช้จริง 20.7 GB) ยังไม่ได้วัดตัวอื่น ให้ AI รายงานค่าจริงจาก `nvidia-smi` หลัง server พร้อม
+- VRAM ≈ น้ำหนักโมเดล (ไม่รวมส่วน Vision ที่ไม่ได้โหลด) + KV cache ของ `--max-context 16384` · ตัวเลข "ประมาณ" คำนวณจากค่าจริงของ qwen3.8-27b-nvfp4 (ไฟล์ 22.1 GiB → ใช้จริง 20.7–24.4 GB) ยังไม่ได้วัดตัวอื่น ให้ AI รายงานค่าจริงจาก `nvidia-smi` หลัง server พร้อม
 - ข้อมูลจาก model card บน Hugging Face (ตรวจ 15 ต.ค. 2026) — ถ้า repo เปลี่ยน ให้ AI เช็ค `https://huggingface.co/api/models?author=neroued` ก่อน
 
 ## 2) ขั้นตอน (AI ทำเองทั้งหมด)
