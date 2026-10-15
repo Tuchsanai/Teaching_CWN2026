@@ -18,13 +18,13 @@
 
 | `MODEL` | HF repo | ไฟล์ `.ninfer` | `LLM_MODEL` (ชื่อใน API) | ขนาดไฟล์ | VRAM ที่ใช้ (ประมาณ) | จุดเด่น |
 |---|---|---|---|---|---|---|
-| `qwen3.8-27b-nvfp4` ⭐ | `neroued/Qwen3.8-27B-nvfp4-NInfer` | `qwen3_8_27b_nvfp4.ninfer` | `qwen3.8-27b` | 22.1 GiB | **~24 GB (วัดจริง)** | รุ่นใหม่สุด แม่นสุด (GPQA 90.4) · ค่าที่ทดสอบใน LAB |
-| `qwen3.8-27b` | `neroued/Qwen3.8-27B-NInfer` | `qwen3_8_27b.ninfer` | `qwen3.8-27b` | 19.0 GiB | ~21 GB | รุ่นใหม่ ไฟล์เล็กกว่า (Q4/Q5) |
-| `qwen3.6-27b` | `neroued/Qwen3.6-27B-NInfer` | `qwen3_6_27b.ninfer` | `qwen3.6-27b` | 16.3 GiB | ~19 GB | เล็กสุด โหลดเร็วสุด |
-| `qwen3.6-27b-nvfp4` | `neroued/Qwen3.6-27B-nvfp4-NInfer` | `qwen3_6_27b_nvfp4.ninfer` | `qwen3.6-27b` | 17.1 GiB | ~20 GB | prefill เร็ว (NVFP4 บน Blackwell) |
-| `qwen3.6-35b-a3b` | `neroued/Qwen3.6-35B-A3B-NInfer` | `qwen3_6_35b_a3b.ninfer` | `qwen3.6-35b-a3b` | 21.2 GiB | ~23 GB | MoE (ใช้งานจริงทีละ 3B) **ตอบเร็วสุด** |
+| `qwen3.8-27b-nvfp4` ⭐ | `neroued/Qwen3.8-27B-nvfp4-NInfer` | `qwen3_8_27b_nvfp4.ninfer` | `qwen3.8-27b` | 22.1 GiB | **20.7 GB (วัดจริง)** | รุ่นใหม่สุด แม่นสุด (GPQA 90.4) · ค่าที่ทดสอบใน LAB |
+| `qwen3.8-27b` | `neroued/Qwen3.8-27B-NInfer` | `qwen3_8_27b.ninfer` | `qwen3.8-27b` | 19.0 GiB | ~18 GB | รุ่นใหม่ ไฟล์เล็กกว่า (Q4/Q5) |
+| `qwen3.6-27b` | `neroued/Qwen3.6-27B-NInfer` | `qwen3_6_27b.ninfer` | `qwen3.6-27b` | 16.3 GiB | ~15 GB | เล็กสุด โหลดเร็วสุด |
+| `qwen3.6-27b-nvfp4` | `neroued/Qwen3.6-27B-nvfp4-NInfer` | `qwen3_6_27b_nvfp4.ninfer` | `qwen3.6-27b` | 17.1 GiB | ~16 GB | prefill เร็ว (NVFP4 บน Blackwell) |
+| `qwen3.6-35b-a3b` | `neroued/Qwen3.6-35B-A3B-NInfer` | `qwen3_6_35b_a3b.ninfer` | `qwen3.6-35b-a3b` | 21.2 GiB | ~20 GB | MoE (ใช้งานจริงทีละ 3B) **ตอบเร็วสุด** |
 
-- VRAM ≈ น้ำหนักโมเดล (ไม่รวมส่วน Vision ที่ไม่ได้โหลด) + KV cache ของ `--max-context 16384` · ตัวเลข "ประมาณ" ยังไม่ได้วัดจริง ให้ AI รายงานค่าจริงจาก `nvidia-smi` หลัง server พร้อม
+- VRAM ≈ น้ำหนักโมเดล (ไม่รวมส่วน Vision ที่ไม่ได้โหลด) + KV cache ของ `--max-context 16384` · ตัวเลข "ประมาณ" คำนวณจากค่าจริงของ qwen3.8-27b-nvfp4 (ไฟล์ 22.1 GiB → ใช้จริง 20.7 GB) ยังไม่ได้วัดตัวอื่น ให้ AI รายงานค่าจริงจาก `nvidia-smi` หลัง server พร้อม
 - ข้อมูลจาก model card บน Hugging Face (ตรวจ 15 ต.ค. 2026) — ถ้า repo เปลี่ยน ให้ AI เช็ค `https://huggingface.co/api/models?author=neroued` ก่อน
 
 ## 2) ขั้นตอน (AI ทำเองทั้งหมด)
@@ -34,6 +34,8 @@ skill `vastai` เช่า 1 เครื่อง ตามเงื่อน�
 - GPU `RTX_5090` · เพดาน `MAX_DPH` · ป้าย `LABEL`
 - เน็ตดาวน์โหลด **> 2500 Mbps** (โมเดล ~20 GiB)
 - image `nvidia/cuda:13.1.2-devel-ubuntu24.04` · disk **90 GB** · Docker options `-p 8080:8080`
+- ถ้าเครื่องค้าง `loading` เกิน ~10 นาที หรือ status ขึ้น `Failed to connect to cloud.vast.ai` (host เน็ตมีปัญหา) → **ลบเครื่องนั้นแล้วเช่าเครื่องใหม่จาก host อื่น** (เจอจริง 15 ต.ค. 2026)
+- **ทำงานให้จบในรอบเดียว**: รอด้วย `sleep` + เช็คสถานะเป็นช่วง ๆ ห้ามจบงานไปก่อนแล้ว "ตั้งเวลากลับมาดู" (โหมด `-p` จะปิดตัวและงานเบื้องหลังหยุดตาม)
 
 ### 2.2 ติดตั้ง NInfer + โหลดโมเดล (บนเครื่องที่เช่า · ~8–10 นาที)
 สร้างสคริปต์เองจากคำสั่งอ้างอิง แล้วรันแบบเบื้องหลัง (`nohup … &`) และคอยดู log ทุก ~60 วินาที เพราะนานเกิน timeout ของ ssh ครั้งเดียว
@@ -99,15 +101,7 @@ LLM_API_KEY=<key>
 
 ห้ามแสดง key บนจอ (ใช้ `scp`/`cat` ลงไฟล์โดยตรง) · ไฟล์นี้ถูก ignore ไม่ถูก commit
 
-## 3) เปลี่ยนโมเดล (เครื่องเดิม ไม่ต้องเช่าใหม่ · ~3–5 นาที)
-
-1. หาเครื่องจาก `LABEL` (ต้อง `running`) — ไม่ต้อง build ใหม่
-2. โหลดโมเดลใหม่ตามข้อ 2.2 (เฉพาะบรรทัด `hf download`) · disk 90 GB เก็บได้ ~3 โมเดล ถ้าพื้นที่ไม่พอให้**ถามผู้ใช้ก่อน**ลบไฟล์โมเดลเก่า
-3. เปิด server ใหม่ตามข้อ 2.3 ด้วย `<FILE>` ใหม่ (key เดิม · URL เดิม)
-4. ทดสอบตามข้อ 2.4 แล้วแก้ `.env.vast` บรรทัด `LLM_MODEL=` เป็นค่าใหม่
-5. บอกผู้ใช้ให้รันฝั่ง frontend ใหม่ (README ข้อ 4.2 โหมด AI จริง: สร้าง `.env` จาก `.env.vast` แล้ว `docker compose up -d --build web`)
-
-## 4) กติกา
+## 3) กติกา
 
 - ห้ามพิมพ์ `VAST_API_KEY` หรือ API key ของ server บนจอ
 - ห้ามขึ้นเพดานราคาเกิน `MAX_DPH` และห้ามลบเครื่องเองโดยไม่ได้รับคำสั่ง
