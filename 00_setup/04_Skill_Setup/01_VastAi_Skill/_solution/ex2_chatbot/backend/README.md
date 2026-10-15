@@ -1,39 +1,27 @@
-# Backend: NInfer + Qwen3.8-27B บน Vast.ai RTX 5090
+# Backend: NInfer + Qwen บน Vast.ai RTX 5090
+
+ไม่มีสคริปต์ให้รันเอง — ให้ `yolo1` (skill `vastai`) อ่าน **[NINFER_RECIPE.md](NINFER_RECIPE.md)** แล้วทำให้ทั้งหมด
+(เช่าเครื่อง → build NInfer → โหลดโมเดล → เปิด API พอร์ต 8080 → ทดสอบ → เขียน `.env.vast`)
 
 | ไฟล์ | ทำอะไร |
 |:--|:--|
-| `setup_ninfer.sh` | ลงแพ็กเกจ → clone + build NInfer → โหลดโมเดล 22 GiB (รันซ้ำได้) |
-| `start_server.sh` | เปิด `ninfer-serve` ที่พอร์ต 8080 แบบเบื้องหลัง พร้อม API key + CORS แล้วรอจน `/health` ผ่าน |
+| `NINFER_RECIPE.md` | สูตรการทำงานสำหรับ AI: ตารางโมเดล Qwen ที่เลือกได้ · เงื่อนไขเครื่อง · คำสั่งอ้างอิง · วิธีเปลี่ยนโมเดล · กติกา |
+| `.env.vast` | AI เขียนให้ตอนจบ (3 บรรทัด `LLM_BASE_URL` `LLM_MODEL` `LLM_API_KEY`) · ถูก ignore ห้าม commit |
 
-## 1) เช่าเครื่อง
-RTX 5090 · image `nvidia/cuda:13.1.2-devel-ubuntu24.04` · disk 90 GB · เน็ต > 2000 Mbps ·
-Docker options: `-p 8080:8080`
+## พรอมต์ (วางใน `yolo1` ที่ `/workspace`)
 
-## 2) ในเครื่อง Vast (SSH เข้าไปแล้ว copy-paste)
-```bash
-mkdir -p /workspace && cd /workspace
-# วางไฟล์ setup_ninfer.sh และ start_server.sh ไว้ที่ /workspace (scp หรือคัดลอกเนื้อหา)
-bash setup_ninfer.sh                         # ~8-10 นาที (build ~7.5 นาที + โหลดโมเดลพร้อมกัน ~2 นาที)
-NINFER_API_KEY=ตั้งรหัสลับเอง bash start_server.sh   # ~15 วินาที จน "พร้อมแล้ว!"
+```text
+ใช้ skill vastai ทำตาม 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
+MODEL=qwen3.8-27b-nvfp4 LABEL=ex2-ninfer-5090 MAX_DPH=1.20
 ```
-log: `tail -f /workspace/ninfer.log`
 
-## 3) หา URL สาธารณะ
-หน้า Vast → instance → ปุ่ม IP/port: ดู `public IP` และพอร์ตที่ map กับ `8080/tcp`
-(เช่น `8080/tcp -> 41234`) → URL = `http://<public_ip>:<HostPort>`
+เปลี่ยนโมเดล (เครื่องเดิม):
 
-## 4) ทดสอบจากเครื่องตัวเอง
-```bash
-URL=http://<public_ip>:<HostPort>; KEY=รหัสลับ
-curl $URL/health
-curl $URL/v1/models -H "Authorization: Bearer $KEY"
-curl $URL/v1/chat/completions -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-  -d '{"model":"qwen3.8-27b","max_tokens":200,"messages":[
-       {"role":"system","content":"คุณคือพนักงานร้านนวดแผนไทย ตอบสุภาพ สั้น เป็นภาษาไทย"},
-       {"role":"user","content":"สวัสดีค่ะ ร้านเปิดกี่โมง"}]}'
+```text
+ใช้ skill vastai ทำตาม NINFER_RECIPE.md ข้อ 3 (เปลี่ยนโมเดล) ในโฟลเดอร์ 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend
+เครื่อง LABEL=ex2-ninfer-5090 เปลี่ยนเป็น MODEL=qwen3.6-35b-a3b
 ```
-ใส่ `"stream":true` เพื่อรับแบบ SSE (ใช้ `curl -N`)
 
-ค่าที่ frontend ใช้: `LLM_BASE_URL=http://<ip>:<port>` · `LLM_MODEL=qwen3.8-27b` · `LLM_API_KEY=<รหัสลับ>`
+ค่าที่ frontend ใช้: `LLM_BASE_URL=http://<ip>:<port>` · `LLM_MODEL=<ชื่อใน API ตามตาราง>` · `LLM_API_KEY=<key>`
 
 > เลิกใช้แล้ว **destroy เครื่องทุกครั้ง** (stop ยังเสียค่า disk)

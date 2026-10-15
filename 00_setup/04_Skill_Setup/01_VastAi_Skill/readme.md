@@ -14,8 +14,17 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
 
 > ⚠️ **เสียเงินจริง** — ทุกครั้งที่ทดลองเสร็จ ต้องสั่ง **ลบเครื่อง (destroy)** แล้วเช็คหน้าเว็บ Instances ว่าว่าง
 
-![ภาพรวม 4 ขั้น: 1 ตั้งค่า SSH Key และ API Key บนเว็บ cloud.vast.ai, 2 ใส่ค่าในไฟล์ .env, 3 container multi-account-devtool mount repo ที่ /workspace แล้วเปิด yolo1 ที่มี skill vastai, 4 สั่งเช่า RTX 4090 ด้วย API key และ ssh เข้าเครื่องด้วย SSH key](image/vast-concept-overview.png)
-*ภาพแนวคิด (Imagegen ด้วย cyolo): ตั้งค่าเว็บ → `.env` → container → เช่า GPU ตรงกับส่วนที่ 1–3 และแบบฝึกหัดด้านล่าง*
+### หลักการ: ตัวแปร 2 ตัวใน `.env`
+
+![ภาพรวม 4 ขั้น: 1 เว็บ cloud.vast.ai ให้ API Key (คัดลอกค่า) และ SSH Key (ใส่ .pub บนเว็บ), 2 ไฟล์ .env มี 2 บรรทัด VAST_API_KEY และ VAST_SSH_KEY_FILE=Devtool_SSH/devtoolSSH, 3 docker run --env-file .env โหลดเป็นตัวแปร environment ใน container multi-account-devtool ให้ yolo1 และ skill vastai อ่าน, 4 skill ใช้ API Key สั่งเช่า/ลบเครื่อง และใช้ SSH Key ssh เข้าเครื่อง RTX 4090 บน Vast.ai](image/vast-flow-env.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo): **สีส้ม = API Key** · **สีฟ้า = SSH Key** ตามเส้นสีจากซ้ายไปขวาได้เลย*
+
+| ตัวแปรใน `.env` | ได้มาจากไหน | skill `vastai` เอาไปทำอะไร |
+|---|---|---|
+| 🟠 `VAST_API_KEY` | เว็บ Vast.ai → Keys → **API Keys** → + New → คัดลอก (ขั้นที่ 3) | ยืนยันตัวตนกับบัญชีเรา เพื่อ**สั่งเช่า / ลบเครื่อง / ดูบิล** (ตัดเงินจากเครดิต) |
+| 🔵 `VAST_SSH_KEY_FILE` | path ของ **private key** ใน repo = `Devtool_SSH/devtoolSSH` (ส่วน `.pub` เอาไปใส่บนเว็บในขั้นที่ 2) | ใช้ **ssh / scp เข้าเครื่อง**ที่เช่ามา |
+
+ลำดับการทำงาน: ใส่ค่าใน `.env` → `docker run --env-file .env` **โหลดค่าเป็นตัวแปร environment** ใน container `multi-account-devtool` → `yolo1` ที่มี skill `vastai` อ่านตัวแปร 2 ตัวนี้ไปเช่าเครื่องให้เรา
 
 สัญลักษณ์: 🖥️ = พิมพ์ใน shell (กรอบ `bash`) · 💬 = วางในช่องแชทของ AI (กรอบ `text` ให้คัดลอกทั้งกรอบ)
 
@@ -23,15 +32,16 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
 
 ## ส่วนที่ 1 · ตั้งค่าบนเว็บ Vast.ai (~10 นาที)
 
-![กุญแจ 2 ดอก: หุ่นยนต์ถือ API Key สั่งเช่า/ลบเครื่อง, นักศึกษาถือ SSH Key เข้าเครื่องได้, หีบ .env ป้ายห้ามแชร์](image/cartoon-keys.png)
-*ภาพแนวคิด (Imagegen ด้วย cyolo): Vast.ai ใช้กุญแจ 2 ดอก — **API Key** ให้ AI สั่งเช่า/ลบเครื่อง, **SSH Key** ให้เราเข้าเครื่อง*
-
-![เทียบ API Key (บัตรสั่งงานบัญชี เช่า/หยุด/ลบเครื่อง ตัดเงินจากเครดิต หลุดคือคนอื่นใช้เงินเราได้) กับ SSH Key (public ฝากไว้ที่ Vast, private เก็บไว้กับเรา ใช้ตอน ssh/scp) ห้าม commit ห้ามแคปหน้าจอให้เห็นค่า key](image/vast-concept-keys.png)
-*ภาพแนวคิด (Imagegen ด้วย cyolo): API Key หลุด = คนอื่นใช้เงินเราได้ · SSH Key ส่วน public ฝากไว้ที่ Vast ส่วน private อยู่กับเรา*
+![เตรียมบัญชี Vast.ai 4 ขั้น: 1 สมัครบัญชีที่ cloud.vast.ai, 2 Billing เติมเครดิต $5–10 ทำเองห้ามให้ AI กรอกบัตร, 3 Keys → SSH Keys → + New วาง .pub, 4 Keys → API Keys → + New คัดลอกทันทีเพราะเห็นครั้งเดียว ได้กุญแจ 2 ดอกไปใส่ในไฟล์ .env](image/vast-signup-steps.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo): 4 ขั้นในส่วนนี้ ภาพจริงของแต่ละขั้นมี**วงกลมสีแดงพร้อมเลขลำดับ** บอกว่าต้องกดตรงไหน*
 
 ### ขั้นที่ 1 · สมัครและเติมเครดิต
 
-สมัครที่ https://cloud.vast.ai/ → เมนู **Billing** → เติมเครดิต (บัตร/ช่องทางที่เว็บรองรับ) — ทำเองนะ ห้ามให้ AI กรอกข้อมูลบัตร
+1. สมัครที่ https://cloud.vast.ai/ (มุมขวาบน **Sign Up** · ยืนยันอีเมล)
+2. เมนูซ้าย **Billing** → กด **Add Credit** → เติม $5–10 — **ทำเองเท่านั้น ห้ามให้ AI กรอกข้อมูลบัตร**
+
+![หน้า Billing: วงกลม 1 ที่เมนู Billing ด้านซ้าย, วงกลม 2 ที่ปุ่ม Add Credit ในการ์ด Credit Balance ยอดเงินและข้อมูลบัตรถูกเบลอ](image/vast-02-billing.png)
+*ภาพจริง: ยอดเครดิต ข้อมูลบัตร และอีเมลถูกเบลอไว้*
 
 ### ขั้นที่ 2 · ใส่ SSH Key (public key)
 
@@ -42,35 +52,29 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
    ```
 
    คัดลอกทั้งบรรทัดที่ขึ้นต้นด้วย `ssh-ed25519 AAAA…` (ไฟล์เดียวกันมีสำเนาใน `01_VastAi_Skill/Devtool_SSH/` ด้วย)
-2. เปิด https://cloud.vast.ai/manage-keys/ → แท็บ **SSH Keys** → กด **+ New**
+2. เปิด https://cloud.vast.ai/manage-keys/ → ทำตามเลข **①–⑤** ในภาพ
 
-![หน้า Manage Keys แท็บ SSH Keys มีปุ่ม + New มุมขวา](image/vast-03-keys-ssh-before.png)
-*ภาพจริง: แท็บ SSH Keys — key ที่ใส่ที่นี่จะถูกใส่ให้เครื่องที่เช่าใหม่ทุกเครื่องอัตโนมัติ*
+![หน้า Manage Keys: วงกลม 1 เมนู Keys ด้านซ้าย, วงกลม 2 แท็บ SSH Keys, วงกลม 3 ปุ่ม + New มุมขวา](image/vast-03-keys-ssh-before.png)
+*ภาพจริง: ① เมนู **Keys** → ② แท็บ **SSH Keys** → ③ **+ New** · key ที่ใส่ที่นี่จะถูกใส่ให้เครื่องที่เช่าใหม่ทุกเครื่องอัตโนมัติ*
 
-3. วางเนื้อหา `.pub` ลงในช่อง → กด **Save**
+![หน้าต่าง Add SSH Key: วงกลม 4 ช่องวาง public key จากคำสั่ง cat Devtool_SSH/devtoolSSH.pub, วงกลม 5 ปุ่ม Save](image/vast-04-keys-ssh-add.png)
+*ภาพจริง: ④ วางบรรทัด `ssh-ed25519 AAAA…` ที่คัดลอกมา → ⑤ **Save** · key ใหม่ไม่ถูกใส่ให้เครื่องที่เช่าไว้ก่อนแล้ว*
 
-![หน้าต่าง Add SSH Key มีช่องวาง key และปุ่ม Save](image/vast-04-keys-ssh-add.png)
-*ภาพจริง: ช่องวาง public key (เบลอไว้) — key ใหม่ไม่ถูกใส่ให้เครื่องที่เช่าไว้ก่อนแล้ว*
-
-![หลัง Save ตาราง SSH Keys มีแถวใหม่ ssh-ed25519 ... devtools-lab](image/vast-05-keys-ssh-after.png)
-*ภาพจริง: แถวล่างสุด `ssh-ed25519 … devtools-lab` คือ key ที่เพิ่งเพิ่ม*
+![หลัง Save ตาราง SSH Keys มีแถวใหม่ ssh-ed25519 ... devtools-lab วงกลมสีเขียว](image/vast-05-keys-ssh-after.png)
+*ภาพจริง: ✔ มีแถว `… devtools-lab` = ใส่ SSH Key สำเร็จ*
 
 ### ขั้นที่ 3 · สร้าง API Key
 
-1. แท็บ **API Keys** → กด **+ New**
+ทำตามเลข **①–⑧** ในภาพ 3 ภาพนี้
 
-![แท็บ API Keys มีปุ่ม + New](image/vast-06-keys-api-tab.png)
-*ภาพจริง: แท็บ API Keys*
+![แท็บ API Keys: วงกลม 1 เมนู Keys, วงกลม 2 แท็บ API Keys, วงกลม 3 ปุ่ม + New](image/vast-06-keys-api-tab.png)
+*ภาพจริง: ① เมนู **Keys** → ② แท็บ **API Keys** → ③ **+ New***
 
-2. ช่อง **Name** ใส่ `devtools-lab` → ในตาราง Permission **เอาเครื่องหมายออกที่ Billing/Earning → Write** (ช่องอื่นติ๊กไว้ตามเดิม) → กด **Save**
+![หน้าต่าง Create API Key: วงกลม 4 ช่อง Name ใส่ devtools-lab, วงกลม 5 ช่อง Billing/Earning Write ที่ต้องเอาติ๊กออก, วงกลม 6 ปุ่ม Save](image/vast-07-keys-api-create.png)
+*ภาพจริง: ④ ชื่อ `devtools-lab` → ⑤ **เอาติ๊กออกที่ Billing/Earning → Write** (ช่องอื่นติ๊กไว้ตามเดิม) → ⑥ **Save** · AI เช่า/ลบเครื่องและดูบิลได้ แต่แก้การเงินในบัญชีไม่ได้*
 
-![หน้าต่าง Create API Key ชื่อ devtools-lab ติ๊ก User Read/Write, Instances Read/Write, Billing/Earning Read แต่ไม่ติ๊ก Write, Miscellaneous Enabled](image/vast-07-keys-api-create.png)
-*ภาพจริง: **Billing/Earning Write ว่างไว้โดยตั้งใจ** — AI เช่า/ลบเครื่องและดูบิลได้ แต่แก้การเงินในบัญชีไม่ได้*
-
-3. ขึ้นหน้าต่าง **API key created successfully** → กดปุ่มคัดลอก 📋 ทันที (**เห็นได้ครั้งเดียว** ปิดแล้วดูอีกไม่ได้ ต้องสร้างใหม่)
-
-![หน้าต่าง API key created successfully. It won't be visible again มีช่อง key (เบลอ) และปุ่มคัดลอก](image/vast-08-keys-api-created.png)
-*ภาพจริง: key ถูกเบลอไว้ — อย่าแคปหน้าจอนี้ให้คนอื่นเห็น*
+![หน้าต่าง API key created successfully: วงกลม 7 ปุ่มคัดลอก key, วงกลม 8 ปุ่ม Close หลังวาง key ลง .env](image/vast-08-keys-api-created.png)
+*ภาพจริง: ⑦ กดคัดลอก 📋 **ทันที** (เห็นได้ครั้งเดียว ปิดแล้วดูอีกไม่ได้ ต้องสร้างใหม่) → ⑧ วางลง `.env` ในส่วนที่ 2 แล้วค่อยกด **Close** · key ในภาพถูกเบลอไว้ อย่าแคปหน้าจอนี้ให้คนอื่นเห็น*
 
 ---
 
@@ -91,6 +95,8 @@ VAST_SSH_KEY_FILE=Devtool_SSH/devtoolSSH
 VAST_HTTP_TIMEOUT=20
 ```
 
+ตัวหลักคือ 🟠 `VAST_API_KEY` กับ 🔵 `VAST_SSH_KEY_FILE` (ดูตารางในหัวข้อ "หลักการ" ด้านบน) · `VAST_HTTP_TIMEOUT` = รอ API ของ Vast ได้นานสุดกี่วินาที ใช้ค่านี้ได้เลย
+
 > ⚠️ **3 กับดักที่เจอจริง**
 > 1. **ห้ามใส่เครื่องหมายคำพูด** `"..."` ครอบ key — `docker --env-file` เก็บ `"` ไว้เป็นส่วนหนึ่งของค่า → skill ฟ้อง `Invalid user key`
 > 2. **ห้ามเขียน `# comment` ต่อท้ายบรรทัดค่า** — เหตุผลเดียวกัน comment จะกลายเป็นส่วนหนึ่งของค่า (เขียน comment ไว้บรรทัดของมันเองได้)
@@ -102,8 +108,9 @@ VAST_HTTP_TIMEOUT=20
 
 ## ส่วนที่ 3 · เปิด container ให้เห็นโฟลเดอร์ repo ที่ `/workspace` (~5 นาที)
 
-![ขั้นเตรียม: โฟลเดอร์ Teaching บน Windows (มี .env และ Devtool_SSH) เป็นโฟลเดอร์เดียวกับ /workspace ใน container multi-account-devtool หุ่นยนต์ถือป้ายห้ามเปิด .env ในเว็บ](image/cartoon-step-container.png)
-*ภาพแนวคิด (Imagegen ด้วย cyolo): โฟลเดอร์ repo บน Windows กับ `/workspace` ใน container คือ**โฟลเดอร์เดียวกัน** — แก้ฝั่งไหนก็เห็นทั้งสองฝั่ง*
+คำสั่ง `docker run` ในขั้นนี้ทำ 2 อย่าง:
+- `--env-file .env` → **โหลด `VAST_API_KEY` และ `VAST_SSH_KEY_FILE` เป็นตัวแปร environment** ของ container (ขั้นที่ 3 ในภาพหลักการ)
+- `-v <REPO>:/workspace` → โฟลเดอร์ repo บน Windows กับ `/workspace` ใน container คือ**โฟลเดอร์เดียวกัน** — skill จึงหาไฟล์ `Devtool_SSH/devtoolSSH` เจอ
 
 ### ขั้นที่ 4 · สร้าง container ใหม่ (ไม่หายล็อกอิน)
 
@@ -130,8 +137,10 @@ docker run -dit --name multi-account-devtool --hostname multi-account-devtool --
 docker exec multi-account-devtool bash -lc 'B=$HOME/ai-accounts; for t in .Claude .Codex; do for s in vastai yolo cyolo; do [ -d $B/$t/shared/skills/$s ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
    ถ้ามี MISSING ให้เตือนฉันว่า "⚠️ ยังไม่ได้ติดตั้ง skill: <รายชื่อ>" ห้ามติดตั้ง skill เอง
 7. ตรวจว่า `docker exec multi-account-devtool ls /workspace` เห็นไฟล์ .env และโฟลเดอร์ Devtool_SSH
-8. ห้ามล็อกอินแทนฉัน ห้ามพิมพ์ค่าใน .env สรุปเป็นภาษาไทย: คำเตือน (ถ้ามี) ไว้บนสุด, port ที่ใช้,
-   URL http://localhost:<JUPYTER_PORT>/lab/tree/workspace, ผลตรวจ skill 6 บรรทัด, ผลตรวจ /workspace
+8. ตรวจว่าตัวแปรถูกโหลดเข้า container (แสดงแค่ OK/MISSING ไม่แสดงค่า):
+docker exec multi-account-devtool bash -lc 'for v in VAST_API_KEY VAST_SSH_KEY_FILE; do [ -n "${!v}" ] && echo "$v OK" || echo "$v MISSING"; done'
+9. ห้ามล็อกอินแทนฉัน ห้ามพิมพ์ค่าใน .env สรุปเป็นภาษาไทย: คำเตือน (ถ้ามี) ไว้บนสุด, port ที่ใช้,
+   URL http://localhost:<JUPYTER_PORT>/lab/tree/workspace, ผลตรวจ skill 6 บรรทัด, ผลตรวจ /workspace, ผลตรวจตัวแปร 2 บรรทัด
 ```
 
 <details>
@@ -151,15 +160,15 @@ docker run -dit --name multi-account-devtool --hostname multi-account-devtool --
 
 </details>
 
-**ผลที่ควรได้:** skill `OK` ครบ 6 บรรทัด และ `/workspace` เห็น `.env` กับ `Devtool_SSH`
+**ผลที่ควรได้:** skill `OK` ครบ 6 บรรทัด · `/workspace` เห็น `.env` กับ `Devtool_SSH` · `VAST_API_KEY OK` และ `VAST_SSH_KEY_FILE OK`
 
 ### ขั้นที่ 5 · เปิด Terminal ใน JupyterLab แล้วติดตั้ง vastai SDK
 
 1. เปิด **http://localhost:8886/lab/tree/workspace** (ใช้ port อื่น? เปลี่ยน `8886`)
 2. แถบไฟล์ซ้ายต้องเขียน `/ workspace /` → ในแท็บ **Launcher** กด **Terminal**
 
-![JupyterLab เปิดที่ /workspace เห็นโฟลเดอร์ของ repo (00_resource, 00_setup, Devtool_SSH, .env ...) และ Launcher มีปุ่ม Terminal](image/vast-10-jupyter-workspace.png)
-*ภาพจริง: `/workspace` = โฟลเดอร์ repo บน Windows · กด **Terminal** ในหมวด Other (อย่าดับเบิลคลิก `.env`)*
+![JupyterLab: วงกลม 1 แถบไฟล์เขียน / workspace /, วงกลม ! ไฟล์ .env ห้ามดับเบิลคลิก, วงกลม 2 ปุ่ม Terminal ในหมวด Other](image/vast-10-jupyter-workspace.png)
+*ภาพจริง: ① ต้องเห็น `/ workspace /` (= โฟลเดอร์ repo บน Windows) → ② กด **Terminal** · ❗ ห้ามดับเบิลคลิก `.env`*
 
 3. 🖥️ ใน Terminal (ทำครั้งเดียวต่อ container ใหม่ — **ใช้เวลา ~5–12 นาที** เพราะดาวน์โหลดจาก PyPI ช้า รอจนขึ้น prompt ใหม่):
 
@@ -210,8 +219,8 @@ skill จะ**ถามขอขึ้นเพดานราคา** เพร
 
 เปิด https://cloud.vast.ai/instances/ → เห็นแท็บ `lab-4090`, ป้าย **lab-4090**, ราคา `$/hr` และสถานะ running
 
-![หน้า Instances: 1x RTX 4090 Verified ราคา $0.697/hr ป้าย lab-4090 สถานะ running มีปุ่ม Connect](image/vast-13-console-instance.png)
-*ภาพจริง: เครื่องที่ AI เช่าให้ ขึ้นบนเว็บจริง (`$0.697/hr`, `Status: success, running`)*
+![หน้า Instances: 1x RTX 4090 ราคา $0.697/hr วงกลมเขียวที่ป้าย lab-4090 และวงกลม 1 ที่ปุ่ม >_Connect](image/vast-13-console-instance.png)
+*ภาพจริง: ✔ ป้าย `lab-4090` = เครื่องที่ AI เช่าให้ (`$0.697/hr`, `Status: success, running`) → ① กด **>_Connect***
 
 กดปุ่ม **>_Connect** → เห็นคำสั่ง ssh แบบเดียวกับที่ `yolo1` บอก
 
@@ -224,8 +233,54 @@ skill จะ**ถามขอขึ้นเพดานราคา** เพร
 2. 🖥️ คัดลอกคำสั่ง **direct** ที่ `yolo1` พิมพ์ (`ssh -i /workspace/Devtool_SSH/devtoolSSH …`) แล้ว**เติม ` nvidia-smi` ต่อท้าย** → Enter
 3. ถ้าถาม `Are you sure you want to continue connecting?` ให้พิมพ์ `yes` (ถามครั้งแรกครั้งเดียว)
 
+**หน้าตาคำสั่งเต็ม** (ตัวอย่าง — **IP และ port ของคุณจะไม่เหมือนนี้** ให้ใช้ค่าที่ `yolo1` บอก):
+
+```bash
+# direct (เร็วกว่า) — ต่อตรงไปที่ IP ของเครื่อง
+ssh -i /workspace/Devtool_SSH/devtoolSSH -p 41234 root@203.0.113.25 -o StrictHostKeyChecking=accept-new nvidia-smi
+
+# proxy (ใช้ตอน direct ต่อไม่ได้) — ผ่านเซิร์ฟเวอร์กลางของ Vast
+ssh -i /workspace/Devtool_SSH/devtoolSSH -p 13478 root@ssh5.vast.ai -o StrictHostKeyChecking=accept-new nvidia-smi
+```
+
+| ส่วนของคำสั่ง | ความหมาย |
+|---|---|
+| `-i /workspace/Devtool_SSH/devtoolSSH` | 🔵 private key = ค่าจาก `VAST_SSH_KEY_FILE` (คู่กับ `.pub` ที่ใส่บนเว็บในขั้นที่ 2) |
+| `-p 41234` | port ของเครื่องที่เช่า (Vast สุ่มให้ — ทุกเครื่องไม่เหมือนกัน) |
+| `root@203.0.113.25` | ล็อกอินเป็น `root` ที่ IP ของเครื่อง (proxy ใช้ `sshN.vast.ai` แทน) |
+| `-o StrictHostKeyChecking=accept-new` | ยอมรับเครื่องใหม่อัตโนมัติ ไม่ต้องพิมพ์ `yes` |
+| `nvidia-smi` | คำสั่งที่จะรัน**บนเครื่องที่เช่า** แล้วออกทันที (ไม่ใส่ = เข้าไปค้างใน shell ของเครื่องนั้น พิมพ์ `exit` เพื่อออก) |
+
+**ผลที่ควรได้** (ผลจริงจากเครื่อง RTX 4090 วันที่ 14 ต.ค. 2026 · IP/port ในบรรทัดแรกเปลี่ยนเป็นค่าตัวอย่าง):
+
+```text
+Warning: Permanently added '[203.0.113.25]:41234' (ED25519) to the list of known hosts.
+Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+Have fun!
+Wed Oct 14 14:38:31 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.173.02             Driver Version: 580.173.02     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 4090        On  |   00000000:E1:00.0 Off |                  Off |
+| 30%   38C    P8             12W /  450W |       4MiB /  24564MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+```
+
 ![Terminal ที่ 2 รัน ssh -i /workspace/Devtool_SSH/devtoolSSH ... nvidia-smi แสดง NVIDIA GeForce RTX 4090 หน่วยความจำ 4MiB / 24564MiB CUDA 13.0](image/vast-16-ssh-nvidia-smi.png)
-*ภาพจริง: `NVIDIA GeForce RTX 4090 … 24564MiB` = เราใช้ GPU บนเครื่องที่เช่ามาได้จริง*
+*ภาพจริง: `NVIDIA GeForce RTX 4090 … 24564MiB` = เราใช้ GPU บนเครื่องที่เช่ามาได้จริง (IP/port ในภาพเบลอไว้)*
 
 > `Connection refused` ตอนเพิ่งเช่าเสร็จ = เครื่องยังบูตไม่เสร็จ รอ 1–2 นาทีแล้วลองใหม่ หรือใช้คำสั่ง proxy
 
@@ -252,10 +307,99 @@ skill จะ**ถามขอขึ้นเพดานราคา** เพร
 | ส่วน | อยู่ที่ไหน | ทำอะไร |
 |---|---|---|
 | **frontend** | Docker บน Windows · http://localhost:3300 | หน้าแชท Next.js + PostgreSQL เก็บการจองคิว |
-| **backend** | Vast.ai RTX 5090 · พอร์ต 8080 | [NInfer](https://github.com/Neroued/ninfer) รันโมเดล Qwen3.8-27B NVFP4 (22 GB, HF `neroued/Qwen3.8-27B-nvfp4-NInfer`) เป็น API แบบ OpenAI พร้อม API key |
+| **backend** | Vast.ai RTX 5090 · พอร์ต 8080 | [NInfer](https://github.com/Neroued/ninfer) รันโมเดล Qwen (เลือกได้ 5 ตัว ดูตารางด้านล่าง) เป็น API แบบ OpenAI พร้อม API key |
 
-> ทำไม RTX 5090: NInfer รองรับเฉพาะ RTX 5090 (CUDA 13.1) · ต้องการเน็ต > 2000 Mbps เพื่อโหลดโมเดล 22 GB ให้เร็ว
+> ทำไม RTX 5090: NInfer รองรับเฉพาะ RTX 5090 (CUDA 13.1) · ต้องการเน็ต > 2500 Mbps เพื่อโหลดโมเดล 22 GB ให้เร็ว
 > อยากลองโดยไม่เสียเงิน: ข้ามไป 4.2 แล้วใช้ **โหมด mock** (ไม่ต้องใช้ GPU)
+
+### 4.0 · รู้จักโมเดลก่อนใช้ (~10 นาที อ่านอย่างเดียว)
+
+ก่อนสั่ง AI เช่าเครื่อง มาดูก่อนว่า "สมอง" ของแชทบอทคืออะไร มีให้เลือกกี่ตัว ต่างกันอย่างไร และถ้าอยากเปลี่ยนต้องแก้ตรงไหน
+
+#### ① ไฟล์ `.ninfer` คืออะไร
+
+![ไฟล์ .ninfer คืออะไร: Qwen ต้นฉบับ BF16 27B พารามิเตอร์ × 16 bit ≈ 54 GB ใหญ่เกิน GPU 32 GB → บีบอัดเหลือ ~4 bit → กระเป๋า .ninfer ไฟล์เดียว 16–22 GB มี config, น้ำหนักโมเดล, MTP, Vision, chat template → NInfer (C++/CUDA) บน RTX 5090 32 GB → API แบบ OpenAI :8080 → หน้าแชท](image/ex2-model-ninfer.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo)*
+
+- **Qwen** คือโมเดลภาษาของ Alibaba ที่เปิดให้ดาวน์โหลดฟรี ตัวที่ใช้มี **27 พันล้านพารามิเตอร์ (27B)** ไฟล์ต้นฉบับ (BF16, 16 bit ต่อค่า) ใหญ่ ~54 GB **ใส่ GPU 32 GB ไม่ได้**
+- จึงต้อง**บีบอัด (quantize)** ให้แต่ละค่าเหลือ ~4 bit แล้วแพ็กทุกอย่างที่ต้องใช้ไว้ใน**ไฟล์เดียว** = ไฟล์ `.ninfer` (16–22 GB)
+- **NInfer** คือโปรแกรมรันโมเดล (C++/CUDA) ที่เขียนมาให้เร็วที่สุด**เฉพาะ RTX 5090** อ่านไฟล์ `.ninfer` แล้วเปิดเป็น API แบบเดียวกับ OpenAI ที่พอร์ต 8080 → หน้าแชทของเราเรียกใช้ได้เลย
+- ไฟล์ `.ninfer` ใช้ได้กับ NInfer เท่านั้น (เปิดด้วย Ollama / vLLM ไม่ได้) · ผู้แปลงไฟล์คือ [Hugging Face `neroued`](https://huggingface.co/neroued) มี Qwen ให้เลือก **5 ไฟล์**
+
+#### ② ข้างในโมเดล 27B มีอะไร
+
+![ข้างใน Qwen 27B Dense 64 ชั้น: คำถาม → token → Embedding คำศัพท์ 248k → ×16 รอบ ของ Gated DeltaNet 3 ชั้น + Full Attention 1 ชั้น (แต่ละชั้นมี FFN) → Output head → คำถัดไป · MTP head เดาล่วงหน้า 3 คำ ตอบเร็วขึ้น ~2–3 เท่า · Vision encoder ไม่ได้ใช้ใน LAB](image/ex2-model-arch.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo) · ตัวเลขจาก `config.json` ของ Qwen*
+
+โมเดลตอบทีละ **token** (คำหรือส่วนของคำ): ข้อความผ่าน 64 ชั้นแล้วได้ token ถัดไป 1 ตัว วนซ้ำจนจบคำตอบ
+
+| ส่วน | ทำอะไร |
+|---|---|
+| **Embedding** | แปลง token (คำศัพท์ 248,320 คำ รองรับภาษาไทย) เป็นตัวเลข |
+| **Gated DeltaNet** 48 ชั้น | attention แบบ "จำย่อ" เก็บความจำขนาดคงที่ → เร็วและไม่กิน VRAM แม้บทสนทนายาว |
+| **Full Attention** 16 ชั้น | มองย้อนทุกคำก่อนหน้า → แม่นยำ แต่ต้องเก็บ **KV cache** (ยิ่งคุยยาวยิ่งใช้ VRAM) · วางสลับ 3:1 กับ DeltaNet |
+| **FFN** ทุกชั้น | ส่วน "ความรู้" ของโมเดล = น้ำหนักส่วนใหญ่ของไฟล์ |
+| **MTP head** | เดาล่วงหน้า 3 token แล้วตรวจทีเดียว (`--spec mtp --draft-tokens 3`) → ตอบเร็วขึ้น ~2–3 เท่า |
+| **Vision** | อ่านภาพ/วิดีโอได้ แต่ LAB นี้ไม่ได้เปิด (ไม่โหลดเข้า VRAM) |
+
+#### ③ Dense กับ MoE ต่างกันอย่างไร
+
+![Dense vs MoE: Dense 27B ทุกคำผ่าน FFN ก้อนเดียว ใช้ครบ 27B ~205 token/วินาที · MoE 35B-A3B มี Router เลือก 8 จากผู้เชี่ยวชาญ 256 ตัว + shared expert ใช้จริง ~3B ต่อคำ ~677 token/วินาที เร็วกว่า ~3 เท่า แต่ต้องเก็บครบ 35B ใน VRAM ไฟล์ 21.2 GiB](image/ex2-model-moe.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo) · ความเร็วจาก model card (ตอบ 1 คน, MTP=3)*
+
+- **Dense (`27b`)** ทุก token ใช้น้ำหนักครบ 27B → แม่นและสม่ำเสมอ แต่คำนวณเยอะ
+- **MoE (`35b-a3b`)** มี "ผู้เชี่ยวชาญ" 256 ตัวต่อชั้น (40 ชั้น) แต่ละ token ให้ **Router เลือกใช้แค่ 8 ตัว** + 1 ตัวที่ใช้ร่วม → คำนวณจริงแค่ **~3B (A3B = Active 3B)** → **ตอบเร็วกว่า ~3 เท่า** แต่ต้องเก็บครบทั้ง 35B ไว้ใน VRAM
+
+#### ④ บีบอัดแบบ Q4/Q5 กับ NVFP4
+
+![บีบโมเดลให้เล็ก: BF16 ต้นฉบับ 16 bit 54 GB · groupwise-int Q4/Q5 จำนวนเต็ม 4–5 bit + ตัวคูณทุกกลุ่ม · NVFP4 ทศนิยม 4 bit + ตัวคูณ FP8 ทุก 16 ค่า Tensor Core ของ RTX 5090 คำนวณได้ตรง ๆ · bit น้อย = ไฟล์เล็ก เร็วขึ้น แต่ความแม่นอาจลดนิดหน่อย](image/ex2-model-quant.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo)*
+
+| วิธี | ชื่อไฟล์ | หลักการ | จุดเด่น |
+|---|---|---|---|
+| **groupwise-int (Q4/Q5)** | ไม่มีคำต่อท้าย เช่น `qwen3.6-27b` | เก็บเป็นจำนวนเต็ม 4–5 bit + ตัวคูณ 1 ค่าต่อกลุ่ม | ไฟล์เล็ก ความแม่นใกล้ต้นฉบับ |
+| **NVFP4** | ลงท้าย `-nvfp4` | เก็บเป็นทศนิยม 4 bit + ตัวคูณ FP8 ทุก 16 ค่า (บางส่วนใช้ FP8) | GPU รุ่น Blackwell (RTX 5090) คำนวณได้ตรง ๆ → **อ่าน prompt ยาวเร็วมาก** |
+
+#### ⑤ เทียบ 5 โมเดล: ความแม่น · ความเร็ว · VRAM
+
+![กราฟเทียบ 5 โมเดล: GPQA-Diamond, AIME 2026, ความเร็ว token/วินาที และขนาดไฟล์ ≈ VRAM โดย qwen3.8-27b-nvfp4 (ค่าเริ่มต้น) GPQA 90.4% AIME 96.7% 205 tok/s 22.1 GiB](image/ex2-model-compare.png)
+*กราฟจากตัวเลขใน model card ของ `neroued` บน Hugging Face (ตรวจ 15 ต.ค. 2026)*
+
+| `MODEL=` (ใส่ในพรอมต์) | โครงสร้าง · บีบอัด | ขนาดไฟล์ | VRAM ที่ใช้ | GPQA-Diamond | AIME 2025 | AIME 2026 | IFBench | ความเร็ว (tok/s) | `LLM_MODEL` |
+|---|---|---|---|---|---|---|---|---|---|
+| `qwen3.8-27b-nvfp4` ⭐ | Dense 27B · NVFP4+FP8 | 22.1 GiB | **~24 GB** (วัดจริง) | **90.4%** | 96.7% | 96.7% | 77.0% | 205 | `qwen3.8-27b` |
+| `qwen3.8-27b` | Dense 27B · Q4/Q5 | 19.0 GiB | ~21 GB | 87.4% | 96.7% | 96.7% | **77.7%** | – | `qwen3.8-27b` |
+| `qwen3.6-27b` | Dense 27B · Q4/Q5 | 16.3 GiB | ~19 GB | 86.9% | 86.7% | 93.3% | – | 167 | `qwen3.6-27b` |
+| `qwen3.6-27b-nvfp4` | Dense 27B · NVFP4 | 17.1 GiB | ~20 GB | 84.3% | 93.3% | 93.3% | – | 220 | `qwen3.6-27b` |
+| `qwen3.6-35b-a3b` | MoE 35B (ใช้ 3B) · Q4–Q6 | 21.2 GiB | ~23 GB | 85.3% | 90.0% | 90.0% | – | **677** | `qwen3.6-35b-a3b` |
+
+ตัววัด (benchmark) คืออะไร — ทุกตัวเป็น **accuracy (% ตอบถูก)** แบบ 0-shot (ไม่ให้ตัวอย่างก่อน) ตรวจคำตอบด้วยกฎอัตโนมัติ:
+
+| ตัววัด | วัดอะไร |
+|---|---|
+| **GPQA-Diamond** | ข้อสอบวิทยาศาสตร์ (ฟิสิกส์ เคมี ชีวะ) ระดับปริญญาเอก แบบเลือกตอบ |
+| **AIME 2025 / 2026** | ข้อสอบคณิตศาสตร์แข่งขันระดับมัธยมของอเมริกา (30 ข้อ/ปี) วัดการคิดหลายขั้น |
+| **IFBench** | ทำตามคำสั่งได้เป๊ะไหม เช่น "ตอบไม่เกิน 3 บรรทัด" — สำคัญกับแชทบอท |
+| **ความเร็ว** | token/วินาที ตอนตอบลูกค้า 1 คน (งานเขียนโค้ด, เปิด MTP=3) · "–" = ไม่มีใน model card |
+
+- VRAM "~" = ประมาณจากขนาดไฟล์ + KV cache (`--max-context 16384`) ยังไม่ได้วัดจริง · RTX 5090 มี 32 GB **ใส่ได้ทุกตัว** · AI จะรายงานค่าจริงจาก `nvidia-smi` ตอนจบ
+- **ค่าเริ่มต้นใช้ `qwen3.8-27b-nvfp4`** เพราะแม่นที่สุดและทดสอบใน LAB แล้ว · อยากได้ตอบไวสุด → `qwen3.6-35b-a3b` · อยากโหลดไวสุด → `qwen3.6-27b`
+- ในแชทจริงเราวัดได้ ~113 tok/s (`qwen3.8-27b-nvfp4`) — ต่ำกว่าตาราง เพราะคำตอบสั้นและรวมเวลาเริ่มต้น
+
+#### ⑥ อยากเปลี่ยนโมเดล แก้ตรงไหน
+
+![อยากเปลี่ยนโมเดล แก้ตรงไหน: 1 พรอมต์ MODEL=qwen3.6-35b-a3b (แก้ตรงนี้ที่เดียว) → 2 NINFER_RECIPE.md ตารางโมเดล ได้ HF repo ไฟล์ .ninfer LLM_MODEL → 3 RTX 5090 hf download และ ninfer-serve → 4 .env.vast LLM_MODEL=qwen3.6-35b-a3b → 5 หน้าแชท :3300 docker compose up -d --build web · ข้อ 2–4 AI ทำให้เอง](image/ex2-model-switch.png)
+*ภาพแนวคิด (Imagegen ด้วย cyolo)*
+
+**เราแก้แค่ค่า `MODEL=` ในพรอมต์** — ที่เหลือ AI อ่านจากตารางใน [NINFER_RECIPE.md](_solution/ex2_chatbot/backend/NINFER_RECIPE.md) แล้วทำเอง
+
+| อยากทำอะไร | แก้ตรงไหน |
+|---|---|
+| เลือกโมเดลตั้งแต่แรก | แก้ `MODEL=` ในพรอมต์ข้อ 4.1 |
+| เปลี่ยนโมเดลบนเครื่องที่เช่าอยู่ | ใช้พรอมต์ "เปลี่ยนโมเดล" ท้ายข้อ 4.1 แล้วทำ 4.2 ใหม่ |
+| ยอมจ่ายแพงขึ้น / ตั้งชื่อเครื่องอื่น | แก้ `MAX_DPH=` / `LABEL=` ในพรอมต์ |
+| ปรับการทำงานของ server (context ยาวขึ้น, รับลูกค้าพร้อมกันมากขึ้น) | แก้ตาราง flag ใน `NINFER_RECIPE.md` ข้อ 2.3 |
+| เพิ่มโมเดลใหม่ที่ `neroued` เพิ่งปล่อย | เพิ่มแถวในตาราง `NINFER_RECIPE.md` ข้อ 1 (repo · ไฟล์ · ชื่อใน API) |
 
 ### 4.1 · backend — ให้ yolo1 เช่า RTX 5090 และเปิด AI server
 
@@ -265,21 +409,27 @@ skill จะ**ถามขอขึ้นเพดานราคา** เพร
 ![หน้า Instances: 1x RTX 5090 Verified ราคา $0.909/hr Max CUDA 13.1 เน็ต 5438/4839 Mbps disk 90 GB ป้าย ex2-ninfer-5090 running nvidia/cuda_13.1.2-devel-ubuntu24.04](image/ex2-vast-5090-console.png)
 *ภาพจริง: เครื่อง backend ที่ได้ — RTX 5090, CUDA 13.1, เน็ต ~5000 Mbps, disk 90 GB, `$0.909/hr`*
 
-🖥️ Terminal ที่ `/workspace` → `yolo1` → 💬 วาง:
+🖥️ Terminal ที่ `/workspace` → `yolo1` → 💬 วาง (อยากใช้โมเดลอื่น แก้แค่ `MODEL=` ตามตารางข้อ 4.0 ⑤):
 
 ```text
-ใช้ skill vastai เช่า RTX 5090 1 เครื่อง ชื่อ ex2-ninfer-5090 ยอมเพดานราคาได้ถึง $1.20/ชม.
-เน็ตดาวน์โหลดมากกว่า 2000 Mbps ใช้ image nvidia/cuda:13.1.2-devel-ubuntu24.04 disk 90 GB เปิดพอร์ต 8080 (-p 8080:8080)
-จากนั้น push ไฟล์ setup_ninfer.sh และ start_server.sh ในโฟลเดอร์ 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend
-ไปที่ /workspace ของเครื่อง แล้วรัน bash setup_ninfer.sh และ bash start_server.sh ตาม README ในโฟลเดอร์นั้น (ไม่ต้องตั้ง NINFER_API_KEY ให้สคริปต์สุ่มเอง)
-หา public IP และ port ที่ map กับ 8080/tcp แล้วทดสอบ /health กับถามภาษาไทย 1 ข้อ
-สุดท้ายเขียน 3 บรรทัด LLM_BASE_URL=http://<ip>:<port> LLM_MODEL=qwen3.8-27b LLM_API_KEY=<key> (ไม่มีเครื่องหมายคำพูด)
-ลงไฟล์ 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/.env.vast ห้ามพิมพ์ API key บนจอ
+ใช้ skill vastai ทำตาม 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
+MODEL=qwen3.8-27b-nvfp4 LABEL=ex2-ninfer-5090 MAX_DPH=1.20
 ```
+
+ไฟล์ `NINFER_RECIPE.md` คือ "สูตร" ที่บอก AI ว่าต้องเช่าเครื่องแบบไหน ติดตั้งอะไร เปิด server ด้วยค่าอะไร ทดสอบอย่างไร และเขียนผลลง `.env.vast` — **ไม่มีสคริปต์ให้เรารันเอง** AI สร้างคำสั่งและรันบนเครื่องที่เช่าให้ทั้งหมด
 
 **ผลจริงที่ได้ (14 ต.ค. 2026):** build NInfer 448 วินาที พร้อมกับโหลดโมเดล 128 วินาที (setup รวม ~8 นาที) · server พร้อมใน 14 วินาที · $0.91/ชม. · ตอบภาษาไทยใน 1.2 วินาที (~113 token/วินาที)
 
 ไฟล์ `backend/.env.vast` อยู่ใน repo บน Windows ด้วย (โฟลเดอร์เดียวกัน) และถูก ignore ไม่ถูก commit — ห้ามเปิดใน JupyterLab
+
+**เปลี่ยนโมเดลภายหลัง** (ใช้เครื่องเดิม ไม่ต้องเช่า/build ใหม่ · ~3–5 นาที) 💬 วางใน `yolo1`:
+
+```text
+ใช้ skill vastai ทำตาม NINFER_RECIPE.md ข้อ 3 (เปลี่ยนโมเดล) ในโฟลเดอร์ 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend
+เครื่อง LABEL=ex2-ninfer-5090 เปลี่ยนเป็น MODEL=qwen3.6-35b-a3b
+```
+
+AI จะแก้ `LLM_MODEL=` ใน `.env.vast` ให้ (URL และ key เดิม) → จากนั้นทำ 4.2 โหมด AI จริงอีกครั้ง หน้าแชทจะใช้โมเดลใหม่
 
 ### 4.2 · frontend — เปิดหน้าแชทบนเครื่องเรา
 
@@ -377,7 +527,7 @@ docker compose --profile mock down
 | 2 | SSH Keys มีแถว `ssh-ed25519 … devtools-lab` | ☐ |
 | 3 | API key `devtools-lab` (Billing Write ว่าง) คัดลอกแล้ว | ☐ |
 | ส่วนที่ 2 | `.env` มี 3 บรรทัด VAST_ ไม่มี `"` ไม่มี comment ท้ายบรรทัด | ☐ |
-| 4 | skill `OK` 6 บรรทัด · `/workspace` เห็น `.env` | ☐ |
+| 4 | skill `OK` 6 บรรทัด · `/workspace` เห็น `.env` · `VAST_API_KEY OK` `VAST_SSH_KEY_FILE OK` | ☐ |
 | 5 | `pip install 'vastai~=1.8'` เสร็จ | ☐ |
 | 6 | ตารางความพร้อม ✅ | ☐ |
 | 7–8 | `lab-4090` running บนเว็บ | ☐ |
@@ -392,6 +542,7 @@ docker compose --profile mock down
 
 | อาการ | สาเหตุ / วิธีแก้ |
 |---|---|
+| `VAST_API_KEY MISSING` (ขั้นที่ 4) | ยังไม่ได้ใส่ค่าใน `.env` หรือสร้าง container ก่อนแก้ `.env` → แก้แล้ว**ทำขั้นที่ 4 ใหม่** |
 | `Invalid user key` | ใน `.env` มี `"` ครอบ key หรือมี `# comment` ท้ายบรรทัด → แก้แล้ว**ทำขั้นที่ 4 ใหม่** (ค่าจาก `--env-file` ถูกอ่านตอนสร้าง container เท่านั้น) |
 | `pip install` ค้างนาน | ปกติ ~5–12 นาที (PyPI ช้า) รอได้ ทำครั้งเดียวต่อ container ใหม่ |
 | `ไม่มี offer <= $…/hr` | เพดานราคาต่ำไป → ตอบ skill ให้ยอมเพดานสูงขึ้น หรือเปลี่ยน GPU (เช่น RTX 3090) |
