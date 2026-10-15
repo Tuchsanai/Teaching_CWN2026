@@ -189,6 +189,14 @@ RUN npm install -g --no-fund --no-audit "@playwright/mcp@${PLAYWRIGHT_MCP_VERSIO
  && npm cache clean --force \
  && rm -rf /var/lib/apt/lists/*
 
+# Python packages เพิ่มเติม (แก้ที่ requirements.txt) — ลง system python เหมือน JupyterLab
+#   vastai~=1.8 : CLI/SDK ของ Vast.ai สำหรับ skill vastai
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt \
+ && vastai --help >/dev/null \
+ && pip show vastai | grep -E '^(Name|Version)' \
+ && rm -f /tmp/requirements.txt
+
 # ระบบหลายบัญชี
 #   /etc/ai-accounts.conf              BASE_PATH="$HOME/ai-accounts" (แก้ที่นี่ที่เดียว) + รายชื่อบัญชี
 #   /usr/local/bin/ai-accounts-setup   installer (รันซ้ำได้) — start.sh เรียกทุกครั้งที่ container start

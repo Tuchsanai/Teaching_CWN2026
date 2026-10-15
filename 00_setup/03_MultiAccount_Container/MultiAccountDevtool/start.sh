@@ -7,6 +7,21 @@
 #   4) jupyter lab (port 8888) : ไม่มีรหัสผ่าน (ตั้งได้ด้วย $JUPYTER_PASSWORD)
 # ถ้ารันแบบมี tty (-it) จะเปิด bash ให้; ถ้ารันแบบ -d จะ tail log แทนเพื่อให้ container ไม่ดับ
 
+# --- cgroup v2 nesting (ต้องทำก่อน sshd/dockerd/คำสั่งอื่นทั้งหมด) ----------------
+# container ทดลองข้างใน (เช่น skill k8s-lab → kind) รัน systemd ซึ่งต้องใช้ controller memory/io
+# ถ้ายังมี process อยู่ใน root cgroup ตอน dockerd สร้าง /sys/fs/cgroup/docker cgroup จะกลายเป็น
+# threaded และเปิด memory/io ไม่ได้อีกเลย (kind ล้มด้วย "could not find ... Multi-User System")
+# จึงย้ายทุก process ไป /sys/fs/cgroup/init ก่อน แล้วเปิด controller ทั้งหมดให้ลูก
+# (วิธีเดียวกับ docker:dind และ devtools-kind) — cgroup v1 ไม่มีไฟล์นี้ จึงข้ามไป
+CG=/sys/fs/cgroup
+if [ -f "$CG/cgroup.controllers" ]; then
+    mkdir -p "$CG/init"
+    xargs -rn1 < "$CG/cgroup.procs" > "$CG/init/cgroup.procs" 2>/dev/null || :
+    sed -e 's/ / +/g' -e 's/^/+/' < "$CG/cgroup.controllers" > "$CG/cgroup.subtree_control" 2>/dev/null \
+        || for c in $(cat "$CG/cgroup.controllers"); do echo "+$c" > "$CG/cgroup.subtree_control" 2>/dev/null; done
+    echo "[start.sh] cgroup v2 controllers: $(cat "$CG/cgroup.subtree_control")"
+fi
+
 mkdir -p /run/sshd
 ssh-keygen -A >/dev/null 2>&1
 

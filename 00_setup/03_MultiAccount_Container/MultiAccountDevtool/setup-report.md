@@ -1,18 +1,20 @@
 # setup-report — MultiAccountDevtool (`tuchsanai/multi-account-devtool:2569_1`)
 
-วันที่ build/ทดสอบ: 2026-09-29 (เวลาไทย UTC+7) · image ID `sha256:1ef1dd87076e…` · ขนาด ≈ 3.0 GB
-push `tuchsanai/multi-account-devtool:2569_1` ขึ้น Docker Hub แล้ว (digest `sha256:36e63a66…`) · ยังไม่มีบัญชีใดล็อกอิน (ผู้ใช้ล็อกอินเอง ดู `login-guide.md`)
+วันที่ build/ทดสอบ: 2026-10-15 (เวลาไทย UTC+7) · image ID `sha256:b423af3b443f…` · ขนาด ≈ 3.2 GB
+push `tuchsanai/multi-account-devtool:2569_1` ขึ้น Docker Hub แล้ว (digest `sha256:9638853cece0…`) · container ทดสอบ `mad-test` (SSH 2233, JupyterLab 8896) ยังไม่มีบัญชีใดล็อกอิน (ผู้ใช้ล็อกอินเอง ดู `login-guide.md`)
+รอบนี้เพิ่ม `requirements.txt` (`vastai~=1.8`) ติดตั้งด้วย `pip install -r` ลง system python
 
 ## 1. เวอร์ชันที่ติดตั้งจริงใน image
 
 | ส่วนประกอบ | เวอร์ชัน | ติดตั้งด้วย | ตำแหน่ง |
 |---|---|---|---|
-| Claude Code | 2.1.284 | `curl -fsSL https://claude.ai/install.sh \| bash` (native) | `/root/.local/share/claude/versions/2.1.284` ← `/root/.local/bin/claude` ← `/usr/local/bin/claude` |
-| Codex CLI | codex-cli 0.159.0 | `npm install -g @openai/codex` | `/usr/lib/node_modules/@openai/codex` ← `/usr/local/bin/codex` |
+| Claude Code | 2.1.300 | `curl -fsSL https://claude.ai/install.sh \| bash` (native) | `/root/.local/share/claude/versions/2.1.300` ← `/root/.local/bin/claude` ← `/usr/local/bin/claude` |
+| Codex CLI | codex-cli 0.162.1 | `npm install -g @openai/codex` | `/usr/lib/node_modules/@openai/codex` ← `/usr/local/bin/codex` |
 | Playwright MCP | `@playwright/mcp@0.0.83` (pin) | `npm install -g` | `/usr/bin/playwright-mcp` |
 | Playwright (ในแพ็กเกจ MCP) | 1.64.0-alpha-1790635538000 | มากับ `@playwright/mcp` | `…/@playwright/mcp/node_modules/playwright` |
 | Chromium | Chrome for Testing 155.0.8059.12 (chromium-1247 + headless shell) | `node <playwright ใน @playwright/mcp>/cli.js install --with-deps chromium` ครั้งเดียวตอน build | `PLAYWRIGHT_BROWSERS_PATH=/ms-playwright` |
-| ของเดิมจาก 00_Devtool_Container | Ubuntu 24.04, git 2.55.0, Docker 29.8.1 (DinD), Node 22, JupyterLab 4.x + extensions, sshd (password + key `devtoolSSH`) | สำเนา Dockerfile เดิมทั้งส่วน | — |
+| vastai (Python) | 1.8.3 (`vastai~=1.8`) | `pip install -r requirements.txt` | system python (`vastai` CLI ใน PATH) |
+| ของเดิมจาก 00_Devtool_Container | Ubuntu 24.04, git 2.55.0, Docker 29.9.1 (DinD), Node 22.23.3, JupyterLab 4.6.4 + extensions, sshd (password + key `devtoolSSH`) | สำเนา Dockerfile เดิมทั้งส่วน | — |
 
 `claude`, `codex`, `yolo1..5`, `cyolo1..5` อยู่ใน `/usr/local/bin` ซึ่งอยู่ใน PATH มาตรฐานอยู่แล้ว → ใช้ได้ทั้ง JupyterLab Terminal (`bash -l`), SSH และ `docker exec` โดยไม่แก้ `.bashrc` (ทดสอบแล้วทั้งสามทาง)
 
@@ -71,7 +73,7 @@ MCP ส่วนกลางตัวแรก (เหมือนกันท�
 
 ## 5. ตรวจ "ข้อเท็จจริงจากการทดลอง" กับเวอร์ชันที่ติดตั้งจริง
 
-| ข้อเท็จจริงในสเปก | ผลกับ Claude 2.1.284 / Codex 0.159.0 / MCP 0.0.83 | หลักฐาน |
+| ข้อเท็จจริงในสเปก | ผลกับ Claude 2.1.300 / Codex 0.162.1 / MCP 0.0.83 | หลักฐาน |
 |---|---|---|
 | root ต้องตั้ง `IS_SANDBOX=1` | จริง — ไม่ตั้ง: `--dangerously-skip-permissions cannot be used with root/sudo privileges`; ตั้งแล้วผ่านไปถึง `Not logged in` | `_agent_logs/t-claude-facts.log` |
 | `CODEX_HOME` ต้อง `mkdir -p` ก่อน | จริง — `Error loading configuration: CODEX_HOME points to "…", but that path does not exist` | `t-claude-facts.log` |
@@ -88,6 +90,8 @@ MCP ส่วนกลางตัวแรก (เหมือนกันท�
 ข้อสังเกตเพิ่มเติมที่พบจริง (ไม่ขัดสเปก):
 - Codex 0.159.0 พิมพ์ `WARNING: … could not create PATH aliases` เมื่อ `CODEX_HOME` อยู่ใต้ `/tmp` เท่านั้น (เจอตอน smoke test ใน build) — ใน `/root/ai-accounts` ไม่มีคำเตือนนี้ และ Codex สร้าง `CODEX_HOME/tmp/` เอง
 - `@playwright/mcp` `browser_take_screenshot` ต้องให้ `filename` เป็น absolute path (relative จะบันทึกเทียบกับ cwd) — probe จึงส่ง absolute path
+- `@playwright/mcp` บันทึกไฟล์ได้เฉพาะใต้ `--output-dir` (`/root/ai-accounts/playwright-output`) หรือ `/workspace` เท่านั้น path อื่นเช่น `/tmp/x.png` จะได้ `File access denied: … is outside allowed roots` (พบรอบ 2026-10-15)
+- Codex สร้างไฟล์ runtime ใน `$CODEX_HOME/tmp/arg0/` ทุกครั้งที่เรียก (เช่น `mcp list`) — ไม่ใช่ credential/config การเทียบ checksum ของ volume จึงตัดโฟลเดอร์นี้และ `playwright-output/` ออก
 - wrapper ของ Claude ตั้ง `DISABLE_AUTOUPDATER=1` เพราะ CLI อยู่ใน image; อัปเดตโดย build ใหม่ (`--build-arg CLAUDE_CODE_VERSION=…`)
 
 ## 6. การทำงานตอน container start (start.sh)
@@ -104,4 +108,5 @@ sshd (password `passwd` + key `devtoolSSH`) → dockerd → `ai-accounts-setup` 
 - Claude: `claude mcp list` ไม่เห็น MCP จาก `--mcp-config` ให้ตรวจด้วย `/mcp`
 - `docker compose down -v` ลบ volume `ai-accounts` = ล็อกอินหายทุกบัญชี
 - env_file (`DEVTOOLS_ENV_FILE`, ค่าเริ่ม `/root/workspace/DGX_2024/.env`) เข้า environment ของ container/JupyterLab แต่ SSH session ไม่สืบทอด (เหมือน container เดิม)
+- JupyterLab ไม่มีรหัสผ่านเป็นค่าเริ่ม และพอร์ตผูก `0.0.0.0` — ถ้าโหลด .env ที่มี token เข้า container ควรตั้ง `JUPYTER_PASSWORD` หรือผูกพอร์ตกับ `127.0.0.1`
 - การทดสอบของ agent ใช้ compose override (`_agent_logs/compose.test-override.yaml`) เพราะ agent อยู่ใน container: bind mount ต้องใช้ path ฝั่ง Docker host (`/run/desktop/mnt/host/c/Users/…/MultiAccountDevtool/{workspace,Devtool_SSH}`) และ mount `Devtool_SSH` แบบ `:ro` — นักศึกษาที่รัน `docker compose up -d` บนเครื่องตัวเองไม่ต้องใช้ override นี้

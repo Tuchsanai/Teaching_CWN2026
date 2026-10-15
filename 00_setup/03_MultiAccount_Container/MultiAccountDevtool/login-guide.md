@@ -5,6 +5,8 @@
 - `ssh -i Devtool_SSH/devtoolSSH root@localhost -p <SSH_PORT>` (หรือ password `passwd`)
 - `docker exec -it <ชื่อ container> bash`
 
+container ทดสอบรอบ 2026-10-15: `mad-test` → SSH `-p 2233`, JupyterLab `http://localhost:8896/lab`
+
 ก่อนเริ่ม: `ai-accounts-setup` รันเองแล้วตอน container start ถ้าสงสัยให้รันซ้ำได้ (ไม่ทับของเดิม)
 
 > ห้ามแชร์หน้าจอ/ข้อความที่มีโค้ดล็อกอินหรือ URL ที่มี token ให้คนอื่น
