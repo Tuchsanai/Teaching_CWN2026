@@ -36,11 +36,15 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 กติกา: ห้ามลบ volume `ai-accounts` (เก็บล็อกอินทุกบัญชี) · ห้ามแสดงค่าในไฟล์ env (แสดงได้แค่ชื่อตัวแปร
 ยกเว้น LOCAL_SKILLS_DIR) หรือเนื้อหา SKILL.md · ห้ามติดตั้ง Claude/Codex/skill เอง (ยกเว้น sync ข้อ 3)
 · ห้ามล็อกอินแทนฉัน · เก็บคำเตือน ⚠️ ทุกข้อไว้บนสุดของสรุป
-ให้เร็ว: ทำแต่ละข้อด้วยคำสั่ง shell เดียว (รวมหลายเช็กในคำสั่งเดียว) ห้าม sleep รอแยกเป็นหลายรอบ
+ให้เร็ว: ทำแต่ละข้อด้วยคำสั่ง shell เดียว (รวมหลายเช็กในคำสั่งเดียว ข้อ 3–4 รันต่อกันได้) ห้าม sleep รอแยกเป็นหลายรอบ
 ใช้ได้ทุก OS: ดูก่อนว่าเครื่องเป็น Windows / macOS / Linux และ shell อะไร แล้วเขียนคำสั่งให้ตรง shell นั้น
-(path ใช้ / ได้ทุก OS) · คำสั่ง docker ข้อ 2–3 รันได้ตามตัวอักษรทุก shell ห้ามแก้ quote
+(path ใช้ / ได้ทุก OS) · คำสั่ง docker ข้อ 2–4 รันได้ตามตัวอักษรทุก shell ห้ามแก้ quote
+(Git Bash บน Windows: ใส่ `export MSYS_NO_PATHCONV=1` ก่อน ไม่งั้น /workspace ถูกแปลงเป็น path ของ Windows)
 
-1. เช็กทุกอย่างในคำสั่งเดียว (เริ่ม `docker pull tuchsanai/multi-account-devtool:2569_1` แบบ background ไปพร้อมกัน)
+1. เช็กทุกอย่างในคำสั่งเดียว
+   - ยังไม่มี image ในเครื่อง (`docker image inspect`) → เริ่ม `docker pull tuchsanai/multi-account-devtool:2569_1`
+     แบบ background แล้วแจ้งฉันทันทีก่อนทำข้อ 2:
+     "⏳ ยังไม่มี image ในเครื่อง กำลังดาวน์โหลด (~4.5 GB) ครั้งแรกอาจใช้หลายนาที กรุณารอสักครู่"
    - container ชื่อนี้มีอยู่แล้ว → จะ `docker rm -f` ก่อนข้อ 2
    - port Jupyter=8886 ถ้าชน (container อื่นใช้อยู่ / มีโปรแกรมฟังอยู่) ใช้ port ว่างถัดไป
      (port ที่ `multi-account-devtool` ตัวเดิมถืออยู่ไม่นับว่าชน เพราะจะถูกลบ)
@@ -54,7 +58,8 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
      → `-v "<path>:/opt/local-skills/<ชื่อโฟลเดอร์>:ro"` · เป็นโฟลเดอร์รวม skill → `-v "<path>:/opt/local-skills:ro"`
 
 2. คำสั่งเดียว: (rm -f ถ้ามี) → docker run (ตัด option ที่ข้อ 1 บอกว่าไม่ใช้) → วนเช็กทุก 2 วิ
-   (สูงสุด 5 นาที เผื่อ pull ครั้งแรก) จน http://localhost:<JUPYTER_PORT>/lab ตอบ 200
+   (สูงสุด 5 นาที, curl ใส่ timeout) จน http://localhost:<JUPYTER_PORT>/lab ตอบ 200
+   docker run ล้ม → หยุดทันทีแล้วรายงาน error ห้ามวนรอต่อ
    docker run แจ้งว่าใช้ port ไม่ได้ (เช่น `ports are not available`, `address already in use` หรือ port ที่ OS สงวนไว้)
    → `docker rm -f` แล้วรันใหม่ด้วย port ว่างถัดไป
 
@@ -68,9 +73,16 @@ docker run -dit --name multi-account-devtool --privileged -w /workspace -p <JUPY
 
 docker exec multi-account-devtool bash -lc 'B=$HOME/ai-accounts; K=/tmp/skills.txt; echo vastai yolo cyolo > $K; n=0; for d in /opt/local-skills/*/; do [ -d $d ] || continue; s=$(basename $d); if [ ! -f $d/SKILL.md ]; then echo SKIP $s no-SKILL.md; continue; fi; if [ $s = shared-check ]; then echo SKIP $s reserved; continue; fi; for t in .Claude .Codex; do rm -rf $B/$t/shared/skills/$s; cp -rL $d $B/$t/shared/skills/$s; done; echo SYNCED $s; n=$((n+1)); echo $s >> $K; done; echo TOTAL $n; for t in .Claude .Codex; do for s in $(xargs -n1 < $K | sort -u); do [ -d $B/$t/shared/skills/$s ] && echo $t/$s OK || echo $t/$s MISSING; done; done'
 
-4. สรุปภาษาไทยตามลำดับ: ⚠️ คำเตือน (ไม่มีให้เขียน "ไม่มี") → URL http://localhost:<JUPYTER_PORT>/lab
+4. ตรวจการล็อกอินทุกบัญชี (ห้ามแสดง token หรืออีเมล) ไม่มี LOGGED_IN เลยสักบัญชี →
+   ⚠️ "ยังไม่มีบัญชีไหนล็อกอิน — กรุณาล็อกอินอย่างน้อย 1 บัญชีใน Terminal ของ JupyterLab:
+   yolo1 (เลือก Claude account with subscription แล้ว /exit) หรือ cyolo1 login --device-auth"
+
+docker exec multi-account-devtool bash -lc 'for a in yolo1 yolo2 yolo3 yolo4 yolo5; do $a auth status 2>/dev/null | grep -q loggedIn.:.true && echo $a LOGGED_IN || echo $a NOT_LOGGED_IN; done; for a in cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do $a login status 2>&1 | grep -q ^Logged.in && echo $a LOGGED_IN || echo $a NOT_LOGGED_IN; done'
+
+5. สรุปภาษาไทยตามลำดับ: ⚠️ คำเตือน (ไม่มีให้เขียน "ไม่มี") → URL http://localhost:<JUPYTER_PORT>/lab
    → เข้า shell: `docker exec -it multi-account-devtool bash` (เริ่มที่ /workspace) → ไฟล์ env ที่ใช้ + ชื่อตัวแปร
    → local skill (path ที่ mount หรือ "ไม่ได้กำหนด", SYNCED/SKIP) → ผลตรวจ skill
+   → ตารางล็อกอิน บัญชี | ล็อกอินแล้ว? (yolo1–5, cyolo1–5)
 ```
 
 | ตัวแปร | ค่าเริ่มต้น | ใช้ทำอะไร |
@@ -78,7 +90,7 @@ docker exec multi-account-devtool bash -lc 'B=$HOME/ai-accounts; K=/tmp/skills.t
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 | `LOCAL_SKILLS_DIR` (ใน `.env`) | ว่าง = ไม่ใช้ | โฟลเดอร์ skill บนเครื่อง (แต่ละ skill = โฟลเดอร์ย่อยที่มี `SKILL.md` หรือชี้ไปที่ skill เดียวก็ได้) → mount เป็น `/opt/local-skills` (อ่านอย่างเดียว) แล้ว copy เข้า `.Claude/shared/skills` และ `.Codex/shared/skills` ให้ทุกบัญชีใช้ร่วมกัน |
 
-**ผลที่ควรได้:** สรุปภาษาไทยที่มี URL `http://localhost:<JUPYTER_PORT>/lab`, คำสั่ง `docker exec -it multi-account-devtool bash`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ), รายชื่อ local skill ที่ sync (ถ้ากำหนด `LOCAL_SKILLS_DIR`) และผลตรวจ skill **`vastai` `yolo` `cyolo` (และ local skill) เป็น `OK` ครบทั้ง `.Claude` และ `.Codex`** ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / `LOCAL_SKILLS_DIR` ใช้ไม่ได้ / skill ขาด) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
+**ผลที่ควรได้:** สรุปภาษาไทยที่มี URL `http://localhost:<JUPYTER_PORT>/lab`, คำสั่ง `docker exec -it multi-account-devtool bash`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ), รายชื่อ local skill ที่ sync (ถ้ากำหนด `LOCAL_SKILLS_DIR`) และผลตรวจ skill **`vastai` `yolo` `cyolo` (และ local skill) เป็น `OK` ครบทั้ง `.Claude` และ `.Codex`** และตารางล็อกอิน `yolo1–5` / `cyolo1–5` ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / `LOCAL_SKILLS_DIR` ใช้ไม่ได้ / skill ขาด / ยังไม่มีบัญชีไหนล็อกอิน) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
 
 > **ทำไม skill สำคัญ:** ขั้นที่ 5 และ LAB ถัดไปใช้ skill จาก `shared` ถ้า AI แจ้งว่ายังไม่ได้ติดตั้ง skill อย่าเพิ่งไปขั้นต่อไป ให้รัน `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ ถ้ายังขาดอยู่ ให้ลบ container แล้วรันขั้นที่ 1 ใหม่ (ห้ามลบ volume `ai-accounts`)
 >
