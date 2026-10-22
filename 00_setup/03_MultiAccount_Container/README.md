@@ -28,7 +28,7 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 ![เส้นทาง A: ดึง image สำเร็จรูปจาก Docker Hub ด้วย docker run แล้วตรวจเวอร์ชัน, playwright MCP และ skill ถ้าไม่มี skill ให้แจ้งผู้ใช้](img/mad-concept-00a-path-a.png)
 *ภาพแนวคิด (Imagegen): เส้นทาง A · ใช้ image สำเร็จรูป*
 
-💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
+💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Windows / macOS / Linux · Docker Desktop หรือ Docker Engine ต้องรันอยู่) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
 
 ```text
 เตรียม container `multi-account-devtool` จาก image `tuchsanai/multi-account-devtool:2569_1`
@@ -37,15 +37,17 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 ยกเว้น LOCAL_SKILLS_DIR) หรือเนื้อหา SKILL.md · ห้ามติดตั้ง Claude/Codex/skill เอง (ยกเว้น sync ข้อ 3)
 · ห้ามล็อกอินแทนฉัน · เก็บคำเตือน ⚠️ ทุกข้อไว้บนสุดของสรุป
 ให้เร็ว: ทำแต่ละข้อด้วยคำสั่ง shell เดียว (รวมหลายเช็กในคำสั่งเดียว) ห้าม sleep รอแยกเป็นหลายรอบ
+ใช้ได้ทุก OS: ดูก่อนว่าเครื่องเป็น Windows / macOS / Linux และ shell อะไร แล้วเขียนคำสั่งให้ตรง shell นั้น
+(path ใช้ / ได้ทุก OS) · คำสั่ง docker ข้อ 2–3 รันได้ตามตัวอักษรทุก shell ห้ามแก้ quote
 
 1. เช็กทุกอย่างในคำสั่งเดียว (เริ่ม `docker pull tuchsanai/multi-account-devtool:2569_1` แบบ background ไปพร้อมกัน)
    - container ชื่อนี้มีอยู่แล้ว → จะ `docker rm -f` ก่อนข้อ 2
-   - port Jupyter=8886 ถ้าชน (docker ps / port ที่ฟังอยู่ / Windows: ช่วงใน
-     `netsh interface ipv4 show excludedportrange protocol=tcp`) ใช้ port ว่างถัดไปที่พ้นช่วงสงวน
+   - port Jupyter=8886 ถ้าชน (container อื่นใช้อยู่ / มีโปรแกรมฟังอยู่) ใช้ port ว่างถัดไป
+     (port ที่ `multi-account-devtool` ตัวเดิมถืออยู่ไม่นับว่าชน เพราะจะถูกลบ)
    - env (โฟลเดอร์ปัจจุบัน) → `--env-file <path เต็ม>`: ใช้ `.env` ถ้าไม่มีใช้ `.env_example` / `.env.example`
      (⚠️ "ไม่พบ .env — ใช้ <ไฟล์> แทน กรุณา copy เป็น .env แล้วใส่ค่าจริง" + ชื่อตัวแปรที่ว่าง/เป็นค่าตัวอย่าง)
      ไม่มีสักไฟล์ → ไม่ใส่ (⚠️ "ไม่พบ .env หรือ .env_example — container จะไม่มี environment variable")
-     อ่านแค่ชื่อตัวแปรกับค่า LOCAL_SKILLS_DIR (เช่น grep) ห้าม cat ทั้งไฟล์
+     อ่านแค่ชื่อตัวแปรกับค่า LOCAL_SKILLS_DIR ห้ามพิมพ์ทั้งไฟล์ออกมา
    - local skill จาก `LOCAL_SKILLS_DIR` (ตัด quote, path relative นับจากโฟลเดอร์ของไฟล์ env):
      ว่าง/ค่าตัวอย่าง (เช่น /path/to/...) → ไม่ mount · ไม่ใช่โฟลเดอร์ที่มีจริง → ไม่ mount
      (⚠️ "LOCAL_SKILLS_DIR=<path> ไม่พบโฟลเดอร์") · มี SKILL.md ตรงตัว (skill เดี่ยว)
@@ -53,21 +55,20 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 
 2. คำสั่งเดียว: (rm -f ถ้ามี) → docker run (ตัด option ที่ข้อ 1 บอกว่าไม่ใช้) → วนเช็กทุก 2 วิ
    (สูงสุด 5 นาที เผื่อ pull ครั้งแรก) จน http://localhost:<JUPYTER_PORT>/lab ตอบ 200
-   ถ้าเจอ `ports are not available` → `docker rm -f` แล้วรันใหม่ด้วย port ว่างถัดไป
+   docker run แจ้งว่าใช้ port ไม่ได้ (เช่น `ports are not available`, `address already in use` หรือ port ที่ OS สงวนไว้)
+   → `docker rm -f` แล้วรันใหม่ด้วย port ว่างถัดไป
 
-docker run -dit --name multi-account-devtool --privileged -w /workspace -p <JUPYTER_PORT>:8888 \
-  --env-file <ENV_FILE> -v ai-accounts:/root/ai-accounts <LOCAL_SKILLS_MOUNT> \
-  tuchsanai/multi-account-devtool:2569_1
+docker run -dit --name multi-account-devtool --privileged -w /workspace -p <JUPYTER_PORT>:8888 --env-file <ENV_FILE> -v ai-accounts:/root/ai-accounts <LOCAL_SKILLS_MOUNT> tuchsanai/multi-account-devtool:2569_1
 
-3. sync local skill + ตรวจ skill ในคำสั่งเดียว (ห้ามข้าม รันได้แม้ไม่ได้ mount local skill)
+3. ตรวจ skill (ห้ามข้าม) + sync local skill ในคำสั่งเดียว
+   ไม่ได้ mount local skill → script ข้ามส่วน sync เอง เหลือตรวจแค่ vastai yolo cyolo (ไม่ต้องแก้คำสั่ง)
    skill ชื่อซ้ำถูกแทนด้วยของ local ยกเว้น shared-check · แสดงแค่ชื่อที่ SYNCED / SKIP
    mount แล้วแต่ TOTAL 0 → ⚠️ "LOCAL_SKILLS_DIR ไม่มีโฟลเดอร์ skill ที่มี SKILL.md"
    มี MISSING → ⚠️ "ยังไม่ได้ติดตั้ง skill — กรุณาติดตั้ง: <รายชื่อที่ขาด>"
 
-docker exec multi-account-devtool bash -lc \
-'B=$HOME/ai-accounts; n=0; L="vastai yolo cyolo"; for d in /opt/local-skills/*/; do [ -d "$d" ] || continue; s=$(basename "$d"); if [ ! -f "$d/SKILL.md" ]; then echo "SKIP $s (no SKILL.md)"; continue; fi; if [ "$s" = shared-check ]; then echo "SKIP $s (reserved)"; continue; fi; for t in .Claude .Codex; do rm -rf "$B/$t/shared/skills/$s"; cp -rL "$d" "$B/$t/shared/skills/$s"; done; echo "SYNCED $s"; n=$((n+1)); L="$L $s"; done; echo "TOTAL $n"; for t in .Claude .Codex; do for s in $(echo $L | tr " " "\n" | sort -u); do [ -d "$B/$t/shared/skills/$s" ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
+docker exec multi-account-devtool bash -lc 'B=$HOME/ai-accounts; K=/tmp/skills.txt; echo vastai yolo cyolo > $K; n=0; for d in /opt/local-skills/*/; do [ -d $d ] || continue; s=$(basename $d); if [ ! -f $d/SKILL.md ]; then echo SKIP $s no-SKILL.md; continue; fi; if [ $s = shared-check ]; then echo SKIP $s reserved; continue; fi; for t in .Claude .Codex; do rm -rf $B/$t/shared/skills/$s; cp -rL $d $B/$t/shared/skills/$s; done; echo SYNCED $s; n=$((n+1)); echo $s >> $K; done; echo TOTAL $n; for t in .Claude .Codex; do for s in $(xargs -n1 < $K | sort -u); do [ -d $B/$t/shared/skills/$s ] && echo $t/$s OK || echo $t/$s MISSING; done; done'
 
-4. สรุปภาษาไทยตามลำดับ: ⚠️ คำเตือน → URL http://localhost:<JUPYTER_PORT>/lab
+4. สรุปภาษาไทยตามลำดับ: ⚠️ คำเตือน (ไม่มีให้เขียน "ไม่มี") → URL http://localhost:<JUPYTER_PORT>/lab
    → เข้า shell: `docker exec -it multi-account-devtool bash` (เริ่มที่ /workspace) → ไฟล์ env ที่ใช้ + ชื่อตัวแปร
    → local skill (path ที่ mount หรือ "ไม่ได้กำหนด", SYNCED/SKIP) → ผลตรวจ skill
 ```
