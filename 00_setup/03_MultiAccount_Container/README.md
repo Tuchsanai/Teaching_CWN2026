@@ -31,112 +31,53 @@ LAB นี้มี **2 เส้นทาง ให้เลือกทำเ�
 💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
 
 ```text
+เตรียม container `multi-account-devtool` จาก image `tuchsanai/multi-account-devtool:2569_1`
 
-เตรียม container `multi-account-devtool`:
+กติกา: ห้ามลบ volume `ai-accounts` (เก็บล็อกอินทุกบัญชี) · ห้ามแสดงค่าในไฟล์ env (แสดงได้แค่ชื่อตัวแปร
+ยกเว้น LOCAL_SKILLS_DIR) หรือเนื้อหา SKILL.md · ห้ามติดตั้ง Claude/Codex/skill เอง (ยกเว้น sync ข้อ 3)
+· ห้ามล็อกอินแทนฉัน · เก็บคำเตือน ⚠️ ทุกข้อไว้บนสุดของสรุป
+ให้เร็ว: ทำแต่ละข้อด้วยคำสั่ง shell เดียว (รวมหลายเช็กในคำสั่งเดียว) ห้าม sleep รอแยกเป็นหลายรอบ
 
-1. ถ้ามี container `multi-account-devtool` อยู่แล้ว ให้ลบด้วย `docker rm -f multi-account-devtool`
-   (ห้ามลบ volume `ai-accounts` เพราะเก็บการล็อกอินของทุกบัญชีไว้)
+1. เช็กทุกอย่างในคำสั่งเดียว (เริ่ม `docker pull tuchsanai/multi-account-devtool:2569_1` แบบ background ไปพร้อมกัน)
+   - container ชื่อนี้มีอยู่แล้ว → จะ `docker rm -f` ก่อนข้อ 2
+   - port Jupyter=8886 ถ้าชน (docker ps / port ที่ฟังอยู่ / Windows: ช่วงใน
+     `netsh interface ipv4 show excludedportrange protocol=tcp`) ใช้ port ว่างถัดไปที่พ้นช่วงสงวน
+   - env (โฟลเดอร์ปัจจุบัน) → `--env-file <path เต็ม>`: ใช้ `.env` ถ้าไม่มีใช้ `.env_example` / `.env.example`
+     (⚠️ "ไม่พบ .env — ใช้ <ไฟล์> แทน กรุณา copy เป็น .env แล้วใส่ค่าจริง" + ชื่อตัวแปรที่ว่าง/เป็นค่าตัวอย่าง)
+     ไม่มีสักไฟล์ → ไม่ใส่ (⚠️ "ไม่พบ .env หรือ .env_example — container จะไม่มี environment variable")
+     อ่านแค่ชื่อตัวแปรกับค่า LOCAL_SKILLS_DIR (เช่น grep) ห้าม cat ทั้งไฟล์
+   - local skill จาก `LOCAL_SKILLS_DIR` (ตัด quote, path relative นับจากโฟลเดอร์ของไฟล์ env):
+     ว่าง/ค่าตัวอย่าง (เช่น /path/to/...) → ไม่ mount · ไม่ใช่โฟลเดอร์ที่มีจริง → ไม่ mount
+     (⚠️ "LOCAL_SKILLS_DIR=<path> ไม่พบโฟลเดอร์") · มี SKILL.md ตรงตัว (skill เดี่ยว)
+     → `-v "<path>:/opt/local-skills/<ชื่อโฟลเดอร์>:ro"` · เป็นโฟลเดอร์รวม skill → `-v "<path>:/opt/local-skills:ro"`
 
-2. ตรวจ port <SSH_PORT>=2223 และ <JUPYTER_PORT>=8886 ถ้าชน ให้ใช้ port ว่างถัดไป
+2. คำสั่งเดียว: (rm -f ถ้ามี) → docker run (ตัด option ที่ข้อ 1 บอกว่าไม่ใช้) → วนเช็กทุก 2 วิ
+   (สูงสุด 5 นาที เผื่อ pull ครั้งแรก) จน http://localhost:<JUPYTER_PORT>/lab ตอบ 200
+   ถ้าเจอ `ports are not available` → `docker rm -f` แล้วรันใหม่ด้วย port ว่างถัดไป
 
-3. หาไฟล์ env ในโฟลเดอร์ปัจจุบัน: ใช้ `.env` ก่อน ถ้าไม่มีใช้ `.env_example` (หรือ `.env.example`)
-   แล้วเติม `--env-file <path เต็ม>` ในข้อ 5 (ห้ามแสดงค่าในไฟล์ แสดงได้เฉพาะชื่อตัวแปร
-   ยกเว้น LOCAL_SKILLS_DIR ซึ่งเป็น path แสดงค่าได้)
-   - ถ้าใช้ไฟล์ example ให้เตือนว่า "⚠️ ไม่พบ .env — ใช้ <ชื่อไฟล์> แทน ค่าอาจเป็นค่าตัวอย่าง
-     กรุณา copy เป็น .env แล้วใส่ค่าจริง" พร้อมบอกชื่อตัวแปรที่ค่าว่างหรือดูเป็นค่าตัวอย่าง
-   - ถ้าไม่พบทั้งสองไฟล์ ให้ตัด `--env-file` ออกแล้วรันต่อ และเตือนว่า
-     "⚠️ ไม่พบ .env หรือ .env_example — container จะไม่มี environment variable กรุณาสร้าง .env แล้วรันใหม่"
-   - local skill: อ่านค่า `LOCAL_SKILLS_DIR` จากไฟล์ env นี้ (ตัดเครื่องหมายคำพูดหัวท้ายออก)
-     - ถ้าไม่มีตัวแปรนี้ ค่าว่าง หรือดูเป็นค่าตัวอย่าง (เช่น /path/to/...) → ไม่ต้อง mount
-     - ถ้าเป็น path แบบ relative ให้นับจากโฟลเดอร์ของไฟล์ env แล้วแปลงเป็น path เต็ม (ใช้ / แทน \ ได้)
-     - ถ้า path ไม่มีอยู่จริงหรือไม่ใช่โฟลเดอร์ → ไม่ต้อง mount และเตือนว่า
-       "⚠️ LOCAL_SKILLS_DIR=<path> ไม่พบโฟลเดอร์ — ไม่ได้โหลด local skill"
-     - ถ้าโฟลเดอร์นั้นมี SKILL.md อยู่ตรงตัวเลย (เป็น skill เดี่ยว) ให้แทน <LOCAL_SKILLS_MOUNT> ในข้อ 5 ด้วย
-       `-v "<path>:/opt/local-skills/<ชื่อโฟลเดอร์>:ro"`
-     - ถ้าไม่ใช่ (เป็นโฟลเดอร์รวมหลาย skill) ให้แทนด้วย `-v "<path>:/opt/local-skills:ro"`
-     - ถ้าไม่ต้อง mount ให้ตัดบรรทัด <LOCAL_SKILLS_MOUNT> ในข้อ 5 ออก
-
-4. หาโฟลเดอร์ key SSH `Devtool_SSH/` (key สำเร็จรูปของ lab) ในโฟลเดอร์ปัจจุบันเท่านั้น
-   (ไม่ต้องค้นในโฟลเดอร์ย่อย) และต้องมีครบทั้ง 2 ไฟล์
-     Devtool_SSH/
-     ├── devtoolSSH       ← private key (ใช้กับ ssh -i)
-     └── devtoolSSH.pub   ← public key (container ใส่ใน authorized_keys ให้อัตโนมัติตอน start)
-   - ถ้าเจอ ให้แทน <SSH_KEY_DIR> ในข้อ 5 และ 7 ด้วย path เต็มของโฟลเดอร์นั้น
-     (ห้ามแสดงเนื้อหา private key)
-   - ถ้าไม่เจอ (หรือไฟล์ไม่ครบ) = ไม่ใช้ key ให้ตัดบรรทัด `-v ...:/etc/devtools/ssh:ro` ออกแล้วรันต่อ และเตือนว่า
-     "⚠️ ไม่พบโฟลเดอร์ Devtool_SSH — SSH ใช้ได้เฉพาะ password (passwd) ยังใช้ key ไม่ได้"
-
-5. รัน:
-
-docker run -dit --name multi-account-devtool --hostname multi-account-devtool --privileged \
-  -p <SSH_PORT>:22 -p <JUPYTER_PORT>:8888 \
-  --env-file <ENV_FILE> \
-  -v "<SSH_KEY_DIR>:/etc/devtools/ssh:ro" \
-  -v ai-accounts:/root/ai-accounts \
-  <LOCAL_SKILLS_MOUNT> \
+docker run -dit --name multi-account-devtool --privileged -w /workspace -p <JUPYTER_PORT>:8888 \
+  --env-file <ENV_FILE> -v ai-accounts:/root/ai-accounts <LOCAL_SKILLS_MOUNT> \
   tuchsanai/multi-account-devtool:2569_1
 
-6. รอจน `docker logs multi-account-devtool` มีบรรทัดที่มีข้อความ `jupyter lab :8888`
-
-7. ถ้า mount `Devtool_SSH` ในข้อ 4 ให้ตรวจ key (ข้ามได้ถ้าไม่เจอโฟลเดอร์):
-   - `docker logs multi-account-devtool` ต้องมีบรรทัด `SSH key login enabled`
-   - ทดสอบ login ด้วย key จริง (ไม่ใช้ password):
-
-ssh -i "<SSH_KEY_DIR>/devtoolSSH" -p <SSH_PORT> -o BatchMode=yes \
-  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@localhost "echo SSH_KEY_OK"
-
-     (บน Windows PowerShell ใช้ `UserKnownHostsFile=NUL`)
-   - ถ้าได้ `SSH_KEY_OK` = ใช้ key ได้ ถ้าไม่ได้ ให้เตือนว่า
-     "⚠️ SSH ด้วย key ไม่สำเร็จ — ใช้ password (passwd) ไปก่อน" พร้อมสาเหตุสั้น ๆ
-     ถ้าสาเหตุคือ permission ของไฟล์ private key กว้างเกินไป (UNPROTECTED PRIVATE KEY FILE)
-     ให้บอกคำสั่งแก้ให้ฉัน (Windows: `icacls`, macOS/Linux: `chmod 600`) โดยไม่ต้องรันเอง
-
-8. ถ้ามีการ mount local skill ในข้อ 3 ให้ sync เข้า shared ของทั้ง Claude และ Codex (ข้ามได้ถ้าไม่ได้ mount):
+3. sync local skill + ตรวจ skill ในคำสั่งเดียว (ห้ามข้าม รันได้แม้ไม่ได้ mount local skill)
+   skill ชื่อซ้ำถูกแทนด้วยของ local ยกเว้น shared-check · แสดงแค่ชื่อที่ SYNCED / SKIP
+   mount แล้วแต่ TOTAL 0 → ⚠️ "LOCAL_SKILLS_DIR ไม่มีโฟลเดอร์ skill ที่มี SKILL.md"
+   มี MISSING → ⚠️ "ยังไม่ได้ติดตั้ง skill — กรุณาติดตั้ง: <รายชื่อที่ขาด>"
 
 docker exec multi-account-devtool bash -lc \
-'B=$HOME/ai-accounts; n=0; for d in /opt/local-skills/*/; do [ -d "$d" ] || continue; s=$(basename "$d"); if [ ! -f "$d/SKILL.md" ]; then echo "SKIP $s (no SKILL.md)"; continue; fi; if [ "$s" = shared-check ]; then echo "SKIP $s (reserved)"; continue; fi; for t in .Claude .Codex; do rm -rf "$B/$t/shared/skills/$s"; cp -rL "$d" "$B/$t/shared/skills/$s"; done; echo "SYNCED $s"; n=$((n+1)); done; echo "TOTAL $n"'
+'B=$HOME/ai-accounts; n=0; L="vastai yolo cyolo"; for d in /opt/local-skills/*/; do [ -d "$d" ] || continue; s=$(basename "$d"); if [ ! -f "$d/SKILL.md" ]; then echo "SKIP $s (no SKILL.md)"; continue; fi; if [ "$s" = shared-check ]; then echo "SKIP $s (reserved)"; continue; fi; for t in .Claude .Codex; do rm -rf "$B/$t/shared/skills/$s"; cp -rL "$d" "$B/$t/shared/skills/$s"; done; echo "SYNCED $s"; n=$((n+1)); L="$L $s"; done; echo "TOTAL $n"; for t in .Claude .Codex; do for s in $(echo $L | tr " " "\n" | sort -u); do [ -d "$B/$t/shared/skills/$s" ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
 
-   - skill ที่ชื่อซ้ำกับของเดิมใน shared จะถูกแทนด้วยเวอร์ชันจาก local (ยกเว้น shared-check ห้ามแตะ)
-   - ถ้า TOTAL 0 ให้เตือนว่า "⚠️ LOCAL_SKILLS_DIR ไม่มีโฟลเดอร์ skill ที่มี SKILL.md — ไม่ได้โหลด local skill"
-   - แสดงได้เฉพาะชื่อ skill ที่ SYNCED / SKIP ห้ามแสดงเนื้อหาใน SKILL.md
-   - บัญชี Codex (cyoloN) จะเห็น skill ใหม่เองเมื่อเปิดบัญชีครั้งถัดไป ไม่ต้องรัน installer ซ้ำ
-
-9. ตรวจ skill `vastai` `yolo` `cyolo` และ skill ทุกตัวที่ SYNCED ในข้อ 8 (สำคัญ ห้ามข้าม):
-
-docker exec multi-account-devtool bash -lc \
-'B=$HOME/ai-accounts; for t in .Claude .Codex; do for s in vastai yolo cyolo <ชื่อ skill ที่ SYNCED>; do [ -d $B/$t/shared/skills/$s ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
-
-   ถ้ามี MISSING แม้แต่ตัวเดียว ให้แจ้งเตือนฉันเป็นภาษาไทยอย่างชัดเจนว่า
-   "⚠️ ยังไม่ได้ติดตั้ง skill — กรุณาติดตั้ง skill ต่อไปนี้ก่อนใช้งาน: <รายชื่อที่ขาด>"
-   ห้ามแสดงรหัสหรือเนื้อหาใน SKILL.md
-   นอกจากการ sync จาก LOCAL_SKILLS_DIR ในข้อ 8 ห้ามติดตั้ง skill เอง ให้แจ้งเตือนอย่างเดียว
-
-10. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
-   สรุปผลเป็นภาษาไทย โดยเรียงดังนี้:
-   - ถ้ามีคำเตือน (ใช้ไฟล์ example / ไม่พบไฟล์ env / ไม่พบ Devtool_SSH / SSH key ไม่สำเร็จ /
-     LOCAL_SKILLS_DIR ใช้ไม่ได้ / skill ขาด)
-     ให้แสดงคำเตือนไว้บนสุดของสรุป ก่อนข้อมูลอื่น
-   - port ที่ใช้ (SSH / Jupyter)
-   - URL ของ JupyterLab
-   - สถานะ SSH key (ใช้ได้ / ไม่พบ Devtool_SSH / ไม่สำเร็จ) พร้อมคำสั่ง
-     `ssh -i "<SSH_KEY_DIR>/devtoolSSH" -p <SSH_PORT> root@localhost`
-   - สถานะไฟล์ env (ใช้ .env / ใช้ .env_example แทน / ไม่พบ) พร้อมรายชื่อตัวแปรที่โหลด (เฉพาะชื่อ)
-   - local skill: path ที่ mount (หรือ "ไม่ได้กำหนด") และรายชื่อ skill ที่ SYNCED / SKIP
-   - ผลตรวจ skill (มีครบ / ขาดอะไร)
-
+4. สรุปภาษาไทยตามลำดับ: ⚠️ คำเตือน → URL http://localhost:<JUPYTER_PORT>/lab
+   → เข้า shell: `docker exec -it multi-account-devtool bash` (เริ่มที่ /workspace) → ไฟล์ env ที่ใช้ + ชื่อตัวแปร
+   → local skill (path ที่ mount หรือ "ไม่ได้กำหนด", SYNCED/SKIP) → ผลตรวจ skill
 ```
 
 | ตัวแปร | ค่าเริ่มต้น | ใช้ทำอะไร |
 |---|---|---|
-| `<SSH_PORT>` | `2223` | `ssh -i Devtool_SSH/devtoolSSH root@localhost -p <SSH_PORT>` (key) หรือ `ssh root@localhost -p <SSH_PORT>` (password `passwd`) |
-| `<SSH_KEY_DIR>` | `./Devtool_SSH` | โฟลเดอร์ key สำเร็จรูปของ lab → mount เป็น `/etc/devtools/ssh` (อ่านอย่างเดียว) ให้ container ใส่ public key ใน `authorized_keys` |
 | `<JUPYTER_PORT>` | `8886` | http://localhost:<JUPYTER_PORT>/lab (ไม่มีรหัสผ่าน) |
 | `LOCAL_SKILLS_DIR` (ใน `.env`) | ว่าง = ไม่ใช้ | โฟลเดอร์ skill บนเครื่อง (แต่ละ skill = โฟลเดอร์ย่อยที่มี `SKILL.md` หรือชี้ไปที่ skill เดียวก็ได้) → mount เป็น `/opt/local-skills` (อ่านอย่างเดียว) แล้ว copy เข้า `.Claude/shared/skills` และ `.Codex/shared/skills` ให้ทุกบัญชีใช้ร่วมกัน |
 
-![โฟลเดอร์ Devtool_SSH บนเครื่องถูก mount เข้า /etc/devtools/ssh แบบอ่านอย่างเดียว start.sh คัด public key ใส่ authorized_keys แล้ว ssh -i devtoolSSH เข้า port 22 ได้ SSH_KEY_OK](img/mad-concept-03-ssh-key.png)
-*ภาพแนวคิด (Imagegen): apply key จาก `Devtool_SSH/` อัตโนมัติ*
-
-**ผลที่ควรได้:** สรุปภาษาไทยที่มี port SSH / Jupyter, URL `http://localhost:<JUPYTER_PORT>/lab`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ), สถานะ SSH key (`SSH_KEY_OK`) รายชื่อ local skill ที่ sync (ถ้ากำหนด `LOCAL_SKILLS_DIR`) และผลตรวจ skill **`vastai` `yolo` `cyolo` (และ local skill) เป็น `OK` ครบทั้ง `.Claude` และ `.Codex`** ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / ไม่พบ `Devtool_SSH` / key ใช้ไม่ได้ / `LOCAL_SKILLS_DIR` ใช้ไม่ได้ / skill ขาด) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
+**ผลที่ควรได้:** สรุปภาษาไทยที่มี URL `http://localhost:<JUPYTER_PORT>/lab`, คำสั่ง `docker exec -it multi-account-devtool bash`, สถานะไฟล์ env พร้อมรายชื่อตัวแปร (เฉพาะชื่อ), รายชื่อ local skill ที่ sync (ถ้ากำหนด `LOCAL_SKILLS_DIR`) และผลตรวจ skill **`vastai` `yolo` `cyolo` (และ local skill) เป็น `OK` ครบทั้ง `.Claude` และ `.Codex`** ถ้ามีคำเตือน (ใช้ `.env_example` / ไม่พบไฟล์ env / `LOCAL_SKILLS_DIR` ใช้ไม่ได้ / skill ขาด) จะอยู่บนสุดของสรุป (ครั้งแรกต้อง pull image อาจนานหลายนาที)
 
 > **ทำไม skill สำคัญ:** ขั้นที่ 5 และ LAB ถัดไปใช้ skill จาก `shared` ถ้า AI แจ้งว่ายังไม่ได้ติดตั้ง skill อย่าเพิ่งไปขั้นต่อไป ให้รัน `docker exec multi-account-devtool ai-accounts-setup` แล้วตรวจซ้ำ ถ้ายังขาดอยู่ ให้ลบ container แล้วรันขั้นที่ 1 ใหม่ (ห้ามลบ volume `ai-accounts`)
 >
@@ -400,7 +341,7 @@ docker logs -f multi-account-devtool        # ดู log ตอน start
 docker stop multi-account-devtool           # หยุด
 docker start multi-account-devtool          # เริ่มใหม่
 docker rm -f multi-account-devtool          # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
-docker exec -it multi-account-devtool bash  # เข้า shell ใน container
+docker exec -it multi-account-devtool bash  # เข้า shell ใน container (เริ่มที่ /workspace)
 ```
 
 🖥️ บนเครื่อง · เส้นทาง B (`docker compose` ในโฟลเดอร์ `MultiAccountDevtool/`)
