@@ -1,0 +1,16 @@
+{"tasks": [
+ {"id": "T01", "title": "โครงโปรเจกต์ Next.js + Docker Compose + Postgres", "size": "M", "depends_on": [], "area": "infra"},
+ {"id": "T02", "title": "สคีมา DB + seed สินค้า 24 รายการ", "size": "M", "depends_on": ["T01"], "area": "backend"},
+ {"id": "T03", "title": "สมัครสมาชิก/ล็อกอิน", "size": "M", "depends_on": ["T02"], "area": "backend"},
+ {"id": "T04", "title": "API สินค้า ค้นหา/กรอง", "size": "M", "depends_on": ["T02"], "area": "backend"},
+ {"id": "T05", "title": "รูปสินค้า/แบนเนอร์ด้วย AI", "size": "M", "depends_on": ["T01"], "area": "image", "only": "cyolo"},
+ {"id": "T06", "title": "หน้าแรก + รายการ + หน้าสินค้า", "size": "L", "depends_on": ["T04", "T05"], "area": "frontend"},
+ {"id": "T07", "title": "คำนวณปริมาณอาหาร", "size": "S", "depends_on": ["T04"], "area": "frontend"},
+ {"id": "T08", "title": "ตะกร้า + ชำระเงิน + คูปอง", "size": "L", "depends_on": ["T03", "T04"], "area": "backend"},
+ {"id": "T09", "title": "สั่งซื้อประจำ (subscription)", "size": "M", "depends_on": ["T08"], "area": "backend"},
+ {"id": "T10", "title": "หลังร้าน admin", "size": "M", "depends_on": ["T08"], "area": "frontend"},
+ {"id": "T11", "title": "ดัชนีค้นข้อมูลสินค้าให้บอท", "size": "M", "depends_on": ["T04"], "area": "rag"},
+ {"id": "T12", "title": "แชทบอท API + mock-llm + ใส่ตะกร้า", "size": "L", "depends_on": ["T08", "T11"], "area": "chat"},
+ {"id": "T13", "title": "หน้าต่างแชท น้องเหมียว", "size": "M", "depends_on": ["T06", "T12"], "area": "frontend"},
+ {"id": "T14", "title": "รวมระบบ + ทดสอบ Playwright", "size": "L", "depends_on": ["T07", "T09", "T10", "T13"], "area": "test", "exclusive": true}
+]}
