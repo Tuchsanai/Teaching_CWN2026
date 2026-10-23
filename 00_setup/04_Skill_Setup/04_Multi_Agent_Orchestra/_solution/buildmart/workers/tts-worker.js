@@ -50,7 +50,12 @@ async function onMessage(ch, msg) {
     const text = speechText(body.text);
     if (!text) throw new Error('empty text');
     const lang = speechLang(text) === 'th' ? 'th' : ['th', 'en'].includes(body.lang) ? body.lang : 'en';
-    const { wav, engine } = await synth(text, lang);
+    // เครือข่ายไป ai-box สะดุดเป็นครั้งคราว ("fetch failed") → ลองซ้ำ 1 ครั้ง
+    const { wav, engine } = await synth(text, lang).catch((e) => {
+      if (!/fetch failed|ECONNRESET|socket/i.test(e.message)) throw e;
+      log(`retry after network error: ${e.message}`);
+      return synth(text, lang);
+    });
     const durationMs = wavDurationMs(wav);
     if (!durationMs) throw new Error('ai-box returned no WAV audio');
     const r = await pool.query(

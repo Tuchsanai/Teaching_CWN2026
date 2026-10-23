@@ -1,47 +1,26 @@
-// 🔊 อ่านออกเสียง T01–T03 — รันเมื่อ BM_TTS=1 (ต้องเปิด profile tts)
-// บันทึกเวลาเริ่มเล่นเทียบเวลาเริ่มวิดีโอ → attach 'audio' {audioId, offsetMs, durationMs} ให้ make-media.mjs รวมเสียงเข้า MP4
+// 🔊 อ่านออกเสียง T01–T03 (v3: VoxCPM2 เสียง "น้องช่าง") — tts-worker เปิดเสมอ · BM_TTS=0 ปิดกลุ่มนี้
+// engine: ai = 'voxcpm2' (ai-box GPU-3) · mock = 'mock' (เสียง VoxCPM2 ที่อัดไว้ใน voice-fixtures/tts-cache หรือ generic/tone)
+// บันทึกเวลาเริ่มเล่นเทียบเวลาเริ่มวิดีโอ → attach 'audio' {audioId, offsetMs, durationMs, engine} ให้ make-media.mjs รวมเสียงเข้า MP4
 import type { Page, TestInfo } from '@playwright/test';
-import { bmCase, expect, intro, ask, expectAnswer, say, show, hold, highlight, openChat, attachJson, TTS, MODE, ANSWER_TIMEOUT } from './_bm';
+import { test, bmCase, expect, intro, ask, expectAnswer, say, show, hold, highlight, openChat, attachJson, TTS, MODE, ANSWER_TIMEOUT } from './_bm';
+import { waitAudio, audioLogLen, nextTtsEngine, expectEngine } from './_voice';
 
-const skip = () => (TTS ? false : 'ตั้ง BM_TTS=1 และเปิด profile tts ก่อน');
+const skip = () => (TTS ? false : 'BM_TTS=0 (ปิดกลุ่ม T)');
 
-const logLen = (page: Page) => page.evaluate(() => (window as any).__bmAudioLog?.length ?? 0);
+/** tts-worker ต้องต่ออยู่ (มี consumer ที่ tts.request) — ไม่งั้นข้ามพร้อมเหตุผล */
+async function requireTts(page: Page) {
+  const st = await page.request.get('/api/tts/status').then((r) => r.json()).catch(() => ({}));
+  test.skip(!st.enabled, 'tts-worker ไม่ได้ต่อคิว tts.request (/api/tts/status enabled=false)');
+}
 
-/** รอเสียงใหม่ใน window.__bmAudioLog → attach offset/duration → ค้างจนเสียงจบ + 1.5 วิ */
-async function waitAudio(page: Page, info: TestInfo, before: number) {
-  await expect.poll(() => logLen(page), { timeout: 120_000, message: 'รอ window.__bmAudioLog (เสียงเริ่มเล่น)' }).toBeGreaterThan(before);
-  const rec = await page.evaluate(() => {
-    const log = (window as any).__bmAudioLog;
-    const r = log[log.length - 1];
-    const a = document.querySelector('[data-testid="chat-audio"]') as HTMLAudioElement | null;
-    return { ...r, timeOrigin: performance.timeOrigin, elDuration: a && isFinite(a.duration) ? a.duration * 1000 : null, paused: a?.paused ?? null };
-  });
-  let durationMs: number = rec.durationMs ?? rec.elDuration ?? 0;
-  if (!durationMs) {
-    durationMs = await page
-      .waitForFunction(() => {
-        const a = document.querySelector('[data-testid="chat-audio"]') as HTMLAudioElement | null;
-        return a && isFinite(a.duration) && a.duration > 0 ? a.duration * 1000 : false;
-      }, null, { timeout: 15_000 })
-      .then((h) => h.jsonValue() as Promise<number>)
-      .catch(() => 0);
-  }
-  const videoStart = (page as any).__bmVideoStart as number;
-  const offsetMs = Math.max(0, Math.round(rec.timeOrigin + rec.startedAt - videoStart));
-  const audio = { audioId: rec.audioId as string, offsetMs, durationMs: Math.round(durationMs) };
-  await attachJson(info, 'audio', audio);
-
-  // ไฟล์ WAV จริงจาก /api/tts/<id>
-  const wav = await page.request.get(`/api/tts/${audio.audioId}`);
-  expect(wav.ok()).toBe(true);
-  const body = await wav.body();
-  expect(wav.headers()['content-type'] || '').toContain('audio');
-  expect(body.subarray(0, 4).toString('latin1')).toBe('RIFF');
-
-  await say(page, `🔊 กำลังเล่นเสียง ${(audio.durationMs / 1000).toFixed(1)} วินาที (audioId ${audio.audioId.slice(0, 8)}…)`);
-  await highlight(page.locator('[data-testid="tts-play"]').last(), audio.durationMs + 1500);
-  await hold(page, audio.durationMs + 1500);
-  expect(audio.durationMs).toBeGreaterThan(1000);
+async function playAndCheck(page: Page, info: TestInfo, click: () => Promise<void>) {
+  const before = await audioLogLen(page);
+  const eng = nextTtsEngine(page);
+  await click();
+  const audio = await waitAudio(page, info, before);
+  const e = await Promise.race([eng, new Promise<{ engine: null; cached: boolean; status: number }>((r) => setTimeout(() => r({ engine: null, cached: false, status: 0 }), 1000))]);
+  await attachJson(info, 'checked', { audioId: audio.audioId, durationMs: audio.durationMs, engine: e.engine ?? (e.cached ? '(cache)' : null), mode: MODE });
+  expectEngine(e);
   return audio;
 }
 
@@ -49,22 +28,21 @@ async function askAndPlay(page: Page, info: TestInfo, q: string) {
   const ans = await ask(page, info, q, { holdMs: 2500 });
   const btn = page.getByTestId('tts-play').last();
   await expect(btn).toBeVisible();
-  await say(page, 'กด 🔊 ฟังคำตอบ');
+  await say(page, 'กด 🔊 ฟังคำตอบ (เสียง VoxCPM2 “น้องช่าง”)');
   await highlight(btn, 2000);
   await hold(page, 1200);
-  const before = await logLen(page);
-  await btn.click();
-  await waitAudio(page, info, before);
+  await playAndCheck(page, info, () => btn.click());
   return ans;
 }
 
 bmCase(
   'T01',
   async ({ page, item }, info) => {
+    await requireTts(page);
     await page.goto('/');
     await intro(page, item);
     const ans = await askAndPlay(page, info, 'ร้านเปิดกี่โมงครับ');
-    expect(ans.text).toMatch(/[฀-๿]/); // คำตอบไทย → เสียงไทย (PyThaiTTS)
+    expect(ans.text).toMatch(/[฀-๿]/); // คำตอบไทย → VoxCPM2 พูดไทย
   },
   { skip, timeout: 6 * 60_000 },
 );
@@ -72,6 +50,7 @@ bmCase(
 bmCase(
   'T02',
   async ({ page, item }, info) => {
+    await requireTts(page);
     await page.goto('/');
     await intro(page, item);
     const ans = await askAndPlay(page, info, 'How much is Portland cement?');
@@ -90,6 +69,7 @@ bmCase(
 bmCase(
   'T03',
   async ({ page, item }, info) => {
+    await requireTts(page);
     await page.goto('/');
     await intro(page, item);
     await openChat(page);
@@ -100,10 +80,14 @@ bmCase(
     await sw.check({ force: true });
     await expect(sw).toBeChecked();
     await hold(page, 1500);
-    const before = await logLen(page);
+    const before = await audioLogLen(page);
+    const eng = nextTtsEngine(page);
     const ans = await ask(page, info, 'มีโค้ดส่วนลดไหม', { holdMs: 300, timeout: ANSWER_TIMEOUT });
     await say(page, 'ไม่ต้องกด 🔊 — ระบบสร้างเสียงแล้วเล่นเอง');
-    await waitAudio(page, info, before);
+    const audio = await waitAudio(page, info, before);
+    const e = await Promise.race([eng, new Promise<{ engine: null; cached: boolean; status: number }>((r) => setTimeout(() => r({ engine: null, cached: false, status: 0 }), 1000))]);
+    await attachJson(info, 'checked', { audioId: audio.audioId, durationMs: audio.durationMs, engine: e.engine ?? (e.cached ? '(cache)' : null), mode: MODE });
+    expectEngine(e);
     expectAnswer(ans.text, [/BUILD5/i]);
     await show(page, page.getByTestId('chat-msg-bot').last(), 1000);
   },

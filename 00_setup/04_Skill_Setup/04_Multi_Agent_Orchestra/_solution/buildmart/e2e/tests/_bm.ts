@@ -17,8 +17,11 @@ export type PlayItem = { id: string; group: string; title: string; what: string;
 export const PLAYLIST: PlayItem[] = JSON.parse(readFileSync(path.join(E2E_DIR, 'playlist.json'), 'utf8'));
 
 export const MODE: 'mock' | 'ai' = process.env.BM_MODE === 'ai' ? 'ai' : 'mock';
-export const TTS = process.env.BM_TTS === '1';
-export const BM_URL = (process.env.BM_URL || 'http://localhost:3400').replace(/\/$/, '');
+/** v3: tts-worker เปิดเสมอ (VoxCPM2 / mock cache) → กลุ่ม T รันโดยดีฟอลต์ · BM_TTS=0 ปิด */
+export const TTS = process.env.BM_TTS !== '0';
+/** launch args ตั้งต้น (ตรงกับ playwright.config.ts) — ไฟล์ที่ test.use({launchOptions}) เองต้องต่อจากนี้ */
+export const BASE_ARGS = ['--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
+export const BM_URL =(process.env.BM_URL || 'http://localhost:3400').replace(/\/$/, '');
 export const ADMIN_PASSWORD = process.env.BM_ADMIN_PASSWORD || 'admin1234';
 /** ระยะค้างภาพหลังผลแต่ละขั้น (3–5 วิ) */
 export const HOLD = Number(process.env.BM_HOLD_MS || 3500);
@@ -179,13 +182,19 @@ export type Check = string | RegExp | { mock: string | RegExp; ai: string | RegE
 
 /** mock: ต้องมีคำนั้นตรงตัว (ยอม comma) · ai: ใช้ regex ยืดหยุ่นถ้าให้มา
  *  ตรวจบนข้อความที่ผ่าน norm() แล้วทุกโหมด → regex ไม่ต้องเผื่อ comma / เลขไทย / ช่องว่างซ้ำ */
-export function expectAnswer(answer: string, checks: Check[]) {
+export function expectAnswer(answer: string, checks: Check[], opts: { soft?: boolean; label?: string } = {}) {
   const a = norm(answer);
+  const ex = opts.soft ? expect.soft : expect;
+  const pre = opts.label ? `${opts.label}: ` : '';
+  let ok = true;
   for (const c of checks) {
     const pick = typeof c === 'object' && !(c instanceof RegExp) ? (MODE === 'ai' ? c.ai : c.mock) : c;
-    if (pick instanceof RegExp) expect(a, `คำตอบควรตรง ${pick}`).toMatch(pick);
-    else expect(a, `คำตอบควรมี "${pick}"`).toContain(norm(pick));
+    const hit = pick instanceof RegExp ? pick.test(a) : a.includes(norm(pick));
+    ok &&= hit;
+    if (pick instanceof RegExp) ex(a, `${pre}คำตอบควรตรง ${pick}`).toMatch(pick);
+    else ex(a, `${pre}คำตอบควรมี "${pick}"`).toContain(norm(pick));
   }
+  return ok;
 }
 
 // ---------------- API helper (ใช้ cookie session เดียวกับหน้าเว็บ) ----------------

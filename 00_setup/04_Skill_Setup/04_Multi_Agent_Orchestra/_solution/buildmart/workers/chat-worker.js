@@ -115,7 +115,8 @@ async function answer(body, emit) {
 
   if (question === '__bm_test_fail__') throw new Error('test failure (DLQ hook)');
 
-  const history = await loadHistory(pool, sessionId);
+  // ประวัติ: ข้อความลูกค้าแปลงตัวเลขคำไทยเป็นตัวเลขด้วย ("หกสิบคูณหกสิบ" → 60x60) ให้ LLM/การค้นอ่านง่าย
+  const history = (await loadHistory(pool, sessionId)).map((m) => (m.role === 'user' ? { ...m, content: digitsForThaiNumbers(m.content).replace(/\s{2,}/g, ' ').trim() } : m));
   const rows = await loadProducts(pool);
   // v3: สินค้าที่กำลังคุยถึง — คำถามต่อเนื่อง ("อันนั้นเก็บได้นานแค่ไหน") เติมชื่อสินค้าเข้าไปในคำค้นเอกสาร
   const focus = conversationFocus(rows, history, askQ);
@@ -132,6 +133,8 @@ async function answer(body, emit) {
     { role: 'user', content: askQ },
   ];
 
+  // v3: token จริงจาก LLM (usage) รวมทุกรอบ tag → done.usage (load test ใช้คิด tokens/s)
+  const usage = { completion_tokens: 0, prompt_tokens: 0, decode_ms: 0, rounds: 0, source: null };
   let quoteNo = null;
   let cartChanged = false;
   let toolUsed = false;
@@ -143,6 +146,15 @@ async function answer(body, emit) {
     let raw;
     try {
       raw = await chatLLM(messages, {
+        onUsage: (u) => {
+          if (u.completion_tokens != null) {
+            usage.completion_tokens += Number(u.completion_tokens) || 0;
+            usage.prompt_tokens += Number(u.prompt_tokens) || 0;
+            usage.rounds++;
+            usage.source = 'llm_usage';
+          }
+          if (u.timings?.predicted_ms) usage.decode_ms += Number(u.timings.predicted_ms) || 0;
+        },
         onDelta: (soFar) => {
           if (toolRound) return;
           if (round < MAX_TOOL_ROUNDS && parseTags(soFar).some((t) => t.name !== 'ADD_TO_CART')) {
@@ -206,7 +218,9 @@ async function answer(body, emit) {
   if (process.env.CHAT_DEBUG) log('raw', JSON.stringify(finalRaw).slice(0, 400), 'docs', docs.map((d) => `${d.filename}#${d.page}:${d.vecSim}`).join(' '));
   const count = await cartCount(pool, sessionId);
   const retrieved = docs.map((d) => ({ filename: d.filename, page: d.page, score: d.rerankScore ?? d.score, hybridRank: d.hybridRank }));
-  return { sessionId, question, text, cites, cartCount: count, cartChanged, quoteNo, llmFailed, retrieved, products: products.map((p) => p.sku), focus: focus.skus };
+  if (usage.decode_ms) usage.decode_tok_s = +(usage.completion_tokens / (usage.decode_ms / 1000)).toFixed(1);
+  usage.decode_ms = Math.round(usage.decode_ms);
+  return { sessionId, question, text, cites, cartCount: count, cartChanged, quoteNo, llmFailed, usage: usage.source ? usage : undefined, retrieved, products: products.map((p) => p.sku), focus: focus.skus };
 }
 
 /** ข้อความ assistant ที่ส่งกลับให้ LLM ในรอบ tag: ตัด think แต่คง tag ไว้ (ตาม Notes from C3) */
@@ -291,6 +305,7 @@ async function onMessage(ch, msg) {
       quoteNo: r.quoteNo || undefined,
       retrieved: r.retrieved,
       products: r.products,
+      usage: r.usage,
     });
     ch.ack(msg);
     log(`done ${messageId} ${Date.now() - t0}ms cites=${r.cites.length} cart=${r.cartCount}${r.focus?.length ? ' focus=' + r.focus.join(',') : ''}${r.quoteNo ? ' ' + r.quoteNo : ''}${r.llmFailed ? ' (LLM down)' : ''}`);

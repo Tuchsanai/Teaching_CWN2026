@@ -1,6 +1,7 @@
 // e2e/make-media.mjs — วิดีโอ webm ของทุกเคส → test-videos/<id>.mp4 (H.264 CRF 28 · กว้าง 1280 · faststart) + test-gifs/<id>.gif (fps 6 · กว้าง 800 · 96 สี ≲ 2.5 MB)
-// env: BM_GIF_WIDTH BM_GIF_FPS BM_GIF_COLORS BM_GIF_DITHER · BM_MP4_CRF BM_MP4_WIDTH · BM_MEDIA_JOBS
-// เคส T: ดาวน์โหลด WAV จาก ${BM_URL}/api/tts/<audioId> แล้วรวมเข้า MP4 ด้วย adelay=offsetMs ให้เสียงตรงจังหวะที่กดเล่น
+// env: BM_GIF_WIDTH BM_GIF_FPS BM_GIF_COLORS BM_GIF_DITHER · BM_MP4_CRF BM_MP4_WIDTH · BM_MEDIA_JOBS · BM_MEDIA_ONLY=M,V,D02 (เฉพาะกลุ่ม/เคส)
+// เคส T/V/D02: ดาวน์โหลด WAV เสียงตอบจาก ${BM_URL}/api/tts/<audioId> (attachment 'audio') + เสียงคำถามจาก voice-fixtures/<file> (attachment 'mic')
+//   แล้วรวมเข้า MP4 ด้วย adelay=offsetMs ให้ตรงจังหวะที่กดไมค์/เริ่มเล่น · เคสที่มีเสียงคำถาม ตรวจ silencedetect ว่ามีช่วงมีเสียง ≥ 2 ช่วงต่อรอบ
 // ใช้ ffmpeg-static · ตรวจว่า MP4 มี audio stream (ffprobe ถ้ามีในเครื่อง ไม่งั้นอ่านจาก ffmpeg -i)
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
@@ -14,6 +15,9 @@ const VIDEOS = path.join(DIR, 'test-videos');
 const GIFS = path.join(DIR, 'test-gifs');
 const TMP = path.join(DIR, '.media-tmp');
 const CONCURRENCY = Number(process.env.BM_MEDIA_JOBS || 4);
+const VOICE_DIR = path.join(DIR, 'voice-fixtures');
+const ONLY = (process.env.BM_MEDIA_ONLY || '').split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+const wanted = (id) => !ONLY.length || ONLY.some((o) => (/^[A-Z]$/.test(o) ? id.startsWith(o) : id === o));
 for (const d of [VIDEOS, GIFS, TMP]) mkdirSync(d, { recursive: true });
 
 if (!existsSync(RESULTS)) {
@@ -92,6 +96,33 @@ const GIF_DITHER = process.env.BM_GIF_DITHER || 'none';
 const MP4_CRF = String(process.env.BM_MP4_CRF || 28);
 const MP4_WIDTH = Number(process.env.BM_MP4_WIDTH || 1280);
 
+/** ffmpeg silencedetect → ช่วงที่มีเสียง [[start,end],…] (วินาที) */
+async function voicedSegments(file) {
+  const log = await run(['-hide_banner', '-nostats', '-i', file, '-vn', '-af', 'silencedetect=noise=-38dB:d=0.35', '-f', 'null', '-']);
+  const total = probe(file).durationSec;
+  const sil = [];
+  let cur = null;
+  for (const line of log.split(/\r?\n/)) {
+    const a = line.match(/silence_start: ([\d.]+)/);
+    const b = line.match(/silence_end: ([\d.]+)/);
+    if (a) cur = [Number(a[1]), total];
+    if (b && cur) {
+      cur[1] = Number(b[1]);
+      sil.push(cur);
+      cur = null;
+    }
+  }
+  if (cur) sil.push(cur);
+  const spans = [];
+  let t = 0;
+  for (const [s0, s1] of sil) {
+    if (s0 - t > 0.15) spans.push([Math.round(t * 100) / 100, Math.round(s0 * 100) / 100]);
+    t = s1;
+  }
+  if (total - t > 0.15) spans.push([Math.round(t * 100) / 100, Math.round(total * 100) / 100]);
+  return { segments: spans.length, spans };
+}
+
 async function makeGif(src, gif) {
   await run([
     '-y', '-hide_banner', '-loglevel', 'error', '-i', src,
@@ -126,12 +157,18 @@ async function processCase({ id, result }) {
     '-vf', `scale='min(${MP4_WIDTH},iw)':-2:flags=lanczos,scale=trunc(iw/2)*2:trunc(ih/2)*2`, '-movflags', '+faststart',
   ];
 
+  const mics = (result.attachments || []).filter((a) => a.name === 'mic').map(attJson).filter((a) => a?.file);
   const wavs = [];
+  for (const m of mics) {
+    const f = path.join(VOICE_DIR, path.basename(m.file));
+    if (existsSync(f)) wavs.push({ kind: 'mic', micFile: m.file, offsetMs: m.offsetMs, durationMs: m.durationMs, file: f });
+    else console.warn(`[${id}] ไม่พบไฟล์เสียงคำถาม ${f}`);
+  }
   for (const [i, a] of audios.entries()) {
     const f = path.join(TMP, `${id}-${i}.wav`);
     try {
       await downloadWav(a.audioId, f);
-      wavs.push({ ...a, file: f });
+      wavs.push({ kind: 'tts', ...a, file: f });
     } catch (e) {
       console.warn(`[${id}] ${e.message}`);
     }
@@ -158,16 +195,28 @@ async function processCase({ id, result }) {
     audio: info.audio,
     hasAudio: !!info.audio,
     probe: info.tool,
-    audios: wavs.map(({ audioId, offsetMs, durationMs }) => ({ audioId, offsetMs, durationMs })),
+    audios: wavs.filter((w) => w.kind === 'tts').map(({ audioId, offsetMs, durationMs, engine }) => ({ audioId, offsetMs, durationMs, engine })),
+    mics: wavs.filter((w) => w.kind === 'mic').map(({ micFile, offsetMs, durationMs }) => ({ file: micFile, offsetMs, durationMs })),
     mp4Bytes: statSync(mp4).size,
     gifBytes: statSync(gif).size,
   };
   if (audios.length && !out.hasAudio) console.warn(`[${id}] ⚠ MP4 ไม่มี audio stream`);
+  if (out.mics.length && out.hasAudio) {
+    // BUILDMART ข้อ 7: เคสเสียง V ต้องได้ยินทั้งคำถามและคำตอบ → ช่วงมีเสียง ≥ 2 ช่วงต่อรอบ
+    out.voiced = await voicedSegments(mp4);
+    out.voicedTurns = out.mics.length;
+    out.voicedOk = out.voiced.segments >= 2 * out.mics.length;
+    // ทุกช่วงที่ส่งเสียงเข้าไป (คำถาม + คำตอบ) ต้องมีเสียงจริงอยู่ในช่วงนั้น
+    const spans = wavs.map((w) => [w.offsetMs / 1000, (w.offsetMs + (w.durationMs || 1000)) / 1000, w.kind]);
+    out.voicedCovered = spans.filter(([a, b]) => out.voiced.spans.some(([s0, s1]) => s0 < b && s1 > a)).length;
+    out.voicedOk &&= out.voicedCovered === spans.length;
+    if (!out.voicedOk) console.warn(`[${id}] ⚠ silencedetect: ช่วงมีเสียง ${out.voiced.segments} (ต้อง ≥ ${2 * out.mics.length}) · ครอบคลุม ${out.voicedCovered}/${spans.length}`);
+  }
   console.log(`✓ ${id} ${out.durationSec}s ${out.hasAudio ? '🔊 ' + out.audio : ''}`);
   return out;
 }
 
-const cases = collect(report.suites).filter((c) => c.result.status !== 'skipped');
+const cases = collect(report.suites).filter((c) => c.result.status !== 'skipped' && wanted(c.id));
 const manifestFile = path.join(DIR, 'media.json');
 const manifest = existsSync(manifestFile) ? JSON.parse(readFileSync(manifestFile, 'utf8')) : {};
 const queue = [...cases];
@@ -187,3 +236,5 @@ writeFileSync(manifestFile, JSON.stringify(Object.fromEntries(Object.entries(man
 const done = Object.values(manifest).filter((m) => m.mp4);
 const avg = done.reduce((s, m) => s + (m.durationSec || 0), 0) / (done.length || 1);
 console.log(`\nสร้างสื่อ ${cases.length} เคส · ความยาววิดีโอเฉลี่ย ${avg.toFixed(1)} วิ · มีเสียง: ${done.filter((m) => m.hasAudio).map((m) => m.id).join(', ') || '-'}`);
+const vs = done.filter((m) => m.mics?.length);
+if (vs.length) console.log(`เสียงถาม+ตอบ (silencedetect ≥ 2 ช่วง/รอบ): ${vs.map((m) => `${m.id} ${m.voicedOk ? '✓' : '✗'} ${m.voiced?.segments}/${2 * m.mics.length}`).join(' · ')}`);

@@ -150,7 +150,7 @@ services:
     environment:
       AMQP_URL: amqp://guest:guest@rabbitmq:5672
       MOCK_LLM_URL: http://mock-llm:8000
-      STT_PREFETCH: ${STT_PREFETCH:-4}
+      STT_PREFETCH: ${STT_PREFETCH:-8}
     depends_on:
       rabbitmq: { condition: service_healthy }
     healthcheck: *worker-health

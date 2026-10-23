@@ -1,0 +1,174 @@
+{
+  "label": "ai-stt-v2",
+  "config": {
+    "mode": "stt",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "stage_sec": 60,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 5000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [
+      "V01.wav",
+      "V02.wav",
+      "V03.wav",
+      "V04.wav",
+      "V05.wav",
+      "V06.wav",
+      "V07.wav",
+      "V08.wav",
+      "V09.wav",
+      "V10.wav"
+    ],
+    "prefetch": {
+      "chat": "4",
+      "stt": "4",
+      "tts": "2"
+    },
+    "note": "base prefetch chat4/stt4/tts2 · 1 worker each"
+  },
+  "summary": {
+    "mode": "stt",
+    "max_users_ok": 16,
+    "thresholds": {
+      "p95_ms": 5000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 5,
+    "stages_total": 6,
+    "best_rps": 5.545,
+    "at_max_users_ok": {
+      "users": 16,
+      "p50": 2921,
+      "p95": 4062
+    },
+    "finished_at": "2026-10-23T10:42:52.924Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 99,
+      "ok_n": 99,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 511,
+      "p95": 1356,
+      "queue_max": 1,
+      "rps": 1.638,
+      "wall_s": 60.44,
+      "x_realtime_p50": 5.28,
+      "audio_s_per_s_total": 5.68,
+      "clips_per_s": 1.638,
+      "rtf": 0.189,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 2,
+      "n": 215,
+      "ok_n": 215,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 514,
+      "p95": 890,
+      "queue_max": 2,
+      "rps": 3.559,
+      "wall_s": 60.41,
+      "x_realtime_p50": 5.68,
+      "audio_s_per_s_total": 12.28,
+      "clips_per_s": 3.559,
+      "rtf": 0.176,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 276,
+      "ok_n": 276,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 746,
+      "p95": 1809,
+      "queue_max": 4,
+      "rps": 4.504,
+      "wall_s": 61.28,
+      "x_realtime_p50": 4.19,
+      "audio_s_per_s_total": 15.64,
+      "clips_per_s": 4.504,
+      "rtf": 0.239,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 337,
+      "ok_n": 337,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1415,
+      "p95": 1643,
+      "queue_max": 9,
+      "rps": 5.512,
+      "wall_s": 61.14,
+      "x_realtime_p50": 2.28,
+      "audio_s_per_s_total": 19.09,
+      "clips_per_s": 5.512,
+      "rtf": 0.439,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 16,
+      "n": 329,
+      "ok_n": 329,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 2921,
+      "p95": 4062,
+      "queue_max": 17,
+      "rps": 5.072,
+      "wall_s": 64.87,
+      "x_realtime_p50": 1.1,
+      "audio_s_per_s_total": 17.5,
+      "clips_per_s": 5.072,
+      "rtf": 0.912,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 32,
+      "n": 362,
+      "ok_n": 362,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 5483,
+      "p95": 6447,
+      "queue_max": 32,
+      "rps": 5.545,
+      "wall_s": 65.28,
+      "x_realtime_p50": 0.59,
+      "audio_s_per_s_total": 19.13,
+      "clips_per_s": 5.545,
+      "rtf": 1.702,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 6447 > 5000 ms"
+      ]
+    }
+  ]
+}

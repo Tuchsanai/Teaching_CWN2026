@@ -1,0 +1,132 @@
+{
+  "label": "ai-rerank",
+  "config": {
+    "mode": "rerank",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "stage_sec": 45,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 1500,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [],
+    "rerank_passages": 20,
+    "prefetch": {
+      "chat": null,
+      "stt": null,
+      "tts": null
+    },
+    "note": "base"
+  },
+  "summary": {
+    "mode": "rerank",
+    "max_users_ok": 16,
+    "thresholds": {
+      "p95_ms": 1500,
+      "error_rate": 0.02
+    },
+    "stages_ok": 5,
+    "stages_total": 5,
+    "best_rps": 70.364,
+    "at_max_users_ok": {
+      "users": 16,
+      "p50": 222,
+      "p95": 233
+    },
+    "finished_at": "2026-10-23T10:28:52.282Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 169,
+      "ok_n": 169,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 225,
+      "p95": 492,
+      "queue_max": 0,
+      "rps": 3.755,
+      "wall_s": 45,
+      "passages_per_s_total": 75.1,
+      "requests_per_s": 3.755,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 2,
+      "n": 399,
+      "ok_n": 399,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 223,
+      "p95": 227,
+      "queue_max": 0,
+      "rps": 8.826,
+      "wall_s": 45.21,
+      "passages_per_s_total": 176.51,
+      "requests_per_s": 8.826,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 682,
+      "ok_n": 682,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 223,
+      "p95": 536,
+      "queue_max": 0,
+      "rps": 14.95,
+      "wall_s": 45.62,
+      "passages_per_s_total": 299,
+      "requests_per_s": 14.95,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 1565,
+      "ok_n": 1565,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 222,
+      "p95": 232,
+      "queue_max": 0,
+      "rps": 34.671,
+      "wall_s": 45.14,
+      "passages_per_s_total": 693.41,
+      "requests_per_s": 34.671,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 16,
+      "n": 3181,
+      "ok_n": 3181,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 222,
+      "p95": 233,
+      "queue_max": 0,
+      "rps": 70.364,
+      "wall_s": 45.21,
+      "passages_per_s_total": 1407.27,
+      "requests_per_s": 70.364,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

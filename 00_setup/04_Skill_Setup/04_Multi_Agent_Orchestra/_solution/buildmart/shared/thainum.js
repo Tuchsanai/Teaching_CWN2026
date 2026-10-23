@@ -31,6 +31,10 @@ const PHRASE_RE = new RegExp(`${NUM}\\s*(${UNITS})(?!\\s*(?:นี้|นั้�
 
 export function digitsForThaiNumbers(text) {
   return String(text || '')
+    // คำที่ Whisper ถอดเป็นเสียงอ่าน: "ดีบี 12" → DB12 · "อาร์บี 9" → RB9 · "CEM001" → CEM-001
+    .replace(/ดีบี\s*(\d+)/g, 'DB$1')
+    .replace(/อาร์บี\s*(\d+)/g, 'RB$1')
+    .replace(/\b(CEM|AGG|STL|BRK|TIL|PNT|PIP|ELC|ROF|WOD|TOL)\s*-?\s*(\d{3})\b/gi, (m, a, b) => `${a.toUpperCase()}-${b}`)
     .replace(DIM_RE, (m, a, b) => {
       const x = thaiWordsToNumber(a);
       const y = thaiWordsToNumber(b);

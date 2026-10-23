@@ -9,6 +9,9 @@
 //   MOCK_RERANK_MS · MOCK_LLM_SLOTS (>0 = รับแชทพร้อมกันได้เท่านี้ ที่เหลือรอคิว เหมือน KV cache ของ GPU เต็ม)
 // บทสนทนาหลายรอบ: อ่านหัวข้อ "## บริบทบทสนทนา" (สินค้าที่กำลังคุยถึง + จำนวนล่าสุด) ที่ chat-worker ใส่มา
 //   → "อันนั้นราคาเท่าไร" / "แล้วราคาส่ง 100 ถุงล่ะ" / "ใส่ตะกร้าให้หน่อย" ใช้สินค้านั้นต่อได้
+// คูปอง: "ยอดในตะกร้าตอนนี้ใช้คูปองอะไรได้" → ตัวไหนใช้ได้/ไม่ได้ + ตัวเลข จาก "## ยอดเงินที่คำนวณแล้ว" (shared/pricing.js)
+// คำถามภาษาอังกฤษที่ตอบจากเอกสาร (ไทย) → แปลแบบ rule-based (sentenceEn) ให้ตอบอังกฤษล้วน
+// ดีบัก: GET /debug/requests → messages + คำตอบ 30 รายการล่าสุด (ในหน่วยความจำ)
 // ไม่มี dependency (ใช้ http ของ Node ล้วน)
 //
 // หลักการ: ทำตัวเหมือน LLM ที่ "รู้เฉพาะสิ่งที่ chat-worker ใส่มาใน messages" เท่านั้น
@@ -50,6 +53,8 @@ function fmt(n) {
     ? r.toLocaleString('en-US')
     : r.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+// ยอดเงินในคำตอบเรื่องตะกร้า/ค่าส่ง/VAT/คูปอง: ตัดศูนย์ท้าย (136.50 → 136.5) ให้ตรงตัวเลขจริงของ /api/cart totals
+const fmtT = (n) => fmt(n).replace(/(\.\d)0$/, '$1');
 function tierPrice(price, qty) {
   if (qty >= 200) return Math.round(price * 0.9 * 100) / 100;
   if (qty >= 50) return Math.round(price * 0.95 * 100) / 100;
@@ -114,7 +119,7 @@ function parseFocus(system) {
   return { skus, qty: q ? num(q) : null };
 }
 // คำที่ชี้กลับไปยังสินค้าที่คุยก่อนหน้า
-const REFER = /(?:ตัว|อัน|ชิ้น|สินค้า|ล็อต|รายการ|แบบ)(?:นั้น|นี้|นั่น|นี่|เมื่อกี้|เดิม|ที่ว่า)|ที่ว่า|นั่น|that one|this one|\bit\b|\bthem\b|\bthat\b/i;
+const REFER = /(?:ตัว|อัน|ชิ้น|สินค้า|ล็อต|รายการ|แบบ)(?:นั้น|นี้|นั่น|นี่|เมื่อกี้|เดิม|ที่ว่า)|ที่ว่า|นั่น|ตามนั้น|จำนวนนั้น|that one|this one|\bit\b|\bthem\b|\bthat\b/i;
 const PLURAL = /สองตัว|สองอย่าง|สองรายการ|ทั้งสอง|ทั้งคู่|ทั้ง 2|both|these two|the two/i;
 
 // "## ยอดเงินที่คำนวณแล้ว" (chat-worker v3 · shared/pricing.js computeTotals ของตะกร้าจริง หรือสินค้าที่คุยถึง × จำนวน)
@@ -261,7 +266,27 @@ function hasTerm(textUpper, raw, term, kind) {
   return raw.includes(term);
 }
 
+// (v3) ตามการอ้างอิงข้ามเอกสาร: ช่วงที่เลือกมาจาก chunk ที่มีหมายเหตุ "…ดูเอกสาร BM-DS-ELC-PIP" ในเรื่องเดียวกับคำถาม
+//   (เช่น "ระยะรับประกันของ ELC-002 ดูเอกสาร BM-DS-ELC-PIP") และเอกสารนั้นอยู่ใน context ด้วย → ตอบจากเอกสารที่ถูกอ้างถึง
 function searchDocs(q, docs, products = []) {
+  const best = searchDocsOnce(q, docs, products);
+  if (!best) return best;
+  const terms = [...questionTerms(q)].filter(([, k]) => k !== 'c').map(([t]) => t);
+  for (const seg of splitPieces(best.doc.content).map((x) => x.join(' '))) {
+    const m = seg.match(/ดู(?:ใน|ที่)?(?:เอกสาร)?\s*(BM-[A-Z][A-Z-]*[A-Z])/);
+    if (!m || best.doc.filename.startsWith(m[1] + '.') || !terms.some((t) => seg.includes(t))) continue;
+    const target = docs.filter((d) => d.filename.startsWith(m[1] + '.'));
+    if (!target.length) continue;
+    const alt = searchDocsOnce(q, target.map((d) => ({ ...d, n: 1 })), products);
+    if (alt && alt.coverage >= 0.3 && /\d/.test(alt.sentence)) {
+      const doc = target.find((d) => d.content === alt.doc.content) || alt.doc;
+      return { ...alt, doc };
+    }
+  }
+  return best;
+}
+
+function searchDocsOnce(q, docs, products = []) {
   if (!docs.length) return null;
   const terms = questionTerms(q);
   // คำที่เป็น "ชื่อสินค้า" (ประธาน) ให้น้ำหนักน้อย — คำที่บอกว่าถามเรื่องอะไร (เก็บ/รับประกัน/คืน) สำคัญกว่า
@@ -436,6 +461,50 @@ function nameEn(name) {
 }
 const unitEn = (u) => UNIT_EN[u] || u.replace(/[฀-๿.]+/g, '').trim() || 'unit';
 
+// (v3) ประโยคจากเอกสาร (ไทย) → อังกฤษแบบ rule-based ให้คำถามภาษาอังกฤษได้คำตอบอังกฤษล้วน (ตัวเลข/หน่วย/รหัสครบ)
+const DOC_TH2EN = [
+  ['นับจากวันที่ผลิต', ' from the production date'], ['นับจากวันผลิต', ' from the production date'], ['นับจากวันที่ซื้อ', ' from the purchase date'],
+  ['นับจากวันที่ในใบเสร็จ', ' from the receipt date'], ['เมื่อทาครบระบบ', ' when applied as a full system:'], ['สีทับหน้า', 'topcoat'],
+  ['รับประกัน', ' warranty '], ['เก็บได้นาน', ' shelf life '], ['เก็บได้', ' can be stored for '], ['อายุการเก็บ', ' shelf life '],
+  ['สีทาภายนอก', ' exterior paint '], ['สีทาภายใน', ' interior paint '], ['สีน้ำอะคริลิก', ' acrylic paint '], ['สีรองพื้นปูนใหม่', ' primer for new plaster '],
+  ['สีรองพื้น', ' primer '], ['รองพื้น', ' primer '], ['ภายนอก', ' exterior '], ['ภายใน', ' interior '], ['ผนังปูนใหม่', ' new plaster wall '],
+  ['ปูนซีเมนต์ปอร์ตแลนด์', ' Portland cement '], ['ปูนซีเมนต์', ' cement '], ['ปูนกาวซีเมนต์', ' tile adhesive '], ['ปูนกาว', ' tile adhesive '],
+  ['ปูนก่อ', ' masonry mortar '], ['ปูนฉาบ', ' plaster mortar '], ['คอนกรีต', ' concrete '], ['บ่ม', ' curing '], ['กระเบื้องพื้น', ' floor tile '],
+  ['กระเบื้องผนัง', ' wall tile '], ['กระเบื้อง', ' tile '], ['ยาแนว', ' grout '], ['เกรียงฟัน', ' notched trowel '], ['อัตราการใช้', ' coverage '],
+  ['เหล็กข้ออ้อย', ' deformed bar '], ['เหล็กเส้นกลม', ' round bar '], ['ทาบเหล็ก', ' rebar lap '], ['ทาบ', ' lap '], ['อย่างน้อย', ' at least '],
+  ['สายไฟ', ' cable '], ['เบรกเกอร์ลูกย่อย', ' circuit breaker '], ['เบรกเกอร์', ' breaker '], ['ตู้คอนซูเมอร์', ' consumer unit '], ['รับกระแสได้', ' current rating '],
+  ['ใช้คู่กับ', ' use with '], ['ท่อ', ' pipe '], ['น้ำดี', ' clean water '], ['น้ำทิ้ง', ' drain water '], ['กาวทาท่อ', ' PVC glue '],
+  ['ห่างจากเที่ยวแรก', ' after the first coat '], ['ทาเที่ยวที่สอง', ' second coat '], ['ต้องรอ', ' wait '], ['รอ', ' wait '], ['ก่อน', ' before '],
+  ['คืนได้', ' returnable '], ['คืนไม่ได้', ' not returnable '], ['คืนสินค้า', ' returns '], ['ภายใน', ' within '], ['ไม่เกิน', ' up to '],
+  ['มอก.', ' TIS '], ['กำลังคราก', ' yield strength '], ['ไม่ต่ำกว่า', ' at least '], ['กก./ตร.ซม.', ' ksc '], ['ชั้นคุณภาพ', ' grade '], ['ชั้น', ' grade '],
+  ['มาตรฐาน', ' standard '], ['ตาม', ' per '], ['เป็นเหล็กข้ออ้อย', ' deformed bar '], ['เส้นผ่านศูนย์กลาง', ' diameter '], ['ยาว', ' length '],
+  ['ประมาณ', ' about '], ['ไม่ได้', ' not allowed '], ['ได้', ' OK '], ['และ', ' and '], ['หรือ', ' or '], ['ต่อ', ' per '],
+];
+const UNIT_TH2EN = [['ตร\\.มม\\.', 'sq.mm', 'sq.mm'], ['ตร\\.ม\\.', 'sq.m', 'sq.m'], ['ปี', 'year', 'years'], ['เดือน', 'month', 'months'], ['วัน', 'day', 'days'],
+  ['ชั่วโมง', 'hour', 'hours'], ['ชม\\.', 'hour', 'hours'], ['นาที', 'minute', 'minutes'], ['มม\\.', 'mm', 'mm'], ['ซม\\.', 'cm', 'cm'], ['กก\\.', 'kg', 'kg'],
+  ['ลิตร', 'liter', 'liters'], ['ล\\.', 'L', 'L'], ['เท่า', 'times', 'times'], ['แกลลอน', 'gallon', 'gallons'], ['ถุง', 'bag', 'bags'], ['เส้น', 'bar', 'bars'],
+  ['กล่อง', 'box', 'boxes'], ['แผ่น', 'sheet', 'sheets'], ['เที่ยว', 'coat', 'coats'], ['องศา', 'degree', 'degrees'], ['ม\\.', 'm', 'm']];
+function sentenceEn(th) {
+  let s = String(th);
+  // ตัวเลข + หน่วยไทย → อังกฤษ (8 ปี → 8 years · 5.5 กก./ตร.ม. → 5.5 kg/sq.m)
+  for (const [re, one, many] of UNIT_TH2EN) {
+    s = s.replace(new RegExp(`(\\d[\\d,]*(?:\\.\\d+)?(?:\\s*[–-]\\s*\\d[\\d,]*(?:\\.\\d+)?)?)\\s*${re}`, 'g'), (m, n) => ` ${n} ${/^1(\.0+)?$/.test(n.trim()) ? one : many} `);
+    s = s.replace(new RegExp(`/\\s*${re}`, 'g'), `/${one}`);
+  }
+  for (const [th2, e] of DOC_TH2EN) s = s.split(th2).join(e);
+  s = s
+    .replace(/[฀-๿]+/g, ' ')
+    .replace(/\s+([,.:;)/])/g, '$1')
+    .replace(/([(/])\s+/g, '$1')
+    .replace(/\(\s*\)/g, '')
+    .replace(/(^|\s)[,.:;›]+(?=\s|$)/g, ' ')
+    .replace(/([,;:])\s*[:,;]+/g, '$1')
+    .replace(/[,;:]\s*$/, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
 function priceLine(p, qty, en) {
   if (en) p = { ...p, name: nameEn(p.name), unit: unitEn(p.unit) };
   if (qty && qty > 1) {
@@ -497,7 +566,26 @@ function buildReply(messages) {
   // คำถามจริงของผู้ใช้ (user ล่าสุดที่ไม่ใช่ผล tag)
   let qIdx = messages.length - 1;
   while (qIdx >= 0 && !(messages[qIdx].role === 'user' && !/^\s*ผล(คำนวณ|คำสั่ง)/.test(text(messages[qIdx].content)))) qIdx--;
-  const q0 = qIdx >= 0 ? text(messages[qIdx].content).trim() : '';
+  let q0 = qIdx >= 0 ? text(messages[qIdx].content).trim() : '';
+  {
+    // ข้อความลูกค้าก่อนหน้า (ไว้ต่อบริบท)
+    let pu = '';
+    for (let k = qIdx - 1; k >= 0 && !pu; k--) if (messages[k].role === 'user' && !/^\s*ผล(คำนวณ|คำสั่ง)/.test(text(messages[k].content))) pu = text(messages[k].content);
+    const CODE = /\d+\s*[xX×]\s*\d+|\b[A-Z]{2,}\d+[A-Z]?\b/g;
+    // "แล้วถ้าเป็น DB16 ล่ะ" = คำถามก่อนหน้า แต่เปลี่ยนตัว
+    let sub = q0.match(/^\s*(?:แล้ว)?\s*(?:ถ้า)?เป็น\s*(.+?)\s*(?:ล่ะ|หละ|ละ)?\s*[?？]?\s*$/) || q0.match(/^\s*(?:and\s+)?what about\s+(.+?)\s*\??$/i);
+    // "ถ้าเป็นผนังปูนใหม่ ต้องรอกี่วัน…" = คำถามใหม่ทั้งประโยค (มีคำถามของตัวเอง) ไม่ใช่ "แค่เปลี่ยนตัว"
+    if (sub && (sub[1].length > 25 || /กี่|อะไร|ไหม|มั้ย|เท่าไร|เท่าไหร่|ยังไง|อย่างไร|ต้อง|ได้|how|what|which|can|\?/i.test(sub[1]))) sub = null;
+    if (sub && pu) {
+      const nc = sub[1].match(CODE) || [];
+      const oc = pu.match(CODE) || [];
+      q0 = nc.length && oc.length ? pu.replace(oc[0], nc[0]) : `${pu} ${sub[1]}`;
+    } else if (pu && /^\s*(แล้ว|งั้น|ส่วน)/.test(q0) && !(q0.match(CODE) || []).length) {
+      // "แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร" → พาขนาด/รหัสจากคำถามก่อนหน้า (60x60) มาด้วย
+      const oc = [...new Set(pu.match(CODE) || [])];
+      if (oc.length) q0 = `${q0} ${oc.join(' ')}`;
+    }
+  }
   const en = q0 ? !THAI.test(q0) : /ตอบเป็นภาษาอังกฤษ|answer in english/i.test(system);
   const out = (s) => (en ? s : endKrub(s));
 
@@ -523,8 +611,43 @@ function buildReply(messages) {
   const bestCoupon = /คุ้ม|โค้ดไหน|ใช้โค้ด|คูปองไหน|best coupon|which coupon/i.test(q);
   const wantWeight = /หนักเท่า|น้ำหนัก|หนักกี่|weigh/i.test(q);
   const wantTotal = /vat|ภาษี|สุทธิ|ต้องจ่าย|รวมทั้งหมด|ทั้งหมดรวม|รวมเป็นเงินทั้งหมด|เหลือเท่า|final total|grand total|in total/i.test(q);
+  // "ยอดในตะกร้าตอนนี้ใช้คูปองอะไรได้" → คูปองไหนใช้ได้/ไม่ได้กับยอดนี้ (ตัวเลขจาก shared/pricing.js ที่ chat-worker คิดแล้ว)
+  const eligibleQ = couponQ && !codeAsked && /ตะกร้า|ยอด|ตอนนี้|ใช้\S*ได้|ได้ไหม|ได้มั้ย|my cart|my order|this order|can i use|eligible|apply|qualify/i.test(q);
+  if (est && eligibleQ && !/แต้ม|point/i.test(q)) {
+    const sub = est.subtotal;
+    const okList = Object.entries(est.coupons).filter(([, o]) => o.ok).sort((a, b) => b[1].discount - a[1].discount);
+    const noList = Object.entries(est.coupons).filter(([, o]) => !o.ok);
+    const min = (code) => shop.coupons.find((c) => c.code === code)?.min ?? num((est.coupons[code].error.match(/([\d,]+(?:\.\d+)?)\s*บาท/) || [])[1] || 'NaN');
+    const parts = [en ? `Your ${est.cart ? 'cart' : 'order'} subtotal before VAT is ${fmtT(sub)} baht.` : `ยอด${est.cart ? 'ในตะกร้า' : 'รายการนี้'}ก่อน VAT ${fmtT(sub)} บาทครับ`];
+    for (const [code, o] of okList) {
+      parts.push(
+        en
+          ? `- ${code}: can be used — discount ${fmtT(o.discount)} baht, final total ${fmtT(o.total)} baht (incl. delivery and VAT).`
+          : `- ${code} ใช้ได้ ✓ ลด ${fmtT(o.discount)} บาท → ยอดสุทธิ ${fmtT(o.total)} บาท (รวมค่าส่งและ VAT แล้ว)`,
+      );
+    }
+    for (const [code] of noList) {
+      const m = min(code);
+      const short = Number.isFinite(m) ? Math.max(0, Math.round((m - sub) * 100) / 100) : null;
+      parts.push(
+        en
+          ? `- ${code}: cannot be used — it needs a subtotal of at least ${fmtT(m)} baht${short ? ` (${fmtT(short)} baht short)` : ''}.`
+          : `- ${code} ใช้ไม่ได้ ✗ ต้องมียอดก่อน VAT ตั้งแต่ ${fmtT(m)} บาท${short ? ` (ยังขาดอีก ${fmtT(short)} บาท)` : ''}`,
+      );
+    }
+    if (okList.length) parts.push(en ? `Best choice: ${okList[0][0]} (one coupon per order).` : `แนะนำใช้ ${okList[0][0]} (ใช้ได้ทีละ 1 ใบ ใส่โค้ดได้ที่หน้าตะกร้า)`);
+    else parts.push(en ? 'No coupon applies to this amount yet.' : 'ตอนนี้ยังไม่มีคูปองที่ใช้กับยอดนี้ได้ครับ');
+    return out(parts.join('\n'));
+  }
   if (est && !explicitWeight && !/แต้ม|point/i.test(q) && (wantShip || wantWeight || wantTotal || codeAsked || (bestCoupon && couponQ))) {
-    const items = est.lines.map((l) => l.replace(/\s*\(น้ำหนัก.*\)$/, '')).join(' · ');
+    const items = est.lines
+      .map((l) => l.replace(/\s*\(น้ำหนัก.*\)$/, ''))
+      .map((l) => {
+        if (!en) return l;
+        const m = l.match(/^([A-Z]{3}-\d{3})\s+(.*?)\s+×\s+([\d,.]+)\s+(\S+)\s+@\s+([\d,.]+)\s+=\s+([\d,.]+)\s*บาท/);
+        return m ? `${m[1]} ${nameEn(m[2])} × ${m[3]} ${unitEn(m[4])} @ ${m[5]} = ${m[6]} baht` : sentenceEn(l);
+      })
+      .join(' · ');
     const veh = en ? VEH_EN[est.vehicle] || est.vehicle : est.vehicle;
     const parts = [];
     parts.push(en ? `For ${items}:` : `${est.cart ? 'ตะกร้าของคุณ' : 'รายการนี้'}: ${items}`);
@@ -533,45 +656,45 @@ function buildReply(messages) {
       if (c.ok) {
         parts.push(
           en
-            ? `Coupon ${codeAsked} can be used: discount ${fmt(c.discount)} baht → ${fmt(c.after)} + delivery ${fmt(c.shipping)} (${veh}) + VAT ${fmt(c.vat)} = final total ${fmt(c.total)} baht.`
-            : `ใช้คูปอง ${codeAsked} ได้ครับ ลด ${fmt(c.discount)} บาท → ยอดหลังส่วนลด ${fmt(c.after)} + ค่าส่ง ${fmt(c.shipping)} บาท (${veh} น้ำหนัก ${fmt(est.weight)} กก.) + VAT ${fmt(c.vat)} = ยอดสุทธิ ${fmt(c.total)} บาท`,
+            ? `Coupon ${codeAsked} can be used: discount ${fmtT(c.discount)} baht → ${fmtT(c.after)} + delivery ${fmtT(c.shipping)} (${veh}) + VAT ${fmtT(c.vat)} = final total ${fmtT(c.total)} baht.`
+            : `ใช้คูปอง ${codeAsked} ได้ครับ ลด ${fmtT(c.discount)} บาท → ยอดหลังส่วนลด ${fmtT(c.after)} + ค่าส่ง ${fmtT(c.shipping)} บาท (${veh} น้ำหนัก ${fmtT(est.weight)} กก.) + VAT ${fmtT(c.vat)} = ยอดสุทธิ ${fmtT(c.total)} บาท`,
         );
       } else {
         parts.push(
           en
-            ? `Coupon ${codeAsked} cannot be used (${c.error}). Final total without coupon ${fmt(est.total)} baht.`
-            : `ใช้คูปอง ${codeAsked} ไม่ได้ครับ (${c.error}) ยอดสุทธิไม่ใช้คูปอง ${fmt(est.total)} บาท`,
+            ? `Coupon ${codeAsked} cannot be used (${c.error}). Final total without coupon ${fmtT(est.total)} baht.`
+            : `ใช้คูปอง ${codeAsked} ไม่ได้ครับ (${c.error}) ยอดสุทธิไม่ใช้คูปอง ${fmtT(est.total)} บาท`,
         );
         // ใช้ไม่ได้ → แนะนำคูปองอื่นที่ใช้ได้
         for (const [code, o] of Object.entries(est.coupons)) {
-          if (code !== codeAsked && o.ok) parts.push(en ? `You can use ${code} instead: discount ${fmt(o.discount)} baht, final total ${fmt(o.total)} baht.` : `ใช้ ${code} แทนได้ครับ ลด ${fmt(o.discount)} บาท ยอดสุทธิ ${fmt(o.total)} บาท`);
+          if (code !== codeAsked && o.ok) parts.push(en ? `You can use ${code} instead: discount ${fmtT(o.discount)} baht, final total ${fmtT(o.total)} baht.` : `ใช้ ${code} แทนได้ครับ ลด ${fmtT(o.discount)} บาท ยอดสุทธิ ${fmtT(o.total)} บาท`);
         }
       }
     } else if (bestCoupon && couponQ) {
       const ok = Object.entries(est.coupons).filter(([, o]) => o.ok).sort((a, b) => b[1].discount - a[1].discount);
       if (ok.length) {
         const [code, o] = ok[0];
-        parts.push(en ? `${code} saves the most: discount ${fmt(o.discount)} baht, final total ${fmt(o.total)} baht.` : `ใช้ ${code} คุ้มที่สุดครับ ลด ${fmt(o.discount)} บาท ยอดสุทธิ ${fmt(o.total)} บาท`);
+        parts.push(en ? `${code} saves the most: discount ${fmtT(o.discount)} baht, final total ${fmtT(o.total)} baht.` : `ใช้ ${code} คุ้มที่สุดครับ ลด ${fmtT(o.discount)} บาท ยอดสุทธิ ${fmtT(o.total)} บาท`);
       }
       for (const [code, o] of Object.entries(est.coupons)) if (!o.ok) parts.push(en ? `${code}: not applicable (${o.error}).` : `${code}: ใช้ไม่ได้ (${o.error})`);
     } else {
       if (wantWeight || wantShip) {
         parts.push(
           en
-            ? `Total weight ${fmt(est.weight)} kg → ${veh}, delivery fee ${fmt(est.shipping)} baht.`
-            : `น้ำหนักรวม ${fmt(est.weight)} กก. ใช้${est.vehicle} ค่าส่ง ${est.shipping ? fmt(est.shipping) + ' บาท' : '0 บาท (ส่งฟรี เพราะยอดหลังส่วนลดตั้งแต่ 20,000 บาท)'}`,
+            ? `Total weight ${fmtT(est.weight)} kg → ${veh}, delivery fee ${fmtT(est.shipping)} baht.`
+            : `น้ำหนักรวม ${fmtT(est.weight)} กก. ใช้${est.vehicle} ค่าส่ง ${est.shipping ? fmtT(est.shipping) + ' บาท' : '0 บาท (ส่งฟรี เพราะยอดหลังส่วนลดตั้งแต่ 20,000 บาท)'}`,
         );
       }
       if (wantTotal || !(wantWeight || wantShip)) {
         parts.push(
           en
-            ? `Subtotal ${fmt(est.subtotal)} + delivery ${fmt(est.shipping)} + VAT 7% ${fmt(est.vat)} = total ${fmt(est.total)} baht.`
-            : `ยอดสินค้า ${fmt(est.subtotal)} + ค่าส่ง ${fmt(est.shipping)} (${est.vehicle}) + VAT 7% ${fmt(est.vat)} = ยอดสุทธิ ${fmt(est.total)} บาท`,
+            ? `Subtotal ${fmtT(est.subtotal)} + delivery ${fmtT(est.shipping)} + VAT 7% ${fmtT(est.vat)} = total ${fmtT(est.total)} baht.`
+            : `ยอดสินค้า ${fmtT(est.subtotal)} + ค่าส่ง ${fmtT(est.shipping)} (${est.vehicle}) + VAT 7% ${fmtT(est.vat)} = ยอดสุทธิ ${fmtT(est.total)} บาท`,
         );
         // ถามแค่ "รวม VAT" ไม่ได้ถามค่าส่ง → บอกราคาสินค้ารวม VAT (ไม่รวมค่าส่ง) ด้วย
         if (!wantShip && /vat|ภาษี/i.test(q)) {
           const withVat = Math.round(est.subtotal * 1.07 * 100) / 100;
-          parts.push(en ? `(Goods only incl. VAT, without delivery: ${fmt(withVat)} baht.)` : `(ถ้าไม่รวมค่าส่ง: ราคาสินค้ารวม VAT ${fmt(withVat)} บาท)`);
+          parts.push(en ? `(Goods only incl. VAT, without delivery: ${fmtT(withVat)} baht.)` : `(ถ้าไม่รวมค่าส่ง: ราคาสินค้ารวม VAT ${fmtT(withVat)} บาท)`);
         }
       }
     }
@@ -615,7 +738,7 @@ function buildReply(messages) {
   }
 
   // 4) ใส่ตะกร้า
-  if (/ใส่ตะกร้า|เพิ่มลงตะกร้า|เพิ่มในตะกร้า|หยิบใส่|add (it |them |these )?to (my |the )?cart|add to cart/i.test(q)) {
+  if (/ใส่ตะกร้า|เพิ่มลงตะกร้า|เพิ่มในตะกร้า|หยิบใส่|\badd\b[^.?!\n]{0,40}\bto (my |the )?cart|add to cart/i.test(q)) {
     let items = [];
     const skus = q.toUpperCase().match(SKU_RE) || [];
     const qty = qtyIn(q);
@@ -625,7 +748,7 @@ function buildReply(messages) {
       const segs = q0.split(/\s*(?:กับ|และ|,(?!\d)|\band\b|&)\s*/).filter((x) => qtyIn(x));
       for (const seg of segs) {
         const top = rankProducts(enrich(seg), products)[0];
-        const p = top && top.s >= 2 ? top.p : REFER.test(seg) && focusProducts[0] ? focusProducts[0] : null;
+        const p = REFER.test(seg) && focusProducts[0] && !(top && top.s >= 6) ? focusProducts[0] : top && top.s >= 3 ? top.p : focusProducts[0] && segs.length === 1 ? focusProducts[0] : null;
         if (p && !items.find((x) => x.sku === p.sku)) items.push({ sku: p.sku, qty: qtyIn(seg), label: p.name, unit: p.unit });
       }
       if (items.length < segs.length) items = [];
@@ -635,7 +758,7 @@ function buildReply(messages) {
       }
     }
     // "ใส่ตะกร้าตามที่คำนวณไว้ทั้งหมด" → รายการจากผลคำนวณล่าสุดในประวัติ
-    if (!items.length && /คำนวณ|ทั้งหมด|ทุกรายการ|ทุกอย่าง|everything|all of/i.test(q0)) items = lastItems(messages, qIdx);
+    if (!items.length && /คำนวณ|ทั้งหมด|ทุกรายการ|ทุกอย่าง|ตามจำนวน|ตามนั้น|everything|all of/i.test(q0)) items = lastItems(messages, qIdx);
     // ไม่ระบุสินค้า: ① รายการในคำตอบล่าสุด (เช่นผลคำนวณ) ② สินค้าที่กำลังคุยถึง (บริบทบทสนทนา) ③ รายการเก่ากว่าในประวัติ
     if (!items.length) items = lastItems(messages, qIdx, { onlyLatest: true });
     if (!items.length && focusProducts.length) {
@@ -649,7 +772,9 @@ function buildReply(messages) {
     if (!items.length) items = lastItems(messages, qIdx);
     items = items.filter((it) => it.qty > 0);
     if (!items.length) return out(en ? 'Which product and how many would you like to add?' : 'ต้องการใส่สินค้าอะไร จำนวนเท่าไรครับ เช่น "ใส่ตะกร้า CEM-001 10 ถุง"');
-    const list = items.map((it) => `- ${it.sku} ${it.label || ''} × ${it.qty} ${it.unit || ''}`.replace(/\s+$/, '')).join('\n');
+    const list = items
+      .map((it) => (en ? `- ${it.sku} ${it.label ? nameEn(it.label) : ''} × ${it.qty} ${it.unit ? unitEn(it.unit) : ''}` : `- ${it.sku} ${it.label || ''} × ${it.qty} ${it.unit || ''}`).replace(/\s+$/, ''))
+      .join('\n');
     const tags = items.map((it) => `[ADD_TO_CART]${JSON.stringify({ sku: it.sku, qty: it.qty })}`).join('\n');
     return (en ? `Done, I added these to your cart:\n${list}` : endKrub(`เรียบร้อยครับ ใส่ตะกร้าให้แล้ว\n${list}\nไปที่หน้าตะกร้าเพื่อสั่งซื้อหรือขอใบเสนอราคาได้เลยครับ`)) + '\n' + tags;
   }
@@ -679,11 +804,11 @@ function buildReply(messages) {
   }
 
   // 5) คำนวณวัสดุ → [CALC]
-  let ct = calcTag(q);
+  let ct = calcTag(REFER.test(q0) && focusProducts.length && /(ตร|ตาราง|คิว|ลบ)/.test(q) ? `${q} ${focusProducts.map((p) => p.name).join(' ')}` : q);
   // พื้นที่/ปริมาตรในคำถาม แต่ไม่บอกงาน ("ห้องน้ำ 12 ตร.ม. ต้องซื้อกี่กล่อง") → งานของสินค้าที่กำลังคุยถึง
   if (!ct && focusProducts.length && /(ตร\.?\s*ม|ตารางเมตร|คิว|ลบ\.?\s*ม)/.test(q) && /กี่|เท่าไร|how many|how much/i.test(q)) ct = calcTag(q + ' ' + focusProducts.map((p) => p.name).join(' '));
   // ไม่มีขนาดในคำถาม แต่เปลี่ยนวัสดุ ("ถ้าเปลี่ยนเป็นอิฐมอญล่ะ ต้องใช้เท่าไร") → ขนาดจากคำถามคำนวณก่อนหน้า
-  if (!ct && /เปลี่ยนเป็น|ถ้าเป็น|แทน|instead/i.test(q) && /ต้องใช้|กี่|เท่าไร|how many|how much/i.test(q)) {
+  if (!ct && /เปลี่ยนเป็น|ถ้าเป็น|แทน|instead/i.test(q) && /ต้องใช้|กี่(?!วัน|ชั่วโมง|ชม|ปี|เดือน|นาที)|เท่าไร|how many|how much/i.test(q) && !/รอ|นานเท่า|wait/i.test(q)) {
     let prevCt = null;
     for (let k = qIdx - 1; k >= 0 && !prevCt; k--) if (messages[k].role === 'user') prevCt = calcTag(enrich(text(messages[k].content)));
     if (prevCt) {
@@ -770,7 +895,8 @@ function buildReply(messages) {
   const priceQ = qtyFollow || pickFollow || /เป็นเงิน|ราคา|กี่บาท|ละเท่า|how much|price|cost/i.test(q);
   const stockQ = /สต็อก|สต๊อก|มีของ|กี่สาขา|เหลือ|ของหมด|in stock|stock|available at|มีที่สาขา|ที่สาขา\S*(ไหม|มั้ย|บ้าง)|สาขาไหนมี|มีกี่สาขา|which branch/i.test(q) || (!!shop.branches.find((b) => q0.includes(b.name)) && /มี.*(ไหม|มั้ย|บ้าง|กี่|เท่าไร)|เหลือ/.test(q0)) || /ทุกสาขา|รวมกัน.*มี|มีมากกว่า|ที่ไหนมี/.test(q0);
   // สาขาที่ถามเจาะจง ("มีที่สาขารังสิตไหม")
-  const askedBranch = shop.branches.find((b) => q0.includes(b.name) || new RegExp(`\\b${b.code}\\b`, 'i').test(q0));
+  const BRANCH_EN = { LKB: /lat\s*krabang/i, BNA: /bang\s*na\b/i, RST: /rangsit/i };
+  const askedBranch = shop.branches.find((b) => q0.includes(b.name) || new RegExp(`\\b${b.code}\\b`, 'i').test(q0) || !!BRANCH_EN[b.code]?.test(q0));
 
   // 9) ราคารวมของรายการล่าสุด (เช่น ต่อจากผลคำนวณ)
   if (priceQ && /รวม|ทั้งหมด|total|altogether/i.test(q) && !(q.toUpperCase().match(SKU_RE) || []).length) {
@@ -834,7 +960,7 @@ function buildReply(messages) {
     const parts = [];
     if (other && docs.length) {
       const d = searchDocs(withFocus(enrich(other)), docs, products);
-      if (d && d.coverage >= 0.3) parts.push((en ? `According to ${d.doc.filename}: ` : `จากเอกสาร ${d.doc.filename} หน้า ${d.doc.page}: `) + `${d.sentence} [${d.doc.n}]`);
+      if (d && d.coverage >= 0.3) parts.push(en ? `According to ${d.doc.filename} (page ${d.doc.page}): ${sentenceEn(d.sentence)} [${d.doc.n}]` : `จากเอกสาร ${d.doc.filename} หน้า ${d.doc.page}: ${d.sentence} [${d.doc.n}]`);
     }
     if (ranked.length && ranked[0].s >= 2) {
       const p = ranked[0].p;
@@ -887,11 +1013,11 @@ function buildReply(messages) {
     const d = searchDocs(withFocus(q), docs, products);
     if (d && d.coverage >= 0.3) {
       let lead = '';
-      if (/ได้ไหม|ได้มั้ย|ได้หรือไม่|ได้หรือเปล่า|\bcan\b|\bis it\b/i.test(q)) {
+      if (en ? /^\s*(can|could|is|are|does|do|may)\b/i.test(q0) : /ได้ไหม|ได้มั้ย|ได้หรือไม่|ได้หรือเปล่า/.test(q)) {
         const neg = /ไม่ได้|ห้าม|ไม่ควร|ไม่รับ|not allowed|cannot/.test(d.sentence);
         lead = en ? (neg ? 'No. ' : 'Yes. ') : neg ? 'ไม่ได้ครับ ' : 'ได้ครับ ';
       }
-      return out(en ? `${lead}According to ${d.doc.filename} (page ${d.doc.page}): ${d.sentence} [${d.doc.n}]` : `${lead}จากเอกสาร ${d.doc.filename} หน้า ${d.doc.page}: ${d.sentence} [${d.doc.n}]`);
+      return out(en ? `${lead}According to ${d.doc.filename} (page ${d.doc.page}): ${sentenceEn(d.sentence)} [${d.doc.n}]` : `${lead}จากเอกสาร ${d.doc.filename} หน้า ${d.doc.page}: ${d.sentence} [${d.doc.n}]`);
     }
   }
 
@@ -1205,6 +1331,7 @@ async function handleChat(req, res, body) {
   }
 }
 
+const recent = [];
 async function handleChatInner(req, res, body) {
   let payload;
   try {
@@ -1215,6 +1342,9 @@ async function handleChatInner(req, res, body) {
   let reply;
   try {
     reply = buildReply(payload.messages);
+    // ดีบัก: เก็บ request ล่าสุด 30 รายการในหน่วยความจำ (GET /debug/requests) — ดูว่า chat-worker ใส่ context อะไรมา
+    recent.push({ at: new Date().toISOString(), messages: payload.messages, reply });
+    if (recent.length > 30) recent.shift();
   } catch (e) {
     console.error('[mock-llm] buildReply error', e);
     reply = 'ขออภัยครับ ระบบขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้งครับ';
@@ -1246,6 +1376,7 @@ function createServer() {
   return http.createServer((req, res) => {
     const url = (req.url || '/').split('?')[0];
     if (req.method === 'GET' && (url === '/health' || url === '/healthz')) return send(res, 200, { status: 'ok', model: MODEL });
+    if (req.method === 'GET' && url === '/debug/requests') return send(res, 200, recent);
     if (req.method === 'GET' && url === '/v1/models') return send(res, 200, { object: 'list', data: [{ id: MODEL, object: 'model', created: 0, owned_by: 'buildmart-mock' }] });
     if (req.method === 'POST' && url === '/v1/audio/transcriptions') {
       const chunks = [];

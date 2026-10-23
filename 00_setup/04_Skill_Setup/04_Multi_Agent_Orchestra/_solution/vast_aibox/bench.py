@@ -143,7 +143,10 @@ def r3(x):
 def _req(path: str, data: bytes | None = None, headers: dict | None = None, timeout=300):
     h = {"Authorization": f"Bearer {KEY}"}
     h.update(headers or {})
-    req = urllib.request.Request(URL + path, data=data, headers=h, method="POST" if data is not None else "GET")
+    # GPU แยก 2 เครื่อง: STT_URL / TTS_URL / RERANK_URL (ถ้ามี) ชนะ AIBOX_URL
+    base = {"/v1/audio/transcriptions": os.environ.get("STT_URL"), "/v1/audio/speech": os.environ.get("TTS_URL"),
+            "/v1/rerank": os.environ.get("RERANK_URL")}.get(path) or URL
+    req = urllib.request.Request(base.rstrip("/") + path, data=data, headers=h, method="POST" if data is not None else "GET")
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read(), dict(r.headers)
 

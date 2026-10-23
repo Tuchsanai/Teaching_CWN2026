@@ -4,7 +4,8 @@
 //   searchDocs(pool, question)                → [{filename, page, content, score, vecSim}] top 4
 //                                               (Hybrid RAG top 20 → reranker บน ai-box → top 4 เมื่อ RERANK=on)
 //   loadProducts(pool)                        → สินค้าทั้งร้าน + สต็อก 3 สาขา
-//   conversationFocus(rows, history)          → v3: สินค้าที่กำลังคุยถึง + จำนวนล่าสุด (ใช้กับ "อันนั้น" / "ใส่ตะกร้าให้หน่อย")
+//   conversationFocus(rows, history, q)       → v3: สินค้าที่กำลังคุยถึง (ล่าสุดก่อน · คำชี้กลับที่บอกชนิด "ปูนกาวอันนั้น" "สีตัวนั้น" เลือกตัวในหมวดนั้น)
+//                                               + จำนวนล่าสุด (ลูกค้าพูด หรือบอทคำนวณ/ตอบราคาให้) ใช้กับ "อันนั้น" / "ใส่ตะกร้าตามจำนวนนั้น"
 //   findProducts(pool, question, history, docs, max, {rows, focus}) → สินค้าที่เกี่ยวข้อง (คำถาม + ประวัติ + SKU ในเอกสาร + focus)
 //   buildSystemPrompt({products, docs, en, focus}) → system prompt ข้อความเดียว (หัวข้อ ## ตายตัว)
 import { hasThai } from './tags.js';
@@ -213,7 +214,7 @@ function namedIn(text, rows, { allowAlias = true } = {}) {
   const explicit = skusIn(t).filter((s) => rows.some((p) => p.sku === s));
   if (explicit.length) return explicit;
   if (!allowAlias) return [];
-  const sc = rows.map((p) => ({ sku: p.sku, s: scoreText(t, p, 1) })).filter((x) => x.s >= 30).sort((a, b) => b.s - a.s);
+  const sc = rows.map((p) => ({ sku: p.sku, s: scoreText(t, p, 1) })).filter((x) => x.s >= 25).sort((a, b) => b.s - a.s);
   if (!sc.length) return [];
   return sc.filter((x) => x.s >= sc[0].s).slice(0, 3).map((x) => x.sku); // ตัวที่คะแนนสูงสุด (เสมอกันได้ ≤ 3)
 }
@@ -236,6 +237,18 @@ export function searchName(p) {
 export function carryCodes(question, history = []) {
   const CODE = /\d+\s*[xX×]\s*\d+|\b[A-Z]{2,}\d+[A-Z]?\b|\b\d+(?:\.\d+)?\s*A\b|\b[A-Z]{3}-\d{3}\b/g;
   const q = digitsForThaiNumbers(question);
+  const prevQ = [...history].reverse().find((m) => m.role === 'user');
+  // "แล้วถ้าเป็น DB16 ล่ะ" / "what about DB16?" = คำถามก่อนหน้า แต่เปลี่ยนตัว → ค้นด้วยคำถามก่อนหน้าที่แทนรหัสแล้ว
+  let sub = q.match(/^\s*(?:แล้ว)?\s*(?:ถ้า)?เป็น\s*(.+?)\s*(?:ล่ะ|หละ|ละ)?\s*[?？]?\s*$/) || q.match(/^\s*(?:and\s+)?what about\s+(.+?)\s*\??$/i);
+  // "ถ้าเป็นผนังปูนใหม่ ต้องรอกี่วันก่อนทารองพื้น" = คำถามใหม่ที่มีคำถามของตัวเอง ไม่ใช่ "เปลี่ยนตัว"
+  if (sub && (sub[1].length > 25 || /กี่|อะไร|ไหม|มั้ย|เท่าไร|เท่าไหร่|ยังไง|อย่างไร|ต้อง|ได้|how|what|which|can|\?/i.test(sub[1]))) sub = null;
+  if (sub && prevQ) {
+    const p = digitsForThaiNumbers(prevQ.content);
+    const newCodes = sub[1].match(CODE) || [];
+    const oldCodes = p.match(CODE) || [];
+    if (newCodes.length && oldCodes.length) return `${p.replace(oldCodes[0], newCodes[0])} ${sub[1]}`;
+    return `${p} ${sub[1]}`;
+  }
   if (!/^\s*(แล้ว|งั้น|ถ้า|ส่วน|and|what about|if)/i.test(q) && !REFER_RE.test(q)) return q;
   if ((q.match(CODE) || []).length) return q;
   const prev = [...history].reverse().find((m) => m.role === 'user');
@@ -270,7 +283,8 @@ export function conversationFocus(rows, history = [], question = '') {
     if (set.size >= 2) skus = [...set];
   }
   // คำถามนี้เอ่ยชื่อสินค้าเอง (และไม่ได้ชี้กลับ) → สินค้านั้นคือเรื่องที่กำลังคุย
-  if (!skus.length && question && !REFER_RE.test(question)) skus = namedIn(question, rows);
+  // (ชี้กลับแต่บอกชนิดด้วย เช่น "ปูนกาวอันนั้น" "เบรกเกอร์ตัวนั้น" → ตัวที่เอ่ยชื่อชนะ)
+  if (!skus.length && question) skus = namedIn(question, rows);
   for (let i = msgs.length - 1; i >= 0 && !skus.length; i--) {
     const m = msgs[i];
     if (m.role === 'assistant') {
@@ -298,6 +312,20 @@ export function conversationFocus(rows, history = [], question = '') {
     const best = rows.map((p) => ({ sku: p.sku, s: scoreText(recent, p, 1) })).sort((a, b) => b.s - a.s || a.sku.localeCompare(b.sku))[0];
     if (best && best.s >= 8) skus = [best.sku];
   }
+  // คำชี้กลับที่บอกหมวด ("สีตัวนั้น" "เหล็กตัวเมื่อกี้") แต่ตัวที่เจอข้างบนไม่อยู่ในหมวดนั้น
+  // → ย้อนประวัติจากล่าสุด หาสินค้าตัวล่าสุดที่อยู่ในหมวดที่บอก (ข้อความลูกค้า + คำตอบบอท)
+  const hintCats = question && REFER_RE.test(question) ? CATEGORY_WORDS.filter(([re]) => re.test(question)).map(([, c]) => c) : [];
+  const inHint = (s) => hintCats.includes(rows.find((p) => p.sku === s)?.category);
+  if (hintCats.length && !skus.some(inHint)) {
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const m = msgs[i];
+      const got = (m.role === 'assistant' ? namedIn(m.content, rows, { allowAlias: false }).concat(namedIn(m.content, rows)) : namedIn(m.content, rows)).filter(inHint);
+      if (got.length) {
+        skus = [...new Set(got)].slice(0, 3);
+        break;
+      }
+    }
+  }
   if (skus.length > 1 && question) {
     // หลายตัว (เช่นผลคำนวณคอนกรีต) แต่คำถามบอกหมวด ("แล้วตัวปูนเก็บได้นานแค่ไหน") → เหลือเฉพาะตัวที่ตรงคำถาม
     const q = hasThai(question) ? question : enrichQuery(question);
@@ -309,10 +337,20 @@ export function conversationFocus(rows, history = [], question = '') {
   const units = new Set(products.map((p) => p.unit));
   let qty = null;
   let unit = null;
-  const users = [question, ...msgs.filter((m) => m.role === 'user').map((m) => m.content).reverse()].slice(0, 4);
-  for (const t of users) {
-    const q = qtyIn(t);
-    if (q && (!units.size || units.has(q.unit) || /^[a-z]/i.test(q.unit))) {
+  // ข้อความลูกค้า: "<จำนวน> <หน่วย>" · คำตอบบอท: บรรทัดที่มี SKU ของสินค้าที่คุยถึง + ผลคำนวณ/ราคาส่ง ("- PNT-001 … : 8 แกลลอน" · "ซื้อ 60 ถุง")
+  // → "ใส่ตะกร้าตามจำนวนนั้น" ใช้จำนวนล่าสุดไม่ว่าลูกค้าพูดเองหรือบอทคำนวณให้ (ไม่นับตัวเลขสต็อก)
+  const botQty = (text) => {
+    for (const line of String(text).split('\n')) {
+      if (!skus.some((s) => line.includes(s))) continue;
+      const m = line.match(new RegExp(`(?:[:：×]|ซื้อ|x)\\s*(\\d[\\d,]*)\\s*(${UNIT_WORDS})`, 'i'));
+      if (m) return { qty: Number(m[1].replace(/,/g, '')), unit: m[2] };
+    }
+    return null;
+  };
+  const recent = [{ role: 'user', content: question }, ...msgs.slice().reverse()].slice(0, 7);
+  for (const m of recent) {
+    const q = m.role === 'user' ? qtyIn(m.content) : botQty(m.content);
+    if (q && q.qty > 0 && (!units.size || units.has(q.unit) || /^[a-z]/i.test(q.unit))) {
       ({ qty, unit } = q);
       break;
     }

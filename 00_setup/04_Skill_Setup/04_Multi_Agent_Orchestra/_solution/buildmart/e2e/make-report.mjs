@@ -52,8 +52,28 @@ function summaryTable(datas) {
   return [head, ...lines].join('\n');
 }
 
+const ok = (b) => (b ? '✓' : '✗');
 function answerOf(r) {
   const parts = [];
+  // เคสเสียง V: ทุกรอบ = ไฟล์ · ข้อความถอด · CER · engine · หยุดพูด→ได้ยิน · คำตอบ · ผล 5 ข้อ
+  if (r.voice?.length) {
+    for (const t of r.voice)
+      parts.push(
+        `[รอบ ${t.n} ${t.file}] 🎙 “${t.transcript}” (CER ${t.cer ?? '–'}${t.engine ? ` · ${t.engine}` : ''}` +
+          `${t.stopToAudioMs != null ? ` · หยุดพูด→ได้ยิน ${(t.stopToAudioMs / 1000).toFixed(1)} วิ` : ''}) → ${t.answer}` +
+          `${t.cites?.length ? ` 📄 ${t.cites.join(', ')}` : ''}${t.cart ? ` 🛒 ${t.cart.join(', ')}` : ''}` +
+          ` [ถอด${ok(t.ok?.transcript)} ตอบ${ok(t.ok?.answer)} เสียง${ok(t.ok?.audio)} มาสคอต${ok(t.ok?.mascot)}]`,
+      );
+    if (r.error) parts.push(`⚠ ${r.error}`);
+    return parts.join('\n');
+  }
+  // เคสหลายรอบ M: ทุกรอบ = คำถาม → คำตอบ (+ cite · ตะกร้า · QT) ✓/✗
+  if (r.turns?.length) {
+    for (const t of r.turns)
+      parts.push(`[รอบ ${t.n}] ${t.q} → ${t.answer}${t.cites?.length ? ` 📄 ${t.cites.join(', ')}` : ''}${t.cart ? ` 🛒 ${t.cart.join(', ')}` : ''}${t.quoteNo ? ` 🧾 ${t.quoteNo}` : ''} ${ok(t.ok)}`);
+    if (r.error) parts.push(`⚠ ${r.error}`);
+    return parts.join('\n');
+  }
   for (const a of r.answers) parts.push((r.answers.length > 1 ? `[${a.name}] ` : '') + a.text);
   if (r.cites?.length) parts.push(`อ้างอิง: ${r.cites.join(', ')}`);
   if (r.audio?.length) parts.push(`เสียง: ${r.audio.map((a) => `${a.audioId.slice(0, 8)}… ${(a.durationMs / 1000).toFixed(1)} วิ @${(a.offsetMs / 1000).toFixed(1)} วิ`).join(', ')}`);
@@ -66,12 +86,13 @@ function answerOf(r) {
 function mediaLinks(id) {
   const m = MEDIA[id];
   if (!m?.mp4) return '';
-  return `[GIF](${m.gif}) · [MP4](${m.mp4})${m.hasAudio ? ' 🔊' : ''}`;
+  const v = m.mics?.length ? ` · เสียงถาม+ตอบ ${m.voicedOk ? '✓' : '✗'} (${m.voiced?.segments ?? '?'} ช่วง/${m.mics.length} รอบ)` : '';
+  return `[GIF](${m.gif}) · [MP4](${m.mp4})${m.hasAudio ? ' 🔊' : ''}${v}`;
 }
 
 function renderMode(d) {
   const rows = d.rows
-    .map((r) => `| ${r.id} | ${r.group} | ${cell(r.title, 80)} | ${ICON[r.status] || r.status} | ${sec(r.durationMs)} | ${cell(answerOf(r), 420)} | ${mediaLinks(r.id)} |`)
+    .map((r) => `| ${r.id} | ${r.group} | ${cell(r.title, 80)} | ${ICON[r.status] || r.status} | ${sec(r.durationMs)} | ${cell(answerOf(r), r.turns?.length || r.voice?.length ? 2600 : 420)} | ${mediaLinks(r.id)} |`)
     .join('\n');
   return `# TEST_REPORT (${d.mode}) — บ้านช่าง BuildMart
 
@@ -101,7 +122,7 @@ function renderAll(datas) {
       });
       // คำตอบจริง: เอาจากโหมดล่าสุดที่มีข้อมูล (ai ก่อน ถ้ารันแล้ว)
       const src = [...modes].reverse().map((m) => byMode[m][id]).find((r) => r && r.status !== 'skipped') || modes.map((m) => byMode[m][id]).find(Boolean);
-      return `| ${id} | ${pl.group} | ${cell(pl.title, 80)} | ${res.join(' | ')} | ${src ? cell(answerOf(src), 360) : ''} | ${mediaLinks(id)} |`;
+      return `| ${id} | ${pl.group} | ${cell(pl.title, 80)} | ${res.join(' | ')} | ${src ? cell(answerOf(src), src.turns?.length || src.voice?.length ? 2600 : 360) : ''} | ${mediaLinks(id)} |`;
     })
     .join('\n');
   return `# TEST_REPORT — บ้านช่าง BuildMart (Playwright เพลย์ลิสต์)
@@ -110,7 +131,8 @@ ${summaryTable(datas)}
 
 - รายงานแยกโหมด: ${modes.map((m) => `[TEST_REPORT.${m}.md](TEST_REPORT.${m}.md)`).join(' · ') || '-'}
 - วิดีโอ ${media.length} เคส · ยาวเฉลี่ย ${avg.toFixed(1)} วิ · MP4 ที่มีเสียงพูดจริง: ${voiced.join(', ') || '-'}
-- ✅ ผ่าน · ❌ ไม่ผ่าน · ⏭️ ข้าม (กลุ่ม T ต้อง \`BM_TTS=1\` + profile tts)
+- ✅ ผ่าน · ❌ ไม่ผ่าน · ⏭️ ข้าม (กลุ่ม V ข้ามเมื่อยังไม่มีไฟล์เสียง \`voice-fixtures/\` · \`BM_TTS=0\` ปิดกลุ่ม T)
+- กลุ่ม M/V แสดงทุกรอบ · V แสดงข้อความถอด + CER + engine + เวลาหยุดพูด→ได้ยินคำตอบ · MP4 ของ T/V มีเสียงจริง (V = เสียงคำถาม + เสียงตอบ ตรวจด้วย silencedetect)
 
 | เคส | กลุ่ม | ทดสอบ | ${modes.map((m) => `ผล ${m}`).join(' | ')} | คำตอบจริง / ค่าที่ตรวจ | สื่อ |
 |---|---|---|${modes.map(() => '---').join('|')}|---|---|
@@ -130,6 +152,8 @@ if (existsSync(RESULTS)) {
     const checked = atts.filter((a) => a.name === 'checked').map(body).join('\n');
     const cites = atts.filter((a) => a.name === 'cites').flatMap((a) => JSON.parse(body(a) || '[]'));
     const audio = atts.filter((a) => a.name === 'audio').map((a) => JSON.parse(body(a) || 'null')).filter(Boolean);
+    const turns = atts.filter((a) => a.name === 'turns').flatMap((a) => JSON.parse(body(a) || '[]'));
+    const voice = atts.filter((a) => a.name === 'voice-turns').flatMap((a) => JSON.parse(body(a) || '[]'));
     const err = (r.errors?.[0]?.message || r.error?.message || '').replace(/\u001b\[[0-9;]*m/g, '').split('\n').filter(Boolean).slice(0, 3).join(' ');
     return {
       id,
@@ -142,6 +166,8 @@ if (existsSync(RESULTS)) {
       checked,
       cites,
       audio,
+      turns,
+      voice,
       error: r.status === 'passed' ? '' : err,
       skipReason: r.status === 'skipped' ? (r.annotations || []).find((a) => a.type === 'skip')?.description || '' : '',
     };

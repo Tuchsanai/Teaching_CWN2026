@@ -1,0 +1,108 @@
+{
+  "label": "e2e-mini",
+  "config": {
+    "mode": "chat",
+    "users": [
+      1,
+      2,
+      4
+    ],
+    "stage_sec": 15,
+    "url": "http://localhost:3400",
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [],
+    "prefetch": {
+      "chat": null,
+      "stt": null,
+      "tts": null
+    }
+  },
+  "summary": {
+    "mode": "chat",
+    "max_users_ok": 4,
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 3,
+    "stages_total": 3,
+    "best_rps": 8.47,
+    "at_max_users_ok": {
+      "users": 4,
+      "p50": 452,
+      "p95": 645
+    },
+    "finished_at": "2026-10-23T10:28:59.419Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 36,
+      "ok_n": 36,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 434,
+      "p95": 616,
+      "queue_max": 1,
+      "rps": 2.33,
+      "wall_s": 15.45,
+      "ttft_p50": 127,
+      "ttft_p95": 193,
+      "tok_s_per_user_p50": 150.63,
+      "tok_s_total": 104.32,
+      "token_count_method": "approx_chars/2.5",
+      "tokens_per_s": 150.63,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 2,
+      "n": 70,
+      "ok_n": 70,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 428,
+      "p95": 614,
+      "queue_max": 2,
+      "rps": 4.578,
+      "wall_s": 15.29,
+      "ttft_p50": 122,
+      "ttft_p95": 195,
+      "tok_s_per_user_p50": 150.73,
+      "tok_s_total": 205.22,
+      "token_count_method": "approx_chars/2.5",
+      "tokens_per_s": 150.73,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 130,
+      "ok_n": 130,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 452,
+      "p95": 645,
+      "queue_max": 4,
+      "rps": 8.47,
+      "wall_s": 15.35,
+      "ttft_p50": 150,
+      "ttft_p95": 216,
+      "tok_s_per_user_p50": 150.77,
+      "tok_s_total": 380.92,
+      "token_count_method": "approx_chars/2.5",
+      "tokens_per_s": 150.77,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

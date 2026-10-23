@@ -1,6 +1,6 @@
 // workers/stt-worker.js — เสียงพูด → ข้อความ (v3 · CONTRACT_V3 §4)
 //
-// คิว stt.request (durable · prefetch STT_PREFETCH=4) body {audioB64, mime, lang?} + reply_to/correlation_id (แบบเดียวกับ tts)
+// คิว stt.request (durable · prefetch STT_PREFETCH=8) body {audioB64, mime, lang?} + reply_to/correlation_id (แบบเดียวกับ tts)
 //   → POST ${STT_URL}/v1/audio/transcriptions (Whisper บน ai-box · ไม่มี .env.aibox → mock-llm เทียบ sha256 ไฟล์ทดสอบ)
 //   → reply ทาง exchange chat.reply: {type:'stt', text, language, durationMs, tookMs, engine} หรือ {type:'stt', error}
 // healthcheck: /tmp/ready (เขียนหลัง consume สำเร็จ)
@@ -8,7 +8,7 @@ import { connectAmqp, replyTo, parseJson, Q } from './lib/amqp.js';
 import { markReady, markNotReady } from './lib/ready.js';
 import { transcribe, aiboxInfo } from './lib/aibox.js';
 
-const PREFETCH = Number(process.env.STT_PREFETCH || 4);
+const PREFETCH = Number(process.env.STT_PREFETCH || 8);
 const MAX_BYTES = 15 * 1024 * 1024;
 const log = (...a) => console.log(new Date().toISOString(), '[stt-worker]', ...a);
 

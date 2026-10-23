@@ -31,6 +31,8 @@ function payload(cfg, messages, stream) {
     max_tokens: 1024,
     enable_thinking: false,
     chat_template_kwargs: { enable_thinking: false },
+    // v3: ขอจำนวน token จริงใน chunk สุดท้าย (OpenAI stream_options) → วัด tokens/s ใน load test
+    ...(stream ? { stream_options: { include_usage: true } } : {}),
   });
 }
 
@@ -52,7 +54,7 @@ export function stripThink(raw) {
  * @param {{onDelta?:(rawSoFar:string)=>void, cfg?:object, timeoutMs?:number}} opt
  * @returns {Promise<string>} ข้อความดิบทั้งหมด (ยังไม่ตัด think/tag)
  */
-export async function chatLLM(messages, { onDelta, cfg = llmConfig, timeoutMs } = {}) {
+export async function chatLLM(messages, { onDelta, onUsage, cfg = llmConfig, timeoutMs } = {}) {
   const url = endpoint(cfg.baseUrl);
   const ms = timeoutMs || cfg.timeoutMs || 90000;
   const deadline = Date.now() + ms;
@@ -77,6 +79,7 @@ export async function chatLLM(messages, { onDelta, cfg = llmConfig, timeoutMs } 
           if (data === '[DONE]') break outer;
           try {
             const j = JSON.parse(data);
+            if (j?.usage || j?.timings) onUsage?.({ ...(j.usage || {}), timings: j.timings || null });
             const piece = j?.choices?.[0]?.delta?.content ?? j?.choices?.[0]?.message?.content ?? '';
             if (piece) {
               raw += piece;
@@ -91,6 +94,7 @@ export async function chatLLM(messages, { onDelta, cfg = llmConfig, timeoutMs } 
     } else if (res.ok && ctype.includes('application/json')) {
       const j = await res.json();
       const text = j?.choices?.[0]?.message?.content ?? '';
+      if (j?.usage) onUsage?.({ ...j.usage, timings: j.timings || null });
       if (text) {
         onDelta?.(text);
         return text;
@@ -114,6 +118,7 @@ export async function chatLLM(messages, { onDelta, cfg = llmConfig, timeoutMs } 
   }
   const j = await res.json();
   const text = j?.choices?.[0]?.message?.content ?? '';
+  if (j?.usage) onUsage?.({ ...j.usage, timings: j.timings || null });
   if (!text) throw new Error('LLM empty response');
   onDelta?.(text);
   return text;

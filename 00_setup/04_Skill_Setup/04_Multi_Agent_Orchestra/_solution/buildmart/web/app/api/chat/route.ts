@@ -25,6 +25,7 @@ type Reply = {
   error?: string;
   retrieved?: { filename: string; page: number; score?: number }[];
   products?: string[];
+  usage?: { completion_tokens: number; prompt_tokens: number; decode_ms?: number; decode_tok_s?: number; source?: string };
 };
 
 export async function POST(req: Request) {
@@ -97,6 +98,7 @@ export async function POST(req: Request) {
                   // v3: เอกสาร top 4 ที่ใส่ในพรอมต์ (ประเมิน Hit@4/MRR) + SKU ที่ดึงจาก DB
                   retrieved: Array.isArray(m.retrieved) ? m.retrieved : [],
                   products: Array.isArray(m.products) ? m.products : [],
+                  usage: m.usage || undefined, // token จริงจาก LLM (load test)
                 });
                 break;
               case 'error':
