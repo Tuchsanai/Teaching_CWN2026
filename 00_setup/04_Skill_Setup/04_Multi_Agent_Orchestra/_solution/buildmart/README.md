@@ -63,7 +63,7 @@ node loadtest/run_load.mjs --mode stt    --users 1,2,4,8,16,32 --stage-sec 60 --
 ```
 
 ผลล่าสุด (23 ต.ค. 2026 · AI จริง 3 GPU): ประเมิน rag ผ่าน **95.9%** (rerank off 88.8%) · qa 91.1% · conv 66.7% · load test แชท 4 คน · ฟัง 32 คน (prefetch 8) · พูด 2 คน · เสียง→เสียง 4 คน
-เพลย์ลิสต์: <!-- PLAYLIST_AI_RESULT: ผล mock __/62 · ai __/62 → e2e/TEST_REPORT.md -->
+เพลย์ลิสต์: ผล mock **62/62** · AI จริง **62/62** → [e2e/TEST_REPORT.md](e2e/TEST_REPORT.md) · [e2e/TEST_REPORT.ai.md](e2e/TEST_REPORT.ai.md)
 
 selftest ที่ไม่ต้องรันทั้งระบบ: `node shared/selftest.mjs` (สูตรราคา/คำนวณ) · `node mock-llm/selftest.mjs` · `node workers/chat-selftest.mjs` · `node workers/rag-selftest.mjs`
 

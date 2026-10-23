@@ -3,7 +3,11 @@
 ![ภาพรวม BuildMart v3: ซ้ายคือเครื่องเรา (Docker Compose) มีเว็บ 3D กับมาสคอตน้องช่าง RabbitMQ กระจายงาน worker ฟัง/คิด/พูด ฐานข้อมูล pgvector และ PDF 6 ไฟล์ · ขวาคือ Vast.ai GPU 3 ใบ: RTX 5090 Qwen (คิด) · RTX 4090 Whisper (ฟัง) · RTX 4090 VoxCPM2 + reranker (พูด + จัดอันดับ)](image/v3-overview.png)
 *ภาพแนวคิด (Imagegen ด้วย cyolo)*
 
-<!-- SHOWCASE: วิดีโอสาธิตระบบจริง (ถามด้วยเสียง → น้องช่างตอบด้วยเสียง) จะใส่ตรงนี้ -->
+### 🎬 ดูระบบจริงก่อน (AI จริงบน GPU 3 ใบ · มีเสียง)
+
+[![ตัวอย่างระบบจริง: หน้าเว็บ 3D + ถามน้องช่างด้วยเสียง "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน" → Whisper ถอดความ → Qwen ตอบ "เก็บได้ 3 เดือน" พร้อมอ้างอิง PDF หน้า 14 → VoxCPM2 พูดตอบ น้องช่างขยับปาก (กดเพื่อดูวิดีโอเต็ม 2 นาทีพร้อมเสียง)](showcase/buildmart-v3-showcase.gif)](showcase/buildmart-v3-showcase.mp4)
+
+▶️ **วิดีโอเต็ม 2 นาที มีเสียง:** [showcase/buildmart-v3-showcase.mp4](showcase/buildmart-v3-showcase.mp4) — หน้าแรก 3D → หน้าสินค้า → คุยด้วยเสียง 3 รอบ (ถามอายุปูน → ราคาส่ง 100 ถุง = 13,775 บาท → ใส่ตะกร้า 0 → 100) → เปิด PDF ที่อ้างอิง → dashboard ประเมิน RAG และ load test · ลำดับเวลาแต่ละช่วง: [showcase/README.md](showcase/README.md)
 
 LAB นี้รวมของจาก 2 LAB ก่อนหน้าเป็นงานเดียว: **วางแผนแบบ [LAB 04.3 DAG Planner](../02_DAG_Planner/readme.md)** → **ให้ทีม AI หลายบัญชีสร้างจริง** → **เปิด AI บน GPU แบบ [LAB 04.1 Vast.ai](../01_VastAi_Skill/readme.md)** (รอบนี้ **3 ใบ**) → deploy → ทดสอบ → **วัดผล** → ลบเครื่อง
 โจทย์คือเว็บร้านวัสดุก่อสร้าง **"บ้านช่าง BuildMart"** (requirement อยู่ใน [BUILDMART.md](BUILDMART.md)) ที่มี:
@@ -30,7 +34,7 @@ LAB นี้รวมของจาก 2 LAB ก่อนหน้าเป็
 | ④ | GPU-1: Qwen บน RTX 5090 จาก GitHub | `yolo1` ใน container | `.env.vast` | ~8 นาที |
 | ⑤ | GPU-2/3: Whisper + VoxCPM2 + reranker บน RTX 4090 × 2 | `yolo1` ใน container | `.env.aibox` | ~15 นาที (ประมาณ) |
 | ⑥ | deploy ทั้งระบบ (AI จริง) | Claude Code (Windows) | เว็บ :3400 + RabbitMQ :15672 | ~5 นาที |
-| ⑦ | เพลย์ลิสต์ทดสอบ 62 เคส | Claude Code (Windows) | GIF + MP4 มีเสียง | <!-- PLAYLIST_AI_RESULT: เวลา --> |
+| ⑦ | เพลย์ลิสต์ทดสอบ 62 เคส | Claude Code (Windows) | GIF + MP4 มีเสียง · mock 62/62 · AI 62/62 | ดูเวลาใน TEST_REPORT |
 | ⑧ | ประเมิน RAG (มี/ไม่มี reranker) | Claude Code (Windows) | `/admin/eval` · `RESULTS.md` | ~10 นาที + ตัดสิน |
 | ⑨ | load test 1 → 32 คน | Claude Code (Windows) | `/admin/load` · กราฟ GPU | ~1.5 ชม. (ทุกโหมด) |
 | ⑩ | ลบเครื่อง 3 ใบ + ค่าใช้จ่าย | `yolo1` ใน container | Instances = 0 | 1–2 นาที |
@@ -519,11 +523,14 @@ deploy ระบบ BuildMart ทั้งระบบบนเครื่อ�
 
 📤 **ผลจริง:**
 
-<!-- PLAYLIST_AI_RESULT: กำลังรันจริงอยู่ — เติมเมื่อจบ:
-- ตาราง โหมด | W | C | R | Q | T | M | V | D | E | L | รวม (mock + ai) จาก _solution/buildmart/e2e/TEST_REPORT.md
-- เวลารวมโหมด ai · เคสที่ไม่ผ่านพร้อมคำตอบจริงและสาเหตุ
-- ลิงก์ MP4 มีเสียง: T01 T02 T03 V01–V06 D02
--->
+| โหมด | W เว็บ | C แชท | R RAG | Q คิว | T เสียงตอบ | M คุย 4–6 รอบ | V ถามด้วยเสียง | D 3D | E eval | L load | รวม |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| mock (ฟรี) | 14/14 | 14/14 | 8/8 | 3/3 | 3/3 | 6/6 | 6/6 | 3/3 | 3/3 | 2/2 | **62/62** |
+| **AI จริง** (GPU 3 ใบ) | 14/14 | 14/14 | 8/8 | 3/3 | 3/3 | 6/6 | 6/6 | 3/3 | 3/3 | 2/2 | **62/62** |
+
+- **รอบแรกโหมด AI ได้ 59/62** — ไม่ใช่ข้อมูลผิด แต่ Qwen ตอบ "รูปแบบ" ไม่ตรง: C13 ส่ง tag `[TAG]{"type":"paint"…}` แทน `[CALC]` (เครื่องคำนวณไม่ทำงาน) · M04 บอกน้ำหนัก/รถถูกแต่ไม่บอกค่าส่ง 3,500 · M06 บอก BUILD5 ใช้ได้แต่ไม่บอกว่า CONTRACTOR10 ใช้ไม่ได้ → แก้ chat-worker ให้รับ tag ทุกชื่อ + คำนวณค่าส่ง/คูปองให้ก่อนแล้วส่งเป็น "ข้อเท็จจริงที่คำนวณแล้ว" ให้ Qwen → **รันซ้ำ C+M 20/20 · รวม 62/62**
+- เสียง: ทุกเคส V ได้ MP4 ที่ได้ยินทั้ง**เสียงคำถาม**และ**เสียงตอบ VoxCPM2** (ตรวจด้วย ffmpeg) · Whisper พลาดชื่อสาขา "รังสิต" → "อาคารังสิทธิ์" (V04) แต่บอทยังตอบสต็อก DB12 ครบทุกสาขา · เวลาจากหยุดพูดถึงได้ยินคำตอบ p50 7.6 วิ (VoxCPM2 รอข้อความครบก่อนสร้างเสียง)
+- รายงานเต็ม: [TEST_REPORT.md](_solution/buildmart/e2e/TEST_REPORT.md) (mock) · [TEST_REPORT.ai.md](_solution/buildmart/e2e/TEST_REPORT.ai.md) (AI จริง)
 
 ตัวอย่าง GIF ของกลุ่มใหม่ (เล่นวนเอง · กดเพื่อดูภาพใหญ่ · ทุกเคสอยู่ใน [TEST_REPORT.md](_solution/buildmart/e2e/TEST_REPORT.md)):
 

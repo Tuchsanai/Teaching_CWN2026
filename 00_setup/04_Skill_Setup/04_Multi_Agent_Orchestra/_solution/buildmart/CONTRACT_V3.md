@@ -1,6 +1,6 @@
 # CONTRACT_V3 — ส่วนเพิ่มของ v3 (อ่านต่อจาก CONTRACT.md · ถ้าขัดกัน ไฟล์นี้ชนะ)
 
-ภาพรวมการออกแบบ: `../../ARCHITECTURE_V3.md` (อ่านก่อน)
+ภาพรวมการออกแบบ: `../../readme.md` ส่วน A (อ่านก่อน)
 ROOT = `C:/Users/oishi/Documents/GitHub/CWN/Teaching/00_setup/04_Skill_Setup/04_Multi_Agent_Orchestra/_solution/buildmart`
 LAB = `C:/Users/oishi/Documents/GitHub/CWN/Teaching/00_setup/04_Skill_Setup/04_Multi_Agent_Orchestra`
 

@@ -128,7 +128,7 @@ async function answer(body, emit) {
   const docs = await searchDocs(pool, searchQuery, 4);
   const products = await findProducts(pool, askQ, history, docs, 8, { rows, focus });
   const messages = [
-    { role: 'system', content: buildSystemPrompt({ products, docs, en, focus, estimate }) },
+    { role: 'system', content: buildSystemPrompt({ products, docs, en, focus, estimate, question: askQ }) },
     ...history,
     { role: 'user', content: askQ },
   ];
@@ -137,6 +137,7 @@ async function answer(body, emit) {
   const usage = { completion_tokens: 0, prompt_tokens: 0, decode_ms: 0, rounds: 0, source: null };
   let quoteNo = null;
   let cartChanged = false;
+  const added = []; // รายการที่ใส่ตะกร้าสำเร็จจริงในข้อความนี้ (ไว้เขียนคำยืนยันเองถ้าโมเดลตอบว่างหรือขอโทษ)
   let toolUsed = false;
   let finalRaw = '';
   let llmFailed = false;
@@ -157,7 +158,7 @@ async function answer(body, emit) {
         },
         onDelta: (soFar) => {
           if (toolRound) return;
-          if (round < MAX_TOOL_ROUNDS && parseTags(soFar).some((t) => t.name !== 'ADD_TO_CART')) {
+          if (round < MAX_TOOL_ROUNDS && parseTags(soFar).some((t) => t.name === 'CALC' || t.name === 'QUOTE')) {
             toolRound = true; // รอบนี้มี tag ที่ต้องเรียกซ้ำ → ไม่ stream ต่อ
             return;
           }
@@ -179,6 +180,7 @@ async function answer(body, emit) {
         if (!it?.sku) continue;
         try {
           await addToCart(pool, sessionId, it.sku, it.qty);
+          added.push({ sku: String(it.sku).toUpperCase(), qty: Number(it.qty) || 1 });
           cartChanged = true;
           toolUsed = true;
         } catch (e) {
@@ -206,11 +208,14 @@ async function answer(body, emit) {
   let text;
   let cites = [];
   if (llmFailed) {
-    text = SORRY[lang];
+    text = added.length ? cartConfirmation(added, rows, en) : SORRY[lang];
     if (quoteNo) text += en ? `\nYour quotation number: ${quoteNo} (/quote/${quoteNo})` : `\nเลขที่ใบเสนอราคา ${quoteNo} (ดูได้ที่ /quote/${quoteNo}) ครับ`;
   } else {
     text = cleanText(finalRaw, { final: true });
     if (quoteNo && !text.includes(quoteNo)) text += en ? `\nQuotation number: ${quoteNo} (/quote/${quoteNo})` : `\nเลขที่ใบเสนอราคา ${quoteNo} ดูได้ที่ /quote/${quoteNo} ครับ`;
+    // ใส่ตะกร้าสำเร็จแล้วแต่โมเดลตอบว่าง/ขอโทษ/ไม่บอกว่าใส่อะไร → คำยืนยันจากรายการที่ระบบใส่จริง (deterministic)
+    if (added.length && (!text || APOLOGY_RE.test(text))) text = cartConfirmation(added, rows, en);
+    else if (added.length && !added.some((a) => text.toUpperCase().includes(a.sku) || text.includes(nameOf(a.sku, rows)))) text = `${text}\n${cartConfirmation(added, rows, en)}`;
     if (!text) text = en ? 'Sorry, I could not find an answer. Could you rephrase your question?' : 'ขออภัยครับ ผมยังหาคำตอบไม่ได้ รบกวนถามใหม่อีกครั้งได้ไหมครับ';
     const excludeText = [buildSystemPrompt({ products, docs: [], en }), question, ...history.map((m) => m.content)].join('\n');
     cites = await makeCites(finalRaw, docs, { allowFallback: !toolUsed, answerText: text, excludeText });
@@ -221,6 +226,27 @@ async function answer(body, emit) {
   if (usage.decode_ms) usage.decode_tok_s = +(usage.completion_tokens / (usage.decode_ms / 1000)).toFixed(1);
   usage.decode_ms = Math.round(usage.decode_ms);
   return { sessionId, question, text, cites, cartCount: count, cartChanged, quoteNo, llmFailed, usage: usage.source ? usage : undefined, retrieved, products: products.map((p) => p.sku), focus: focus.skus };
+}
+
+const APOLOGY_RE = /^\s*(ขออภัย|ขอโทษ|sorry)|ยังหาคำตอบไม่ได้|could not find an answer/i;
+const nameOf = (sku, rows) => rows.find((p) => p.sku === sku)?.name || sku;
+/** คำยืนยันการใส่ตะกร้า สร้างจากรายการที่ระบบใส่จริง (ไม่พึ่งข้อความของโมเดล) */
+function cartConfirmation(added, rows, en) {
+  const merged = [];
+  for (const a of added) {
+    const m = merged.find((x) => x.sku === a.sku);
+    if (m) m.qty += a.qty;
+    else merged.push({ ...a });
+  }
+  const list = merged
+    .map((a) => {
+      const p = rows.find((r) => r.sku === a.sku);
+      return `- ${a.sku} ${p?.name || ''} × ${a.qty} ${p?.unit || ''}`.replace(/\s+$/, '');
+    })
+    .join('\n');
+  return en
+    ? `Done, I added these to your cart:\n${list}\nYou can check out or ask me for a quotation.`
+    : `เรียบร้อยครับ ใส่ตะกร้าให้แล้ว\n${list}\nไปที่หน้าตะกร้าเพื่อสั่งซื้อ หรือพิมพ์ "ขอใบเสนอราคา" ได้เลยครับ`;
 }
 
 /** ข้อความ assistant ที่ส่งกลับให้ LLM ในรอบ tag: ตัด think แต่คง tag ไว้ (ตาม Notes from C3) */
