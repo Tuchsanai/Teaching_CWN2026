@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
-import { bmCase, expect, intro, say, show, hold, highlight, adminLogin, attachJson, attachText, BM_URL, E2E_DIR, ROOT } from './_bm';
+import { bmCase, expect, intro, say, show, hold, highlight, adminLogin, attachJson, attachText, BM_URL, E2E_DIR, ROOT, MODE } from './_bm';
 
 const TOKEN = process.env.EVAL_TOKEN || 'bm-eval';
 const fx = (f: string) => JSON.parse(readFileSync(path.join(E2E_DIR, 'fixtures', f), 'utf8'));
@@ -256,7 +256,7 @@ bmCase(
     await intro(page, item);
     await adminLogin(page);
     await page.goto('/admin/load');
-    const label = 'e2e-mini';
+    const label = MODE === 'ai' ? 'e2e-mini-ai' : 'e2e-mini'; // แยกไฟล์ผล ให้รัน 2 โหมดพร้อมกันได้
     const args = ['loadtest/run_load.mjs', '--mode', 'chat', '--users', '1,2,4', '--stage-sec', '15', '--label', label, '--url', BM_URL, '--drain-sec', '30'];
     await say(page, `รัน: node ${args.join(' ')}`);
     const t0 = Date.now();

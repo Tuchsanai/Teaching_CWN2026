@@ -211,7 +211,8 @@ export type VoiceTurn = {
 
 /** กดไมค์ → เล่นไฟล์ fixture เข้าไมค์ปลอม → กดหยุด → รอฟองถอดเสียง 🎙 → คำตอบบอท → เสียงตอบเล่นเอง (voice-mode) → มาสคอตกลับ idle
  *  ตรวจ ①③④ ด้วย expect.soft (ไปต่อทุกรอบ ให้วิดีโอ/รายงานครบ) · ② ให้ผู้เรียกตรวจคำตอบ */
-export async function voiceTurn(page: Page, info: TestInfo, n: number, file: string): Promise<VoiceTurn> {
+/** opts.maxCer: เกณฑ์ CER ในโหมด ai (ดีฟอลต์ 0.25 · ไฟล์ที่ Whisper ถอดยากเช่น V06 "รังสิต"→"ลังศิษย์" ผ่อนได้) */
+export async function voiceTurn(page: Page, info: TestInfo, n: number, file: string, opts: { maxCer?: number } = {}): Promise<VoiceTurn> {
   const q = question(file);
   const expectedText = q?.text || '';
   const voiceRows = page.getByTestId('chat-msg-voice');
@@ -261,8 +262,9 @@ export async function voiceTurn(page: Page, info: TestInfo, n: number, file: str
   transcript = (await vrow.getByTestId('chat-msg-user').innerText()).trim();
   await highlight(vrow, 3000);
   const c = Math.min(cer(expectedText, transcript), ...(q?.accept || []).map((a) => cer(a, transcript)));
-  const transcriptOk = MODE === 'mock' ? norm(transcript) === norm(expectedText) : c <= 0.25;
-  expect.soft(transcriptOk, `รอบ ${n}: ข้อความถอดเสียง “${transcript}” ${MODE === 'mock' ? `ควรตรง “${expectedText}”` : `CER ${c.toFixed(2)} ควร ≤ 0.25`}`).toBe(true);
+  const maxCer = opts.maxCer ?? 0.25;
+  const transcriptOk = MODE === 'mock' ? norm(transcript) === norm(expectedText) : c <= maxCer;
+  expect.soft(transcriptOk, `รอบ ${n}: ข้อความถอดเสียง “${transcript}” ${MODE === 'mock' ? `ควรตรง “${expectedText}”` : `CER ${c.toFixed(2)} ควร ≤ ${maxCer}`}`).toBe(true);
 
   // ② คำตอบบอท
   const bot = bots.nth(bBefore);

@@ -23,10 +23,11 @@ export default defineConfig({
   grep,
   timeout: 5 * 60_000,
   expect: { timeout: 15_000 },
-  outputDir: './test-results',
+  // ai/mock แยกโฟลเดอร์วิดีโอดิบ + ไฟล์ผล → รัน 2 โหมดพร้อมกันได้ ไม่ทับกัน
+  outputDir: process.env.BM_OUTPUT_DIR || (MODE === 'ai' ? './test-results-ai' : './test-results'),
   globalSetup: './global-setup.ts',
   metadata: { mode: MODE, tts: process.env.BM_TTS !== '0', url: process.env.BM_URL || 'http://localhost:3400' },
-  reporter: [['list'], ['json', { outputFile: 'results.json' }]],
+  reporter: [['list'], ['json', { outputFile: process.env.BM_RESULTS || (MODE === 'ai' ? 'results.ai.json' : 'results.json') }]],
   use: {
     baseURL: process.env.BM_URL || 'http://localhost:3400',
     viewport: { width: 1280, height: 800 },

@@ -14,7 +14,7 @@
 | `RUN` | `/root/runs/buildmart` | โฟลเดอร์ทำงานใน container (ไม่อยู่ใน `/workspace` เพราะ `node_modules` หลายชุดบน bind mount ของ Windows ช้ามาก) |
 | `OUT` | `my_buildmart/` (ข้างไฟล์นี้) | ที่ export ผลลัพธ์กลับเข้า repo ตอนจบ |
 | `MAX_AGENTS` | `12` | worker ที่รัน **พร้อมกัน** สูงสุด — **ไม่นับงาน image ของ cyolo** (image พร้อมกันได้อีก ≤ 5) |
-| `BACKEND` | `mock` | `mock` = แชทบอทใช้ `mock-llm` ตอนสร้าง/ทดสอบ (ไม่เสียเงิน · ขั้น "เปิด AI บน Vast" เป็นพรอมต์แยกใน readme) · `vast` = ให้ทีมเช่า RTX 5090 เองระหว่างสร้าง (งาน VAST ในแผน) |
+| `BACKEND` | `mock` | `mock` = แชทบอทใช้ `mock-llm` ตอนสร้าง/ทดสอบ (ไม่เสียเงิน · ขั้น "เปิด AI บน Vast" เป็นพรอมต์แยกใน readme) · `vast` = ให้ทีมเช่า GPU 3 ใบเองระหว่างสร้าง (งาน VAST ในแผน: RTX 5090 Qwen · RTX 4090 Whisper · RTX 4090 VoxCPM2+reranker) |
 | `BUDGET` | ไม่จำกัด | งบต่อบัญชีเป็น % ของโควตาสัปดาห์ เช่น `yolo3=3` → เขียนลง `RUN/accounts.json` เป็น `{"yolo3":{"budget_pct":3}}` |
 | `EXPIRES` | – | วันหมดแพลนของบัญชี เช่น `yolo2=2026-10-30` → `{"yolo2":{"plan_expires":"2026-10-30"}}` |
 
@@ -38,20 +38,20 @@ $O quota
 
 **มี `PLAN/tasks.json`** (ปกติ): copy เป็น `$RUN/tasks.json` แล้วเติมให้ครบสำหรับรันจริง — คง `id` `title` `size` `depends_on` `only` `exclusive` ตามแผนเดิม (ให้ตรงกับ DAG/Gantt ที่นักศึกษาเห็น) และเติม:
 - `owns` ของทุกงาน (ไฟล์/โฟลเดอร์ที่เป็นเจ้าของ ไม่ทับกันมากที่สุด) · `status: "todo"`
-- `BACKEND=mock` → งาน VAST (ถ้ามี) ใส่ `status: "done"` + `note: "ข้าม — เปิด AI บน Vast เป็นพรอมต์แยก"` และงานที่รอ VAST ไม่ต้องรอ
+- `BACKEND=mock` → งาน VAST ทุกงาน (ถ้ามี) ใส่ `status: "done"` + `note: "ข้าม — เปิด AI บน Vast เป็นพรอมต์แยก"` และงานที่รอ VAST ไม่ต้องรอ
 - ปรับได้เฉพาะเมื่อจำเป็น (เช่นงานใหญ่เกิน L ต้องแบ่ง) และจดเหตุผลใน `$RUN/NOTES.md`
 
 **ไม่มีแผน**: แตกเอง 14–22 งาน ขนาด `S`/`M`/`L` (~0.6/1.5/3 ล้านโทเคน · งานต้องปิดได้ด้วยโทเคนที่บัญชีเหลือ) · งานแรก = โครงโปรเจกต์ + compose + DB + RabbitMQ · งานรูป `area: image` ให้ cyolo · งานสุดท้าย `exclusive: true`
 
 จากนั้นเขียน:
-1. `$RUN/tasks/_shared.md` — **สัญญากลาง** ที่ทุก worker ต้องยึด (ใส่ไว้หัว prompt ของทุกงาน): โครงโฟลเดอร์ + เจ้าของไฟล์ · service ใน compose + port · ตาราง DB (รวม `doc_chunks vector(384)`) · ชื่อคิว/exchange RabbitMQ + รูปแบบข้อความ JSON (ข้อ 4.2 ของ BUILDMART) · API + JSON · ฟังก์ชันคำนวณที่ใช้ร่วม · env · `data-testid` ทุกตัว · ล็อกเวอร์ชัน `@playwright/test` ให้ตรงกับ Chromium ที่มีใน container (`/ms-playwright` · ตรวจเองว่าเวอร์ชันไหนตรง) — เขียนให้ละเอียดพอที่งานขนานจะต่อกันได้โดยไม่ต้องคุยกัน
+1. `$RUN/tasks/_shared.md` — **สัญญากลาง** ที่ทุก worker ต้องยึด (ใส่ไว้หัว prompt ของทุกงาน): โครงโฟลเดอร์ + เจ้าของไฟล์ · service ใน compose + port · ตาราง DB (รวม `doc_chunks vector(384)` · `eval_runs` · `load_runs`) · ชื่อคิว/exchange RabbitMQ + รูปแบบข้อความ JSON (ข้อ 4.2 ของ BUILDMART · รวม `stt.request` `tts.request`) · API ของ ai-box (STT/TTS/rerank) + mock ใน mock-llm · PDF อยู่ที่ `documents/` ของ LAB (ให้มาแล้ว ห้ามสร้างใหม่ · copy เข้า `$RUN/app/documents/`) · ไฟล์เสียงคำถามทดสอบ V01–V10 อยู่ที่ `test-fixtures/voice/` ของ LAB (ให้มาแล้ว · copy ไปใช้ใน e2e) · API + JSON · ฟังก์ชันคำนวณที่ใช้ร่วม · env · `data-testid` ทุกตัว · ล็อกเวอร์ชัน `@playwright/test` ให้ตรงกับ Chromium ที่มีใน container (`/ms-playwright` · ตรวจเองว่าเวอร์ชันไหนตรง) — เขียนให้ละเอียดพอที่งานขนานจะต่อกันได้โดยไม่ต้องคุยกัน
 2. `$RUN/tasks/<ID>.md` ทีละงาน: เป้าหมาย · ไฟล์ที่เป็นของงานนี้ · ขั้นตอนย่อย (checklist) · **เกณฑ์ผ่าน** ที่ worker รันตรวจเองได้ (`npm run build`, `curl`, script ทดสอบคิว, Playwright ฯลฯ) อ้างเลขเคสใน BUILDMART ข้อ 7
 
 กติกาของ prompt งาน:
 - dev infra ที่ใช้ร่วมกันทั้งทีม (เปิดด้วย `$O infra up`): Postgres+pgvector (ฐานข้อมูลแยกต่องาน) · RabbitMQ (`AMQP_URL` ใน prompt ของ worker) · embedder (`EMBED_URL`) — worker ทดสอบคิว/RAG ได้โดยไม่ต้องรัน compose
 - **ชื่อคิวต้องไม่ชนกันระหว่างงานที่ทดสอบพร้อมกัน** บน RabbitMQ dev กลาง → ให้แต่ละงานใช้ vhost หรือ prefix ชื่อคิวจาก env (`MQ_PREFIX=<id>_`) ตอนทดสอบ
 - `docker compose` ทั้งระบบรันได้เฉพาะงาน `exclusive` — compose รันบน Docker **ใน container นี้** → เว็บอยู่ที่ `http://localhost:3400` · RabbitMQ UI `http://localhost:15672` · Playwright ใช้ Chromium ที่ `/ms-playwright` (ห้าม `npx playwright install`)
-- งานทดสอบรวมสุดท้าย: `docker compose --profile mock --profile tts up -d --build` → รัน Playwright ทุกเคสในข้อ 7 ของ BUILDMART (วิดีโอช้าพอให้คนดูทัน · เคส T ต้องได้ MP4 มีเสียง) → `test-gifs/` `test-videos/` `TEST_REPORT.md` แล้ว commit ลง main
+- งานทดสอบรวมสุดท้าย: `docker compose --profile mock up -d --build` → รัน Playwright ทุกเคสในข้อ 7 ของ BUILDMART (วิดีโอช้าพอให้คนดูทัน · เคส T/V ต้องได้ MP4 มีเสียง · เคส M คุย 4–6 รอบ) → `test-gifs/` `test-videos/` `TEST_REPORT.md` แล้ว commit ลง main
 
 ```bash
 $O check        # ต้องได้ OK ก่อนไปต่อ

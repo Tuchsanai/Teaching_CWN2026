@@ -10,10 +10,13 @@ import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
-const RESULTS = path.join(DIR, process.argv[2] || 'results.json');
-const VIDEOS = path.join(DIR, 'test-videos');
-const GIFS = path.join(DIR, 'test-gifs');
-const TMP = path.join(DIR, '.media-tmp');
+// โหมด ai แยกสื่อไว้ test-videos/ai · test-gifs/ai · media.ai.json (mock = ที่เดิม · media.json)
+const RESULTS = path.join(DIR, process.argv[2] || (process.env.BM_MODE === 'ai' ? 'results.ai.json' : 'results.json'));
+const MODE_OF_RESULTS = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')).config?.metadata?.mode || 'mock' : 'mock';
+const SUB = MODE_OF_RESULTS === 'ai' ? 'ai/' : '';
+const VIDEOS = path.join(DIR, 'test-videos', SUB);
+const GIFS = path.join(DIR, 'test-gifs', SUB);
+const TMP = path.join(DIR, '.media-tmp', MODE_OF_RESULTS);
 const CONCURRENCY = Number(process.env.BM_MEDIA_JOBS || 4);
 const VOICE_DIR = path.join(DIR, 'voice-fixtures');
 const ONLY = (process.env.BM_MEDIA_ONLY || '').split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
@@ -146,7 +149,7 @@ async function processCase({ id, result }) {
     console.log(`✓ ${id} (GIF จาก MP4 เดิม)`);
     return {
       audios: [], ...(manifest[id] || {}), // เก็บข้อมูลเสียง (audioId/offset) ของรอบก่อนไว้
-      id, status: result.status, mp4: `test-videos/${id}.mp4`, gif: `test-gifs/${id}.gif`,
+      id, status: result.status, mp4: `test-videos/${SUB}${id}.mp4`, gif: `test-gifs/${SUB}${id}.gif`,
       durationSec: Math.round(info.durationSec * 10) / 10, video: info.video, audio: info.audio, hasAudio: !!info.audio, probe: info.tool,
       gifFromMp4: true, mp4Bytes: statSync(mp4).size, gifBytes: statSync(gif).size,
     };
@@ -188,8 +191,8 @@ async function processCase({ id, result }) {
   const out = {
     id,
     status: result.status,
-    mp4: `test-videos/${id}.mp4`,
-    gif: `test-gifs/${id}.gif`,
+    mp4: `test-videos/${SUB}${id}.mp4`,
+    gif: `test-gifs/${SUB}${id}.gif`,
     durationSec: Math.round(info.durationSec * 10) / 10,
     video: info.video,
     audio: info.audio,
@@ -217,7 +220,7 @@ async function processCase({ id, result }) {
 }
 
 const cases = collect(report.suites).filter((c) => c.result.status !== 'skipped' && wanted(c.id));
-const manifestFile = path.join(DIR, 'media.json');
+const manifestFile = path.join(DIR, MODE_OF_RESULTS === 'ai' ? 'media.ai.json' : 'media.json');
 const manifest = existsSync(manifestFile) ? JSON.parse(readFileSync(manifestFile, 'utf8')) : {};
 const queue = [...cases];
 await Promise.all(

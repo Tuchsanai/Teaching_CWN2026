@@ -22,8 +22,10 @@ async function queueInfo(name = 'chat.request') {
   }
 }
 
+/** compose project ของ stack ที่ทดสอบ (mock = buildmart · ai = bmai) — Q02 หยุด/เปิด chat-worker ของ stack นั้น */
+const PROJECT = process.env.BM_COMPOSE_PROJECT || 'buildmart';
 const compose = (args: string) =>
-  execSync(`docker compose -p buildmart ${args}`, { cwd: ROOT, stdio: 'pipe', timeout: 120_000 }).toString();
+  execSync(`docker compose -p ${PROJECT} ${args}`, { cwd: ROOT, stdio: 'pipe', timeout: 120_000 }).toString();
 
 const Q01_QUESTIONS = [
   'ร้านเปิดกี่โมงครับ',
@@ -134,7 +136,7 @@ bmCase(
     }
 
     // หน้า RabbitMQ UI → คิว chat.request มี consumer
-    await say(page, 'เปิด RabbitMQ Management UI (:15672) ดูคิว chat.request');
+    await say(page, `เปิด RabbitMQ Management UI (${MQ_URL.replace(/^https?:\/\//, '')}) ดูคิว chat.request`);
     await page.goto(`${MQ_URL}/`);
     const user = page.locator('input[name="username"]');
     if (await user.isVisible({ timeout: 10_000 }).catch(() => false)) {

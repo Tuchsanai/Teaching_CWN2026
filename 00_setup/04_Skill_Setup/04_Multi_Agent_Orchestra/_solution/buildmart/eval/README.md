@@ -28,7 +28,9 @@ node run_eval.mjs --label mock-smoke --mode mock --limit 2          # ทดส�
 #   --no-voice (รอบเสียงใช้ข้อความอ้างอิง) · --fixtures <dir> · --docs <LAB/documents> · --pdf-engine auto|pymupdf|pdfjs
 #   --llm/--stt/--tts <ชื่อ> ใส่ใน config ของ run (dashboard แสดงเป็นป้าย · rerank=off ใช้เทียบ)
 # … Claude ตัดสินทุก runs/<label>/judge_batches/batch-NN.md …
-node score.mjs --label ai-rerank-on --post http://localhost:3400    # header x-eval-token = $EVAL_TOKEN หรือ bm-eval (--token)
+node score.mjs --label ai-rerank-on --post http://localhost:3400    # --as <ชื่อ> = label ที่ POST
+node run_eval.mjs --label ai-rerank-on --rescore-cer                # คิด stt_cer ใหม่จาก transcript ที่บันทึกไว้ (ไม่ถาม API)
+node make_report.mjs                                                # → RESULTS.md · results.html · SAMPLES.md    # header x-eval-token = $EVAL_TOKEN หรือ bm-eval (--token)
 ```
 
 - **session ใหม่ต่อข้อ/บท**: คำขอแรกไม่ส่ง cookie เลย → web สร้าง `bm_sid` ใหม่ → รอบถัดไปในบทเดียวกันส่ง cookie นั้นต่อ (ตะกร้า/ประวัติ 10 ข้อความเป็นของบทนั้นเท่านั้น)
@@ -45,14 +47,14 @@ node score.mjs --label ai-rerank-on --post http://localhost:3400    # header x-e
 | `citation_acc` | rag | โค้ด | 1 ถ้ามี cite ≥ 1 ที่ตรง `sources` **และ**ไม่มี cite จากไฟล์นอก `sources` |
 | `exact_value` | qa (+conv) | โค้ด | 1 ถ้า **ทุก**ค่าใน `expected_values` อยู่ในคำตอบ · ค่าตัวเลขล้วนเทียบเชิงตัวเลขหลัง normalize (ตัด `,` · เลขไทย→อารบิก · `137.75` = `137.750` · `"13,775"` = `13775`) · ค่าข้อความ/มีหน่วยเทียบแบบ substring หลังตัดช่องว่าง · ค่าที่เป็น array = รูปเขียนที่ยอมรับ (ตรงตัวใดตัวหนึ่งพอ) |
 | `sql_correct` | qa (+conv) | โค้ด | 1 ถ้า `products` ⊇ SKU ใน `needs_products` ∪ SKU ใน `sql` · ข้อคูปอง/ค่าส่ง/ยอดรวมที่ไม่มี SKU = `exact_value` |
-| `stt_cer` | conv เสียง | โค้ด | CER = (S+D+I)/N ระดับตัวอักษร (Levenshtein) หลังตัดช่องว่าง/เครื่องหมาย · ตัวพิมพ์เล็ก · เลขไทย→อารบิก · ต่ำสุดของข้อความหลัก/`accept` · **ยิ่งต่ำยิ่งดี** |
+| `stt_cer` | conv เสียง | โค้ด | CER = (S+D+I)/N ระดับตัวอักษร (Levenshtein) หลังแปลงคำตัวเลขไทยเป็นตัวเลขทั้งสองฝั่ง (`shared/thainum.js`: สองจุดห้า→2.5 · ร้อยถุง→100 ถุง · หกสิบคูณหกสิบ→60x60 · ดีบี 12→DB12) แล้วตัดช่องว่าง/เครื่องหมาย · ตัวพิมพ์เล็ก · เลขไทย→อารบิก · ต่ำสุดของข้อความหลัก/`accept` · **ยิ่งต่ำยิ่งดี** |
 | `key_fact_recall` | rag/conv | โค้ด (ช่วยผู้ตัดสิน) | สัดส่วน `key_facts` ที่ match ในคำตอบ (กติกาเดียวกับ exact_value) |
 | `state_ok` | conv | โค้ด | รอบที่มี `expect_state`: `cartCount` ใน SSE done ตรง และ/หรือมี `quoteNo` |
 | `faithfulness` | rag | ผู้ตัดสิน | ดู rubric |
 | `correctness` | ทุก set | ผู้ตัดสิน | ดู rubric · conv = เฉลี่ยทุกรอบ |
 | `context_retention` | conv | ผู้ตัดสิน | เฉลี่ยรอบที่ 2 ขึ้นไป |
 
-**pass ต่อข้อ**: rag = `correctness` = 1 และ (`hit_at_4` = 1 หรือ negative) · qa = `correctness` = 1 และ (`exact_value` = 1 หรือไม่มี `expected_values`) · conv = **ทุกรอบ** `correctness` = 1 · ข้อที่ยังไม่ได้ตัดสิน → pass คิดจาก metric โค้ด (`key_fact_recall`/`exact_value` = 1) และ `reason` ขึ้นต้นด้วย "(ยังไม่ได้ตัดสิน …)" · ค่าเฉลี่ยของ metric ผู้ตัดสินคิดเฉพาะข้อที่ตัดสินแล้ว (`summary.<set>.judged`)
+**pass ต่อข้อ** (= "ผ่าน/ไม่ผ่าน ต่อข้อ" ใน `METRICS.md`): rag = `correctness` ≥ 0.5 และ `faithfulness` ≥ 0.5 · qa = `correctness` ≥ 0.5 และ (`exact_value` = 1 หรือไม่มี `expected_values`) · conv = **ทุกรอบ** `correctness` ≥ 0.5 (+ `exact_value` ≠ 0 · `state_ok` ≠ 0) และ `context_retention` ≥ 0.5 · ข้อที่ยังไม่ได้ตัดสิน → pass คิดจาก metric โค้ด (`key_fact_recall`/`exact_value` = 1) และ `reason` ขึ้นต้นด้วย "(ยังไม่ได้ตัดสิน …)" · ค่าเฉลี่ยของ metric ผู้ตัดสินคิดเฉพาะข้อที่ตัดสินแล้ว (`summary.<set>.judged`)
 
 `results.json` = `{label, config:{llm, rerank, stt, tts, mode, …}, summary, items, meta}`
 - `summary.rag|qa|conv` = `{<metric>: 0..1, n, judged, pass_rate}` (conv มี `turns` `voice_turns` เพิ่ม)

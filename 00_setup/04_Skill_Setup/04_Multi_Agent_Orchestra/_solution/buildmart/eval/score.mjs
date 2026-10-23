@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 // eval/score.mjs — รวม answers.json (metric โค้ด) + judgments (ผู้ตัดสิน = Claude) → results.json ตาม CONTRACT_V3 §6 แล้ว POST เข้า /api/admin/eval
 //
-//   node score.mjs --label <ชื่อ> [--post http://localhost:3400] [--token bm-eval] [--llm ..] [--rerank on|off] [--stt ..] [--tts ..] [--no-sql-alias]
+//   node score.mjs --label <ชื่อ> [--as <ชื่อที่ POST>] [--post http://localhost:3400] [--token bm-eval] [--llm ..] [--rerank on|off] [--stt ..] [--tts ..] [--no-sql-alias]
 //
 // อ่าน:  eval/runs/<label>/answers.json
 //        eval/runs/<label>/judge_batches/*.judgments.json  แล้วทับด้วย  eval/runs/<label>/judgments.json (ถ้ามี)
 // เขียน: eval/runs/<label>/results.json  {label, config, summary, items}
 //   summary.<set> = ค่าเฉลี่ยต่อ metric (0..1) + n + judged + pass_rate · summary.by_doc / by_type / by_difficulty / latency
 //   summary.sql = สำเนาของ summary.qa (หน้า /admin/eval เดิมอ่านการ์ด B จาก key "sql") · ปิดด้วย --no-sql-alias
+// pass ต่อข้อ = เกณฑ์ "ผ่าน/ไม่ผ่าน ต่อข้อ" ใน METRICS.md (rag: ตอบถูก ≥ 0.5 และไม่แต่งเติม ≥ 0.5 · qa: ตอบถูก ≥ 0.5 และตัวเลขตรง · conv: ทุกรอบผ่าน + จำบริบท ≥ 0.5 + ทำงานจริง)
 // ข้อที่ยังไม่ได้ตัดสิน: correctness/faithfulness/context_retention = null (ไม่นับในค่าเฉลี่ย) · pass คิดจาก metric โค้ดแทน และ reason บอกไว้
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -39,7 +40,7 @@ async function main() {
   if (/^(off|false|0|no)$/i.test(config.rerank || '')) config.rerank = 'off';
 
   results = {
-    label: answers.meta?.label || String(args.label),
+    label: args.as && args.as !== true ? String(args.as) : answers.meta?.label || String(args.label),
     config,
     summary,
     items,
@@ -132,11 +133,13 @@ function scoreSingle(it) {
   let pass;
   if (it.error) pass = false;
   else if (it.set === 'rag') {
+    // เกณฑ์ METRICS.md: ตอบถูก ≥ 0.5 และ ไม่แต่งเติม ≥ 0.5 (hit@4 ไม่บังคับ — แสดงใน reason)
     const retrievalOk = negative || m.hit_at_4 == null || m.hit_at_4 === 1;
-    pass = judged ? m.correctness === 1 && retrievalOk : retrievalOk && (m.key_fact_recall ?? 0) === 1;
+    pass = judged ? m.correctness >= 0.5 && (m.faithfulness == null || m.faithfulness >= 0.5) : retrievalOk && (m.key_fact_recall ?? 0) === 1;
   } else {
     const exactOk = m.exact_value == null || m.exact_value === 1;
-    pass = judged ? m.correctness === 1 && exactOk : exactOk && (m.exact_value != null || (m.key_fact_recall ?? 0) === 1);
+    // เกณฑ์ METRICS.md: ตอบถูก ≥ 0.5 และ ตัวเลขตรง (ถ้าข้อนั้นมีตัวเลข)
+    pass = judged ? m.correctness >= 0.5 && exactOk : exactOk && (m.exact_value != null || (m.key_fact_recall ?? 0) === 1);
   }
 
   const why = [];
@@ -169,7 +172,7 @@ function scoreSingle(it) {
     metrics: round(m),
     pass: !!pass,
     judged,
-    reason: pass && judged ? '' : why.join(' · '),
+    reason: why.join(' · '),
     timing: it.timing,
   };
 }
@@ -218,13 +221,18 @@ function scoreConv(it) {
   let pass;
   const anyErr = turns.some((t) => t.error) || !turns.length;
   if (anyErr) pass = false;
-  else if (perTurnC.length === turns.length) pass = perTurnC.every((v) => v === 1);
-  else if (judged) pass = m.correctness === 1;
+  // เกณฑ์ METRICS.md: ทุกรอบ ตอบถูก ≥ 0.5 + ตัวเลขตรง (ถ้ามี) และ จำบริบท ≥ 0.5 และ ทำงานจริง (ถ้ามีคำสั่ง)
+  else if (perTurnC.length === turns.length)
+    pass = turns.every((t, i) => {
+      const x = t.metrics;
+      return x.correctness >= 0.5 && x.exact_value !== 0 && x.state_ok !== 0 && (i === 0 || x.context_retention == null || x.context_retention >= 0.5);
+    });
+  else if (judged) pass = m.correctness >= 0.5;
   else pass = turns.every((t) => (t.metrics.exact_value ?? t.metrics.key_fact_recall ?? 0) === 1 && (t.metrics.state_ok ?? 1) === 1);
 
   const why = [];
   if (!judged) why.push('(ยังไม่ได้ตัดสิน · pass จาก metric โค้ด)');
-  if (j.reason && !pass) why.push(j.reason);
+  if (j.reason && (!pass || turns.some((t) => (t.metrics.correctness ?? 1) < 1 || (t.metrics.context_retention ?? 1) < 1))) why.push(j.reason);
   for (const t of turns) {
     const bits = [];
     if (t.error) bits.push(`error: ${t.error}`);
@@ -270,7 +278,7 @@ function scoreConv(it) {
     metrics: round(m),
     pass: !!pass,
     judged,
-    reason: pass && judged ? '' : why.join(' · '),
+    reason: why.join(' · '),
   };
 }
 

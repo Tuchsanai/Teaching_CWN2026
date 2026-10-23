@@ -7,7 +7,9 @@ import { fileURLToPath } from 'node:url';
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const RESULTS = path.join(DIR, process.argv[2] || 'results.json');
 const PLAYLIST = JSON.parse(readFileSync(path.join(DIR, 'playlist.json'), 'utf8'));
-const MEDIA = existsSync(path.join(DIR, 'media.json')) ? JSON.parse(readFileSync(path.join(DIR, 'media.json'), 'utf8')) : {};
+const RJ = (f) => (existsSync(path.join(DIR, f)) ? JSON.parse(readFileSync(path.join(DIR, f), 'utf8')) : {});
+// สื่อแยกโหมด: mock = media.json (test-gifs/…) · ai = media.ai.json (test-gifs/ai/…)
+const MEDIA_BY_MODE = { mock: RJ('media.json'), ai: RJ('media.ai.json') };
 const GROUPS = [...new Set(PLAYLIST.map((p) => p.group))];
 const ICON = { passed: '✅', failed: '❌', timedOut: '❌', interrupted: '❌', skipped: '⏭️' };
 
@@ -83,8 +85,8 @@ function answerOf(r) {
   return parts.join('\n');
 }
 
-function mediaLinks(id) {
-  const m = MEDIA[id];
+function mediaLinks(id, mode = 'mock') {
+  const m = (MEDIA_BY_MODE[mode] || {})[id];
   if (!m?.mp4) return '';
   const v = m.mics?.length ? ` · เสียงถาม+ตอบ ${m.voicedOk ? '✓' : '✗'} (${m.voiced?.segments ?? '?'} ช่วง/${m.mics.length} รอบ)` : '';
   return `[GIF](${m.gif}) · [MP4](${m.mp4})${m.hasAudio ? ' 🔊' : ''}${v}`;
@@ -92,7 +94,7 @@ function mediaLinks(id) {
 
 function renderMode(d) {
   const rows = d.rows
-    .map((r) => `| ${r.id} | ${r.group} | ${cell(r.title, 80)} | ${ICON[r.status] || r.status} | ${sec(r.durationMs)} | ${cell(answerOf(r), r.turns?.length || r.voice?.length ? 2600 : 420)} | ${mediaLinks(r.id)} |`)
+    .map((r) => `| ${r.id} | ${r.group} | ${cell(r.title, 80)} | ${ICON[r.status] || r.status} | ${sec(r.durationMs)} | ${cell(answerOf(r), r.turns?.length || r.voice?.length ? 2600 : 420)} | ${mediaLinks(r.id, d.mode)} |`)
     .join('\n');
   return `# TEST_REPORT (${d.mode}) — บ้านช่าง BuildMart
 
@@ -110,9 +112,9 @@ function renderAll(datas) {
   const ids = PLAYLIST.map((p) => p.id);
   const byMode = Object.fromEntries(datas.map((d) => [d.mode, Object.fromEntries(d.rows.map((r) => [r.id, r]))]));
   const modes = datas.map((d) => d.mode);
-  const media = Object.values(MEDIA).filter((m) => m.mp4);
+  const media = modes.flatMap((md) => Object.values(MEDIA_BY_MODE[md] || {}).filter((m) => m.mp4 && (m.mode || 'mock') === md));
   const avg = media.reduce((s, m) => s + (m.durationSec || 0), 0) / (media.length || 1);
-  const voiced = media.filter((m) => m.hasAudio).map((m) => `${m.id} (${m.audio})`);
+  const voiced = [...new Set(media.filter((m) => m.hasAudio).map((m) => m.id))];
   const rows = ids
     .map((id) => {
       const pl = PLAYLIST.find((p) => p.id === id);
@@ -122,7 +124,7 @@ function renderAll(datas) {
       });
       // คำตอบจริง: เอาจากโหมดล่าสุดที่มีข้อมูล (ai ก่อน ถ้ารันแล้ว)
       const src = [...modes].reverse().map((m) => byMode[m][id]).find((r) => r && r.status !== 'skipped') || modes.map((m) => byMode[m][id]).find(Boolean);
-      return `| ${id} | ${pl.group} | ${cell(pl.title, 80)} | ${res.join(' | ')} | ${src ? cell(answerOf(src), src.turns?.length || src.voice?.length ? 2600 : 360) : ''} | ${mediaLinks(id)} |`;
+      return `| ${id} | ${pl.group} | ${cell(pl.title, 80)} | ${res.join(' | ')} | ${src ? cell(answerOf(src), src.turns?.length || src.voice?.length ? 2600 : 360) : ''} | ${modes.map((m) => { const l = mediaLinks(id, m); return l ? `${m}: ${l}` : ''; }).filter(Boolean).join('<br>')} |`;
     })
     .join('\n');
   return `# TEST_REPORT — บ้านช่าง BuildMart (Playwright เพลย์ลิสต์)

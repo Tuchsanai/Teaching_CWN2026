@@ -70,7 +70,8 @@ function dialog(page: Page, info: TestInfo) {
   return { turn, cartHas, quoteHas, finish, log };
 }
 
-const N = (n: number) => new RegExp(`(^|[^\\d.])${String(n).replace('.', '\\.')}(?![\\d])`);
+// ตัวเลขตรงค่า (136.5 = 136.50 · หลัง norm() ไม่มี comma)
+const N = (n: number) => new RegExp(`(^|[^\\d.])${String(n).replace('.', '\\.')}${String(n).includes('.') ? '0*' : ''}(?![\\d])`);
 const OPTS = { timeout: 10 * 60_000 };
 
 bmCase('M01', async ({ page, item }, info) => {
@@ -171,7 +172,11 @@ bmCase('M06', async ({ page, item }, info) => {
   await d.turn('ยอดในตะกร้าตอนนี้ใช้คูปองอะไรได้', [
     /BUILD5/i,
     /CONTRACTOR10/i,
-    /CONTRACTOR10[^\n]{0,80}(?:ไม่ได้|ไม่ถึง|ยังไม่|ไม่ครบ|ขาดอีก|ต้อง(?:มี)?ยอด)|(?:ไม่ได้|ไม่ถึง|ยังไม่)[^\n]{0,40}CONTRACTOR10/i,
+    {
+      mock: /CONTRACTOR10[^\n]{0,80}(?:ไม่ได้|ไม่ถึง|ยังไม่|ไม่ครบ|ขาดอีก|ต้อง(?:มี)?ยอด)|(?:ไม่ได้|ไม่ถึง|ยังไม่)[^\n]{0,40}CONTRACTOR10/i,
+      // ai: เรียบเรียงต่างกันได้ แต่ต้องบอกว่า CONTRACTOR10 ใช้ไม่ได้ (ยอดไม่ถึง 30,000)
+      ai: /CONTRACTOR10[\s\S]{0,200}(?:ไม่ได้|ไม่ถึง|ยังไม่|ไม่ครบ|ขาดอีก|ไม่สามารถ|ไม่เข้าเงื่อนไข|ต่ำกว่า|ต้อง(?:มี)?ยอด|30000)|(?:ไม่ได้|ไม่ถึง|ยังไม่|ไม่สามารถ)[\s\S]{0,80}CONTRACTOR10/i,
+    },
   ]);
   await d.finish();
 }, OPTS);

@@ -17,6 +17,7 @@ import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync, rmSync
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { digitsForThaiNumbers } from '../shared/thainum.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -154,7 +155,7 @@ function buildConfig() {
     mode,
     llm: String(args.llm || (ai ? process.env.LLM_MODEL || 'Qwen3.8-27B-nvfp4' : mode === 'mock' ? 'mock-llm' : 'unknown')),
     rerank: rerankOn ? String(args['rerank-model'] || (ai ? 'bge-reranker-v2-m3' : mode === 'mock' ? 'mock (ลำดับเดิม)' : 'on')) : 'off',
-    stt: String(args.stt || (ai ? 'whisper-large-v3-turbo' : mode === 'mock' ? 'mock (sha256/fingerprint)' : 'unknown')),
+    stt: String(args.stt || (ai ? 'whisper-large-v3' : mode === 'mock' ? 'mock (sha256/fingerprint)' : 'unknown')),
     tts: String(args.tts || (ai ? 'voxcpm2' : mode === 'mock' ? 'mock (tts-cache)' : 'unknown')),
     top_k: 4,
     candidates: 20,
@@ -468,7 +469,8 @@ function cerMin(hyp, refs) {
   return vals.length ? round3(Math.min(...vals)) : null;
 }
 function cerNorm(s) {
-  return thaiDigits(String(s || '').normalize('NFC'))
+  // คำตัวเลขไทย → ตัวเลข ทั้งสองฝั่ง ("สองจุดห้า"→2.5 · "ร้อยถุง"→100 ถุง · "หกสิบคูณหกสิบ"→60x60 · "ดีบี 12"→DB12)
+  return thaiDigits(digitsForThaiNumbers(String(s || '').normalize('NFC')))
     .toLowerCase()
     .replace(/[^\p{L}\p{M}\p{N}]+/gu, '');
 }
@@ -833,4 +835,31 @@ function parseArgs(a) {
   return o;
 }
 
-await main();
+if (args['rescore-cer']) rescoreCer();
+else await main();
+
+/** --rescore-cer: คิด stt_cer ใหม่จาก transcript ที่บันทึกไว้ใน runs/<label>/answers.json (ไม่ถาม API ใหม่) */
+function rescoreCer() {
+  const f = path.join(OUT, 'answers.json');
+  const ans = JSON.parse(readFileSync(f, 'utf8'));
+  const src = Object.fromEntries(loadItems().map((i) => [i.id, i]));
+  let n = 0;
+  for (const it of ans.items) {
+    if (it.set !== 'conv') continue;
+    const ts = src[it.id]?.turns || [];
+    it.turns.forEach((t, i) => {
+      if (!t.audio || !t.stt || t.stt.skipped) return;
+      const ref = ts[i] || {};
+      const before = t.stt_cer;
+      t.stt_cer = cerMin(t.stt.text || '', [ref.text, ...(ref.accept || [])]);
+      t.metrics = t.metrics || {};
+      if (t.stt_cer != null) t.metrics.stt_cer = t.stt_cer;
+      if (before !== t.stt_cer) console.log(`  ${it.id} รอบ ${i + 1} ${t.audio}: CER ${before} → ${t.stt_cer}`);
+      n++;
+    });
+    const v = mean(it.turns.map((t) => t.metrics?.stt_cer));
+    if (v != null) it.metrics.stt_cer = round3(v);
+  }
+  writeFileSync(f, JSON.stringify(ans, null, 2));
+  console.log(`rescore-cer ${LABEL}: ${n} รอบเสียง → ${path.relative(HERE, f)}`);
+}
