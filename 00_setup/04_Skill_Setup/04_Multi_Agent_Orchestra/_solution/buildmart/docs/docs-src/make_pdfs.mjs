@@ -15,7 +15,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const docsDir = path.resolve(here, '..');
+const docsDir = path.resolve(here, '../../../../documents'); // LAB/documents/ (ชั้นแรกของ LAB)
 const fixturesDir = path.resolve(here, '../../tests/fixtures');
 
 const ALL = [

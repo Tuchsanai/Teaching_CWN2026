@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       { timeoutMs: 60_000, isFinal: (m: any) => m?.type === 'tts' || m?.type === 'error' },
     ).result;
     if (!r?.audioId || r.error) return Response.json({ error: r?.error || 'tts_failed' }, { status: 502 });
-    return Response.json({ audioId: r.audioId, durationMs: r.durationMs ?? null });
+    return Response.json({ audioId: r.audioId, durationMs: r.durationMs ?? null, engine: r.engine });
   } catch (e: any) {
     const timeout = e?.message === 'timeout';
     return Response.json({ error: timeout ? 'timeout' : 'queue_error' }, { status: timeout ? 504 : 502 });

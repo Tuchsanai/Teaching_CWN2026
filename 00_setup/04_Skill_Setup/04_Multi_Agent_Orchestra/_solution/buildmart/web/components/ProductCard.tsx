@@ -1,6 +1,7 @@
 // components/ProductCard.tsx (B1) — การ์ดสินค้าในหน้ารายการ
 import Link from 'next/link';
 import { CATEGORIES } from '@/lib/categories';
+import { ProductImage } from '@/components/CatImage';
 import { formatBaht } from '@/shared/pricing.js';
 
 export type ProductCardData = {
@@ -19,9 +20,10 @@ export function categoryIcon(category: string) {
 export default function ProductCard({ p }: { p: ProductCardData }) {
   const out = p.totalStock <= 0;
   return (
-    <Link href={`/products/${encodeURIComponent(p.sku)}`} className="p-card" data-testid="product-card" data-sku={p.sku}>
+    <Link href={`/products/${encodeURIComponent(p.sku)}`} className="p-card tilt" data-testid="product-card" data-sku={p.sku}>
       <div className="p-thumb" aria-hidden>
-        <span>{categoryIcon(p.category)}</span>
+        <ProductImage sku={p.sku} category={p.category} className="p-thumb-img" />
+        <span className={`p-badge ${out ? 'out' : 'in'}`}>{out ? 'หมด' : 'พร้อมส่ง'}</span>
       </div>
       <div className="p-body">
         <div className="p-meta">

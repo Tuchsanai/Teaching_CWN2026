@@ -1,0 +1,1237 @@
+{
+  "meta": {
+    "label": "evconv-test",
+    "base": "http://localhost:3400",
+    "started": "2026-10-23T08:56:59.368Z",
+    "finished": "2026-10-23T08:57:03.790Z",
+    "config": {
+      "mode": "mock",
+      "llm": "mock-llm",
+      "rerank": "mock (ลำดับเดิม)",
+      "stt": "mock (sha256/fingerprint)",
+      "tts": "mock (tts-cache)",
+      "top_k": 4,
+      "candidates": 20,
+      "instance": "web-cd00eab1",
+      "voice": true
+    },
+    "sets": [
+      "rag",
+      "qa",
+      "conv"
+    ],
+    "counts": {
+      "rag": 2,
+      "qa": 2,
+      "conv": 2
+    },
+    "api": {
+      "done_events": 15,
+      "retrieved": true,
+      "products": true,
+      "cites": true
+    },
+    "warnings": [],
+    "args": {
+      "limit": 2,
+      "ids": null,
+      "concurrency": 2,
+      "voice": true
+    }
+  },
+  "items": [
+    {
+      "id": "R-CEM-01",
+      "set": "rag",
+      "type": "text",
+      "difficulty": "easy",
+      "question": "ปูนฉาบสำเร็จรูปของร้าน ปกติควรฉาบหนากี่เซนครับ",
+      "expected": "ปูนฉาบสำเร็จรูป CEM-003 แนะนำความหนาฉาบ 1–1.5 ซม.",
+      "key_facts": [
+        "CEM-003",
+        [
+          "1–1.5 ซม.",
+          "1-1.5 ซม.",
+          "1 ถึง 1.5 ซม.",
+          "1–1.5 เซน",
+          "1-1.5 เซน"
+        ]
+      ],
+      "sources": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 3
+        }
+      ],
+      "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 3: 1.2 ปูนก่อและปูนฉาบสำเร็จรูป ครับ",
+      "cites": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 3,
+          "snippet": "1. ภาพรวมและขอบเขตสินค้า 1 เหมาะกับงานคอนกรีตเสริมเหล็กทั่วไป เช่นเสา คาน พื้น ฐานราก และงานหล่อคอนกรีต CEM-001 มีกำลังอัดที่ 28 วัน ≥ 325 กก./ตร.ซม. ตามเกณฑ์ มอก.15 ประเภท 1 1.2 ป"
+        }
+      ],
+      "retrieved": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 3,
+          "score": 1
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 3,
+          "score": 0.95
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 21,
+          "score": 0.9
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 21,
+          "score": 0.85
+        }
+      ],
+      "products": [
+        "CEM-003",
+        "CEM-001",
+        "CEM-002",
+        "CEM-004"
+      ],
+      "cartCount": 0,
+      "quoteNo": null,
+      "done_fields": [
+        "text",
+        "cites",
+        "cartCount",
+        "retrieved",
+        "products"
+      ],
+      "timing": {
+        "ttft_ms": 158,
+        "total_ms": 346
+      },
+      "error": null,
+      "missing_facts": [
+        "CEM-003",
+        "1–1.5 ซม."
+      ],
+      "metrics": {
+        "hit_at_4": 1,
+        "mrr": 1,
+        "citation_acc": 1,
+        "key_fact_recall": 0
+      }
+    },
+    {
+      "id": "R-CEM-02",
+      "set": "rag",
+      "type": "text",
+      "difficulty": "medium",
+      "question": "จะเทฐานรากแผ่ใหญ่ๆ หนาๆ ได้ยินว่าร้าวเพราะความร้อนในเนื้อปูนได้ ปูนมันร้อนสุดช่วงไหน แล้วต้องหนาแค่ไหนถึงต้องระวัง",
+      "expected": "ปฏิกิริยาไฮเดรชันปล่อยความร้อนมากที่สุดในช่วง 12–24 ชั่วโมงแรก ชิ้นส่วนที่หนาเกิน 60 ซม. อุณหภูมิภายในอาจสูงกว่าผิวมากจนเกิดรอยร้าวจากความร้อน",
+      "key_facts": [
+        [
+          "12–24 ชั่วโมง",
+          "12-24 ชั่วโมง",
+          "12–24 ชม.",
+          "12-24 ชม."
+        ],
+        [
+          "60 ซม.",
+          "60 เซน"
+        ]
+      ],
+      "sources": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 5
+        }
+      ],
+      "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 5: ปฏิกิริยาไฮเดรชันปล่อยความร้อนมากที่สุดในช่วง 12–24 ชั่วโมงแรก ชิ้นส่วนที่หนาเกิน 60 ซม. เช่น ฐานรากแผ่ขนาดใหญ่ อาจมีอุณหภูมิภายในสูงกว่าผิวมาก ทำให้เกิดรอยร้าวจากความร้อน ส่วนพื้นบางที่โดนแดดและลมจะเสียน้ำเร็วจนหดตัวแบบพลาสติก ครับ",
+      "cites": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 5,
+          "snippet": "2. หลักการทางเทคนิค CEM-001 2.1 ความร้อนจากปฏิกิริยาและการหดตัว ปฏิกิริยาไฮเดรชันปล่อยความร้อนมากที่สุดในช่วง 12–24 ชั่วโมงแรก ชิ้นส่วนที่หนาเกิน 60 ซม. เช่น ฐานรากแผ่ขนาดใหญ่ อาจม"
+        }
+      ],
+      "retrieved": [
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 5,
+          "score": 1
+        },
+        {
+          "filename": "BM-DS-TIL.pdf",
+          "page": 19,
+          "score": 0.95
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 20,
+          "score": 0.9
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 3,
+          "score": 0.85
+        }
+      ],
+      "products": [
+        "CEM-001",
+        "AGG-001",
+        "AGG-003",
+        "CEM-003",
+        "CEM-004",
+        "TIL-001",
+        "TIL-002",
+        "CEM-002"
+      ],
+      "cartCount": 0,
+      "quoteNo": null,
+      "done_fields": [
+        "text",
+        "cites",
+        "cartCount",
+        "retrieved",
+        "products"
+      ],
+      "timing": {
+        "ttft_ms": 209,
+        "total_ms": 894
+      },
+      "error": null,
+      "metrics": {
+        "hit_at_4": 1,
+        "mrr": 1,
+        "citation_acc": 1,
+        "key_fact_recall": 1
+      }
+    },
+    {
+      "id": "Q-01",
+      "set": "qa",
+      "type": "price",
+      "category": "price",
+      "question": "อิฐมอญขายก้อนละกี่บาทครับ",
+      "expected": "อิฐมอญ (BRK-001) ก้อนละ 1.20 บาท (ยังไม่รวม VAT)",
+      "expected_values": [
+        "1.2"
+      ],
+      "sql": "SELECT sku, name, price, unit FROM products WHERE sku='BRK-001';",
+      "needs_products": [
+        "BRK-001"
+      ],
+      "answer": "อิฐมอญ (ก้อน) (BRK-001) ราคา 1.20 บาท/ก้อน (ยังไม่รวม VAT 7%) ครับ",
+      "cites": [],
+      "retrieved": [
+        {
+          "filename": "BM-POLICY.pdf",
+          "page": 15,
+          "score": 1
+        },
+        {
+          "filename": "BM-POLICY.pdf",
+          "page": 13,
+          "score": 0.95
+        },
+        {
+          "filename": "BM-POLICY.pdf",
+          "page": 13,
+          "score": 0.9
+        },
+        {
+          "filename": "BM-DS-CEM.pdf",
+          "page": 18,
+          "score": 0.85
+        }
+      ],
+      "products": [
+        "BRK-001",
+        "BRK-002",
+        "CEM-002",
+        "CEM-003",
+        "BRK-003"
+      ],
+      "cartCount": 0,
+      "quoteNo": null,
+      "done_fields": [
+        "text",
+        "cites",
+        "cartCount",
+        "retrieved",
+        "products"
+      ],
+      "timing": {
+        "ttft_ms": 101,
+        "total_ms": 274
+      },
+      "error": null,
+      "metrics": {
+        "exact_value": 1,
+        "sql_correct": 1
+      }
+    },
+    {
+      "id": "Q-02",
+      "set": "qa",
+      "type": "price",
+      "category": "price",
+      "question": "สายไฟ THW 2.5 ม้วน 100 เมตร ม้วนละเท่าไหร่",
+      "expected": "ELC-001 ม้วนละ 1,650 บาท (ยังไม่รวม VAT)",
+      "expected_values": [
+        "1650"
+      ],
+      "sql": "SELECT sku, name, price FROM products WHERE sku='ELC-001';",
+      "needs_products": [
+        "ELC-001"
+      ],
+      "answer": "สายไฟ THW 2.5 ตร.มม. (ม้วน 100 ม.) (ELC-001) ซื้อ 5 ม้วน ได้ราคาปกติ ราคา 1,650 บาท/ม้วน รวม 8,250 บาท (ยังไม่รวม VAT) ครับ",
+      "cites": [],
+      "retrieved": [
+        {
+          "filename": "BM-POLICY.pdf",
+          "page": 4,
+          "score": 1
+        },
+        {
+          "filename": "BM-DS-ELC-PIP.pdf",
+          "page": 3,
+          "score": 0.95
+        },
+        {
+          "filename": "BM-DS-ELC-PIP.pdf",
+          "page": 4,
+          "score": 0.9
+        },
+        {
+          "filename": "BM-DS-ELC-PIP.pdf",
+          "page": 14,
+          "score": 0.85
+        }
+      ],
+      "products": [
+        "ELC-001",
+        "ELC-002",
+        "PIP-004"
+      ],
+      "cartCount": 0,
+      "quoteNo": null,
+      "done_fields": [
+        "text",
+        "cites",
+        "cartCount",
+        "retrieved",
+        "products"
+      ],
+      "timing": {
+        "ttft_ms": 147,
+        "total_ms": 470
+      },
+      "error": null,
+      "metrics": {
+        "exact_value": 1,
+        "sql_correct": 1
+      }
+    },
+    {
+      "id": "CV-01",
+      "set": "conv",
+      "title": "ปูน CEM-001 อายุเก็บ → ราคาส่ง 100 ถุง → ตะกร้า → ค่าส่ง → ใบเสนอราคา (เสียงทุกรอบ)",
+      "voice": true,
+      "question": "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน → ถ้าซื้อร้อยถุงราคาส่งเท่าไร → ใส่ตะกร้าให้หน่อย → แล้วส่งด้วยรถอะไร ค่าส่งเท่าไร → ขอใบเสนอราคาด้วย",
+      "turns": [
+        {
+          "n": 1,
+          "audio": "V01.wav",
+          "ref_text": "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน",
+          "expected": "CEM-001 เก็บได้ 3 เดือนนับจากวันผลิต (วางบนพาเลท ซ้อนไม่เกิน 10 ถุง)",
+          "key_facts": [
+            [
+              "3 เดือน",
+              "สามเดือน"
+            ]
+          ],
+          "sources": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 12
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14
+            }
+          ],
+          "needs_products": [
+            "CEM-001"
+          ],
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V01.wav"
+          },
+          "q": "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน",
+          "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 3: อายุการเก็บ, CEM-001: 3 เดือน, ครับ",
+          "cites": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "snippet": "ตารางที่ 1 เปรียบเทียบคุณสมบัติผลิตภัณฑ์ปูน CEM-001 ถึง CEM-004 (ต่อ) คุณสมบัติ: อัตราใช้งาน, CEM-001: 7 ถุง/ลบ.ม. (1:2:4), CEM-002: อิฐมอญ 0.25 ถุง/ตร.ม., CEM-003: 0.6 ถุง/ตร.ม. ("
+            }
+          ],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 12,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-001",
+            "CEM-002",
+            "CEM-003",
+            "CEM-004"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 132,
+            "total_ms": 326
+          },
+          "error": null,
+          "metrics": {
+            "hit_at_4": 1,
+            "mrr": 1,
+            "citation_acc": 1,
+            "key_fact_recall": 1,
+            "sql_correct": 1
+          }
+        },
+        {
+          "n": 2,
+          "audio": "V02.wav",
+          "ref_text": "ถ้าซื้อร้อยถุงราคาส่งเท่าไร",
+          "refers_to": "CEM-001",
+          "expected": "CEM-001 100 ถุงได้ราคาส่งขั้น 50–199 (ลด 5%) ถุงละ 137.75 บาท รวม 13,775.00 บาท (ก่อน VAT)",
+          "expected_values": [
+            "137.75",
+            "13775"
+          ],
+          "needs_products": [
+            "CEM-001"
+          ],
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V02.wav"
+          },
+          "q": "ถ้าซื้อร้อยถุงราคาส่งเท่าไร",
+          "answer": "ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) (CEM-001) ราคา 145 บาท/ถุง (ยังไม่รวม VAT 7%) ครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-POLICY.pdf",
+              "page": 4,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 15,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-001",
+            "CEM-002",
+            "CEM-003"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 112,
+            "total_ms": 346
+          },
+          "error": null,
+          "missing_values": [
+            "137.75",
+            "13775"
+          ],
+          "metrics": {
+            "exact_value": 0,
+            "sql_correct": 1
+          }
+        },
+        {
+          "n": 3,
+          "audio": "V03.wav",
+          "ref_text": "ใส่ตะกร้าให้หน่อย",
+          "refers_to": "CEM-001 × 100 ถุง",
+          "expected": "เพิ่ม CEM-001 จำนวน 100 ถุงลงตะกร้าแล้ว",
+          "key_facts": [
+            "CEM-001",
+            "100"
+          ],
+          "needs_products": [
+            "CEM-001"
+          ],
+          "expect_state": {
+            "cartCount": 100
+          },
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V03.wav"
+          },
+          "q": "ใส่ตะกร้าให้หน่อย",
+          "answer": "ต้องการใส่ CEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) จำนวนเท่าไรครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-POLICY.pdf",
+              "page": 4,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-001",
+            "CEM-002",
+            "CEM-003",
+            "CEM-004"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 131,
+            "total_ms": 332
+          },
+          "error": null,
+          "missing_facts": [
+            "100"
+          ],
+          "metrics": {
+            "key_fact_recall": 0.5,
+            "sql_correct": 1,
+            "state_ok": 0
+          }
+        },
+        {
+          "n": 4,
+          "audio": "V09.wav",
+          "ref_text": "แล้วส่งด้วยรถอะไร ค่าส่งเท่าไร",
+          "refers_to": "ตะกร้า CEM-001 × 100 ถุง",
+          "expected": "น้ำหนักรวม 5,000 กก. ส่งด้วยรถ 6 ล้อ ค่าส่ง 1,500.00 บาท",
+          "key_facts": [
+            [
+              "5000",
+              "5,000.00"
+            ]
+          ],
+          "expected_values": [
+            "รถ 6 ล้อ",
+            "1500"
+          ],
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V09.wav"
+          },
+          "q": "แล้วส่งด้วยรถอะไร ค่าส่งเท่าไร",
+          "answer": "ค่าส่งคิดตามน้ำหนักรวมครับ\n- ไม่เกิน 1,000 กก. กระบะ 500 บาท (ฟรีถ้ายอดก่อน VAT หลังส่วนลดตั้งแต่ 20,000 บาท)\n- 1,000.01–6,000 กก. รถ 6 ล้อ 1,500 บาท\n- เกิน 6,000 กก. รถ 10 ล้อ 3,500 บาท ครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-POLICY.pdf",
+              "page": 4,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 17,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-001",
+            "CEM-002",
+            "CEM-003"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 159,
+            "total_ms": 641
+          },
+          "error": null,
+          "missing_facts": [
+            "5000"
+          ],
+          "metrics": {
+            "exact_value": 1,
+            "key_fact_recall": 0
+          }
+        },
+        {
+          "n": 5,
+          "audio": "V10.wav",
+          "ref_text": "ขอใบเสนอราคาด้วย",
+          "refers_to": "ตะกร้าปัจจุบัน",
+          "expected": "สร้างใบเสนอราคาเลข QT-YYYYMMDD-NNNN จากตะกร้า (CEM-001 100 ถุง ยอดก่อน VAT 13,775.00 + ค่าส่ง 1,500.00 + VAT 1,069.25 = 16,344.25 บาท)",
+          "key_facts": [
+            [
+              "16344.25",
+              "16,344.25"
+            ]
+          ],
+          "expected_values": [
+            "QT-"
+          ],
+          "expect_state": {
+            "quoteNo": true
+          },
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V10.wav"
+          },
+          "q": "ขอใบเสนอราคาด้วย",
+          "answer": "ตะกร้ายังว่างอยู่ครับ เพิ่มสินค้าลงตะกร้าก่อน แล้วค่อยขอใบเสนอราคาอีกครั้งนะครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-POLICY.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 17,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-001",
+            "CEM-002",
+            "CEM-003"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 122,
+            "total_ms": 515
+          },
+          "error": null,
+          "missing_values": [
+            "QT-"
+          ],
+          "missing_facts": [
+            "16344.25"
+          ],
+          "metrics": {
+            "exact_value": 0,
+            "key_fact_recall": 0,
+            "state_ok": 0
+          }
+        }
+      ],
+      "metrics": {
+        "hit_at_4": 1,
+        "mrr": 1,
+        "citation_acc": 1,
+        "exact_value": 0.333,
+        "sql_correct": 1,
+        "key_fact_recall": 0.375,
+        "state_ok": 0
+      }
+    },
+    {
+      "id": "CV-02",
+      "set": "conv",
+      "title": "ปูกระเบื้อง 60x60: เกรียง → อัตราปูนกาว → พื้น 20 ตร.ม. → กี่ถุง → ตะกร้า → ยอดรวม (2 รอบแรกเป็นเสียง)",
+      "voice": true,
+      "question": "ปูกระเบื้องหกสิบคูณหกสิบ ใช้เกรียงฟันกี่มิล → แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร → ถ้าพื้นห้อง 20 ตร.ม. ต้องใช้ปูนกาวทั้งหมดกี่กิโล → คิดเป็นกี่ถุง → ใส่ตะกร้าให้ 6 ถุงเลย → รวมค่าส่งกับ VAT แล้วต้องจ่ายเท่าไร",
+      "turns": [
+        {
+          "n": 1,
+          "audio": "V04.wav",
+          "ref_text": "ปูกระเบื้องหกสิบคูณหกสิบ ใช้เกรียงฟันกี่มิล",
+          "expected": "กระเบื้อง 60x60 ซม. ใช้เกรียงฟัน 10 มม.",
+          "key_facts": [
+            [
+              "10 มม.",
+              "10 มิล",
+              "10 mm"
+            ]
+          ],
+          "sources": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14
+            }
+          ],
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V04.wav"
+          },
+          "q": "ปูกระเบื้องหกสิบคูณหกสิบ ใช้เกรียงฟันกี่มิล",
+          "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 11: ปูกระเบื้อง 60x60 ซม. พื้น 50 ตร.ม. ใช้เกรียงฟัน 10 มม. อัตรา 5.5 กก./ตร.ม. ได้ปูนกาว 275 กก. ครับ",
+          "cites": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 11,
+              "snippet": "6. การคำนวณปริมาณวัสดุ ลบ.ม. ใช้ CEM-001 25.4 → 26 ถุง ทรายหยาบ 1.81 → 2 ลบ.ม. หิน 3/4 3.27 → 4 ลบ.ม. ตัวอย่างที่ 3 ผนังอิฐมอญพื้นที่ 10 ตร.ม. ก่อแล้วฉาบ 2 ด้าน หนา 1 ซม. ใช้อิฐมอญ"
+            }
+          ],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 11,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 19,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "TIL-001",
+            "TIL-003",
+            "CEM-004",
+            "AGG-001",
+            "AGG-002",
+            "AGG-003",
+            "CEM-001",
+            "CEM-002"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 111,
+            "total_ms": 471
+          },
+          "error": null,
+          "metrics": {
+            "hit_at_4": 1,
+            "mrr": 1,
+            "citation_acc": 0,
+            "key_fact_recall": 1
+          }
+        },
+        {
+          "n": 2,
+          "audio": "V05.wav",
+          "ref_text": "แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร",
+          "refers_to": "กระเบื้อง 60x60 / เกรียงฟัน 10 มม. (ปูนกาว CEM-004)",
+          "expected": "ปูนกาว CEM-004 อัตราประมาณ 5.5 กก./ตร.ม. สำหรับกระเบื้อง 60x60 ซม.",
+          "key_facts": [
+            [
+              "5.5 กก",
+              "5.5 กิโล"
+            ]
+          ],
+          "sources": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14
+            }
+          ],
+          "needs_products": [
+            "CEM-004"
+          ],
+          "stt": {
+            "skipped": "ไม่พบไฟล์ V05.wav"
+          },
+          "q": "แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร",
+          "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 7: ตารางที่ 7 อัตราการใช้ปูนกาว CEM-004 ตามขนาดกระเบื้องและขนาดฟันเกรียง (ต่อ) ครับ",
+          "cites": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "snippet": "ตารางที่ 7 อัตราการใช้ปูนกาว CEM-004 ตามขนาดกระเบื้องและขนาดฟันเกรียง (ต่อ) ประเภทงาน: ผนัง, ขนาดกระเบื้อง: 40x80 ซม., เกรียงหวี › ขนาดฟันเกรียง: 10 มม., เกรียงหวี › รูปฟัน: ฟันเหล"
+            }
+          ],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-004",
+            "TIL-001",
+            "TIL-003",
+            "CEM-001",
+            "CEM-002",
+            "CEM-003",
+            "TIL-002"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 135,
+            "total_ms": 444
+          },
+          "error": null,
+          "missing_facts": [
+            "5.5 กก"
+          ],
+          "metrics": {
+            "hit_at_4": 1,
+            "mrr": 1,
+            "citation_acc": 1,
+            "key_fact_recall": 0,
+            "sql_correct": 1
+          }
+        },
+        {
+          "n": 3,
+          "ref_text": "ถ้าพื้นห้อง 20 ตร.ม. ต้องใช้ปูนกาวทั้งหมดกี่กิโล",
+          "refers_to": "อัตรา 5.5 กก./ตร.ม.",
+          "expected": "20 × 5.5 = 110 กก.",
+          "expected_values": [
+            "110"
+          ],
+          "sources": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7
+            }
+          ],
+          "q": "ถ้าพื้นห้อง 20 ตร.ม. ต้องใช้ปูนกาวทั้งหมดกี่กิโล",
+          "answer": "จากเอกสาร BM-DS-TIL.pdf หน้า 15: พื้นที่ใช้งาน: พื้นห้องน้ำส่วนเปียก, กระเบื้อง › TIL- 001: ✓, กระเบื้อง › TIL- 002: ✗, ปูนกาว ครับ",
+          "cites": [
+            {
+              "filename": "BM-DS-TIL.pdf",
+              "page": 15,
+              "snippet": "ตารางที่ 20 เมทริกซ์พื้นที่ใช้งาน × สินค้า → ความเหมาะสมและเงื่อนไข พื้นที่ใช้งาน: พื้นห้องนั่งเล่น ห้องนอน, กระเบื้อง › TIL- 001: ✓, กระเบื้อง › TIL- 002: ✗, ปูนกาว CEM-004 (ฟันเก"
+            }
+          ],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 14,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-TIL.pdf",
+              "page": 15,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 7,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-004",
+            "TIL-001",
+            "CEM-001",
+            "TIL-003",
+            "CEM-002",
+            "CEM-003",
+            "AGG-001",
+            "AGG-002"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 225,
+            "total_ms": 582
+          },
+          "error": null,
+          "missing_values": [
+            "110"
+          ],
+          "metrics": {
+            "hit_at_4": 1,
+            "mrr": 1,
+            "citation_acc": 0,
+            "exact_value": 0
+          }
+        },
+        {
+          "n": 4,
+          "ref_text": "คิดเป็นกี่ถุง",
+          "refers_to": "ปูนกาว 110 กก. / ถุง 20 กก.",
+          "expected": "110 ÷ 20 = 5.5 → 6 ถุง (CEM-004 ถุงละ 20 กก.) · เครื่องคำนวณเว็บใช้ 1 ถุง/4 ตร.ม. ได้ 5 ถุง",
+          "expected_values": [
+            [
+              "6 ถุง",
+              "6ถุง",
+              "6 bags"
+            ]
+          ],
+          "needs_products": [
+            "CEM-004"
+          ],
+          "q": "คิดเป็นกี่ถุง",
+          "answer": "จากเอกสาร BM-DS-CEM.pdf หน้า 4: ปูนกาวซีเมนต์ ปูกระเบื้อง (20 กก.), บรรจุภัณฑ์ › น้ำหนัก (กก.): 20, บรรจุภัณฑ์ › ขนาดถุงก×ย×ส (ซม.): 35×50×10, บรรจุภัณฑ์ › ถุง / แถบสี: กระดาษ ครับ",
+          "cites": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "snippet": "ตารางที่ 2 สเปกบรรจุภัณฑ์และการจัดเก็บตาม SKU หมวดปูน (ต่อ) SKU: CEM- 004, ชื่อสินค้า: ปูนกาวซีเมนต์ ปูกระเบื้อง (20 กก.), บรรจุภัณฑ์ › น้ำหนัก (กก.): 20, บรรจุภัณฑ์ › ขนาดถุงก×ย×ส"
+            }
+          ],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 10,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 15,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 22,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-004",
+            "CEM-001",
+            "TIL-001",
+            "TIL-003",
+            "CEM-002",
+            "CEM-003",
+            "TIL-002"
+          ],
+          "cartCount": 0,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 126,
+            "total_ms": 598
+          },
+          "error": null,
+          "missing_values": [
+            "6 ถุง"
+          ],
+          "metrics": {
+            "exact_value": 0,
+            "sql_correct": 1
+          }
+        },
+        {
+          "n": 5,
+          "ref_text": "ใส่ตะกร้าให้ 6 ถุงเลย",
+          "refers_to": "CEM-004 × 6",
+          "expected": "เพิ่ม CEM-004 6 ถุงลงตะกร้า",
+          "key_facts": [
+            "CEM-004",
+            "6"
+          ],
+          "expect_state": {
+            "cartCount": 6
+          },
+          "q": "ใส่ตะกร้าให้ 6 ถุงเลย",
+          "answer": "เรียบร้อยครับ ใส่ตะกร้าให้แล้ว\n- CEM-004 ปูนกาวซีเมนต์ ปูกระเบื้อง (20 กก.) × 6 ถุง\nไปที่หน้าตะกร้าเพื่อสั่งซื้อหรือขอใบเสนอราคาได้เลยครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 15,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 12,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 8,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-004",
+            "CEM-001",
+            "TIL-001",
+            "TIL-003",
+            "CEM-003",
+            "CEM-002",
+            "AGG-002"
+          ],
+          "cartCount": 6,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 150,
+            "total_ms": 618
+          },
+          "error": null,
+          "metrics": {
+            "key_fact_recall": 1,
+            "state_ok": 1
+          }
+        },
+        {
+          "n": 6,
+          "ref_text": "รวมค่าส่งกับ VAT แล้วต้องจ่ายเท่าไร",
+          "refers_to": "ตะกร้า CEM-004",
+          "expected": "ยอดสินค้า 1,110.00 + ค่าส่งกระบะ 500.00 + VAT 112.70 = 1,722.70 บาท",
+          "expected_values": [
+            "1110",
+            "500",
+            "1722.7"
+          ],
+          "q": "รวมค่าส่งกับ VAT แล้วต้องจ่ายเท่าไร",
+          "answer": "ค่าส่งคิดตามน้ำหนักรวมครับ\n- ไม่เกิน 1,000 กก. กระบะ 500 บาท (ฟรีถ้ายอดก่อน VAT หลังส่วนลดตั้งแต่ 20,000 บาท)\n- 1,000.01–6,000 กก. รถ 6 ล้อ 1,500 บาท\n- เกิน 6,000 กก. รถ 10 ล้อ 3,500 บาท ครับ",
+          "cites": [],
+          "retrieved": [
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 4,
+              "score": 1
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 3,
+              "score": 0.95
+            },
+            {
+              "filename": "BM-DS-CEM.pdf",
+              "page": 11,
+              "score": 0.9
+            },
+            {
+              "filename": "BM-POLICY.pdf",
+              "page": 13,
+              "score": 0.85
+            }
+          ],
+          "products": [
+            "CEM-004",
+            "CEM-001",
+            "TIL-001",
+            "TIL-003",
+            "CEM-002",
+            "CEM-003"
+          ],
+          "cartCount": 6,
+          "quoteNo": null,
+          "done_fields": [
+            "text",
+            "cites",
+            "cartCount",
+            "retrieved",
+            "products"
+          ],
+          "timing": {
+            "stt_ms": null,
+            "ttft_ms": 121,
+            "total_ms": 615
+          },
+          "error": null,
+          "missing_values": [
+            "1110",
+            "1722.7"
+          ],
+          "metrics": {
+            "exact_value": 0
+          }
+        }
+      ],
+      "metrics": {
+        "hit_at_4": 1,
+        "mrr": 1,
+        "citation_acc": 0.333,
+        "exact_value": 0,
+        "sql_correct": 1,
+        "key_fact_recall": 0.667,
+        "state_ok": 1
+      }
+    }
+  ]
+}

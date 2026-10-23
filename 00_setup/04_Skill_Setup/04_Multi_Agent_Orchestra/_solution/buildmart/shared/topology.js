@@ -6,6 +6,7 @@ export const Q = {
   CHAT_DLQ: 'chat.dlq',
   RAG_INGEST: 'rag.ingest',
   TTS_REQUEST: 'tts.request',
+  STT_REQUEST: 'stt.request', // v3: เสียงพูด → ข้อความ (stt-worker)
   NOTIFY_ORDERS: 'notify.orders',
 };
 export const EX = {
@@ -21,6 +22,7 @@ export const QUEUES = [
   { name: Q.CHAT_DLQ, options: { durable: true } },
   { name: Q.RAG_INGEST, options: { durable: true } },
   { name: Q.TTS_REQUEST, options: { durable: true } },
+  { name: Q.STT_REQUEST, options: { durable: true } },
   { name: Q.NOTIFY_ORDERS, options: { durable: true } },
 ];
 export const EXCHANGES = [

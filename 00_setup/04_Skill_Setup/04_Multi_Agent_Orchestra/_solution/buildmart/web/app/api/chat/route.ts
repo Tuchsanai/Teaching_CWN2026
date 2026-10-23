@@ -1,7 +1,7 @@
 // POST /api/chat {text} → SSE (text/event-stream) — C1
 // web ไม่เรียก LLM ตรง: ส่งงานเข้าคิว `chat.request` (persistent · reply_to = instanceId · correlation_id = messageId)
 // แล้วส่งต่อข้อความจาก exchange `chat.reply` ให้เบราว์เซอร์ทีละ event:
-//   queued {messageId} (ทันที) → status {status:'thinking'} → delta {text สะสม} → done {text, cites, cartCount, quoteNo} | error {error}
+//   queued {messageId} (ทันที) → status {status:'thinking'} → delta {text สะสม} → done {text, cites, cartCount, quoteNo, retrieved, products} | error {error}
 // รอได้นาน 240 วิ — ถ้า chat-worker ดับ ข้อความจะค้างอยู่ในคิว (durable) จนกว่า worker กลับมา (เคส Q02)
 import { randomUUID } from 'node:crypto';
 import { rpc } from '@/lib/amqp';
@@ -23,6 +23,8 @@ type Reply = {
   cartCount?: number;
   quoteNo?: string;
   error?: string;
+  retrieved?: { filename: string; page: number; score?: number }[];
+  products?: string[];
 };
 
 export async function POST(req: Request) {
@@ -92,6 +94,9 @@ export async function POST(req: Request) {
                   cites: Array.isArray(m.cites) ? m.cites : [],
                   cartCount: typeof m.cartCount === 'number' ? m.cartCount : undefined,
                   quoteNo: m.quoteNo || undefined,
+                  // v3: เอกสาร top 4 ที่ใส่ในพรอมต์ (ประเมิน Hit@4/MRR) + SKU ที่ดึงจาก DB
+                  retrieved: Array.isArray(m.retrieved) ? m.retrieved : [],
+                  products: Array.isArray(m.products) ? m.products : [],
                 });
                 break;
               case 'error':

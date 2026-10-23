@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import Header from '@/components/Header';
 import ChatWidget from '@/components/ChatWidget';
+import Interactions from '@/components/Interactions';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'บ้านช่าง BuildMart — ร้านวัสดุก่อสร้างออนไลน์',
   description: 'ปูน เหล็ก อิฐ กระเบื้อง สี ประปา ไฟฟ้า ราคาส่งตามจำนวน ส่งถึงหน้างาน',
 };
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#F26B1D' };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#10141C', colorScheme: 'dark' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap"
         />
       </head>
       <body>
@@ -39,6 +40,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </footer>
         {/* แชทบอทลอยมุมขวาล่าง (C1) */}
         <ChatWidget />
+        {/* เอฟเฟกต์การ์ดเอียง + reveal ตอนเลื่อน (v3) */}
+        <Interactions />
       </body>
     </html>
   );

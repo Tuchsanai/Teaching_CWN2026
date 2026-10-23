@@ -1,0 +1,84 @@
+{
+  "label": "mock-tts-smoke",
+  "config": {
+    "mode": "tts",
+    "users": [
+      1,
+      4,
+      8
+    ],
+    "stage_sec": 15,
+    "url": "http://localhost:3400",
+    "thresholds": {
+      "p95_ms": 10000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": []
+  },
+  "summary": {
+    "mode": "tts",
+    "max_users_ok": 8,
+    "thresholds": {
+      "p95_ms": 10000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 3,
+    "stages_total": 3,
+    "best_rps": 2.082,
+    "finished_at": "2026-10-23T08:26:17.625Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 17,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 920,
+      "p95": 948,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 0.129,
+      "tokens_per_s": null,
+      "queue_max": 1,
+      "rps": 1.085,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 34,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1910,
+      "p95": 1926,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 0.255,
+      "tokens_per_s": null,
+      "queue_max": 5,
+      "rps": 2.062,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 38,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 3819,
+      "p95": 3837,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 0.481,
+      "tokens_per_s": null,
+      "queue_max": 8,
+      "rps": 2.082,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

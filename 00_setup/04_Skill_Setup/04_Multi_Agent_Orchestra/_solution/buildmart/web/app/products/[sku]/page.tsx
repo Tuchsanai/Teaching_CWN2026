@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ProductBuyBox from '@/components/ProductBuyBox';
-import { categoryIcon } from '@/components/ProductCard';
+import { ProductImage } from '@/components/CatImage';
 import { formatBaht } from '@/shared/pricing.js';
 import { getProduct } from '../../api/products/_lib';
 import '../products.css';
@@ -33,7 +33,8 @@ export default async function ProductPage({ params }: { params: { sku: string } 
 
       <div className="pd-grid">
         <div className="pd-visual card" aria-hidden>
-          <span>{categoryIcon(p.category)}</span>
+          <ProductImage sku={p.sku} category={p.category} className="pd-visual-img" />
+          <span className="pd-visual-sku">{p.sku}</span>
         </div>
 
         <div className="pd-info">

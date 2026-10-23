@@ -1,6 +1,7 @@
 'use client';
 // app/cart/CartView.tsx (B2) — ตะกร้า: ราคาส่งต่อรายการ · แก้จำนวน · คูปอง · รถ/ค่าส่ง/VAT/ยอดสุทธิ
 import Link from 'next/link';
+import { ProductImage } from '@/components/CatImage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, baht, notifyCart, TotalsBox, type Cart, type CartItem } from './Summary';
 
@@ -142,6 +143,9 @@ export default function CartView() {
               return (
                 <tr key={it.sku} data-testid="cart-row" data-sku={it.sku}>
                   <td className="wide">
+                    <Link href={`/products/${it.sku}`} className="b2-thumb" aria-hidden tabIndex={-1}>
+                      <ProductImage sku={it.sku} className="b2-thumb-img" />
+                    </Link>
                     <Link href={`/products/${it.sku}`} className="b2-name">
                       {it.name}
                     </Link>

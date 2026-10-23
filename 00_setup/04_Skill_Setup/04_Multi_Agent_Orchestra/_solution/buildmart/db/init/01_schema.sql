@@ -165,7 +165,18 @@ CREATE TABLE tts_audio (
   text        text,
   wav         bytea,
   duration_ms int,
+  engine      text,                      -- v3: voxcpm2 | kokoro | pythaitts
   created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+-- ---------- v3: ผลประเมิน RAG (POST /api/admin/eval · หน้า /admin/eval) ----------
+CREATE TABLE eval_runs (
+  id         serial PRIMARY KEY,
+  label      text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  config     jsonb,
+  summary    jsonb,
+  items      jsonb
 );
 
 -- ---------- เลขเอกสาร QT/BM (ใช้ร่วมกันทั้ง web และ workers) ----------
@@ -187,3 +198,14 @@ BEGIN
   RETURNING n INTO v;
   RETURN p_prefix || '-' || to_char(d, 'YYYYMMDD') || '-' || lpad(v::text, 4, '0');
 END $$;
+
+-- ---------- v3: ผล load test (loadtest/run_load.mjs → POST /api/admin/load · หน้า /admin/load) ----------
+-- items = ขั้นของ load test [{users, n, errors, p50, p95, ttft_p50, ttft_p95, rtf, tokens_per_s, queue_max, ok}]
+CREATE TABLE load_runs (
+  id         serial PRIMARY KEY,
+  label      text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  config     jsonb,
+  summary    jsonb,
+  items      jsonb
+);

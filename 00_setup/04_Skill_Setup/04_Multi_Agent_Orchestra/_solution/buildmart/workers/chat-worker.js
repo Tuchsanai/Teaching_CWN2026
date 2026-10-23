@@ -1,9 +1,10 @@
 // workers/chat-worker.js — แชทบอท "น้องช่าง" (BUILDMART ข้อ 4.4 · CONTRACT หัวข้อ chat-worker)
 //
 // รับงานจากคิว chat.request (RPC) → ส่ง status 'thinking' ทันที
-//   → เตรียม context: ประวัติ 6 ข้อความ + Hybrid RAG top 4 + สินค้าที่เกี่ยวข้องจาก DB + ข้อมูลร้าน/กฎ
+//   → เตรียม context: ประวัติ 10 ข้อความ + สินค้าที่กำลังคุยถึง (v3) + Hybrid RAG top 20 → rerank → top 4
+//     + สินค้าที่เกี่ยวข้องจาก DB + ข้อมูลร้าน/กฎ
 //   → เรียก LLM (stream) → ถ้าเจอ tag: [CALC] คำนวณ / [QUOTE] สร้างใบเสนอราคา แล้วเรียกซ้ำ (≤ 2 รอบ) · [ADD_TO_CART] เขียนตะกร้า
-//   → stream delta (ข้อความสะสม) ไป exchange chat.reply → done {text, cites, cartCount, quoteNo}
+//   → stream delta (ข้อความสะสม) ไป exchange chat.reply → done {text, cites, cartCount, quoteNo, retrieved, products}
 //   → บันทึก chat_messages (user + assistant) → ack
 // error ที่ไม่ใช่ LLM (เช่น DB) → republish พร้อม header x-retries+1 · ครบ 2 ครั้ง → nack(requeue=false) → chat.dlq
 // LLM ล่ม/timeout → ตอบขอโทษแบบ type 'done' (ไม่ใช่ error)
@@ -14,10 +15,15 @@ import { addToCart, cartCount } from './lib/cart.js';
 import { createQuoteFromCart } from './lib/quote.js';
 import { chatLLM, llmConfig } from './lib/llm.js';
 import { parseTags, cleanText, citeRefs, hasThai } from './lib/tags.js';
-import { loadHistory, searchDocs, findProducts, buildSystemPrompt, citeThreshold } from './lib/context.js';
+import {
+  loadHistory, searchDocs, findProducts, buildSystemPrompt, citeThreshold,
+  loadProducts, conversationFocus, namesProduct, searchName, buildEstimate, carryCodes, REFER_RE, RERANK_ON,
+} from './lib/context.js';
+import { aiboxInfo } from './lib/aibox.js';
+import { digitsForThaiNumbers } from '../shared/thainum.js';
 import { calculate } from '../shared/calc.js';
 
-const PREFETCH = 4;
+const PREFETCH = Number(process.env.CHAT_PREFETCH || 4);
 const MAX_TOOL_ROUNDS = 2; // เรียก LLM ซ้ำหลังผล tag ได้ไม่เกิน 2 รอบ
 const MAX_RETRIES = 2;
 const DELTA_EVERY_MS = 50;
@@ -102,18 +108,28 @@ async function makeCites(raw, docs, { allowFallback, answerText = '', excludeTex
 async function answer(body, emit) {
   const sessionId = String(body.sessionId || 'anonymous');
   const question = String(body.text || '').trim().slice(0, 2000);
+  // ตัวเลขที่สะกดเป็นคำ (ข้อความจาก Whisper เช่น "ร้อยถุง") → ตัวเลข ให้ LLM/การค้นเห็นจำนวนชัด ๆ (บันทึกประวัติด้วยข้อความเดิม)
+  const askQ = digitsForThaiNumbers(question).replace(/\s{2,}/g, ' ').trim();
   const en = body.lang ? body.lang === 'en' : !hasThai(question);
   const lang = en ? 'en' : 'th';
 
   if (question === '__bm_test_fail__') throw new Error('test failure (DLQ hook)');
 
   const history = await loadHistory(pool, sessionId);
-  const docs = await searchDocs(pool, question, 4);
-  const products = await findProducts(pool, question, history, docs);
+  const rows = await loadProducts(pool);
+  // v3: สินค้าที่กำลังคุยถึง — คำถามต่อเนื่อง ("อันนั้นเก็บได้นานแค่ไหน") เติมชื่อสินค้าเข้าไปในคำค้นเอกสาร
+  const focus = conversationFocus(rows, history, askQ);
+  const followUp = focus.products.length > 0 && (REFER_RE.test(askQ) || !namesProduct(askQ, rows));
+  // คำถามต่อเนื่อง ("แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร") พารหัส/ขนาดจากคำถามก่อนหน้า (60x60 · DB12) ไปค้นด้วย
+  const baseQuery = carryCodes(askQ, history);
+  const searchQuery = followUp ? `${baseQuery} ${focus.products.map(searchName).join(' ')}` : baseQuery;
+  const estimate = await buildEstimate(pool, sessionId, focus, { question: askQ, rows }).catch(() => null);
+  const docs = await searchDocs(pool, searchQuery, 4);
+  const products = await findProducts(pool, askQ, history, docs, 8, { rows, focus });
   const messages = [
-    { role: 'system', content: buildSystemPrompt({ products, docs, en }) },
+    { role: 'system', content: buildSystemPrompt({ products, docs, en, focus, estimate }) },
     ...history,
-    { role: 'user', content: question },
+    { role: 'user', content: askQ },
   ];
 
   let quoteNo = null;
@@ -189,7 +205,8 @@ async function answer(body, emit) {
   }
   if (process.env.CHAT_DEBUG) log('raw', JSON.stringify(finalRaw).slice(0, 400), 'docs', docs.map((d) => `${d.filename}#${d.page}:${d.vecSim}`).join(' '));
   const count = await cartCount(pool, sessionId);
-  return { sessionId, question, text, cites, cartCount: count, cartChanged, quoteNo, llmFailed };
+  const retrieved = docs.map((d) => ({ filename: d.filename, page: d.page, score: d.rerankScore ?? d.score, hybridRank: d.hybridRank }));
+  return { sessionId, question, text, cites, cartCount: count, cartChanged, quoteNo, llmFailed, retrieved, products: products.map((p) => p.sku), focus: focus.skus };
 }
 
 /** ข้อความ assistant ที่ส่งกลับให้ LLM ในรอบ tag: ตัด think แต่คง tag ไว้ (ตาม Notes from C3) */
@@ -272,9 +289,11 @@ async function onMessage(ch, msg) {
       cites: r.cites,
       cartCount: r.cartCount,
       quoteNo: r.quoteNo || undefined,
+      retrieved: r.retrieved,
+      products: r.products,
     });
     ch.ack(msg);
-    log(`done ${messageId} ${Date.now() - t0}ms cites=${r.cites.length} cart=${r.cartCount}${r.quoteNo ? ' ' + r.quoteNo : ''}${r.llmFailed ? ' (LLM down)' : ''}`);
+    log(`done ${messageId} ${Date.now() - t0}ms cites=${r.cites.length} cart=${r.cartCount}${r.focus?.length ? ' focus=' + r.focus.join(',') : ''}${r.quoteNo ? ' ' + r.quoteNo : ''}${r.llmFailed ? ' (LLM down)' : ''}`);
   } catch (e) {
     emit.close();
     console.error(`[chat-worker] error ${messageId} (retry ${retries}):`, e.message);
@@ -304,7 +323,8 @@ async function startConsuming({ ch }) {
   await ch.prefetch(PREFETCH);
   await ch.consume(Q.CHAT_REQUEST, (msg) => onMessage(ch, msg).catch((e) => console.error('[chat-worker] handler crash', e)), { noAck: false });
   markReady(`chat-worker mode=${llmConfig.mode}`);
-  log(`consuming ${Q.CHAT_REQUEST} prefetch=${PREFETCH} mode=${llmConfig.mode} llm=${llmConfig.baseUrl}${llmConfig.model ? ' model=' + llmConfig.model : ''}`);
+  const ab = aiboxInfo('rerank');
+  log(`consuming ${Q.CHAT_REQUEST} prefetch=${PREFETCH} mode=${llmConfig.mode} llm=${llmConfig.baseUrl}${llmConfig.model ? ' model=' + llmConfig.model : ''} rerank=${RERANK_ON ? 'on' : 'off'} aibox=${ab.url}${ab.mock ? ' (mock)' : ''}`);
 }
 
 // ---------------------------------------------------------------- main

@@ -1,0 +1,643 @@
+[
+  {
+    "id": "R-STL-01",
+    "set": "rag",
+    "question": "เหล็กข้ออ้อยที่เขียนว่า SD40 ตัวเลข 40 นี่มันหมายถึงอะไรครับ",
+    "expected": "SD หมายถึงเหล็กข้ออ้อย (Steel Deformed) ตัวเลขต่อท้ายคูณ 100 คือกำลังครากต่ำสุด SD40 จึงมีกำลังครากไม่ต่ำกว่า 4,000 กก./ตร.ซม.",
+    "key_facts": [
+      [
+        "4,000",
+        "4000"
+      ],
+      [
+        "Steel Deformed",
+        "ข้ออ้อย"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "text",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-02",
+    "set": "rag",
+    "question": "ทำไมระยะทาบเหล็กถึงกำหนดเป็นกี่เท่าของขนาดเหล็ก ไม่กำหนดเป็นเซนตายตัวไปเลย",
+    "expected": "เพราะเหล็กที่ใหญ่ขึ้นรับแรงมากขึ้นตามพื้นที่หน้าตัด (กำลังสองของเส้นผ่านศูนย์กลาง) แต่เส้นรอบรูปที่ใช้ยึดเกาะเพิ่มตามเส้นผ่านศูนย์กลางเท่านั้น ระยะทาบจึงกำหนดเป็น 40 เท่าของเส้นผ่านศูนย์กลาง (40d)",
+    "key_facts": [
+      [
+        "40d",
+        "40 เท่า"
+      ],
+      [
+        "พื้นที่",
+        "กำลังสอง"
+      ],
+      "เส้นรอบรูป"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "text",
+    "difficulty": "hard"
+  },
+  {
+    "id": "R-STL-03",
+    "set": "rag",
+    "question": "Does rebar have a shelf life? How long can I keep it on site before using it?",
+    "expected": "Rebar does not expire, but it should be used within 6 months when stored under a roof and covered with a tarp, so that rust does not exceed level B.",
+    "key_facts": [
+      [
+        "6 months",
+        "6 เดือน"
+      ],
+      [
+        "level B",
+        "grade B",
+        "ระดับ B"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "text",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-04",
+    "set": "rag",
+    "question": "แบกเหล็ก DB12 ด้วยแรงคน 2 คน แบกได้ทีละกี่เส้น",
+    "expected": "DB12 แบก 2 คนได้สูงสุด 5 เส้น (น้ำหนักต่อคน 22.20 กก.) ตามเกณฑ์ไม่เกิน 25 กก. ต่อคน",
+    "key_facts": [
+      "5 เส้น",
+      "25 กก."
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 11
+      }
+    ],
+    "type": "table_simple",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-05",
+    "set": "rag",
+    "question": "ตะแกรงเหล็ก DB12 ห่าง 15 ซม. สองทาง หนักตารางเมตรละกี่โล",
+    "expected": "ตะแกรง DB12 @15 ซม. 2 ทาง หนักประมาณ 11.84 กก./ตร.ม. (ยังไม่รวมทาบและเศษตัด)",
+    "key_facts": [
+      "11.84"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 19
+      }
+    ],
+    "type": "table_simple",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-06",
+    "set": "rag",
+    "question": "เหล็กกลม RB9 มัดย่อยนึงมีกี่เส้น หนักมัดละกี่กิโล",
+    "expected": "RB9 (STL-002) มัดย่อยละ 25 เส้น หนัก 124.75 กก. ต่อมัด ปลายเหล็กทาสีเหลือง",
+    "key_facts": [
+      "25 เส้น",
+      "124.75"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "table_multiheader",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-07",
+    "set": "rag",
+    "question": "คานนอกบ้านที่โดนแดดโดนฝน ต้องเว้นระยะหุ้มคอนกรีตกี่ซม. แล้วถ้าเป็นคานคอดินที่หล่อในแบบล่ะ",
+    "expected": "คานภายนอกโดนแดดฝน (ไม่สัมผัสดิน) ระยะหุ้มขั้นต่ำ 4.0 ซม. ส่วนคานคอดินที่สัมผัสดินแบบหล่อในแบบใช้ 5.0 ซม. (หล่อติดดินโดยตรง 7.5 ซม.)",
+    "key_facts": [
+      [
+        "4.0 ซม.",
+        "4 ซม."
+      ],
+      [
+        "5.0 ซม.",
+        "5 ซม."
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 10
+      }
+    ],
+    "type": "table_multiheader",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-08",
+    "set": "rag",
+    "question": "What is the closest JIS grade to the Thai SR24 round bar, and what is its minimum yield strength in MPa?",
+    "expected": "SR24 (2,400 kg/cm², about 235.4 MPa) is closest to JIS G3112 SR235; there is no comparable ASTM A615 grade listed, and the comparison is for reference only.",
+    "key_facts": [
+      "SR235",
+      "235.4"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 17
+      }
+    ],
+    "type": "table_multiheader",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-09",
+    "set": "rag",
+    "question": "เสาบ้าน 2 ชั้นขนาด 25x25 ตามตัวอย่าง เสริมเหล็กยังไง ปลอกห่างกันเท่าไหร่",
+    "expected": "เสา C2 25×25 ซม. ใช้เหล็กหลัก 4-DB16 รอบเสา เหล็กปลอก RB6 ระยะห่าง 15 ซม. ระยะหุ้ม 3.5 ซม.",
+    "key_facts": [
+      [
+        "4-DB16",
+        "DB16 4 เส้น"
+      ],
+      "RB6",
+      [
+        "15 ซม.",
+        "@15"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 10
+      }
+    ],
+    "type": "table_merged",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-10",
+    "set": "rag",
+    "question": "ต่อทาบเหล็ก RB9 ต้องทาบยาวกี่ซม. แล้วต้องผูกลวดที่จุดทาบอย่างน้อยกี่จุด",
+    "expected": "RB9 (SR24) ระยะทาบขั้นต่ำ 36 ซม. ผูกลวดที่จุดทาบอย่างน้อย 2 จุด",
+    "key_facts": [
+      "36 ซม.",
+      "2 จุด"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 8
+      }
+    ],
+    "type": "table_merged",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-11",
+    "set": "rag",
+    "question": "สั่ง DB16 มาตันนึง จะได้กี่เส้นเต็ม แล้วควรซื้อลวดผูกกี่ม้วน",
+    "expected": "เหล็ก 1 ตันเป็น DB16 ได้ 63 เส้นเต็ม (ยาวรวม 633.7 ม.) และใช้ลวดผูก STL-005 ประมาณ 10–15 ม้วน (10–15 กก.)",
+    "key_facts": [
+      "63 เส้น",
+      [
+        "10–15 ม้วน",
+        "10-15 ม้วน",
+        "10–15 กก.",
+        "10-15 กก."
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 7
+      }
+    ],
+    "type": "table_merged",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-12",
+    "set": "rag",
+    "question": "ตอนรับของ ดูแค่สีที่ทาปลายเหล็กแยกขนาดเอาเลยได้ไหม ไม่ต้องวัด",
+    "expected": "ไม่ได้ สีปลายเหล็กเป็นสีที่ BuildMart ทาเพื่อแยกกองในคลัง ไม่ใช่เครื่องหมายของผู้ผลิต ห้ามใช้แทนการตรวจขนาดด้วยเวอร์เนียร์ในการตรวจรับ",
+    "key_facts": [
+      [
+        "ไม่ได้",
+        "ห้าม"
+      ],
+      "เวอร์เนียร์"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "footnote",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-13",
+    "set": "rag",
+    "question": "เหล็ก DB16 ที่กองไว้ขึ้นสนิมทั่วเส้น ขูดแล้วเป็นผง มีหลุมตื้นๆ ยังใช้ได้ไหม",
+    "expected": "เป็นสนิมระดับ C ใช้ได้ถ้าน้ำหนักผ่านเกณฑ์ ให้ขัดแปรงลวดแล้วชั่งเส้นตัวอย่าง DB16 ต้องหนักไม่ต่ำกว่า 14.99 กก. ต่อเส้น 10 ม.",
+    "key_facts": [
+      "14.99",
+      "แปรงลวด"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 11
+      }
+    ],
+    "type": "footnote",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-14",
+    "set": "rag",
+    "question": "ทาบเหล็กกลม RB6 เอาความยาวขอที่งอปลายมานับรวมเป็นระยะทาบได้ไหม",
+    "expected": "ไม่ได้ RB6 ต้องทาบอย่างน้อย 24 ซม. เหล็กเส้นกลมผิวเรียบควรงอขอที่ปลายทั้งสองข้างของช่วงทาบเพิ่ม และระยะของขอไม่นับรวมในระยะทาบ 40 เท่า",
+    "key_facts": [
+      [
+        "ไม่นับ",
+        "ไม่รวม",
+        "ไม่ได้"
+      ],
+      "24 ซม."
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 8
+      }
+    ],
+    "type": "footnote",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-15",
+    "set": "rag",
+    "question": "งานนี้ต้องใช้ DB16 ยาวรวม 380 เมตร ต้องซื้อกี่เส้น น้ำหนักรวมเท่าไหร่",
+    "expected": "ความยาวรวม 380 ม. ต้องซื้อ 38 เส้น น้ำหนักรวม DB16 599.64 กก.",
+    "key_facts": [
+      "38 เส้น",
+      "599.64"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 6
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 7
+      }
+    ],
+    "type": "cross_page",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-16",
+    "set": "rag",
+    "question": "บ้านชั้นเดียว 8x4 ในตัวอย่างรายการตัดเหล็ก ต้องซื้อ DB12 จริงๆ กี่เส้น ทำไมไม่เท่ากับเอาความยาวรวมหาร 10",
+    "expected": "ตามแผนตัดจริงต้องซื้อ DB12 37 เส้น (328.56 กก.) ขณะที่คิดจากยาวรวม ÷ 10 ได้ 32 เส้น เพราะชิ้นที่ตัดจากเส้น 10 ม. เหลือเศษ เช่นชิ้น 4.00 ม. ตัดได้เพียง 2 ชิ้นต่อเส้น",
+    "key_facts": [
+      "37 เส้น",
+      "32 เส้น",
+      "328.56"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 7
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 8
+      }
+    ],
+    "type": "cross_page",
+    "difficulty": "hard"
+  },
+  {
+    "id": "R-STL-17",
+    "set": "rag",
+    "question": "บ้าน 2 ชั้นเสา 9 ต้นตามกรณีศึกษา ต้องซื้อ DB16 ทั้งหมดกี่เส้น แบ่งเป็นเหล็กเสากับฐานรากอย่างละเท่าไหร่",
+    "expected": "ต้องซื้อ DB16 54 เส้น (852.12 กก.) แบ่งเป็นเหล็กเสา 30 เส้น และเหล็กฐานราก F2 24 เส้น พร้อม RB6 ทำปลอก 38 เส้น และลวดผูก 12 ม้วน",
+    "key_facts": [
+      "54 เส้น",
+      "30 เส้น",
+      "24 เส้น"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 15
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 13
+      }
+    ],
+    "type": "cross_page",
+    "difficulty": "hard"
+  },
+  {
+    "id": "R-STL-18",
+    "set": "rag",
+    "question": "ลวดผูกเหล็ก STL-005 ม้วนนึงยาวกี่เมตร ลังนึงมีกี่ม้วน",
+    "expected": "ลวดผูก STL-005 ม้วนละ 1 กก. ยาวประมาณ 112 ม. (ลวดเบอร์ 18 ประมาณ 1.2 มม.) บรรจุ 25 ม้วนต่อลัง",
+    "key_facts": [
+      "112",
+      "25 ม้วน"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 4
+      }
+    ],
+    "type": "spec_by_sku",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-19",
+    "set": "rag",
+    "question": "เหล็กเส้นกลม RB6 เส้นนึงยาว 10 เมตร หนักกี่โล",
+    "expected": "RB6 (STL-001) หนัก 0.222 กก./ม. หรือ 2.22 กก. ต่อเส้น 10 ม.",
+    "key_facts": [
+      "2.22"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 3
+      }
+    ],
+    "type": "spec_by_sku",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-20",
+    "set": "rag",
+    "question": "DB16 พื้นที่หน้าตัดกี่ตารางมิลครับ",
+    "expected": "DB16 (STL-004) มีพื้นที่หน้าตัด 201.1 ตร.มม.",
+    "key_facts": [
+      "201.1"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 3
+      }
+    ],
+    "type": "spec_by_sku",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-21",
+    "set": "rag",
+    "question": "RB9 กับ DB12 ต่างกันยังไงบ้าง เรื่องชั้นคุณภาพ กำลังคราก แล้วก็ระยะทาบ",
+    "expected": "RB9 เป็นเหล็กกลมชั้น SR24 (มอก.20-2559) กำลังครากต่ำสุด 2,400 กก./ตร.ซม. ทาบ 36 ซม. ส่วน DB12 เป็นเหล็กข้ออ้อยชั้น SD40 (มอก.24-2559) กำลังคราก 4,000 กก./ตร.ซม. ทาบ 48 ซม.",
+    "key_facts": [
+      "SR24",
+      "SD40",
+      [
+        "2,400",
+        "2400"
+      ],
+      [
+        "4,000",
+        "4000"
+      ],
+      "36 ซม.",
+      "48 ซม."
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 3
+      }
+    ],
+    "type": "compare",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-22",
+    "set": "rag",
+    "question": "How do SR24 and SD40 compare in minimum tensile strength and elongation?",
+    "expected": "SR24 has a minimum tensile strength of 3,900 kg/cm² with 21% elongation, while SD40 has 5,700 kg/cm² with 15% elongation.",
+    "key_facts": [
+      [
+        "3,900",
+        "3900"
+      ],
+      [
+        "5,700",
+        "5700"
+      ],
+      "21%",
+      "15%"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 5
+      }
+    ],
+    "type": "compare",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-23",
+    "set": "rag",
+    "question": "คาน B2 เหล็กล่าง 3-DB16 ถ้าอยากเปลี่ยนเป็น DB12 ต้องใช้กี่เส้น เปลี่ยนเองได้ไหม",
+    "expected": "เทียบแรงคราก DB16 1 เส้นเท่ากับ DB12 ประมาณ 1.78 เส้น 3-DB16 (24,132 กก.) ต้องใช้ DB12 6 เส้น ซึ่งคานกว้าง 20 ซม. วางไม่พอ และการเปลี่ยนขนาดต้องได้รับอนุมัติจากวิศวกร",
+    "key_facts": [
+      "6 เส้น",
+      "1.78",
+      "วิศวกร"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 17
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 13
+      }
+    ],
+    "type": "compare",
+    "difficulty": "hard"
+  },
+  {
+    "id": "R-STL-24",
+    "set": "rag",
+    "question": "ขั้นตอนการต่อทาบเหล็กที่ถูกต้องมีอะไรบ้าง",
+    "expected": "ตรวจแบบหาตำแหน่งที่อนุญาตให้ต่อ (เลี่ยงจุดรับแรงดัดสูงสุด เช่นกลางช่วงคานด้านล่าง) → ทำเครื่องหมายระยะทาบ 40d บนเหล็กทั้งสองเส้น → วางทับซ้อนแนบกันตลอดช่วงทาบ → ผูกลวด STL-005 ที่ปลายทั้งสองข้างและกลางช่วงทาบ → สลับตำแหน่งรอยต่อไม่ทาบทุกเส้นที่หน้าตัดเดียวกัน",
+    "key_facts": [
+      "40d",
+      "กลางช่วงคาน",
+      [
+        "สลับ",
+        "เหลื่อม"
+      ],
+      [
+        "ลวดผูก",
+        "STL-005"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 9
+      }
+    ],
+    "type": "procedure",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-25",
+    "set": "rag",
+    "question": "คานนอกบ้านปูนกะเทาะจนเห็นเหล็กเป็นสนิม ต้องซ่อมยังไงทีละขั้น",
+    "expected": "สกัดคอนกรีตให้ลึกเลยหลังเหล็กอย่างน้อย 2 ซม. และเลยช่วงสนิมข้างละ 10 ซม. → ขัดสนิมด้วยแปรงลวด ถ้าเหล็กหายเกิน 10% ให้วิศวกรพิจารณาทาบเหล็กใหม่ → ทาน้ำยากันสนิมและน้ำยาประสานคอนกรีต → ซ่อมด้วยมอร์ตาร์ไม่หดตัวให้ได้ระยะหุ้ม 4.0 ซม. แล้วบ่มชื้นอย่างน้อย 3 วัน",
+    "key_facts": [
+      "2 ซม.",
+      "10 ซม.",
+      "แปรงลวด",
+      "น้ำยากันสนิม",
+      "มอร์ตาร์ไม่หดตัว",
+      [
+        "4.0 ซม.",
+        "4 ซม."
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 16
+      }
+    ],
+    "type": "procedure",
+    "difficulty": "hard"
+  },
+  {
+    "id": "R-STL-26",
+    "set": "rag",
+    "question": "ชั่งเหล็ก DB12 ตอนรับของแล้วเจอเส้นนึงเบากว่าเกณฑ์ ต้องทำยังไงต่อ",
+    "expected": "เกณฑ์ DB12 ต้องไม่ต่ำกว่า 8.35 กก. ต่อเส้น ถ้าเจอเส้นต่ำกว่าเกณฑ์ให้สุ่มชั่งเพิ่มอีก 5 เส้น ถ้ายังพบเส้นที่ต่ำกว่าเกณฑ์ให้ปฏิเสธการรับทั้งล็อตของขนาดนั้น",
+    "key_facts": [
+      "8.35",
+      "5 เส้น",
+      [
+        "ปฏิเสธ",
+        "ทั้งล็อต"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 12
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 16
+      }
+    ],
+    "type": "procedure",
+    "difficulty": "medium"
+  },
+  {
+    "id": "R-STL-27",
+    "set": "rag",
+    "question": "สั่งให้ร้านดัดปลอกจากเหล็ก DB16 ได้ไหม",
+    "expected": "ไม่ได้ บริการดัดปลอกทำได้เฉพาะ RB6 RB9 และ DB12 ส่วน DB16 รับตัดและงอขอเหล็กหลักแต่ไม่รับทำปลอก",
+    "key_facts": [
+      [
+        "ไม่รับ",
+        "ไม่ได้"
+      ],
+      "RB6",
+      "DB12"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 10
+      }
+    ],
+    "type": "negative",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-28",
+    "set": "rag",
+    "question": "เหล็กดัดยากมาก เอาไฟเป่าให้ร้อนก่อนดัดได้ไหม",
+    "expected": "ไม่ได้ ต้องดัดเหล็กขณะเย็นด้วยโต๊ะดัดหรือเครื่องดัด ห้ามเผาไฟเพื่อดัดเพราะทำให้สมบัติของเหล็กเปลี่ยน",
+    "key_facts": [
+      [
+        "ห้าม",
+        "ไม่ได้"
+      ],
+      [
+        "ขณะเย็น",
+        "เย็น"
+      ]
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 9
+      }
+    ],
+    "type": "negative",
+    "difficulty": "easy"
+  },
+  {
+    "id": "R-STL-29",
+    "set": "rag",
+    "question": "แบบบ้านระบุเหล็ก DB20 ร้านมีขายไหม ถ้าไม่มีเปลี่ยนเป็นขนาดอื่นเองได้ไหม",
+    "expected": "ไม่มีจำหน่าย DB20 แสดงในตารางเพื่อเปรียบเทียบเท่านั้น (BuildMart มี RB6 RB9 DB12 DB16) และการเปลี่ยนขนาดหรือชนิดเหล็กต้องได้รับอนุมัติจากวิศวกรเสมอ",
+    "key_facts": [
+      [
+        "ไม่มีจำหน่าย",
+        "ไม่มี"
+      ],
+      "วิศวกร"
+    ],
+    "sources": [
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 16
+      },
+      {
+        "filename": "BM-DS-STL.pdf",
+        "page": 17
+      }
+    ],
+    "type": "negative",
+    "difficulty": "medium"
+  }
+]
