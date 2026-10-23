@@ -479,240 +479,125 @@ deploy ระบบ BuildMart ทั้งระบบบนเครื่อ�
 | **T02** | Portland cement → กดฟัง (Kokoro) | ✅ | ✅ | Portland cement (CEM-001) is 145 baht per 50 kg bag. | [GIF](_solution/buildmart/e2e/test-gifs/T02.gif) · [MP4 🔊](_solution/buildmart/e2e/test-videos/T02.mp4) |
 | **T03** | อ่านออกเสียงอัตโนมัติ | ✅ | ✅ | มีครับ! ปัจจุบันมีคูปองส่วนลด 2 แบบให้เลือกใช้ (ใช้ได้ทีละ 1 ใบ) ครับ BUILD5: ลด 5% เมื่อยอดซื้อก่อน VAT ตั้งแต่ 5,000 บาทขึ้นไป CONTRACTOR10: ลด 10% … | [GIF](_solution/buildmart/e2e/test-gifs/T03.gif) · [MP4 🔊](_solution/buildmart/e2e/test-videos/T03.mp4) |
 
-<details><summary><b>🛒 หน้าร้าน</b> · 14 เคส (กดเพื่อดู GIF)</summary>
-
-
-**W01 · ค้นหา "ปูน"**
-
-<img src="_solution/buildmart/e2e/test-gifs/W01.gif" width="640" alt="วิดีโอเคส W01">
-
-
-**W02 · กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ**
-
-<img src="_solution/buildmart/e2e/test-gifs/W02.gif" width="640" alt="วิดีโอเคส W02">
-
-
-**W03 · หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น**
-
-<img src="_solution/buildmart/e2e/test-gifs/W03.gif" width="640" alt="วิดีโอเคส W03">
-
-
-**W04 · หน้าสินค้า CEM-002 สาขารังสิตหมด**
-
-<img src="_solution/buildmart/e2e/test-gifs/W04.gif" width="640" alt="วิดีโอเคส W04">
-
-
-**W05 · คำนวณคอนกรีต 3 ลบ.ม.**
-
-<img src="_solution/buildmart/e2e/test-gifs/W05.gif" width="640" alt="วิดีโอเคส W05">
-
-
-**W06 · คำนวณกระเบื้อง 50 ตร.ม.**
-
-<img src="_solution/buildmart/e2e/test-gifs/W06.gif" width="640" alt="วิดีโอเคส W06">
-
-
-**W07 · คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว**
-
-<img src="_solution/buildmart/e2e/test-gifs/W07.gif" width="640" alt="วิดีโอเคส W07">
-
-
-**W08 · ตะกร้า STL-003 × 60 ได้ราคาส่ง**
-
-<img src="_solution/buildmart/e2e/test-gifs/W08.gif" width="640" alt="วิดีโอเคส W08">
-
-
-**W09 · ตะกร้า CEM-001 × 100 + คูปอง BUILD5**
-
-<img src="_solution/buildmart/e2e/test-gifs/W09.gif" width="640" alt="วิดีโอเคส W09">
-
-
-**W10 · ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4)**
-
-<img src="_solution/buildmart/e2e/test-gifs/W10.gif" width="640" alt="วิดีโอเคส W10">
-
-
-**W11 · ขอใบเสนอราคาจากตะกร้า**
-
-<img src="_solution/buildmart/e2e/test-gifs/W11.gif" width="640" alt="วิดีโอเคส W11">
-
-
-**W12 · สั่งซื้อแล้วติดตามคำสั่งซื้อ**
-
-<img src="_solution/buildmart/e2e/test-gifs/W12.gif" width="640" alt="วิดีโอเคส W12">
-
-
-**W13 · สั่งเกินสต็อก BRK-003 สาขารังสิต**
-
-<img src="_solution/buildmart/e2e/test-gifs/W13.gif" width="640" alt="วิดีโอเคส W13">
-
-
-**W14 · หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง**
-
-<img src="_solution/buildmart/e2e/test-gifs/W14.gif" width="640" alt="วิดีโอเคส W14">
-
-
-</details>
-
-<details><summary><b>💬 แชทบอท (Qwen ตอบจริง)</b> · 14 เคส (กดเพื่อดู GIF)</summary>
-
-
-**C01 · ร้านเปิดกี่โมงครับ**
-
-<img src="_solution/buildmart/e2e/test-gifs/C01.gif" width="640" alt="วิดีโอเคส C01">
-
-
-**C02 · วันอาทิตย์เปิดไหม**
-
-<img src="_solution/buildmart/e2e/test-gifs/C02.gif" width="640" alt="วิดีโอเคส C02">
-
-
-**C03 · ปูนซีเมนต์ถุงละเท่าไร**
-
-<img src="_solution/buildmart/e2e/test-gifs/C03.gif" width="640" alt="วิดีโอเคส C03">
-
-
-**C04 · เหล็ก DB12 มีกี่สาขาที่มีของ**
-
-<img src="_solution/buildmart/e2e/test-gifs/C04.gif" width="640" alt="วิดีโอเคส C04">
-
-
-**C05 · เหล็ก DB12 60 เส้น ราคาเท่าไร**
-
-<img src="_solution/buildmart/e2e/test-gifs/C05.gif" width="640" alt="วิดีโอเคส C05">
-
-
-**C06 · เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง**
-
-<img src="_solution/buildmart/e2e/test-gifs/C06.gif" width="640" alt="วิดีโอเคส C06">
-
-
-**C07 · ใส่ตะกร้าให้เลย (ต่อจาก C06)**
-
-<img src="_solution/buildmart/e2e/test-gifs/C07.gif" width="640" alt="วิดีโอเคส C07">
-
-
-**C08 · ขอใบเสนอราคาหน่อย**
-
-<img src="_solution/buildmart/e2e/test-gifs/C08.gif" width="640" alt="วิดีโอเคส C08">
-
-
-**C09 · ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร**
-
-<img src="_solution/buildmart/e2e/test-gifs/C09.gif" width="640" alt="วิดีโอเคส C09">
-
-
-**C10 · มีโค้ดส่วนลดไหม**
-
-<img src="_solution/buildmart/e2e/test-gifs/C10.gif" width="640" alt="วิดีโอเคส C10">
-
-
-**C11 · มีกระเบื้องยางขายไหม**
-
-<img src="_solution/buildmart/e2e/test-gifs/C11.gif" width="640" alt="วิดีโอเคส C11">
-
-
-**C12 · ช่วยเขียนโค้ด Python ให้หน่อย**
-
-<img src="_solution/buildmart/e2e/test-gifs/C12.gif" width="640" alt="วิดีโอเคส C12">
-
-
-**C13 · ทาสีภายนอก 120 ตร.ม. แล้วราคารวม**
-
-<img src="_solution/buildmart/e2e/test-gifs/C13.gif" width="640" alt="วิดีโอเคส C13">
-
-
-**C14 · สาขาบางนาเบอร์อะไร**
-
-<img src="_solution/buildmart/e2e/test-gifs/C14.gif" width="640" alt="วิดีโอเคส C14">
-
-
-</details>
-
-<details><summary><b>📄 Hybrid RAG จาก PDF</b> · 8 เคส (กดเพื่อดู GIF)</summary>
-
-
-**R01 · ปูนเก็บได้นานแค่ไหน**
-
-<img src="_solution/buildmart/e2e/test-gifs/R01.gif" width="640" alt="วิดีโอเคส R01">
-
-
-**R02 · สีทาภายนอกรับประกันกี่ปี**
-
-<img src="_solution/buildmart/e2e/test-gifs/R02.gif" width="640" alt="วิดีโอเคส R02">
-
-
-**R03 · TIL-001 ปูพื้นนอกบ้านได้ไหม**
-
-<img src="_solution/buildmart/e2e/test-gifs/R03.gif" width="640" alt="วิดีโอเคส R03">
-
-
-**R04 · ปูนเปิดถุงแล้วคืนได้ไหม**
-
-<img src="_solution/buildmart/e2e/test-gifs/R04.gif" width="640" alt="วิดีโอเคส R04">
-
-
-**R05 · ทาบเหล็ก DB12 ต้องยาวเท่าไร**
-
-<img src="_solution/buildmart/e2e/test-gifs/R05.gif" width="640" alt="วิดีโอเคส R05">
-
-
-**R06 · สาย THW 2.5 กับเบรกเกอร์ (Hybrid)**
-
-<img src="_solution/buildmart/e2e/test-gifs/R06.gif" width="640" alt="วิดีโอเคส R06">
-
-
-**R08 · ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว**
-
-<img src="_solution/buildmart/e2e/test-gifs/R08.gif" width="640" alt="วิดีโอเคส R08">
-
-
-**R07 · อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร**
-
-<img src="_solution/buildmart/e2e/test-gifs/R07.gif" width="640" alt="วิดีโอเคส R07">
-
-
-</details>
-
-<details><summary><b>📨 RabbitMQ</b> · 3 เคส (กดเพื่อดู GIF)</summary>
-
-
-**Q01 · แชท 8 หน้าต่างพร้อมกัน**
-
-<img src="_solution/buildmart/e2e/test-gifs/Q01.gif" width="640" alt="วิดีโอเคส Q01">
-
-
-**Q02 · หยุด chat-worker แล้วข้อความไม่หาย**
-
-<img src="_solution/buildmart/e2e/test-gifs/Q02.gif" width="640" alt="วิดีโอเคส Q02">
-
-
-**Q03 · สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน**
-
-<img src="_solution/buildmart/e2e/test-gifs/Q03.gif" width="640" alt="วิดีโอเคส Q03">
-
-
-</details>
-
-<details><summary><b>🔊 อ่านออกเสียง</b> · 3 เคส (กดเพื่อดู GIF)</summary>
-
-
-**T01 · ร้านเปิดกี่โมง → กดฟัง (ไทย)**
-
-<img src="_solution/buildmart/e2e/test-gifs/T01.gif" width="640" alt="วิดีโอเคส T01">
-
-
-**T02 · Portland cement → กดฟัง (Kokoro)**
-
-<img src="_solution/buildmart/e2e/test-gifs/T02.gif" width="640" alt="วิดีโอเคส T02">
-
-
-**T03 · อ่านออกเสียงอัตโนมัติ**
-
-<img src="_solution/buildmart/e2e/test-gifs/T03.gif" width="640" alt="วิดีโอเคส T03">
-
-
-</details>
+**วิดีโอทุกเคส** (GIF เล่นอัตโนมัติ · ไม่มีเสียง — เคส 🔊 กดลิงก์ MP4 เพื่อฟัง):
+
+
+#### 🛒 หน้าร้าน · 14 เคส
+
+<table>
+<tr>
+<td width="50%" valign="top"><b>W01</b> · ค้นหา "ปูน"<br><img src="_solution/buildmart/e2e/test-gifs/W01.gif" width="100%" alt="วิดีโอเคส W01"></td>
+<td width="50%" valign="top"><b>W02</b> · กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ<br><img src="_solution/buildmart/e2e/test-gifs/W02.gif" width="100%" alt="วิดีโอเคส W02"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W03</b> · หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น<br><img src="_solution/buildmart/e2e/test-gifs/W03.gif" width="100%" alt="วิดีโอเคส W03"></td>
+<td width="50%" valign="top"><b>W04</b> · หน้าสินค้า CEM-002 สาขารังสิตหมด<br><img src="_solution/buildmart/e2e/test-gifs/W04.gif" width="100%" alt="วิดีโอเคส W04"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W05</b> · คำนวณคอนกรีต 3 ลบ.ม.<br><img src="_solution/buildmart/e2e/test-gifs/W05.gif" width="100%" alt="วิดีโอเคส W05"></td>
+<td width="50%" valign="top"><b>W06</b> · คำนวณกระเบื้อง 50 ตร.ม.<br><img src="_solution/buildmart/e2e/test-gifs/W06.gif" width="100%" alt="วิดีโอเคส W06"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W07</b> · คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว<br><img src="_solution/buildmart/e2e/test-gifs/W07.gif" width="100%" alt="วิดีโอเคส W07"></td>
+<td width="50%" valign="top"><b>W08</b> · ตะกร้า STL-003 × 60 ได้ราคาส่ง<br><img src="_solution/buildmart/e2e/test-gifs/W08.gif" width="100%" alt="วิดีโอเคส W08"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W09</b> · ตะกร้า CEM-001 × 100 + คูปอง BUILD5<br><img src="_solution/buildmart/e2e/test-gifs/W09.gif" width="100%" alt="วิดีโอเคส W09"></td>
+<td width="50%" valign="top"><b>W10</b> · ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4)<br><img src="_solution/buildmart/e2e/test-gifs/W10.gif" width="100%" alt="วิดีโอเคส W10"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W11</b> · ขอใบเสนอราคาจากตะกร้า<br><img src="_solution/buildmart/e2e/test-gifs/W11.gif" width="100%" alt="วิดีโอเคส W11"></td>
+<td width="50%" valign="top"><b>W12</b> · สั่งซื้อแล้วติดตามคำสั่งซื้อ<br><img src="_solution/buildmart/e2e/test-gifs/W12.gif" width="100%" alt="วิดีโอเคส W12"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>W13</b> · สั่งเกินสต็อก BRK-003 สาขารังสิต<br><img src="_solution/buildmart/e2e/test-gifs/W13.gif" width="100%" alt="วิดีโอเคส W13"></td>
+<td width="50%" valign="top"><b>W14</b> · หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง<br><img src="_solution/buildmart/e2e/test-gifs/W14.gif" width="100%" alt="วิดีโอเคส W14"></td>
+</tr>
+</table>
+
+
+#### 💬 แชทบอท (Qwen ตอบจริง) · 14 เคส
+
+<table>
+<tr>
+<td width="50%" valign="top"><b>C01</b> · ร้านเปิดกี่โมงครับ<br><img src="_solution/buildmart/e2e/test-gifs/C01.gif" width="100%" alt="วิดีโอเคส C01"></td>
+<td width="50%" valign="top"><b>C02</b> · วันอาทิตย์เปิดไหม<br><img src="_solution/buildmart/e2e/test-gifs/C02.gif" width="100%" alt="วิดีโอเคส C02"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C03</b> · ปูนซีเมนต์ถุงละเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C03.gif" width="100%" alt="วิดีโอเคส C03"></td>
+<td width="50%" valign="top"><b>C04</b> · เหล็ก DB12 มีกี่สาขาที่มีของ<br><img src="_solution/buildmart/e2e/test-gifs/C04.gif" width="100%" alt="วิดีโอเคส C04"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C05</b> · เหล็ก DB12 60 เส้น ราคาเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C05.gif" width="100%" alt="วิดีโอเคส C05"></td>
+<td width="50%" valign="top"><b>C06</b> · เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง<br><img src="_solution/buildmart/e2e/test-gifs/C06.gif" width="100%" alt="วิดีโอเคส C06"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C07</b> · ใส่ตะกร้าให้เลย (ต่อจาก C06)<br><img src="_solution/buildmart/e2e/test-gifs/C07.gif" width="100%" alt="วิดีโอเคส C07"></td>
+<td width="50%" valign="top"><b>C08</b> · ขอใบเสนอราคาหน่อย<br><img src="_solution/buildmart/e2e/test-gifs/C08.gif" width="100%" alt="วิดีโอเคส C08"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C09</b> · ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C09.gif" width="100%" alt="วิดีโอเคส C09"></td>
+<td width="50%" valign="top"><b>C10</b> · มีโค้ดส่วนลดไหม<br><img src="_solution/buildmart/e2e/test-gifs/C10.gif" width="100%" alt="วิดีโอเคส C10"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C11</b> · มีกระเบื้องยางขายไหม<br><img src="_solution/buildmart/e2e/test-gifs/C11.gif" width="100%" alt="วิดีโอเคส C11"></td>
+<td width="50%" valign="top"><b>C12</b> · ช่วยเขียนโค้ด Python ให้หน่อย<br><img src="_solution/buildmart/e2e/test-gifs/C12.gif" width="100%" alt="วิดีโอเคส C12"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>C13</b> · ทาสีภายนอก 120 ตร.ม. แล้วราคารวม<br><img src="_solution/buildmart/e2e/test-gifs/C13.gif" width="100%" alt="วิดีโอเคส C13"></td>
+<td width="50%" valign="top"><b>C14</b> · สาขาบางนาเบอร์อะไร<br><img src="_solution/buildmart/e2e/test-gifs/C14.gif" width="100%" alt="วิดีโอเคส C14"></td>
+</tr>
+</table>
+
+
+#### 📄 Hybrid RAG จาก PDF · 8 เคส
+
+<table>
+<tr>
+<td width="50%" valign="top"><b>R01</b> · ปูนเก็บได้นานแค่ไหน<br><img src="_solution/buildmart/e2e/test-gifs/R01.gif" width="100%" alt="วิดีโอเคส R01"></td>
+<td width="50%" valign="top"><b>R02</b> · สีทาภายนอกรับประกันกี่ปี<br><img src="_solution/buildmart/e2e/test-gifs/R02.gif" width="100%" alt="วิดีโอเคส R02"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>R03</b> · TIL-001 ปูพื้นนอกบ้านได้ไหม<br><img src="_solution/buildmart/e2e/test-gifs/R03.gif" width="100%" alt="วิดีโอเคส R03"></td>
+<td width="50%" valign="top"><b>R04</b> · ปูนเปิดถุงแล้วคืนได้ไหม<br><img src="_solution/buildmart/e2e/test-gifs/R04.gif" width="100%" alt="วิดีโอเคส R04"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>R05</b> · ทาบเหล็ก DB12 ต้องยาวเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/R05.gif" width="100%" alt="วิดีโอเคส R05"></td>
+<td width="50%" valign="top"><b>R06</b> · สาย THW 2.5 กับเบรกเกอร์ (Hybrid)<br><img src="_solution/buildmart/e2e/test-gifs/R06.gif" width="100%" alt="วิดีโอเคส R06"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>R08</b> · ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว<br><img src="_solution/buildmart/e2e/test-gifs/R08.gif" width="100%" alt="วิดีโอเคส R08"></td>
+<td width="50%" valign="top"><b>R07</b> · อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร<br><img src="_solution/buildmart/e2e/test-gifs/R07.gif" width="100%" alt="วิดีโอเคส R07"></td>
+</tr>
+</table>
+
+
+#### 📨 RabbitMQ · 3 เคส
+
+<table>
+<tr>
+<td width="50%" valign="top"><b>Q01</b> · แชท 8 หน้าต่างพร้อมกัน<br><img src="_solution/buildmart/e2e/test-gifs/Q01.gif" width="100%" alt="วิดีโอเคส Q01"></td>
+<td width="50%" valign="top"><b>Q02</b> · หยุด chat-worker แล้วข้อความไม่หาย<br><img src="_solution/buildmart/e2e/test-gifs/Q02.gif" width="100%" alt="วิดีโอเคส Q02"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>Q03</b> · สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน<br><img src="_solution/buildmart/e2e/test-gifs/Q03.gif" width="100%" alt="วิดีโอเคส Q03"></td>
+<td width="50%"></td>
+</tr>
+</table>
+
+
+#### 🔊 อ่านออกเสียง · 3 เคส
+
+<table>
+<tr>
+<td width="50%" valign="top"><b>T01</b> · ร้านเปิดกี่โมง → กดฟัง (ไทย) · <a href="_solution/buildmart/e2e/test-videos/T01.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T01.gif" width="100%" alt="วิดีโอเคส T01"></td>
+<td width="50%" valign="top"><b>T02</b> · Portland cement → กดฟัง (Kokoro) · <a href="_solution/buildmart/e2e/test-videos/T02.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T02.gif" width="100%" alt="วิดีโอเคส T02"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><b>T03</b> · อ่านออกเสียงอัตโนมัติ · <a href="_solution/buildmart/e2e/test-videos/T03.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T03.gif" width="100%" alt="วิดีโอเคส T03"></td>
+<td width="50%"></td>
+</tr>
+</table>
 
 
 **ระบบที่ทีมสร้างเอง (`my_buildmart`) ต่อ Qwen จริงได้ไหม?** ลองต่อ `.env.vast` เดียวกันแล้วรันกลุ่มแชท + RAG ของทีม: **ผ่าน 20/21** · ล้มเคสเดียวคือ C13 "ทาสีภายนอก 120 ตร.ม. → ราคารวม" — Qwen คิดราคารวม**รวมสีรองพื้นด้วย** (8 × 890 + 3 × 650 = **9,070** บาท) ขณะที่เกณฑ์ต้องการ 7,120 (สีอย่างเดียว) · ตัวเลข 7,120 อยู่ในคำตอบแรกแล้ว → นี่คือตัวอย่างที่ดีว่า **LLM ตีความคำถามกว้างกว่าที่ requirement เขียน** ทางแก้คือเขียน requirement/system prompt ให้ชัด ไม่ใช่ลดเกณฑ์
