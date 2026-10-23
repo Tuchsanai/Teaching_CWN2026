@@ -432,172 +432,53 @@ deploy ระบบ BuildMart ทั้งระบบบนเครื่อ�
 
 วิดีโอยาวเฉลี่ย 17 วินาที · เคสที่มีเสียง: [T01 ไทย 🔊](_solution/buildmart/e2e/test-videos/T01.mp4) (เสียง 9.3 วิ) · [T02 Kokoro อังกฤษ 🔊](_solution/buildmart/e2e/test-videos/T02.mp4) (5.6 วิ) · [T03 อ่านอัตโนมัติ 🔊](_solution/buildmart/e2e/test-videos/T03.mp4) (26.4 วิ) — กดลิงก์แล้วเปิด/ดาวน์โหลดเพื่อฟังเสียง (GIF ไม่มีเสียง) · MP4 ของทุกเคสสร้างเองได้ด้วย `npm run media` (repo เก็บเฉพาะ 3 ไฟล์ที่มีเสียง) · รายงานเต็ม [TEST_REPORT.md](_solution/buildmart/e2e/TEST_REPORT.md)
 
-**ทุกเคส** (คำตอบจริงของ Qwen · LLM เรียบเรียงใหม่ทุกครั้ง ถ้อยคำของคุณจะไม่ตรงทุกคำ แต่ต้องมีตัวเลข/คำสำคัญที่ถูก):
+**ทุกเคส** (GIF ในคอลัมน์ขวาเล่นวนเอง กดเพื่อดูภาพใหญ่ · เคส 🔊 กดลิงก์ MP4 เพื่อฟังเสียง · คำตอบจริงของ Qwen · LLM เรียบเรียงใหม่ทุกครั้ง ถ้อยคำของคุณจะไม่ตรงทุกคำ แต่ต้องมีตัวเลข/คำสำคัญที่ถูก):
 
-| เคส | ทดสอบ | mock | AI จริง | คำตอบจริง / ค่าที่ตรวจ (โหมด AI) | วิดีโอ |
+| เคส | ทดสอบ | mock | AI จริง | คำตอบจริง / ค่าที่ตรวจ (โหมด AI) | วิดีโอ (GIF วนเอง) |
 |---|---|---|---|---|---|
-| **W01** | ค้นหา "ปูน" | ✅ | ✅ | CEM-001, CEM-002, CEM-003, CEM-004, PNT-003 | [GIF](_solution/buildmart/e2e/test-gifs/W01.gif) |
-| **W02** | กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ | ✅ | ✅ | STL-004 > STL-003 > STL-002 > STL-005 > STL-001 | [GIF](_solution/buildmart/e2e/test-gifs/W02.gif) |
-| **W03** | หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น | ✅ | ✅ | tiers: 195.00, 185.25, 175.50 · stock: LKB: 700 เส้น, BNA: 500 เส้น, RST: 400 เส้น | [GIF](_solution/buildmart/e2e/test-gifs/W03.gif) |
-| **W04** | หน้าสินค้า CEM-002 สาขารังสิตหมด | ✅ | ✅ | stock-RST = หมด | [GIF](_solution/buildmart/e2e/test-gifs/W04.gif) |
-| **W05** | คำนวณคอนกรีต 3 ลบ.ม. | ✅ | ✅ | { "CEM-001": 21, "AGG-001": 2, "AGG-003": 3 } ตะกร้า: AGG-001, AGG-003, CEM-001 | [GIF](_solution/buildmart/e2e/test-gifs/W05.gif) |
-| **W06** | คำนวณกระเบื้อง 50 ตร.ม. | ✅ | ✅ | TIL-001: 39 · CEM-004: 13 · TIL-003: 10 | [GIF](_solution/buildmart/e2e/test-gifs/W06.gif) |
-| **W07** | คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว | ✅ | ✅ | PNT-001: 8 · PNT-003: 3 | [GIF](_solution/buildmart/e2e/test-gifs/W07.gif) |
-| **W08** | ตะกร้า STL-003 × 60 ได้ราคาส่ง | ✅ | ✅ | ราคาต่อเส้น = 185.25 | [GIF](_solution/buildmart/e2e/test-gifs/W08.gif) |
-| **W09** | ตะกร้า CEM-001 × 100 + คูปอง BUILD5 | ✅ | ✅ | unit: 137.75 · subtotal: 13,775.00 · discount: 688.75 · weight: 5,000 กก. · vehicle: รถ 6 ล้อ · shipping: 1,500.00 · vat: 1,021.04 · total: 15,607.29 | [GIF](_solution/buildmart/e2e/test-gifs/W09.gif) |
-| **W10** | ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4) | ✅ | ✅ | weight: 6,400 กก. · vehicle: รถ 10 ล้อ · shipping: 3,500.00 | [GIF](_solution/buildmart/e2e/test-gifs/W10.gif) |
-| **W11** | ขอใบเสนอราคาจากตะกร้า | ✅ | ✅ | quoteNo: QT-20261023-0019 · quoteTotal: 4,167.65 · cartTotal: 4,167.65 · quoteRows: CEM-001, TIL-001 · cartRows: CEM-001, TIL-001 | [GIF](_solution/buildmart/e2e/test-gifs/W11.gif) |
-| **W12** | สั่งซื้อแล้วติดตามคำสั่งซื้อ | ✅ | ✅ | orderNo: BM-20261023-0015 · stockLKB: before: 194, after: 192 · track: รับคำสั่งซื้อ | [GIF](_solution/buildmart/e2e/test-gifs/W12.gif) |
-| **W13** | สั่งเกินสต็อก BRK-003 สาขารังสิต | ✅ | ✅ | stockError: ⚠ สินค้าที่สาขารังสิตมีไม่พอ — สั่งซื้อไม่ได้ กรุณาเลือกสาขาอื่นหรือลดจำนวน BRK-003 บล็อกประสาน (ก้อน): ต้องการ 10 ก้อน · คงเหลือ 0 ก้อน ·… | [GIF](_solution/buildmart/e2e/test-gifs/W13.gif) |
-| **W14** | หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง | ✅ | ✅ | orderNo: BM-20261023-0016 · track: กำลังจัดส่ง | [GIF](_solution/buildmart/e2e/test-gifs/W14.gif) |
-| **C01** | ร้านเปิดกี่โมงครับ | ✅ | ✅ | ร้านบ้านช่าง BuildMart เปิดทำการดังนี้ครับ จันทร์–เสาร์: 07:00–18:00 น. อาทิตย์: 08:00–12:00 น. | [GIF](_solution/buildmart/e2e/test-gifs/C01.gif) |
-| **C02** | วันอาทิตย์เปิดไหม | ✅ | ✅ | เปิดครับ แต่เปิดเฉพาะช่วงเช้า 08:00–12:00 น. เท่านั้น (ไม่มีการจัดส่งสินค้าในวันอาทิตย์) | [GIF](_solution/buildmart/e2e/test-gifs/C02.gif) |
-| **C03** | ปูนซีเมนต์ถุงละเท่าไร | ✅ | ✅ | ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (CEM-001) ราคาถุงละ 145 บาท ครับ | [GIF](_solution/buildmart/e2e/test-gifs/C03.gif) |
-| **C04** | เหล็ก DB12 มีกี่สาขาที่มีของ | ✅ | ✅ | เหล็ก DB12 (STL-003) มีสต็อกครบทั้ง 3 สาขา ครับ LKB ลาดกระบัง: 700 เส้น BNA บางนา: 500 เส้น RST รังสิต: 400 เส้น | [GIF](_solution/buildmart/e2e/test-gifs/C04.gif) |
-| **C05** | เหล็ก DB12 60 เส้น ราคาเท่าไร | ✅ | ✅ | 60 เส้นเข้าเกณฑ์ราคาส่ง (50–199 ชิ้น) ลด 5% ครับ ราคาต่อเส้น: 185.25 บาท ยอดรวม: 11,115 บาท (ยังไม่รวม VAT) | [GIF](_solution/buildmart/e2e/test-gifs/C05.gif) |
-| **C06** | เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง | ✅ | ✅ | CEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) : 21 ถุง AGG-001 ทรายหยาบ : 2 ลบ.ม. AGG-003 หิน 3/4 (หินเบอร์ 1) : 3 ลบ.ม. พิมพ์ "ใส่ตะกร้าให้เลย" ได้ค… | [GIF](_solution/buildmart/e2e/test-gifs/C06.gif) |
-| **C07** | ใส่ตะกร้าให้เลย (ต่อจาก C06) | ✅ | ✅ | ยืนยันรายการใส่ตะกร้าให้ครับ: CEM-001 : 21 ถุง AGG-001 : 2 ลบ.ม. AGG-003 : 3 ลบ.ม. | [GIF](_solution/buildmart/e2e/test-gifs/C07.gif) |
-| **C08** | ขอใบเสนอราคาหน่อย | ✅ | ✅ | ออกใบเสนอราคาให้เรียบร้อยแล้วครับ เลขที่: QT-20261023-0020 ยอดรวม: 2,086.50 บาท (ยังไม่รวม VAT) ดูรายละเอียดได้ที่: /quote/QT-20261023-0020 ใบเสนอราคา… | [GIF](_solution/buildmart/e2e/test-gifs/C08.gif) |
-| **C09** | ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร | ✅ | ✅ | ส่งของน้ำหนัก 5 ตัน (5,000 กก.) ใช้ รถ 6 ล้อ ครับ ค่าส่งอยู่ที่ 1,500 บาท ครับ | [GIF](_solution/buildmart/e2e/test-gifs/C09.gif) |
-| **C10** | มีโค้ดส่วนลดไหม | ✅ | ✅ | มีครับ! ตอนนี้เรามีคูปองส่วนลด 2 แบบให้เลือกใช้ (ใช้ได้ทีละ 1 ใบ) ครับ BUILD5: ลด 5% เมื่อยอดซื้อก่อน VAT ตั้งแต่ 5,000 บาทขึ้นไป CONTRACTOR10: ลด 10%… | [GIF](_solution/buildmart/e2e/test-gifs/C10.gif) |
-| **C11** | มีกระเบื้องยางขายไหม | ✅ | ✅ | ขออภัยครับ ร้านบ้านช่าง BuildMart ไม่มีกระเบื้องยางขายในขณะนี้ เรามีสินค้ากระเบื้องที่ใกล้เคียงดังนี้ครับ: TIL-001 กระเบื้องพื้น 60x60 ลายหินอ่อน (389… | [GIF](_solution/buildmart/e2e/test-gifs/C11.gif) |
-| **C12** | ช่วยเขียนโค้ด Python ให้หน่อย | ✅ | ✅ | ขออภัยครับ น้องช่างช่วยเขียนโค้ดไม่ได้ แต่ยินดีช่วยเรื่องวัสดุก่อสร้าง ราคา สต็อก หรือคำนวณปริมาณวัสดุให้ครับ | [GIF](_solution/buildmart/e2e/test-gifs/C12.gif) |
-| **C13** | ทาสีภายนอก 120 ตร.ม. แล้วราคารวม | ✅ | ✅ | PNT-001 สีน้ำอะคริลิก ภายนอก : 8 แกลลอน × 890 = 7,120 บาท PNT-003 สีรองพื้นปูนใหม่ : 3 แกลลอน × 650 = 1,950 บาท ยอดรวมสินค้า (ยังไม่รวม VAT และค่าส่ง)… | [GIF](_solution/buildmart/e2e/test-gifs/C13.gif) |
-| **C14** | สาขาบางนาเบอร์อะไร | ✅ | ✅ | เบอร์โทรสาขาบางนา (BNA) คือ 02-111-0002 ครับ | [GIF](_solution/buildmart/e2e/test-gifs/C14.gif) |
-| **R01** | ปูนเก็บได้นานแค่ไหน | ✅ | ✅ | ปูนซีเมนต์เก็บได้ 3 เดือน นับจากวันผลิตครับ | [GIF](_solution/buildmart/e2e/test-gifs/R01.gif) |
-| **R02** | สีทาภายนอกรับประกันกี่ปี | ✅ | ✅ | สีทาภายนอก PNT-001 รับประกัน 8 ปี เมื่อทาครบระบบรองพื้น 1 เที่ยวและสีทับหน้า 2 เที่ยวครับ | [GIF](_solution/buildmart/e2e/test-gifs/R02.gif) |
-| **R03** | TIL-001 ปูพื้นนอกบ้านได้ไหม | ✅ | ✅ | ได้ครับ กระเบื้อง TIL-001 สามารถปูพื้นภายนอกได้ เนื่องจากมีค่าดูดซึมน้ำน้อยกว่า 0.5% และกันลื่นระดับ R10 | [GIF](_solution/buildmart/e2e/test-gifs/R03.gif) |
-| **R04** | ปูนเปิดถุงแล้วคืนได้ไหม | ✅ | ✅ | คืนไม่ได้ครับ ปูนที่เปิดถุงแล้วคืนไม่ได้ทุกกรณี แม้จะยังอยู่ในระยะ 7 วันก็ตาม | [GIF](_solution/buildmart/e2e/test-gifs/R04.gif) |
-| **R05** | ทาบเหล็ก DB12 ต้องยาวเท่าไร | ✅ | ✅ | ระยะทาบเหล็ก DB12 ต้องยาวอย่างน้อย 48 ซม. ครับ | [GIF](_solution/buildmart/e2e/test-gifs/R05.gif) |
-| **R06** | สาย THW 2.5 กับเบรกเกอร์ (Hybrid) | ✅ | ✅ | สาย THW 2.5 ตร.มม. ใช้คู่กับเบรกเกอร์ขนาด 16–20 A ครับ ส่วนเบรกเกอร์ลูกย่อย 16A (SKU: ELC-002) ราคา 145 บาท/ตัว ครับ | [GIF](_solution/buildmart/e2e/test-gifs/R06.gif) |
-| **R08** | ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว | ✅ | ✅ | สำหรับกระเบื้อง 60x60 ซม. ต้องใช้เกรียงหวีขนาดฟัน 10 มม. และอัตราการใช้ปูนกาวประมาณ 5.5 กก./ตร.ม. ครับ | [GIF](_solution/buildmart/e2e/test-gifs/R08.gif) |
-| **R07** | อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร | ✅ | ✅ | เดือนพฤศจิกายนมีโปรโมชั่นพิเศษดังนี้ครับ ซื้อปูน CEM-001 ครบ 100 ถุง ในใบเสร็จเดียว แถมลวดผูกเหล็ก STL-005 จำนวน 2 ม้วน ใช้ได้ตั้งแต่วันที่ 1–30 พฤศจิ… | [GIF](_solution/buildmart/e2e/test-gifs/R07.gif) |
-| **Q01** | แชท 8 หน้าต่างพร้อมกัน | ✅ | ✅ | 1. ร้านเปิดกี่โมงครับ → ร้านเปิดทำการ จันทร์–เสาร์ เวลา 07:00–18:00 น. และวันอาทิตย์ เวลา 08:00–12:00 น. ครับ 2. ปูนซีเมนต์ถุงละเท่าไร → ปูนซีเมนต์ปอร… | [GIF](_solution/buildmart/e2e/test-gifs/Q01.gif) |
-| **Q02** | หยุด chat-worker แล้วข้อความไม่หาย | ✅ | ✅ | ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (CEM-001) ราคา 145 บาท/ถุง ครับ | [GIF](_solution/buildmart/e2e/test-gifs/Q02.gif) |
-| **Q03** | สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน | ✅ | ✅ | pick: sku: TOL-002, branch: RST, qty: 1, stock: 2, reorder: 5 · orderNo: BM-20261023-0017 · stockAfter: 1 · order: 🧾 คำสั่งซื้อใหม่ BM-20261023-0017 ·… | [GIF](_solution/buildmart/e2e/test-gifs/Q03.gif) |
-| **T01** | ร้านเปิดกี่โมง → กดฟัง (ไทย) | ✅ | ✅ | ร้านบ้านช่าง BuildMart เปิดทำการดังนี้ครับ จันทร์–เสาร์: 07:00–18:00 น. อาทิตย์: 08:00–12:00 น. | [GIF](_solution/buildmart/e2e/test-gifs/T01.gif) · [MP4 🔊](_solution/buildmart/e2e/test-videos/T01.mp4) |
-| **T02** | Portland cement → กดฟัง (Kokoro) | ✅ | ✅ | Portland cement (CEM-001) is 145 baht per 50 kg bag. | [GIF](_solution/buildmart/e2e/test-gifs/T02.gif) · [MP4 🔊](_solution/buildmart/e2e/test-videos/T02.mp4) |
-| **T03** | อ่านออกเสียงอัตโนมัติ | ✅ | ✅ | มีครับ! ปัจจุบันมีคูปองส่วนลด 2 แบบให้เลือกใช้ (ใช้ได้ทีละ 1 ใบ) ครับ BUILD5: ลด 5% เมื่อยอดซื้อก่อน VAT ตั้งแต่ 5,000 บาทขึ้นไป CONTRACTOR10: ลด 10% … | [GIF](_solution/buildmart/e2e/test-gifs/T03.gif) · [MP4 🔊](_solution/buildmart/e2e/test-videos/T03.mp4) |
+| **W01** | ค้นหา "ปูน" | ✅ | ✅ | CEM-001, CEM-002, CEM-003, CEM-004, PNT-003 | <a href="_solution/buildmart/e2e/test-gifs/W01.gif"><img src="_solution/buildmart/e2e/test-gifs/W01.gif" width="360" alt="วิดีโอเคส W01"></a> |
+| **W02** | กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ | ✅ | ✅ | STL-004 > STL-003 > STL-002 > STL-005 > STL-001 | <a href="_solution/buildmart/e2e/test-gifs/W02.gif"><img src="_solution/buildmart/e2e/test-gifs/W02.gif" width="360" alt="วิดีโอเคส W02"></a> |
+| **W03** | หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น | ✅ | ✅ | tiers: 195.00, 185.25, 175.50 · stock: LKB: 700 เส้น, BNA: 500 เส้น, RST: 400 เส้น | <a href="_solution/buildmart/e2e/test-gifs/W03.gif"><img src="_solution/buildmart/e2e/test-gifs/W03.gif" width="360" alt="วิดีโอเคส W03"></a> |
+| **W04** | หน้าสินค้า CEM-002 สาขารังสิตหมด | ✅ | ✅ | stock-RST = หมด | <a href="_solution/buildmart/e2e/test-gifs/W04.gif"><img src="_solution/buildmart/e2e/test-gifs/W04.gif" width="360" alt="วิดีโอเคส W04"></a> |
+| **W05** | คำนวณคอนกรีต 3 ลบ.ม. | ✅ | ✅ | { "CEM-001": 21, "AGG-001": 2, "AGG-003": 3 } ตะกร้า: AGG-001, AGG-003, CEM-001 | <a href="_solution/buildmart/e2e/test-gifs/W05.gif"><img src="_solution/buildmart/e2e/test-gifs/W05.gif" width="360" alt="วิดีโอเคส W05"></a> |
+| **W06** | คำนวณกระเบื้อง 50 ตร.ม. | ✅ | ✅ | TIL-001: 39 · CEM-004: 13 · TIL-003: 10 | <a href="_solution/buildmart/e2e/test-gifs/W06.gif"><img src="_solution/buildmart/e2e/test-gifs/W06.gif" width="360" alt="วิดีโอเคส W06"></a> |
+| **W07** | คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว | ✅ | ✅ | PNT-001: 8 · PNT-003: 3 | <a href="_solution/buildmart/e2e/test-gifs/W07.gif"><img src="_solution/buildmart/e2e/test-gifs/W07.gif" width="360" alt="วิดีโอเคส W07"></a> |
+| **W08** | ตะกร้า STL-003 × 60 ได้ราคาส่ง | ✅ | ✅ | ราคาต่อเส้น = 185.25 | <a href="_solution/buildmart/e2e/test-gifs/W08.gif"><img src="_solution/buildmart/e2e/test-gifs/W08.gif" width="360" alt="วิดีโอเคส W08"></a> |
+| **W09** | ตะกร้า CEM-001 × 100 + คูปอง BUILD5 | ✅ | ✅ | unit: 137.75 · subtotal: 13,775.00 · discount: 688.75 · weight: 5,000 กก. · vehicle: รถ 6 ล้อ · shipping: 1,500.00 · vat: 1,021.04 · total: 15,607.29 | <a href="_solution/buildmart/e2e/test-gifs/W09.gif"><img src="_solution/buildmart/e2e/test-gifs/W09.gif" width="360" alt="วิดีโอเคส W09"></a> |
+| **W10** | ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4) | ✅ | ✅ | weight: 6,400 กก. · vehicle: รถ 10 ล้อ · shipping: 3,500.00 | <a href="_solution/buildmart/e2e/test-gifs/W10.gif"><img src="_solution/buildmart/e2e/test-gifs/W10.gif" width="360" alt="วิดีโอเคส W10"></a> |
+| **W11** | ขอใบเสนอราคาจากตะกร้า | ✅ | ✅ | quoteNo: QT-20261023-0019 · quoteTotal: 4,167.65 · cartTotal: 4,167.65 · quoteRows: CEM-001, TIL-001 · cartRows: CEM-001, TIL-001 | <a href="_solution/buildmart/e2e/test-gifs/W11.gif"><img src="_solution/buildmart/e2e/test-gifs/W11.gif" width="360" alt="วิดีโอเคส W11"></a> |
+| **W12** | สั่งซื้อแล้วติดตามคำสั่งซื้อ | ✅ | ✅ | orderNo: BM-20261023-0015 · stockLKB: before: 194, after: 192 · track: รับคำสั่งซื้อ | <a href="_solution/buildmart/e2e/test-gifs/W12.gif"><img src="_solution/buildmart/e2e/test-gifs/W12.gif" width="360" alt="วิดีโอเคส W12"></a> |
+| **W13** | สั่งเกินสต็อก BRK-003 สาขารังสิต | ✅ | ✅ | stockError: ⚠ สินค้าที่สาขารังสิตมีไม่พอ — สั่งซื้อไม่ได้ กรุณาเลือกสาขาอื่นหรือลดจำนวน BRK-003 บล็อกประสาน (ก้อน): ต้องการ 10 ก้อน · คงเหลือ 0 ก้อน ·… | <a href="_solution/buildmart/e2e/test-gifs/W13.gif"><img src="_solution/buildmart/e2e/test-gifs/W13.gif" width="360" alt="วิดีโอเคส W13"></a> |
+| **W14** | หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง | ✅ | ✅ | orderNo: BM-20261023-0016 · track: กำลังจัดส่ง | <a href="_solution/buildmart/e2e/test-gifs/W14.gif"><img src="_solution/buildmart/e2e/test-gifs/W14.gif" width="360" alt="วิดีโอเคส W14"></a> |
+| **C01** | ร้านเปิดกี่โมงครับ | ✅ | ✅ | ร้านบ้านช่าง BuildMart เปิดทำการดังนี้ครับ จันทร์–เสาร์: 07:00–18:00 น. อาทิตย์: 08:00–12:00 น. | <a href="_solution/buildmart/e2e/test-gifs/C01.gif"><img src="_solution/buildmart/e2e/test-gifs/C01.gif" width="360" alt="วิดีโอเคส C01"></a> |
+| **C02** | วันอาทิตย์เปิดไหม | ✅ | ✅ | เปิดครับ แต่เปิดเฉพาะช่วงเช้า 08:00–12:00 น. เท่านั้น (ไม่มีการจัดส่งสินค้าในวันอาทิตย์) | <a href="_solution/buildmart/e2e/test-gifs/C02.gif"><img src="_solution/buildmart/e2e/test-gifs/C02.gif" width="360" alt="วิดีโอเคส C02"></a> |
+| **C03** | ปูนซีเมนต์ถุงละเท่าไร | ✅ | ✅ | ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (CEM-001) ราคาถุงละ 145 บาท ครับ | <a href="_solution/buildmart/e2e/test-gifs/C03.gif"><img src="_solution/buildmart/e2e/test-gifs/C03.gif" width="360" alt="วิดีโอเคส C03"></a> |
+| **C04** | เหล็ก DB12 มีกี่สาขาที่มีของ | ✅ | ✅ | เหล็ก DB12 (STL-003) มีสต็อกครบทั้ง 3 สาขา ครับ LKB ลาดกระบัง: 700 เส้น BNA บางนา: 500 เส้น RST รังสิต: 400 เส้น | <a href="_solution/buildmart/e2e/test-gifs/C04.gif"><img src="_solution/buildmart/e2e/test-gifs/C04.gif" width="360" alt="วิดีโอเคส C04"></a> |
+| **C05** | เหล็ก DB12 60 เส้น ราคาเท่าไร | ✅ | ✅ | 60 เส้นเข้าเกณฑ์ราคาส่ง (50–199 ชิ้น) ลด 5% ครับ ราคาต่อเส้น: 185.25 บาท ยอดรวม: 11,115 บาท (ยังไม่รวม VAT) | <a href="_solution/buildmart/e2e/test-gifs/C05.gif"><img src="_solution/buildmart/e2e/test-gifs/C05.gif" width="360" alt="วิดีโอเคส C05"></a> |
+| **C06** | เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง | ✅ | ✅ | CEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) : 21 ถุง AGG-001 ทรายหยาบ : 2 ลบ.ม. AGG-003 หิน 3/4 (หินเบอร์ 1) : 3 ลบ.ม. พิมพ์ "ใส่ตะกร้าให้เลย" ได้ค… | <a href="_solution/buildmart/e2e/test-gifs/C06.gif"><img src="_solution/buildmart/e2e/test-gifs/C06.gif" width="360" alt="วิดีโอเคส C06"></a> |
+| **C07** | ใส่ตะกร้าให้เลย (ต่อจาก C06) | ✅ | ✅ | ยืนยันรายการใส่ตะกร้าให้ครับ: CEM-001 : 21 ถุง AGG-001 : 2 ลบ.ม. AGG-003 : 3 ลบ.ม. | <a href="_solution/buildmart/e2e/test-gifs/C07.gif"><img src="_solution/buildmart/e2e/test-gifs/C07.gif" width="360" alt="วิดีโอเคส C07"></a> |
+| **C08** | ขอใบเสนอราคาหน่อย | ✅ | ✅ | ออกใบเสนอราคาให้เรียบร้อยแล้วครับ เลขที่: QT-20261023-0020 ยอดรวม: 2,086.50 บาท (ยังไม่รวม VAT) ดูรายละเอียดได้ที่: /quote/QT-20261023-0020 ใบเสนอราคา… | <a href="_solution/buildmart/e2e/test-gifs/C08.gif"><img src="_solution/buildmart/e2e/test-gifs/C08.gif" width="360" alt="วิดีโอเคส C08"></a> |
+| **C09** | ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร | ✅ | ✅ | ส่งของน้ำหนัก 5 ตัน (5,000 กก.) ใช้ รถ 6 ล้อ ครับ ค่าส่งอยู่ที่ 1,500 บาท ครับ | <a href="_solution/buildmart/e2e/test-gifs/C09.gif"><img src="_solution/buildmart/e2e/test-gifs/C09.gif" width="360" alt="วิดีโอเคส C09"></a> |
+| **C10** | มีโค้ดส่วนลดไหม | ✅ | ✅ | มีครับ! ตอนนี้เรามีคูปองส่วนลด 2 แบบให้เลือกใช้ (ใช้ได้ทีละ 1 ใบ) ครับ BUILD5: ลด 5% เมื่อยอดซื้อก่อน VAT ตั้งแต่ 5,000 บาทขึ้นไป CONTRACTOR10: ลด 10%… | <a href="_solution/buildmart/e2e/test-gifs/C10.gif"><img src="_solution/buildmart/e2e/test-gifs/C10.gif" width="360" alt="วิดีโอเคส C10"></a> |
+| **C11** | มีกระเบื้องยางขายไหม | ✅ | ✅ | ขออภัยครับ ร้านบ้านช่าง BuildMart ไม่มีกระเบื้องยางขายในขณะนี้ เรามีสินค้ากระเบื้องที่ใกล้เคียงดังนี้ครับ: TIL-001 กระเบื้องพื้น 60x60 ลายหินอ่อน (389… | <a href="_solution/buildmart/e2e/test-gifs/C11.gif"><img src="_solution/buildmart/e2e/test-gifs/C11.gif" width="360" alt="วิดีโอเคส C11"></a> |
+| **C12** | ช่วยเขียนโค้ด Python ให้หน่อย | ✅ | ✅ | ขออภัยครับ น้องช่างช่วยเขียนโค้ดไม่ได้ แต่ยินดีช่วยเรื่องวัสดุก่อสร้าง ราคา สต็อก หรือคำนวณปริมาณวัสดุให้ครับ | <a href="_solution/buildmart/e2e/test-gifs/C12.gif"><img src="_solution/buildmart/e2e/test-gifs/C12.gif" width="360" alt="วิดีโอเคส C12"></a> |
+| **C13** | ทาสีภายนอก 120 ตร.ม. แล้วราคารวม | ✅ | ✅ | PNT-001 สีน้ำอะคริลิก ภายนอก : 8 แกลลอน × 890 = 7,120 บาท PNT-003 สีรองพื้นปูนใหม่ : 3 แกลลอน × 650 = 1,950 บาท ยอดรวมสินค้า (ยังไม่รวม VAT และค่าส่ง)… | <a href="_solution/buildmart/e2e/test-gifs/C13.gif"><img src="_solution/buildmart/e2e/test-gifs/C13.gif" width="360" alt="วิดีโอเคส C13"></a> |
+| **C14** | สาขาบางนาเบอร์อะไร | ✅ | ✅ | เบอร์โทรสาขาบางนา (BNA) คือ 02-111-0002 ครับ | <a href="_solution/buildmart/e2e/test-gifs/C14.gif"><img src="_solution/buildmart/e2e/test-gifs/C14.gif" width="360" alt="วิดีโอเคส C14"></a> |
+| **R01** | ปูนเก็บได้นานแค่ไหน | ✅ | ✅ | ปูนซีเมนต์เก็บได้ 3 เดือน นับจากวันผลิตครับ | <a href="_solution/buildmart/e2e/test-gifs/R01.gif"><img src="_solution/buildmart/e2e/test-gifs/R01.gif" width="360" alt="วิดีโอเคส R01"></a> |
+| **R02** | สีทาภายนอกรับประกันกี่ปี | ✅ | ✅ | สีทาภายนอก PNT-001 รับประกัน 8 ปี เมื่อทาครบระบบรองพื้น 1 เที่ยวและสีทับหน้า 2 เที่ยวครับ | <a href="_solution/buildmart/e2e/test-gifs/R02.gif"><img src="_solution/buildmart/e2e/test-gifs/R02.gif" width="360" alt="วิดีโอเคส R02"></a> |
+| **R03** | TIL-001 ปูพื้นนอกบ้านได้ไหม | ✅ | ✅ | ได้ครับ กระเบื้อง TIL-001 สามารถปูพื้นภายนอกได้ เนื่องจากมีค่าดูดซึมน้ำน้อยกว่า 0.5% และกันลื่นระดับ R10 | <a href="_solution/buildmart/e2e/test-gifs/R03.gif"><img src="_solution/buildmart/e2e/test-gifs/R03.gif" width="360" alt="วิดีโอเคส R03"></a> |
+| **R04** | ปูนเปิดถุงแล้วคืนได้ไหม | ✅ | ✅ | คืนไม่ได้ครับ ปูนที่เปิดถุงแล้วคืนไม่ได้ทุกกรณี แม้จะยังอยู่ในระยะ 7 วันก็ตาม | <a href="_solution/buildmart/e2e/test-gifs/R04.gif"><img src="_solution/buildmart/e2e/test-gifs/R04.gif" width="360" alt="วิดีโอเคส R04"></a> |
+| **R05** | ทาบเหล็ก DB12 ต้องยาวเท่าไร | ✅ | ✅ | ระยะทาบเหล็ก DB12 ต้องยาวอย่างน้อย 48 ซม. ครับ | <a href="_solution/buildmart/e2e/test-gifs/R05.gif"><img src="_solution/buildmart/e2e/test-gifs/R05.gif" width="360" alt="วิดีโอเคส R05"></a> |
+| **R06** | สาย THW 2.5 กับเบรกเกอร์ (Hybrid) | ✅ | ✅ | สาย THW 2.5 ตร.มม. ใช้คู่กับเบรกเกอร์ขนาด 16–20 A ครับ ส่วนเบรกเกอร์ลูกย่อย 16A (SKU: ELC-002) ราคา 145 บาท/ตัว ครับ | <a href="_solution/buildmart/e2e/test-gifs/R06.gif"><img src="_solution/buildmart/e2e/test-gifs/R06.gif" width="360" alt="วิดีโอเคส R06"></a> |
+| **R08** | ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว | ✅ | ✅ | สำหรับกระเบื้อง 60x60 ซม. ต้องใช้เกรียงหวีขนาดฟัน 10 มม. และอัตราการใช้ปูนกาวประมาณ 5.5 กก./ตร.ม. ครับ | <a href="_solution/buildmart/e2e/test-gifs/R08.gif"><img src="_solution/buildmart/e2e/test-gifs/R08.gif" width="360" alt="วิดีโอเคส R08"></a> |
+| **R07** | อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร | ✅ | ✅ | เดือนพฤศจิกายนมีโปรโมชั่นพิเศษดังนี้ครับ ซื้อปูน CEM-001 ครบ 100 ถุง ในใบเสร็จเดียว แถมลวดผูกเหล็ก STL-005 จำนวน 2 ม้วน ใช้ได้ตั้งแต่วันที่ 1–30 พฤศจิ… | <a href="_solution/buildmart/e2e/test-gifs/R07.gif"><img src="_solution/buildmart/e2e/test-gifs/R07.gif" width="360" alt="วิดีโอเคส R07"></a> |
+| **Q01** | แชท 8 หน้าต่างพร้อมกัน | ✅ | ✅ | 1. ร้านเปิดกี่โมงครับ → ร้านเปิดทำการ จันทร์–เสาร์ เวลา 07:00–18:00 น. และวันอาทิตย์ เวลา 08:00–12:00 น. ครับ 2. ปูนซีเมนต์ถุงละเท่าไร → ปูนซีเมนต์ปอร… | <a href="_solution/buildmart/e2e/test-gifs/Q01.gif"><img src="_solution/buildmart/e2e/test-gifs/Q01.gif" width="360" alt="วิดีโอเคส Q01"></a> |
+| **Q02** | หยุด chat-worker แล้วข้อความไม่หาย | ✅ | ✅ | ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (CEM-001) ราคา 145 บาท/ถุง ครับ | <a href="_solution/buildmart/e2e/test-gifs/Q02.gif"><img src="_solution/buildmart/e2e/test-gifs/Q02.gif" width="360" alt="วิดีโอเคส Q02"></a> |
+| **Q03** | สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน | ✅ | ✅ | pick: sku: TOL-002, branch: RST, qty: 1, stock: 2, reorder: 5 · orderNo: BM-20261023-0017 · stockAfter: 1 · order: 🧾 คำสั่งซื้อใหม่ BM-20261023-0017 ·… | <a href="_solution/buildmart/e2e/test-gifs/Q03.gif"><img src="_solution/buildmart/e2e/test-gifs/Q03.gif" width="360" alt="วิดีโอเคส Q03"></a> |
+| **T01** | ร้านเปิดกี่โมง → กดฟัง (ไทย) | ✅ | ✅ | ร้านบ้านช่าง BuildMart เปิดทำการดังนี้ครับ จันทร์–เสาร์: 07:00–18:00 น. อาทิตย์: 08:00–12:00 น. | <a href="_solution/buildmart/e2e/test-gifs/T01.gif"><img src="_solution/buildmart/e2e/test-gifs/T01.gif" width="360" alt="วิดีโอเคส T01"></a><br>[🎬 MP4 มีเสียง](_solution/buildmart/e2e/test-videos/T01.mp4) |
+| **T02** | Portland cement → กดฟัง (Kokoro) | ✅ | ✅ | Portland cement (CEM-001) is 145 baht per 50 kg bag. | <a href="_solution/buildmart/e2e/test-gifs/T02.gif"><img src="_solution/buildmart/e2e/test-gifs/T02.gif" width="360" alt="วิดีโอเคส T02"></a><br>[🎬 MP4 มีเสียง](_solution/buildmart/e2e/test-videos/T02.mp4) |
+| **T03** | อ่านออกเสียงอัตโนมัติ | ✅ | ✅ | มีครับ! ปัจจุบันมีคูปองส่วนลด 2 แบบให้เลือกใช้ (ใช้ได้ทีละ 1 ใบ) ครับ BUILD5: ลด 5% เมื่อยอดซื้อก่อน VAT ตั้งแต่ 5,000 บาทขึ้นไป CONTRACTOR10: ลด 10% … | <a href="_solution/buildmart/e2e/test-gifs/T03.gif"><img src="_solution/buildmart/e2e/test-gifs/T03.gif" width="360" alt="วิดีโอเคส T03"></a><br>[🎬 MP4 มีเสียง](_solution/buildmart/e2e/test-videos/T03.mp4) |
 
-**วิดีโอทุกเคส** (GIF เล่นอัตโนมัติ · ไม่มีเสียง — เคส 🔊 กดลิงก์ MP4 เพื่อฟัง):
-
-
-#### 🛒 หน้าร้าน · 14 เคส
-
-<table>
-<tr>
-<td width="50%" valign="top"><b>W01</b> · ค้นหา "ปูน"<br><img src="_solution/buildmart/e2e/test-gifs/W01.gif" width="100%" alt="วิดีโอเคส W01"></td>
-<td width="50%" valign="top"><b>W02</b> · กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ<br><img src="_solution/buildmart/e2e/test-gifs/W02.gif" width="100%" alt="วิดีโอเคส W02"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W03</b> · หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น<br><img src="_solution/buildmart/e2e/test-gifs/W03.gif" width="100%" alt="วิดีโอเคส W03"></td>
-<td width="50%" valign="top"><b>W04</b> · หน้าสินค้า CEM-002 สาขารังสิตหมด<br><img src="_solution/buildmart/e2e/test-gifs/W04.gif" width="100%" alt="วิดีโอเคส W04"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W05</b> · คำนวณคอนกรีต 3 ลบ.ม.<br><img src="_solution/buildmart/e2e/test-gifs/W05.gif" width="100%" alt="วิดีโอเคส W05"></td>
-<td width="50%" valign="top"><b>W06</b> · คำนวณกระเบื้อง 50 ตร.ม.<br><img src="_solution/buildmart/e2e/test-gifs/W06.gif" width="100%" alt="วิดีโอเคส W06"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W07</b> · คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว<br><img src="_solution/buildmart/e2e/test-gifs/W07.gif" width="100%" alt="วิดีโอเคส W07"></td>
-<td width="50%" valign="top"><b>W08</b> · ตะกร้า STL-003 × 60 ได้ราคาส่ง<br><img src="_solution/buildmart/e2e/test-gifs/W08.gif" width="100%" alt="วิดีโอเคส W08"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W09</b> · ตะกร้า CEM-001 × 100 + คูปอง BUILD5<br><img src="_solution/buildmart/e2e/test-gifs/W09.gif" width="100%" alt="วิดีโอเคส W09"></td>
-<td width="50%" valign="top"><b>W10</b> · ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4)<br><img src="_solution/buildmart/e2e/test-gifs/W10.gif" width="100%" alt="วิดีโอเคส W10"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W11</b> · ขอใบเสนอราคาจากตะกร้า<br><img src="_solution/buildmart/e2e/test-gifs/W11.gif" width="100%" alt="วิดีโอเคส W11"></td>
-<td width="50%" valign="top"><b>W12</b> · สั่งซื้อแล้วติดตามคำสั่งซื้อ<br><img src="_solution/buildmart/e2e/test-gifs/W12.gif" width="100%" alt="วิดีโอเคส W12"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>W13</b> · สั่งเกินสต็อก BRK-003 สาขารังสิต<br><img src="_solution/buildmart/e2e/test-gifs/W13.gif" width="100%" alt="วิดีโอเคส W13"></td>
-<td width="50%" valign="top"><b>W14</b> · หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง<br><img src="_solution/buildmart/e2e/test-gifs/W14.gif" width="100%" alt="วิดีโอเคส W14"></td>
-</tr>
-</table>
-
-
-#### 💬 แชทบอท (Qwen ตอบจริง) · 14 เคส
-
-<table>
-<tr>
-<td width="50%" valign="top"><b>C01</b> · ร้านเปิดกี่โมงครับ<br><img src="_solution/buildmart/e2e/test-gifs/C01.gif" width="100%" alt="วิดีโอเคส C01"></td>
-<td width="50%" valign="top"><b>C02</b> · วันอาทิตย์เปิดไหม<br><img src="_solution/buildmart/e2e/test-gifs/C02.gif" width="100%" alt="วิดีโอเคส C02"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C03</b> · ปูนซีเมนต์ถุงละเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C03.gif" width="100%" alt="วิดีโอเคส C03"></td>
-<td width="50%" valign="top"><b>C04</b> · เหล็ก DB12 มีกี่สาขาที่มีของ<br><img src="_solution/buildmart/e2e/test-gifs/C04.gif" width="100%" alt="วิดีโอเคส C04"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C05</b> · เหล็ก DB12 60 เส้น ราคาเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C05.gif" width="100%" alt="วิดีโอเคส C05"></td>
-<td width="50%" valign="top"><b>C06</b> · เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง<br><img src="_solution/buildmart/e2e/test-gifs/C06.gif" width="100%" alt="วิดีโอเคส C06"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C07</b> · ใส่ตะกร้าให้เลย (ต่อจาก C06)<br><img src="_solution/buildmart/e2e/test-gifs/C07.gif" width="100%" alt="วิดีโอเคส C07"></td>
-<td width="50%" valign="top"><b>C08</b> · ขอใบเสนอราคาหน่อย<br><img src="_solution/buildmart/e2e/test-gifs/C08.gif" width="100%" alt="วิดีโอเคส C08"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C09</b> · ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/C09.gif" width="100%" alt="วิดีโอเคส C09"></td>
-<td width="50%" valign="top"><b>C10</b> · มีโค้ดส่วนลดไหม<br><img src="_solution/buildmart/e2e/test-gifs/C10.gif" width="100%" alt="วิดีโอเคส C10"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C11</b> · มีกระเบื้องยางขายไหม<br><img src="_solution/buildmart/e2e/test-gifs/C11.gif" width="100%" alt="วิดีโอเคส C11"></td>
-<td width="50%" valign="top"><b>C12</b> · ช่วยเขียนโค้ด Python ให้หน่อย<br><img src="_solution/buildmart/e2e/test-gifs/C12.gif" width="100%" alt="วิดีโอเคส C12"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>C13</b> · ทาสีภายนอก 120 ตร.ม. แล้วราคารวม<br><img src="_solution/buildmart/e2e/test-gifs/C13.gif" width="100%" alt="วิดีโอเคส C13"></td>
-<td width="50%" valign="top"><b>C14</b> · สาขาบางนาเบอร์อะไร<br><img src="_solution/buildmart/e2e/test-gifs/C14.gif" width="100%" alt="วิดีโอเคส C14"></td>
-</tr>
-</table>
-
-
-#### 📄 Hybrid RAG จาก PDF · 8 เคส
-
-<table>
-<tr>
-<td width="50%" valign="top"><b>R01</b> · ปูนเก็บได้นานแค่ไหน<br><img src="_solution/buildmart/e2e/test-gifs/R01.gif" width="100%" alt="วิดีโอเคส R01"></td>
-<td width="50%" valign="top"><b>R02</b> · สีทาภายนอกรับประกันกี่ปี<br><img src="_solution/buildmart/e2e/test-gifs/R02.gif" width="100%" alt="วิดีโอเคส R02"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>R03</b> · TIL-001 ปูพื้นนอกบ้านได้ไหม<br><img src="_solution/buildmart/e2e/test-gifs/R03.gif" width="100%" alt="วิดีโอเคส R03"></td>
-<td width="50%" valign="top"><b>R04</b> · ปูนเปิดถุงแล้วคืนได้ไหม<br><img src="_solution/buildmart/e2e/test-gifs/R04.gif" width="100%" alt="วิดีโอเคส R04"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>R05</b> · ทาบเหล็ก DB12 ต้องยาวเท่าไร<br><img src="_solution/buildmart/e2e/test-gifs/R05.gif" width="100%" alt="วิดีโอเคส R05"></td>
-<td width="50%" valign="top"><b>R06</b> · สาย THW 2.5 กับเบรกเกอร์ (Hybrid)<br><img src="_solution/buildmart/e2e/test-gifs/R06.gif" width="100%" alt="วิดีโอเคส R06"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>R08</b> · ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว<br><img src="_solution/buildmart/e2e/test-gifs/R08.gif" width="100%" alt="วิดีโอเคส R08"></td>
-<td width="50%" valign="top"><b>R07</b> · อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร<br><img src="_solution/buildmart/e2e/test-gifs/R07.gif" width="100%" alt="วิดีโอเคส R07"></td>
-</tr>
-</table>
-
-
-#### 📨 RabbitMQ · 3 เคส
-
-<table>
-<tr>
-<td width="50%" valign="top"><b>Q01</b> · แชท 8 หน้าต่างพร้อมกัน<br><img src="_solution/buildmart/e2e/test-gifs/Q01.gif" width="100%" alt="วิดีโอเคส Q01"></td>
-<td width="50%" valign="top"><b>Q02</b> · หยุด chat-worker แล้วข้อความไม่หาย<br><img src="_solution/buildmart/e2e/test-gifs/Q02.gif" width="100%" alt="วิดีโอเคส Q02"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>Q03</b> · สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน<br><img src="_solution/buildmart/e2e/test-gifs/Q03.gif" width="100%" alt="วิดีโอเคส Q03"></td>
-<td width="50%"></td>
-</tr>
-</table>
-
-
-#### 🔊 อ่านออกเสียง · 3 เคส
-
-<table>
-<tr>
-<td width="50%" valign="top"><b>T01</b> · ร้านเปิดกี่โมง → กดฟัง (ไทย) · <a href="_solution/buildmart/e2e/test-videos/T01.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T01.gif" width="100%" alt="วิดีโอเคส T01"></td>
-<td width="50%" valign="top"><b>T02</b> · Portland cement → กดฟัง (Kokoro) · <a href="_solution/buildmart/e2e/test-videos/T02.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T02.gif" width="100%" alt="วิดีโอเคส T02"></td>
-</tr>
-<tr>
-<td width="50%" valign="top"><b>T03</b> · อ่านออกเสียงอัตโนมัติ · <a href="_solution/buildmart/e2e/test-videos/T03.mp4">🎬 MP4 มีเสียง</a><br><img src="_solution/buildmart/e2e/test-gifs/T03.gif" width="100%" alt="วิดีโอเคส T03"></td>
-<td width="50%"></td>
-</tr>
-</table>
 
 
 **ระบบที่ทีมสร้างเอง (`my_buildmart`) ต่อ Qwen จริงได้ไหม?** ลองต่อ `.env.vast` เดียวกันแล้วรันกลุ่มแชท + RAG ของทีม: **ผ่าน 20/21** · ล้มเคสเดียวคือ C13 "ทาสีภายนอก 120 ตร.ม. → ราคารวม" — Qwen คิดราคารวม**รวมสีรองพื้นด้วย** (8 × 890 + 3 × 650 = **9,070** บาท) ขณะที่เกณฑ์ต้องการ 7,120 (สีอย่างเดียว) · ตัวเลข 7,120 อยู่ในคำตอบแรกแล้ว → นี่คือตัวอย่างที่ดีว่า **LLM ตีความคำถามกว้างกว่าที่ requirement เขียน** ทางแก้คือเขียน requirement/system prompt ให้ชัด ไม่ใช่ลดเกณฑ์
