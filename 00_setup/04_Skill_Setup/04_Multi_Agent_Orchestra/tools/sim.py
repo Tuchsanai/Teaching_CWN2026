@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""sim.py — จำลองการแจกงานให้หลายบัญชี เทียบ EUBF (โค้ดเดียวกับ orch.py) กับวิธีพื้นฐาน
+"""sim.py — จำลองการแจกงานให้หลายบัญชี เทียบ KC-QUEST (โค้ดเดียวกับ orch.py) กับวิธีพื้นฐาน
 
 รัน: python3 tools/sim.py [--seeds 200] [--out sim_result.json]
 
@@ -9,7 +9,7 @@
 - งาน: DAG แบบโปรเจกต์เว็บจริง (scaffold → งานขนาน → รวม → ทดสอบ) ขนาด S/M/L
   โทเคนจริง = ค่าประเมิน × lognormal(σ=0.35) · ความเร็ว yolo 0.12M/นาที, cyolo 0.08M/นาที
 - งานชนเพดานกลางทาง (limit) → งานหยุด เสียเวลา 5 นาที + งานที่ยังไม่ commit 15% ต้องทำใหม่
-- ย้ายงานล่วงหน้า (เฉพาะ EUBF ⑤) → เสียเวลา 2 นาที + 3% (อ่าน HANDOFF แล้วทำต่อ)
+- ย้ายงานล่วงหน้า (เฉพาะ KC-QUEST ⑤) → เสียเวลา 2 นาที + 3% (อ่าน HANDOFF แล้วทำต่อ)
 ตัวชี้วัด: เวลาจบโปรเจกต์ · จำนวนครั้งชนเพดาน · โควตาที่หมดอายุทิ้ง (สูญเปล่า) · โควตาของบัญชีอายุยาวที่ถูกใช้
 """
 import argparse, copy, json, math, os, random, sys
@@ -18,8 +18,8 @@ import orch
 from orch import choose_account, make_state, reserve_on, critical_ranks, plan_assignments, margin, session_burn
 
 CFG = copy.deepcopy(orch.DEFAULT_CFG)
-CFG_BASIC = copy.deepcopy(CFG); CFG_BASIC["relay"] = False          # EUBF รุ่นแรก (ไม่มี ⑦⑨)
-POLICY_SMART = {"EUBF": True, "EUBF-basic": False}
+CFG_BASIC = copy.deepcopy(CFG); CFG_BASIC["relay"] = False          # KC-QUEST รุ่นแรก (ไม่มี ⑦⑨)
+POLICY_SMART = {"KC-QUEST": True, "KC-QUEST-basic": False}
 SIZE = CFG["size_mtok"]
 SPEED = {"yolo": 0.12, "cyolo": 0.08}       # M weighted token ต่อนาที ต่อ worker
 
@@ -89,7 +89,7 @@ def run(policy, scen, seed):
         running = [t for t in tasks if t["status"] == "run"]
         ranks = critical_ranks([{"id": t["id"], "depends_on": t["dep"]} for t in tasks],
                                lambda x: 0 if by[x["id"]]["status"] == "done" else by[x["id"]]["est"] - by[x["id"]]["done"])
-        if policy.startswith("EUBF"): ready.sort(key=lambda t: (-ranks[t["id"]], -t["est"]))
+        if policy.startswith("KC-QUEST"): ready.sort(key=lambda t: (-ranks[t["id"]], -t["est"]))
         else: ready.sort(key=lambda t: t["id"])
         states = []
         for a in accs:
@@ -101,7 +101,7 @@ def run(policy, scen, seed):
                                      100 - a.wu - pend * a.est_rw, hrs, 4 if a.kind == "yolo" else 3, len(run_on),
                                      sreset_h=sr if POLICY_SMART.get(policy) else None))
         n_run = len(running)
-        if policy.startswith("EUBF"):
+        if policy.startswith("KC-QUEST"):
             cfg = CFG if POLICY_SMART.get(policy) else CFG_BASIC
             items = [{"id": t["id"], "need": max(t["est"] - t["done"], 0.3 * t["est"]), "crit": ranks[t["id"]],
                       "avoid": {t["avoid"]} if t.get("avoid") else ()} for t in ready]
@@ -113,7 +113,7 @@ def run(policy, scen, seed):
             need = max(t["est"] - t["done"], 0.3 * t["est"])
             free = [s for s in states if s["used"] < s["slots"]]
             if not free: break
-            if policy == "EUBF":
+            if policy == "KC-QUEST":
                 c = choose_account(need, ranks[t["id"]], states, CFG, avoid={t["avoid"]} if t.get("avoid") else ())
                 if not c: continue
                 pick = c[0]["account"]; reserve_on(states, pick, c[0]["qs"], c[0]["qw"])
@@ -125,7 +125,7 @@ def run(policy, scen, seed):
             else:  # random
                 pick = rng.choice(free)["account"]
             for s in states:
-                if s["account"] == pick and policy != "EUBF" and policy != "most-headroom": s["used"] += 1
+                if s["account"] == pick and policy != "KC-QUEST" and policy != "most-headroom": s["used"] += 1
             t["status"], t["acc"] = "run", next(a for a in accs if a.name == pick); n_run += 1
         # ---- run 1 minute
         for t in [t for t in tasks if t["status"] == "run"]:
@@ -138,11 +138,11 @@ def run(policy, scen, seed):
             a.use(t_min, step); t["done"] += step
             if t["done"] >= t["true"] - 1e-9:
                 t["status"] = "done"
-                # ⑥ เรียนรู้อัตรา (EUBF เท่านั้น) — ปรับความเชื่อเข้าหาค่าจริง
-                if policy.startswith("EUBF"):
+                # ⑥ เรียนรู้อัตรา (KC-QUEST เท่านั้น) — ปรับความเชื่อเข้าหาค่าจริง
+                if policy.startswith("KC-QUEST"):
                     a.est_rs = 0.6 * a.est_rs + 0.4 * a.rs; a.est_rw = 0.6 * a.est_rw + 0.4 * a.rw
-        # ---- ⑤ ย้ายงานล่วงหน้า (EUBF)
-        if policy.startswith("EUBF"):
+        # ---- ⑤ ย้ายงานล่วงหน้า (KC-QUEST)
+        if policy.startswith("KC-QUEST"):
             for a in accs:
                 run_on = [t for t in tasks if t["status"] == "run" and t["acc"] is a]
                 if not run_on: continue
@@ -174,7 +174,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--seeds", type=int, default=200); ap.add_argument("--out")
     ap.add_argument("--only", help="รันเฉพาะสถานการณ์ที่ชื่อขึ้นต้นด้วยตัวอักษรนี้ เช่น G")
     a = ap.parse_args()
-    pols = ["EUBF", "EUBF-basic", "most-headroom", "round-robin", "random"]
+    pols = ["KC-QUEST", "KC-QUEST-basic", "most-headroom", "round-robin", "random"]
     res = {}
     for sc in SCEN:
         if a.only and not sc.startswith(a.only): continue

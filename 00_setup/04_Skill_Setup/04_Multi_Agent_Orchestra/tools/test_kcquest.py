@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""unit test ของอัลกอริทึม EUBF (ใช้ฟังก์ชันจริงจาก orch.py) — รัน: python3 tools/test_eubf.py"""
+"""unit test ของอัลกอริทึม KC-QUEST (ใช้ฟังก์ชันจริงจาก orch.py) — รัน: python3 tools/test_kcquest.py"""
 import copy, os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import orch
@@ -15,7 +15,7 @@ def pick(cost, states, crit=0.5, cfg=CFG, **kw):
     c = choose_account(cost, crit, states, cfg, **kw)
     return c[0]["account"] if c else None
 
-class TestEUBF(unittest.TestCase):
+class TestKCQuest(unittest.TestCase):
     def test_1_feasibility_job_must_fit(self):
         """งานต้องปิดได้: งาน 10M tok ต้องใช้ 13%×... ของสัปดาห์ → บัญชีที่เหลือไม่พอถูกตัดทิ้ง"""
         st = [acc("yolo1", h_w=2, hours=10), acc("yolo2", h_w=60, hours=150)]

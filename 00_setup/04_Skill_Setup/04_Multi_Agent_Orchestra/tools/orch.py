@@ -44,7 +44,7 @@ DEFAULT_CFG = {
     "orch_min_headroom": 15,       # orchestrator เหลือน้อยกว่านี้ → ส่งไม้ต่อ
     "usage_poll_sec": 90,          # อ่าน /usage ของบัญชี Claude ทุกกี่วินาที (ฟรี ไม่เสียโทเคน)
     "max_attempts": 4,
-    # อัลกอริทึม EUBF (Expiry-Urgency Best-Fit) — ตัวแปร (factor) ที่ใช้ให้คะแนนบัญชี
+    # อัลกอริทึม KC-QUEST (KMITL–Chanwanich Quota-Urgency Expiry-aware Scheduling Technique · เดิมชื่อ EUBF) — ตัวแปร (factor) ที่ใช้ให้คะแนนบัญชี
     # เพิ่ม/ลดตัวแปรได้: ใส่น้ำหนัก 0 = ปิดตัวแปรนั้น · น้ำหนักติดลบ = เป็นค่าปรับ · เพิ่มตัวแปรใหม่ = เพิ่มฟังก์ชันใน FACTORS
     "weights": {"urgency": 0.40, "fit": 0.20, "session": 0.15, "speed": 0.15, "load": -0.10, "bonus": 0.0},
     "speed": {"yolo": 1.0, "cyolo": 0.7},
@@ -231,12 +231,12 @@ def score_accounts(run, snaps):
         expires = min(exp) if exp else t + dt.timedelta(days=7)
         hours = max(1.0, (expires - t).total_seconds() / 3600)
         q["expires"], q["hours_left"] = iso(expires), round(hours, 1)
-        # ความเร่งด่วนวันหมดอายุ (0..1) — ตัวแปร U ของ EUBF
+        # ความเร่งด่วนวันหมดอายุ (0..1) — ตัวแปร U ของ KC-QUEST
         q["use_first"] = round(cfg["urgency_t0_h"] / (cfg["urgency_t0_h"] + hours), 3)
     ok = [q for q in snaps if q.get("logged_in") and not q.get("disabled")]
     for q in ok:   # คะแนนภาพรวมของบัญชี (ไว้แสดงในตาราง · การเลือกจริงต่องานใช้ choose_account)
         q["score"] = round(100 * (0.6 * q["use_first"] + 0.4 * q["headroom"] / 100), 1)
-        # slot = จำนวนงานพร้อมกัน · 0 เฉพาะเมื่อเหลือไม่ถึงเส้นเผื่อขั้นต่ำ (ส่วนว่ารับงานไหนได้ capacity() ใน EUBF ตัดสินเอง)
+        # slot = จำนวนงานพร้อมกัน · 0 เฉพาะเมื่อเหลือไม่ถึงเส้นเผื่อขั้นต่ำ (ส่วนว่ารับงานไหนได้ capacity() ใน KC-QUEST ตัดสินเอง)
         q["slots"] = 0 if q["headroom"] <= cfg["min_margin"] else max(1, min(cfg["per_account_max"][q["kind"]], int(q["headroom"] // cfg["slot_pct"])))
     return snaps
 
@@ -355,7 +355,7 @@ def learn_size(run, t):
     cal[k] = round(0.6 * cal[k] + 0.4 * r, 3) if k in cal else round(r, 3)
     jsave(run.f("state", "size_cal.json"), cal)
 
-# ---------------------------------------------------------------- EUBF algorithm
+# ---------------------------------------------------------------- KC-QUEST algorithm
 def critical_ranks(tasks, cost):
     """critical path: rank(j) = cost(j) + max rank(งานที่รอ j) → งานบนเส้นทางยาวสุดได้เริ่มก่อน (คืนค่า 0..1)
     tasks = [{"id","depends_on"}], cost = ฟังก์ชัน task → โทเคนที่เหลือ"""
@@ -400,7 +400,7 @@ def make_state(acc, kind, rs, rw, h_s, h_w, hours_left, slots, used, is_orch=Fal
             "urg": max(h_w, 0) / max(1.0, hours_left), "slots": slots, "used": used, "is_orch": is_orch, "bonus": bonus,
             "cap_w": cap_w, "sreset_h": sreset_h}
 
-# ตัวแปร (factor) ของ EUBF — แต่ละตัวคืนค่า 0..1 · คะแนน = Σ น้ำหนัก × ค่า  (น้ำหนักอยู่ใน cfg["weights"])
+# ตัวแปร (factor) ของ KC-QUEST — แต่ละตัวคืนค่า 0..1 · คะแนน = Σ น้ำหนัก × ค่า  (น้ำหนักอยู่ใน cfg["weights"])
 # เพิ่มตัวแปรใหม่: เพิ่มฟังก์ชันที่นี่ + ใส่น้ำหนักใน config.json  · ลดตัวแปร: ตั้งน้ำหนัก 0
 FACTORS = {
     # U: ความเร่งด่วนวันหมดอายุ = T0 / (T0 + ชั่วโมงก่อนหมดอายุ)  (T0 = 24 ชม. → เหลือ 1 วัน = 0.5)
@@ -449,7 +449,7 @@ def capacity(s, cfg, reserve=0.0, sigma=None):
     return min(room_s, room_w)
 
 def choose_account(cost, crit, states, cfg, kind_only=None, avoid=(), need_slot=True, image=False, partial=0.0):
-    """EUBF: คืนบัญชีที่ "ปิดงานนี้ได้" เรียงตามคะแนน (มาก→น้อย) พร้อมค่าตัวแปรแยกส่วน
+    """KC-QUEST: คืนบัญชีที่ "ปิดงานนี้ได้" เรียงตามคะแนน (มาก→น้อย) พร้อมค่าตัวแปรแยกส่วน
 
     ปิดงานได้ (feasible): cost ≤ capacity(บัญชี)
       capacity = min( (h_s − m_s − reserve) / (σ·r_s) [+ โควตา 5 ชม. ใหม่ถ้ารีเซ็ตก่อนงานเสร็จ],
@@ -527,7 +527,7 @@ def reserve_on(states, acc, qs, qw, image=False):
 def why_text(c, need, cands):
     p = " ".join(f"{k}={v}" for k, v in c["parts"].items())
     alt = f" · อันดับ 2 {cands[1]['account']} {cands[1]['score']}" if len(cands) > 1 else ""
-    return f"EUBF {c['score']} ({p}) · ประเมิน {need:.2f}M tok ≈ 5ชม. {c['qs']}% / สัปดาห์ {c['qw']}%{alt}"
+    return f"KC-QUEST {c['score']} ({p}) · ประเมิน {need:.2f}M tok ≈ 5ชม. {c['qs']}% / สัปดาห์ {c['qw']}%{alt}"
 
 def deps_done(d, t):
     st = {x["id"]: x["status"] for x in d["tasks"]}
@@ -865,7 +865,7 @@ def monitor_once(run, snaps_cache):
         for rem, tid, rec in items:
             t = task_by_id(d, tid)
             if t.get("no_handoff"): continue
-            # ⑤ ย้ายงาน: ใช้ EUBF ตัวเดียวกันหาบัญชีที่ "ปิดงานส่วนที่เหลือ" ได้ดีที่สุด
+            # ⑤ ย้ายงาน: ใช้ KC-QUEST ตัวเดียวกันหาบัญชีที่ "ปิดงานส่วนที่เหลือ" ได้ดีที่สุด
             others = choose_account(rem, task_ranks(run, d).get(tid, 0), account_states(run, q_by, running(run), d, orch),
                                     run.cfg, kind_only=t.get("only"), avoid={acc}, need_slot=False, image=bool(rec.get("image")),
                                     partial=run.cfg.get("relay_min_frac", 0.3) if run.cfg.get("relay", True) else 0.0)
@@ -874,7 +874,7 @@ def monitor_once(run, snaps_cache):
                 break
             why = (f"{acc} ใช้ถึงเพดานแล้ว (5ชม. {q['session_used']}% · สัปดาห์ {wk}%/{cap_w}%)" if hard else
                    f"คาดว่า {acc} จะใช้ถึง 5ชม. {q['proj_session']}% / สัปดาห์ {q['proj_week']}% (เพดาน {cap_w}%) ก่อนงานเสร็จ")
-            if others: why += f" → รับต่อได้ดีสุด: {others[0]['account']} (EUBF {others[0]['score']})"
+            if others: why += f" → รับต่อได้ดีสุด: {others[0]['account']} (KC-QUEST {others[0]['score']})"
             evs.append(requeue(run, d, t, rec, why))
             proj_s -= rem * rs; proj_w -= rem * rw
             if not hard and proj_s <= lim_s and proj_w <= lim_w: break
