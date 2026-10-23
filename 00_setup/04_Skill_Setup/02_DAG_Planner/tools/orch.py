@@ -44,7 +44,7 @@ DEFAULT_CFG = {
     "orch_min_headroom": 15,       # orchestrator เหลือน้อยกว่านี้ → ส่งไม้ต่อ
     "usage_poll_sec": 90,          # อ่าน /usage ของบัญชี Claude ทุกกี่วินาที (ฟรี ไม่เสียโทเคน)
     "max_attempts": 4,
-    # อัลกอริทึม KC-QUEST (KMITL–Chanwanich Quota-Urgency Expiry-aware Scheduling Technique · เดิมชื่อ EUBF) — ตัวแปร (factor) ที่ใช้ให้คะแนนบัญชี
+    # อัลกอริทึม KC-QUEST (KMITL–Chanwanich Quota-Urgency Expiry-aware Scheduling Technique) — ตัวแปร (factor) ที่ใช้ให้คะแนนบัญชี
     # เพิ่ม/ลดตัวแปรได้: ใส่น้ำหนัก 0 = ปิดตัวแปรนั้น · น้ำหนักติดลบ = เป็นค่าปรับ · เพิ่มตัวแปรใหม่ = เพิ่มฟังก์ชันใน FACTORS
     "weights": {"urgency": 0.40, "fit": 0.20, "session": 0.15, "speed": 0.15, "load": -0.10, "bonus": 0.0},
     "speed": {"yolo": 1.0, "cyolo": 0.7},

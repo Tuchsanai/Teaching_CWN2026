@@ -29,7 +29,7 @@
         [--mode real|teach] [--example ID]           โหมดใช้งานจริง / โหมดสอน (ดูด้านบน)
 
 tasks.json (AI เขียนตามพรอมต์ใน readme.md · ผลลัพธ์ปกติอยู่ที่ out/<ชื่อแผน>/):
-  {"tasks": [{"id": "T01", "title": "...", "size": "S|M|L", "depends_on": [], "area": "backend|frontend|chat|rag|ml|k8s|test|image|infra",
+  {"tasks": [{"id": "T01", "title": "...", "size": "S|M|L", "depends_on": [], "area": "backend|frontend|chat|rag|ml|k8s|agent|voice|test|image|infra",
               "only": "yolo|cyolo" (ไม่บังคับ), "exclusive": true (ไม่บังคับ)}]}
 """
 import argparse, datetime as dt, glob, html, json, os, shutil, subprocess, sys
@@ -52,7 +52,7 @@ import orch  # noqa: E402  (KC-QUEST: score_accounts · choose_account · plan_a
 
 PALETTE = ["#2b7bd6", "#2e9e5b", "#8e44ad", "#c0392b", "#d4a017", "#16a3a3", "#e67e22", "#5d6d7e", "#d35490", "#6b8e23"]
 CRIT = "#dc5a1e"
-AREA_ICON = {"image": "🖼", "infra": "☁", "test": "🧪", "chat": "💬", "rag": "📚", "ml": "🧠", "k8s": "☸"}
+AREA_ICON = {"image": "🖼", "infra": "☁", "test": "🧪", "chat": "💬", "rag": "📚", "ml": "🧠", "k8s": "☸", "agent": "🤖", "voice": "🎙"}
 
 # ---------------------------------------------------------------- quota
 def assumed(acc, left):
