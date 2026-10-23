@@ -1,0 +1,774 @@
+{
+  "mode": "mock",
+  "tts": true,
+  "url": "http://localhost:3400",
+  "startTime": "2026-10-23T05:02:46.470Z",
+  "durationMs": 630009.098,
+  "rows": [
+    {
+      "id": "W01",
+      "group": "🛒 หน้าร้าน",
+      "title": "ค้นหา \"ปูน\"",
+      "expect": "เจอ CEM-001…004 อย่างน้อย 4 รายการ",
+      "status": "passed",
+      "durationMs": 7874,
+      "answers": [],
+      "checked": "CEM-001, CEM-002, CEM-003, CEM-004, PNT-003",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W02",
+      "group": "🛒 หน้าร้าน",
+      "title": "กรองหมวดเหล็ก + เรียงราคาสูง→ต่ำ",
+      "expect": "รายการแรกคือ STL-004",
+      "status": "passed",
+      "durationMs": 9110,
+      "answers": [],
+      "checked": "STL-004 > STL-003 > STL-002 > STL-005 > STL-001",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W03",
+      "group": "🛒 หน้าร้าน",
+      "title": "หน้าสินค้า STL-003 ราคาส่ง 3 ขั้น",
+      "expect": "ราคาส่ง 195 / 185.25 / 175.50 และสต็อก 3 สาขา",
+      "status": "passed",
+      "durationMs": 10886,
+      "answers": [],
+      "checked": "{\n  \"tiers\": [\n    \"195.00\",\n    \"185.25\",\n    \"175.50\"\n  ],\n  \"stock\": {\n    \"LKB\": \"700 เส้น\",\n    \"BNA\": \"500 เส้น\",\n    \"RST\": \"400 เส้น\"\n  }\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W04",
+      "group": "🛒 หน้าร้าน",
+      "title": "หน้าสินค้า CEM-002 สาขารังสิตหมด",
+      "expect": "สาขารังสิต (RST) แสดง \"หมด\"",
+      "status": "passed",
+      "durationMs": 7357,
+      "answers": [],
+      "checked": "stock-RST = หมด",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W05",
+      "group": "🛒 หน้าร้าน",
+      "title": "คำนวณคอนกรีต 3 ลบ.ม.",
+      "expect": "ปูน 21 ถุง · ทราย 2 ลบ.ม. · หิน 3 ลบ.ม. และตะกร้ามี 3 รายการ",
+      "status": "passed",
+      "durationMs": 13818,
+      "answers": [],
+      "checked": "{\n  \"CEM-001\": 21,\n  \"AGG-001\": 2,\n  \"AGG-003\": 3\n}\nตะกร้า: AGG-001, AGG-003, CEM-001",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W06",
+      "group": "🛒 หน้าร้าน",
+      "title": "คำนวณกระเบื้อง 50 ตร.ม.",
+      "expect": "TIL-001 39 กล่อง · ปูนกาว 13 ถุง · ยาแนว 10 ถุง",
+      "status": "passed",
+      "durationMs": 8487,
+      "answers": [],
+      "checked": "{\n  \"TIL-001\": 39,\n  \"CEM-004\": 13,\n  \"TIL-003\": 10\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W07",
+      "group": "🛒 หน้าร้าน",
+      "title": "คำนวณสีภายนอก 120 ตร.ม. 2 เที่ยว",
+      "expect": "PNT-001 8 แกลลอน + รองพื้น PNT-003 3 แกลลอน",
+      "status": "passed",
+      "durationMs": 9186,
+      "answers": [],
+      "checked": "{\n  \"PNT-001\": 8,\n  \"PNT-003\": 3\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W08",
+      "group": "🛒 หน้าร้าน",
+      "title": "ตะกร้า STL-003 × 60 ได้ราคาส่ง",
+      "expect": "ราคาต่อเส้น 185.25 (ลด 5%)",
+      "status": "passed",
+      "durationMs": 9957,
+      "answers": [],
+      "checked": "ราคาต่อเส้น = 185.25",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W09",
+      "group": "🛒 หน้าร้าน",
+      "title": "ตะกร้า CEM-001 × 100 + คูปอง BUILD5",
+      "expect": "137.75 → 13,775 · หลังคูปอง 13,086.25 · 5,000 กก. รถ 6 ล้อ 1,500 · VAT 1,021.04 · สุทธิ 15,607.29",
+      "status": "passed",
+      "durationMs": 16520,
+      "answers": [],
+      "checked": "{\n  \"unit\": \"137.75\",\n  \"subtotal\": \"13,775.00\",\n  \"discount\": \"688.75\",\n  \"weight\": \"5,000 กก.\",\n  \"vehicle\": \"รถ 6 ล้อ\",\n  \"shipping\": \"1,500.00\",\n  \"vat\": \"1,021.04\",\n  \"total\": \"15,607.29\"\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W10",
+      "group": "🛒 หน้าร้าน",
+      "title": "ตะกร้าหนักเกิน 6 ตัน (AGG-003 × 4)",
+      "expect": "ใช้รถ 10 ล้อ ค่าส่ง 3,500",
+      "status": "passed",
+      "durationMs": 9362,
+      "answers": [],
+      "checked": "{\n  \"weight\": \"6,400 กก.\",\n  \"vehicle\": \"รถ 10 ล้อ\",\n  \"shipping\": \"3,500.00\"\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W11",
+      "group": "🛒 หน้าร้าน",
+      "title": "ขอใบเสนอราคาจากตะกร้า",
+      "expect": "ได้เลข QT-… หน้าใบเสนอราคาแสดงรายการและยอดตรงตะกร้า",
+      "status": "passed",
+      "durationMs": 19893,
+      "answers": [],
+      "checked": "{\n  \"quoteNo\": \"QT-20261023-0013\",\n  \"quoteTotal\": \"4,167.65\",\n  \"cartTotal\": \"4,167.65\",\n  \"quoteRows\": [\n    \"CEM-001\",\n    \"TIL-001\"\n  ],\n  \"cartRows\": [\n    \"CEM-001\",\n    \"TIL-001\"\n  ]\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W12",
+      "group": "🛒 หน้าร้าน",
+      "title": "สั่งซื้อแล้วติดตามคำสั่งซื้อ",
+      "expect": "ได้เลข BM-… สต็อกสาขาลดลง และ /track แสดง \"รับคำสั่งซื้อ\"",
+      "status": "passed",
+      "durationMs": 24598,
+      "answers": [],
+      "checked": "{\n  \"orderNo\": \"BM-20261023-0012\",\n  \"stockLKB\": {\n    \"before\": 196,\n    \"after\": 194\n  },\n  \"track\": \"รับคำสั่งซื้อ\"\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W13",
+      "group": "🛒 หน้าร้าน",
+      "title": "สั่งเกินสต็อก BRK-003 สาขารังสิต",
+      "expect": "แจ้งเตือนของไม่พอ และสั่งซื้อไม่ได้",
+      "status": "passed",
+      "durationMs": 21296,
+      "answers": [],
+      "checked": "{\n  \"stockError\": \"⚠ สินค้าที่สาขารังสิตมีไม่พอ — สั่งซื้อไม่ได้ กรุณาเลือกสาขาอื่นหรือลดจำนวน\\nBRK-003 บล็อกประสาน (ก้อน): ต้องการ 10 ก้อน · คงเหลือ 0 ก้อน\",\n  \"stockBefore\": {\n    \"LKB\": 5000,\n    \"BNA\": 3000,\n    \"RST\": 0\n  },\n  \"stockAfter\": {\n    \"LKB\": 5000,\n    \"BNA\": 3000,\n    \"RST\": 0\n  }\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "W14",
+      "group": "🛒 หน้าร้าน",
+      "title": "หลังร้านเปลี่ยนสถานะเป็นกำลังจัดส่ง",
+      "expect": "/track แสดงขั้น \"กำลังจัดส่ง\"",
+      "status": "passed",
+      "durationMs": 16024,
+      "answers": [],
+      "checked": "{\n  \"orderNo\": \"BM-20261023-0013\",\n  \"track\": \"กำลังจัดส่ง\"\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C01",
+      "group": "💬 แชทบอท",
+      "title": "ร้านเปิดกี่โมงครับ",
+      "expect": "มี 07:00 และ 18:00",
+      "status": "passed",
+      "durationMs": 10716,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ร้านเปิดวันจันทร์–เสาร์ 07:00–18:00 น. และวันอาทิตย์ 08:00–12:00 น. ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C02",
+      "group": "💬 แชทบอท",
+      "title": "วันอาทิตย์เปิดไหม",
+      "expect": "มี 08:00 และ 12:00",
+      "status": "passed",
+      "durationMs": 10624,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "วันอาทิตย์ร้านเปิดครับ เวลา 08:00–12:00 น. (จันทร์–เสาร์ 07:00–18:00 น.) ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C03",
+      "group": "💬 แชทบอท",
+      "title": "ปูนซีเมนต์ถุงละเท่าไร",
+      "expect": "มี 145",
+      "status": "passed",
+      "durationMs": 10925,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) (CEM-001) ราคา 145 บาท/ถุง (ยังไม่รวม VAT 7%) ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C04",
+      "group": "💬 แชทบอท",
+      "title": "เหล็ก DB12 มีกี่สาขาที่มีของ",
+      "expect": "ตอบสต็อกตรง DB ครบ 3 สาขา",
+      "status": "passed",
+      "durationMs": 11763,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "เหล็กข้ออ้อย DB12 ยาว 10 ม. (STL-003) มีของ 3 สาขา จาก 3 สาขา (ลาดกระบัง 700 · บางนา 500 · รังสิต 400) ครับ"
+        }
+      ],
+      "checked": "{\n  \"STL-003 stock (DB)\": {\n    \"LKB\": 700,\n    \"BNA\": 500,\n    \"RST\": 400\n  }\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C05",
+      "group": "💬 แชทบอท",
+      "title": "เหล็ก DB12 60 เส้น ราคาเท่าไร",
+      "expect": "มี 185.25",
+      "status": "passed",
+      "durationMs": 12587,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "เหล็กข้ออ้อย DB12 ยาว 10 ม. (STL-003) ซื้อ 60 เส้น ได้ราคาส่งลด 5% ราคา 185.25 บาท/เส้น รวม 11,115 บาท (ยังไม่รวม VAT) ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C06",
+      "group": "💬 แชทบอท",
+      "title": "เทพื้นคอนกรีต 3 คิว ใช้ปูนกี่ถุง",
+      "expect": "มี 21 (คำนวณผ่าน [CALC])",
+      "status": "passed",
+      "durationMs": 12674,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "เทคอนกรีต 3 ลบ.ม. (ส่วนผสม 1:2:4) ต้องใช้ปูนซีเมนต์ 21 ถุง พร้อมทรายและหินดังนี้ครับ\n\nCEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) : 21 ถุง\nAGG-001 ทรายหยาบ : 2 ลบ.ม.\nAGG-003 หิน 3/4 (หินเบอร์ 1) : 3 ลบ.ม.\n\nถ้าต้องการ พิมพ์ \"ใส่ตะกร้าให้เลย\" ได้เลยครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C07",
+      "group": "💬 แชทบอท",
+      "title": "ใส่ตะกร้าให้เลย (ต่อจาก C06)",
+      "expect": "ตะกร้ามี CEM-001 × 21 และตัวเลขบนไอคอนตะกร้าเพิ่ม",
+      "status": "passed",
+      "durationMs": 22471,
+      "answers": [
+        {
+          "name": "answer-1",
+          "text": "เทคอนกรีต 3 ลบ.ม. (ส่วนผสม 1:2:4) ต้องใช้ปูนซีเมนต์ 21 ถุง พร้อมทรายและหินดังนี้ครับ\n\nCEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) : 21 ถุง\nAGG-001 ทรายหยาบ : 2 ลบ.ม.\nAGG-003 หิน 3/4 (หินเบอร์ 1) : 3 ลบ.ม.\n\nถ้าต้องการ พิมพ์ \"ใส่ตะกร้าให้เลย\" ได้เลยครับ"
+        },
+        {
+          "name": "answer",
+          "text": "เรียบร้อยครับ ใส่ตะกร้าให้แล้ว\n\nCEM-001 ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) × 21 ถุง\nAGG-001 ทรายหยาบ × 2 ลบ.ม.\nAGG-003 หิน 3/4 (หินเบอร์ 1) × 3 ลบ.ม.\n\nไปที่หน้าตะกร้าเพื่อสั่งซื้อหรือขอใบเสนอราคาได้เลยครับ"
+        }
+      ],
+      "checked": "{\n  \"navCartBefore\": 0,\n  \"navCartAfter\": 26,\n  \"cart\": [\n    \"AGG-001×2\",\n    \"AGG-003×3\",\n    \"CEM-001×21\"\n  ]\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C08",
+      "group": "💬 แชทบอท",
+      "title": "ขอใบเสนอราคาหน่อย",
+      "expect": "ได้เลข QT-",
+      "status": "passed",
+      "durationMs": 12547,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "สร้างใบเสนอราคาเรียบร้อยแล้วครับ เลขที่ QT-20261023-0018 ยอดรวม 2,086.50 บาท ดูและพิมพ์ได้ที่ /quote/QT-20261023-0018 (มีอายุ 7 วัน) ครับ"
+        }
+      ],
+      "checked": "{\n  \"quoteNo\": \"QT-20261023-0018\",\n  \"exists\": true\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C09",
+      "group": "💬 แชทบอท",
+      "title": "ส่งของ 5 ตันใช้รถอะไร ค่าส่งเท่าไร",
+      "expect": "รถ 6 ล้อ 1,500",
+      "status": "passed",
+      "durationMs": 11946,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "น้ำหนัก 5,000 กก. ใช้รถ 6 ล้อ ค่าส่ง 1,500 บาท ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C10",
+      "group": "💬 แชทบอท",
+      "title": "มีโค้ดส่วนลดไหม",
+      "expect": "มี BUILD5 และ CONTRACTOR10",
+      "status": "passed",
+      "durationMs": 10803,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "มีโค้ดส่วนลดดังนี้ครับ (ใช้ได้ทีละ 1 ใบ ลดจากยอดหลังราคาส่ง)\n\nBUILD5 ลด 5% เมื่อยอดก่อน VAT ตั้งแต่ 5,000 บาท\nCONTRACTOR10 ลด 10% เมื่อยอดก่อน VAT ตั้งแต่ 30,000 บาท\n\nใส่โค้ดได้ที่หน้าตะกร้าครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C11",
+      "group": "💬 แชทบอท",
+      "title": "มีกระเบื้องยางขายไหม",
+      "expect": "บอกว่าไม่มี ไม่แต่งสินค้า",
+      "status": "passed",
+      "durationMs": 11637,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ขออภัยครับ ตอนนี้ร้านไม่มี \"กระเบื้องยาง\" ขายครับ\nสินค้าใกล้เคียงที่ร้านมี:\n\nTIL-001 กระเบื้องพื้น 60x60 ลายหินอ่อน (กล่อง 4 แผ่น = 1.44 ตร.ม.) 389 บาท/กล่อง\nTIL-002 กระเบื้องผนัง 30x60 ขาวเงา (กล่อง 8 แผ่น = 1.44 ตร.ม.) 299 บาท/กล่อง\nCEM-004 ปูนกาวซีเมนต์ ปูกระเบื้อง (20 กก.) 185 บาท/ถุง ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C12",
+      "group": "💬 แชทบอท",
+      "title": "ช่วยเขียนโค้ด Python ให้หน่อย",
+      "expect": "ปฏิเสธสุภาพ ชวนกลับเรื่องวัสดุ",
+      "status": "passed",
+      "durationMs": 11694,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ขออภัยครับ เรื่องนี้ผมช่วยไม่ได้ ผมเป็นผู้ช่วยของร้าน บ้านช่าง BuildMart ตอบได้เฉพาะเรื่องวัสดุก่อสร้าง ราคา สต็อก การจัดส่ง และคำนวณวัสดุครับ มีงานก่อสร้างหรือวัสดุอะไรให้ช่วยดูไหมครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C13",
+      "group": "💬 แชทบอท",
+      "title": "ทาสีภายนอก 120 ตร.ม. แล้วราคารวม",
+      "expect": "มี 8 แกลลอน และ 7,120 (8 × 890)",
+      "status": "passed",
+      "durationMs": 19340,
+      "answers": [
+        {
+          "name": "answer-1",
+          "text": "ทาสีภายนอก 120 ตร.ม. 2 เที่ยว ต้องใช้สี 8 แกลลอน และสีรองพื้น 3 แกลลอน ครับ\n\nPNT-001 สีน้ำอะคริลิก ภายนอก สีขาว : 8 แกลลอน\nPNT-003 สีรองพื้นปูนใหม่ : 3 แกลลอน\n\nถ้าต้องการ พิมพ์ \"ใส่ตะกร้าให้เลย\" ได้เลยครับ"
+        },
+        {
+          "name": "answer",
+          "text": "สรุปราคา (ยังไม่รวม VAT 7%)\n\nPNT-001 สีน้ำอะคริลิก ภายนอก สีขาว (แกลลอน 3.785 ล.): 8 × 890 = 7,120 บาท\nPNT-003 สีรองพื้นปูนใหม่ (แกลลอน): 3 × 650 = 1,950 บาท\n\nรวมทั้งหมด 9,070 บาท ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "C14",
+      "group": "💬 แชทบอท",
+      "title": "สาขาบางนาเบอร์อะไร",
+      "expect": "มี 02-111-0002",
+      "status": "passed",
+      "durationMs": 10496,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "สาขาบางนา (BNA) โทร 02-111-0002\nหรือทัก LINE @buildmart-demo ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R01",
+      "group": "📄 RAG",
+      "title": "ปูนเก็บได้นานแค่ไหน",
+      "expect": "มี \"3 เดือน\" · อ้างอิง BM-DS-CEM.pdf",
+      "status": "passed",
+      "durationMs": 11768,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-DS-CEM.pdf หน้า 8: ปูนซีเมนต์เก็บได้ 3 เดือนนับจากวันผลิต หากเก็บนานกว่านี้ปูนจะดูดความชื้น จับตัวเป็นก้อน และกำลังอัดลดลง ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-CEM.pdf · หน้า 8"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R02",
+      "group": "📄 RAG",
+      "title": "สีทาภายนอกรับประกันกี่ปี",
+      "expect": "มี 8 ปี · อ้างอิง BM-DS-PNT.pdf",
+      "status": "passed",
+      "durationMs": 11396,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-DS-PNT.pdf หน้า 9: สีทาภายนอก PNT-001 รับประกัน 8 ปี เมื่อทาครบระบบรองพื้น 1 เที่ยวและสีทับหน้า 2 ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-PNT.pdf · หน้า 9"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R03",
+      "group": "📄 RAG",
+      "title": "TIL-001 ปูพื้นนอกบ้านได้ไหม",
+      "expect": "ได้ · มี 0.5% หรือ R10 · อ้างอิง BM-DS-TIL.pdf",
+      "status": "passed",
+      "durationMs": 12197,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ได้ครับ จากเอกสาร BM-DS-TIL.pdf หน้า 9: กระเบื้อง TIL-001 ปูพื้นภายนอกได้ ดูดซึมน้ำ < 0.5% และกันลื่นระดับ R10 ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-TIL.pdf · หน้า 9"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R04",
+      "group": "📄 RAG",
+      "title": "ปูนเปิดถุงแล้วคืนได้ไหม",
+      "expect": "ตอบว่าคืนไม่ได้ · อ้างอิง BM-POLICY.pdf",
+      "status": "passed",
+      "durationMs": 11929,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ไม่ได้ครับ จากเอกสาร BM-POLICY.pdf หน้า 4: ปูนที่เปิดถุงแล้วคืนไม่ได้ทุกกรณี แม้ใช้ไปเพียงบางส่วนหรือยังอยู่ในระยะ 7 วัน ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-POLICY.pdf · หน้า 4"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R05",
+      "group": "📄 RAG",
+      "title": "ทาบเหล็ก DB12 ต้องยาวเท่าไร",
+      "expect": "มี 48 · อ้างอิง BM-DS-STL.pdf",
+      "status": "passed",
+      "durationMs": 11579,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-DS-STL.pdf หน้า 9: เท่าของเส้นผ่านศูนย์กลาง ทาบเหล็ก DB12 ต้องยาวอย่างน้อย 48 ซม. และ DB16 อย่างน้อย 64 ซม. ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-STL.pdf · หน้า 9"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R06",
+      "group": "📄 RAG",
+      "title": "สาย THW 2.5 กับเบรกเกอร์ (Hybrid)",
+      "expect": "มี 16 และ 145 (สเปกจาก PDF + ราคาจาก DB) · อ้างอิง BM-DS-ELC-PIP.pdf",
+      "status": "passed",
+      "durationMs": 14099,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-DS-ELC-PIP.pdf หน้า 3: สาย THW 2.5 ตร.มม. รับกระแสได้ 21 A ใช้คู่กับเบรกเกอร์ 16–20 A\nเบรกเกอร์ลูกย่อย 16A (ELC-002) ราคา 145 บาท/ตัว (ยังไม่รวม VAT 7%) ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-ELC-PIP.pdf · หน้า 3"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R08",
+      "group": "📄 RAG",
+      "title": "ปูกระเบื้อง 60x60 เกรียงฟัน + ปูนกาว",
+      "expect": "มี 10 (มม.) และ 5.5 (กก./ตร.ม.) — อ่านจากตารางหัว 2 ชั้น · อ้างอิง BM-DS-CEM.pdf",
+      "status": "passed",
+      "durationMs": 15284,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-DS-CEM.pdf หน้า 6: กระเบื้อง 60x60 ซม. ใช้เกรียงฟัน 10 มม. อัตราการใช้ปูนกาวประมาณ 5.5 กก./ตร.ม. ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [
+        "📄 BM-DS-CEM.pdf · หน้า 6"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "R07",
+      "group": "📄 RAG",
+      "title": "อัปโหลด BM-PROMO-NOV.pdf แล้วถามโปร",
+      "expect": "มี \"ลวดผูกเหล็ก\" · อ้างอิง BM-PROMO-NOV.pdf (ลบเอกสารทิ้งตอนจบ)",
+      "status": "passed",
+      "durationMs": 20013,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "จากเอกสาร BM-PROMO-NOV.pdf หน้า 1: โปรเดือนพฤศจิกายน: ซื้อปูน CEM-001 ครบ 100 ถุง แถมลวดผูกเหล็ก ครับ"
+        }
+      ],
+      "checked": "{\n  \"upload\": \"BM-PROMO-NOV.pdf\",\n  \"status\": \"ready\",\n  \"chunks\": \"3\",\n  \"ingestMs\": 824\n}",
+      "cites": [
+        "📄 BM-PROMO-NOV.pdf · หน้า 1"
+      ],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "Q01",
+      "group": "📨 RabbitMQ",
+      "title": "แชท 8 หน้าต่างพร้อมกัน",
+      "expect": "ได้คำตอบครบ 8 ไม่มี error · คิว chat.request มี consumer",
+      "status": "passed",
+      "durationMs": 43860,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "1. ร้านเปิดกี่โมงครับ → ร้านเปิดวันจันทร์–เสาร์ 07:00–18:00 น. และวันอาทิตย์ 08:00–12:00 น. ครับ\n2. ปูนซีเมนต์ถุงละเท่าไร → ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) (CEM-001) ราคา 145 บาท/ถุง (ยังไม่รวม VAT 7%) ครับ\n3. มีโค้ดส่วนลดไหม → มีโค้ดส่วนลดดังนี้ครับ (ใช้ได้ทีละ 1 ใบ ลดจากยอดหลังราคาส่ง) BUILD5 ลด 5% เมื่อยอดก่อน VAT ตั้งแต่ 5,000 บาท CONTRACTOR10 ลด 10% เมื่อยอดก่อน VAT ตั้งแต่ 30,000 บาท ใส่โค้ดได้ที่หน้าตะกร้าครับ\n4. สาขาบางนาเบอร์อะไร → สาขาบางนา (BNA) โทร 02-111-0002 หรือทัก LINE @buildmart-demo ครับ\n5. วันอาทิตย์เปิดไหม → วันอาทิตย์ร้านเปิดครับ เวลา 08:00–12:00 น. (จันทร์–เสาร์ 07:00–18:00 น.) ครับ\n6. ส่งของน้ำหนัก 5 ตันใช้รถอะไร ค่าส่งเท่าไร → น้ำหนัก 5,000 กก. ใช้รถ 6 ล้อ ค่าส่ง 1,500 บาท ครับ\n7. ปูนซีเมนต์เก็บได้นานแค่ไหนครับ → จากเอกสาร BM-DS-CEM.pdf หน้า 8: ปูนซีเมนต์เก็บได้ 3 เดือนนับจากวันผลิต หากเก็บนานกว่านี้ปูนจะดูดความชื้น จับตัวเป็นก้อน และกำลังอัดลดลง ครับ\n8. สีทาภายนอกรับประกันกี่ปี → จากเอกสาร BM-DS-PNT.pdf หน้า 9: สีทาภายนอก PNT-001 รับประกัน 8 ปี เมื่อทาครบระบบรองพื้น 1 เที่ยวและสีทับหน้า 2 ครับ"
+        }
+      ],
+      "checked": "{\n  \"totalMs\": 21392,\n  \"peakQueue\": {\n    \"ready\": 0,\n    \"unacked\": 0,\n    \"consumers\": 1\n  },\n  \"states\": [\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\",\n    \"เสร็จ\"\n  ],\n  \"ms\": [\n    21297,\n    21296,\n    21296,\n    843,\n    842,\n    843,\n    21297,\n    21299\n  ]\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "Q02",
+      "group": "📨 RabbitMQ",
+      "title": "หยุด chat-worker แล้วข้อความไม่หาย",
+      "expect": "ข้อความไม่หาย ได้คำตอบที่มี 145",
+      "status": "passed",
+      "durationMs": 20680,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ปูนซีเมนต์ปอร์ตแลนด์ ประเภท 1 (50 กก.) (CEM-001) ราคา 145 บาท/ถุง (ยังไม่รวม VAT 7%) ครับ"
+        }
+      ],
+      "checked": "{\n  \"queueWhileWorkerStopped\": {\n    \"messages\": 1,\n    \"ready\": 1,\n    \"unacked\": 0,\n    \"consumers\": 0\n  },\n  \"queueAfter\": {\n    \"messages\": 1,\n    \"ready\": 1,\n    \"unacked\": 0,\n    \"consumers\": 0\n  }\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "Q03",
+      "group": "📨 RabbitMQ",
+      "title": "สั่งซื้อจนสต็อกต่ำ → แจ้งเตือนหลังร้าน",
+      "expect": "แจ้งเตือน \"คำสั่งซื้อใหม่ BM-…\" และ \"สต็อกต่ำ\" (จาก order.events)",
+      "status": "passed",
+      "durationMs": 28159,
+      "answers": [],
+      "checked": "{\n  \"pick\": {\n    \"sku\": \"TOL-002\",\n    \"branch\": \"RST\",\n    \"qty\": 1,\n    \"stock\": 3,\n    \"reorder\": 5\n  },\n  \"orderNo\": \"BM-20261023-0014\",\n  \"stockAfter\": 2,\n  \"order\": \"🧾\\nคำสั่งซื้อใหม่ BM-20261023-0014 · 1 รายการ · ยอด ฿3,199.30 · ส่งจากสาขารังสิต\\nคำสั่งซื้อใหม่ · 23 ต.ค. 12:11\",\n  \"lowStock\": \"⚠️\\nสต็อกต่ำ: สว่านกระแทกไร้สาย 18V (TOL-002) สาขารังสิต (RST) คงเหลือ 2 เครื่อง (จุดสั่งซื้อซ้ำ 5)\\nสต็อกต่ำ · 23 ต.ค. 12:11\"\n}",
+      "cites": [],
+      "audio": [],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "T01",
+      "group": "🔊 อ่านออกเสียง",
+      "title": "ร้านเปิดกี่โมง → กดฟัง (ไทย)",
+      "expect": "ได้ WAV ภาษาไทยยาว > 1 วินาที และเล่นในหน้าเว็บ",
+      "status": "passed",
+      "durationMs": 19862,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "ร้านเปิดวันจันทร์–เสาร์ 07:00–18:00 น. และวันอาทิตย์ 08:00–12:00 น. ครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [
+        {
+          "audioId": "8d25e66a-dda6-43d4-a38a-81c31b20c875",
+          "offsetMs": 10639,
+          "durationMs": 7220
+        }
+      ],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "T02",
+      "group": "🔊 อ่านออกเสียง",
+      "title": "Portland cement → กดฟัง (Kokoro)",
+      "expect": "ตอบภาษาอังกฤษ · เสียง Kokoro ยาว > 1 วินาที",
+      "status": "passed",
+      "durationMs": 22370,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "Portland cement Type 1 (50 kg) (CEM-001) costs 145 baht per bag (excluding 7% VAT)."
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [
+        {
+          "audioId": "3ba9558e-5f46-4e28-a278-95a3c6a20430",
+          "offsetMs": 11392,
+          "durationMs": 8927
+        }
+      ],
+      "error": "",
+      "skipReason": ""
+    },
+    {
+      "id": "T03",
+      "group": "🔊 อ่านออกเสียง",
+      "title": "อ่านออกเสียงอัตโนมัติ",
+      "expect": "เล่นเสียงเองโดยไม่ต้องกด",
+      "status": "passed",
+      "durationMs": 36193,
+      "answers": [
+        {
+          "name": "answer",
+          "text": "มีโค้ดส่วนลดดังนี้ครับ (ใช้ได้ทีละ 1 ใบ ลดจากยอดหลังราคาส่ง)\n\nBUILD5 ลด 5% เมื่อยอดก่อน VAT ตั้งแต่ 5,000 บาท\nCONTRACTOR10 ลด 10% เมื่อยอดก่อน VAT ตั้งแต่ 30,000 บาท\n\nใส่โค้ดได้ที่หน้าตะกร้าครับ"
+        }
+      ],
+      "checked": "",
+      "cites": [],
+      "audio": [
+        {
+          "audioId": "0adf499f-ea64-4cf3-aa63-bb08a79ddd1a",
+          "offsetMs": 12881,
+          "durationMs": 19690
+        }
+      ],
+      "error": "",
+      "skipReason": ""
+    }
+  ]
+}

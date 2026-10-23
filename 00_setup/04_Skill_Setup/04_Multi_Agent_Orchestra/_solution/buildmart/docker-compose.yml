@@ -1,0 +1,165 @@
+# บ้านช่าง BuildMart — ทั้งระบบในไฟล์เดียว (build context = โฟลเดอร์นี้ทุก service)
+#   ฟรี (mock):   docker compose -p buildmart --profile mock up -d --build
+#   AI จริง:      วาง .env.vast แล้ว docker compose -p buildmart up -d --build
+#   เปิดเสียง:    เติม --profile tts
+#   build ใหม่ทีละตัว: docker compose -p buildmart up -d --build --no-deps web
+name: buildmart
+
+x-worker-env: &worker-env
+  DATABASE_URL: postgres://bm:bm@db:5432/buildmart
+  AMQP_URL: amqp://guest:guest@rabbitmq:5672
+  EMBED_URL: http://embedder:80
+
+x-worker-health: &worker-health
+  # worker เขียนไฟล์ /tmp/ready เมื่อเชื่อม DB + RabbitMQ สำเร็จ (workers/lib/ready.js)
+  test: ["CMD-SHELL", "test -f /tmp/ready"]
+  interval: 5s
+  timeout: 3s
+  retries: 30
+  start_period: 10s
+
+services:
+  db:
+    build: { context: ., dockerfile: db/Dockerfile }
+    environment:
+      POSTGRES_USER: bm
+      POSTGRES_PASSWORD: bm
+      POSTGRES_DB: buildmart
+    volumes: [bm-db:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bm -d buildmart && psql -U bm -d buildmart -tAc 'select 1 from products limit 1' | grep -q 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:4.4-management
+    hostname: buildmart-mq
+    ports: ["127.0.0.1:15672:15672"]
+    volumes: [bm-mq:/var/lib/rabbitmq]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  embedder:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9
+    command: ["--model-id", "intfloat/multilingual-e5-small", "--port", "80"]
+    volumes: [bm-hf:/data]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 600s   # ครั้งแรกโหลดโมเดล ~470MB
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: web/Dockerfile }
+    ports: ["3400:3000"]
+    environment:
+      DATABASE_URL: postgres://bm:bm@db:5432/buildmart
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
+      TTS_ENABLED: ${TTS_ENABLED:-auto}
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  chat-worker:
+    build: { context: ., dockerfile: workers/Dockerfile }
+    command: ["node", "chat-worker.js"]
+    # .env.vast (ถ้ามี) ให้ MODE / LLM_BASE_URL / LLM_MODEL / LLM_API_KEY
+    # ไม่มี → workers/lib/config.js เลือก mock-llm (http://mock-llm:8000) และ MODE=mock อัตโนมัติ
+    # (อย่าใส่ LLM_* ใน environment: ด้านล่าง เพราะ environment ทับค่าจาก env_file)
+    env_file:
+      - path: .env.vast
+        required: false
+    environment:
+      <<: *worker-env
+      MOCK_LLM_URL: http://mock-llm:8000
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      embedder: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  rag-worker:
+    build: { context: ., dockerfile: workers/Dockerfile }
+    command: ["node", "rag-worker.js"]
+    environment: *worker-env
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      embedder: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  notify-worker:
+    build: { context: ., dockerfile: workers/Dockerfile }
+    command: ["node", "notify-worker.js"]
+    environment: *worker-env
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  mock-llm:
+    profiles: [mock]
+    build: { context: ., dockerfile: mock-llm/Dockerfile }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+
+  tts-worker:
+    profiles: [tts]
+    build: { context: ., dockerfile: tts/Dockerfile }
+    environment:
+      DATABASE_URL: postgres://bm:bm@db:5432/buildmart
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      KOKORO_URL: http://kokoro:8880
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      kokoro: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "healthcheck.py"]   # heartbeat file < 60 s old = connected + consuming
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    restart: unless-stopped
+
+  kokoro:
+    profiles: [tts]
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:v0.9.0
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://localhost:8880/health', timeout=4); sys.exit(0)"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 300s
+    restart: unless-stopped
+
+volumes:
+  bm-db:
+  bm-hf:
+  bm-mq:

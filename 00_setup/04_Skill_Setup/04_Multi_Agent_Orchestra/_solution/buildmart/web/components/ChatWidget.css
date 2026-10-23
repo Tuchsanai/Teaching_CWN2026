@@ -1,0 +1,94 @@
+/* ChatWidget (C1) — แชทบอทน้องช่าง · class ขึ้นต้น bmchat- ทั้งหมด */
+.bmchat { position: fixed; right: 20px; bottom: 20px; z-index: 60; font-family: var(--font); }
+
+.bmchat-fab { display: flex; align-items: center; gap: 8px; border: 0; cursor: pointer; border-radius: 999px;
+  padding: 12px 20px 12px 14px; background: var(--brand); color: #fff; font-weight: 700; font-size: 16px;
+  box-shadow: 0 6px 20px rgba(242, 107, 29, 0.45), 0 2px 6px rgba(0, 0, 0, 0.15); transition: transform 0.15s, background 0.15s; }
+.bmchat-fab:hover { background: var(--brand-dark); transform: translateY(-2px); }
+.bmchat-fab-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: grid; place-items: center; font-size: 18px; }
+
+.bmchat-panel { width: 400px; max-width: calc(100vw - 24px); height: min(640px, calc(100vh - 40px)); display: flex; flex-direction: column;
+  background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: bmchat-in 0.18s ease-out; }
+@keyframes bmchat-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.bmchat-head { display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 14px; color: #fff;
+  background: linear-gradient(120deg, var(--ink) 0%, #3d434c 70%, var(--brand) 160%); flex-wrap: wrap; }
+.bmchat-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--brand); display: grid; place-items: center; font-size: 20px; flex: none; }
+.bmchat-title { display: flex; flex-direction: column; line-height: 1.25; flex: 1; min-width: 120px; }
+.bmchat-title b { font-size: 16px; white-space: nowrap; }
+.bmchat-title span { font-size: 12px; color: #d1d5db; }
+.bmchat-close { border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.bmchat-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* สวิตช์อ่านออกเสียงอัตโนมัติ (checkbox ซ่อน + track) */
+.bmchat-switch { order: 5; flex-basis: 100%; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #e5e7eb; user-select: none; position: relative; margin: 2px 0 0 48px; width: max-content; max-width: calc(100% - 48px); }
+.bmchat-switch input { position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 1; opacity: 0; width: 36px; height: 20px; margin: 0; cursor: pointer; }
+.bmchat-switch-track, .bmchat-switch-text { pointer-events: none; }
+.bmchat-switch-track { width: 36px; height: 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.25); position: relative; transition: background 0.15s; flex: none; }
+.bmchat-switch-knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left 0.15s; }
+.bmchat-switch input:checked + .bmchat-switch-track { background: var(--brand); }
+.bmchat-switch input:checked + .bmchat-switch-track .bmchat-switch-knob { left: 18px; }
+.bmchat-switch input:focus-visible + .bmchat-switch-track { outline: 2px solid #fff; outline-offset: 2px; }
+
+.bmchat-list { flex: 1; overflow-y: auto; padding: 14px 12px; background: var(--bg); display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+.bmchat-welcome { background: var(--brand-soft); border: 1px dashed #f8b88f; color: var(--ink-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+
+.bmchat-row { display: flex; flex-direction: column; gap: 6px; }
+.bmchat-row.user { align-items: flex-end; }
+.bmchat-row.bot { align-items: flex-start; }
+.bmchat-bubble { max-width: 86%; padding: 9px 13px; border-radius: 14px; font-size: 15px; line-height: 1.55; word-break: break-word; }
+.bmchat-bubble.user { background: var(--brand); color: #fff; border-bottom-right-radius: 4px; white-space: pre-wrap; }
+.bmchat-bubble.bot { background: #fff; color: var(--ink); border: 1px solid var(--line); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+.bmchat-bubble.bot.error { background: #fef2f2; border-color: #fecaca; color: var(--danger); }
+.bmchat-bubble p { margin: 0 0 6px; }
+.bmchat-bubble p:last-child, .bmchat-bubble ul:last-child, .bmchat-bubble ol:last-child { margin-bottom: 0; }
+.bmchat-bubble ul, .bmchat-bubble ol { margin: 2px 0 6px; padding-left: 20px; }
+.bmchat-bubble li { margin: 1px 0; }
+.bmchat-bubble strong { color: var(--brand-dark); }
+.bmchat-caret { display: inline-block; width: 7px; height: 15px; margin-left: 2px; vertical-align: -2px; background: var(--brand); animation: bmchat-blink 0.9s steps(2) infinite; }
+@keyframes bmchat-blink { 50% { opacity: 0; } }
+
+.bmchat-status { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: #fff; border: 1px solid var(--line); color: var(--muted); }
+.bmchat-status.queued { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+.bmchat-status.thinking { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.bmchat-dots { display: inline-flex; gap: 3px; }
+.bmchat-dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.35; animation: bmchat-dot 1s infinite; }
+.bmchat-dots i:nth-child(2) { animation-delay: 0.15s; }
+.bmchat-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bmchat-dot { 0%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+.bmchat-meta { display: flex; flex-wrap: wrap; gap: 6px; max-width: 92%; }
+.bmchat-cite { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; text-decoration: none; padding: 3px 9px; border-radius: 999px;
+  background: #fff; border: 1px solid #f8b88f; color: var(--brand-dark); font-weight: 600; }
+.bmchat-cite:hover { background: var(--brand-soft); }
+.bmchat-cite.quote { border-color: #bbf7d0; color: var(--ok); }
+.bmchat-tts { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; padding: 3px 10px; border-radius: 999px; cursor: pointer;
+  background: #fff; border: 1px solid var(--line); color: var(--ink-2); font-weight: 600; }
+.bmchat-tts:hover:not(:disabled) { border-color: var(--brand); color: var(--brand-dark); }
+.bmchat-tts.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.bmchat-tts:disabled { cursor: progress; opacity: 0.85; }
+.bmchat-spin { width: 13px; height: 13px; border: 2px solid #f8b88f; border-top-color: var(--brand); border-radius: 50%; animation: bmchat-rot 0.7s linear infinite; }
+@keyframes bmchat-rot { to { transform: rotate(360deg); } }
+
+.bmchat-suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px 0; background: #fff; border-top: 1px solid var(--line); }
+.bmchat-suggest button { flex: none; border: 1px solid #f8b88f; background: var(--brand-soft); color: var(--brand-dark); border-radius: 999px;
+  padding: 5px 11px; font-size: 13px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+.bmchat-suggest button:hover:not(:disabled) { background: var(--brand); color: #fff; }
+.bmchat-suggest button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.bmchat-form { display: flex; gap: 8px; padding: 10px; background: #fff; align-items: flex-end; }
+.bmchat-input { flex: 1; resize: none; border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; font-size: 15px; max-height: 110px; min-height: 42px; outline: none; }
+.bmchat-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(242, 107, 29, 0.15); }
+.bmchat-send { width: 42px; height: 42px; flex: none; border: 0; border-radius: 12px; background: var(--brand); color: #fff; font-size: 17px; cursor: pointer; }
+.bmchat-send:hover:not(:disabled) { background: var(--brand-dark); }
+.bmchat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+
+@media (max-width: 520px) {
+  .bmchat { right: 12px; bottom: 12px; }
+  .bmchat-fab-label { display: none; }
+  .bmchat-fab { padding: 10px; }
+  .bmchat-panel { position: fixed; inset: 0; width: 100vw; max-width: 100vw; height: 100dvh; border-radius: 0; }
+}
+@media print { .bmchat { display: none; } }

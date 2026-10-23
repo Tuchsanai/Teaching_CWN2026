@@ -1,0 +1,151 @@
+/* B2 — ตะกร้า · ชำระเงิน · ใบเสนอราคา · ติดตาม (คลาสขึ้นต้น b2- กันชนกับหน้าอื่น) */
+.b2-page h1 { font-size: 26px; margin: 4px 0 4px; }
+.b2-sub { color: var(--muted); margin: 0 0 18px; }
+.b2-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.b2-grid > aside { position: sticky; top: 84px; }
+.b2-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+.b2-card + .b2-card { margin-top: 16px; }
+.b2-card h2 { font-size: 18px; margin: 0 0 12px; }
+
+/* ---------- ตาราง ---------- */
+.b2-table { width: 100%; border-collapse: collapse; }
+.b2-table th { text-align: left; font-size: 13px; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.b2-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.b2-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.b2-table tr:last-child td { border-bottom: 0; }
+.b2-name { font-weight: 600; text-decoration: none; display: block; }
+.b2-name:hover { color: var(--brand-dark); }
+.b2-sku { font-size: 12px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; }
+.b2-strike { text-decoration: line-through; color: var(--muted); font-size: 12px; display: block; }
+.b2-tier { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; background: var(--ok); border-radius: 999px; padding: 0 7px; margin-left: 4px; }
+.b2-hint { font-size: 12px; color: var(--brand-dark); margin-top: 3px; }
+
+.b2-qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+.b2-qty button { border: 0; background: var(--bg); width: 30px; height: 34px; cursor: pointer; font-size: 18px; color: var(--ink-2); }
+.b2-qty button:hover { background: var(--brand-soft); color: var(--brand-dark); }
+.b2-qty input { width: 64px; height: 34px; border: 0; text-align: center; font-weight: 600; -moz-appearance: textfield; }
+.b2-qty input::-webkit-outer-spin-button, .b2-qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.b2-remove { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px 6px; border-radius: 6px; }
+.b2-remove:hover { color: var(--danger); background: #fee2e2; }
+
+/* ---------- สรุปยอด ---------- */
+.b2-sum { display: grid; gap: 8px; font-variant-numeric: tabular-nums; }
+.b2-sum .row { display: flex; justify-content: space-between; gap: 10px; }
+.b2-sum .row span:first-child { color: var(--ink-2); }
+.b2-sum .row.disc span:last-child { color: var(--ok); font-weight: 600; }
+.b2-sum .row.total { border-top: 2px solid var(--ink); padding-top: 10px; margin-top: 4px; font-size: 20px; font-weight: 800; }
+.b2-sum .row.total span:last-child { color: var(--brand-dark); }
+.b2-truck { display: flex; align-items: center; gap: 10px; background: var(--brand-soft); border-radius: 8px; padding: 10px 12px; margin: 4px 0; }
+.b2-truck .ico { font-size: 26px; }
+.b2-truck b { display: block; }
+.b2-truck small { color: var(--ink-2); }
+.b2-free { color: var(--ok); font-weight: 700; }
+
+.b2-coupon { display: flex; gap: 8px; margin-bottom: 8px; }
+.b2-coupon .input { flex: 1; text-transform: uppercase; }
+.b2-chip { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: var(--ok); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 600; }
+.b2-chip button { border: 0; background: none; cursor: pointer; color: inherit; font-size: 14px; }
+.b2-actions { display: grid; gap: 8px; margin-top: 14px; }
+.b2-actions .btn { justify-content: center; padding: 12px 16px; font-size: 16px; }
+
+.b2-msg { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin: 8px 0; }
+.b2-msg.err { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+.b2-msg.ok { background: #dcfce7; color: var(--ok); border: 1px solid #bbf7d0; }
+.b2-msg.warn { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.b2-msg ul { margin: 6px 0 0; padding-left: 20px; }
+
+.b2-empty { text-align: center; padding: 48px 16px; }
+.b2-empty .big { font-size: 56px; }
+.b2-empty p { color: var(--muted); }
+
+/* ---------- ฟอร์ม ---------- */
+.b2-form { display: grid; gap: 14px; }
+.b2-form label { display: grid; gap: 5px; font-weight: 600; font-size: 14px; }
+.b2-form label .muted { font-weight: 400; }
+.b2-form .input, .b2-form .select, .b2-form textarea { width: 100%; padding: 10px 12px; }
+.b2-form textarea { border: 1px solid var(--line); border-radius: 8px; min-height: 76px; resize: vertical; }
+.b2-form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+.b2-branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.b2-branch { border: 2px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; cursor: pointer; background: #fff; text-align: left; }
+.b2-branch b { display: block; font-size: 14px; }
+.b2-branch.sel { border-color: var(--brand); background: var(--brand-soft); }
+.b2-branch .ok { color: var(--ok); }
+.b2-branch .no { color: var(--danger); }
+
+.b2-mini { display: grid; gap: 6px; font-size: 14px; margin-bottom: 12px; max-height: 260px; overflow: auto; }
+.b2-mini .it { display: flex; justify-content: space-between; gap: 8px; }
+.b2-mini .it span:first-child { overflow: hidden; text-overflow: ellipsis; }
+
+.b2-success { text-align: center; padding: 32px 18px; }
+.b2-success .big { font-size: 60px; }
+.b2-docno { display: inline-block; font-family: ui-monospace, Consolas, monospace; font-size: 24px; font-weight: 800; letter-spacing: 1px;
+  background: var(--ink); color: #fff; border-radius: 8px; padding: 6px 16px; margin: 6px 0 12px; }
+
+/* ---------- ติดตาม ---------- */
+.b2-track-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+.b2-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 20px 0 8px; position: relative; }
+.b2-step { text-align: center; position: relative; padding-top: 4px; }
+.b2-step::before { content: ''; position: absolute; top: 24px; left: -50%; width: 100%; height: 4px; background: var(--line); z-index: 0; }
+.b2-step:first-child::before { display: none; }
+.b2-step[data-active='true']::before { background: var(--brand); }
+.b2-step .dot { position: relative; z-index: 1; width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 8px; display: grid; place-items: center;
+  background: #fff; border: 3px solid var(--line); font-size: 20px; }
+.b2-step[data-active='true'] .dot { border-color: var(--brand); background: var(--brand); }
+.b2-step.current .dot { box-shadow: 0 0 0 6px rgba(242, 107, 29, 0.22); }
+.b2-step .lbl { font-weight: 700; font-size: 14px; }
+.b2-step[data-active='false'] .lbl { color: var(--muted); }
+.b2-step .when { font-size: 12px; color: var(--muted); min-height: 18px; }
+.b2-status-now { font-size: 15px; }
+.b2-status-now b { color: var(--brand-dark); font-size: 20px; }
+.b2-kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; font-size: 14px; }
+.b2-kv dt { color: var(--muted); }
+.b2-kv dd { margin: 0; font-weight: 600; }
+
+/* ---------- ใบเสนอราคา (พิมพ์ได้) ---------- */
+.b2-doc { max-width: 900px; margin: 0 auto; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 40px; }
+.b2-doc-head { display: flex; justify-content: space-between; gap: 20px; border-bottom: 3px solid var(--brand); padding-bottom: 16px; margin-bottom: 18px; }
+.b2-doc-head .shop b { font-size: 22px; display: block; }
+.b2-doc-head .shop b span { color: var(--brand); }
+.b2-doc-head .shop div { font-size: 13px; color: var(--ink-2); }
+.b2-doc-head .title { text-align: right; }
+.b2-doc-head .title h1 { margin: 0; font-size: 28px; color: var(--brand-dark); }
+.b2-doc-head .title .no { font-family: ui-monospace, Consolas, monospace; font-size: 17px; font-weight: 800; }
+.b2-doc-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; font-size: 14px; }
+.b2-doc-meta .box { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.b2-doc-meta .box h3 { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.b2-doc .b2-table th { background: var(--bg); }
+.b2-doc-foot { display: grid; grid-template-columns: 1fr 320px; gap: 24px; margin-top: 16px; }
+.b2-doc-note { font-size: 13px; color: var(--ink-2); }
+.b2-doc-note ul { padding-left: 18px; margin: 6px 0; }
+.b2-toolbar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 18px 0 0; }
+.b2-expired { background: #fee2e2; color: var(--danger); border-radius: 8px; padding: 8px 12px; font-weight: 600; margin-bottom: 12px; text-align: center; }
+.b2-sign { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; text-align: center; font-size: 13px; color: var(--ink-2); }
+.b2-sign div { border-top: 1px dotted var(--muted); padding-top: 6px; }
+
+@media (max-width: 900px) {
+  .b2-grid { grid-template-columns: 1fr; }
+  .b2-grid > aside { position: static; }
+  .b2-doc { padding: 20px 16px; }
+  .b2-doc-head, .b2-doc-foot, .b2-doc-meta { grid-template-columns: 1fr; display: grid; }
+  .b2-doc-head .title { text-align: left; }
+}
+@media (max-width: 640px) {
+  .b2-table.resp thead { display: none; }
+  .b2-table.resp tr { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .b2-table.resp td { border: 0; padding: 0; }
+  .b2-table.resp td.wide { grid-column: 1 / -1; }
+  .b2-form .two, .b2-track-form, .b2-branches { grid-template-columns: 1fr; }
+  .b2-steps { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+  .b2-step::before { display: none; }
+  .b2-kv { grid-template-columns: 110px 1fr; }
+}
+@media print {
+  @page { size: A4; margin: 14mm; }
+  main.container { padding: 0 !important; max-width: none; }
+  .b2-doc { box-shadow: none; border-radius: 0; padding: 0; max-width: none; }
+  .b2-doc-head, .b2-doc-foot, .b2-doc-meta { display: flex; }
+  .b2-doc-foot > * , .b2-doc-meta > * { flex: 1; }
+  .b2-table tr { break-inside: avoid; }
+  .b2-toolbar { display: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

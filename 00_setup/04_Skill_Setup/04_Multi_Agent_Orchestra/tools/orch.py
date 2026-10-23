@@ -61,7 +61,16 @@ DEFAULT_CFG = {
         "worker":       {"yolo": ["opus", "medium"], "cyolo": ["gpt-6-astra", "medium"]},
         "image":        {"cyolo": ["gpt-6-astra", "medium"]},
     },
-    "dev_db": {"name": "bm-devdb", "port": 55432, "user": "dev", "password": "dev"},
+    "dev_db": {"name": "bm-devdb", "port": 55432, "user": "dev", "password": "dev", "host": "auto",
+               "image": "pgvector/pgvector:pg16"},                      # Postgres + pgvector (ใช้ RAG ได้)
+    # บริการ dev เพิ่มเติมที่ worker ทุกตัวใช้ร่วมกัน (infra up เปิดให้) · ใส่ [] = ไม่เปิด
+    "dev_services": [
+        {"name": "bm-devmq", "image": "rabbitmq:4.4-management", "ports": {"5672": 55672, "15672": 55673},
+         "env": "AMQP_URL=amqp://guest:guest@{host}:55672"},
+        {"name": "bm-devembed", "image": "ghcr.io/huggingface/text-embeddings-inference:cpu-1.9",
+         "args": "--model-id intfloat/multilingual-e5-small", "ports": {"80": 55680},
+         "env": "EMBED_URL=http://{host}:55680"},
+    ],
     "port_base": 4100,
 }
 
@@ -191,7 +200,12 @@ def codex_quota(acc):
             mins = w.get("window_minutes") or 0
             reset = dt.datetime.fromtimestamp(w["resets_at"], TZ) if w.get("resets_at") else None
             slot = "session" if mins and mins <= 600 else "week"
-            q[f"{slot}_used"], q[f"{slot}_reset"] = round(float(w.get("used_percent") or 0)), iso(reset)
+            used = round(float(w.get("used_percent") or 0))
+            if reset and mins and reset < now():   # ข้อมูลจาก session เก่า: รอบนั้นรีเซ็ตไปแล้ว → เลื่อนไปรอบถัดไป · ใช้ไป 0%
+                step = dt.timedelta(minutes=mins)
+                while reset < now(): reset += step
+                used = 0
+            q[f"{slot}_used"], q[f"{slot}_reset"] = used, iso(reset)
         break
     if q["at"] is None:
         q["usage_error"] = "ยังไม่มีข้อมูลโควตา (ยังไม่เคยใช้) → ถือว่า 0%"
@@ -573,21 +587,31 @@ WORKER_RULES = """
 - เขียนความคืบหน้าลง `{progress}` เป็น checklist (`- [ ]` / `- [x]`) ตั้งแต่เริ่มงาน และอัปเดตทุกครั้งที่จบข้อย่อย
 - `git add -A && git commit -m "{tid}: <ข้อย่อย>"` หลังจบแต่ละข้อย่อย (งานจะไม่หายถ้าถูกสลับบัญชีกลางทาง)
 - ทดสอบตาม "เกณฑ์ผ่าน" ด้วยตัวเองก่อนจบ · ห้ามรัน `docker compose` ยกเว้นงานที่ระบุว่า exclusive
-- ทรัพยากรของคุณ: `PORT={port}` (ใช้เปิด dev server) · `DATABASE_URL={dburl}` (Postgres dev ฐานข้อมูลของงานนี้คนเดียว) · `MOCK_LLM_PORT={mport}`
+- ทรัพยากรของคุณ: `PORT={port}` (ใช้เปิด dev server) · `DATABASE_URL={dburl}` (Postgres+pgvector dev ฐานข้อมูลของงานนี้คนเดียว) · `MOCK_LLM_PORT={mport}`{extra}
 - ห้ามพิมพ์ค่า secret · ห้ามแตะโฟลเดอร์นอก `{wt}` ยกเว้นไฟล์ progress · ห้าม push
 - จบงาน: เขียนบรรทัดสุดท้ายของ `{progress}` เป็น `STATUS: DONE` (หรือ `STATUS: BLOCKED <เหตุผล>`) แล้ว commit ครั้งสุดท้าย
 """
 
+def dev_db_host(c):
+    """host ของ Postgres dev: docker ใน container (DinD) → 127.0.0.1 · docker ของเครื่อง host ผ่าน docker.sock → host.docker.internal"""
+    if c.get("host", "auto") != "auto": return c["host"]
+    import socket
+    try:
+        socket.create_connection(("127.0.0.1", c["port"]), timeout=1).close(); return "127.0.0.1"
+    except OSError:
+        return "host.docker.internal"
+
 def build_prompt(run, t, wt, port, attempt, handoff):
     cfg = run.cfg["dev_db"]
     dbname = "t_" + re.sub(r"\W", "_", t["id"].lower())
-    dburl = f"postgres://{cfg['user']}:{cfg['password']}@host.docker.internal:{cfg['port']}/{dbname}"
+    dburl = f"postgres://{cfg['user']}:{cfg['password']}@{dev_db_host(cfg)}:{cfg['port']}/{dbname}"
     body = open(run.f("tasks", f"{t['id']}.md"), encoding="utf-8").read()
     shared = run.f("tasks", "_shared.md")
     head = open(shared, encoding="utf-8").read() if os.path.exists(shared) else ""
     p = f"# งาน {t['id']}: {t.get('title','')}\n\n{head}\n\n{body}\n" + WORKER_RULES.format(
         wt=wt, tid=t["id"], owns=", ".join(t.get("owns", [])) or "-", progress=run.f("progress", f"{t['id']}.md"),
-        port=port, dburl=dburl, mport=port + 500)
+        port=port, dburl=dburl, mport=port + 500,
+        extra="".join(f" · `{x['env'].format(host=dev_db_host(cfg))}` (ใช้ร่วมกันทั้งทีม)" for x in run.cfg.get("dev_services", [])))
     if handoff:
         p += f"\n## ⚠️ งานนี้ส่งต่อมาจากบัญชีอื่น (รอบที่ {attempt})\n{handoff}\n- อ่าน `git log --oneline -15` และไฟล์ progress ก่อน แล้ว**ทำต่อจากที่ค้าง ไม่ต้องเริ่มใหม่**\n"
     return p, dburl, dbname
@@ -1038,15 +1062,22 @@ def cmd_infra(run, action):
         r = sh(f"docker ps -a --format '{{{{.Names}}}}' | grep -qx {c['name']}")
         if r.returncode != 0:
             sh(f"docker run -d --name {c['name']} -p 127.0.0.1:{c['port']}:5432 -e POSTGRES_USER={c['user']} "
-               f"-e POSTGRES_PASSWORD={c['password']} postgres:16-alpine", check=True)
+               f"-e POSTGRES_PASSWORD={c['password']} {c.get('image', 'postgres:16-alpine')}", check=True)
         else:
             sh(f"docker start {c['name']}")
+        for x in run.cfg.get("dev_services", []):          # RabbitMQ / embedder ฯลฯ ที่ใช้ร่วมกัน
+            if sh(f"docker ps -a --format '{{{{.Names}}}}' | grep -qx {x['name']}").returncode == 0:
+                sh(f"docker start {x['name']}"); continue
+            ports = " ".join(f"-p 127.0.0.1:{h}:{ct}" for ct, h in x.get("ports", {}).items())
+            sh(f"docker run -d --name {x['name']} {ports} {x['image']} {x.get('args', '')}", check=True)
         for _ in range(30):
             if sh(f"docker exec {c['name']} pg_isready -U {c['user']}").returncode == 0: break
             time.sleep(2)
-        print(f"dev db พร้อม: host.docker.internal:{c['port']} (user {c['user']})")
+        print(f"dev db พร้อม: {dev_db_host(c)}:{c['port']} (user {c['user']})")
+        for x in run.cfg.get("dev_services", []): print(f"{x['name']} เปิดแล้ว → {x['env'].format(host=dev_db_host(c))}")
     else:
-        sh(f"docker rm -f {c['name']}"); print("ปิด dev db แล้ว")
+        sh(f"docker rm -f {c['name']} " + " ".join(x["name"] for x in run.cfg.get("dev_services", [])))
+        print("ปิด dev db + บริการ dev แล้ว")
 
 def cmd_report(run):
     """สรุปผลทั้งรัน: งาน × บัญชี × โทเคน × การสลับ → REPORT.md"""
@@ -1103,7 +1134,7 @@ def cmd_export(run, to):
     if os.path.isdir(os.path.join(to, "app")): shutil.rmtree(os.path.join(to, "app"))
     os.makedirs(os.path.join(to, "app"))
     sh(f"git archive main | tar -x -C '{to}/app'", cwd=run.app, check=True)
-    for extra in ("test-gifs", "TEST_REPORT.md"):   # ไฟล์ผลทดสอบที่ไม่ได้ commit
+    for extra in ("test-gifs", "test-videos", "TEST_REPORT.md"):   # ไฟล์ผลทดสอบที่ไม่ได้ commit
         src = os.path.join(run.app, extra)
         if os.path.exists(src) and not os.path.exists(os.path.join(to, "app", extra)):
             (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(to, "app", extra))

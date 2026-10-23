@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th">
+<!-- แม่แบบเอกสาร BuildMart: คัดลอกไฟล์นี้แล้วแก้เนื้อหา · render: node make_pdfs.mjs _template → _out/_template.pdf
+     กติกา: ปก (section.cover) → สารบัญ (nav.toc เติมให้อัตโนมัติจาก h2/h3 ใน main) → เนื้อหาใน <main>
+     ตาราง: ใส่ <caption>ตารางที่ N ...</caption> เสมอ · หัวตารางใน <thead> (2–3 ชั้นได้ ใช้ rowspan/colspan)
+            หัวแถวใช้ <th scope="row"> · เชิงอรรถใส่ ¹ ² ในเซลล์ แล้วอธิบายใน <div class="tnotes"> ต่อท้ายตาราง
+            เซลล์ที่ไม่มีค่าให้ใส่ "–" (ห้ามปล่อยว่าง) -->
+<head><meta charset="utf-8"><title>_template ตัวอย่างเอกสาร</title><link rel="stylesheet" href="style.css"></head>
+<body data-doc="BM-XX-TEMPLATE" data-title="เอกสารข้อมูลสินค้า" data-rev="Rev. 1 · ตุลาคม 2569">
+
+<section class="cover">
+  <div class="kicker">เอกสารข้อมูลทางเทคนิค (Technical Datasheet)</div>
+  <h1>ชื่อเอกสาร</h1>
+  <p class="lead">คำอธิบายสั้น ๆ ว่าเอกสารนี้ครอบคลุมอะไร</p>
+  <div class="band"></div>
+  <table class="meta">
+    <tr><th scope="row">รหัสเอกสาร</th><td>BM-XX-TEMPLATE</td></tr>
+    <tr><th scope="row">สินค้าที่ครอบคลุม</th><td>XXX-001 · XXX-002</td></tr>
+    <tr><th scope="row">ฉบับ</th><td>Rev. 1 · ตุลาคม 2569</td></tr>
+  </table>
+</section>
+
+<nav class="toc"><h2>สารบัญ</h2><ol></ol></nav>
+
+<main>
+  <h2>1. หลักการ</h2>
+  <p>ย่อหน้าเนื้อหา...</p>
+
+  <h3>1.1 ตารางหัว 2 ชั้น + เซลล์รวม</h3>
+  <table>
+    <caption>ตารางที่ 1 ตัวอย่างหัวตาราง 2 ชั้น</caption>
+    <thead>
+      <tr><th rowspan="2">ขนาด</th><th colspan="2">วิธี A</th><th colspan="2">วิธี B</th></tr>
+      <tr><th>ค่า 1</th><th>ค่า 2</th><th>ค่า 1</th><th>ค่า 2</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row" rowspan="2">กลุ่ม 1</th><td>1</td><td>2</td><td>3</td><td>4¹</td></tr>
+      <tr><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+    </tbody>
+  </table>
+  <div class="tnotes"><p>¹ เชิงอรรถอธิบายค่าที่มีเครื่องหมาย</p></div>
+</main>
+</body>
+</html>

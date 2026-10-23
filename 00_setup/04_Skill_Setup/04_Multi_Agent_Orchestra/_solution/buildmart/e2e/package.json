@@ -1,0 +1,18 @@
+{
+  "name": "buildmart-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "playlist": "playwright test",
+    "media": "node make-media.mjs",
+    "report": "node make-report.mjs",
+    "all": "playwright test; node make-media.mjs && node make-report.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "ffmpeg-static": "5.2.0"
+  },
+  "allowScripts": {
+    "ffmpeg-static@5.2.0": true
+  }
+}

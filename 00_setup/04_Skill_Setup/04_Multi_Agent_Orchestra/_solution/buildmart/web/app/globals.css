@@ -1,0 +1,83 @@
+/* BuildMart — โทนส้ม-เทาเข้ม · ไม่มี UI library */
+:root {
+  --brand: #f26b1d;
+  --brand-dark: #c9530f;
+  --brand-soft: #fff1e8;
+  --ink: #2b2f36;
+  --ink-2: #4a5059;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --bg: #f6f6f7;
+  --card: #ffffff;
+  --ok: #15803d;
+  --danger: #b91c1c;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --font: 'Sarabun', 'Noto Sans Thai', 'Leelawadee UI', 'Tahoma', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--font); color: var(--ink); background: var(--bg); font-size: 16px; line-height: 1.55; }
+a { color: inherit; }
+img, svg { max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+main.container { padding-top: 20px; padding-bottom: 48px; min-height: 60vh; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer;
+  background: var(--brand); color: #fff; font-weight: 600; text-decoration: none; }
+.btn:hover { background: var(--brand-dark); }
+.btn.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.btn.secondary:hover { background: var(--bg); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.input, .select { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; min-width: 0; }
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.muted { color: var(--muted); }
+.price { color: var(--brand-dark); font-weight: 700; }
+
+/* ---------- header ---------- */
+.site-header { background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 40; }
+.site-header .bar { display: flex; align-items: center; gap: 16px; padding: 10px 16px; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+.logo .mark { width: 36px; height: 36px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; font-weight: 800; }
+.logo .name { font-size: 20px; font-weight: 800; letter-spacing: 0.2px; white-space: nowrap; }
+.logo .name b { color: var(--brand); }
+.search { flex: 1; display: flex; min-width: 220px; }
+.search input { flex: 1; border: 0; border-radius: 8px 0 0 8px; padding: 9px 12px; min-width: 0; }
+.search button { border: 0; border-radius: 0 8px 8px 0; background: var(--brand); color: #fff; padding: 0 16px; cursor: pointer; font-weight: 600; }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav a { color: #e5e7eb; text-decoration: none; padding: 7px 10px; border-radius: 6px; white-space: nowrap; }
+.nav a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.nav .cart { position: relative; }
+.cart-badge { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 999px; background: var(--brand);
+  color: #fff; font-size: 13px; font-weight: 700; text-align: center; line-height: 20px; }
+.strip { background: var(--brand); color: #fff; font-size: 14px; }
+.strip .container { padding: 4px 16px; }
+
+/* ---------- home ---------- */
+.hero { background: linear-gradient(120deg, var(--ink) 0%, #3d434c 55%, var(--brand) 140%); color: #fff; border-radius: 14px;
+  padding: 36px 28px; display: grid; gap: 10px; }
+.hero h1 { margin: 0; font-size: clamp(26px, 4vw, 40px); }
+.hero p { margin: 0; color: #e5e7eb; max-width: 680px; }
+.hero .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.section-title { margin: 28px 0 12px; font-size: 22px; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.cat-tile { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 12px; text-align: center;
+  text-decoration: none; border: 2px solid transparent; }
+.cat-tile:hover { border-color: var(--brand); }
+.cat-tile .icon { font-size: 30px; display: block; }
+.cat-tile .label { font-weight: 600; }
+
+.site-footer { background: var(--ink); color: #cbd5e1; font-size: 14px; padding: 20px 0; }
+.site-footer .container { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; }
+
+@media (max-width: 720px) {
+  .site-header .bar { gap: 10px; }
+  .search { order: 3; flex-basis: 100%; }
+  .nav { order: 2; }
+}
+@media print {
+  .site-header, .site-footer, .strip, .no-print { display: none !important; }
+  body { background: #fff; }
+}
