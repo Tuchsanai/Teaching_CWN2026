@@ -5,9 +5,9 @@
 
 ### 🎬 ดูระบบจริงก่อน (AI จริงบน GPU 3 ใบ · มีเสียง)
 
-[![ตัวอย่างระบบจริง: หน้าเว็บ 3D + ถามน้องช่างด้วยเสียง "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน" → Whisper ถอดความ → Qwen ตอบ "เก็บได้ 3 เดือน" พร้อมอ้างอิง PDF หน้า 14 → VoxCPM2 พูดตอบ น้องช่างขยับปาก (กดเพื่อดูวิดีโอเต็ม 2 นาทีพร้อมเสียง)](showcase/buildmart-v3-showcase.gif)](showcase/buildmart-v3-showcase.mp4)
+[![ตัวอย่างระบบจริง: หน้าเว็บ 3D + ถามน้องช่างด้วยเสียง "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน" → Whisper ถอดความ → Qwen ตอบ "เก็บได้ 3 เดือน" พร้อมอ้างอิง PDF หน้า 14 → VoxCPM2 พูดตอบ น้องช่างขยับปาก (กดเพื่อดูภาพใหญ่)](showcase/buildmart-v3-showcase.gif)](showcase/buildmart-v3-showcase.gif)
 
-▶️ **วิดีโอเต็ม 2 นาที มีเสียง:** [showcase/buildmart-v3-showcase.mp4](showcase/buildmart-v3-showcase.mp4) — หน้าแรก 3D → หน้าสินค้า → คุยด้วยเสียง 3 รอบ (ถามอายุปูน → ราคาส่ง 100 ถุง = 13,775 บาท → ใส่ตะกร้า 0 → 100) → เปิด PDF ที่อ้างอิง → dashboard ประเมิน RAG และ load test · ลำดับเวลาแต่ละช่วง: [showcase/README.md](showcase/README.md)
+▶️ **ภาพเคลื่อนไหวย่อ ~18 วินาที (GIF ไม่มีเสียง · วิดีโอเต็ม 2 นาทีไม่ได้เก็บใน repo):** [showcase/buildmart-v3-showcase.gif](showcase/buildmart-v3-showcase.gif) — หน้าแรก 3D → หน้าสินค้า → คุยด้วยเสียง 3 รอบ (ถามอายุปูน → ราคาส่ง 100 ถุง = 13,775 บาท → ใส่ตะกร้า 0 → 100) → เปิด PDF ที่อ้างอิง → dashboard ประเมิน RAG และ load test · ลำดับเวลาแต่ละช่วง: [showcase/README.md](showcase/README.md)
 
 LAB นี้รวมของจาก 2 LAB ก่อนหน้าเป็นงานเดียว: **วางแผนแบบ [LAB 04.3 DAG Planner](../02_DAG_Planner/readme.md)** → **ให้ทีม AI หลายบัญชีสร้างจริง** → **เปิด AI บน GPU แบบ [LAB 04.1 Vast.ai](../01_VastAi_Skill/readme.md)** (รอบนี้ **3 ใบ**) → deploy → ทดสอบ → **วัดผล** → ลบเครื่อง
 โจทย์คือเว็บร้านวัสดุก่อสร้าง **"บ้านช่าง BuildMart"** (requirement อยู่ใน [BUILDMART.md](BUILDMART.md)) ที่มี:
@@ -542,9 +542,9 @@ deploy ระบบ BuildMart ทั้งระบบบนเครื่อ�
 
 | 🧊 D01 ฉาก 3D + มาสคอต | 🎙 V01 ถามด้วยเสียง | 🧵 M04 คุย 5 รอบ |
 |---|---|---|
-| <a href="_solution/buildmart/e2e/test-gifs/D01.gif"><img src="_solution/buildmart/e2e/test-gifs/D01.gif" width="300" alt="เคส D01 ฉาก 3D"></a> | <a href="_solution/buildmart/e2e/test-gifs/V01.gif"><img src="_solution/buildmart/e2e/test-gifs/V01.gif" width="300" alt="เคส V01 ถามด้วยเสียง"></a><br>[🎬 MP4 มีเสียง](_solution/buildmart/e2e/test-videos/V01.mp4) | <a href="_solution/buildmart/e2e/test-gifs/M04.gif"><img src="_solution/buildmart/e2e/test-gifs/M04.gif" width="300" alt="เคส M04 บทสนทนา 5 รอบ"></a> |
+| <a href="_solution/buildmart/e2e/test-gifs/D01.gif"><img src="_solution/buildmart/e2e/test-gifs/D01.gif" width="300" alt="เคส D01 ฉาก 3D"></a> | <a href="_solution/buildmart/e2e/test-gifs/V01.gif"><img src="_solution/buildmart/e2e/test-gifs/V01.gif" width="300" alt="เคส V01 ถามด้วยเสียง"></a><br>[🎞 GIF ภาพใหญ่](_solution/buildmart/e2e/test-gifs/V01.gif) | <a href="_solution/buildmart/e2e/test-gifs/M04.gif"><img src="_solution/buildmart/e2e/test-gifs/M04.gif" width="300" alt="เคส M04 บทสนทนา 5 รอบ"></a> |
 | 🧊 **D02 มาสคอตขยับปาก** | 🧪 **E02 เทียบ rerank on/off** | ⚡ **L01 dashboard load** |
-| <a href="_solution/buildmart/e2e/test-gifs/D02.gif"><img src="_solution/buildmart/e2e/test-gifs/D02.gif" width="300" alt="เคส D02 ท่าทางมาสคอต"></a><br>[🎬 MP4 มีเสียง](_solution/buildmart/e2e/test-videos/D02.mp4) | <a href="_solution/buildmart/e2e/test-gifs/E02.gif"><img src="_solution/buildmart/e2e/test-gifs/E02.gif" width="300" alt="เคส E02 เทียบ 2 run"></a> | <a href="_solution/buildmart/e2e/test-gifs/L01.gif"><img src="_solution/buildmart/e2e/test-gifs/L01.gif" width="300" alt="เคส L01 dashboard load test"></a> |
+| <a href="_solution/buildmart/e2e/test-gifs/D02.gif"><img src="_solution/buildmart/e2e/test-gifs/D02.gif" width="300" alt="เคส D02 ท่าทางมาสคอต"></a><br>[🎞 GIF ภาพใหญ่](_solution/buildmart/e2e/test-gifs/D02.gif) | <a href="_solution/buildmart/e2e/test-gifs/E02.gif"><img src="_solution/buildmart/e2e/test-gifs/E02.gif" width="300" alt="เคส E02 เทียบ 2 run"></a> | <a href="_solution/buildmart/e2e/test-gifs/L01.gif"><img src="_solution/buildmart/e2e/test-gifs/L01.gif" width="300" alt="เคส L01 dashboard load test"></a> |
 
 ### F2 · ขั้นที่ 8 · พรอมต์ ⑧ — ประเมิน RAG: บอทตอบถูกแค่ไหน (มี/ไม่มี reranker)
 
