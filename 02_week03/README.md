@@ -6,7 +6,8 @@
 
 | บท | หัวข้อ | เครื่องมือที่เพิ่ม | แอปที่ได้ | ผลวัดจริง |
 |---|---|---|---|---|
-| [01_REA_Basics_Flight](01_REA_Basics_Flight/README.md) | ทฤษฎี REA แบบละเอียด + ติดตั้งใน container + เดโม | REA อย่างเดียว | **SkyThai Mini** (v1) · :5081 | playlist ผ่าน 5/5 |
+| [00_REA_Theory_Setup](00_REA_Theory_Setup/README.md) | ทฤษฎี REA ทีละขั้น (T1–T15) + ติดตั้ง REA ใน container | REA (ติดตั้ง) | — | `yolo1` เห็น REA 207 tools |
+| [01_REA_Basics_Flight](01_REA_Basics_Flight/README.md) | ใช้ REA สืบ Google Flights แล้วสร้างแอป + วัดผล 5 ไม้บรรทัด | REA อย่างเดียว | **SkyThai Mini** (v1) · :5081 | playlist ผ่าน 5/5 · วัดด้วยไม้บรรทัด 5 อัน (LAB 6) |
 | [02_REA_Playwright_Exploration](02_REA_Playwright_Exploration/README.md) | สำรวจเว็บแบบ EXPLORATION (A–E) | + Playwright MCP | **SkyThai Plus** (v2) · :5082 | ชุดเทียบของบท: v1 4/35 (11.4%) → v2 33/35 (94.3%) |
 | [03_REA_Toolchain_Loop](03_REA_Toolchain_Loop/README.md) | ปิดวงจรโคลน | + HAR · trace/GIF · กรรมการอิสระ (Codex) · วนแก้ · visual diff | **SkyThai Pro** (v3) · :5083 | กรรมการ 82 ข้อ: v1 0 · v2 51 (62%) · v3 74 (90%) · เที่ยวบิน 22 → 300 |
 | [04_REA_Differential_Oracle](04_REA_Differential_Oracle/README.md) | ใช้ต้นฉบับเป็นเฉลย | + ต้นฉบับแช่แข็งจาก HAR · differential testing · เทียบโครงสร้าง (ariaSnapshot) · mutation testing · แก้แบบรุม (swarm) | **SkyThai Max** (v4) · :5084 | differential v3 4/8 → **v4 8/8** · โครงสร้าง 70.5% → **78.6%** · visual diff 8.32% → **5.13%** |
@@ -19,6 +20,12 @@
 | v2 Plus · + Playwright | 51/82 | 3/8 | 55.8% | 8.19% | 22 |
 | v3 Pro · + HAR · กรรมการ · วนแก้ | 74/82 | 4/8 | 70.5% | 8.32% | 300 |
 | v4 Max · + ต้นฉบับแช่แข็ง · differential · swarm | 74/82 | **8/8** | **78.6%** | **5.13%** | 300 |
+
+**visual diff คำนวณยังไง:** เทียบภาพหน้าผลค้นหา $1366 \times 900$ ทีละพิกเซลด้วย pixelmatch ($t = 0.1$) พิกเซลนับว่าต่างเมื่อ $\delta = 0.5053Y^2 + 0.299I^2 + 0.1957Q^2 > 352.15$ แล้ว
+
+$$\text{visual diff} = \frac{\text{จำนวนพิกเซลที่ต่าง}}{1{,}229{,}400} \times 100\% \qquad \text{เช่น v4} = \frac{63{,}012}{1{,}229{,}400} \times 100 = 5.13\%$$
+
+(อธิบายทีละขั้นใน [บทที่ 3 · T7](03_REA_Toolchain_Loop/README.md))
 
 **ต้องมีก่อน:** [LAB 03 container](../01_week02/03_MultiAccount_Container/) (เปิดด้วย `/maccount`) · [LAB 04 shared skills](../01_week02/04_Skill_Setup/00_Setup_Skill/readme.md) · Docker Desktop · Claude Code Desktop
 
