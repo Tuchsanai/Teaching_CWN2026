@@ -1,0 +1,31 @@
+{
+  "run": "2026-11-02 12:28–12:33 (เวลาไทย)",
+  "browser": "Google Chrome ของผู้เรียน ผ่าน Playwright MCP --extension (@playwright/mcp 0.0.84)",
+  "captcha": {
+    "seen": true,
+    "when": "เปิด https://shopee.co.th/ ครั้งแรก → /verify/traffic → /verify/captcha (scene=crawler_item)",
+    "handled_by": "คน (ผู้เรียนเลื่อนยืนยันเอง) ประมาณ 9 วินาที แล้วกลับหน้าแรกแบบ login อยู่",
+    "ai_touched": false
+  },
+  "cases": [
+    {
+      "id": "TC-AUTH-01", "priority": "P1", "result": "pass",
+      "actual": "มุมขวาบนเป็นปุ่มชื่อบัญชี (ไม่บันทึกชื่อไว้) ไม่พบปุ่ม เข้าสู่ระบบ / สมัครใหม่",
+      "cart_badge_before": 138
+    },
+    {
+      "id": "TC-SRCH-01", "priority": "P1", "result": "pass",
+      "keyword": "อาหารแมว", "results_page1": 58, "pages": 6,
+      "first20_with_cat_word": 20, "ratio": 1.0, "threshold": 0.8
+    },
+    {
+      "id": "TC-CART-01", "priority": "P1", "result": "pass",
+      "keyword": "ของเล่นแมว",
+      "first_product": "ของเล่นเเมวซ่อนหาอัตโนมัติ สิ่งประดิษฐ์แมวตลก ชาร์จไฟได้ (฿205, ตัวเลือกเดียว: สีฟ้า)",
+      "cart_badge": { "before": 138, "after_add": 139, "after_remove": 138 },
+      "cart_page_select_all": { "with_item": 13, "after_remove": 12 },
+      "bought": false
+    }
+  ],
+  "summary": { "total": 3, "pass": 3, "fail": 0, "blocked": 0, "exit_criteria_met": true }
+}
