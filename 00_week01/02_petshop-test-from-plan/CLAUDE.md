@@ -8,7 +8,7 @@
   - เปิดเว็บ: `docker compose up -d --build` ใน `petshop/` → http://localhost:3000
   - โหมดฝังบั๊ก: ตั้ง env `BUG_MODE=1` ก่อน `docker compose up -d` (PowerShell: `$env:BUG_MODE=1`)
 - `e2e/` ชุดทดสอบ Playwright (รันบน Windows)
-  - `npx playwright test` = 3 เบราว์เซอร์ · `npm run test:gif` = Chromium อัด GIF + MP4
+  - `npx playwright test` = ทดสอบบน Chromium · `npm run test:gif` = Chromium อัด GIF + MP4 (ใช้เบราว์เซอร์ที่ติดตั้งไว้แล้วในบท 01 ไม่ต้อง `npx playwright install`)
   - รายงาน: `e2e/test-report/TEST-REPORT.md`, GIF: `test-report/gifs/`, MP4: `test-report/videos/`
 - `TEST-PLAN.md` แผนการทดสอบ
 

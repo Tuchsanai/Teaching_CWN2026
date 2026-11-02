@@ -26,11 +26,6 @@ export default defineConfig({
     video: GIF ? { mode: 'on', size: viewport } : 'retain-on-failure',
     launchOptions: GIF ? { slowMo: 650 } : {},
   },
-  projects: GIF
-    ? [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport } }]
-    : [
-        { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport } },
-        { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport } },
-        { name: 'webkit', use: { ...devices['Desktop Safari'], viewport } },
-      ],
+  // One browser is enough for this lesson: Playwright's Chromium (same engine as Chrome / Edge).
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport } }],
 });

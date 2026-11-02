@@ -87,9 +87,8 @@ test.describe('สั่งซื้อและชำระเงิน', () =>
   test('TC-CHK-04 สั่งซื้อแล้วสต็อกลดลง', {
     tag: ['@checkout', '@api', '@P2'],
     annotation: { type: 'expected', description: 'สต็อกหลังสั่งซื้อ = สต็อกก่อนสั่ง − 2' },
-  }, async ({ page }, testInfo) => {
-    // each browser buys a different product so parallel runs never share stock
-    const slug = ({ chromium: 'senior-tuna-dry', firefox: 'urinary-care-dry', webkit: 'large-breed-beef-dry' } as Record<string, string>)[testInfo.project.name] ?? 'senior-tuna-dry';
+  }, async ({ page }) => {
+    const slug = 'senior-tuna-dry';
     const stockOf = async () => (await (await page.request.get(`/api/products/${slug}`)).json()).stock as number;
 
     await registerByApi(page.request);
