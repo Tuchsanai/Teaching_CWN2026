@@ -1,490 +1,0 @@
-[1;34m[lab04][0m building lab04-api:0.4.0 (FastAPI + Claude Code + Codex CLI + yoloN/cyoloN wrappers, no credentials)
-#0 building with "default" instance using docker driver
-
-#1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 2.68kB 0.0s done
-#1 DONE 0.1s
-
-#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
-#2 ...
-
-#3 [auth] docker/dockerfile:pull token for registry-1.docker.io
-#3 DONE 0.0s
-
-#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
-#2 DONE 1.6s
-
-#4 docker-image://docker.io/docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
-#4 CACHED
-
-#5 [internal] load metadata for docker.io/library/node:22.23.3-bookworm-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c
-#5 ...
-
-#6 [auth] library/node:pull token for registry-1.docker.io
-#6 DONE 0.0s
-
-#5 [internal] load metadata for docker.io/library/node:22.23.3-bookworm-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c
-#5 DONE 2.5s
-
-#7 [internal] load .dockerignore
-#7 transferring context: 201B 0.0s done
-#7 DONE 0.1s
-
-#8 [internal] load build context
-#8 DONE 0.0s
-
-#9 [ 1/10] FROM docker.io/library/node:22.23.3-bookworm-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c
-#9 resolve docker.io/library/node:22.23.3-bookworm-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c 0.0s done
-#9 ...
-
-#8 [internal] load build context
-#8 transferring context: 41.39kB 0.1s done
-#8 DONE 0.1s
-
-#9 [ 1/10] FROM docker.io/library/node:22.23.3-bookworm-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 0B / 49.84MB 0.1s
-#9 sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c 5.22kB / 5.22kB done
-#9 sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2 1.93kB / 1.93kB done
-#9 sha256:88f8ba583a884279252779bbe221bf1ff2c61cf236cc973f8ca97676ae6d07f0 6.77kB / 6.77kB done
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 0B / 28.24MB 0.1s
-#9 sha256:8ab8fd6c944526e5da2ca93b1663b2ab6f4bb8d4ea7b50a90d53c9fdcc5b0b9e 0B / 3.31kB 0.1s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 2.10MB / 28.24MB 0.4s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 5.24MB / 28.24MB 0.6s
-#9 sha256:8ab8fd6c944526e5da2ca93b1663b2ab6f4bb8d4ea7b50a90d53c9fdcc5b0b9e 3.31kB / 3.31kB 0.6s done
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 7.34MB / 28.24MB 0.7s
-#9 sha256:8d9d84ee31888adba85837fbf8f0e6eca99263904b2ba04d79e7d4fc1da40056 0B / 1.71MB 0.7s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 11.53MB / 28.24MB 0.9s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 4.19MB / 49.84MB 1.1s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 14.68MB / 28.24MB 1.1s
-#9 sha256:8d9d84ee31888adba85837fbf8f0e6eca99263904b2ba04d79e7d4fc1da40056 1.71MB / 1.71MB 1.1s done
-#9 sha256:dc40c63c08b5453854c13da6d72b3182737b2e223156b786c67779e0d6f4e8e0 0B / 446B 1.1s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 16.78MB / 28.24MB 1.2s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 10.49MB / 49.84MB 1.4s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 20.97MB / 28.24MB 1.4s
-#9 sha256:dc40c63c08b5453854c13da6d72b3182737b2e223156b786c67779e0d6f4e8e0 446B / 446B 1.3s done
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 14.68MB / 49.84MB 1.6s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 25.17MB / 28.24MB 1.6s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 27.26MB / 28.24MB 1.7s
-#9 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 18.87MB / 49.84MB 1.8s
-#9 sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 28.24MB / 28.24MB 1.7s done
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 24.12MB / 49.84MB 2.0s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 28.31MB / 49.84MB 2.2s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 33.55MB / 49.84MB 2.5s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 38.80MB / 49.84MB 2.9s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 42.99MB / 49.84MB 3.1s
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 46.14MB / 49.84MB 3.2s
-#9 extracting sha256:774043ccc8ccd0d0833a9ee0792142ab7ad93df971e59dd248fbf82db16d0150 1.5s done
-#9 sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 49.84MB / 49.84MB 3.3s done
-#9 extracting sha256:8ab8fd6c944526e5da2ca93b1663b2ab6f4bb8d4ea7b50a90d53c9fdcc5b0b9e done
-#9 extracting sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 0.1s
-#9 extracting sha256:61592f5b60306b96e5208206668cdf0fa62d3cda3a3baeed26efdcd1a21aaba5 1.5s done
-#9 extracting sha256:8d9d84ee31888adba85837fbf8f0e6eca99263904b2ba04d79e7d4fc1da40056 0.1s done
-#9 extracting sha256:dc40c63c08b5453854c13da6d72b3182737b2e223156b786c67779e0d6f4e8e0 done
-#9 DONE 5.3s
-
-#10 [ 2/10] RUN apt-get update  && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates tini bubblewrap  && rm -rf /var/lib/apt/lists/*
-#10 0.332 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
-#10 0.357 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
-#10 0.369 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
-#10 0.397 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
-#10 1.007 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
-#10 1.012 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [341 kB]
-#10 1.547 Fetched 9379 kB in 1s (7190 kB/s)
-#10 1.547 Reading package lists...
-#10 1.809 Reading package lists...
-#10 2.063 Building dependency tree...
-#10 2.142 Reading state information...
-#10 2.255 The following additional packages will be installed:
-#10 2.255   libexpat1 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3
-#10 2.255   libkrb5support0 libncursesw6 libnsl2 libpython3-stdlib libpython3.11-minimal
-#10 2.255   libpython3.11-stdlib libreadline8 libsqlite3-0 libssl3 libtirpc-common
-#10 2.255   libtirpc3 media-types openssl python3-distutils python3-lib2to3
-#10 2.255   python3-minimal python3-pip-whl python3-setuptools-whl python3.11
-#10 2.255   python3.11-minimal python3.11-venv readline-common
-#10 2.257 Suggested packages:
-#10 2.257   krb5-doc krb5-user python3-doc python3-tk python3.11-doc binutils
-#10 2.257   binfmt-support readline-doc
-#10 2.257 Recommended packages:
-#10 2.257   procps krb5-locales libgpm2
-#10 2.391 The following NEW packages will be installed:
-#10 2.392   bubblewrap ca-certificates libexpat1 libgssapi-krb5-2 libk5crypto3
-#10 2.392   libkeyutils1 libkrb5-3 libkrb5support0 libncursesw6 libnsl2
-#10 2.392   libpython3-stdlib libpython3.11-minimal libpython3.11-stdlib libreadline8
-#10 2.392   libsqlite3-0 libssl3 libtirpc-common libtirpc3 media-types openssl python3
-#10 2.392   python3-distutils python3-lib2to3 python3-minimal python3-pip-whl
-#10 2.392   python3-setuptools-whl python3-venv python3.11 python3.11-minimal
-#10 2.392   python3.11-venv readline-common tini
-#10 2.425 0 upgraded, 32 newly installed, 0 to remove and 1 not upgraded.
-#10 2.425 Need to get 14.4 MB of archives.
-#10 2.425 After this operation, 41.3 MB of additional disk space will be used.
-#10 2.425 Get:1 http://deb.debian.org/debian bookworm/main amd64 libssl3 amd64 3.0.20-1~deb12u2 [2036 kB]
-#10 2.590 Get:2 http://deb.debian.org/debian bookworm/main amd64 libpython3.11-minimal amd64 3.11.2-6+deb12u8 [818 kB]
-#10 2.646 Get:3 http://deb.debian.org/debian-security bookworm-security/main amd64 libexpat1 amd64 2.5.0-1+deb12u3 [104 kB]
-#10 2.654 Get:4 http://deb.debian.org/debian bookworm/main amd64 python3.11-minimal amd64 3.11.2-6+deb12u8 [2065 kB]
-#10 2.791 Get:5 http://deb.debian.org/debian bookworm/main amd64 python3-minimal amd64 3.11.2-1+b1 [26.3 kB]
-#10 2.793 Get:6 http://deb.debian.org/debian bookworm/main amd64 media-types all 10.0.0 [26.1 kB]
-#10 2.795 Get:7 http://deb.debian.org/debian bookworm/main amd64 libncursesw6 amd64 6.4-4 [134 kB]
-#10 2.803 Get:8 http://deb.debian.org/debian bookworm/main amd64 libkrb5support0 amd64 1.20.1-2+deb12u5 [33.2 kB]
-#10 2.805 Get:9 http://deb.debian.org/debian bookworm/main amd64 libk5crypto3 amd64 1.20.1-2+deb12u5 [79.7 kB]
-#10 2.812 Get:10 http://deb.debian.org/debian bookworm/main amd64 libkeyutils1 amd64 1.6.3-2 [8808 B]
-#10 2.812 Get:11 http://deb.debian.org/debian bookworm/main amd64 libkrb5-3 amd64 1.20.1-2+deb12u5 [332 kB]
-#10 2.834 Get:12 http://deb.debian.org/debian bookworm/main amd64 libgssapi-krb5-2 amd64 1.20.1-2+deb12u5 [135 kB]
-#10 2.842 Get:13 http://deb.debian.org/debian bookworm/main amd64 libtirpc-common all 1.3.3+ds-1 [14.0 kB]
-#10 2.843 Get:14 http://deb.debian.org/debian bookworm/main amd64 libtirpc3 amd64 1.3.3+ds-1 [85.2 kB]
-#10 2.850 Get:15 http://deb.debian.org/debian bookworm/main amd64 libnsl2 amd64 1.3.0-2 [39.5 kB]
-#10 2.853 Get:16 http://deb.debian.org/debian bookworm/main amd64 readline-common all 8.2-1.3 [69.0 kB]
-#10 2.858 Get:17 http://deb.debian.org/debian bookworm/main amd64 libreadline8 amd64 8.2-1.3 [166 kB]
-#10 2.871 Get:18 http://deb.debian.org/debian bookworm/main amd64 libsqlite3-0 amd64 3.40.1-2+deb12u2 [839 kB]
-#10 2.914 Get:19 http://deb.debian.org/debian bookworm/main amd64 libpython3.11-stdlib amd64 3.11.2-6+deb12u8 [1799 kB]
-#10 3.047 Get:20 http://deb.debian.org/debian bookworm/main amd64 python3.11 amd64 3.11.2-6+deb12u8 [574 kB]
-#10 3.088 Get:21 http://deb.debian.org/debian bookworm/main amd64 libpython3-stdlib amd64 3.11.2-1+b1 [9312 B]
-#10 3.089 Get:22 http://deb.debian.org/debian bookworm/main amd64 python3 amd64 3.11.2-1+b1 [26.3 kB]
-#10 3.090 Get:23 http://deb.debian.org/debian bookworm/main amd64 openssl amd64 3.0.20-1~deb12u2 [1439 kB]
-#10 3.185 Get:24 http://deb.debian.org/debian-security bookworm-security/main amd64 ca-certificates all 20250419~deb12u1 [162 kB]
-#10 3.197 Get:25 http://deb.debian.org/debian bookworm/main amd64 bubblewrap amd64 0.8.0-2+deb12u1 [47.3 kB]
-#10 3.201 Get:26 http://deb.debian.org/debian bookworm/main amd64 python3-lib2to3 all 3.11.2-3 [76.3 kB]
-#10 3.208 Get:27 http://deb.debian.org/debian bookworm/main amd64 python3-distutils all 3.11.2-3 [131 kB]
-#10 3.218 Get:28 http://deb.debian.org/debian bookworm/main amd64 python3-pip-whl all 23.0.1+dfsg-1 [1717 kB]
-#10 3.336 Get:29 http://deb.debian.org/debian bookworm/main amd64 python3-setuptools-whl all 66.1.1-1+deb12u2 [1112 kB]
-#10 3.418 Get:30 http://deb.debian.org/debian bookworm/main amd64 python3.11-venv amd64 3.11.2-6+deb12u8 [5888 B]
-#10 3.419 Get:31 http://deb.debian.org/debian bookworm/main amd64 python3-venv amd64 3.11.2-1+b1 [1200 B]
-#10 3.419 Get:32 http://deb.debian.org/debian bookworm/main amd64 tini amd64 0.19.0-1+b3 [267 kB]
-#10 3.506 debconf: delaying package configuration, since apt-utils is not installed
-#10 3.528 Fetched 14.4 MB in 1s (13.8 MB/s)
-#10 3.560 Selecting previously unselected package libssl3:amd64.
-#10 3.560 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6096 files and directories currently installed.)
-#10 3.563 Preparing to unpack .../libssl3_3.0.20-1~deb12u2_amd64.deb ...
-#10 3.577 Unpacking libssl3:amd64 (3.0.20-1~deb12u2) ...
-#10 3.701 Selecting previously unselected package libpython3.11-minimal:amd64.
-#10 3.702 Preparing to unpack .../libpython3.11-minimal_3.11.2-6+deb12u8_amd64.deb ...
-#10 3.709 Unpacking libpython3.11-minimal:amd64 (3.11.2-6+deb12u8) ...
-#10 3.848 Selecting previously unselected package libexpat1:amd64.
-#10 3.848 Preparing to unpack .../libexpat1_2.5.0-1+deb12u3_amd64.deb ...
-#10 3.856 Unpacking libexpat1:amd64 (2.5.0-1+deb12u3) ...
-#10 3.918 Selecting previously unselected package python3.11-minimal.
-#10 3.919 Preparing to unpack .../python3.11-minimal_3.11.2-6+deb12u8_amd64.deb ...
-#10 3.928 Unpacking python3.11-minimal (3.11.2-6+deb12u8) ...
-#10 4.069 Setting up libssl3:amd64 (3.0.20-1~deb12u2) ...
-#10 4.090 Setting up libpython3.11-minimal:amd64 (3.11.2-6+deb12u8) ...
-#10 4.117 Setting up libexpat1:amd64 (2.5.0-1+deb12u3) ...
-#10 4.138 Setting up python3.11-minimal (3.11.2-6+deb12u8) ...
-#10 4.528 Selecting previously unselected package python3-minimal.
-#10 4.528 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6424 files and directories currently installed.)
-#10 4.531 Preparing to unpack .../00-python3-minimal_3.11.2-1+b1_amd64.deb ...
-#10 4.540 Unpacking python3-minimal (3.11.2-1+b1) ...
-#10 4.590 Selecting previously unselected package media-types.
-#10 4.591 Preparing to unpack .../01-media-types_10.0.0_all.deb ...
-#10 4.599 Unpacking media-types (10.0.0) ...
-#10 4.654 Selecting previously unselected package libncursesw6:amd64.
-#10 4.655 Preparing to unpack .../02-libncursesw6_6.4-4_amd64.deb ...
-#10 4.662 Unpacking libncursesw6:amd64 (6.4-4) ...
-#10 4.719 Selecting previously unselected package libkrb5support0:amd64.
-#10 4.720 Preparing to unpack .../03-libkrb5support0_1.20.1-2+deb12u5_amd64.deb ...
-#10 4.727 Unpacking libkrb5support0:amd64 (1.20.1-2+deb12u5) ...
-#10 4.781 Selecting previously unselected package libk5crypto3:amd64.
-#10 4.782 Preparing to unpack .../04-libk5crypto3_1.20.1-2+deb12u5_amd64.deb ...
-#10 4.789 Unpacking libk5crypto3:amd64 (1.20.1-2+deb12u5) ...
-#10 4.843 Selecting previously unselected package libkeyutils1:amd64.
-#10 4.844 Preparing to unpack .../05-libkeyutils1_1.6.3-2_amd64.deb ...
-#10 4.851 Unpacking libkeyutils1:amd64 (1.6.3-2) ...
-#10 4.924 Selecting previously unselected package libkrb5-3:amd64.
-#10 4.925 Preparing to unpack .../06-libkrb5-3_1.20.1-2+deb12u5_amd64.deb ...
-#10 4.938 Unpacking libkrb5-3:amd64 (1.20.1-2+deb12u5) ...
-#10 5.039 Selecting previously unselected package libgssapi-krb5-2:amd64.
-#10 5.040 Preparing to unpack .../07-libgssapi-krb5-2_1.20.1-2+deb12u5_amd64.deb ...
-#10 5.048 Unpacking libgssapi-krb5-2:amd64 (1.20.1-2+deb12u5) ...
-#10 5.113 Selecting previously unselected package libtirpc-common.
-#10 5.114 Preparing to unpack .../08-libtirpc-common_1.3.3+ds-1_all.deb ...
-#10 5.125 Unpacking libtirpc-common (1.3.3+ds-1) ...
-#10 5.200 Selecting previously unselected package libtirpc3:amd64.
-#10 5.201 Preparing to unpack .../09-libtirpc3_1.3.3+ds-1_amd64.deb ...
-#10 5.208 Unpacking libtirpc3:amd64 (1.3.3+ds-1) ...
-#10 5.286 Selecting previously unselected package libnsl2:amd64.
-#10 5.287 Preparing to unpack .../10-libnsl2_1.3.0-2_amd64.deb ...
-#10 5.298 Unpacking libnsl2:amd64 (1.3.0-2) ...
-#10 5.368 Selecting previously unselected package readline-common.
-#10 5.369 Preparing to unpack .../11-readline-common_8.2-1.3_all.deb ...
-#10 5.378 Unpacking readline-common (8.2-1.3) ...
-#10 5.451 Selecting previously unselected package libreadline8:amd64.
-#10 5.452 Preparing to unpack .../12-libreadline8_8.2-1.3_amd64.deb ...
-#10 5.463 Unpacking libreadline8:amd64 (8.2-1.3) ...
-#10 5.539 Selecting previously unselected package libsqlite3-0:amd64.
-#10 5.540 Preparing to unpack .../13-libsqlite3-0_3.40.1-2+deb12u2_amd64.deb ...
-#10 5.552 Unpacking libsqlite3-0:amd64 (3.40.1-2+deb12u2) ...
-#10 5.638 Selecting previously unselected package libpython3.11-stdlib:amd64.
-#10 5.639 Preparing to unpack .../14-libpython3.11-stdlib_3.11.2-6+deb12u8_amd64.deb ...
-#10 5.651 Unpacking libpython3.11-stdlib:amd64 (3.11.2-6+deb12u8) ...
-#10 5.837 Selecting previously unselected package python3.11.
-#10 5.838 Preparing to unpack .../15-python3.11_3.11.2-6+deb12u8_amd64.deb ...
-#10 5.849 Unpacking python3.11 (3.11.2-6+deb12u8) ...
-#10 5.917 Selecting previously unselected package libpython3-stdlib:amd64.
-#10 5.918 Preparing to unpack .../16-libpython3-stdlib_3.11.2-1+b1_amd64.deb ...
-#10 5.926 Unpacking libpython3-stdlib:amd64 (3.11.2-1+b1) ...
-#10 5.985 Setting up python3-minimal (3.11.2-1+b1) ...
-#10 6.133 Selecting previously unselected package python3.
-#10 6.133 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6932 files and directories currently installed.)
-#10 6.136 Preparing to unpack .../00-python3_3.11.2-1+b1_amd64.deb ...
-#10 6.145 Unpacking python3 (3.11.2-1+b1) ...
-#10 6.213 Selecting previously unselected package openssl.
-#10 6.214 Preparing to unpack .../01-openssl_3.0.20-1~deb12u2_amd64.deb ...
-#10 6.226 Unpacking openssl (3.0.20-1~deb12u2) ...
-#10 6.381 Selecting previously unselected package ca-certificates.
-#10 6.382 Preparing to unpack .../02-ca-certificates_20250419~deb12u1_all.deb ...
-#10 6.391 Unpacking ca-certificates (20250419~deb12u1) ...
-#10 6.499 Selecting previously unselected package bubblewrap.
-#10 6.500 Preparing to unpack .../03-bubblewrap_0.8.0-2+deb12u1_amd64.deb ...
-#10 6.512 Unpacking bubblewrap (0.8.0-2+deb12u1) ...
-#10 6.584 Selecting previously unselected package python3-lib2to3.
-#10 6.585 Preparing to unpack .../04-python3-lib2to3_3.11.2-3_all.deb ...
-#10 6.596 Unpacking python3-lib2to3 (3.11.2-3) ...
-#10 6.679 Selecting previously unselected package python3-distutils.
-#10 6.680 Preparing to unpack .../05-python3-distutils_3.11.2-3_all.deb ...
-#10 6.689 Unpacking python3-distutils (3.11.2-3) ...
-#10 6.762 Selecting previously unselected package python3-pip-whl.
-#10 6.763 Preparing to unpack .../06-python3-pip-whl_23.0.1+dfsg-1_all.deb ...
-#10 6.774 Unpacking python3-pip-whl (23.0.1+dfsg-1) ...
-#10 6.877 Selecting previously unselected package python3-setuptools-whl.
-#10 6.878 Preparing to unpack .../07-python3-setuptools-whl_66.1.1-1+deb12u2_all.deb ...
-#10 6.886 Unpacking python3-setuptools-whl (66.1.1-1+deb12u2) ...
-#10 6.968 Selecting previously unselected package python3.11-venv.
-#10 6.969 Preparing to unpack .../08-python3.11-venv_3.11.2-6+deb12u8_amd64.deb ...
-#10 6.976 Unpacking python3.11-venv (3.11.2-6+deb12u8) ...
-#10 7.018 Selecting previously unselected package python3-venv.
-#10 7.019 Preparing to unpack .../09-python3-venv_3.11.2-1+b1_amd64.deb ...
-#10 7.026 Unpacking python3-venv (3.11.2-1+b1) ...
-#10 7.069 Selecting previously unselected package tini.
-#10 7.071 Preparing to unpack .../10-tini_0.19.0-1+b3_amd64.deb ...
-#10 7.078 Unpacking tini (0.19.0-1+b3) ...
-#10 7.137 Setting up media-types (10.0.0) ...
-#10 7.169 Setting up bubblewrap (0.8.0-2+deb12u1) ...
-#10 7.191 Setting up python3-setuptools-whl (66.1.1-1+deb12u2) ...
-#10 7.213 Setting up libkeyutils1:amd64 (1.6.3-2) ...
-#10 7.234 Setting up libtirpc-common (1.3.3+ds-1) ...
-#10 7.263 Setting up libsqlite3-0:amd64 (3.40.1-2+deb12u2) ...
-#10 7.284 Setting up libkrb5support0:amd64 (1.20.1-2+deb12u5) ...
-#10 7.305 Setting up tini (0.19.0-1+b3) ...
-#10 7.326 Setting up libncursesw6:amd64 (6.4-4) ...
-#10 7.347 Setting up libk5crypto3:amd64 (1.20.1-2+deb12u5) ...
-#10 7.367 Setting up libkrb5-3:amd64 (1.20.1-2+deb12u5) ...
-#10 7.389 Setting up openssl (3.0.20-1~deb12u2) ...
-#10 7.417 Setting up readline-common (8.2-1.3) ...
-#10 7.440 Setting up libreadline8:amd64 (8.2-1.3) ...
-#10 7.460 Setting up ca-certificates (20250419~deb12u1) ...
-#10 7.818 Updating certificates in /etc/ssl/certs...
-#10 8.295 150 added, 0 removed; done.
-#10 8.331 Setting up libgssapi-krb5-2:amd64 (1.20.1-2+deb12u5) ...
-#10 8.352 Setting up libtirpc3:amd64 (1.3.3+ds-1) ...
-#10 8.372 Setting up python3-pip-whl (23.0.1+dfsg-1) ...
-#10 8.393 Setting up libnsl2:amd64 (1.3.0-2) ...
-#10 8.413 Setting up libpython3.11-stdlib:amd64 (3.11.2-6+deb12u8) ...
-#10 8.433 Setting up libpython3-stdlib:amd64 (3.11.2-1+b1) ...
-#10 8.453 Setting up python3.11 (3.11.2-6+deb12u8) ...
-#10 8.837 Setting up python3 (3.11.2-1+b1) ...
-#10 8.900 Setting up python3-lib2to3 (3.11.2-3) ...
-#10 8.966 Setting up python3-distutils (3.11.2-3) ...
-#10 9.043 Setting up python3.11-venv (3.11.2-6+deb12u8) ...
-#10 9.085 Setting up python3-venv (3.11.2-1+b1) ...
-#10 9.105 Processing triggers for libc-bin (2.36-9+deb12u14) ...
-#10 9.130 Processing triggers for ca-certificates (20250419~deb12u1) ...
-#10 9.139 Updating certificates in /etc/ssl/certs...
-#10 9.492 0 added, 0 removed; done.
-#10 9.492 Running hooks in /etc/ca-certificates/update.d...
-#10 9.493 done.
-#10 DONE 9.7s
-
-#11 [ 3/10] RUN npm install -g --no-fund --no-audit       "@anthropic-ai/claude-code@2.1.281"       "@openai/codex@0.156.1"  && npm cache clean --force  && claude --version && codex --version
-#11 9.831 
-#11 9.831 added 4 packages in 9s
-#11 9.906 npm warn using --force Recommended protections disabled.
-#11 10.01 2.1.281 (Claude Code)
-#11 10.03 codex-cli 0.156.1
-#11 DONE 10.2s
-
-#12 [ 4/10] COPY requirements.txt /opt/lab04/requirements.txt
-#12 DONE 0.1s
-
-#13 [ 5/10] RUN python3 -m venv /opt/venv  && /opt/venv/bin/pip install --no-cache-dir -r /opt/lab04/requirements.txt
-#13 2.066 Collecting fastapi==0.141.1
-#13 2.132   Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
-#13 2.153      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.0/132.0 kB 6.4 MB/s eta 0:00:00
-#13 2.189 Collecting starlette==0.46.2
-#13 2.195   Downloading starlette-0.46.2-py3-none-any.whl (72 kB)
-#13 2.201      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 72.0/72.0 kB 16.9 MB/s eta 0:00:00
-#13 2.345 Collecting pydantic==2.13.5
-#13 2.352   Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
-#13 2.384      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.6/472.6 kB 15.2 MB/s eta 0:00:00
-#13 3.130 Collecting pydantic_core==2.46.5
-#13 3.137   Downloading pydantic_core-2.46.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
-#13 3.297      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 13.0 MB/s eta 0:00:00
-#13 3.314 Collecting annotated-doc==0.0.5
-#13 3.322   Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
-#13 3.331 Collecting annotated-types==0.8.0
-#13 3.338   Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
-#13 3.358 Collecting typing-inspection==0.4.4
-#13 3.367   Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
-#13 3.386 Collecting typing_extensions==4.16.0
-#13 3.398   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
-#13 3.402      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 18.3 MB/s eta 0:00:00
-#13 3.445 Collecting anyio==4.15.1
-#13 3.452   Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
-#13 3.463      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 13.2 MB/s eta 0:00:00
-#13 3.479 Collecting idna==3.20
-#13 3.491   Downloading idna-3.20-py3-none-any.whl (69 kB)
-#13 3.498      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 14.2 MB/s eta 0:00:00
-#13 3.525 Collecting uvicorn==0.53.0
-#13 3.536   Downloading uvicorn-0.53.0-py3-none-any.whl (87 kB)
-#13 3.545      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.1/87.1 kB 12.0 MB/s eta 0:00:00
-#13 3.562 Collecting click==8.5.0
-#13 3.568   Downloading click-8.5.0-py3-none-any.whl (125 kB)
-#13 3.578      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 kB 15.9 MB/s eta 0:00:00
-#13 3.593 Collecting h11==0.16.0
-#13 3.601   Downloading h11-0.16.0-py3-none-any.whl (37 kB)
-#13 3.704 Installing collected packages: typing_extensions, idna, h11, click, annotated-types, annotated-doc, uvicorn, typing-inspection, pydantic_core, anyio, starlette, pydantic, fastapi
-#13 4.164 Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 click-8.5.0 fastapi-0.141.1 h11-0.16.0 idna-3.20 pydantic-2.13.5 pydantic_core-2.46.5 starlette-0.46.2 typing-inspection-0.4.4 typing_extensions-4.16.0 uvicorn-0.53.0
-#13 DONE 4.4s
-
-#14 [ 6/10] RUN useradd --uid 10001 --user-group --create-home --home-dir /home/app --shell /usr/sbin/nologin app  && mkdir -p /data/accounts/claude /data/accounts/codex  && chown -R app:app /data/accounts && chmod -R 0700 /data/accounts
-#14 DONE 0.4s
-
-#15 [ 7/10] COPY --chmod=0755 wrappers/lab04-cli /opt/lab04/bin/lab04-cli
-#15 DONE 0.1s
-
-#16 [ 8/10] RUN cd /opt/lab04/bin  && for n in 1 2 3 4 5; do ln -s lab04-cli "yolo$n"; ln -s lab04-cli "cyolo$n"; done
-#16 DONE 0.3s
-
-#17 [ 9/10] COPY app /opt/lab04/app
-#17 DONE 0.1s
-
-#18 [10/10] WORKDIR /opt/lab04
-#18 DONE 0.1s
-
-#19 exporting to image
-#19 exporting layers
-#19 exporting layers 0.9s done
-#19 writing image sha256:9297164b461e8491fd0e6bfd38633ffd56a5a52f4e11010ab8242c65639dcf6e done
-#19 naming to docker.io/library/lab04-api:0.4.0 done
-#19 DONE 0.9s
-[1;34m[lab04][0m building lab04-web:0.4.0 (static index.html, CSP connect-src = API port 8004)
-#0 building with "default" instance using docker driver
-
-#1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 972B 0.0s done
-#1 DONE 0.1s
-
-#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
-#2 DONE 0.9s
-
-#3 docker-image://docker.io/docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
-#3 CACHED
-
-#4 [internal] load metadata for docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612
-#4 ...
-
-#5 [auth] library/python:pull token for registry-1.docker.io
-#5 DONE 0.0s
-
-#6 [auth] nginxinc/nginx-unprivileged:pull token for registry-1.docker.io
-#6 DONE 0.0s
-
-#7 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
-#7 DONE 2.5s
-
-#4 [internal] load metadata for docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612
-#4 DONE 3.1s
-
-#8 [internal] load .dockerignore
-#8 transferring context: 83B 0.0s done
-#8 DONE 0.1s
-
-#9 [stage-1 1/3] FROM docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612
-#9 resolve docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612
-#9 ...
-
-#10 [internal] load build context
-#10 transferring context: 29.67kB 0.0s done
-#10 DONE 0.1s
-
-#9 [stage-1 1/3] FROM docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612
-#9 resolve docker.io/nginxinc/nginx-unprivileged:1.31.6-alpine@sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612 0.1s done
-#9 sha256:6a23acdfca2b9cfbcec61419e3f1426bcbedb91362f2f19306a8567423bb4612 6.79kB / 6.79kB done
-#9 sha256:334791b789e0dfab66415dc74e0680434afbd340fb427be9b1c569f8796762eb 2.61kB / 2.61kB done
-#9 sha256:05710105fa144da291bc75b5322653ba4d2e086ef8867ab763901a8ff4506e8d 14.06kB / 14.06kB done
-#9 sha256:e2de96513ba9eb53b431787ec8a65cdde380ac4772a3e4c4b714dcfde2a102b5 0B / 3.85MB 0.2s
-#9 sha256:405f7f61999d2f7c1ffe22a7249f3342dc5c01e7f5c640bbe645c5f4d67b6e8c 0B / 2.79kB 0.2s
-#9 sha256:6d4f3b25f194e3dfdad8a45a84b1e34b1cd4a874a17d09235d306c4f5f8fbe5f 0B / 1.93MB 0.2s
-#9 sha256:e2de96513ba9eb53b431787ec8a65cdde380ac4772a3e4c4b714dcfde2a102b5 2.10MB / 3.85MB 0.5s
-#9 sha256:e2de96513ba9eb53b431787ec8a65cdde380ac4772a3e4c4b714dcfde2a102b5 3.15MB / 3.85MB 0.6s
-#9 sha256:e2de96513ba9eb53b431787ec8a65cdde380ac4772a3e4c4b714dcfde2a102b5 3.85MB / 3.85MB 0.6s done
-#9 sha256:405f7f61999d2f7c1ffe22a7249f3342dc5c01e7f5c640bbe645c5f4d67b6e8c 2.79kB / 2.79kB 0.6s done
-#9 extracting sha256:e2de96513ba9eb53b431787ec8a65cdde380ac4772a3e4c4b714dcfde2a102b5 0.1s done
-#9 sha256:e3da06c05c18e1a11b0727afce7a56a5fc8be085e31a21e9a0a1da91aa2ca7f6 0B / 628B 0.7s
-#9 sha256:69ace78d1a42d971db3cb62916650ee1a8073517dd1d36db28b2e67cb9da2cfd 0B / 967B 0.7s
-#9 sha256:6d4f3b25f194e3dfdad8a45a84b1e34b1cd4a874a17d09235d306c4f5f8fbe5f 1.05MB / 1.93MB 1.0s
-#9 sha256:e3da06c05c18e1a11b0727afce7a56a5fc8be085e31a21e9a0a1da91aa2ca7f6 628B / 628B 0.9s done
-#9 sha256:69ace78d1a42d971db3cb62916650ee1a8073517dd1d36db28b2e67cb9da2cfd 967B / 967B 0.9s done
-#9 sha256:fde9f63b3dd5f2299ecfbfb0555ac8a5313add8f5706cdcdd573a424fd156da6 0B / 404B 1.0s
-#9 sha256:04807f1ef2af2156ff21a0cc84edaafb3fb68d13c79ee58ea64ebf7917957711 0B / 1.20kB 1.0s
-#9 extracting sha256:6d4f3b25f194e3dfdad8a45a84b1e34b1cd4a874a17d09235d306c4f5f8fbe5f
-#9 sha256:6d4f3b25f194e3dfdad8a45a84b1e34b1cd4a874a17d09235d306c4f5f8fbe5f 1.93MB / 1.93MB 1.0s done
-#9 extracting sha256:6d4f3b25f194e3dfdad8a45a84b1e34b1cd4a874a17d09235d306c4f5f8fbe5f 0.1s done
-#9 sha256:79afa174ac2fa444c4a99f5395d5d61c494f921915b9c470680e829f53a33ee0 0B / 1.40kB 1.2s
-#9 sha256:fde9f63b3dd5f2299ecfbfb0555ac8a5313add8f5706cdcdd573a424fd156da6 404B / 404B 1.3s done
-#9 sha256:04807f1ef2af2156ff21a0cc84edaafb3fb68d13c79ee58ea64ebf7917957711 1.20kB / 1.20kB 1.2s done
-#9 extracting sha256:405f7f61999d2f7c1ffe22a7249f3342dc5c01e7f5c640bbe645c5f4d67b6e8c done
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 0B / 17.52MB 1.3s
-#9 extracting sha256:e3da06c05c18e1a11b0727afce7a56a5fc8be085e31a21e9a0a1da91aa2ca7f6 done
-#9 extracting sha256:69ace78d1a42d971db3cb62916650ee1a8073517dd1d36db28b2e67cb9da2cfd done
-#9 extracting sha256:fde9f63b3dd5f2299ecfbfb0555ac8a5313add8f5706cdcdd573a424fd156da6 done
-#9 extracting sha256:04807f1ef2af2156ff21a0cc84edaafb3fb68d13c79ee58ea64ebf7917957711
-#9 extracting sha256:04807f1ef2af2156ff21a0cc84edaafb3fb68d13c79ee58ea64ebf7917957711 done
-#9 extracting sha256:79afa174ac2fa444c4a99f5395d5d61c494f921915b9c470680e829f53a33ee0 done
-#9 sha256:79afa174ac2fa444c4a99f5395d5d61c494f921915b9c470680e829f53a33ee0 1.40kB / 1.40kB 1.5s done
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 4.19MB / 17.52MB 1.8s
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 7.34MB / 17.52MB 1.9s
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 9.44MB / 17.52MB 2.0s
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 11.53MB / 17.52MB 2.1s
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 13.63MB / 17.52MB 2.2s
-#9 sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 17.52MB / 17.52MB 2.4s done
-#9 extracting sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 0.1s
-#9 extracting sha256:70b1eddd31e3e001b0db8d155e910b0db17bd57689b2ae18c1b4d02206998c23 0.3s done
-#9 DONE 3.1s
-
-#11 [csp 1/4] FROM docker.io/library/python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
-#11 resolve docker.io/library/python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e 0.1s done
-#11 sha256:febd0be41adb897a0ab8f1f1c693d8912669ea60c4940e076e9946b60e210ef0 5.68kB / 5.68kB done
-#11 sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e 6.55kB / 6.55kB done
-#11 sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a 1.75kB / 1.75kB done
-#11 sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 3.53MB / 3.53MB 1.8s done
-#11 sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 13.67MB / 13.67MB 2.5s done
-#11 extracting sha256:1c5e03f304918f89aed0c098c8f4b6f163f7bf9d2702991696bf0132a2853e30 0.2s done
-#11 sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 249B / 249B 2.1s done
-#11 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 0.5s
-#11 extracting sha256:a2e58067964fcd8f46a6b5992975e9c8ab34e7620d96204e08e99bf0fdf4dab8 0.7s done
-#11 extracting sha256:7c6fab1667eb7d9029684d783e4c127f11dd7ed5120829f875b799a0b9431558 done
-#11 DONE 3.5s
-
-#12 [csp 2/4] WORKDIR /src
-#12 DONE 0.1s
-
-#13 [csp 3/4] COPY index.html build_csp.py nginx.conf.in ./
-#13 DONE 0.1s
-
-#14 [csp 4/4] RUN python3 build_csp.py index.html nginx.conf.in "http://127.0.0.1:8004 http://localhost:8004" default.conf
-#14 0.254 CSP: default-src 'none'; script-src 'sha256-rFbloRuiuTNjQQPHRzFQ9nwVGzqrTeCHb8JyDGqR6h4='; style-src 'sha256-qVI0JEdibf7LD80Ear+gD6uqcg8c9OzevZ5PEc213Yw='; img-src data:; connect-src http://127.0.0.1:8004 http://localhost:8004; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
-#14 DONE 0.3s
-
-#15 [stage-1 2/3] COPY --from=csp /src/default.conf /etc/nginx/conf.d/default.conf
-#15 DONE 0.0s
-
-#16 [stage-1 3/3] COPY index.html /usr/share/nginx/html/index.html
-#16 DONE 0.1s
-
-#17 exporting to image
-#17 exporting layers 0.1s done
-#17 writing image sha256:f1ac8e2faf3488a10a5d44e83674b86761a29c978fb5865da0e7a9152fb93611 done
-#17 naming to docker.io/library/lab04-web:0.4.0 done
-#17 DONE 0.1s
-[1;34m[lab04][0m versions inside lab04-api:0.4.0 (through the container-local wrappers):
-2.1.281 (Claude Code)
-codex-cli 0.156.1
