@@ -5,7 +5,8 @@
 ## วิธีทดสอบ
 - ใช้เครื่องมือ Playwright MCP โหมด `--extension` (`mcp__playwright__browser_*`) ซึ่งคุมแท็บใน Google Chrome ของผู้เรียนที่ login Shopee ไว้แล้ว
 - ถ้า Chrome ขึ้นหน้า Playwright Extension ให้ผู้เรียนกด Connect เอง
-- ทำตาม `TEST-PLAN.md` 3 ข้อ (TC-AUTH-01, TC-SRCH-01, TC-CART-01) ทีละข้อ
+- ก่อนเริ่ม ตรวจว่า Chrome login อยู่ (มุมขวาบนเป็นชื่อบัญชี) ถ้าไม่ ให้หยุดและบันทึกทุกข้อเป็น Blocked
+- ทำตาม `TEST-PLAN.md` 4 ข้อ (TC-SRCH-01, TC-SRCH-02, TC-SORT-01, TC-CART-01) ทีละข้อ
 
 ## กติกาที่ห้ามละเมิด
 - **ช้าแบบคน**: พักทุกขั้น 2–5 วินาที พิมพ์ทีละตัวอักษร (`slowly`) เลื่อนหน้าทีละนิด ไม่เปิดหลายแท็บ ไม่รันซ้ำถี่ ๆ
