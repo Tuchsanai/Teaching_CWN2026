@@ -1219,6 +1219,8 @@ docker compose up -d --build
 
 ตอนนี้เรามีเครื่องมือครบทั้งวงจรของงานโคลน: **สืบ** (REA) · **กดใช้** (Playwright) · **เก็บครบ** (HAR) · **ตัดสินเป็นกลาง** (กรรมการอิสระ) · **เฉลยที่ไม่ไหล** (ต้นฉบับแช่แข็ง) · **วัดลึกทุกแถว** (differential) · **วัดความครบของหน้า** (โครงสร้าง) · **วัดตัววัด** (mutation) · **แก้เร็ว** (swarm) และมีตารางที่พิสูจน์ได้ว่า v1 → v4 ดีขึ้นจริงในทุกตัววัดที่เทียบกับต้นฉบับ
 
+บทถัดไป [**05 · Two-Stage Pipeline**](../05_REA_Two_Stage_Pipeline/README.md) ต่อยอด v4 ด้วยอัลกอริทึม 2 ขั้น (ล็อกโครงสร้างก่อน แล้วค่อยจูนพิกเซลโดยมีตัวกันอ่านไม่ออก) ได้ Score 73.56 → 92.18
+
 ---
 
 *ตัวเลขทุกตัวในบทนี้มาจากการรันจริงใน `_solution/run/` เมื่อ 1 พ.ย. 2569 (00:49 → 02:16 น.) · ข้อมูลเที่ยวบินเป็นภาพนิ่งของเที่ยวบิน 15 พ.ย. 2569 เก็บ ณ 1 พ.ย. 2569 ราว 00:03 น. · Playwright: playwright.dev (Microsoft) — `routeFromHAR`, `route`, `clock`, `ariaSnapshot` · git worktree: git-scm.com/docs/git-worktree · HAR: W3C Web Performance WG "HTTP Archive (HAR) format" · pixelmatch: github.com/mapbox/pixelmatch · REA: github.com/morluto/rea (npm `rea-agents`)*
