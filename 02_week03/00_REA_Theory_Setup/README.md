@@ -307,7 +307,7 @@
 | 6 | หน้า Google Flights | ถูกอ่านอย่างเดียว ไม่มีการคลิก |
 | ↩ | ผลเดินกลับ | หลักฐาน `ev_…` → ไฟล์ `.json` → yolo1 สรุปให้เราอ่าน |
 
-🧪 **ทดสอบจริง:** หลังติดตั้ง ถาม `yolo1` ว่าเห็น REA ไหม ได้คำตอบว่าเห็น **207 tools** และเห็นคู่มือ ✅ (ติดตั้งที่ส่วนกลางให้ทุกบัญชีใช้ได้ ดู T14)
+🧪 **ทดสอบจริง:** หลังติดตั้ง ถาม `yolo1` ว่าเห็น REA ไหม ได้คำตอบว่าเห็น **207 tools** และเห็นคู่มือ ✅ (ติดตั้งที่ส่วนกลางให้ทุกบัญชีใช้ได้ ดู T14) · ตัวเลข 207 มาจากรุ่น 6.7.0 ส่วนรุ่น 6.8.0 ที่ LAB 1 ติดตั้งตามคู่มือล่าสุดมี 229 tools
 
 **สรุป:** REA = เครื่องมือ 207 ชิ้น + คู่มือ + สวิตช์ + ใบเสร็จ · คำสั่งเดินจากเรา → yolo1 → REA → Chrome แล้วผลกลับมาเป็นไฟล์หลักฐาน
 
@@ -665,7 +665,7 @@ skill `/maccount` จะทำตามขั้นที่ 1 ของ LAB 03 
 
 👀 **สังเกต**
 - ถ้า `yolo1` ยังไม่ล็อกอิน ให้กลับไปทำ LAB 03 ขั้นล็อกอินก่อน เพราะทุกพรอมต์หลังจากนี้ส่งงานให้ `yolo1 -p`
-- สร้าง container ใหม่ทับแล้ว **REA ยังอยู่** เพราะการตั้งค่าเก็บใน Docker volume `ai-accounts` ทดสอบจริงหลังสร้างใหม่: ถาม `yolo1 -p` ว่าเห็น `rea` ไหม ได้คำตอบใน 21 วินาทีว่าเห็น `rea` **207 tools** และ skill `reverse-engineer-anything` ถ้าเคยทำ LAB 1 แล้ว ข้ามไป LAB 2 ได้เลย
+- สร้าง container ใหม่ทับแล้ว **REA ยังอยู่** เพราะการตั้งค่าเก็บใน Docker volume `ai-accounts` ทดสอบจริงหลังสร้างใหม่: ถาม `yolo1 -p` ว่าเห็น `rea` ไหม ได้คำตอบใน 21 วินาทีว่าเห็น `rea` **207 tools** (รุ่น 6.7.0 ตอนนั้น) และ skill `reverse-engineer-anything` ถ้าเคยทำ LAB 1 แล้ว ข้ามไป LAB 2 ได้เลย
 - อย่าลบ volume `ai-accounts` (เก็บทั้งล็อกอินและ REA)
 
 ---
@@ -674,35 +674,42 @@ skill `/maccount` จะทำตามขั้นที่ 1 ของ LAB 03 
 
 🎯 ให้ทั้ง `yolo1`–`yolo5` และ `cyolo1`–`cyolo5` เห็น MCP `rea` และ skill `reverse-engineer-anything` (ทฤษฎี: T8, T14)
 
-![หน้าต่าง Claude Code Desktop วางพรอมต์ติดตั้ง REA เวอร์ชัน 6.7.0 ลงใน container ไว้ในช่องข้อความ กรอบสีแดง](img/lab1-paste.png)
+![หน้าต่าง Claude Code Desktop วางพรอมต์ติดตั้ง REA ลงใน container ไว้ในช่องข้อความ กรอบสีแดง](img/lab1-paste.png)
 *วางพรอมต์ติดตั้ง REA*
+
+📖 **ติดตั้งตามคู่มือทางการ:** พรอมต์นี้ **ไม่ระบุเวอร์ชัน** แต่ให้ AI อ่านคู่มือที่ [rea.tools/get-started](https://rea.tools/get-started/) แล้วรัน `npx rea-agents@latest setup` ซึ่งจะเลือกเวอร์ชันล่าสุดให้เอง ทุกครั้งที่ทำ LAB จึงได้ REA ใหม่ล่าสุด
 
 💬 **คัดลอกพรอมต์นี้**
 
 ```text
-ติดตั้ง REA (Reverse Engineer Anything) เวอร์ชัน 6.7.0 ลงใน container multi-account-devtool ให้ทุกบัญชี (yolo1–5 และ cyolo1–5) ใช้ได้ ทำทุกอย่างใน container ผ่าน docker exec
-1. เช็กว่า container multi-account-devtool กำลังรัน และ node -v ใน container เป็น 22.19 ขึ้นไป
-2. เพิ่ม MCP server ชื่อ rea ในไฟล์ส่วนกลาง /root/ai-accounts/.Claude/shared/mcp/mcp.json ให้รันคำสั่ง npx -y rea-agents@6.7.0 mcp (สำรองไฟล์เดิมก่อน และห้ามลบ playwright ที่มีอยู่)
-3. ติดตั้ง REA skill: รัน npx -y rea-agents@6.7.0 setup --yes --client claude_code โดยตั้ง CLAUDE_CONFIG_DIR เป็นโฟลเดอร์ชั่วคราว แล้วคัดลอกโฟลเดอร์ skills/reverse-engineer-anything ที่ได้ ไปไว้ใน /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills
-4. ทดสอบ: ใน container ให้ yolo1 -p ตอบว่าเห็น MCP rea กี่ tools และเห็น skill reverse-engineer-anything ไหม
-สรุปเป็นตาราง ขั้น | ผล
+ติดตั้ง REA (Reverse Engineer Anything) เวอร์ชันล่าสุด ลงใน container multi-account-devtool ให้ทุกบัญชี (yolo1–5 และ cyolo1–5) ใช้ได้ โดยอ่านและทำตามคู่มือทางการที่ https://rea.tools/get-started/ (ไม่ต้องระบุเวอร์ชันเอง ให้ setup ของ REA เลือกเวอร์ชันล่าสุดให้) ทำทุกอย่างใน container ผ่าน docker exec
+1. อ่านคู่มือ แล้วเช็กว่า container กำลังรัน และ node -v ใน container ผ่านเงื่อนไขในคู่มือไหม ถ้าไม่ผ่าน ห้ามแก้ Node ของ container ให้ดาวน์โหลด Node 24 LTS (.tar.gz) จาก nodejs.org ไว้ใน /tmp แล้วใช้เฉพาะตอนรัน setup
+2. รัน npx rea-agents@latest setup --client claude_code --client codex --yes โดยตั้ง HOME, CLAUDE_CONFIG_DIR และ CODEX_HOME เป็นโฟลเดอร์ชั่วคราว (เพราะทุกบัญชีใน container อ่านเครื่องมือและคู่มือจากโฟลเดอร์ส่วนกลาง ไม่ได้อ่านจากที่ปกติ)
+3. ย้ายผลของ setup ไปไว้ที่ส่วนกลาง (สำรองของเดิมก่อนทุกครั้ง ห้ามลบ playwright):
+   - MCP server ชื่อ rea ที่ setup เขียนให้ claude_code → /root/ai-accounts/.Claude/shared/mcp/mcp.json
+   - MCP server ชื่อ rea ที่ setup เขียนให้ codex → /root/ai-accounts/.Codex/shared/mcp/mcp.json
+   - skill reverse-engineer-anything → /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills (สำรองของเดิมไว้นอกโฟลเดอร์ skills)
+4. ทดสอบ: ให้ yolo1 -p และ cyolo1 exec ตอบว่าเห็น MCP rea กี่ tools และเห็น skill reverse-engineer-anything ไหม
+สรุปเป็นตาราง ขั้น | ผล พร้อมบอกเวอร์ชัน REA ที่ติดตั้งได้
 ```
 
-💡 พรอมต์นี้มีชื่อไฟล์และคำสั่งเทคนิคอยู่บ้าง **เพื่อให้ AI ทำได้ตรงเป๊ะ** เราไม่ต้องเข้าใจทุกบรรทัด แค่รู้ว่ามันทำ 3 อย่าง: ① ให้ทุกบัญชีเห็นเครื่องมือ REA ② วางคู่มือ REA ③ ทดสอบว่าเห็นจริง
+💡 พรอมต์นี้มีชื่อไฟล์และคำสั่งเทคนิคอยู่บ้าง **เพื่อให้ AI ทำได้ตรงเป๊ะ** เราไม่ต้องเข้าใจทุกบรรทัด แค่รู้ว่ามันทำ 4 อย่าง: ① อ่านคู่มือทางการ ② ให้ setup ของ REA ติดตั้งเวอร์ชันล่าสุด ③ ย้ายเครื่องมือและคู่มือไปไว้ที่ส่วนกลางให้ทุกบัญชีเห็น (T14) ④ ทดสอบว่าเห็นจริงทั้งฝั่ง Claude Code และ Codex
 
-✅ **ผลจริง**
+✅ **ผลจริง** (รันจริง 2 พ.ย. 2569 ใช้เวลาราว 4 นาที · setup เลือกให้ได้ `rea-agents` **6.8.0**)
 
 | ขั้น | ผล |
 |---|---|
-| 1 เช็ก container | ✅ รันอยู่ และพร้อมติดตั้ง |
-| 2 เพิ่มเครื่องมือ REA ที่ส่วนกลาง | ✅ เพิ่มแล้ว (สำรองของเดิมไว้ และเครื่องมือเดิมยังอยู่ครบ) |
-| 3 วางคู่มือ REA ที่ส่วนกลาง | ✅ วางแล้ว ทั้งฝั่ง Claude Code และ Codex |
-| 4 ทดสอบ | ✅ `yolo1` ตอบว่าเห็น REA **207 tools** และเห็นคู่มือ `reverse-engineer-anything` |
+| 1 อ่านคู่มือ + เช็ก Node | ✅ container รันอยู่ · คู่มือกำหนด Node 22.23.4+ แต่ใน container เป็น `v22.23.3` → AI ดาวน์โหลด Node 24 ไว้ใน `/tmp` ใช้เฉพาะตอน setup (ไม่แตะ Node ของ container) |
+| 2 รัน setup ของ REA | ✅ `status: ready` · setup เลือกเวอร์ชันล่าสุดแล้วล็อกไว้เป็น `npx -y rea-agents@6.8.0 mcp` |
+| 3 ย้ายไปส่วนกลาง | ✅ `mcp.json` ทั้งฝั่ง `.Claude` และ `.Codex` มี `rea` แล้ว (สำรองของเดิมไว้ playwright ยังอยู่) · คู่มือวางครบทั้ง 2 ฝั่ง |
+| 4 ทดสอบ | ✅ `yolo1` และ `cyolo1` ตอบตรงกันว่าเห็น REA **229 tools** และเห็นคู่มือ `reverse-engineer-anything` (ลอง `yolo2` เพิ่มก็เห็น 229 เหมือนกัน) |
 
 👀 **สังเกต**
-- ตัวเลข **207 tools** ตรงกับที่เห็นในวิดีโอ
+- **จำนวน tools ขึ้นกับเวอร์ชัน:** 6.7.0 (ในวิดีโอและตัวอย่างทฤษฎี) มี **207 tools** · 6.8.0 มี **229 tools** ถ้าวันที่ทำ LAB ได้เวอร์ชันใหม่กว่านี้ ตัวเลขอาจเปลี่ยนอีก ไม่ผิดปกติ
+- **Node ต่ำกว่าที่คู่มือกำหนด 1 รุ่นย่อย:** ตัว `setup` จะไม่ยอมทำงาน (`needs_human`) จึงต้องใช้ Node 24 ชั่วคราว ส่วนตัว MCP server รันบน Node ของ container ได้ปกติ
+- **Claude Code กับ Codex อ่าน `mcp.json` คนละไฟล์:** ถ้าใส่แค่ฝั่ง `.Claude` บัญชี `cyolo` จะเห็น REA **0 tools** (เจอจริงตอนทดสอบ) พรอมต์จึงสั่งให้ใส่ทั้ง 2 ไฟล์
 - ครั้งแรกที่ AI เรียกใช้ REA จะช้านิดหนึ่ง เพราะต้องดาวน์โหลดเครื่องมือมาก่อน ครั้งต่อไปเร็วขึ้น
-- ถ้า `yolo1` ตอบว่า "ไม่เห็น rea" ให้ใช้พรอมต์ในหัวข้อ "ถ้าเจอปัญหา" ด้านล่าง AI จะตรวจและแก้ให้
+- ถ้า `yolo1` หรือ `cyolo1` ตอบว่า "ไม่เห็น rea" ให้ใช้พรอมต์ในหัวข้อ "ถ้าเจอปัญหา" ด้านล่าง AI จะตรวจและแก้ให้
 
 ---
 
@@ -713,7 +720,7 @@ skill `/maccount` จะทำตามขั้นที่ 1 ของ LAB 03 
 - [ ] อธิบายได้ว่า MCP server กับ skill ต่างกันอย่างไร
 - [ ] บอกได้ว่าป้าย 🟢 ยืนยันแล้ว · 🟡 อนุมาน · ⚪ ไม่ทราบ ต่างกันยังไง
 - [ ] `/maccount` แล้ว container พร้อม และ `yolo1` ล็อกอินอยู่ (LAB 0)
-- [ ] `yolo1` เห็น REA 207 tools และคู่มือ `reverse-engineer-anything` (LAB 1)
+- [ ] `yolo1` และ `cyolo1` เห็น REA (6.8.0 = 229 tools) และคู่มือ `reverse-engineer-anything` (LAB 1)
 
 ---
 
@@ -722,10 +729,10 @@ skill `/maccount` จะทำตามขั้นที่ 1 ของ LAB 03 
 ```text
 LAB REA ใน container multi-account-devtool มีปัญหา ช่วยตรวจทีละข้อแบบอ่านอย่างเดียวก่อน แล้วบอกฉันว่าจะแก้อย่างไร ห้ามลบไฟล์ใน /workspace/rea-flight และห้ามแก้ไฟล์ใน evidence/
 1. container multi-account-devtool รันอยู่ไหม และ node -v ใน container คือเวอร์ชันอะไร
-2. /root/ai-accounts/.Claude/shared/mcp/mcp.json เป็น JSON ที่ถูกต้องไหม มีทั้ง rea (rea-agents@6.7.0) และ playwright ไหม
+2. /root/ai-accounts/.Claude/shared/mcp/mcp.json และ /root/ai-accounts/.Codex/shared/mcp/mcp.json เป็น JSON ที่ถูกต้องไหม มีทั้ง rea (rea-agents เวอร์ชันอะไร) และ playwright ไหม
 3. มีโฟลเดอร์ reverse-engineer-anything ใน /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ไหม
 4. มี Chrome ที่เปิด --remote-debugging-port=9222 อยู่ไหม และ curl http://127.0.0.1:9222/json/version ใน container ตอบอะไร
-5. ให้ yolo1 -p ตอบสั้น ๆ ว่าเห็น MCP rea กี่ tools
+5. ให้ yolo1 -p และ cyolo1 exec ตอบสั้น ๆ ว่าเห็น MCP rea กี่ tools
 6. ถ้าหน้า Google Flights ขึ้น CAPTCHA หรือหน้าบล็อก ให้บอกฉัน ห้ามพยายามหลบ
 สรุปเป็นตาราง ข้อ | ผล | วิธีแก้ที่แนะนำ แล้วรอให้ฉันยืนยันก่อนแก้
 ```
@@ -733,7 +740,8 @@ LAB REA ใน container multi-account-devtool มีปัญหา ช่ว�
 | อาการ | สาเหตุที่พบบ่อย | วิธีแก้ |
 |---|---|---|
 | yolo1 ไม่เห็น `rea` | `mcp.json` เสีย (ลืม `,`) หรือยังไม่ได้เพิ่ม | กู้จากไฟล์สำรอง แล้วทำ LAB 1 ใหม่ |
-| `npx` ติดตั้ง REA ไม่ผ่าน เพราะ Node | ใช้ 6.8.0 หรือ `latest` | ระบุ `rea-agents@6.7.0` เสมอ |
+| yolo1 เห็น แต่ cyolo1 เห็น 0 tools | เพิ่ม `rea` แค่ใน `.Claude/shared/mcp/mcp.json` | เพิ่มใน `.Codex/shared/mcp/mcp.json` ด้วย (Codex อ่านไฟล์ของตัวเอง) |
+| `setup` ตอบ `needs_human` ให้ติดตั้ง Node ใหม่ | Node ใน container (`v22.23.3`) ต่ำกว่าที่ REA รุ่นล่าสุดกำหนด | ใช้ Node 24 ชั่วคราวใน `/tmp` เฉพาะตอนรัน setup (พรอมต์ LAB 1 สั่งไว้แล้ว) ห้ามแก้ Node ของ container |
 | prompt 1 เชื่อมต่อไม่ได้ | Chrome ไม่ได้เปิด / ปิดไปแล้ว | วางพรอมต์ LAB 2 ใหม่ |
 | ภาพหน้าจอหมดเวลา | หน้าเว็บหนัก หรือ headless ช้า | ข้ามภาพได้ ส่วนอื่นยังใช้ได้ |
 | ได้เที่ยวบินน้อยกว่า 22 ใบ หรือหน้าไม่เหมือนในบทนี้ | Google เปลี่ยนหน้า/ราคาตามวัน | ปกติ ดูโครงสร้างแทนตัวเลข |
