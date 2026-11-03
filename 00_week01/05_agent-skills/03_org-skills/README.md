@@ -277,13 +277,21 @@ desks/sales-nida/             desks/sales-nida/
 
 ### 1.3 ตัวอย่าง 3 โต๊ะ
 
-ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง แต่ละภาพอ่านจากซ้ายไปขวา: ① อ่านอะไร → ② ได้งานอะไรใน `work/` → ③ ได้ skill หน้าตาแบบไหน
+ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง แต่ละภาพคือ **ผังโฟลเดอร์ของโต๊ะนั้นหลังจบ LAB 1 ครบทุกไฟล์** แถบบนบอกว่าอ่านอะไรจากนอกโต๊ะ · 🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`
 
-![นิดา หัวหน้าทีมขาย → skill sales-proposal (4 นาที 4 วินาที): ① อ่าน people/sales/sales-nida.md, company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv และ margin-rules.md → ② work/ proposal 9 หัวข้อ 4,780,000 บาท margin 31.6% → ③ .claude/skills/sales-proposal/ มี SKILL.md, references/ 6 ไฟล์, scripts/price.py · proposal นี้ไม่มีภาคผนวก PDPA เพราะกฎอยู่ในโน้ตของ MD คนเดียว](img/lab1-desk-sales-nida.png)
+![โต๊ะของนิดา หัวหน้าทีมขาย desks/sales-nida/ (4 นาที 4 วินาที): อ่าน people/sales/sales-nida.md, company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv, margin-rules.md · .gitea-token บัตรผ่าน · work/ มี deal-001-proposal-nakhonluang-queue.md (proposal 9 หัวข้อ 4,780,000 บาท margin 31.6%), deal-001-pricing-input.json, deal-001-pricing-output.md, deal-001-internal-notes.md · .claude/skills/sales-proposal/ มี SKILL.md, references/ (proposal-template.md, winning-patterns.md, pricing-rules.md, สำเนา price-list.csv, สำเนา pdpa-rules.md, checklist.md), scripts/price.py · proposal ไม่มีภาคผนวก PDPA](img/lab1-desk-sales-nida.png)
 
-![สมชาย MD → skill deal-approval (2 นาที 37 วินาที): ① อ่าน people/exec/md-somchai.md, โน้ตลับ notes/deal-rules.md, company-kit/deal-summaries/DS-2026-034, margin-rules.md และ price-list.csv → ② work/DS-2026-034/approval.md ตีกลับ margin หลังบวก buffer เหลือ 11.8% (เกณฑ์ ≥ 15%) → ③ .claude/skills/deal-approval/ มี SKILL.md, references/ 3 ไฟล์, scripts/deal_check.py · กฎภาคผนวก PDPA ของลูกค้าธนาคารอยู่ใน approval-rules.md ของ skill นี้ที่เดียว](img/lab1-desk-md-somchai.png)
+📂 ไฟล์จริง: [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`sales-proposal/`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/) · [`SKILL.md`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/SKILL.md)
 
-![จอย หัวหน้าบัญชี → skill pricing-calc (3 นาที 51 วินาที): ① อ่าน people/finance/fin-joy.md, company-kit/price-list.csv, margin-rules.md, deal-001/ และ won-proposals/ → ② work/ ใบคิดราคาและร่างใบเสนอราคา ฉบับเข้างบ 4,800,000 บาท margin 27.1% ต้องให้ MD อนุมัติ → ③ .claude/skills/pricing-calc/ มี SKILL.md, references/ 3 ไฟล์, assets/example-deal.json, scripts/price_calc.py · price-list.csv ถูกคัดลอกไว้ใน skill ของทั้ง 3 คน](img/lab1-desk-fin-joy.png)
+![โต๊ะของสมชาย MD desks/md-somchai/ (2 นาที 37 วินาที): อ่าน people/exec/md-somchai.md, company-kit/deal-summaries/DS-2026-034, margin-rules.md, price-list.csv · .gitea-token · notes/deal-rules.md โน้ตลับมีกฎภาคผนวก PDPA · work/DS-2026-034/ มี approval.md (ตีกลับ margin หลังบวก buffer 11.8%) และ deal-input.json · .claude/skills/deal-approval/ มี SKILL.md, references/ (approval-rules.md มีกฎภาคผนวก PDPA, approval-template.md, สำเนา price-list.csv), scripts/deal_check.py](img/lab1-desk-md-somchai.png)
+
+📂 ไฟล์จริง: [`notes/deal-rules.md`](novatech/seed/notes/md-somchai/deal-rules.md) · [`work/`](_solution/desks-after-lab1/md-somchai/work/DS-2026-034/) · [`deal-approval/`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
+
+![โต๊ะของจอย หัวหน้าบัญชี desks/fin-joy/ (3 นาที 51 วินาที): อ่าน people/finance/fin-joy.md, company-kit/price-list.csv, margin-rules.md, deal-001/, won-proposals/ · .gitea-token · work/ มี deal-001-input.json, deal-001-pricing-internal.md, deal-001-quotation-draft.md และชุด deal-001-B-* ฉบับเข้างบ 4,800,000 บาท margin 27.1% · .claude/skills/pricing-calc/ มี SKILL.md, references/ (margin-rules.md, estimate-benchmarks.md, สำเนา price-list.csv), assets/example-deal.json, scripts/price_calc.py](img/lab1-desk-fin-joy.png)
+
+📂 ไฟล์จริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`pricing-calc/`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+
+> 📌 ในโฟลเดอร์เฉลย skill เก็บไว้ที่ `_solution/desks-after-lab1/<ชื่อ>/skills/` (ไม่มีจุดนำหน้า จะได้เปิดดูบน GitHub ง่าย) แต่ในโต๊ะจริงของผู้เรียนอยู่ที่ `desks/<ชื่อ>/.claude/skills/` ตามภาพ
 
 ### 1.4 ทุกคนทำงานอะไร (ผลจริง 24 โต๊ะ)
 
@@ -320,27 +328,29 @@ desks/sales-nida/             desks/sales-nida/
 
 ### 1.5 ผลที่เห็น: 3 ปัญหาของ "ต่างคนต่างเก็บ"
 
-ทุกคนทำถูกตามพรอมต์ แต่พอเอา skill 24 ตัวมาวางเทียบกัน เจอ 3 ปัญหา
+ทุกคนทำถูกตามพรอมต์ แต่พอเอา skill ของทุกโต๊ะมาวางเทียบกัน เจอ 3 ปัญหา
 
-**⚠️ ปัญหา 1 · ความรู้เดียวกันถูกคัดลอกไว้หลายที่**
+| ปัญหา | สั้น ๆ | แก้ใน |
+|---|---|---|
+| 1 · คัดลอกซ้ำ | กติกาเดียวกันมีสำเนาอยู่ 14 skill | LAB 2 |
+| 2 · หัวไฟล์คนละแบบ | ช่อง `uses` / `follows` แต่ละคนใส่ไม่เหมือนกัน | LAB 2 · LAB 6 |
+| 3 · ความรู้ติดอยู่ที่คนเดียว | กฎ PDPA อยู่ที่ MD คนเดียว proposal ของ Sales จึงไม่มี | LAB 4 · LAB 5 |
 
-![ผลจริง: กติกาข้อมูลลูกค้าถูกคัดลอกไว้ใน 14 skill, กติกาแบรนด์ 5 skill, ราคา/กำไร 7 skill โดย plat-may และ fin-joy เป็นเจ้าของเรื่อง](img/lab1-duplication.png)
+**⚠️ ปัญหา 1 · ความรู้เดียวกัน ถูกคัดลอกไปหลายที่**
 
-พรอมต์บอกให้ "สรุปความรู้ที่จำเป็นไว้ใน `references/`" ทุกคนจึงคัดลอกไปเก็บเอง เช่น **กติกาข้อมูลลูกค้าอยู่ใน 14 skill** (นับจาก 19 โต๊ะแรก) ถ้ากติกาเปลี่ยนต้องตามแก้ 14 ที่ และนิดายังเขียนสคริปต์คิดราคา (`price.py`) ซ้ำกับ `pricing-calc` ของจอย → LAB 2 จะย้ายของที่ทุกคนใช้ไปไว้ที่เดียวในชั้น **core**
+![ปัญหา 1 ความรู้เดียวกันถูกคัดลอกไปหลายที่: ต้นฉบับ company-kit/customer-data-policy.md 1 ไฟล์ เจ้าของ plat-may · ต่างคนต่างคัดลอกไปไว้ใน references/ ของตัวเองด้วยชื่อไฟล์ต่างกัน เช่น sales-nida pdpa-rules.md, sales-krit customer-data-rules.md, qa-bank data-policy.md, ml-jay data-policy-summary.md, ml-pim data-policy.md, fin-nok pdpa-for-invoices.md, ops-fon company-rules.md, md-somchai approval-rules.md · รวม 14 skill · price-list.csv ก็ถูกคัดลอก 3 skill · ถ้ากติกาเปลี่ยนต้องแก้ 14 ที่ · แก้ใน LAB 2 ย้ายไปไว้ที่เดียวใน core](img/lab1-problem-1-copies.png)
+
+พรอมต์บอกให้ "สรุปความรู้ที่จำเป็นไว้ใน `references/`" เพื่อให้ skill ใช้ที่เครื่องอื่นได้ ทุกคนจึงคัดลอกไปเก็บเอง ผลคือกติกาที่มีต้นฉบับไฟล์เดียว กลายเป็น 14 สำเนาที่ชื่อไฟล์ไม่เหมือนกันเลย
 
 **⚠️ ปัญหา 2 · ต่างคนต่างเข้าใจหัวไฟล์ไม่ตรงกัน**
 
-| ช่อง | ควรใส่ | ที่เกิดจริง |
-|---|---|---|
-| `follows` | นโยบายที่ต้องทำตาม | ใส่ถูกแค่ 2 คน (`sales-nida`, `exec-ploy`) คนอื่นใส่ "งานที่มาก่อน" เช่น `hr-oat` ใส่ `jd-writer` · 5 โต๊ะใหม่ก็ไม่มีใครใส่นโยบายเลย |
-| `uses` | skill ที่เรียกใช้ | 15 คนใส่ `customer-data-policy` ไว้ที่นี่แทน `follows` · `exec-ploy` ใส่ชื่อไฟล์ `monthly-kpi.csv` แทนชื่อ skill |
-| `version` | — | บางคน `0.1.0` บางคน `1.0.0` |
+![ปัญหา 2 ต่างคนต่างเข้าใจหัวไฟล์ไม่ตรงกัน: ที่ขอไว้ uses = skill ที่เรียกใช้ follows = นโยบายที่ต้องทำตาม · sales-nida ใส่ uses [pricing-calc] follows [customer-data-policy] ถูกทั้งคู่ · md-somchai ใส่ customer-data-policy ไว้ใน uses และ pricing-calc ไว้ใน follows สลับกัน · fin-joy ใส่ customer-data-policy ใน uses, follows เป็นงานที่ทำมาก่อน และ version 0.1.0 · ทั้งบริษัทใส่ follows เป็นนโยบายถูกแค่ 2 คน · แก้ใน LAB 2 และ LAB 6](img/lab1-problem-2-headers.png)
 
-ต่างคนต่างตีความ กราฟของ skill (หัวข้อ 25) จะเพี้ยน → LAB 2 ทีมกลางจะทำหัวไฟล์ให้เป็นแบบเดียวกันทั้งคลัง และ LAB 6 ให้ CI ตรวจทุก PR
+ภาพนี้คือหัวไฟล์จริงของ 3 โต๊ะใน 1.3 ทั้งบริษัทใส่ `follows` เป็นนโยบายถูกแค่ 2 คน ถ้าปล่อยไว้ เวลาถามว่า "แก้กติกานี้แล้วกระทบ skill ไหน" (LAB 7) จะตอบผิด
 
-**⚠️ ปัญหา 3 · ความรู้ที่อยู่ในหัวคนเดียว ไม่ไปถึงคนที่ต้องใช้**
+**⚠️ ปัญหา 3 · ความรู้ในหัวคนเดียว ไม่ไปถึงคนที่ต้องใช้**
 
-proposal ของนิดา **ไม่มี "ภาคผนวก PDPA"** เพราะกฎนี้อยู่ในโน้ตลับของ MD (`desks/md-somchai/notes/deal-rules.md`) และใน skill `deal-approval` ของ MD เท่านั้น (ดูภาพนิดากับ MD ใน 1.3) สองคนนี้ยังไม่เคยแชร์ความรู้กัน → จะกลับมาเจอกันใน LAB 4
+![ปัญหา 3 ความรู้ในหัวคนเดียวไม่ไปถึงคนที่ต้องใช้: desks/md-somchai/ มี notes/deal-rules.md ข้อ 5 ลูกค้าธนาคารต้องมีภาคผนวก PDPA ไม่มีตีกลับ และ skill deal-approval เก็บกฎนี้ไว้ · กำแพงกั้น · desks/sales-nida/ proposal ธนาคาร 9 หัวข้อไม่มีภาคผนวก PDPA และ skill sales-proposal ไม่รู้จักกฎนี้ · ใน LAB 4 proposal ถูกตีกลับ · แก้ใน LAB 5 ด้วย PR](img/lab1-problem-3-silo.png)
 
 > **สรุป LAB 1:** ทุกคนเก่งขึ้นได้ด้วย skill ของตัวเอง แต่ **บริษัทยังไม่เก่งขึ้น** เพราะ skill อยู่คนละโต๊ะ ซ้ำกัน เขียนหัวไฟล์คนละแบบ และความรู้สำคัญไม่ไปถึงคนที่ต้องใช้ → LAB 2 ทีมกลางจะรวมทั้งหมดเป็นคลังเดียวบน Gitea
 
