@@ -10,8 +10,8 @@
 | ส่วน | เนื้อหา | เวลาโดยประมาณ |
 |---|---|---|
 | [**01 ทฤษฎี**](01_theory/README.md) | T1–T12: AI เห็นเว็บแค่ไหน · Playwright 3 แบบ · charter · แบ่ง agent ขนาน · รวมไฟล์ · oracle และการอบบั๊ก · ความเสี่ยง P1/P2/P3 · TEST-PLAN ละเอียด · จากแผนสู่รายงาน | 1.5–2 ชม. |
-| [**02 LAB · PawPantry**](02_lab/01_pawpantry/README.md) | เว็บของเราเอง (Docker บนเครื่อง) · LAB 0–7 สำรวจ → รวม → แผน → รีวิว → test จริง Chromium + มือถือ พร้อมกัน → ล่าบั๊ก | 3–4 ชม. |
-| [**02 LAB · Google Flights**](02_lab/02_google-flights/README.md) | เว็บจริงของคนอื่น · Playwright อย่างเดียว · ไม่ระบุตัวตน · ไม่เกิน 5 เบราว์เซอร์ · LAB 0–5 | 2.5–3 ชม. |
+| [**02 LAB · PawPantry**](02_lab/01_pawpantry/README.md) | เว็บของเราเอง (Docker บนเครื่อง) · LAB 0–7 สำรวจ → รวม → แผน → รีวิว → test จริง Chromium + มือถือ พร้อมกัน → ล่าบั๊ก | ราว 5 ชม. (AI รันจริงรวม ~4.9 ชม. · LAB 6 อย่างเดียว ~2.2 ชม.) |
+| [**02 LAB · Google Flights**](02_lab/02_google-flights/README.md) | เว็บจริงของคนอื่น · Playwright อย่างเดียว · ไม่ระบุตัวตน · เปิดพร้อมกันไม่เกิน 5 session · test Chromium อย่างเดียว · LAB 0–5 | ราว 3.5 ชม. (LAB 5 อย่างเดียว 2.1 ชม.) |
 
 ## 🤖 agent กระจายงานกันยังไง
 
@@ -27,7 +27,7 @@
 
 ![การกระจายงานตอนเขียนแผน](01_theory/img/flow-plan.png)
 
-![จากแผนสู่ test และรายงาน](01_theory/img/flow-test.png)
+![จากแผนสู่ test และรายงาน: แบ่งแผน TEST-PLAN.md เป็น 5 สี หุ่น 5 ตัวเขียน test ของตัวเอง Playwright รันจริงพร้อมกัน 2 เลน Chromium บนจอคอมไปเว็บ 3000 กับมือถือไปเว็บ 3001 ได้ GIF หลักฐานกรอบแดง และ % ต่อหัวข้อใน index.html](01_theory/img/flow-test.png)
 
 ## 🧰 เครื่องมือ
 
