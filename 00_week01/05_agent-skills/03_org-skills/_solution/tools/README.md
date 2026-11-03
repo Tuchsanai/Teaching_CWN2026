@@ -8,5 +8,6 @@
 | `cap.mjs <scenes.json>` + `capture-scenes/` | ล็อกอิน Gitea แบบ headless แล้วถ่ายภาพ/วิดีโอ (แปลงเป็น GIF ด้วย ffmpeg) — "playlist" ของทุก LAB |
 | `joblogs2.mjs` | ดึง log ของ job CI จากหน้าเว็บ Gitea |
 | `chart-lab3.py`, `chart-graph.py` | วาดกราฟจากข้อมูลจริงของ LAB 3 และ LAB 7 |
+| `copy-lab1-desks.mjs` | สำหรับผู้เรียนที่ไม่ทำ LAB 1 ครบ 19 โต๊ะ: คัดลอก skill + work จาก `desks-after-lab1/` ไปโต๊ะที่ยังไม่มี skill (รันที่ `novatech/`: `node ../_solution/tools/copy-lab1-desks.mjs`) |
 
 ผลจริงในส่วน 03 รันในสำเนาแยก `C:/t/org05/novatech` ด้วย `claude -p ... --strict-mcp-config --model opus` (ไม่เชื่อม Chrome) และ `--resume <session>` เมื่อเป็น "แชตเดิม"
