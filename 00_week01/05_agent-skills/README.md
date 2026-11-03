@@ -1,6 +1,6 @@
 # บท 05 · Agent Skills — เลิก copy-paste พรอมต์ทุก LAB ให้ AI "รู้งาน" ด้วย skill
 
-![บท 05 มีหลายส่วน: 01 ทฤษฎี → 02 สร้าง skill จากบท 02 → ต่อไป บท 03 · 04](01_skill-theory/img/00-chapter-map.jpg)
+![บท 05 · Agent Skills: 01 ทฤษฎี (skill คืออะไร) → 02 skill ของคนเดียว (test-from-plan v1 → v4) → 03 skill ระดับองค์กร (9 แผนก 21 คน · PR · CI) → ต่อไป 04 (บท 03 · 04) · จากคนเดียวเก่ง สู่ทั้งบริษัทเก่ง](01_skill-theory/img/00-chapter-map.jpg)
 
 | ส่วน | เนื้อหา | สถานะ |
 |---|---|---|
