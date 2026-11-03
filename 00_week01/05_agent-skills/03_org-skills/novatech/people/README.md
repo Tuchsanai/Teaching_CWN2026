@@ -5,9 +5,7 @@
 
 ## ผังองค์กร: ใครรายงานต่อใคร (4 ชั้น)
 
-![ผังองค์กรโนวาเทค ภาพ 1/2 ภาพรวม 28 คน 4 ชั้น: MD → ผู้บริหาร 3 สาย (ธุรกิจ, เทคโนโลยี, บริหารและการเงิน) → หัวหน้าแผนก 👑 → พนักงาน](../../img/org-chart-1-overview.png)
-
-![ผังองค์กรโนวาเทค ภาพ 2/2 ทุกคนตามสาย: แต่ละคอลัมน์ = 1 แผนก มีชื่อ user บทบาท และ skill ของแต่ละคน](../../img/org-chart-2-people.png)
+[![ผังองค์กรโนวาเทค 4 ชั้น 28 คน ภาพเดียว: ชั้น 1 MD สมชาย (md-somchai) มีผู้ช่วยผู้บริหารพลอยไพลิน (exec-ploy) ขึ้นตรง → ชั้น 2 ผู้บริหาร 3 สาย สายธุรกิจ วิทย์ (cco-wit) ดูแล Sales (sales-nida 👑, sales-krit, sales-mook 🆕) SA (sa-ton 👑, sa-ice) Product (pm-beam 👑, pm-gift) · สายเทคโนโลยี ณัฐ (cto-nat) ดูแล Dev (dev-pond 👑, dev-mew, dev-new 🆕) QA (qa-mint 👑, qa-bank) DevOps (ops-art 👑, ops-fon) ML (ml-jay 👑, ml-pim) ทีมกลาง (plat-ken 👑, plat-may) · สายบริหารและการเงิน หญิง (cfo-ying) ดูแล HR (hr-fah 👑, hr-oat, hr-namtan 🆕) บัญชี (fin-joy 👑, fin-nok) · กล่องบนสุดของแต่ละคอลัมน์คือหัวหน้าแผนก (ชั้น 3) ที่เหลือคือพนักงาน (ชั้น 4) · แต่ละกล่องมีชื่อ user บทบาท และ skill](../../img/org-chart.png)](../../img/org-chart.png)
 
 | ชั้น | ใคร | สั่งงานใคร |
 |---|---|---|

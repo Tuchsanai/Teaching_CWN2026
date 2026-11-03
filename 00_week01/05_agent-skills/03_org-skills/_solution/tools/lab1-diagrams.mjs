@@ -1,8 +1,9 @@
 // ภาพประกอบ LAB 1 (กว้าง 1200px ให้อ่านออกบน GitHub): แผนที่โฟลเดอร์ · พรอมต์เดียวทุกโต๊ะ · ผังโต๊ะ 3 คนจากผลรันจริง · 3 ปัญหา
-// node lab1-diagrams.mjs <img-dir> <chromium.exe>
+// node lab1-diagrams.mjs <img-dir> <chromium.exe> [pages-dir]   (pages-dir = หน้าแรกของไฟล์ Word/Excel ที่ export เป็น PNG แล้ว)
 import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
-const [,, dir, exe] = process.argv;
+const [,, dir, exe, pages] = process.argv;
 
 const css = `body{margin:0;width:1200px;font-family:'Leelawadee UI','Segoe UI',sans-serif;background:#f8fafc;color:#1d2433}
 h1{font-size:44px;margin:26px 36px 4px} .sub{margin:0 36px 18px;font-size:23px;color:#4a5568}
@@ -11,39 +12,47 @@ code,.m{font-family:Consolas,monospace} .read{color:#1d4ed8} .write{color:#15803
 .tr{background:#dbeafe;color:#1e40af} .tw{background:#dcfce7;color:#166534} .tg{background:#f1f5f9;color:#475569}
 .foot{margin:18px 36px 28px;font-size:21px;color:#334155;line-height:1.7}`;
 
-// ① แผนที่โฟลเดอร์: อ่านจากไหน เขียนลงไหน
-const row = (indent, name, tag, note, cls = '') => `<div class="row ${cls}" style="padding-left:${24 + indent * 34}px"><span class="m nm">${name}</span>${tag}<span class="note">${note}</span></div>`;
-const R = '<span class="tag tr">📖 อ่าน</span>', W = '<span class="tag tw">✍️ เขียน</span>', G = '<span class="tag tg">ไม่แตะ</span>';
+// ① แผนที่โฟลเดอร์ทั้งบริษัท: 3 โต๊ะอยู่ตรงไหน อ่านจากไหน เขียนลงไหน
+const R = '<span class="tag tr">📖 อ่าน</span>', W = '<span class="tag tw">✍️ เขียน</span>';
+const dk = (icon, name, who, lines) => `<div class="dk"><div class="dh">${icon} <code>${name}/</code><br><span>${who} · ▶ เปิด Claude Code ที่นี่</span></div>${lines.map(([f, t, c]) => `<div class="dl ${c}"><code>${f}</code>${t}</div>`).join('')}</div>`;
 const folders = `<html><head><meta charset="utf-8"><style>${css}
-.tree{margin:0 36px;background:#fff;border:2px solid #cbd5e1;border-radius:18px;padding:12px 0}
-.row{display:flex;align-items:center;gap:6px;min-height:52px;font-size:22px;border-bottom:1px dashed #e2e8f0}
-.row:last-child{border-bottom:0} .nm{font-size:24px;font-weight:700;min-width:300px}
-.note{color:#475569;margin-left:14px;font-size:20px}
-.desk{background:#fefce8} .here{background:#fef9c3;border-left:8px solid #f59e0b}
-.real{margin:18px 36px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.real div{background:#fff;border:2px solid #cbd5e1;border-radius:14px;padding:10px 14px;font-size:19px;line-height:1.5}
-.real b{font-size:21px}
+.top{margin:0 36px;background:#fff;border:3px solid #0B2545;border-radius:18px;padding:12px 18px}
+.top h2{margin:0 0 8px;font-size:28px} .top h2 code{font-size:28px}
+.shared{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sh{background:#eff6ff;border:2px solid #93c5fd;border-radius:14px;padding:10px 14px;font-size:19px;line-height:1.5}
+.sh b{font-size:22px} .sh code{font-size:17px}
+.dbar{margin:14px 0 8px;font-size:24px;font-weight:800} .dbar span{font-weight:400;font-size:20px;color:#475569}
+.desks{display:grid;grid-template-columns:1fr 1fr 1fr 150px;gap:10px}
+.dk{background:#fefce8;border:3px solid #f59e0b;border-radius:14px;padding:0 0 8px;overflow:hidden}
+.dh{background:#f59e0b;color:#fff;font-size:22px;font-weight:800;padding:8px 12px;line-height:1.3} .dh code{font-size:21px;color:#fff}
+.dh span{font-size:16px;font-weight:600}
+.dl{font-size:17px;padding:6px 12px 0;line-height:1.4} .dl code{font-size:17px;margin-right:4px}
+.dl.w{color:#9a3412} .dl.k{color:#166534} .dl.n{color:#1e40af} .dl .tag{font-size:14px;padding:1px 8px;margin-left:4px}
+.more{background:#f1f5f9;border:2px dashed #94a3b8;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:19px;color:#475569;padding:8px}
+.real{margin:16px 36px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.real div{background:#fff;border:2px solid #cbd5e1;border-radius:14px;padding:10px 14px;font-size:19px;line-height:1.5} .real b{font-size:21px}
 </style></head><body>
-<h1>LAB 1 · ของแต่ละคนอยู่ที่ไหน</h1>
-<div class="sub">ตัวอย่าง: เปิด Claude Code ที่โต๊ะของนิดา <code>novatech/desks/sales-nida/</code></div>
-<div class="tree">
-${row(0, 'novatech/', '', 'บริษัททั้งหมด (อยู่ในเครื่องเราเครื่องเดียว)')}
-${row(1, 'people/', R, 'การ์ดพนักงาน: อ่านแค่ใบของตัวเอง <code>people/sales/sales-nida.md</code>')}
-${row(1, 'company-kit/', R, 'ไดรฟ์กลาง: TOR ลูกค้า ราคา กติกา (ทุกคนอ่านที่เดียวกัน)')}
-${row(1, 'desks/', '', 'โต๊ะ 1 โฟลเดอร์ต่อ 1 คน')}
-${row(2, 'sales-nida/', '<span class="tag" style="background:#f59e0b;color:#fff">▶ เปิด Claude Code ที่นี่</span>', '= คอมพิวเตอร์ของนิดา', 'here')}
-${row(3, 'notes/', R, 'โน้ตส่วนตัว (มีแค่ MD · นิดาไม่มี)', 'desk')}
-${row(3, 'work/', W, '② ผลงานจริง 1 ชิ้น เช่น proposal', 'desk')}
-${row(3, '.claude/skills/', W, '③ skill ส่วนตัว <code>sales-proposal/</code> อยู่ที่นี่', 'desk')}
-${row(3, '.gitea-token', G, 'บัตรผ่านของนิดา (ใช้ตั้งแต่ LAB 2)', 'desk')}
-${row(2, 'md-somchai/ · fin-joy/ · …', G, 'โต๊ะของคนอื่น ห้ามแตะ', '')}
+<h1>LAB 1 · ของแต่ละคนอยู่ตรงไหนในบริษัท</h1>
+<div class="sub">ทั้งบริษัทคือโฟลเดอร์ <code>novatech/</code> โฟลเดอร์เดียว · ของกลางอยู่ข้างบน · โต๊ะของแต่ละคนอยู่ใน <code>desks/</code></div>
+<div class="top">
+<h2>🏢 <code>novatech/</code> บริษัททั้งหมด</h2>
+<div class="shared">
+<div class="sh"><b>👥 people/</b> ${R}<br>การ์ดพนักงาน 28 ใบ · แต่ละคนอ่านใบของตัวเอง<br><code>people/sales/sales-nida.md</code></div>
+<div class="sh"><b>🗄️ company-kit/</b> ${R}<br>ไดรฟ์กลาง ทุกคนอ่านที่เดียวกัน<br><code>deal-001/ · price-list.csv · margin-rules.md …</code></div>
 </div>
+<div class="dbar">💻 desks/ <span>โต๊ะ 1 โฟลเดอร์ต่อ 1 คน (28 โต๊ะ) · คนอื่นมองไม่เห็นโต๊ะของเรา</span></div>
+<div class="desks">
+${dk('💼', 'sales-nida', 'นิดา หัวหน้าทีมขาย', [['work/', W, 'w'], ['  📘 proposal.docx', '', 'w'], ['  📗 pricing.xlsx', '', 'w'], ['.claude/skills/', W, 'k'], ['  sales-proposal/', '', 'k']])}
+${dk('👔', 'md-somchai', 'สมชาย MD', [['notes/', R, 'n'], ['  🔒 deal-rules.md', '', 'n'], ['work/', W, 'w'], ['  📘 approval.docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  deal-approval/', '', 'k']])}
+${dk('🧾', 'fin-joy', 'จอย หัวหน้าบัญชี', [['work/', W, 'w'], ['  📗 pricing-internal.xlsx', '', 'w'], ['  📘 quotation-draft.docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  pricing-calc/', '', 'k']])}
+<div class="more">… อีก 25 โต๊ะ<br>แบบเดียวกัน</div>
+</div></div>
 <div class="real">
 <div><b>💻 desks/&lt;ชื่อ&gt;/</b><br>ในบริษัทจริง = คอมของคนนั้น</div>
 <div><b>📁 .claude/skills/</b> ในโต๊ะ<br>ในบริษัทจริง = <code>~/.claude/skills/</code> ในเครื่องตัวเอง</div>
 <div><b>🗄️ company-kit/</b><br>ในบริษัทจริง = ไดรฟ์กลางของบริษัท</div>
 </div>
-<div class="foot">💡 skill อยู่ใน <b>โต๊ะของเจ้าของเท่านั้น</b> คนอื่นมองไม่เห็นและใช้ไม่ได้ → นี่คือ "ต่างคนต่างเก็บ" ที่ LAB 2 จะรวมเป็นคลังกลาง</div>
+<div class="foot">💡 ทุกคนอ่านของกลางชุดเดียวกัน แต่ <b>เขียนลงโต๊ะตัวเองเท่านั้น</b> skill จึงอยู่คนละโต๊ะ ใช้ร่วมกันไม่ได้ → นี่คือ "ต่างคนต่างเก็บ" ที่ LAB 2 จะรวมเป็นคลังกลาง</div>
 </body></html>`;
 
 // ② พรอมต์เดียว ใช้ได้ทุกโต๊ะ
@@ -106,10 +115,11 @@ const people = [
       [1, '.gitea-token', 'บัตรผ่านของนิดา (seed สร้างให้ตั้งแต่ LAB 0)', 's'],
       [0, '#ea580c', '② ผลงานจริง: proposal ธนาคาร 4,780,000 บาท · margin 31.6%', 'h'],
       [1, 'work/', '', 'w'],
-      [2, 'deal-001-proposal-nakhonluang-queue.md', 'proposal 9 หัวข้อ ตัวที่ส่งลูกค้า', 'w'],
-      [2, 'deal-001-pricing-input.json', 'ข้อมูลที่ใส่ให้สคริปต์คิดราคา', 'w'],
-      [2, 'deal-001-pricing-output.md', 'ผลคิดราคา', 'w'],
+      [2, '📘 deal-001-proposal-nakhonluang-queue.docx', 'proposal 9 หัวข้อ ตัวที่ส่งลูกค้า (Word)', 'w'],
+      [2, '📗 deal-001-pricing.xlsx', 'ใบคิดราคา สูตรคำนวณในเซลล์ (Excel)', 'w'],
       [2, 'deal-001-internal-notes.md', 'ต้นทุน margin เรื่องที่ต้องตัดสินใจ (ใช้ภายใน)', 'w'],
+      [2, 'deal-001-pricing-input.json', 'ข้อมูลที่ใส่ให้สคริปต์คิดราคา', 'w'],
+      [2, '📝 *.md 2 ไฟล์', 'ต้นฉบับ proposal และผลคิดราคาที่ Claude เขียน', 'w'],
       [0, '#16a34a', '③ skill ส่วนตัว', 'h'],
       [1, '.claude/skills/sales-proposal/', '', 'k'],
       [2, 'SKILL.md', 'หัวไฟล์ (name · description · metadata) + ขั้นตอน', 'k'],
@@ -131,8 +141,9 @@ const people = [
       [1, 'notes/deal-rules.md', '🔒 โน้ตลับ (seed ใส่ให้ MD คนเดียว) มีกฎภาคผนวก PDPA', 'n'],
       [0, '#ea580c', '② ผลงานจริง: พิจารณาดีล รพ.เมืองใหม่ → ❌ ตีกลับ (margin หลังบวก buffer 11.8%)', 'h'],
       [1, 'work/DS-2026-034/', '', 'w'],
-      [2, 'approval.md', 'ผลพิจารณา + ส่งกลับให้ใครแก้อะไร', 'w'],
+      [2, '📘 approval.docx', 'บันทึกผลพิจารณา + ส่งกลับให้ใครแก้อะไร (Word)', 'w'],
       [2, 'deal-input.json', 'ตัวเลขของดีล เอาไปรันซ้ำได้', 'w'],
+      [2, '📝 approval.md', 'ต้นฉบับที่ Claude เขียน', 'w'],
       [0, '#16a34a', '③ skill ส่วนตัว', 'h'],
       [1, '.claude/skills/deal-approval/', '', 'k'],
       [2, 'SKILL.md', 'หัวไฟล์ + ขั้นตอนพิจารณาดีล', 'k'],
@@ -150,10 +161,10 @@ const people = [
       [1, '.gitea-token', 'บัตรผ่านของจอย (seed สร้างให้)', 's'],
       [0, '#ea580c', '② ผลงานจริง: คิดราคา deal-001 · ฉบับเข้างบ 4,800,000 บาท margin 27.1%', 'h'],
       [1, 'work/', '', 'w'],
-      [2, 'deal-001-input.json', 'ข้อมูลตั้งต้น (ฉบับครบตาม TOR)', 'w'],
-      [2, 'deal-001-pricing-internal.md', 'ใบคิดราคาภายใน ห้ามส่งลูกค้า', 'w'],
-      [2, 'deal-001-quotation-draft.md', 'ร่างตารางราคาให้ Sales', 'w'],
-      [2, 'deal-001-B-*  (3 ไฟล์)', 'ชุดเดียวกัน ฉบับเข้างบ', 'w'],
+      [2, '📗 deal-001-B-pricing-internal.xlsx', 'ใบคิดราคาภายใน ฉบับเข้างบ ห้ามส่งลูกค้า (Excel)', 'w'],
+      [2, '📘 deal-001-B-quotation-draft.docx', 'ร่างตารางราคาให้ Sales (Word)', 'w'],
+      [2, 'deal-001-*.json  (2 ไฟล์)', 'ข้อมูลตั้งต้น ฉบับครบตาม TOR และฉบับเข้างบ', 'w'],
+      [2, '📝 *.md  (4 ไฟล์)', 'ต้นฉบับใบคิดราคาและร่างทั้ง 2 ฉบับที่ Claude เขียน', 'w'],
       [0, '#16a34a', '③ skill ส่วนตัว', 'h'],
       [1, '.claude/skills/pricing-calc/', '', 'k'],
       [2, 'SKILL.md', 'หัวไฟล์ + ขั้นตอนคิดราคา 8 ขั้น', 'k'],
@@ -234,11 +245,31 @@ work/deal-001-proposal-….md
 <div class="fix">✅ แก้ใน LAB 5: นิดาเปิด PR เอากฎนี้ใส่ skill ของ Sales ผ่านคลังกลาง แล้วเซลส์ทุกคนได้กฎไปด้วย</div>
 <div class="foot"></div></body></html>`;
 
+// ⑤ ภาพหน้าเอกสารจริงที่เปิดด้วย Word / Excel (export เป็น PDF แล้วเรนเดอร์หน้าแรก · ส่ง pages-dir เป็นอาร์กิวเมนต์ที่ 3)
+const docs = pages ? [
+  ['lab1-doc-sales-nida.png', 'Word', '#185ABD', '💼 นิดา', 'desks/sales-nida/work/deal-001-proposal-nakhonluang-queue.docx', 'deal-001-proposal-nakhonluang-queue.png', 'proposal ที่ส่งลูกค้า · หน้า 1 จาก 4', 1000],
+  ['lab1-doc-md-somchai.png', 'Word', '#185ABD', '👔 สมชาย MD', 'desks/md-somchai/work/DS-2026-034/approval.docx', 'approval.png', 'บันทึกผลพิจารณาดีล · หน้า 1 จาก 2', 1000],
+  ['lab1-doc-fin-joy.png', 'Excel', '#107C41', '🧾 จอย', 'desks/fin-joy/work/deal-001-B-pricing-internal.xlsx', 'deal-001-B-pricing-internal.png', 'ใบคิดราคาภายใน · ราคาขาย ต้นทุน margin เป็นสูตรในเซลล์', 0],
+].map(([file, app, color, who, path, png, cap, h]) => [`<html><head><meta charset="utf-8"><style>${css}
+.win{margin:24px 36px 0;border-radius:14px;overflow:hidden;box-shadow:0 8px 28px #0003;border:1px solid #cbd5e1}
+.bar{background:${color};color:#fff;padding:12px 18px;font-size:22px;font-weight:700;display:flex;gap:14px;align-items:center}
+.bar code{font-size:19px;font-weight:400;opacity:.95} .app{background:#fff;color:${color};border-radius:8px;padding:2px 10px;font-size:19px}
+.page{background:#e5e7eb;padding:18px;${h ? `height:${h}px;` : ''}overflow:hidden;position:relative}
+.page img{width:100%;display:block;box-shadow:0 2px 10px #0002;background:#fff}
+${h ? '' : '.page:after{display:none}'}
+.page:after{content:'';position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(#e5e7eb00,#e5e7eb)}
+.cap{margin:12px 36px 26px;font-size:21px;color:#334155}
+</style></head><body>
+<div class="win"><div class="bar"><span class="app">${app}</span>${who}<code>${path}</code></div>
+<div class="page"><img src="data:image/png;base64,${readFileSync(join(pages, png)).toString('base64')}"></div></div>
+<div class="cap">${cap} · เปิดด้วย ${app} จริงแล้ว export หน้าแรก</div>
+</body></html>`, file]) : [];
+
 const b = await chromium.launch({ executablePath: exe });
 const shots = [[folders, 'lab1-folders.png'], [prompt, 'lab1-prompt.png'], ...people.map(p => [desk(p), p.file]),
-  [p1, 'lab1-problem-1-copies.png'], [p2, 'lab1-problem-2-headers.png'], [p3, 'lab1-problem-3-silo.png']];
+  [p1, 'lab1-problem-1-copies.png'], [p2, 'lab1-problem-2-headers.png'], [p3, 'lab1-problem-3-silo.png'], ...docs];
 for (const [html, out] of shots) {
-  const pg = await b.newPage({ viewport: { width: 1200, height: 400 } });
+  const pg = await b.newPage({ viewport: { width: 1200, height: 400 }, deviceScaleFactor: 2 });
   await pg.setContent(html); await pg.screenshot({ path: join(dir, out), fullPage: true });
 }
 await b.close();

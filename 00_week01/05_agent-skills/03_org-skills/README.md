@@ -135,9 +135,9 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 
 ### 0.5 คนในบริษัท 28 คน
 
-![ผังองค์กรโนวาเทค ภาพ 1/2 ภาพรวม: ชั้น 1 MD สมชาย (md-somchai) มีผู้ช่วยผู้บริหารพลอยไพลิน (exec-ploy) ขึ้นตรง → ชั้น 2 ผู้บริหาร 3 สาย: สายธุรกิจ วิทย์ (cco-wit) · สายเทคโนโลยี ณัฐ (cto-nat) · สายบริหารและการเงิน หญิง (cfo-ying) → ชั้น 3 หัวหน้าแผนก 👑: Sales นิดา, Presales/SA ต้นตระกูล, Product บีม · Dev ปอนด์, QA มินท์, DevOps อาร์ต, ML เจ, ทีมกลาง เคน · HR ฟ้า, บัญชี จอย พร้อมจำนวนคนในแผนก → ชั้น 4 พนักงาน 13 คน รวมน้องใหม่ 3 คน](img/org-chart-1-overview.png)
+[![ผังองค์กรโนวาเทค 4 ชั้น 28 คน ภาพเดียว: ชั้น 1 MD สมชาย (md-somchai) มีผู้ช่วยผู้บริหารพลอยไพลิน (exec-ploy) ขึ้นตรง → ชั้น 2 ผู้บริหาร 3 สาย สายธุรกิจ วิทย์ (cco-wit) ดูแล Sales (sales-nida 👑, sales-krit, sales-mook 🆕) SA (sa-ton 👑, sa-ice) Product (pm-beam 👑, pm-gift) · สายเทคโนโลยี ณัฐ (cto-nat) ดูแล Dev (dev-pond 👑, dev-mew, dev-new 🆕) QA (qa-mint 👑, qa-bank) DevOps (ops-art 👑, ops-fon) ML (ml-jay 👑, ml-pim) ทีมกลาง (plat-ken 👑, plat-may) · สายบริหารและการเงิน หญิง (cfo-ying) ดูแล HR (hr-fah 👑, hr-oat, hr-namtan 🆕) บัญชี (fin-joy 👑, fin-nok) · กล่องบนสุดของแต่ละคอลัมน์คือหัวหน้าแผนก (ชั้น 3) ที่เหลือคือพนักงาน (ชั้น 4) · แต่ละกล่องมีชื่อ user บทบาท และ skill](img/org-chart.png)](img/org-chart.png)
 
-![ผังองค์กรโนวาเทค ภาพ 2/2 ทุกคนตามสาย: สายธุรกิจ Sales (sales-nida 👑, sales-krit, sales-mook 🆕) · SA (sa-ton 👑, sa-ice) · Product (pm-beam 👑, pm-gift) · สายเทคโนโลยี Dev (dev-pond 👑, dev-mew, dev-new 🆕) · QA (qa-mint 👑, qa-bank) · DevOps (ops-art 👑, ops-fon) · ML (ml-jay 👑, ml-pim) · ทีมกลาง (plat-ken 👑, plat-may) · สายบริหารและการเงิน HR (hr-fah 👑, hr-oat, hr-namtan 🆕) · บัญชี (fin-joy 👑, fin-nok) · แต่ละกล่องมีชื่อ user บทบาท และ skill ที่สร้าง](img/org-chart-2-people.png)
+<sub>🔍 กดที่ภาพเพื่อเปิดขนาดเต็ม (2400 px)</sub>
 
 | ชั้น | ใคร | คน |
 |---|---|---|
@@ -204,7 +204,9 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 
 ### 1.1 ของแต่ละคนอยู่ที่ไหน (สำคัญ)
 
-![LAB 1 ของแต่ละคนอยู่ที่ไหน: เปิด Claude Code ที่ novatech/desks/sales-nida/ · อ่าน people/ การ์ดของตัวเอง · อ่าน company-kit/ ไดรฟ์กลาง · ในโต๊ะ: อ่าน notes/ (มีแค่ MD) · เขียน work/ ผลงานจริง · เขียน .claude/skills/ skill ส่วนตัว · ไม่แตะ .gitea-token และโต๊ะของคนอื่น · ในบริษัทจริง desks/<ชื่อ>/ = คอมของคนนั้น, .claude/skills/ = ~/.claude/skills/, company-kit/ = ไดรฟ์กลาง](img/lab1-folders.png)
+ทั้งบริษัทคือโฟลเดอร์ `novatech/` โฟลเดอร์เดียว **ของกลางอยู่ข้างบน** (`people/`, `company-kit/`) ทุกคนอ่านชุดเดียวกัน ส่วน **โต๊ะของแต่ละคนอยู่ใน `desks/`** เขียนได้แค่โต๊ะตัวเอง
+
+[![LAB 1 ของแต่ละคนอยู่ตรงไหนในบริษัท: novatech/ บริษัททั้งหมด มี people/ การ์ดพนักงาน 28 ใบ (อ่าน) และ company-kit/ ไดรฟ์กลาง (อ่าน) · desks/ โต๊ะ 1 โฟลเดอร์ต่อ 1 คน 28 โต๊ะ · sales-nida/ นิดา มี work/ proposal.docx pricing.xlsx และ .claude/skills/sales-proposal/ · md-somchai/ สมชาย MD มี notes/deal-rules.md โน้ตลับ work/ approval.docx และ .claude/skills/deal-approval/ · fin-joy/ จอย มี work/ pricing-internal.xlsx quotation-draft.docx และ .claude/skills/pricing-calc/ · อีก 25 โต๊ะแบบเดียวกัน · ในบริษัทจริง desks/<ชื่อ>/ = คอมของคนนั้น, .claude/skills/ = ~/.claude/skills/, company-kit/ = ไดรฟ์กลาง](img/lab1-folders.png)](img/lab1-folders.png)
 
 | โฟลเดอร์ | คืออะไร | Claude ทำอะไรกับมัน |
 |---|---|---|
@@ -221,7 +223,8 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 desks/sales-nida/             desks/sales-nida/
 └─ .gitea-token               ├─ .gitea-token
                               ├─ work/                        ← ② ผลงานจริง
-                              │  └─ deal-001-proposal-….md
+                              │  ├─ deal-001-proposal-….docx   (Word)
+                              │  └─ deal-001-pricing.xlsx      (Excel)
                               └─ .claude/skills/
                                  └─ sales-proposal/           ← ③ skill ส่วนตัว
                                     ├─ SKILL.md
@@ -277,19 +280,33 @@ desks/sales-nida/             desks/sales-nida/
 
 ### 1.3 ตัวอย่าง 3 โต๊ะ
 
-ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง แต่ละภาพคือ **ผังโฟลเดอร์ของโต๊ะนั้นหลังจบ LAB 1 ครบทุกไฟล์** แถบบนบอกว่าอ่านอะไรจากนอกโต๊ะ · 🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`
+ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง แต่ละคนมี 2 ภาพ: **ผังโฟลเดอร์ของโต๊ะหลังจบ LAB 1 ครบทุกไฟล์** (🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`) และ **หน้าเอกสารจริง** ที่เปิดด้วย Word / Excel
 
-![โต๊ะของนิดา หัวหน้าทีมขาย desks/sales-nida/ (4 นาที 4 วินาที): อ่าน people/sales/sales-nida.md, company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv, margin-rules.md · .gitea-token บัตรผ่าน · work/ มี deal-001-proposal-nakhonluang-queue.md (proposal 9 หัวข้อ 4,780,000 บาท margin 31.6%), deal-001-pricing-input.json, deal-001-pricing-output.md, deal-001-internal-notes.md · .claude/skills/sales-proposal/ มี SKILL.md, references/ (proposal-template.md, winning-patterns.md, pricing-rules.md, สำเนา price-list.csv, สำเนา pdpa-rules.md, checklist.md), scripts/price.py · proposal ไม่มีภาคผนวก PDPA](img/lab1-desk-sales-nida.png)
+> 📄 **ทำไมมีทั้ง .docx/.xlsx และ .md:** ในบริษัทจริงงานส่งกันเป็น Word / Excel Claude เขียนผลงานเป็น `.md` ตอนรัน แล้วเราแปลงเป็น Word / Excel ด้วย [`lab1-office-files.py`](_solution/tools/lab1-office-files.py) (เนื้อหาเดิมทุกตัวอักษร ตัวเลขใน Excel เป็นสูตร คำนวณได้ยอดตรงกับที่ Claude คิด) · ถ้าอยากให้ Claude ออกเป็น Word / Excel เอง เติมในพรอมต์ว่า "เก็บผลงานเป็นไฟล์ Word/Excel"
 
-📂 ไฟล์จริง: [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`sales-proposal/`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/) · [`SKILL.md`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/SKILL.md)
+#### 💼 นิดา หัวหน้าทีมขาย → `sales-proposal`
 
-![โต๊ะของสมชาย MD desks/md-somchai/ (2 นาที 37 วินาที): อ่าน people/exec/md-somchai.md, company-kit/deal-summaries/DS-2026-034, margin-rules.md, price-list.csv · .gitea-token · notes/deal-rules.md โน้ตลับมีกฎภาคผนวก PDPA · work/DS-2026-034/ มี approval.md (ตีกลับ margin หลังบวก buffer 11.8%) และ deal-input.json · .claude/skills/deal-approval/ มี SKILL.md, references/ (approval-rules.md มีกฎภาคผนวก PDPA, approval-template.md, สำเนา price-list.csv), scripts/deal_check.py](img/lab1-desk-md-somchai.png)
+![โต๊ะของนิดา หัวหน้าทีมขาย desks/sales-nida/ (4 นาที 4 วินาที): อ่าน people/sales/sales-nida.md, company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv, margin-rules.md · .gitea-token บัตรผ่าน · work/ มี deal-001-proposal-nakhonluang-queue.docx (Word proposal 9 หัวข้อ 4,780,000 บาท margin 31.6%), deal-001-pricing.xlsx (Excel ใบคิดราคา), deal-001-internal-notes.md, deal-001-pricing-input.json และต้นฉบับ .md · .claude/skills/sales-proposal/ มี SKILL.md, references/ (proposal-template.md, winning-patterns.md, pricing-rules.md, สำเนา price-list.csv, สำเนา pdpa-rules.md, checklist.md), scripts/price.py · proposal ไม่มีภาคผนวก PDPA](img/lab1-desk-sales-nida.png)
 
-📂 ไฟล์จริง: [`notes/deal-rules.md`](novatech/seed/notes/md-somchai/deal-rules.md) · [`work/`](_solution/desks-after-lab1/md-somchai/work/DS-2026-034/) · [`deal-approval/`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
+[![หน้าแรกของ deal-001-proposal-nakhonluang-queue.docx เปิดด้วย Word: หัวกระดาษ บริษัท โนวาเทค จำกัด ข้อเสนอโครงการ · ข้อเสนอโครงการระบบจองคิวสาขาและพยากรณ์ปริมาณคิว เสนอต่อธนาคารนครหลวงพัฒนา อ้างอิง TOR NLP-PROC-2026-114 · 1 บทสรุปผู้บริหาร มูลค่า 4,780,000 บาท ไม่รวม VAT · 2 ความเข้าใจความต้องการ ตารางข้อ TOR กับสิ่งที่เราส่งมอบ](img/lab1-doc-sales-nida.png)](img/lab1-doc-sales-nida.png)
 
-![โต๊ะของจอย หัวหน้าบัญชี desks/fin-joy/ (3 นาที 51 วินาที): อ่าน people/finance/fin-joy.md, company-kit/price-list.csv, margin-rules.md, deal-001/, won-proposals/ · .gitea-token · work/ มี deal-001-input.json, deal-001-pricing-internal.md, deal-001-quotation-draft.md และชุด deal-001-B-* ฉบับเข้างบ 4,800,000 บาท margin 27.1% · .claude/skills/pricing-calc/ มี SKILL.md, references/ (margin-rules.md, estimate-benchmarks.md, สำเนา price-list.csv), assets/example-deal.json, scripts/price_calc.py](img/lab1-desk-fin-joy.png)
+📂 ไฟล์จริง: [`proposal.docx`](_solution/desks-after-lab1/sales-nida/work/deal-001-proposal-nakhonluang-queue.docx) · [`pricing.xlsx`](_solution/desks-after-lab1/sales-nida/work/deal-001-pricing.xlsx) · [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`sales-proposal/`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/)
 
-📂 ไฟล์จริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`pricing-calc/`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+#### 👔 สมชาย MD → `deal-approval`
+
+![โต๊ะของสมชาย MD desks/md-somchai/ (2 นาที 37 วินาที): อ่าน people/exec/md-somchai.md, company-kit/deal-summaries/DS-2026-034, margin-rules.md, price-list.csv · .gitea-token · notes/deal-rules.md โน้ตลับมีกฎภาคผนวก PDPA · work/DS-2026-034/ มี approval.docx (Word บันทึกผลพิจารณา ตีกลับ margin หลังบวก buffer 11.8%), deal-input.json และต้นฉบับ approval.md · .claude/skills/deal-approval/ มี SKILL.md, references/ (approval-rules.md มีกฎภาคผนวก PDPA, approval-template.md, สำเนา price-list.csv), scripts/deal_check.py](img/lab1-desk-md-somchai.png)
+
+[![หน้าแรกของ approval.docx เปิดด้วย Word: หัวกระดาษ บันทึกผลพิจารณาดีล (ภายใน) · ผลพิจารณาดีล DS-2026-034 พอร์ทัลผู้ป่วยและนัดหมายออนไลน์ · ตารางสรุป ลูกค้าโรงพยาบาลเมืองใหม่ มูลค่า 3,307,000 บาท margin 18.0% ถ้าเติม buffer 11.8% ผลตีกลับ · เหตุผล 5 ข้อ · ตรวจตามเกณฑ์ 7 ข้อ](img/lab1-doc-md-somchai.png)](img/lab1-doc-md-somchai.png)
+
+📂 ไฟล์จริง: [`approval.docx`](_solution/desks-after-lab1/md-somchai/work/DS-2026-034/approval.docx) · [`notes/deal-rules.md`](novatech/seed/notes/md-somchai/deal-rules.md) · [`work/`](_solution/desks-after-lab1/md-somchai/work/DS-2026-034/) · [`deal-approval/`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
+
+#### 🧾 จอย หัวหน้าบัญชี → `pricing-calc`
+
+![โต๊ะของจอย หัวหน้าบัญชี desks/fin-joy/ (3 นาที 51 วินาที): อ่าน people/finance/fin-joy.md, company-kit/price-list.csv, margin-rules.md, deal-001/, won-proposals/ · .gitea-token · work/ มี deal-001-B-pricing-internal.xlsx (Excel ใบคิดราคาภายใน ฉบับเข้างบ 4,800,000 บาท margin 27.1%), deal-001-B-quotation-draft.docx (Word ร่างตารางราคาให้ Sales), ไฟล์ json 2 ไฟล์ และต้นฉบับ .md 4 ไฟล์ · .claude/skills/pricing-calc/ มี SKILL.md, references/ (margin-rules.md, estimate-benchmarks.md, สำเนา price-list.csv), assets/example-deal.json, scripts/price_calc.py](img/lab1-desk-fin-joy.png)
+
+[![deal-001-B-pricing-internal.xlsx เปิดด้วย Excel: ตารางคิดราคา (ภายใน) deal-001 ฉบับ B เข้างบ 4.8M คอลัมน์ รหัส รายการ ประเมิน จำนวนรวม buffer หน่วย ราคาต่อหน่วย ราคาขาย ต้นทุนต่อหน่วย ต้นทุน margin บรรทัด หมายเหตุ 13 รายการ ส่วนลดพิเศษ -619,000 รวมราคาขาย 4,800,000 ต้นทุน 3,497,500 margin 27.1% VAT 336,000 รวมทั้งสิ้น 5,136,000 ผู้อนุมัติ MD](img/lab1-doc-fin-joy.png)](img/lab1-doc-fin-joy.png)
+
+📂 ไฟล์จริง: [`pricing-internal.xlsx`](_solution/desks-after-lab1/fin-joy/work/deal-001-B-pricing-internal.xlsx) · [`quotation-draft.docx`](_solution/desks-after-lab1/fin-joy/work/deal-001-B-quotation-draft.docx) · [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`pricing-calc/`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
 
 > 📌 ในโฟลเดอร์เฉลย skill เก็บไว้ที่ `_solution/desks-after-lab1/<ชื่อ>/skills/` (ไม่มีจุดนำหน้า จะได้เปิดดูบน GitHub ง่าย) แต่ในโต๊ะจริงของผู้เรียนอยู่ที่ `desks/<ชื่อ>/.claude/skills/` ตามภาพ
 
