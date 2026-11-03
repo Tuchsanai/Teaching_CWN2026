@@ -1,0 +1,86 @@
+{
+ "seen": {
+  "A": {
+   "n": 60,
+   "hit1": 98.3,
+   "hit5": 100,
+   "miss": []
+  },
+  "B": {
+   "n": 60,
+   "hit1": 98.3,
+   "hit5": 100,
+   "miss": []
+  }
+ },
+ "heldout": {
+  "A": {
+   "n": 60,
+   "hit1": 80,
+   "hit5": 95,
+   "miss": [
+    {
+     "q": "รีวิว deal summary 3 ตัวสัปดาห์นี้ให้หน่อย จัด priority แล้วบอก go / no-go พร้อมเหตุผลสั้นๆ",
+     "expect": "exec:deal-approval",
+     "got": [
+      "mlops:mlflow-experiment",
+      "devops:postmortem",
+      "devops:deploy-checklist"
+     ]
+    },
+    {
+     "q": "ช่วยทำ onboarding kit ให้ new hire หน่อย มี welcome email, first-week schedule แล้วก็ checklist เรื่อง account กับอุปกรณ์",
+     "expect": "hr:onboarding-pack",
+     "got": [
+      "core:skill-finder",
+      "shared:meeting-minutes",
+      "mlops:model-release"
+     ]
+    },
+    {
+     "q": "แต่ละแผนกส่ง skill มาให้ทีมกลาง บางอันซ้ำกัน บางอันเขียนไม่ครบ ต้องตรวจให้ได้มาตรฐานก่อนปล่อยเวอร์ชันใหม่ปลายเดือน ช่วยวางขั้นตอนตรวจให้หน่อย",
+     "expect": "core:skill-finder",
+     "got": [
+      "mlops:model-release",
+      "qa:bug-report",
+      "dev:coding-standard"
+     ]
+    }
+   ]
+  },
+  "B": {
+   "n": 60,
+   "hit1": 66.7,
+   "hit5": 95,
+   "miss": [
+    {
+     "q": "รันเทสก่อน release",
+     "expect": "qa:test-from-plan",
+     "got": [
+      "mlops:mlflow-experiment",
+      "mlops:model-release",
+      "hr:onboarding-pack"
+     ]
+    },
+    {
+     "q": "ช่วยทำ onboarding kit ให้ new hire หน่อย มี welcome email, first-week schedule แล้วก็ checklist เรื่อง account กับอุปกรณ์",
+     "expect": "hr:onboarding-pack",
+     "got": [
+      "mlops:model-release",
+      "shared:meeting-minutes",
+      "core:skill-finder"
+     ]
+    },
+    {
+     "q": "แต่ละแผนกส่ง skill มาให้ทีมกลาง บางอันซ้ำกัน บางอันเขียนไม่ครบ ต้องตรวจให้ได้มาตรฐานก่อนปล่อยเวอร์ชันใหม่ปลายเดือน ช่วยวางขั้นตอนตรวจให้หน่อย",
+     "expect": "core:skill-finder",
+     "got": [
+      "hr:onboarding-pack",
+      "hr:jd-writer",
+      "mlops:model-release"
+     ]
+    }
+   ]
+  }
+ }
+}

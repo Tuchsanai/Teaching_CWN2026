@@ -1,0 +1,410 @@
+[
+  {
+    "name": "brand-guide",
+    "plugin": "core",
+    "description": "กติกาแบรนด์โนวาเทค v3.2 ที่ทุกเอกสารส่งออกนอกบริษัทต้องทำตาม — สี ฟอนต์ น้ำเสียง (ตรง ชัด สั้น ไม่โอ้อวด ไม่มีอีโมจิ) การเขียนชื่อบริษัท ตัวเลขเงิน/VAT โครงสไลด์ โครงเอกสาร เลขที่เอกสาร NVT-<ประเภท>-<ปี>-<ลำดับ> และโลโก้ ใช้ตรวจหรือเขียน proposal, อีเมลลูกค้า, สไลด์, JD, จดหมาย, รายงานถึงลูกค้า ให้ตรงแบรนด์ หรือเมื่อผู้ใช้พิมพ์ \"ทำให้ตรงแบรนด์\", \"สีบริษัทคืออะไร\", \"เช็กน้ำเสียงเอกสารนี้\", \"ขอโลโก้\" — skill อื่นที่ส่งเอกสารออกนอกบริษัทอ้าง skill นี้แทนการคัดลอกกติกาแบรนด์ไปเก็บเอง",
+    "metadata": {
+      "owner": "plat-may",
+      "layer": "core",
+      "version": "1.0.0",
+      "uses": [],
+      "next": [],
+      "follows": []
+    }
+  },
+  {
+    "name": "customer-data-policy",
+    "plugin": "core",
+    "description": "ตรวจเอกสารว่าใส่ข้อมูลลูกค้าได้ไหมตามนโยบายข้อมูลลูกค้า (PDPA) ของโนวาเทค v1.4 — หาเลขบัตรประชาชน เบอร์มือถือ เลขบัญชี/บัตร ชื่อลูกค้าปลายทาง แล้วตัดสินทีละจุด ห้าม/mask/ได้ พร้อมข้อความแทนที่และฉบับแก้ ใช้เมื่อผู้ใช้พิมพ์ \"เอกสารนี้ใส่ข้อมูลลูกค้าได้ไหม\", \"เช็ก PDPA ให้หน่อย\", \"ข้อมูลนี้ส่งลูกค้าได้ไหม\", \"ช่วย mask ข้อมูล\" หรือส่ง proposal/ใบแจ้งหนี้/อีเมล/สไลด์/รายงานบั๊ก/log มาให้ตรวจก่อนส่ง",
+    "metadata": {
+      "owner": "plat-may",
+      "layer": "core",
+      "version": "1.1.0",
+      "uses": [],
+      "next": [],
+      "follows": []
+    }
+  },
+  {
+    "name": "pricing-rules",
+    "plugin": "core",
+    "description": "ตารางราคามาตรฐาน (price-list 16 รายการ ราคาขาย + ต้นทุน) และกฎกำไร margin-rules v2026.1 ของโนวาเทคฉบับเดียวของบริษัท — สูตร margin หลังส่วนลด, buffer 10% งาน fixed-price, เกณฑ์ 25%/15%, สิทธิ์ให้ส่วนลด 5/10%, ห้ามลด MA/hosting, VAT 7%, ห้ามแสดงต้นทุนในเอกสารลูกค้า ใช้เมื่อถาม \"ราคา man-day SA เท่าไหร่\", \"ส่วนลดเท่านี้ใครอนุมัติ\", \"margin ขั้นต่ำเท่าไหร่\", \"ต้องบวก buffer ไหม\" หรือเมื่อ skill อื่น (pricing-calc, sales-proposal, deal-approval) ต้องใช้ราคา/กฎกำไร — ไม่ใช่การคิดราคาทั้งดีล (นั่นคือ pricing-calc)",
+    "metadata": {
+      "owner": "fin-joy",
+      "layer": "core",
+      "version": "1.0.0",
+      "uses": [],
+      "next": [
+        "pricing-calc"
+      ],
+      "follows": []
+    }
+  },
+  {
+    "name": "skill-finder",
+    "plugin": "core",
+    "description": "หา skill ของโนวาเทคที่ตรงกับงาน บอกว่าอยู่ plugin/แผนกไหน ใครดูแล ต้องติดตั้งแพ็กอะไร ทำงานต่อจากอะไรและส่งต่อให้ใคร และถ้าแก้ skill นี้จะกระทบ skill ไหนบ้าง จากแค็ตตาล็อกของคลัง org-skills (marketplace novatech-skills) ใช้เมื่อผู้ใช้ถาม \"มี skill สำหรับเรื่องนี้ไหม\", \"แผนกอื่นทำเรื่องนี้ยังไง\", \"ถ้าแก้ skill นี้กระทบใคร\", \"ต้องติดตั้งแพ็กไหน\", \"คนใหม่ต้องใช้ skill อะไร\"",
+    "metadata": {
+      "owner": "plat-ken",
+      "layer": "core",
+      "version": "1.0.0",
+      "uses": [],
+      "next": [],
+      "follows": []
+    }
+  },
+  {
+    "name": "coding-standard",
+    "plugin": "dev",
+    "description": "รีวิวโค้ดตามมาตรฐานทีม Dev โนวาเทค (coding-rules 10 ข้อ ให้คะแนน 0–10, ต่ำกว่า 8 ห้าม merge) และเขียน/แก้โค้ดให้ตรงสไตล์ทีม (TypeScript, Next.js 15, Prisma) — ใช้เมื่อผู้ใช้พิมพ์ \"รีวิวโค้ดนี้ตามมาตรฐานทีม\", \"โค้ดนี้ผิดมาตรฐานตรงไหน\", \"เขียนให้ตรงสไตล์ทีม\" หรือส่ง PR/diff/ไฟล์มาให้ตรวจก่อน merge",
+    "metadata": {
+      "owner": "dev-pond",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "test-from-plan"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "project-scaffold",
+    "plugin": "dev",
+    "description": "ขึ้นโปรเจกต์ใหม่แบบระบบสมาชิก + ชำระเงินของโนวาเทค (Next.js 15 + TypeScript + PostgreSQL/Prisma + BullMQ) พร้อม 5 โมดูลมาตรฐาน\nauth / member / payment / notification / audit ที่แก้บั๊ก token หมดอายุกลางจ่ายเงินและ webhook ซ้ำไว้แล้ว ผ่าน coding-rules 10 ข้อ\nใช้เมื่อผู้ใช้พูดว่า \"ขึ้นโปรเจกต์ใหม่ให้หน่อย\", \"สร้างโครงระบบสมาชิกกับชำระเงิน\", \"เริ่มโปรเจกต์ตาม spec\" หรือ /project-scaffold\nไม่ใช่สำหรับรีวิวโค้ด (ใช้ coding-standard) หรือวาด architecture ละเอียด (ใช้ arch-template)",
+    "metadata": {
+      "owner": "dev-mew",
+      "layer": "department",
+      "version": "1.1.0",
+      "uses": [
+        "coding-standard"
+      ],
+      "next": [
+        "coding-standard",
+        "test-from-plan",
+        "deploy-checklist"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "deploy-checklist",
+    "plugin": "devops",
+    "description": "เตรียม checklist ขึ้นระบบจริง (production deploy) สำหรับ release หนึ่งรอบ ตามกติกาโนวาเทค:\nวัน/เวลาที่อนุญาต, แจ้งลูกค้าล่วงหน้า, backup, migration dry-run, feature flag, smoke test, แผน rollback และ on-call\nผลลัพธ์: ไฟล์ checklist ที่บอกคำตัดสิน GO/NO-GO พร้อม blocker และร่างประกาศแจ้งลูกค้า\nใช้เมื่อผู้ใช้พูดว่า \"เตรียม checklist ขึ้นระบบ\", \"จะ deploy คืนนี้ ต้องเช็กอะไรบ้าง\", \"แผน rollback ถ้าพัง\",\n\"ขึ้น production\", \"go-live\", \"ปล่อย release\" หรือสั่ง /deploy-checklist",
+    "metadata": {
+      "owner": "ops-art",
+      "layer": "department",
+      "version": "1.1.0",
+      "uses": [],
+      "next": [
+        "postmortem"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "postmortem",
+    "plugin": "devops",
+    "description": "เขียน postmortem หลังระบบล่มแบบไม่โทษคน (blameless) จาก log ดิบ/แชต/ticket — เรียงไทม์ไลน์ วัดผลกระทบ หาต้นเหตุจริงด้วย \"ทำไม\" ทีละชั้น และสรุปสิ่งที่ต้องแก้พร้อมเจ้าของและกำหนด\nได้ 2 ไฟล์: postmortem ฉบับภายใน + รายงานสรุปถึงลูกค้า (ปิดบังข้อมูลตาม PDPA)\nใช้เมื่อผู้ใช้พูดว่า \"สรุปเหตุระบบล่มเมื่อคืน\", \"เขียน postmortem ให้หน่อย\", \"หาต้นเหตุ incident นี้\", \"สรุป incident\", \"RCA\" หรือ /postmortem",
+    "metadata": {
+      "owner": "ops-fon",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "exec-deck"
+      ],
+      "follows": [
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "deal-approval",
+    "plugin": "exec",
+    "description": "พิจารณาสรุปดีลแบบ MD โนวาเทค แล้วออกผลอนุมัติ / อนุมัติแบบมีเงื่อนไข / ตีกลับ ลง approval.md — ตรวจกำไร (margin หลังส่วนลด + buffer 10%), แผนงาน, เงื่อนไขชำระเงิน, ความเสี่ยงสัญญา, ภาคผนวก PDPA ลูกค้าธนาคาร, ทีมว่าง, ข้อมูลลูกค้าในเอกสาร ใช้เมื่อผู้ใช้ถาม \"ดีลนี้อนุมัติได้ไหม\", \"สรุปความเสี่ยงของดีลนี้ให้หน่อย\", \"กำไรพอไหม ควรรับงานนี้หรือเปล่า\" หรือส่งไฟล์สรุปดีล (DS-xxxx) มาให้พิจารณา",
+    "metadata": {
+      "owner": "md-somchai",
+      "layer": "department",
+      "version": "1.1.0",
+      "uses": [],
+      "next": [
+        "sales-proposal",
+        "invoice-check",
+        "jd-writer"
+      ],
+      "follows": [
+        "pricing-rules",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "exec-deck",
+    "plugin": "exec",
+    "description": "ทำสไลด์ประชุมผู้บริหารต้นเดือนให้ MD อ่านจบใน 5 นาที จาก KPI เดือนที่แล้ว + ดีลที่รออนุมัติ ตามโครง 7 หน้าของแบรนด์โนวาเทค ได้ไฟล์ HTML 16:9 และ PDF ใช้เมื่อพูดว่า \"ทำสไลด์ประชุมผู้บริหารเดือนนี้\", \"สรุป KPI เดือนที่แล้วเป็นสไลด์\", \"เตรียม deck ให้ MD\"",
+    "metadata": {
+      "owner": "exec-ploy",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "deal-approval"
+      ],
+      "follows": [
+        "brand-guide",
+        "pricing-rules",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "invoice-check",
+    "plugin": "finance",
+    "description": "ตรวจใบแจ้งหนี้ของโนวาเทคก่อนส่งลูกค้า — ยอดตรง (ยอดงวด/VAT 7%/รวมทั้งสิ้น/จำนวนเงินตัวอักษร) งวดตรงสัญญา เลขที่และวันครบกำหนดถูก และไม่มีข้อมูลลูกค้าที่ห้ามเปิดเผย (เบอร์มือถือ ชื่อลูกค้าปลายทาง เลขบัตร รายละเอียดเคส) แล้วออกผลตรวจ + ฉบับแก้ ใช้เมื่อพิมพ์ \"ตรวจใบแจ้งหนี้นี้ให้หน่อย\", \"ยอดในใบแจ้งหนี้ถูกไหม\", \"ออกใบแจ้งหนี้งวดแรก\" (หรืองวดที่ 2/3, ใบ MA) หรือ /invoice-check — ไม่ใช่การคิดราคา/ใบเสนอราคา (นั่นคือ pricing-calc)",
+    "metadata": {
+      "owner": "fin-nok",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "pricing-calc",
+    "plugin": "finance",
+    "description": "คิดราคาโปรเจกต์และกำไรของโนวาเทคจากตารางราคามาตรฐาน (price-list) ตามกฎกำไร — บวก buffer 10% งาน fixed-price, margin หลังส่วนลด, เกณฑ์ 25%/15%, สิทธิ์ให้ส่วนลด, ห้ามลด MA/hosting, VAT 7% — ได้ใบคิดราคาภายใน (มีต้นทุน/margin/ผู้อนุมัติ) + ร่างตารางราคาสำหรับใบเสนอราคา (ไม่มีต้นทุน) ใช้เมื่อผู้ใช้พิมพ์ \"คิดราคาโปรเจกต์นี้\", \"ดีลนี้กำไรเท่าไหร่\", \"ทำใบเสนอราคา\", ขอราคาแบบช่วง/ราคาเข้างบ หรือส่ง TOR/SPEC/รายการ man-day มาให้คิดราคา",
+    "metadata": {
+      "owner": "fin-joy",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "sales-proposal",
+        "deal-approval"
+      ],
+      "follows": [
+        "pricing-rules",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "jd-writer",
+    "plugin": "hr",
+    "description": "เขียนประกาศรับสมัครงาน (JD) ของโนวาเทคตามแม่แบบ 6 หัวข้อ น้ำเสียงแบรนด์ ไม่เกิน 1 หน้า A4 ระบุช่วงเงินเดือนเสมอ ใส่สวัสดิการจริงของบริษัท แล้วตรวจคำต้องห้ามและการเลือกปฏิบัติก่อนส่ง — ใช้เมื่อผู้ใช้พิมพ์ \"ทำประกาศรับสมัคร dev\", \"เขียน JD ตำแหน่งนี้ให้หน่อย\", \"โปรเจกต์ใหม่ต้องรับคนเพิ่ม\" หรือส่งคำขออัตรากำลัง / รหัสตำแหน่ง NVT-JOB-xxxx มาให้",
+    "metadata": {
+      "owner": "hr-fah",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "onboarding-pack"
+      ],
+      "follows": [
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "onboarding-pack",
+    "plugin": "hr",
+    "description": "เตรียมชุดต้อนรับพนักงานใหม่ของโนวาเทคครบในครั้งเดียว — ไทม์ไลน์ D−5 ถึง D119 เป็นวันที่จริง, คำขอพร้อมส่งถึงทีมกลาง/ธุรการ/หัวหน้าแผนก, ตารางวันแรก, งานสัปดาห์แรกตามแผนก, เช็กลิสต์ D−1 และจดหมายต้อนรับ ใช้เมื่อพิมพ์ \"เตรียมของต้อนรับพนักงานใหม่\", \"คนใหม่ฝ่าย dev เข้าวันจันทร์\" (หรือแผนกอื่น/วันอื่น), \"onboarding checklist\", \"ชุดต้อนรับ\", \"มีคนใหม่เข้า\"",
+    "metadata": {
+      "owner": "hr-oat",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [
+        "skill-finder"
+      ],
+      "next": [
+        "skill-finder"
+      ],
+      "follows": [
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "mlflow-experiment",
+    "plugin": "mlops",
+    "description": "จัดระเบียบและบันทึกผลการทดลองโมเดล ML ให้เทียบกันได้ (ข้อมูล, พารามิเตอร์, metric, เหตุผลที่เลือก) แล้วทำรายงานรายสัปดาห์ + แผนรอบถัดไป ใช้เมื่อผู้ใช้พิมพ์ \"บันทึกผลการทดลองรอบนี้\", \"เทียบโมเดลทั้งสามรอบ\", \"วางแผนทดลองโมเดลพยากรณ์\", ขอสรุป experiment-results.csv หรือเตรียมลง MLflow (ไม่ใช่การปล่อยโมเดลขึ้นจริง ซึ่งเป็นงานของ model-release)",
+    "metadata": {
+      "owner": "ml-jay",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "model-release"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "model-release",
+    "plugin": "mlops",
+    "description": "วางแผนปล่อยโมเดล ML รุ่นใหม่ขึ้นระบบจริงแทนรุ่นเดิม พร้อมเกณฑ์ถอยกลับ (rollback) และการเฝ้าดูว่าโมเดลยังแม่นอยู่ไหม —\nตรวจด่านก่อนปล่อย 10 ด่าน (เทียบแฟร์บน data version เดียวกัน, ทำซ้ำได้, กลุ่มย่อย/ทิศทาง error, fallback, shadow, PDPA, กติกา deploy)\nแล้วได้ release plan 1 ไฟล์ + สคริปต์ตรวจเกณฑ์ rollback รายสัปดาห์\nใช้เมื่อผู้ใช้พิมพ์ \"ปล่อยโมเดลรุ่นใหม่\", \"เตรียม release โมเดลพยากรณ์คิว\", \"เกณฑ์ rollback โมเดล\", \"โมเดลยังแม่นอยู่ไหม / ควรถอยไหม\" หรือ /model-release\nไม่ใช่สำหรับออกแบบ/บันทึกการทดลอง (นั่นคือ mlflow-experiment) และไม่ใช่ checklist คืน deploy ของ DevOps (นั่นคือ deploy-checklist)",
+    "metadata": {
+      "owner": "ml-pim",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "deploy-checklist",
+        "postmortem"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "bug-report",
+    "plugin": "qa",
+    "description": "เขียนรายงานบั๊กจาก test ที่ล้ม (log Playwright/CI, trace, server log, โน้ตทดสอบมือ) ให้ Dev ทำซ้ำได้ทุกครั้งโดยไม่ต้องถาม QA\nได้ไฟล์ markdown ตามแม่แบบทีม QA: ชื่อบอกอาการ+เงื่อนไข, Severity/Priority, ขั้นตอนทำซ้ำพร้อมค่าจริง, ผลที่คาด, ผลจริง, ความถี่, หลักฐาน, ข้อสังเกต, ผลกระทบ\nใช้เมื่อผู้ใช้พูดว่า \"เขียนรายงานบั๊กนี้ให้หน่อย\", \"สรุปบั๊กให้ dev แก้ได้\", \"แจ้งบั๊กพร้อมขั้นตอนทำซ้ำ\" หรือ /bug-report",
+    "metadata": {
+      "owner": "qa-bank",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "coding-standard"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "test-from-plan",
+    "plugin": "qa",
+    "description": "ทดสอบเว็บแบบ black-box ตามแผนใน TEST-PLAN.md (อ่าน URL, test cases, เกณฑ์จากแผนเอง) ด้วย Playwright headless และ agent ขนาน\nได้ test ครบทุกข้อใน e2e/, GIF หลักฐานทุกข้อ, index.html, TEST-REPORT.md และคำตัดสินว่าปล่อยได้ไหม\nใช้เมื่อผู้ใช้พูดว่า \"ทดสอบเว็บตามแผน\", \"รัน test ตาม TEST-PLAN\", \"ทำรายงานผลทดสอบ\" หรือ /test-from-plan",
+    "metadata": {
+      "owner": "qa-mint",
+      "layer": "department",
+      "version": "1.1.0",
+      "uses": [],
+      "next": [
+        "bug-report",
+        "deploy-checklist"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "arch-template",
+    "plugin": "sa",
+    "description": "วาด architecture ระบบใหม่ตามมาตรฐานโนวาเทค (arch-standards v4) จาก TOR / spec — เลือกแบบแผน monolith / service แยก / คิวงานด้วยเกณฑ์บริษัท\nแล้วเติมแม่แบบที่ใช้ซ้ำ 80% ให้ได้ docs/architecture.md: C4 ระดับ 1–2 (+3 ถ้าซับซ้อน) เป็น Mermaid สีบริษัท, ตาราง container, คิว/event, ข้อมูล-ความปลอดภัย, observability, รายการ ADR และคำถามที่ต้องยืนยัน\nใช้เมื่อผู้ใช้พูดว่า \"วาด architecture ระบบนี้\", \"ออกแบบโครงระบบให้หน่อย\", \"ระบบจองคิวควรแบ่ง service ยังไง\", \"แบ่ง service ยังไงดี\" หรือ /arch-template\nไม่ใช่สำหรับแตก TOR เป็น spec (นั่นคือ req-to-spec) และไม่ใช่การขึ้นโค้ดโปรเจกต์ (นั่นคือ project-scaffold)",
+    "metadata": {
+      "owner": "sa-ice",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "project-scaffold",
+        "pricing-calc",
+        "sales-proposal"
+      ],
+      "follows": [
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "req-to-spec",
+    "plugin": "sa",
+    "description": "แปลง TOR / proposal ลูกค้าเป็น SPEC.md (requirement มีรหัส ไม่ตกหล่น + คำถามที่ลูกค้ามักลืมเขียน) และ TEST-PLAN.md ที่ส่งต่อ QA ได้ทันที ตามมาตรฐานสถาปัตยกรรมและนโยบายข้อมูลลูกค้าของโนวาเทค\nใช้เมื่อผู้ใช้พูดว่า \"ทำ spec จาก TOR นี้\", \"แตก requirement เป็นหัวข้อให้หน่อย\", \"เขียน spec พร้อมแผนทดสอบ\" หรือ /req-to-spec",
+    "metadata": {
+      "owner": "sa-ton",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "arch-template",
+        "test-from-plan",
+        "pricing-calc",
+        "sales-proposal"
+      ],
+      "follows": [
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "follow-up-email",
+    "plugin": "sales",
+    "description": "ร่างอีเมลติดตามลูกค้าองค์กรที่สั้น สุภาพ และมีขั้นต่อไปเดียวที่ชัดเจน จากบันทึกประชุม TOR หรือประวัติการคุย\nใช้เมื่อผู้ใช้พูดว่า \"เขียนอีเมลตามลูกค้าหลังประชุม\", \"ลูกค้าเงียบไป 2 อาทิตย์ ช่วยตามหน่อย\",\n\"ร่างเมลสรุปนัดหมายถัดไป\" หรือขอให้ตามงาน/ตามคำตอบจากลูกค้า\nไม่ใช้สำหรับเขียน proposal หรือคิดราคา",
+    "metadata": {
+      "owner": "sales-krit",
+      "layer": "department",
+      "version": "0.2.0",
+      "uses": [],
+      "next": [
+        "sales-proposal",
+        "pricing-calc"
+      ],
+      "follows": [
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "sales-proposal",
+    "plugin": "sales",
+    "description": "ร่าง proposal (ข้อเสนอโครงการ) ลูกค้าองค์กร โดยเฉพาะธนาคาร จาก TOR — โครง 9 หัวข้อแบบที่ชนะมาแล้ว เน้นความปลอดภัยและ SLA ใส่ \"ภาคผนวก PDPA\" ทุกครั้งที่ลูกค้าเป็นธนาคาร คิดราคาจาก price-list พร้อมเช็ก margin/ส่วนลด/งบ และตัดข้อมูลส่วนบุคคลออก ใช้เมื่อผู้ใช้พิมพ์ \"ทำ proposal ให้ลูกค้าธนาคาร\", \"ร่างข้อเสนอโครงการตาม TOR\", \"ทำโปรให้ลูกค้าหน่อย\" หรือขอข้อเสนอ/ใบเสนอโครงการให้ลูกค้า",
+    "metadata": {
+      "owner": "sales-nida",
+      "layer": "department",
+      "version": "1.2.0",
+      "uses": [],
+      "next": [
+        "deal-approval",
+        "follow-up-email",
+        "req-to-spec"
+      ],
+      "follows": [
+        "pricing-rules",
+        "brand-guide",
+        "customer-data-policy"
+      ]
+    }
+  },
+  {
+    "name": "meeting-minutes",
+    "plugin": "shared",
+    "description": "เรียบเรียงโน้ตประชุมดิบ (จดมือ แชต transcript) ของทุกแผนกเป็นบันทึกการประชุมแบบเดียวกันทั้งบริษัท — สรุป 3 บรรทัด, เรื่องที่ตัดสินแล้ว, action item ที่มีเจ้าของและวันกำหนดจริง, คำถามค้าง แยกฉบับภายในกับฉบับส่งผู้เข้าประชุมภายนอก (ตัดเบอร์มือถือ ความเห็นภายใน คู่แข่ง ตาม PDPA) ใช้เมื่อพิมพ์ \"สรุปประชุมให้หน่อย\", \"ทำ minutes\", \"บันทึกการประชุมจากโน้ตนี้\", \"action item จากประชุมมีอะไรบ้าง\" หรือส่งโน้ต/transcript ประชุมมา — ไม่ใช่การเขียนอีเมลติดตามลูกค้า (นั่นคือ follow-up-email ของ Sales)",
+    "metadata": {
+      "owner": "plat-ken",
+      "layer": "shared",
+      "version": "1.0.0",
+      "uses": [],
+      "next": [
+        "follow-up-email",
+        "req-to-spec",
+        "pricing-calc"
+      ],
+      "follows": [
+        "customer-data-policy",
+        "brand-guide"
+      ]
+    }
+  }
+]
