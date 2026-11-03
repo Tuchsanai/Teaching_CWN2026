@@ -1,4 +1,4 @@
-# บริษัทจำลองโนวาเทค: Gitea (คลังกลาง = remote) + CI runner + seed พนักงาน 21 คน
+# บริษัทจำลองโนวาเทค: Gitea (คลังกลาง = remote) + CI runner + seed พนักงาน 28 คน
 # เปิด:  docker compose up -d        ปิดและลบทั้งหมด:  docker compose down -v
 # ทำงานตลอด 2 ตัว: gitea, runner (ล่มเอง/รีสตาร์ต Docker แล้วกลับมาเอง)
 # ตัวช่วยตอนเปิด 3 ตัว: init → seed → cleanup ทำงานครั้งเดียว แล้ว cleanup ลบทั้งสามทิ้งเอง
@@ -68,7 +68,7 @@ services:
       seed:
         condition: service_completed_successfully
 
-  seed:                                    # สร้างองค์กร ทีม 11 ทีม พนักงาน 21 คน โต๊ะทำงาน และ token ของ runner (รันครั้งเดียว cleanup ลบทิ้งให้)
+  seed:                                    # สร้างองค์กร ทีม 12 ทีม (11 แผนก + leads) พนักงาน 28 คน โต๊ะทำงาน และ token ของ runner (รันครั้งเดียว cleanup ลบทิ้งให้)
     image: node:22-alpine
     container_name: novatech-seed
     working_dir: /novatech

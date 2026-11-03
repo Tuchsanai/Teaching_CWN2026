@@ -26,9 +26,26 @@
 | `monthly-kpi.csv` | KPI ก.ย. และ ต.ค. 2026 เทียบเป้า | `exec-ploy` (exec-deck) |
 | `invoices/INV-2026-0142.md` · `invoices/invoicing-rules.md` | ร่างใบแจ้งหนี้รอตรวจ + กติกาออกใบแจ้งหนี้ | `fin-nok` (invoice-check) |
 | `qa/failed-test-log.txt` · `qa/bug-template.md` | log Playwright ที่ล้ม + โน้ต QA, แม่แบบรายงานบั๊ก | `qa-bank` (bug-report), `qa-mint` |
+| `product/novaqueue-overview.md` | ผลิตภัณฑ์ NovaQueue (ระบบจองคิว SaaS) v1 on-prem กับ v2 cloud, วงจรชีวิตผลิตภัณฑ์, ตัวเลข ต.ค. 2026 | `pm-beam`, `pm-gift` |
+| `product/novaqueue-feedback-2026-q3.md` | เสียงลูกค้า v2 ไตรมาส 3: ตัวเลข no-show + 12 ความเห็น (มีเบอร์ลูกค้าปลายทางใน ticket) | `pm-beam` (prd-writer) |
+| `product/product-lifecycle-policy.md` | สิ่งที่ PRD ต้องมี + ขั้นตอนเลิกให้บริการ: ประกาศ 180 วัน, ส่งออกข้อมูล 90 วัน, ห้ามปิดก่อนสัญญา MA หมด, ลบข้อมูลใน 30 วัน | `pm-beam`, `pm-gift` (product-sunset) |
+| `product/novaqueue-v1-customers.csv` | ลูกค้า v1 5 ราย: สาขา, วันหมดสัญญา MA, ค่า MA, การใช้งาน 30 วัน | `pm-gift` (product-sunset) |
+
+## ผู้บริหารสายใช้ข้อมูลอะไร (ชั้น 2 ของผังองค์กร)
+
+ผู้บริหารสายไม่มีไฟล์ของตัวเอง แต่อ่าน **ข้อมูลของหลายแผนกในสายพร้อมกัน** เพื่อตัดสินใจภาพรวม
+
+| ผู้บริหาร | ดูแลแผนก | อ่านไฟล์ | skill |
+|---|---|---|---|
+| `cco-wit` สายธุรกิจ | Sales · SA · Product | `monthly-kpi.csv` (pipeline, win rate), `deal-summaries/`, `deal-001/`, `deal-002/`, `product/novaqueue-feedback-2026-q3.md` | `pipeline-review` |
+| `cto-nat` สายเทคโนโลยี | Dev · QA · DevOps · ML · ทีมกลาง | `incident-2026-09.md`, `deploy-runbook.md`, `arch-standards.md`, `ml-queue-forecast/`, `qa/failed-test-log.txt`, `monthly-kpi.csv` (incident) | `tech-risk-review` |
+| `cfo-ying` สายบริหารและการเงิน | HR · บัญชี | `monthly-kpi.csv` (รายได้, margin, headcount, ตำแหน่งว่าง), `margin-rules.md`, `hr-benefits-faq.md`, `jd-template.md` | `cost-headcount-review` |
+
+> `monthly-kpi.csv` เป็นตัวเลขของทั้งบริษัท (พนักงานจริง 88 คน) ส่วน 28 คนในแล็บคือ **ตัวแทน** ของแต่ละแผนก
 
 ## ชื่อที่ใช้ซ้ำข้ามไฟล์ (ให้ตรงกัน)
 
 - ลูกค้าธนาคาร: **สยามรุ่งเรือง** (ลูกค้าเก่า loan portal), **ออมทรัพย์เกษตรไทย** (ลูกค้าเก่า แอปนัดหมาย + ข้อมูล ML), **นครหลวงพัฒนา** (deal-001), **เอเชียไทยสากล** (deal-002)
-- ลูกค้าอื่น: ช้อปดีมาร์ท (ShopDee, incident ก.ย.), ไทยโลจิสติกส์ครบวงจร (DS-031), โรงพยาบาลเมืองใหม่ (DS-034)
+- ลูกค้าอื่น: ช้อปดีมาร์ท (ShopDee, incident ก.ย.), ไทยโลจิสติกส์ครบวงจร (DS-031), โรงพยาบาลเมืองใหม่ (DS-034), สำนักงานที่ดินเขต 4 และสหกรณ์ครูภาคเหนือ (ลูกค้า NovaQueue v1)
+- ผลิตภัณฑ์ของบริษัท: **NovaQueue** (v1 on-prem 2023, v2 cloud SaaS 2025)
 - payment gateway สมมติ: ThaiPay GW
