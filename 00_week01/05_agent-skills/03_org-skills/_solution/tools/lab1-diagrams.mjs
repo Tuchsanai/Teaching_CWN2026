@@ -22,7 +22,7 @@ const folders = `<html><head><meta charset="utf-8"><style>${css}
 .sh{background:#eff6ff;border:2px solid #93c5fd;border-radius:14px;padding:10px 14px;font-size:19px;line-height:1.5}
 .sh b{font-size:22px} .sh code{font-size:17px}
 .dbar{margin:14px 0 8px;font-size:24px;font-weight:800} .dbar span{font-weight:400;font-size:20px;color:#475569}
-.desks{display:grid;grid-template-columns:1fr 1fr 1fr 150px;gap:10px}
+.desks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .dk{background:#fefce8;border:3px solid #f59e0b;border-radius:14px;padding:0 0 8px;overflow:hidden}
 .dh{background:#f59e0b;color:#fff;font-size:22px;font-weight:800;padding:8px 12px;line-height:1.3} .dh code{font-size:21px;color:#fff}
 .dh span{font-size:16px;font-weight:600}
@@ -45,7 +45,9 @@ const folders = `<html><head><meta charset="utf-8"><style>${css}
 ${dk('💼', 'sales-nida', 'นิดา หัวหน้าทีมขาย', [['work/', W, 'w'], ['  📘 proposal.docx', '', 'w'], ['  📗 pricing.xlsx', '', 'w'], ['.claude/skills/', W, 'k'], ['  sales-proposal/', '', 'k']])}
 ${dk('👔', 'md-somchai', 'สมชาย MD', [['notes/', R, 'n'], ['  🔒 deal-rules.md', '', 'n'], ['work/', W, 'w'], ['  📘 approval.docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  deal-approval/', '', 'k']])}
 ${dk('🧾', 'fin-joy', 'จอย หัวหน้าบัญชี', [['work/', W, 'w'], ['  📗 pricing-internal.xlsx', '', 'w'], ['  📘 quotation-draft.docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  pricing-calc/', '', 'k']])}
-<div class="more">… อีก 25 โต๊ะ<br>แบบเดียวกัน</div>
+${dk('🤝', 'hr-fah', 'ฟ้า หัวหน้าฝ่าย HR', [['work/', W, 'w'], ['  📘 NVT-JOB-…-fullstack.docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  jd-writer/', '', 'k']])}
+${dk('🤖', 'ml-jay', 'เจ หัวหน้าทีม ML', [['work/', W, 'w'], ['  📗 experiment-registry.xlsx', '', 'w'], ['  📘 2026-W45-….docx', '', 'w'], ['.claude/skills/', W, 'k'], ['  mlflow-experiment/', '', 'k']])}
+<div class="more">… อีก 23 โต๊ะ<br>แบบเดียวกัน</div>
 </div></div>
 <div class="real">
 <div><b>💻 desks/&lt;ชื่อ&gt;/</b><br>ในบริษัทจริง = คอมของคนนั้น</div>
@@ -176,6 +178,47 @@ const people = [
       [2, 'scripts/price_calc.py', 'คิดตามกฎกำไร ผิดกฎไม่ออกใบเสนอราคา', 'k'],
     ],
     note: '📋 <code>price-list.csv</code> มีสำเนาอยู่ใน skill ของ <b>ทั้ง 3 คน</b> และนิดาเขียนสคริปต์คิดราคาซ้ำกับจอย' },
+  { file: 'lab1-desk-hr-fah.png', icon: '🤝', title: 'โต๊ะของฟ้า หัวหน้าฝ่าย HR', user: 'hr-fah', time: '2 นาที 10 วินาที', result: 'ได้ skill jd-writer',
+    reads: ['people/hr/hr-fah.md', 'company-kit/jd-template.md', 'company-kit/hr-benefits-faq.md', 'company-kit/brand-guide.md', 'company-kit/deal-001/'],
+    rows: [
+      [0, 'desks/hr-fah/', '= คอมพิวเตอร์ของฟ้า', 'd'],
+      [1, '.gitea-token', 'บัตรผ่านของฟ้า (seed สร้างให้)', 's'],
+      [0, '#ea580c', '② ผลงานจริง: ประกาศรับ Senior Full-stack Developer (NVT-JOB-2026-021)', 'h'],
+      [1, 'work/', '', 'w'],
+      [2, '📘 NVT-JOB-2026-021-…fullstack.docx', 'ประกาศรับสมัคร 6 หัวข้อ เงินเดือน 75,000–105,000 (Word)', 'w'],
+      [2, 'NVT-JOB-2026-021-check.md', 'ตารางตรวจตามกติกา + จุดที่ต้องตัดสินใจ', 'w'],
+      [2, '📝 NVT-JOB-2026-021-…fullstack.md', 'ต้นฉบับที่ Claude เขียน', 'w'],
+      [0, '#16a34a', '③ skill ส่วนตัว', 'h'],
+      [1, '.claude/skills/jd-writer/', '', 'k'],
+      [2, 'SKILL.md', 'หัวไฟล์ + 6 ขั้นตอน (ไม่มีช่วงเงินเดือน = หยุดถาม)', 'k'],
+      [2, 'references/', '', 'k'],
+      [3, 'jd-rules.md', 'โครงประกาศ คำต้องห้าม น้ำเสียงแบรนด์', 'k'],
+      [3, 'benefits.md', 'สวัสดิการ ขั้นตอนสัมภาษณ์ on-call', 'k'],
+      [3, 'example-jd.md', 'ประกาศฉบับนี้ ไว้เทียบความยาวและน้ำเสียง', 'k'],
+    ],
+    note: '💡 ไม่ใส่ชื่อธนาคารในประกาศเพราะ TOR มี NDA และไม่ระบุเพศหรืออายุ · กติกาข้อมูลลูกค้าถูกสรุปซ้ำใน <code>jd-rules.md</code> อีกที่' },
+  { file: 'lab1-desk-ml-jay.png', icon: '🤖', title: 'โต๊ะของเจ หัวหน้าทีม ML', user: 'ml-jay', time: '3 นาที 27 วินาที', result: 'ได้ skill mlflow-experiment',
+    reads: ['people/mlops/ml-jay.md', 'company-kit/ml-queue-forecast/experiment-results.csv', 'company-kit/ml-queue-forecast/notes.md', 'company-kit/deal-001/tor-bank-queue.md'],
+    rows: [
+      [0, 'desks/ml-jay/', '= คอมพิวเตอร์ของเจ', 'd'],
+      [1, '.gitea-token', 'บัตรผ่านของเจ (seed สร้างให้)', 's'],
+      [0, '#ea580c', '② ผลงานจริง: เทียบโมเดลพยากรณ์คิว 3 รอบ · r03 MAPE 15.2% = candidate', 'h'],
+      [1, 'work/', '', 'w'],
+      [2, '📗 experiment-registry.xlsx', 'ทะเบียน run ทุกรอบ + แผน r02b, r03b (Excel)', 'w'],
+      [2, '📘 2026-W45-…-experiments.docx', 'รายงานการทดลองประจำสัปดาห์ (Word)', 'w'],
+      [2, 'experiment-registry.csv', 'ทะเบียนเดียวกัน ไว้ backfill ลง MLflow', 'w'],
+      [2, '📝 2026-W45-….md', 'ต้นฉบับรายงานที่ Claude เขียน', 'w'],
+      [0, '#16a34a', '③ skill ส่วนตัว', 'h'],
+      [1, '.claude/skills/mlflow-experiment/', '', 'k'],
+      [2, 'SKILL.md', 'หัวไฟล์ + 6 ขั้นตอน (ห้ามประกาศผู้ชนะถ้าเทียบไม่แฟร์)', 'k'],
+      [2, 'references/', '', 'k'],
+      [3, 'run-record-standard.md', 'คอลัมน์ที่ต้องมี กติกาเทียบแฟร์', 'k'],
+      [3, 'queue-forecast-context.md', 'เกณฑ์ TOR ข้อ 3.3 + ผล 3 รอบ', 'k'],
+      [3, 'data-policy-summary.md', '📋 สำเนากติกาข้อมูลลูกค้า (ส่วนของ ML)', 'k'],
+      [2, 'assets/weekly-report-template.md', 'แม่แบบรายงานประจำสัปดาห์', 'k'],
+      [2, 'scripts/compare_runs.py', 'ตารางเทียบ run + ตรวจว่าเทียบแฟร์ไหม', 'k'],
+    ],
+    note: '💡 จับได้เองว่า r03 ใช้ข้อมูลคนละชุดกับ r02 (v4 38 สาขา vs v3 40 สาขา) จึงยังไม่ประกาศว่าชนะ แค่ให้สถานะ candidate' },
 ];
 
 // ④ 3 ปัญหาของ "ต่างคนต่างเก็บ" (นับจากไฟล์จริงใน _solution/desks-after-lab1)
@@ -249,6 +292,8 @@ work/deal-001-proposal-….md
 const docs = pages ? [
   ['lab1-doc-sales-nida.png', 'Word', '#185ABD', '💼 นิดา', 'desks/sales-nida/work/deal-001-proposal-nakhonluang-queue.docx', 'deal-001-proposal-nakhonluang-queue.png', 'proposal ที่ส่งลูกค้า · หน้า 1 จาก 4', 1000],
   ['lab1-doc-md-somchai.png', 'Word', '#185ABD', '👔 สมชาย MD', 'desks/md-somchai/work/DS-2026-034/approval.docx', 'approval.png', 'บันทึกผลพิจารณาดีล · หน้า 1 จาก 2', 1000],
+  ['lab1-doc-hr-fah.png', 'Word', '#185ABD', '🤝 ฟ้า', 'desks/hr-fah/work/NVT-JOB-2026-021-senior-fullstack.docx', 'NVT-JOB-2026-021-senior-fullstack.png', 'ประกาศรับสมัครงาน · หน้า 1 จาก 2', 1000],
+  ['lab1-doc-ml-jay.png', 'Excel', '#107C41', '🤖 เจ', 'desks/ml-jay/work/experiment-registry.xlsx', 'experiment-registry.png', 'ทะเบียน run · สีตามสถานะ · MAPE ผ่านเกณฑ์ ≤ 20% เป็นสีเขียว', 0],
   ['lab1-doc-fin-joy.png', 'Excel', '#107C41', '🧾 จอย', 'desks/fin-joy/work/deal-001-B-pricing-internal.xlsx', 'deal-001-B-pricing-internal.png', 'ใบคิดราคาภายใน · ราคาขาย ต้นทุน margin เป็นสูตรในเซลล์', 0],
 ].map(([file, app, color, who, path, png, cap, h]) => [`<html><head><meta charset="utf-8"><style>${css}
 .win{margin:24px 36px 0;border-radius:14px;overflow:hidden;box-shadow:0 8px 28px #0003;border:1px solid #cbd5e1}

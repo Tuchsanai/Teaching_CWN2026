@@ -1,7 +1,7 @@
-# ทำผลงาน LAB 1 ของ 3 โต๊ะ (sales-nida, md-somchai, fin-joy) ให้เป็นไฟล์ Word / Excel แบบที่บริษัทใช้จริง
+# ทำผลงาน LAB 1 ของ 5 โต๊ะ (sales-nida, md-somchai, fin-joy, hr-fah, ml-jay) ให้เป็นไฟล์ Word / Excel แบบที่บริษัทใช้จริง
 # เนื้อหามาจากไฟล์ .md ที่ Claude เขียนตอนรันจริงทุกตัวอักษร (แค่แปลงรูปแบบ) · ใช้ pandoc + python-docx + openpyxl
 # python lab1-office-files.py   (รันที่โฟลเดอร์ _solution/tools/)
-import re, subprocess, tempfile
+import csv, re, subprocess
 from pathlib import Path
 from docx import Document
 from docx.shared import Pt, RGBColor
@@ -147,4 +147,33 @@ for row in ws.iter_rows(min_row=r0, max_row=ws.max_row):
     for c in (row[1], row[10]): c.alignment = Alignment(wrap_text=True, vertical='center')
 for c in ws[tot]: c.font = Font(name=FONT, bold=True)
 wb.save(joy / 'deal-001-B-pricing-internal.xlsx')
+# ---------- hr-fah ----------
+fah = DESKS / 'hr-fah' / 'work'
+to_docx(fah / 'NVT-JOB-2026-021-senior-fullstack.md', fah / 'NVT-JOB-2026-021-senior-fullstack.docx', 'บริษัท โนวาเทค จำกัด · ประกาศรับสมัครงาน NVT-JOB-2026-021')
+
+# ---------- ml-jay ----------
+jay = DESKS / 'ml-jay' / 'work'
+to_docx(jay / '2026-W45-queue-forecast-experiments.md', jay / '2026-W45-queue-forecast-experiments.docx', 'บริษัท โนวาเทค จำกัด · ทีม ML · บันทึกการทดลองประจำสัปดาห์ (ภายใน)')
+rows = list(csv.DictReader(open(jay / 'experiment-registry.csv', encoding='utf-8')))
+wb = Workbook(); ws = wb.active; ws.title = 'สรุป run'
+title(ws, 'ทะเบียนการทดลอง · โมเดลพยากรณ์คิวสาขา', 'จัดทำโดย ml-jay · สัปดาห์ 45 · เกณฑ์ TOR: MAPE ≤ 20% · ข้อมูลเต็มทุกคอลัมน์อยู่ในชีต "ทะเบียนเต็ม"')
+ws.append([])
+cols = [('run_id', 'run'), ('run_name', 'ชื่อ'), ('model', 'โมเดล'), ('data_version', 'ข้อมูล'), ('n_branches', 'สาขา'), ('seed', 'seed'),
+        ('MAPE_pct', 'MAPE %'), ('MAPE_payday_pct', 'MAPE วันเงินเดือนออก %'), ('MAPE_holiday_week_pct', 'MAPE สัปดาห์วันหยุด %'), ('status', 'สถานะ'), ('decision', 'การตัดสินใจ')]
+ws.append([h for _, h in cols])
+fill = {'production': 'E5E7EB', 'superseded': 'F4F6F8', 'candidate': 'FEF3C7', 'planned': 'DBEAFE'}
+for r in rows:
+    ws.append([num(r[k]) if k.endswith('_pct') or k == 'n_branches' else r[k] for k, _ in cols])
+    for c in ws[ws.max_row]: c.fill = PatternFill('solid', fgColor=fill.get(r['status'], 'FFFFFF'))
+    m = ws.cell(row=ws.max_row, column=7)
+    if m.value is not None: m.font = Font(name=FONT, bold=True, color='13A89E' if m.value <= 20 else 'F26B38')
+sheet_style(ws, 4, {'A': 7, 'B': 18, 'C': 15, 'D': 10, 'E': 7, 'F': 18, 'G': 9, 'H': 13, 'I': 13, 'J': 12, 'K': 52})
+for row in ws.iter_rows(min_row=5, max_row=ws.max_row):
+    for c in row[6:9]: c.number_format = '0.0'
+    for c in (row[5], row[10]): c.alignment = Alignment(wrap_text=True, vertical='center')
+full = wb.create_sheet('ทะเบียนเต็ม')
+full.append(list(rows[0].keys()))
+for r in rows: full.append(list(r.values()))
+sheet_style(full, 1, {})
+wb.save(jay / 'experiment-registry.xlsx')
 print('ok')

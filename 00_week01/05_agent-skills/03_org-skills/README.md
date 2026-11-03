@@ -196,7 +196,7 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 |---|---|
 | [1.1](#11-ของแต่ละคนอยู่ที่ไหน-สำคัญ) | 📁 อ่านจากโฟลเดอร์ไหน เขียนลงโฟลเดอร์ไหน |
 | [1.2](#12-พรอมต์เดียว-วางได้ทุกโต๊ะ) | 💬 พรอมต์ และวิธีรัน |
-| [1.3](#13-ตัวอย่าง-3-โต๊ะ) | 👀 ผลจริงของนิดา · MD · จอย |
+| [1.3](#13-ตัวอย่าง-5-โต๊ะ) | 👀 ผลจริงของนิดา · MD · จอย · HR · ML |
 | [1.4](#14-ทุกคนทำงานอะไร-ผลจริง-24-โต๊ะ) | 📋 ทั้ง 24 คนทำงานอะไร ได้ skill อะไร |
 | [1.5](#15-ผลที่เห็น-3-ปัญหาของ-ต่างคนต่างเก็บ) | ⚠️ 3 ปัญหาที่จะแก้ใน LAB ถัดไป |
 
@@ -206,7 +206,7 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 
 ทั้งบริษัทคือโฟลเดอร์ `novatech/` โฟลเดอร์เดียว **ของกลางอยู่ข้างบน** (`people/`, `company-kit/`) ทุกคนอ่านชุดเดียวกัน ส่วน **โต๊ะของแต่ละคนอยู่ใน `desks/`** เขียนได้แค่โต๊ะตัวเอง
 
-[![LAB 1 ของแต่ละคนอยู่ตรงไหนในบริษัท: novatech/ บริษัททั้งหมด มี people/ การ์ดพนักงาน 28 ใบ (อ่าน) และ company-kit/ ไดรฟ์กลาง (อ่าน) · desks/ โต๊ะ 1 โฟลเดอร์ต่อ 1 คน 28 โต๊ะ · sales-nida/ นิดา มี work/ proposal.docx pricing.xlsx และ .claude/skills/sales-proposal/ · md-somchai/ สมชาย MD มี notes/deal-rules.md โน้ตลับ work/ approval.docx และ .claude/skills/deal-approval/ · fin-joy/ จอย มี work/ pricing-internal.xlsx quotation-draft.docx และ .claude/skills/pricing-calc/ · อีก 25 โต๊ะแบบเดียวกัน · ในบริษัทจริง desks/<ชื่อ>/ = คอมของคนนั้น, .claude/skills/ = ~/.claude/skills/, company-kit/ = ไดรฟ์กลาง](img/lab1-folders.png)](img/lab1-folders.png)
+[![LAB 1 ของแต่ละคนอยู่ตรงไหนในบริษัท: novatech/ บริษัททั้งหมด มี people/ การ์ดพนักงาน 28 ใบ (อ่าน) และ company-kit/ ไดรฟ์กลาง (อ่าน) · desks/ โต๊ะ 1 โฟลเดอร์ต่อ 1 คน 28 โต๊ะ · sales-nida/ นิดา มี work/ proposal.docx pricing.xlsx และ .claude/skills/sales-proposal/ · md-somchai/ สมชาย MD มี notes/deal-rules.md โน้ตลับ work/ approval.docx และ .claude/skills/deal-approval/ · fin-joy/ จอย มี work/ pricing-internal.xlsx quotation-draft.docx และ .claude/skills/pricing-calc/ · hr-fah/ ฟ้า HR มี work/ ประกาศรับสมัคร .docx และ .claude/skills/jd-writer/ · ml-jay/ เจ ML มี work/ experiment-registry.xlsx รายงาน .docx และ .claude/skills/mlflow-experiment/ · อีก 23 โต๊ะแบบเดียวกัน · ในบริษัทจริง desks/<ชื่อ>/ = คอมของคนนั้น, .claude/skills/ = ~/.claude/skills/, company-kit/ = ไดรฟ์กลาง](img/lab1-folders.png)](img/lab1-folders.png)
 
 | โฟลเดอร์ | คืออะไร | Claude ทำอะไรกับมัน |
 |---|---|---|
@@ -278,9 +278,9 @@ desks/sales-nida/             desks/sales-nida/
 | `next` | งาน **ถัดไป** ที่มักทำต่อ | `[deal-approval, follow-up-email, req-to-spec]` |
 | `follows` | **นโยบาย** ที่ต้องทำตาม | `[customer-data-policy]` |
 
-### 1.3 ตัวอย่าง 3 โต๊ะ
+### 1.3 ตัวอย่าง 5 โต๊ะ
 
-ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง แต่ละคนมี 2 ภาพ: **ผังโฟลเดอร์ของโต๊ะหลังจบ LAB 1 ครบทุกไฟล์** (🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`) และ **หน้าเอกสารจริง** ที่เปิดด้วย Word / Excel
+ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง (นิดา · MD · จอย) และอีก 2 โต๊ะจากแผนกที่งานหน้าตาต่างออกไป (HR · ML) แต่ละคนมี 2 ภาพ: **ผังโฟลเดอร์ของโต๊ะหลังจบ LAB 1 ครบทุกไฟล์** (🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`) และ **หน้าเอกสารจริง** ที่เปิดด้วย Word / Excel
 
 > 📄 **ทำไมมีทั้ง .docx/.xlsx และ .md:** ในบริษัทจริงงานส่งกันเป็น Word / Excel Claude เขียนผลงานเป็น `.md` ตอนรัน แล้วเราแปลงเป็น Word / Excel ด้วย [`lab1-office-files.py`](_solution/tools/lab1-office-files.py) (เนื้อหาเดิมทุกตัวอักษร ตัวเลขใน Excel เป็นสูตร คำนวณได้ยอดตรงกับที่ Claude คิด) · ถ้าอยากให้ Claude ออกเป็น Word / Excel เอง เติมในพรอมต์ว่า "เก็บผลงานเป็นไฟล์ Word/Excel"
 
@@ -307,6 +307,22 @@ desks/sales-nida/             desks/sales-nida/
 [![deal-001-B-pricing-internal.xlsx เปิดด้วย Excel: ตารางคิดราคา (ภายใน) deal-001 ฉบับ B เข้างบ 4.8M คอลัมน์ รหัส รายการ ประเมิน จำนวนรวม buffer หน่วย ราคาต่อหน่วย ราคาขาย ต้นทุนต่อหน่วย ต้นทุน margin บรรทัด หมายเหตุ 13 รายการ ส่วนลดพิเศษ -619,000 รวมราคาขาย 4,800,000 ต้นทุน 3,497,500 margin 27.1% VAT 336,000 รวมทั้งสิ้น 5,136,000 ผู้อนุมัติ MD](img/lab1-doc-fin-joy.png)](img/lab1-doc-fin-joy.png)
 
 📂 ไฟล์จริง: [`pricing-internal.xlsx`](_solution/desks-after-lab1/fin-joy/work/deal-001-B-pricing-internal.xlsx) · [`quotation-draft.docx`](_solution/desks-after-lab1/fin-joy/work/deal-001-B-quotation-draft.docx) · [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`pricing-calc/`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+
+#### 🤝 ฟ้า หัวหน้าฝ่าย HR → `jd-writer`
+
+![โต๊ะของฟ้า หัวหน้าฝ่าย HR desks/hr-fah/ (2 นาที 10 วินาที): อ่าน people/hr/hr-fah.md, company-kit/jd-template.md, hr-benefits-faq.md, brand-guide.md, deal-001/ · .gitea-token · work/ มี NVT-JOB-2026-021-senior-fullstack.docx (Word ประกาศรับสมัคร 6 หัวข้อ เงินเดือน 75,000–105,000), NVT-JOB-2026-021-check.md ตารางตรวจตามกติกา และต้นฉบับ .md · .claude/skills/jd-writer/ มี SKILL.md, references/ (jd-rules.md, benefits.md, example-jd.md) · ไม่ใส่ชื่อธนาคารเพราะ NDA ไม่ระบุเพศหรืออายุ](img/lab1-desk-hr-fah.png)
+
+[![หน้าแรกของ NVT-JOB-2026-021-senior-fullstack.docx เปิดด้วย Word: หัวกระดาษ ประกาศรับสมัครงาน NVT-JOB-2026-021 · Senior Full-stack Developer โปรเจกต์ระบบจองคิวสาขาธนาคาร · สิ่งที่คุณจะได้ทำ · สิ่งที่เรามองหา · จะดีมากถ้ามี · ทีมและวิธีทำงาน](img/lab1-doc-hr-fah.png)](img/lab1-doc-hr-fah.png)
+
+📂 ไฟล์จริง: [`ประกาศ .docx`](_solution/desks-after-lab1/hr-fah/work/NVT-JOB-2026-021-senior-fullstack.docx) · [`work/`](_solution/desks-after-lab1/hr-fah/work/) · [`jd-writer/`](_solution/desks-after-lab1/hr-fah/skills/jd-writer/)
+
+#### 🤖 เจ หัวหน้าทีม ML → `mlflow-experiment`
+
+![โต๊ะของเจ หัวหน้าทีม ML desks/ml-jay/ (3 นาที 27 วินาที): อ่าน people/mlops/ml-jay.md, company-kit/ml-queue-forecast/experiment-results.csv, notes.md, deal-001/tor-bank-queue.md · .gitea-token · work/ มี experiment-registry.xlsx (Excel ทะเบียน run ทุกรอบ + แผน r02b r03b), 2026-W45-queue-forecast-experiments.docx (Word รายงานประจำสัปดาห์), experiment-registry.csv และต้นฉบับ .md · .claude/skills/mlflow-experiment/ มี SKILL.md, references/ (run-record-standard.md, queue-forecast-context.md, สำเนา data-policy-summary.md), assets/weekly-report-template.md, scripts/compare_runs.py · จับได้ว่า r03 ใช้ข้อมูลคนละชุดกับ r02 จึงให้แค่สถานะ candidate](img/lab1-desk-ml-jay.png)
+
+[![experiment-registry.xlsx เปิดด้วย Excel: ทะเบียนการทดลองโมเดลพยากรณ์คิวสาขา เกณฑ์ TOR MAPE ≤ 20% · r01 baseline-ma4w moving average ข้อมูล v3 40 สาขา MAPE 31.5 production · r02 gbm-base LightGBM v3 MAPE 19.8 superseded · r03 gbm-holiday LightGBM v4 38 สาขา MAPE 15.2 candidate · r02b และ r03b planned · สีพื้นแถวตามสถานะ](img/lab1-doc-ml-jay.png)](img/lab1-doc-ml-jay.png)
+
+📂 ไฟล์จริง: [`experiment-registry.xlsx`](_solution/desks-after-lab1/ml-jay/work/experiment-registry.xlsx) · [`รายงาน .docx`](_solution/desks-after-lab1/ml-jay/work/2026-W45-queue-forecast-experiments.docx) · [`work/`](_solution/desks-after-lab1/ml-jay/work/) · [`mlflow-experiment/`](_solution/desks-after-lab1/ml-jay/skills/mlflow-experiment/)
 
 > 📌 ในโฟลเดอร์เฉลย skill เก็บไว้ที่ `_solution/desks-after-lab1/<ชื่อ>/skills/` (ไม่มีจุดนำหน้า จะได้เปิดดูบน GitHub ง่าย) แต่ในโต๊ะจริงของผู้เรียนอยู่ที่ `desks/<ชื่อ>/.claude/skills/` ตามภาพ
 
