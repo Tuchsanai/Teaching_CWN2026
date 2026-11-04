@@ -1,5 +1,3 @@
-**3 โต๊ะหลัก** (ตัวเอกของ LAB 4–5)
-
 #### 💼 นิดา `sales-nida` → skill `sales-proposal`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sales-nida/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`skill`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/)
@@ -15,7 +13,12 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 สมชาย `md-somchai` → skill `deal-approval`
+<details>
+<summary>📋 ดูพรอมต์ที่อีก 23 คนได้รับ (ตามแผนก)</summary>
+
+**👔 MD / ผู้บริหาร**
+
+##### 👔 สมชาย `md-somchai` → skill `deal-approval`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/md-somchai/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/md-somchai/work/) · [`skill`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
 
@@ -30,25 +33,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🧾 จอย `fin-joy` → skill `pricing-calc`
-
-สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-joy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
-
-> ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)  
-> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md  
-> 1\. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales  
-> &emsp;ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/  
-> &emsp;เก็บผลงานไว้ใน work/  
-> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/  
-> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
-> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
-> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
-
-
-<details>
-<summary>👔 <b>MD / ผู้บริหาร</b> · <code>exec-ploy</code> · <code>cco-wit</code> · <code>cto-nat</code> · <code>cfo-ying</code></summary>
-
-#### 👔 พลอยไพลิน `exec-ploy` → skill `exec-deck`
+##### 👔 พลอยไพลิน `exec-ploy` → skill `exec-deck`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/exec-ploy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/exec-ploy/work/) · [`skill`](_solution/desks-after-lab1/exec-ploy/skills/exec-deck/)
 
@@ -63,7 +48,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 วิทย์ `cco-wit` → skill `pipeline-review`
+##### 👔 วิทย์ `cco-wit` → skill `pipeline-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cco-wit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cco-wit/work/) · [`skill`](_solution/desks-after-lab1/cco-wit/skills/pipeline-review/)
 
@@ -78,7 +63,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 ณัฐ `cto-nat` → skill `tech-risk-review`
+##### 👔 ณัฐ `cto-nat` → skill `tech-risk-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cto-nat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cto-nat/work/) · [`skill`](_solution/desks-after-lab1/cto-nat/skills/tech-risk-review/)
 
@@ -93,7 +78,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 หญิง `cfo-ying` → skill `cost-headcount-review`
+##### 👔 หญิง `cfo-ying` → skill `cost-headcount-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cfo-ying/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cfo-ying/work/) · [`skill`](_solution/desks-after-lab1/cfo-ying/skills/cost-headcount-review/)
 
@@ -108,12 +93,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**💼 Sales**
 
-<details>
-<summary>💼 <b>Sales</b> · <code>sales-krit</code></summary>
-
-#### 💼 กฤต `sales-krit` → skill `follow-up-email`
+##### 💼 กฤต `sales-krit` → skill `follow-up-email`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sales-krit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-krit/work/) · [`skill`](_solution/desks-after-lab1/sales-krit/skills/follow-up-email/)
 
@@ -128,12 +110,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧩 Presales / SA**
 
-<details>
-<summary>🧩 <b>Presales / SA</b> · <code>sa-ton</code> · <code>sa-ice</code></summary>
-
-#### 🧩 ต้นตระกูล `sa-ton` → skill `req-to-spec`
+##### 🧩 ต้นตระกูล `sa-ton` → skill `req-to-spec`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ton/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ton/work/) · [`skill`](_solution/desks-after-lab1/sa-ton/skills/req-to-spec/)
 
@@ -148,7 +127,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🧩 ไอศวรรย์ `sa-ice` → skill `arch-template`
+##### 🧩 ไอศวรรย์ `sa-ice` → skill `arch-template`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ice/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ice/work/) · [`skill`](_solution/desks-after-lab1/sa-ice/skills/arch-template/)
 
@@ -163,12 +142,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**📦 Product**
 
-<details>
-<summary>📦 <b>Product</b> · <code>pm-beam</code> · <code>pm-gift</code></summary>
-
-#### 📦 บีม `pm-beam` → skill `prd-writer`
+##### 📦 บีม `pm-beam` → skill `prd-writer`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-beam/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-beam/work/) · [`skill`](_solution/desks-after-lab1/pm-beam/skills/prd-writer/)
 
@@ -183,7 +159,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 📦 กิ๊ฟ `pm-gift` → skill `product-sunset`
+##### 📦 กิ๊ฟ `pm-gift` → skill `product-sunset`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-gift/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-gift/work/) · [`skill`](_solution/desks-after-lab1/pm-gift/skills/product-sunset/)
 
@@ -198,12 +174,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**💻 Dev**
 
-<details>
-<summary>💻 <b>Dev</b> · <code>dev-pond</code> · <code>dev-mew</code></summary>
-
-#### 💻 ปอนด์ `dev-pond` → skill `coding-standard`
+##### 💻 ปอนด์ `dev-pond` → skill `coding-standard`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-pond/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-pond/work/) · [`skill`](_solution/desks-after-lab1/dev-pond/skills/coding-standard/)
 
@@ -218,7 +191,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 💻 มิว `dev-mew` → skill `project-scaffold`
+##### 💻 มิว `dev-mew` → skill `project-scaffold`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-mew/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-mew/work/) · [`skill`](_solution/desks-after-lab1/dev-mew/skills/project-scaffold/)
 
@@ -233,12 +206,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧪 QA**
 
-<details>
-<summary>🧪 <b>QA</b> · <code>qa-mint</code> · <code>qa-bank</code></summary>
-
-#### 🧪 มินท์ `qa-mint` → skill `test-from-plan`
+##### 🧪 มินท์ `qa-mint` → skill `test-from-plan`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-mint/` ได้รับ · ผลจริง: [`skill`](_solution/desks-after-lab1/qa-mint/skills/test-from-plan/)
 
@@ -249,7 +219,7 @@
 > ห้ามแก้เนื้อหาขั้นตอนเดิม จบแล้วสรุปสั้น ๆ ว่าเติมอะไรและเพราะอะไร  
 
 
-#### 🧪 แบงค์ `qa-bank` → skill `bug-report`
+##### 🧪 แบงค์ `qa-bank` → skill `bug-report`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-bank/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/qa-bank/work/) · [`skill`](_solution/desks-after-lab1/qa-bank/skills/bug-report/)
 
@@ -264,12 +234,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**⚙️ DevOps**
 
-<details>
-<summary>⚙️ <b>DevOps</b> · <code>ops-art</code> · <code>ops-fon</code></summary>
-
-#### ⚙️ อาร์ต `ops-art` → skill `deploy-checklist`
+##### ⚙️ อาร์ต `ops-art` → skill `deploy-checklist`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-art/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-art/work/) · [`skill`](_solution/desks-after-lab1/ops-art/skills/deploy-checklist/)
 
@@ -284,7 +251,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### ⚙️ ฝน `ops-fon` → skill `postmortem`
+##### ⚙️ ฝน `ops-fon` → skill `postmortem`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-fon/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-fon/work/) · [`skill`](_solution/desks-after-lab1/ops-fon/skills/postmortem/)
 
@@ -299,12 +266,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🤖 ML / MLOps**
 
-<details>
-<summary>🤖 <b>ML / MLOps</b> · <code>ml-jay</code> · <code>ml-pim</code></summary>
-
-#### 🤖 เจ `ml-jay` → skill `mlflow-experiment`
+##### 🤖 เจ `ml-jay` → skill `mlflow-experiment`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-jay/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-jay/work/) · [`skill`](_solution/desks-after-lab1/ml-jay/skills/mlflow-experiment/)
 
@@ -319,7 +283,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🤖 พิมพ์ชนก `ml-pim` → skill `model-release`
+##### 🤖 พิมพ์ชนก `ml-pim` → skill `model-release`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-pim/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-pim/work/) · [`skill`](_solution/desks-after-lab1/ml-pim/skills/model-release/)
 
@@ -334,12 +298,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🤝 HR**
 
-<details>
-<summary>🤝 <b>HR</b> · <code>hr-fah</code> · <code>hr-oat</code></summary>
-
-#### 🤝 ฟ้า `hr-fah` → skill `jd-writer`
+##### 🤝 ฟ้า `hr-fah` → skill `jd-writer`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-fah/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-fah/work/) · [`skill`](_solution/desks-after-lab1/hr-fah/skills/jd-writer/)
 
@@ -354,7 +315,7 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🤝 โอ๊ต `hr-oat` → skill `onboarding-pack`
+##### 🤝 โอ๊ต `hr-oat` → skill `onboarding-pack`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-oat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-oat/work/) · [`skill`](_solution/desks-after-lab1/hr-oat/skills/onboarding-pack/)
 
@@ -369,12 +330,24 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧾 บัญชี / ธุรการ**
 
-<details>
-<summary>🧾 <b>บัญชี / ธุรการ</b> · <code>fin-nok</code></summary>
+##### 🧾 จอย `fin-joy` → skill `pricing-calc`
 
-#### 🧾 นก `fin-nok` → skill `invoice-check`
+สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-joy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+
+> ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)  
+> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
+
+##### 🧾 นก `fin-nok` → skill `invoice-check`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-nok/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-nok/work/) · [`skill`](_solution/desks-after-lab1/fin-nok/skills/invoice-check/)
 
@@ -389,12 +362,9 @@
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🏛️ ทีมกลาง (platform)**
 
-<details>
-<summary>🏛️ <b>ทีมกลาง (platform)</b> · <code>plat-may</code></summary>
-
-#### 🏛️ เมย์ `plat-may` → skill `customer-data-policy`
+##### 🏛️ เมย์ `plat-may` → skill `customer-data-policy`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/plat-may/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/plat-may/work/) · [`skill`](_solution/desks-after-lab1/plat-may/skills/customer-data-policy/)
 

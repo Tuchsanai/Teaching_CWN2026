@@ -30,6 +30,10 @@
 | ☐ | ต่ออินเทอร์เน็ตได้ (ครั้งแรกต้องดึง image `gitea/gitea`, `gitea/act_runner`, `node` ราว 1 GB) |
 | ☐ | เปิด **Claude Code** ที่โฟลเดอร์ [`novatech/`](novatech/) (ทุก LAB เริ่มที่นี่) |
 
+> 🖥️ **"เปิด Claude Code ที่โฟลเดอร์ X" ทำยังไง** ในแอป Claude Code: เลือกโฟลเดอร์ X · ใน terminal: `cd <ที่อยู่ของ X>` แล้วพิมพ์ `claude` · ทุก LAB ใช้ **โหมดขออนุญาตปกติ** (Ask permissions) ถ้า Claude ถามขอสิทธิ์ให้กดอนุญาต
+>
+> 🤖 **agent ย่อย** = Claude ตัวเล็กที่ Claude หลักเปิดขึ้นมาทำงานแทน เริ่มจากศูนย์ ไม่เห็นแชตหลัก เหมือนเปิดแชตใหม่ให้คนนั้น (ใช้ใน LAB 1 และ LAB 3)
+
 > 🧪 **หมายเหตุผู้สอน:** ผลจริงด้านล่างรันในสำเนาแยกที่ `C:/t/org05/novatech` (LAB 0 และ 5 โต๊ะใหม่ใน LAB 1 รันใหม่ที่ `C:/t/org05p/novatech`) ด้วย Claude Code (Opus 5.5) แบบไม่เชื่อม Chrome · พรอมต์เหมือนของผู้เรียนทุกตัวอักษร
 
 ---
@@ -44,7 +48,7 @@ LAB นี้ยังไม่แตะเรื่อง skill แค่ **เ
 
 ![GIF แนะนำบริษัทโนวาเทค: ① compose.yml ใบสั่งตั้งบริษัท 5 container gitea init runner seed cleanup ② คลิกขวา compose.yml ใน VS Code เลือก Compose Up ③ terminal แสดง novatech-gitea Healthy, init และ seed ทำงานเสร็จแล้วออก, runner Started, cleanup ลบตัวช่วย เหลือทำงาน 2 ตัว ④ เปิด localhost:3300 หน้าองค์กรโนวาเทค ยังไม่มี repository Members 29 Teams 13 ⑤ หน้าทีม 11 แผนก + leads ⑥ หน้าพนักงาน 1 บัญชี = 1 พนักงาน = 1 โต๊ะ · บริษัทพร้อมแล้ว 2 container 28 คน 12 ทีม 28 โต๊ะ](img/lab0-company-intro.gif)
 
-<sub>หน้าจอ VS Code และ terminal เป็นภาพจำลอง · หน้าเว็บ Gitea เป็นภาพหน้าจอจริงจากบริษัทที่เปิดด้วย compose.yml นี้</sub>
+<sub>ภาพนี้แค่ให้เห็นภาพรวม **ไม่ต้องทำตาม** ให้ใช้พรอมต์ในหัวข้อ 0.3 · หน้าจอ VS Code และ terminal เป็นภาพจำลอง · หน้าเว็บ Gitea เป็นภาพหน้าจอจริงจากบริษัทที่เปิดด้วย compose.yml นี้</sub>
 
 | หัวข้อ | ได้อะไร |
 |---|---|
@@ -94,7 +98,7 @@ LAB นี้ยังไม่แตะเรื่อง skill แค่ **เ
 
 🧑 **คิดก่อน** ถ้าพนักงานคนหนึ่งลาออกพรุ่งนี้ ความเก่งของเขาอยู่ที่ไหน
 
-💬 **พรอมต์** (เปิด Claude Code ที่โฟลเดอร์ [`novatech/`](novatech/) ในบทผู้ดูแลระบบ)
+💬 **พรอมต์** (เปิด Claude Code ที่โฟลเดอร์ [`novatech/`](novatech/) · ตอนนี้คุณเป็นผู้ดูแลระบบ ไม่ใช่พนักงานคนไหน)
 
 ![หน้าต่าง Claude Code วางพรอมต์ LAB 0](img/lab0-paste.png)
 
@@ -122,14 +126,19 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 
 > 🔁 `docker compose down` = ปิด (ข้อมูลอยู่) · `docker compose down -v` = **ลบทั้งบริษัท** เริ่มใหม่ · สั่ง `up -d` ซ้ำได้ แต่ token ของทุกคนจะถูกออกใหม่
 
-> 🧪 **หมายเหตุผู้สอน:** รอบนี้รันด้วย `claude -p` จึงเห็น `docker compose up` ใน log 3 ครั้ง (2 ครั้งแรกติดการขออนุญาต) ผู้เรียนที่ใช้ Claude Code ในแอปจะเห็นหน้าต่างขออนุญาต กดอนุญาตแล้วไปต่อได้เลย
+<details>
+<summary>🧪 หมายเหตุผู้สอน</summary>
+
+รอบนี้รันด้วย `claude -p` จึงเห็น `docker compose up` ใน log 3 ครั้ง (2 ครั้งแรกติดการขออนุญาต) ผู้เรียนที่ใช้ Claude Code ในแอปจะเห็นหน้าต่างขออนุญาต กดอนุญาตแล้วไปต่อได้เลย
+
+</details>
 
 ### 0.4 ตรวจว่าเปิดสำเร็จ
 
 | ✅ | ตรวจ | ควรเห็น |
 |---|---|---|
 | ☐ | `docker compose ps` | 2 แถว: `novatech-gitea` (healthy) และ `novatech-runner` |
-| ☐ | เปิด `http://localhost:3300` ล็อกอินด้วย `ADMIN_USER` / `ADMIN_PASSWORD` | องค์กร `novatech`: Members **29** (28 คน + แอดมิน) · Teams **13** · **0 repositories** |
+| ☐ | เปิด `http://localhost:3300` ล็อกอินด้วยค่า `ADMIN_USER=` / `ADMIN_PASSWORD=` ในไฟล์ `novatech/.env` (ไม่มีให้ดู `novatech/.env.example`) | องค์กร `novatech`: Members **29** (28 คน + แอดมิน) · Teams **13** (11 แผนก + `leads` + `Owners` ที่ Gitea สร้างเอง) · **0 repositories** |
 | ☐ | ล็อกอินเป็นพนักงาน: user = ชื่อในการ์ด (เช่น `sales-nida`) รหัส = `LAB_PASSWORD` | เห็นเฉพาะทีมของตัวเอง |
 | ☐ | เปิดโฟลเดอร์ `desks/` | 28 โฟลเดอร์ มี `.gitea-token` ทุกโต๊ะ |
 
@@ -194,7 +203,7 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 
 ## LAB 1 · 24 คนเก็บความเก่งของตัวเองเป็น skill ส่วนตัว 🤖 ×24
 
-![LAB 1 เก็บความเก่งของตัวเองเป็น skill ส่วนตัว: เกาะ 9 เกาะของแต่ละแผนก แต่ละคนเก็บความรู้ในหัวเป็นโฟลเดอร์ SKILL.md บนโต๊ะตัวเอง ไม่มีสะพานเชื่อมกัน](img/lab1-personal.png)
+![LAB 1 เก็บความเก่งของตัวเองเป็น skill ส่วนตัว: เกาะหลายเกาะของแต่ละแผนก แต่ละคนเก็บความรู้ในหัวเป็นโฟลเดอร์ SKILL.md บนโต๊ะตัวเอง ไม่มีสะพานเชื่อมกัน](img/lab1-personal.png)
 
 **LAB นี้ทำอะไร:** พนักงาน 24 คน **ต่างคนต่างทำ** ที่โต๊ะตัวเอง: ทำงานจริงของตัวเอง 1 ชิ้น แล้วเก็บวิธีทำเป็น skill ไว้ในเครื่องตัวเอง (แบบที่บริษัทส่วนใหญ่เริ่มต้น) ยังไม่มีใครแชร์ให้ใคร
 
@@ -250,6 +259,17 @@ desks/sales-nida/             desks/sales-nida/
 
 ![LAB 1 พรอมต์เต็มรายคน ตัวอย่างของนิดา: ① ฉันคือใคร ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย อ่านการ์ด ../../people/sales/sales-nida.md · ② ทำงานอะไร ร่าง proposal ให้ลูกค้าธนาคารตาม TOR ของ deal-001 ข้อมูลที่ใช้ ../../company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv เก็บไว้ใน work/ · ③ เก็บเป็น skill ชื่อ sales-proposal ที่ .claude/skills/sales-proposal/ · ตาราง desks/sales-nida/ → sales-proposal, desks/md-somchai/ → deal-approval, desks/fin-joy/ → pricing-calc · ครบ 24 คน 1 โต๊ะ = 1 แชตใหม่ = 1 พรอมต์ของคนนั้น](img/lab1-prompt.png)
 
+`metadata` ในหัวไฟล์คือ "การ์ดประจำตัว" ของ skill ที่ทีมกลางจะใช้จัดคลังและวาดกราฟ (ทฤษฎีหัวข้อ 21.1)
+
+| ช่อง | ความหมาย | ตัวอย่างของนิดา |
+|---|---|---|
+| `owner` | เจ้าของ skill | `sales-nida` |
+| `layer` | ชั้นของ skill ตอนนี้ทุกตัวเป็น `personal` | `personal` |
+| `version` | เลขเวอร์ชัน แก้แล้วต้องเพิ่ม | `1.0.0` |
+| `uses` | skill อื่นที่ **เรียกใช้** ระหว่างทำงาน | `[pricing-calc]` |
+| `next` | งาน **ถัดไป** ที่มักทำต่อ | `[deal-approval, follow-up-email, req-to-spec]` |
+| `follows` | **นโยบาย** ที่ต้องทำตาม | `[customer-data-policy]` |
+
 **วิธีรัน:** เปิด Claude Code ที่ `novatech/` แล้ววาง **พรอมต์รวมด้านล่างครั้งเดียว** Claude จะแตก **agent ย่อย 1 ตัวต่อ 1 โต๊ะ** แล้วส่งพรอมต์ของแต่ละคนให้เอง ถ้า Claude ขออนุญาตเขียนโฟลเดอร์ `.claude/skills/` ให้กดอนุญาต
 
 **💬 พรอมต์ (ก๊อปอันนี้อันเดียว)** · เปิด Claude Code ที่ `novatech/` · ได้ครบทุกคน
@@ -279,7 +299,7 @@ desks/sales-nida/             desks/sales-nida/
 - เจอปัญหาเดิมทุกอย่างเหมือนตอนวางทีละโต๊ะ: ทุกคนตีความ `uses` / `next` / `follows` ไม่ตรงกัน (Claude เสนอเองให้ `plat-ken` ออกกติกาหัวไฟล์) และ proposal ของนิดาก็ **ไม่มีภาคผนวก PDPA** เหมือนเดิม (→ 1.5)
 - 🧪 รอบแรกรันด้วย `claude -p` แล้วหยุดกลางทางหลัง 9 โต๊ะ เพราะโหมด `-p` ตัดงานเบื้องหลังหลัง 10 นาที จึงวางพรอมต์เดิมซ้ำ (พรอมต์ข้ามโต๊ะที่เสร็จแล้วเอง) ในแอป Claude Code ไม่มีข้อจำกัดนี้ · ถ้ารอบไหนค้างกลางทาง วางพรอมต์เดิมซ้ำได้เลย
 
-> ⏱️ **ไม่อยากรอทั้ง 24 คน** ทำเองแค่ 3 คนที่เป็นตัวเอกของ LAB ถัดไป (`sales-nida`, `md-somchai`, `fin-joy`) แล้วคัดลอกที่เหลือจากผลรันจริงด้วยคำสั่งนี้ (เปิด terminal ที่ `novatech/`) สคริปต์จะข้ามโต๊ะที่ทำเองแล้ว
+> ⏱️ **ไม่อยากรอทั้ง 24 คน** เติมบรรทัด `ทำเฉพาะโต๊ะ sales-nida, md-somchai, fin-joy` ท้ายพรอมต์รวม (3 คนนี้คือตัวเอกของ LAB 4–5) แล้วคัดลอกโต๊ะที่เหลือจากผลรันจริงด้วยคำสั่งนี้ (เปิด terminal ที่ `novatech/`) สคริปต์จะข้ามโต๊ะที่ทำเองแล้ว
 >
 > ```bash
 > node ../_solution/tools/copy-lab1-desks.mjs
@@ -288,8 +308,6 @@ desks/sales-nida/             desks/sales-nida/
 **👀 ตัวอย่าง: พรอมต์ที่ agent ย่อยของแต่ละโต๊ะได้รับ** (อ่านอย่างเดียว ไม่ต้องก๊อป พรอมต์รวมส่งให้เองแล้ว · ไฟล์จริงอยู่ใน [`_solution/lab1/prompts/`](_solution/lab1/prompts/))
 
 ทุกคนได้พรอมต์โครงเดียวกัน ต่างกันแค่ ① ฉันคือใคร ② ทำงานอะไรด้วยไฟล์ไหน ③ เก็บเป็น skill ชื่ออะไร (ตามภาพด้านบน)
-
-**3 โต๊ะหลัก** (ตัวเอกของ LAB 4–5)
 
 #### 💼 นิดา `sales-nida` → skill `sales-proposal`
 
@@ -306,7 +324,12 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 สมชาย `md-somchai` → skill `deal-approval`
+<details>
+<summary>📋 ดูพรอมต์ที่อีก 23 คนได้รับ (ตามแผนก)</summary>
+
+**👔 MD / ผู้บริหาร**
+
+##### 👔 สมชาย `md-somchai` → skill `deal-approval`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/md-somchai/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/md-somchai/work/) · [`skill`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
 
@@ -321,25 +344,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🧾 จอย `fin-joy` → skill `pricing-calc`
-
-สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-joy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
-
-> ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)  
-> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md  
-> 1\. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales  
-> &emsp;ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/  
-> &emsp;เก็บผลงานไว้ใน work/  
-> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/  
-> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
-> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
-> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
-
-
-<details>
-<summary>👔 <b>MD / ผู้บริหาร</b> · <code>exec-ploy</code> · <code>cco-wit</code> · <code>cto-nat</code> · <code>cfo-ying</code></summary>
-
-#### 👔 พลอยไพลิน `exec-ploy` → skill `exec-deck`
+##### 👔 พลอยไพลิน `exec-ploy` → skill `exec-deck`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/exec-ploy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/exec-ploy/work/) · [`skill`](_solution/desks-after-lab1/exec-ploy/skills/exec-deck/)
 
@@ -354,7 +359,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 วิทย์ `cco-wit` → skill `pipeline-review`
+##### 👔 วิทย์ `cco-wit` → skill `pipeline-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cco-wit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cco-wit/work/) · [`skill`](_solution/desks-after-lab1/cco-wit/skills/pipeline-review/)
 
@@ -369,7 +374,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 ณัฐ `cto-nat` → skill `tech-risk-review`
+##### 👔 ณัฐ `cto-nat` → skill `tech-risk-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cto-nat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cto-nat/work/) · [`skill`](_solution/desks-after-lab1/cto-nat/skills/tech-risk-review/)
 
@@ -384,7 +389,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 👔 หญิง `cfo-ying` → skill `cost-headcount-review`
+##### 👔 หญิง `cfo-ying` → skill `cost-headcount-review`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/cfo-ying/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cfo-ying/work/) · [`skill`](_solution/desks-after-lab1/cfo-ying/skills/cost-headcount-review/)
 
@@ -399,12 +404,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**💼 Sales**
 
-<details>
-<summary>💼 <b>Sales</b> · <code>sales-krit</code></summary>
-
-#### 💼 กฤต `sales-krit` → skill `follow-up-email`
+##### 💼 กฤต `sales-krit` → skill `follow-up-email`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sales-krit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-krit/work/) · [`skill`](_solution/desks-after-lab1/sales-krit/skills/follow-up-email/)
 
@@ -419,12 +421,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧩 Presales / SA**
 
-<details>
-<summary>🧩 <b>Presales / SA</b> · <code>sa-ton</code> · <code>sa-ice</code></summary>
-
-#### 🧩 ต้นตระกูล `sa-ton` → skill `req-to-spec`
+##### 🧩 ต้นตระกูล `sa-ton` → skill `req-to-spec`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ton/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ton/work/) · [`skill`](_solution/desks-after-lab1/sa-ton/skills/req-to-spec/)
 
@@ -439,7 +438,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🧩 ไอศวรรย์ `sa-ice` → skill `arch-template`
+##### 🧩 ไอศวรรย์ `sa-ice` → skill `arch-template`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ice/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ice/work/) · [`skill`](_solution/desks-after-lab1/sa-ice/skills/arch-template/)
 
@@ -454,12 +453,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**📦 Product**
 
-<details>
-<summary>📦 <b>Product</b> · <code>pm-beam</code> · <code>pm-gift</code></summary>
-
-#### 📦 บีม `pm-beam` → skill `prd-writer`
+##### 📦 บีม `pm-beam` → skill `prd-writer`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-beam/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-beam/work/) · [`skill`](_solution/desks-after-lab1/pm-beam/skills/prd-writer/)
 
@@ -474,7 +470,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 📦 กิ๊ฟ `pm-gift` → skill `product-sunset`
+##### 📦 กิ๊ฟ `pm-gift` → skill `product-sunset`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-gift/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-gift/work/) · [`skill`](_solution/desks-after-lab1/pm-gift/skills/product-sunset/)
 
@@ -489,12 +485,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**💻 Dev**
 
-<details>
-<summary>💻 <b>Dev</b> · <code>dev-pond</code> · <code>dev-mew</code></summary>
-
-#### 💻 ปอนด์ `dev-pond` → skill `coding-standard`
+##### 💻 ปอนด์ `dev-pond` → skill `coding-standard`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-pond/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-pond/work/) · [`skill`](_solution/desks-after-lab1/dev-pond/skills/coding-standard/)
 
@@ -509,7 +502,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 💻 มิว `dev-mew` → skill `project-scaffold`
+##### 💻 มิว `dev-mew` → skill `project-scaffold`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-mew/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-mew/work/) · [`skill`](_solution/desks-after-lab1/dev-mew/skills/project-scaffold/)
 
@@ -524,12 +517,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧪 QA**
 
-<details>
-<summary>🧪 <b>QA</b> · <code>qa-mint</code> · <code>qa-bank</code></summary>
-
-#### 🧪 มินท์ `qa-mint` → skill `test-from-plan`
+##### 🧪 มินท์ `qa-mint` → skill `test-from-plan`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-mint/` ได้รับ · ผลจริง: [`skill`](_solution/desks-after-lab1/qa-mint/skills/test-from-plan/)
 
@@ -540,7 +530,7 @@ desks/sales-nida/             desks/sales-nida/
 > ห้ามแก้เนื้อหาขั้นตอนเดิม จบแล้วสรุปสั้น ๆ ว่าเติมอะไรและเพราะอะไร  
 
 
-#### 🧪 แบงค์ `qa-bank` → skill `bug-report`
+##### 🧪 แบงค์ `qa-bank` → skill `bug-report`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-bank/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/qa-bank/work/) · [`skill`](_solution/desks-after-lab1/qa-bank/skills/bug-report/)
 
@@ -555,12 +545,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**⚙️ DevOps**
 
-<details>
-<summary>⚙️ <b>DevOps</b> · <code>ops-art</code> · <code>ops-fon</code></summary>
-
-#### ⚙️ อาร์ต `ops-art` → skill `deploy-checklist`
+##### ⚙️ อาร์ต `ops-art` → skill `deploy-checklist`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-art/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-art/work/) · [`skill`](_solution/desks-after-lab1/ops-art/skills/deploy-checklist/)
 
@@ -575,7 +562,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### ⚙️ ฝน `ops-fon` → skill `postmortem`
+##### ⚙️ ฝน `ops-fon` → skill `postmortem`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-fon/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-fon/work/) · [`skill`](_solution/desks-after-lab1/ops-fon/skills/postmortem/)
 
@@ -590,12 +577,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🤖 ML / MLOps**
 
-<details>
-<summary>🤖 <b>ML / MLOps</b> · <code>ml-jay</code> · <code>ml-pim</code></summary>
-
-#### 🤖 เจ `ml-jay` → skill `mlflow-experiment`
+##### 🤖 เจ `ml-jay` → skill `mlflow-experiment`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-jay/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-jay/work/) · [`skill`](_solution/desks-after-lab1/ml-jay/skills/mlflow-experiment/)
 
@@ -610,7 +594,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🤖 พิมพ์ชนก `ml-pim` → skill `model-release`
+##### 🤖 พิมพ์ชนก `ml-pim` → skill `model-release`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-pim/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-pim/work/) · [`skill`](_solution/desks-after-lab1/ml-pim/skills/model-release/)
 
@@ -625,12 +609,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🤝 HR**
 
-<details>
-<summary>🤝 <b>HR</b> · <code>hr-fah</code> · <code>hr-oat</code></summary>
-
-#### 🤝 ฟ้า `hr-fah` → skill `jd-writer`
+##### 🤝 ฟ้า `hr-fah` → skill `jd-writer`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-fah/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-fah/work/) · [`skill`](_solution/desks-after-lab1/hr-fah/skills/jd-writer/)
 
@@ -645,7 +626,7 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-#### 🤝 โอ๊ต `hr-oat` → skill `onboarding-pack`
+##### 🤝 โอ๊ต `hr-oat` → skill `onboarding-pack`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-oat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-oat/work/) · [`skill`](_solution/desks-after-lab1/hr-oat/skills/onboarding-pack/)
 
@@ -660,12 +641,24 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🧾 บัญชี / ธุรการ**
 
-<details>
-<summary>🧾 <b>บัญชี / ธุรการ</b> · <code>fin-nok</code></summary>
+##### 🧾 จอย `fin-joy` → skill `pricing-calc`
 
-#### 🧾 นก `fin-nok` → skill `invoice-check`
+สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-joy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+
+> ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)  
+> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
+
+##### 🧾 นก `fin-nok` → skill `invoice-check`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-nok/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-nok/work/) · [`skill`](_solution/desks-after-lab1/fin-nok/skills/invoice-check/)
 
@@ -680,12 +673,9 @@ desks/sales-nida/             desks/sales-nida/
 > จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
 
 
-</details>
+**🏛️ ทีมกลาง (platform)**
 
-<details>
-<summary>🏛️ <b>ทีมกลาง (platform)</b> · <code>plat-may</code></summary>
-
-#### 🏛️ เมย์ `plat-may` → skill `customer-data-policy`
+##### 🏛️ เมย์ `plat-may` → skill `customer-data-policy`
 
 สิ่งที่ agent ย่อยของโต๊ะ `desks/plat-may/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/plat-may/work/) · [`skill`](_solution/desks-after-lab1/plat-may/skills/customer-data-policy/)
 
@@ -702,22 +692,17 @@ desks/sales-nida/             desks/sales-nida/
 
 </details>
 
-> 🧪 **หมายเหตุผู้สอน:** ภาพและตารางใน 1.3–1.5 มาจากรอบแรกของบทนี้ ที่วางพรอมต์โครงเดียวกันแบบสั้น ([`prompt.txt`](_solution/lab1/prompt.txt)) ทีละโต๊ะ ส่วนพรอมต์รวมด้านบนรันจริงอีกรอบ ได้ผลแบบเดียวกัน ([ผลงานรอบพรอมต์รวม](_solution/lab1/combined-run/desks/))
+<details>
+<summary>🧪 หมายเหตุผู้สอน</summary>
 
-`metadata` ในหัวไฟล์คือ "การ์ดประจำตัว" ของ skill ที่ทีมกลางจะใช้จัดคลังและวาดกราฟ (ทฤษฎีหัวข้อ 21.1)
+ภาพและตารางใน 1.3–1.5 มาจากรอบแรกของบทนี้ ที่วางพรอมต์โครงเดียวกันแบบสั้น ([`prompt.txt`](_solution/lab1/prompt.txt)) ทีละโต๊ะ ส่วนพรอมต์รวมด้านบนรันจริงอีกรอบ ได้ผลแบบเดียวกัน ([ผลงานรอบพรอมต์รวม](_solution/lab1/combined-run/desks/))
 
-| ช่อง | ความหมาย | ตัวอย่างของนิดา |
-|---|---|---|
-| `owner` | เจ้าของ skill | `sales-nida` |
-| `layer` | ชั้นของ skill ตอนนี้ทุกตัวเป็น `personal` | `personal` |
-| `version` | เลขเวอร์ชัน แก้แล้วต้องเพิ่ม | `1.0.0` |
-| `uses` | skill อื่นที่ **เรียกใช้** ระหว่างทำงาน | `[pricing-calc]` |
-| `next` | งาน **ถัดไป** ที่มักทำต่อ | `[deal-approval, follow-up-email, req-to-spec]` |
-| `follows` | **นโยบาย** ที่ต้องทำตาม | `[customer-data-policy]` |
+</details>
+
 
 ### 1.3 ตัวอย่าง 5 โต๊ะ
 
-ผลรันจริงของ 3 โต๊ะที่ผู้เรียนต้องทำเอง (นิดา · MD · จอย) และอีก 2 โต๊ะจากแผนกที่งานหน้าตาต่างออกไป (HR · ML) แต่ละคนมี 2 ภาพ: **ผังโฟลเดอร์ของโต๊ะหลังจบ LAB 1 ครบทุกไฟล์** (🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`) และ **หน้าเอกสารจริง** ที่เปิดด้วย Word / Excel
+ผลรันจริงของ 3 โต๊ะหลัก (นิดา · MD · จอย) และอีก 2 โต๊ะจากแผนกที่งานหน้าตาต่างออกไป (HR · ML) แต่ละคนมี 2 ภาพ: **ผังโฟลเดอร์ของโต๊ะหลังจบ LAB 1 ครบทุกไฟล์** (🟧 ส้ม = ผลงานใน `work/` · 🟩 เขียว = skill ใน `.claude/skills/`) และ **หน้าเอกสารจริง** ที่เปิดด้วย Word / Excel
 
 > 📄 **ทำไมมีทั้ง .docx/.xlsx และ .md:** ในบริษัทจริงงานส่งกันเป็น Word / Excel Claude เขียนผลงานเป็น `.md` ตอนรัน แล้วเราแปลงเป็น Word / Excel ด้วย [`lab1-office-files.py`](_solution/tools/lab1-office-files.py) (เนื้อหาเดิมทุกตัวอักษร ตัวเลขใน Excel เป็นสูตร คำนวณได้ยอดตรงกับที่ Claude คิด) · ถ้าอยากให้ Claude ออกเป็น Word / Excel เอง เติมในพรอมต์ว่า "เก็บผลงานเป็นไฟล์ Word/Excel"
 
@@ -794,7 +779,12 @@ desks/sales-nida/             desks/sales-nida/
 | | `fin-nok` | `invoices/` | ตรวจใบแจ้งหนี้ เจอ VAT ผิด | `invoice-check` |
 | ทีมกลาง | `plat-may` | `customer-data-policy.md` | ตรวจใบแจ้งหนี้ตามกติกาข้อมูลลูกค้า | `customer-data-policy` |
 
-> 🧪 **หมายเหตุผู้สอน:** 19 โต๊ะแรกรันในรอบบริษัท 21 คน (พร้อมกันครั้งละ 10 แชต รวม 23 นาที 27 วินาที) ส่วน 5 โต๊ะใหม่ (Product 2 + ผู้บริหารสาย 3) รันทีหลังด้วย `claude -p` ซึ่งไม่มีหน้าต่างขออนุญาต 4 โต๊ะจึงหยุดรอสิทธิ์เขียน `.claude/` ผู้สอนวางไฟล์ skill ตามที่ Claude ร่างไว้ทุกตัวอักษร (ดึงจาก log) · ผู้เรียนที่ใช้แอปจะเห็นหน้าต่างขออนุญาต กดอนุญาตได้เลย
+<details>
+<summary>🧪 หมายเหตุผู้สอน</summary>
+
+19 โต๊ะแรกรันในรอบบริษัท 21 คน (พร้อมกันครั้งละ 10 แชต รวม 23 นาที 27 วินาที) ส่วน 5 โต๊ะใหม่ (Product 2 + ผู้บริหารสาย 3) รันทีหลังด้วย `claude -p` ซึ่งไม่มีหน้าต่างขออนุญาต 4 โต๊ะจึงหยุดรอสิทธิ์เขียน `.claude/` ผู้สอนวางไฟล์ skill ตามที่ Claude ร่างไว้ทุกตัวอักษร (ดึงจาก log) · ผู้เรียนที่ใช้แอปจะเห็นหน้าต่างขออนุญาต กดอนุญาตได้เลย
+
+</details>
 
 ### 1.5 ผลที่เห็น: 3 ปัญหาของ "ต่างคนต่างเก็บ"
 
@@ -838,7 +828,7 @@ desks/sales-nida/             desks/sales-nida/
 | ② จัดเป็นคลังเดียว | ทำคลัง `org-skills` ในโต๊ะของเคน: 1 แผนก = 1 plugin · ของที่ทุกคนใช้รวมไว้ใน `core` · ทำหัวไฟล์ให้เหมือนกันทั้งคลัง | คลังเดียวที่ทุกคนใช้ร่วมกัน ไม่มีสำเนาซ้ำ |
 | ③ ขึ้น Gitea | push คลังขึ้น `localhost:3300/novatech/org-skills` แล้วตั้งยามให้ branch `main` | ทุกโต๊ะดึงไปติดตั้งได้ (LAB 3) · แก้ได้ทาง PR เท่านั้น (LAB 5) |
 
-> 📦 **plugin marketplace คืออะไร** คลัง Git ที่มีสารบัญ `marketplace.json` บอกว่ามี **plugin** (แพ็ก skill) อะไรบ้าง ติดตั้งทีละแพ็กด้วย `claude plugin install <ชื่อ>@novatech-skills` เช่น ฝ่ายขายติดตั้ง `core` + `sales` ได้ skill 6 ตัวในคำสั่งเดียว
+> 📦 **plugin marketplace คืออะไร** คลัง Git ที่มีสารบัญ `marketplace.json` บอกว่ามี **plugin** (แพ็ก skill) อะไรบ้าง ติดตั้งทีละแพ็กด้วย `claude plugin install <ชื่อ>@novatech-skills` · `org-skills` = ชื่อ repo บน Gitea · `novatech-skills` = ชื่อคลังที่ Claude Code รู้จัก (เขียนไว้ใน `marketplace.json`) เช่น ฝ่ายขายติดตั้ง `core` + `sales` ได้ skill 6 ตัวในคำสั่งเดียว
 
 🧑 **คิดก่อน** จากปัญหา 1 ใน LAB 1 (ความรู้เดียวกันถูกคัดลอกไว้หลายที่) ของที่ซ้ำกันควรไปอยู่ชั้นไหน (ทฤษฎีหัวข้อ 21 ตาราง 5 ชั้น) และใครควรเป็นคนรีวิว skill ของแต่ละแผนก
 
@@ -846,11 +836,11 @@ desks/sales-nida/             desks/sales-nida/
 
 [![LAB 2 จากทุกโต๊ะเป็นคลังเดียว: ก่อน ต่างคนต่างเก็บ desks/sales-nida/.claude/skills/sales-proposal/, sales-krit follow-up-email, md-somchai deal-approval, fin-joy pricing-calc, hr-fah jd-writer, ml-jay mlflow-experiment, plat-may customer-data-policy และโต๊ะอื่นทุกโต๊ะ → plat-ken อ่านอย่างเดียว → หลัง desks/plat-ken/org-skills/ มี .claude-plugin/marketplace.json สารบัญ 11 plugin · plugins/core/skills/ ชั้น 1 ทุกคนติดตั้ง customer-data-policy brand-guide pricing-rules skill-finder · shared/skills/ ชั้น 2 meeting-minutes · sales exec finance hr mlops sa dev qa devops ชั้น 3 แผนกละ 2 skill · .gitea/CODEOWNERS · scripts/build.py · push ขึ้น http://localhost:3300/novatech/org-skills · main ห้าม push ตรง ต้องผ่าน PR approve อย่างน้อย 1 คน](img/lab2-before-after.png)](img/lab2-before-after.png)
 
-| ชั้น | plugin | ใครติดตั้ง | ใครรีวิว (CODEOWNER) |
-|---|---|---|---|
-| 1 · องค์กร | `core` | **ทุกคน** | `plat-ken` (+ เจ้าของเรื่อง `plat-may`, `fin-joy`) |
-| 2 · ข้ามแผนก | `shared` | ทุกแผนกที่ต้องใช้ | `plat-ken` |
-| 3 · แผนก | `sales` · `exec` · `finance` · `hr` · `mlops` · `sa` · `dev` · `qa` · `devops` | คนในแผนกนั้น | หัวหน้าแผนก 👑 |
+| ชั้น | `layer` ในหัวไฟล์ | plugin | ใครติดตั้ง | ใครรีวิว (CODEOWNER) |
+|---|---|---|---|---|
+| 1 · องค์กร | `core` | `core` | **ทุกคน** | `plat-ken` (+ เจ้าของเรื่อง `plat-may`, `fin-joy`) |
+| 2 · ข้ามแผนก | `shared` | `shared` | ทุกแผนกที่ต้องใช้ | `plat-ken` |
+| 3 · แผนก | `department` | `sales` · `exec` · `finance` · `hr` · `mlops` · `sa` · `dev` · `qa` · `devops` (+ `product` ในบริษัท 28 คน) | คนในแผนกนั้น | หัวหน้าแผนก 👑 |
 
 ### 2.2 พรอมต์
 
@@ -883,9 +873,16 @@ desks/sales-nida/             desks/sales-nida/
 | 5 validate | Claude Code อ่านคลังได้จริง ก่อนให้คนอื่นติดตั้ง |
 | 6–7 push + ยามของ main | ของจริงมีที่เดียวบน Gitea · ห้ามใครแก้ตรง ต้องผ่าน PR (ทฤษฎีหัวข้อ 22.2) |
 
-> 🧪 **หมายเหตุผู้สอน:** ผลจริงด้านล่างรันด้วยพรอมต์ถ้อยคำเดิมแบบย่อหน้าเดียว ([`prompt.txt`](_solution/lab2/prompt.txt)) ในรอบบริษัท 21 คน (9 แผนก ยังไม่มีทีม Product) พรอมต์ด้านบนเรียงงานเดียวกันเป็นขั้น และเพิ่มคำว่า "อ่านอย่างเดียว" ให้ชัด (รอบจริง Claude ก็ไม่ได้แก้โต๊ะของใคร) ยังไม่ได้รันด้วยถ้อยคำใหม่
+<details>
+<summary>🧪 หมายเหตุผู้สอน</summary>
+
+ผลจริงด้านล่างรันด้วยพรอมต์ถ้อยคำเดิมแบบย่อหน้าเดียว ([`prompt.txt`](_solution/lab2/prompt.txt)) ในรอบบริษัท 21 คน (9 แผนก ยังไม่มีทีม Product) พรอมต์ด้านบนเรียงงานเดียวกันเป็นขั้น และเพิ่มคำว่า "อ่านอย่างเดียว" ให้ชัด (รอบจริง Claude ก็ไม่ได้แก้โต๊ะของใคร) ยังไม่ได้รันด้วยถ้อยคำใหม่
+
+</details>
 
 ### 2.3 ผลจริง
+
+> ⚠️ **ผลด้านล่างมาจากรอบบริษัท 21 คน** (9 แผนก ยังไม่มีทีม Product) · ถ้าคุณรันกับบริษัท 28 คน ควรได้ **12 plugin** (มี `product` เพิ่ม) และ `exec` มี 5 skill (MD · ผู้ช่วย · ผู้บริหารสาย 3 คน) ตัวเลขอื่นต่างได้
 
 ✅ **ผลจริง: ~13 นาที · 57 คำสั่ง · 11 plugin · 23 skill** ([คำตอบเต็มของ Claude](_solution/lab2/claude-summary.md) · [คลังที่ได้](_solution/org-skills-after-lab2/))
 
@@ -904,6 +901,8 @@ Claude รวมอะไรเป็น `core` และเพราะอะ�
 | `customer-data-policy` | สรุป PDPA คนละแบบ 8 skill | เหลือที่เดียว กติกาเฉพาะงานที่มีแค่ในบางสำเนาย้ายเป็นตาราง `doc-type-rules.md` ไม่มีข้อไหนหาย |
 | `brand-guide` | กติกาแบรนด์ 7 skill | ใช้คู่มือฉบับเต็มกับโลโก้ชุดเดียว |
 | `pricing-rules` | `price-list.csv` 3 สำเนาที่ **เหมือนกันทุกไบต์** + กฎกำไร 3 ชุด (sales, finance, exec) | สคริปต์คิดราคา 3 ตัวแก้ให้อ่านราคาจาก core ที่เดียว ทดสอบแล้วตัวเลขตรง (755,000 บาท · margin 36.8%) |
+
+> 🔢 ตัวเลขนับคนละแบบ: LAB 1 นับ skill ที่มีกติกาข้อมูลลูกค้าปนอยู่ (14 จาก 19 โต๊ะ) ตารางนี้นับ skill ที่ Claude ใน LAB 2 พบว่ามีไฟล์สรุป PDPA เป็นสำเนา (8 skill) ส่วน 12 ไฟล์ด้านล่างคือไฟล์สำเนาที่ลบได้ทั้งไฟล์ รวมทุกเรื่อง (PDPA แบรนด์ ราคา)
 
 และ **ลบไฟล์สำเนาทิ้ง 12 ไฟล์** skill ในแผนกเปลี่ยนไปอ้าง core ผ่าน `follows` แทน · หัวไฟล์ทุกตัวเป็นแบบเดียวกัน (เทียบกับ LAB 1 ปัญหา 2)
 
@@ -941,7 +940,22 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 - Claude บอกเองว่า skill ที่เขียนใหม่ใน core (`brand-guide`, `pricing-rules`) **ควรให้เจ้าของเรื่องรีวิว** (`plat-may`, `fin-joy`) — AI ร่างได้ แต่คนต้องตรวจ (ทฤษฎีหัวข้อ 15)
 - คำอธิบาย repo ในหน้า Gitea เป็นตัวอ่านไม่ออก เพราะส่งภาษาไทยผ่าน `curl` บน Windows โดยไม่ได้ตั้ง UTF-8 (ตัว repo และไฟล์ไม่เป็นอะไร)
 
-> 🧪 **หมายเหตุผู้สอน:** รอบแรก LAB 2 สร้าง repo ไม่ได้ เพราะ `seed` ออก token ให้ทีมกลางแค่สิทธิ์เขียน repo ไม่มีสิทธิ์สร้าง repo ในองค์กร Claude **หยุดและถาม** แทนที่จะเอารหัสผ่านใน `.env` ไปออก token สิทธิ์สูงกว่าเอง ([บันทึกรอบแรก](_solution/lab2/attempt1-blocked-token.md)) · แก้ `seed` ให้ทีมกลางได้ `write:organization` แล้วรัน LAB 2 ใหม่ทั้งหมด ผลด้านบนคือรอบที่ 2
+<details>
+<summary>🧪 หมายเหตุผู้สอน</summary>
+
+รอบแรก LAB 2 สร้าง repo ไม่ได้ เพราะ `seed` ออก token ให้ทีมกลางแค่สิทธิ์เขียน repo ไม่มีสิทธิ์สร้าง repo ในองค์กร Claude **หยุดและถาม** แทนที่จะเอารหัสผ่านใน `.env` ไปออก token สิทธิ์สูงกว่าเอง ([บันทึกรอบแรก](_solution/lab2/attempt1-blocked-token.md)) · แก้ `seed` ให้ทีมกลางได้ `write:organization` แล้วรัน LAB 2 ใหม่ทั้งหมด ผลด้านบนคือรอบที่ 2
+
+</details>
+
+### 2.5 ตรวจเองว่าขึ้น Gitea สำเร็จ
+
+| ✅ | ตรวจที่ | ควรเห็น |
+|---|---|---|
+| ☐ | `http://localhost:3300/novatech/org-skills` | repo มีโฟลเดอร์ `plugins/` แยกแผนก และ `.claude-plugin/marketplace.json` |
+| ☐ | ไฟล์ `.gitea/CODEOWNERS` | `plugins/sales/` → `@sales-nida` และหัวหน้าแผนกอื่นครบ |
+| ☐ | Settings → Branches | มีกติกาของ `main` (ห้าม push ตรง · approve อย่างน้อย 1 คน) |
+
+> **สรุป LAB 2:** ตอนนี้ skill ของทุกคนมี **ที่เดียว** บน Gitea แล้ว ซ้ำกันน้อยลง หัวไฟล์เป็นแบบเดียวกัน แต่ **ยังไม่มีใครติดตั้งไปใช้** → LAB 3 ทุกโต๊ะติดตั้งแพ็กของแผนกตัวเอง
 
 ---
 

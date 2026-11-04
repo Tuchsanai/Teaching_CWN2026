@@ -70,7 +70,7 @@ const prompt = `<html><head><meta charset="utf-8"><style>${css}
 .tbl code{font-size:18px}
 </style></head><body>
 <h1>LAB 1 · พรอมต์เต็มรายคน</h1>
-<div class="sub">ทุกคนใช้โครงเดียวกัน ต่างกันแค่ช่องที่ไฮไลต์ · ตัวอย่างพรอมต์ของนิดา (วางที่ <code>novatech/desks/sales-nida/</code>)</div>
+<div class="sub">สิ่งที่ agent ย่อยของแต่ละโต๊ะได้รับ: โครงเดียวกัน ต่างกันแค่ช่องที่ไฮไลต์ · ตัวอย่างของนิดา</div>
 <div class="pr">
 <span class="l">${hl(B, 'ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย ฝ่าย Sales')} · นี่คือโต๊ะของฉัน (novatech/desks/sales-nida/)</span>
 <span class="l">อ่านการ์ดของฉันก่อน: ${hl(B, '../../people/sales/sales-nida.md')}</span>
@@ -87,11 +87,11 @@ const prompt = `<html><head><meta charset="utf-8"><style>${css}
 <div class="k" style="background:${O}"><b>② ทำงานอะไร</b><br>งาน 1 ชิ้น + ไฟล์ข้อมูลใน company-kit</div>
 <div class="k" style="background:${G}"><b>③ เก็บเป็น skill ชื่ออะไร</b><br>ชื่อ skill + โฟลเดอร์ .claude/skills/</div>
 </div>
-<table class="tbl"><tr><th>เปิด Claude Code ที่</th><th>② งาน</th><th>③ skill</th></tr>
+<table class="tbl"><tr><th>agent ย่อยทำงานที่</th><th>② งาน</th><th>③ skill</th></tr>
 <tr><td><code>desks/sales-nida/</code></td><td>ร่าง proposal ธนาคาร + ใบคิดราคา</td><td><code>sales-proposal</code></td></tr>
 <tr><td><code>desks/md-somchai/</code></td><td>พิจารณาดีล DS-2026-034 (+ โน้ตลับ notes/)</td><td><code>deal-approval</code></td></tr>
 <tr><td><code>desks/fin-joy/</code></td><td>คิดราคาและกำไร deal-001</td><td><code>pricing-calc</code></td></tr>
-<tr><td colspan="3" style="color:#475569">… ครบ 24 คน · <b>1 โต๊ะ = 1 แชตใหม่ = 1 พรอมต์ของคนนั้น</b></td></tr></table>
+<tr><td colspan="3" style="color:#475569">… ครบ 24 คน · คุณวาง<b>พรอมต์รวมครั้งเดียว</b>ที่ <code>novatech/</code> แล้ว Claude แตก agent ย่อย 1 ตัวต่อ 1 โต๊ะ ส่งพรอมต์แบบนี้ให้เอง</td></tr></table>
 <div class="foot"></div>
 </body></html>`;
 

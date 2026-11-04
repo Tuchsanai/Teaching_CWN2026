@@ -78,10 +78,11 @@ out = ROOT / '_solution/lab1/prompts'; out.mkdir(exist_ok=True)
 users = [u for t in ORDER for u in people if people[u]['team'] == t and (u in TASKS or u == 'qa-mint')]
 for u in users:
     (out / f'{u}.txt').write_text(prompt(u), encoding='utf-8')
-md = ['**3 โต๊ะหลัก** (ตัวเอกของ LAB 4–5)\n'] + [block(u) for u in MAIN]
+md = [block('sales-nida')]
+rest = []
 for t in ORDER:
-    rest = [u for u in users if people[u]['team'] == t and u not in MAIN]
-    if not rest: continue
-    md.append(f"<details>\n<summary>{icon[t]} <b>{dept[t]}</b> · {' · '.join(f'<code>{u}</code>' for u in rest)}</summary>\n\n" + '\n'.join(block(u) for u in rest) + "\n</details>\n")
+    us = [u for u in users if people[u]['team'] == t and u != 'sales-nida']
+    if us: rest.append(f"**{icon[t]} {dept[t]}**\n\n" + '\n'.join(block(u, '#####') for u in us))
+md.append("<details>\n<summary>📋 ดูพรอมต์ที่อีก 23 คนได้รับ (ตามแผนก)</summary>\n\n" + '\n'.join(rest) + "\n</details>\n")
 (out / 'README-block.md').write_text('\n'.join(md), encoding='utf-8')
 print(len(users), 'prompts')
