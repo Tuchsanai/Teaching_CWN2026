@@ -1,7 +1,7 @@
 # พรอมต์ LAB 1 แบบเต็มรายคน (24 โต๊ะ): แต่ละพรอมต์บอกชัดว่าเป็นใคร ทำงานอะไร ใช้ไฟล์ไหน และเก็บ skill ชื่ออะไรไว้ที่ไหน
 # งานของแต่ละคน = งานที่ Claude เลือกจากการ์ดตอนรันจริง (ผลอยู่ใน _solution/desks-after-lab1/<user>/work/)
 # python lab1-prompts.py  → _solution/lab1/prompts/<user>.txt + _solution/lab1/prompts/README-block.md
-import json
+import json, re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,19 +55,30 @@ def prompt(u):
                    f"   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill\n"
                    f"จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง\n")
 
+def quoted(text):
+    """แสดงพรอมต์เป็นข้อความอ้างอิง (blockquote) แทน code block เพื่อไม่ให้มีปุ่มก๊อปบน GitHub · เป็นตัวอย่างให้อ่าน ไม่ใช่ให้วาง"""
+    lines = []
+    for l in text.rstrip('\n').split('\n'):
+        ind = len(l) - len(l.lstrip(' '))
+        l = l.lstrip(' ')
+        l = re.sub(r'^(\d+)\. ', r'\1\. ', l)          # กัน markdown แปลงเป็นรายการลำดับ
+        l = re.sub(r'^- ', r'\- ', l)
+        lines.append('> ' + '&emsp;' * (ind // 3) + l + '  ')
+    return '\n'.join(lines) + '\n'
+
 def block(u, level='####'):
     p = people[u]
     return (f"{level} {icon[p['team']]} {p['name'].split()[0]} `{u}` → skill `{p['skill']}`\n\n"
-            f"▶ เปิด Claude Code ที่ `novatech/desks/{u}/` · แชตใหม่ · ผลจริง: "
+            f"สิ่งที่ agent ย่อยของโต๊ะ `desks/{u}/` ได้รับ · ผลจริง: "
             + (f"[`work/`](_solution/desks-after-lab1/{u}/work/) · " if (ROOT / f'_solution/desks-after-lab1/{u}/work').exists() else '')
             + f"[`skill`](_solution/desks-after-lab1/{u}/skills/{p['skill']}/)\n\n"
-            f"```text\n{prompt(u)}```\n")
+            f"{quoted(prompt(u))}\n")
 
 out = ROOT / '_solution/lab1/prompts'; out.mkdir(exist_ok=True)
 users = [u for t in ORDER for u in people if people[u]['team'] == t and (u in TASKS or u == 'qa-mint')]
 for u in users:
     (out / f'{u}.txt').write_text(prompt(u), encoding='utf-8')
-md = ['**3 โต๊ะที่ต้องทำเอง** (ตัวเอกของ LAB 4–5)\n'] + [block(u) for u in MAIN]
+md = ['**3 โต๊ะหลัก** (ตัวเอกของ LAB 4–5)\n'] + [block(u) for u in MAIN]
 for t in ORDER:
     rest = [u for u in users if people[u]['team'] == t and u not in MAIN]
     if not rest: continue

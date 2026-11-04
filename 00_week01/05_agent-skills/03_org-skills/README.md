@@ -40,6 +40,12 @@
 
 LAB นี้ยังไม่แตะเรื่อง skill แค่ **เปิดบริษัทจำลองด้วยพรอมต์ประโยคเดียว** (ใช้เวลาราว 1 นาที) แล้วทำความรู้จักว่าในบริษัทมีอะไร มีใคร และเราจะเล่นเป็นใคร
 
+🎬 **ดูภาพรวมใน 19 วินาที:** เปิด `compose.yml` ใน VS Code → คลิกขวา **Compose Up** → container ขึ้นมา → เปิดเว็บ Gitea ของบริษัท (องค์กร · ทีม · พนักงาน)
+
+![GIF แนะนำบริษัทโนวาเทค: ① compose.yml ใบสั่งตั้งบริษัท 5 container gitea init runner seed cleanup ② คลิกขวา compose.yml ใน VS Code เลือก Compose Up ③ terminal แสดง novatech-gitea Healthy, init และ seed ทำงานเสร็จแล้วออก, runner Started, cleanup ลบตัวช่วย เหลือทำงาน 2 ตัว ④ เปิด localhost:3300 หน้าองค์กรโนวาเทค ยังไม่มี repository Members 29 Teams 13 ⑤ หน้าทีม 11 แผนก + leads ⑥ หน้าพนักงาน 1 บัญชี = 1 พนักงาน = 1 โต๊ะ · บริษัทพร้อมแล้ว 2 container 28 คน 12 ทีม 28 โต๊ะ](img/lab0-company-intro.gif)
+
+<sub>หน้าจอ VS Code และ terminal เป็นภาพจำลอง · หน้าเว็บ Gitea เป็นภาพหน้าจอจริงจากบริษัทที่เปิดด้วย compose.yml นี้</sub>
+
 | หัวข้อ | ได้อะไร |
 |---|---|
 | [0.1](#01-แล็บนี้จำลองอะไร) | บริษัทจริงมีอะไร → ในแล็บแทนด้วยอะไร |
@@ -195,7 +201,7 @@ Claude ตอบเป็นตาราง 3 สาย 11 แผนก ชี�
 | หัวข้อ | ได้อะไร |
 |---|---|
 | [1.1](#11-ของแต่ละคนอยู่ที่ไหน-สำคัญ) | 📁 อ่านจากโฟลเดอร์ไหน เขียนลงโฟลเดอร์ไหน |
-| [1.2](#12-พรอมต์ของแต่ละคน-24-พรอมต์) | 💬 พรอมต์รวม (ก๊อปครั้งเดียวได้ทุกคน) + ตัวอย่างพรอมต์ของแต่ละคน |
+| [1.2](#12-พรอมต์ของแต่ละคน-24-พรอมต์) | 💬 พรอมต์รวม (ก๊อปอันเดียวได้ทุกคน) + ตัวอย่างพรอมต์ที่แต่ละคนได้รับ |
 | [1.3](#13-ตัวอย่าง-5-โต๊ะ) | 👀 ผลจริงของนิดา · MD · จอย · HR · ML |
 | [1.4](#14-ทุกคนทำงานอะไร-ผลจริง-24-โต๊ะ) | 📋 ทั้ง 24 คนทำงานอะไร ได้ skill อะไร |
 | [1.5](#15-ผลที่เห็น-3-ปัญหาของ-ต่างคนต่างเก็บ) | ⚠️ 3 ปัญหาที่จะแก้ใน LAB ถัดไป |
@@ -244,16 +250,9 @@ desks/sales-nida/             desks/sales-nida/
 
 ![LAB 1 พรอมต์เต็มรายคน ตัวอย่างของนิดา: ① ฉันคือใคร ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย อ่านการ์ด ../../people/sales/sales-nida.md · ② ทำงานอะไร ร่าง proposal ให้ลูกค้าธนาคารตาม TOR ของ deal-001 ข้อมูลที่ใช้ ../../company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv เก็บไว้ใน work/ · ③ เก็บเป็น skill ชื่อ sales-proposal ที่ .claude/skills/sales-proposal/ · ตาราง desks/sales-nida/ → sales-proposal, desks/md-somchai/ → deal-approval, desks/fin-joy/ → pricing-calc · ครบ 24 คน 1 โต๊ะ = 1 แชตใหม่ = 1 พรอมต์ของคนนั้น](img/lab1-prompt.png)
 
-**วิธีรัน: เลือก 1 ใน 2 ทาง**
+**วิธีรัน:** เปิด Claude Code ที่ `novatech/` แล้ววาง **พรอมต์รวมด้านล่างครั้งเดียว** Claude จะแตก **agent ย่อย 1 ตัวต่อ 1 โต๊ะ** แล้วส่งพรอมต์ของแต่ละคนให้เอง ถ้า Claude ขออนุญาตเขียนโฟลเดอร์ `.claude/skills/` ให้กดอนุญาต
 
-| ทาง | ใช้เมื่อ | ทำยังไง |
-|---|---|---|
-| 🅰️ **พรอมต์รวม** (แนะนำ) | อยากได้ครบ 24 คนในครั้งเดียว | เปิด Claude Code ที่ `novatech/` วางพรอมต์รวมครั้งเดียว Claude แตก **agent ย่อย 1 ตัวต่อ 1 โต๊ะ** ให้เอง |
-| 🅱️ **ทีละโต๊ะ** | อยากเห็นการทำงานของคนเดียวชัด ๆ | เปิด Claude Code ที่ `novatech/desks/<ชื่อ>/` เริ่มแชตใหม่ แล้ววางพรอมต์ของคนนั้น |
-
-ทั้ง 2 ทางถ้า Claude ขออนุญาตเขียนโฟลเดอร์ `.claude/skills/` ให้กดอนุญาต
-
-**💬 🅰️ พรอมต์รวม: ก๊อปวางครั้งเดียว ได้ทุกคน** (เปิด Claude Code ที่ `novatech/`)
+**💬 พรอมต์ (ก๊อปอันนี้อันเดียว)** · เปิด Claude Code ที่ `novatech/` · ได้ครบทุกคน
 
 ![หน้าต่าง Claude Code วางพรอมต์ LAB 1](img/lab1-paste.png)
 
@@ -270,7 +269,7 @@ desks/sales-nida/             desks/sales-nida/
 | ส่วนของพรอมต์ | มีไว้ทำไม |
 |---|---|
 | agent ย่อย 1 ตัวต่อ 1 คน | agent ย่อยเริ่มจากศูนย์ ไม่เห็นแชตหลัก = **แชตใหม่ของคนนั้น** งานของนิดาจึงไม่ปนกับของ MD |
-| ส่งพรอมต์ของคนนั้นทุกตัวอักษร | ได้งานและ skill แบบเดียวกับวางทีละโต๊ะ (🅱️) |
+| ส่งพรอมต์ของคนนั้นทุกตัวอักษร | แต่ละคนได้งานและ skill ของตัวเอง (ดูตัวอย่างพรอมต์รายคนด้านล่าง) |
 | เขียนได้เฉพาะโต๊ะตัวเอง · ห้ามเปิด `_solution/` | เหมือนพนักงานจริงที่ใช้คอมของตัวเอง และ `_solution/` มีผลงานเฉลยของทุกคนอยู่ |
 | ครั้งละ 4 ตัว | ไม่ให้เครื่องหนักหรือโควตาหมดกลางทาง |
 | ข้ามโต๊ะที่มี skill แล้ว | สั่งซ้ำได้ ถ้ารอบแรกค้างกลางทาง ไม่ทับงานที่ทำเสร็จแล้ว |
@@ -281,124 +280,119 @@ desks/sales-nida/             desks/sales-nida/
 > node ../_solution/tools/copy-lab1-desks.mjs
 > ```
 
-**💬 🅱️ พรอมต์รายคน: ตัวอย่างของแต่ละคน** (พรอมต์รวมส่งไฟล์ชุดนี้ให้ agent ย่อย · ใช้วางทีละโต๊ะได้ด้วย · ไฟล์ `.txt` อยู่ใน [`_solution/lab1/prompts/`](_solution/lab1/prompts/))
+**👀 ตัวอย่าง: พรอมต์ที่ agent ย่อยของแต่ละโต๊ะได้รับ** (อ่านอย่างเดียว ไม่ต้องก๊อป พรอมต์รวมส่งให้เองแล้ว · ไฟล์จริงอยู่ใน [`_solution/lab1/prompts/`](_solution/lab1/prompts/))
 
-**3 โต๊ะที่ต้องทำเอง** (ตัวเอกของ LAB 4–5)
+ทุกคนได้พรอมต์โครงเดียวกัน ต่างกันแค่ ① ฉันคือใคร ② ทำงานอะไรด้วยไฟล์ไหน ③ เก็บเป็น skill ชื่ออะไร (ตามภาพด้านบน)
+
+**3 โต๊ะหลัก** (ตัวเอกของ LAB 4–5)
 
 #### 💼 นิดา `sales-nida` → skill `sales-proposal`
 
-▶ เปิด Claude Code ที่ `novatech/desks/sales-nida/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`skill`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/sales-nida/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-nida/work/) · [`skill`](_solution/desks-after-lab1/sales-nida/skills/sales-proposal/)
 
-```text
-ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย ฝ่าย Sales · นี่คือโต๊ะของฉัน (novatech/desks/sales-nida/)
-อ่านการ์ดของฉันก่อน: ../../people/sales/sales-nida.md
-1. ลงมือทำงานจริง 1 ชิ้น: ร่าง proposal ให้ลูกค้าธนาคารตาม TOR ของ deal-001 พร้อมใบคิดราคา
-   ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/, ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/brand-guide.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ sales-proposal ที่ .claude/skills/sales-proposal/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sales-nida, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย ฝ่าย Sales · นี่คือโต๊ะของฉัน (novatech/desks/sales-nida/)  
+> อ่านการ์ดของฉันก่อน: ../../people/sales/sales-nida.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ร่าง proposal ให้ลูกค้าธนาคารตาม TOR ของ deal-001 พร้อมใบคิดราคา  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/, ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/brand-guide.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ sales-proposal ที่ .claude/skills/sales-proposal/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sales-nida, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 👔 สมชาย `md-somchai` → skill `deal-approval`
 
-▶ เปิด Claude Code ที่ `novatech/desks/md-somchai/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/md-somchai/work/) · [`skill`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/md-somchai/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/md-somchai/work/) · [`skill`](_solution/desks-after-lab1/md-somchai/skills/deal-approval/)
 
-```text
-ฉันคือ สมชาย วงศ์ประเสริฐ (md-somchai) MD (กรรมการผู้จัดการ) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/md-somchai/)
-อ่านการ์ดของฉันก่อน: ../../people/exec/md-somchai.md
-1. ลงมือทำงานจริง 1 ชิ้น: พิจารณาดีล DS-2026-034 ว่าอนุมัติหรือตีกลับ พร้อมเหตุผล
-   ข้อมูลที่ใช้: ../../company-kit/deal-summaries/DS-2026-034-muangmai-hospital-portal.md, ../../company-kit/margin-rules.md, ../../company-kit/price-list.csv และโน้ตของฉัน notes/deal-rules.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ deal-approval ที่ .claude/skills/deal-approval/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: md-somchai, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ สมชาย วงศ์ประเสริฐ (md-somchai) MD (กรรมการผู้จัดการ) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/md-somchai/)  
+> อ่านการ์ดของฉันก่อน: ../../people/exec/md-somchai.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: พิจารณาดีล DS-2026-034 ว่าอนุมัติหรือตีกลับ พร้อมเหตุผล  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/deal-summaries/DS-2026-034-muangmai-hospital-portal.md, ../../company-kit/margin-rules.md, ../../company-kit/price-list.csv และโน้ตของฉัน notes/deal-rules.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ deal-approval ที่ .claude/skills/deal-approval/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: md-somchai, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 🧾 จอย `fin-joy` → skill `pricing-calc`
 
-▶ เปิด Claude Code ที่ `novatech/desks/fin-joy/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-joy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-joy/work/) · [`skill`](_solution/desks-after-lab1/fin-joy/skills/pricing-calc/)
 
-```text
-ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)
-อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md
-1. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales
-   ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ จอย พัฒนสิน (fin-joy) หัวหน้าบัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-joy/)  
+> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-joy.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: คิดราคาและกำไรของ deal-001 ให้ Sales  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/price-list.csv, ../../company-kit/margin-rules.md, ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/won-proposals/  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pricing-calc ที่ .claude/skills/pricing-calc/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-joy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 <details>
 <summary>👔 <b>MD / ผู้บริหาร</b> · <code>exec-ploy</code> · <code>cco-wit</code> · <code>cto-nat</code> · <code>cfo-ying</code></summary>
 
 #### 👔 พลอยไพลิน `exec-ploy` → skill `exec-deck`
 
-▶ เปิด Claude Code ที่ `novatech/desks/exec-ploy/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/exec-ploy/work/) · [`skill`](_solution/desks-after-lab1/exec-ploy/skills/exec-deck/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/exec-ploy/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/exec-ploy/work/) · [`skill`](_solution/desks-after-lab1/exec-ploy/skills/exec-deck/)
 
-```text
-ฉันคือ พลอยไพลิน ศรีสุข (exec-ploy) ผู้ช่วยผู้บริหาร ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/exec-ploy/)
-อ่านการ์ดของฉันก่อน: ../../people/exec/exec-ploy.md
-1. ลงมือทำงานจริง 1 ชิ้น: ทำสไลด์ประชุมผู้บริหารเดือน พ.ย. 2026 (HTML + PDF) ที่ MD อ่านจบใน 5 นาที
-   ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/brand-guide.md, ../../company-kit/logo.svg
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ exec-deck ที่ .claude/skills/exec-deck/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: exec-ploy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ พลอยไพลิน ศรีสุข (exec-ploy) ผู้ช่วยผู้บริหาร ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/exec-ploy/)  
+> อ่านการ์ดของฉันก่อน: ../../people/exec/exec-ploy.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ทำสไลด์ประชุมผู้บริหารเดือน พ.ย. 2026 (HTML + PDF) ที่ MD อ่านจบใน 5 นาที  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/brand-guide.md, ../../company-kit/logo.svg  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ exec-deck ที่ .claude/skills/exec-deck/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: exec-ploy, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 👔 วิทย์ `cco-wit` → skill `pipeline-review`
 
-▶ เปิด Claude Code ที่ `novatech/desks/cco-wit/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/cco-wit/work/) · [`skill`](_solution/desks-after-lab1/cco-wit/skills/pipeline-review/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/cco-wit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cco-wit/work/) · [`skill`](_solution/desks-after-lab1/cco-wit/skills/pipeline-review/)
 
-```text
-ฉันคือ วิทย์ ประภาสกุล (cco-wit) ผู้อำนวยการสายธุรกิจ (CCO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cco-wit/)
-อ่านการ์ดของฉันก่อน: ../../people/exec/cco-wit.md
-1. ลงมือทำงานจริง 1 ชิ้น: ทบทวน pipeline ดีลทั้งหมด: ดีลไหนควรเร่ง ส่งต่อ ประคอง หรือตีกลับ
-   ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/deal-summaries/, ../../company-kit/deal-001/, ../../company-kit/deal-002/, ../../company-kit/product/
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pipeline-review ที่ .claude/skills/pipeline-review/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cco-wit, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ วิทย์ ประภาสกุล (cco-wit) ผู้อำนวยการสายธุรกิจ (CCO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cco-wit/)  
+> อ่านการ์ดของฉันก่อน: ../../people/exec/cco-wit.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ทบทวน pipeline ดีลทั้งหมด: ดีลไหนควรเร่ง ส่งต่อ ประคอง หรือตีกลับ  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/deal-summaries/, ../../company-kit/deal-001/, ../../company-kit/deal-002/, ../../company-kit/product/  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ pipeline-review ที่ .claude/skills/pipeline-review/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cco-wit, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 👔 ณัฐ `cto-nat` → skill `tech-risk-review`
 
-▶ เปิด Claude Code ที่ `novatech/desks/cto-nat/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/cto-nat/work/) · [`skill`](_solution/desks-after-lab1/cto-nat/skills/tech-risk-review/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/cto-nat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cto-nat/work/) · [`skill`](_solution/desks-after-lab1/cto-nat/skills/tech-risk-review/)
 
-```text
-ฉันคือ ณัฐ ธนวัฒน์ (cto-nat) ผู้อำนวยการสายเทคโนโลยี (CTO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cto-nat/)
-อ่านการ์ดของฉันก่อน: ../../people/exec/cto-nat.md
-1. ลงมือทำงานจริง 1 ชิ้น: ทบทวนความเสี่ยงทางเทคนิคของ deal-001 ก่อนรับงาน
-   ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/incident-2026-09.md, ../../company-kit/deploy-runbook.md, ../../company-kit/arch-standards.md, ../../company-kit/ml-queue-forecast/, ../../company-kit/qa/
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ tech-risk-review ที่ .claude/skills/tech-risk-review/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cto-nat, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ณัฐ ธนวัฒน์ (cto-nat) ผู้อำนวยการสายเทคโนโลยี (CTO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cto-nat/)  
+> อ่านการ์ดของฉันก่อน: ../../people/exec/cto-nat.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ทบทวนความเสี่ยงทางเทคนิคของ deal-001 ก่อนรับงาน  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/incident-2026-09.md, ../../company-kit/deploy-runbook.md, ../../company-kit/arch-standards.md, ../../company-kit/ml-queue-forecast/, ../../company-kit/qa/  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ tech-risk-review ที่ .claude/skills/tech-risk-review/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cto-nat, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 👔 หญิง `cfo-ying` → skill `cost-headcount-review`
 
-▶ เปิด Claude Code ที่ `novatech/desks/cfo-ying/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/cfo-ying/work/) · [`skill`](_solution/desks-after-lab1/cfo-ying/skills/cost-headcount-review/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/cfo-ying/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/cfo-ying/work/) · [`skill`](_solution/desks-after-lab1/cfo-ying/skills/cost-headcount-review/)
 
-```text
-ฉันคือ หญิง ศรีพัฒนา (cfo-ying) ผู้อำนวยการสายบริหารและการเงิน (CFO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cfo-ying/)
-อ่านการ์ดของฉันก่อน: ../../people/exec/cfo-ying.md
-1. ลงมือทำงานจริง 1 ชิ้น: สรุปรายได้ ต้นทุน และกำลังคนเดือน ต.ค. 2026 ให้ MD: เงินพอไหม ควรรับคนเพิ่มหรือยัง
-   ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/margin-rules.md, ../../company-kit/jd-template.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ cost-headcount-review ที่ .claude/skills/cost-headcount-review/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cfo-ying, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ หญิง ศรีพัฒนา (cfo-ying) ผู้อำนวยการสายบริหารและการเงิน (CFO) ฝ่าย MD / ผู้บริหาร · นี่คือโต๊ะของฉัน (novatech/desks/cfo-ying/)  
+> อ่านการ์ดของฉันก่อน: ../../people/exec/cfo-ying.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: สรุปรายได้ ต้นทุน และกำลังคนเดือน ต.ค. 2026 ให้ MD: เงินพอไหม ควรรับคนเพิ่มหรือยัง  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/monthly-kpi.csv, ../../company-kit/margin-rules.md, ../../company-kit/jd-template.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ cost-headcount-review ที่ .claude/skills/cost-headcount-review/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: cfo-ying, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -407,19 +401,18 @@ desks/sales-nida/             desks/sales-nida/
 
 #### 💼 กฤต `sales-krit` → skill `follow-up-email`
 
-▶ เปิด Claude Code ที่ `novatech/desks/sales-krit/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-krit/work/) · [`skill`](_solution/desks-after-lab1/sales-krit/skills/follow-up-email/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/sales-krit/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sales-krit/work/) · [`skill`](_solution/desks-after-lab1/sales-krit/skills/follow-up-email/)
 
-```text
-ฉันคือ กฤต ธนากร (sales-krit) เซลส์ ฝ่าย Sales · นี่คือโต๊ะของฉัน (novatech/desks/sales-krit/)
-อ่านการ์ดของฉันก่อน: ../../people/sales/sales-krit.md
-1. ลงมือทำงานจริง 1 ชิ้น: เขียนอีเมลติดตามลูกค้า deal-002 หลังประชุมวันที่ 28 ต.ค. 2026
-   ข้อมูลที่ใช้: ../../company-kit/meeting-notes/2026-10-28-bank-meeting.md, ../../company-kit/deal-002/tor-bank-dispute.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ follow-up-email ที่ .claude/skills/follow-up-email/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sales-krit, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ กฤต ธนากร (sales-krit) เซลส์ ฝ่าย Sales · นี่คือโต๊ะของฉัน (novatech/desks/sales-krit/)  
+> อ่านการ์ดของฉันก่อน: ../../people/sales/sales-krit.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: เขียนอีเมลติดตามลูกค้า deal-002 หลังประชุมวันที่ 28 ต.ค. 2026  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/meeting-notes/2026-10-28-bank-meeting.md, ../../company-kit/deal-002/tor-bank-dispute.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ follow-up-email ที่ .claude/skills/follow-up-email/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sales-krit, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -428,35 +421,33 @@ desks/sales-nida/             desks/sales-nida/
 
 #### 🧩 ต้นตระกูล `sa-ton` → skill `req-to-spec`
 
-▶ เปิด Claude Code ที่ `novatech/desks/sa-ton/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ton/work/) · [`skill`](_solution/desks-after-lab1/sa-ton/skills/req-to-spec/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ton/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ton/work/) · [`skill`](_solution/desks-after-lab1/sa-ton/skills/req-to-spec/)
 
-```text
-ฉันคือ ต้นตระกูล มีชัย (sa-ton) SA อาวุโส ฝ่าย Presales / SA · นี่คือโต๊ะของฉัน (novatech/desks/sa-ton/)
-อ่านการ์ดของฉันก่อน: ../../people/sa/sa-ton.md
-1. ลงมือทำงานจริง 1 ชิ้น: แปลง TOR ของ deal-001 เป็น spec และแผนทดสอบ
-   ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/arch-standards.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ req-to-spec ที่ .claude/skills/req-to-spec/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sa-ton, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ต้นตระกูล มีชัย (sa-ton) SA อาวุโส ฝ่าย Presales / SA · นี่คือโต๊ะของฉัน (novatech/desks/sa-ton/)  
+> อ่านการ์ดของฉันก่อน: ../../people/sa/sa-ton.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: แปลง TOR ของ deal-001 เป็น spec และแผนทดสอบ  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/deal-001/tor-bank-queue.md, ../../company-kit/arch-standards.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ req-to-spec ที่ .claude/skills/req-to-spec/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sa-ton, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 🧩 ไอศวรรย์ `sa-ice` → skill `arch-template`
 
-▶ เปิด Claude Code ที่ `novatech/desks/sa-ice/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ice/work/) · [`skill`](_solution/desks-after-lab1/sa-ice/skills/arch-template/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/sa-ice/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/sa-ice/work/) · [`skill`](_solution/desks-after-lab1/sa-ice/skills/arch-template/)
 
-```text
-ฉันคือ ไอศวรรย์ บุญมา (sa-ice) SA ฝ่าย Presales / SA · นี่คือโต๊ะของฉัน (novatech/desks/sa-ice/)
-อ่านการ์ดของฉันก่อน: ../../people/sa/sa-ice.md
-1. ลงมือทำงานจริง 1 ชิ้น: วาดแผนภาพ architecture ของระบบจองคิวสาขา (deal-001) ตามมาตรฐานบริษัท
-   ข้อมูลที่ใช้: ../../company-kit/arch-standards.md, ../../company-kit/deal-001/tor-bank-queue.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ arch-template ที่ .claude/skills/arch-template/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sa-ice, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ไอศวรรย์ บุญมา (sa-ice) SA ฝ่าย Presales / SA · นี่คือโต๊ะของฉัน (novatech/desks/sa-ice/)  
+> อ่านการ์ดของฉันก่อน: ../../people/sa/sa-ice.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: วาดแผนภาพ architecture ของระบบจองคิวสาขา (deal-001) ตามมาตรฐานบริษัท  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/arch-standards.md, ../../company-kit/deal-001/tor-bank-queue.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ arch-template ที่ .claude/skills/arch-template/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: sa-ice, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -465,35 +456,33 @@ desks/sales-nida/             desks/sales-nida/
 
 #### 📦 บีม `pm-beam` → skill `prd-writer`
 
-▶ เปิด Claude Code ที่ `novatech/desks/pm-beam/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-beam/work/) · [`skill`](_solution/desks-after-lab1/pm-beam/skills/prd-writer/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-beam/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-beam/work/) · [`skill`](_solution/desks-after-lab1/pm-beam/skills/prd-writer/)
 
-```text
-ฉันคือ บีม ศิริวัฒน์ (pm-beam) หัวหน้าฝ่ายผลิตภัณฑ์ (Head of Product) ฝ่าย Product · นี่คือโต๊ะของฉัน (novatech/desks/pm-beam/)
-อ่านการ์ดของฉันก่อน: ../../people/product/pm-beam.md
-1. ลงมือทำงานจริง 1 ชิ้น: จัดลำดับฟีเจอร์ NovaQueue จาก feedback ไตรมาส 3 แล้วเขียน PRD ฟีเจอร์ที่ควรทำก่อน 1 ฉบับ
-   ข้อมูลที่ใช้: ../../company-kit/product/novaqueue-feedback-2026-q3.md, ../../company-kit/product/novaqueue-overview.md, ../../company-kit/product/product-lifecycle-policy.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ prd-writer ที่ .claude/skills/prd-writer/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: pm-beam, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ บีม ศิริวัฒน์ (pm-beam) หัวหน้าฝ่ายผลิตภัณฑ์ (Head of Product) ฝ่าย Product · นี่คือโต๊ะของฉัน (novatech/desks/pm-beam/)  
+> อ่านการ์ดของฉันก่อน: ../../people/product/pm-beam.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: จัดลำดับฟีเจอร์ NovaQueue จาก feedback ไตรมาส 3 แล้วเขียน PRD ฟีเจอร์ที่ควรทำก่อน 1 ฉบับ  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/product/novaqueue-feedback-2026-q3.md, ../../company-kit/product/novaqueue-overview.md, ../../company-kit/product/product-lifecycle-policy.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ prd-writer ที่ .claude/skills/prd-writer/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: pm-beam, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 📦 กิ๊ฟ `pm-gift` → skill `product-sunset`
 
-▶ เปิด Claude Code ที่ `novatech/desks/pm-gift/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-gift/work/) · [`skill`](_solution/desks-after-lab1/pm-gift/skills/product-sunset/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/pm-gift/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/pm-gift/work/) · [`skill`](_solution/desks-after-lab1/pm-gift/skills/product-sunset/)
 
-```text
-ฉันคือ กิ๊ฟ วรรณศิริ (pm-gift) Product Manager (ดูแลวงจรชีวิตผลิตภัณฑ์) ฝ่าย Product · นี่คือโต๊ะของฉัน (novatech/desks/pm-gift/)
-อ่านการ์ดของฉันก่อน: ../../people/product/pm-gift.md
-1. ลงมือทำงานจริง 1 ชิ้น: วางแผนเลิกให้บริการ NovaQueue v1 พร้อมร่างประกาศแจ้งลูกค้า
-   ข้อมูลที่ใช้: ../../company-kit/product/novaqueue-v1-customers.csv, ../../company-kit/product/product-lifecycle-policy.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ product-sunset ที่ .claude/skills/product-sunset/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: pm-gift, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ กิ๊ฟ วรรณศิริ (pm-gift) Product Manager (ดูแลวงจรชีวิตผลิตภัณฑ์) ฝ่าย Product · นี่คือโต๊ะของฉัน (novatech/desks/pm-gift/)  
+> อ่านการ์ดของฉันก่อน: ../../people/product/pm-gift.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: วางแผนเลิกให้บริการ NovaQueue v1 พร้อมร่างประกาศแจ้งลูกค้า  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/product/novaqueue-v1-customers.csv, ../../company-kit/product/product-lifecycle-policy.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ product-sunset ที่ .claude/skills/product-sunset/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: pm-gift, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -502,35 +491,33 @@ desks/sales-nida/             desks/sales-nida/
 
 #### 💻 ปอนด์ `dev-pond` → skill `coding-standard`
 
-▶ เปิด Claude Code ที่ `novatech/desks/dev-pond/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-pond/work/) · [`skill`](_solution/desks-after-lab1/dev-pond/skills/coding-standard/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-pond/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-pond/work/) · [`skill`](_solution/desks-after-lab1/dev-pond/skills/coding-standard/)
 
-```text
-ฉันคือ ปอนด์ เจริญกิจ (dev-pond) tech lead ฝ่าย Dev · นี่คือโต๊ะของฉัน (novatech/desks/dev-pond/)
-อ่านการ์ดของฉันก่อน: ../../people/dev/dev-pond.md
-1. ลงมือทำงานจริง 1 ชิ้น: รีวิว PR ตัวอย่าง 1 ชิ้นตามมาตรฐานโค้ดของทีม (ถ้าไม่มีโค้ดจริงให้ทำ PR สมมติขึ้นมาเอง)
-   ข้อมูลที่ใช้: ../../company-kit/coding-rules.md, ../../company-kit/project-scaffold-notes.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ coding-standard ที่ .claude/skills/coding-standard/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: dev-pond, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ปอนด์ เจริญกิจ (dev-pond) tech lead ฝ่าย Dev · นี่คือโต๊ะของฉัน (novatech/desks/dev-pond/)  
+> อ่านการ์ดของฉันก่อน: ../../people/dev/dev-pond.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: รีวิว PR ตัวอย่าง 1 ชิ้นตามมาตรฐานโค้ดของทีม (ถ้าไม่มีโค้ดจริงให้ทำ PR สมมติขึ้นมาเอง)  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/coding-rules.md, ../../company-kit/project-scaffold-notes.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ coding-standard ที่ .claude/skills/coding-standard/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: dev-pond, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 💻 มิว `dev-mew` → skill `project-scaffold`
 
-▶ เปิด Claude Code ที่ `novatech/desks/dev-mew/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-mew/work/) · [`skill`](_solution/desks-after-lab1/dev-mew/skills/project-scaffold/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/dev-mew/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/dev-mew/work/) · [`skill`](_solution/desks-after-lab1/dev-mew/skills/project-scaffold/)
 
-```text
-ฉันคือ มิว อินทรสุวรรณ (dev-mew) Dev ฝ่าย Dev · นี่คือโต๊ะของฉัน (novatech/desks/dev-mew/)
-อ่านการ์ดของฉันก่อน: ../../people/dev/dev-mew.md
-1. ลงมือทำงานจริง 1 ชิ้น: ขึ้นโปรเจกต์ระบบสมาชิก + ชำระเงินใหม่ให้รันได้และ test ผ่าน
-   ข้อมูลที่ใช้: ../../company-kit/project-scaffold-notes.md, ../../company-kit/coding-rules.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ project-scaffold ที่ .claude/skills/project-scaffold/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: dev-mew, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ มิว อินทรสุวรรณ (dev-mew) Dev ฝ่าย Dev · นี่คือโต๊ะของฉัน (novatech/desks/dev-mew/)  
+> อ่านการ์ดของฉันก่อน: ../../people/dev/dev-mew.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ขึ้นโปรเจกต์ระบบสมาชิก + ชำระเงินใหม่ให้รันได้และ test ผ่าน  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/project-scaffold-notes.md, ../../company-kit/coding-rules.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ project-scaffold ที่ .claude/skills/project-scaffold/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: dev-mew, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -539,31 +526,29 @@ desks/sales-nida/             desks/sales-nida/
 
 #### 🧪 มินท์ `qa-mint` → skill `test-from-plan`
 
-▶ เปิด Claude Code ที่ `novatech/desks/qa-mint/` · แชตใหม่ · ผลจริง: [`skill`](_solution/desks-after-lab1/qa-mint/skills/test-from-plan/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-mint/` ได้รับ · ผลจริง: [`skill`](_solution/desks-after-lab1/qa-mint/skills/test-from-plan/)
 
-```text
-ฉันคือ มินท์ รัตนพงศ์ (qa-mint) QA lead ฝ่าย QA · นี่คือโต๊ะของฉัน (novatech/desks/qa-mint/)
-อ่านการ์ดของฉันก่อน: ../../people/qa/qa-mint.md
-skill test-from-plan ของฉันทำเสร็จแล้วตั้งแต่ส่วน 02 อยู่ที่ ../../company-kit/qa/test-from-plan-skill/
-คัดลอกมาเป็น skill ส่วนตัวที่ .claude/skills/test-from-plan/ แล้วเติม metadata ในหัวไฟล์: owner: qa-mint, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-ห้ามแก้เนื้อหาขั้นตอนเดิม จบแล้วสรุปสั้น ๆ ว่าเติมอะไรและเพราะอะไร
-```
+> ฉันคือ มินท์ รัตนพงศ์ (qa-mint) QA lead ฝ่าย QA · นี่คือโต๊ะของฉัน (novatech/desks/qa-mint/)  
+> อ่านการ์ดของฉันก่อน: ../../people/qa/qa-mint.md  
+> skill test-from-plan ของฉันทำเสร็จแล้วตั้งแต่ส่วน 02 อยู่ที่ ../../company-kit/qa/test-from-plan-skill/  
+> คัดลอกมาเป็น skill ส่วนตัวที่ .claude/skills/test-from-plan/ แล้วเติม metadata ในหัวไฟล์: owner: qa-mint, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> ห้ามแก้เนื้อหาขั้นตอนเดิม จบแล้วสรุปสั้น ๆ ว่าเติมอะไรและเพราะอะไร  
+
 
 #### 🧪 แบงค์ `qa-bank` → skill `bug-report`
 
-▶ เปิด Claude Code ที่ `novatech/desks/qa-bank/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/qa-bank/work/) · [`skill`](_solution/desks-after-lab1/qa-bank/skills/bug-report/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/qa-bank/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/qa-bank/work/) · [`skill`](_solution/desks-after-lab1/qa-bank/skills/bug-report/)
 
-```text
-ฉันคือ แบงค์ ศักดิ์ดี (qa-bank) QA ฝ่าย QA · นี่คือโต๊ะของฉัน (novatech/desks/qa-bank/)
-อ่านการ์ดของฉันก่อน: ../../people/qa/qa-bank.md
-1. ลงมือทำงานจริง 1 ชิ้น: เขียนรายงานบั๊กจาก log ของ test ที่ล้ม
-   ข้อมูลที่ใช้: ../../company-kit/qa/failed-test-log.txt, ../../company-kit/qa/bug-template.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ bug-report ที่ .claude/skills/bug-report/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: qa-bank, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ แบงค์ ศักดิ์ดี (qa-bank) QA ฝ่าย QA · นี่คือโต๊ะของฉัน (novatech/desks/qa-bank/)  
+> อ่านการ์ดของฉันก่อน: ../../people/qa/qa-bank.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: เขียนรายงานบั๊กจาก log ของ test ที่ล้ม  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/qa/failed-test-log.txt, ../../company-kit/qa/bug-template.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ bug-report ที่ .claude/skills/bug-report/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: qa-bank, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -572,35 +557,33 @@ skill test-from-plan ของฉันทำเสร็จแล้วตั�
 
 #### ⚙️ อาร์ต `ops-art` → skill `deploy-checklist`
 
-▶ เปิด Claude Code ที่ `novatech/desks/ops-art/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-art/work/) · [`skill`](_solution/desks-after-lab1/ops-art/skills/deploy-checklist/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-art/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-art/work/) · [`skill`](_solution/desks-after-lab1/ops-art/skills/deploy-checklist/)
 
-```text
-ฉันคือ อาร์ต พงษ์ไพบูลย์ (ops-art) DevOps lead ฝ่าย DevOps · นี่คือโต๊ะของฉัน (novatech/desks/ops-art/)
-อ่านการ์ดของฉันก่อน: ../../people/devops/ops-art.md
-1. ลงมือทำงานจริง 1 ชิ้น: ทำ checklist ขึ้นระบบจริงรอบ 2026.11
-   ข้อมูลที่ใช้: ../../company-kit/deploy-runbook.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ deploy-checklist ที่ .claude/skills/deploy-checklist/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ops-art, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ อาร์ต พงษ์ไพบูลย์ (ops-art) DevOps lead ฝ่าย DevOps · นี่คือโต๊ะของฉัน (novatech/desks/ops-art/)  
+> อ่านการ์ดของฉันก่อน: ../../people/devops/ops-art.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ทำ checklist ขึ้นระบบจริงรอบ 2026.11  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/deploy-runbook.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ deploy-checklist ที่ .claude/skills/deploy-checklist/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ops-art, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### ⚙️ ฝน `ops-fon` → skill `postmortem`
 
-▶ เปิด Claude Code ที่ `novatech/desks/ops-fon/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-fon/work/) · [`skill`](_solution/desks-after-lab1/ops-fon/skills/postmortem/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/ops-fon/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ops-fon/work/) · [`skill`](_solution/desks-after-lab1/ops-fon/skills/postmortem/)
 
-```text
-ฉันคือ ฝน จันทร์เพ็ญ (ops-fon) DevOps ฝ่าย DevOps · นี่คือโต๊ะของฉัน (novatech/desks/ops-fon/)
-อ่านการ์ดของฉันก่อน: ../../people/devops/ops-fon.md
-1. ลงมือทำงานจริง 1 ชิ้น: เขียน postmortem เหตุระบบ payment ล่มเดือน ก.ย. 2026 แบบไม่โทษคน
-   ข้อมูลที่ใช้: ../../company-kit/incident-2026-09.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ postmortem ที่ .claude/skills/postmortem/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ops-fon, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ฝน จันทร์เพ็ญ (ops-fon) DevOps ฝ่าย DevOps · นี่คือโต๊ะของฉัน (novatech/desks/ops-fon/)  
+> อ่านการ์ดของฉันก่อน: ../../people/devops/ops-fon.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: เขียน postmortem เหตุระบบ payment ล่มเดือน ก.ย. 2026 แบบไม่โทษคน  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/incident-2026-09.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ postmortem ที่ .claude/skills/postmortem/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ops-fon, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -609,35 +592,33 @@ skill test-from-plan ของฉันทำเสร็จแล้วตั�
 
 #### 🤖 เจ `ml-jay` → skill `mlflow-experiment`
 
-▶ เปิด Claude Code ที่ `novatech/desks/ml-jay/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-jay/work/) · [`skill`](_solution/desks-after-lab1/ml-jay/skills/mlflow-experiment/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-jay/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-jay/work/) · [`skill`](_solution/desks-after-lab1/ml-jay/skills/mlflow-experiment/)
 
-```text
-ฉันคือ เจ วรวุฒิ (ml-jay) MLOps lead ฝ่าย ML / MLOps · นี่คือโต๊ะของฉัน (novatech/desks/ml-jay/)
-อ่านการ์ดของฉันก่อน: ../../people/mlops/ml-jay.md
-1. ลงมือทำงานจริง 1 ชิ้น: จัดระเบียบผลการทดลองโมเดลพยากรณ์คิวประจำสัปดาห์ และเทียบทุกรอบ
-   ข้อมูลที่ใช้: ../../company-kit/ml-queue-forecast/experiment-results.csv, ../../company-kit/ml-queue-forecast/notes.md, ../../company-kit/deal-001/tor-bank-queue.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ mlflow-experiment ที่ .claude/skills/mlflow-experiment/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ml-jay, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ เจ วรวุฒิ (ml-jay) MLOps lead ฝ่าย ML / MLOps · นี่คือโต๊ะของฉัน (novatech/desks/ml-jay/)  
+> อ่านการ์ดของฉันก่อน: ../../people/mlops/ml-jay.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: จัดระเบียบผลการทดลองโมเดลพยากรณ์คิวประจำสัปดาห์ และเทียบทุกรอบ  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/ml-queue-forecast/experiment-results.csv, ../../company-kit/ml-queue-forecast/notes.md, ../../company-kit/deal-001/tor-bank-queue.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ mlflow-experiment ที่ .claude/skills/mlflow-experiment/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ml-jay, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 🤖 พิมพ์ชนก `ml-pim` → skill `model-release`
 
-▶ เปิด Claude Code ที่ `novatech/desks/ml-pim/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-pim/work/) · [`skill`](_solution/desks-after-lab1/ml-pim/skills/model-release/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/ml-pim/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/ml-pim/work/) · [`skill`](_solution/desks-after-lab1/ml-pim/skills/model-release/)
 
-```text
-ฉันคือ พิมพ์ชนก ทองดี (ml-pim) ML engineer ฝ่าย ML / MLOps · นี่คือโต๊ะของฉัน (novatech/desks/ml-pim/)
-อ่านการ์ดของฉันก่อน: ../../people/mlops/ml-pim.md
-1. ลงมือทำงานจริง 1 ชิ้น: ทำแผนปล่อยโมเดลพยากรณ์คิว r03 พร้อมเกณฑ์ถอยกลับ
-   ข้อมูลที่ใช้: ../../company-kit/ml-queue-forecast/, ../../company-kit/deploy-runbook.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ model-release ที่ .claude/skills/model-release/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ml-pim, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ พิมพ์ชนก ทองดี (ml-pim) ML engineer ฝ่าย ML / MLOps · นี่คือโต๊ะของฉัน (novatech/desks/ml-pim/)  
+> อ่านการ์ดของฉันก่อน: ../../people/mlops/ml-pim.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ทำแผนปล่อยโมเดลพยากรณ์คิว r03 พร้อมเกณฑ์ถอยกลับ  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/ml-queue-forecast/, ../../company-kit/deploy-runbook.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ model-release ที่ .claude/skills/model-release/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: ml-pim, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -646,35 +627,33 @@ skill test-from-plan ของฉันทำเสร็จแล้วตั�
 
 #### 🤝 ฟ้า `hr-fah` → skill `jd-writer`
 
-▶ เปิด Claude Code ที่ `novatech/desks/hr-fah/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-fah/work/) · [`skill`](_solution/desks-after-lab1/hr-fah/skills/jd-writer/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-fah/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-fah/work/) · [`skill`](_solution/desks-after-lab1/hr-fah/skills/jd-writer/)
 
-```text
-ฉันคือ ฟ้า ประเสริฐวงศ์ (hr-fah) HR BP ฝ่าย HR · นี่คือโต๊ะของฉัน (novatech/desks/hr-fah/)
-อ่านการ์ดของฉันก่อน: ../../people/hr/hr-fah.md
-1. ลงมือทำงานจริง 1 ชิ้น: เขียนประกาศรับสมัคร Senior Full-stack Developer สำหรับโปรเจกต์ deal-001
-   ข้อมูลที่ใช้: ../../company-kit/jd-template.md, ../../company-kit/hr-benefits-faq.md, ../../company-kit/brand-guide.md, ../../company-kit/deal-001/tor-bank-queue.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ jd-writer ที่ .claude/skills/jd-writer/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: hr-fah, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ ฟ้า ประเสริฐวงศ์ (hr-fah) HR BP ฝ่าย HR · นี่คือโต๊ะของฉัน (novatech/desks/hr-fah/)  
+> อ่านการ์ดของฉันก่อน: ../../people/hr/hr-fah.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: เขียนประกาศรับสมัคร Senior Full-stack Developer สำหรับโปรเจกต์ deal-001  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/jd-template.md, ../../company-kit/hr-benefits-faq.md, ../../company-kit/brand-guide.md, ../../company-kit/deal-001/tor-bank-queue.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ jd-writer ที่ .claude/skills/jd-writer/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: hr-fah, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 #### 🤝 โอ๊ต `hr-oat` → skill `onboarding-pack`
 
-▶ เปิด Claude Code ที่ `novatech/desks/hr-oat/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-oat/work/) · [`skill`](_solution/desks-after-lab1/hr-oat/skills/onboarding-pack/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/hr-oat/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/hr-oat/work/) · [`skill`](_solution/desks-after-lab1/hr-oat/skills/onboarding-pack/)
 
-```text
-ฉันคือ โอ๊ต สุขสวัสดิ์ (hr-oat) HR ฝ่าย HR · นี่คือโต๊ะของฉัน (novatech/desks/hr-oat/)
-อ่านการ์ดของฉันก่อน: ../../people/hr/hr-oat.md
-1. ลงมือทำงานจริง 1 ชิ้น: เตรียมชุดต้อนรับ Dev คนใหม่ที่จะเข้างานวันจันทร์ 9 พ.ย. 2026
-   ข้อมูลที่ใช้: ../../company-kit/onboarding-notes.md, ../../company-kit/hr-benefits-faq.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ onboarding-pack ที่ .claude/skills/onboarding-pack/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: hr-oat, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ โอ๊ต สุขสวัสดิ์ (hr-oat) HR ฝ่าย HR · นี่คือโต๊ะของฉัน (novatech/desks/hr-oat/)  
+> อ่านการ์ดของฉันก่อน: ../../people/hr/hr-oat.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: เตรียมชุดต้อนรับ Dev คนใหม่ที่จะเข้างานวันจันทร์ 9 พ.ย. 2026  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/onboarding-notes.md, ../../company-kit/hr-benefits-faq.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ onboarding-pack ที่ .claude/skills/onboarding-pack/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: hr-oat, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -683,19 +662,18 @@ skill test-from-plan ของฉันทำเสร็จแล้วตั�
 
 #### 🧾 นก `fin-nok` → skill `invoice-check`
 
-▶ เปิด Claude Code ที่ `novatech/desks/fin-nok/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-nok/work/) · [`skill`](_solution/desks-after-lab1/fin-nok/skills/invoice-check/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/fin-nok/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/fin-nok/work/) · [`skill`](_solution/desks-after-lab1/fin-nok/skills/invoice-check/)
 
-```text
-ฉันคือ นก ศรีอำไพ (fin-nok) บัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-nok/)
-อ่านการ์ดของฉันก่อน: ../../people/finance/fin-nok.md
-1. ลงมือทำงานจริง 1 ชิ้น: ตรวจใบแจ้งหนี้ INV-2026-0142 ก่อนส่งลูกค้า
-   ข้อมูลที่ใช้: ../../company-kit/invoices/INV-2026-0142.md, ../../company-kit/invoices/invoicing-rules.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ invoice-check ที่ .claude/skills/invoice-check/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-nok, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ นก ศรีอำไพ (fin-nok) บัญชี ฝ่าย บัญชี / ธุรการ · นี่คือโต๊ะของฉัน (novatech/desks/fin-nok/)  
+> อ่านการ์ดของฉันก่อน: ../../people/finance/fin-nok.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ตรวจใบแจ้งหนี้ INV-2026-0142 ก่อนส่งลูกค้า  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/invoices/INV-2026-0142.md, ../../company-kit/invoices/invoicing-rules.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ invoice-check ที่ .claude/skills/invoice-check/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: fin-nok, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -704,19 +682,18 @@ skill test-from-plan ของฉันทำเสร็จแล้วตั�
 
 #### 🏛️ เมย์ `plat-may` → skill `customer-data-policy`
 
-▶ เปิด Claude Code ที่ `novatech/desks/plat-may/` · แชตใหม่ · ผลจริง: [`work/`](_solution/desks-after-lab1/plat-may/work/) · [`skill`](_solution/desks-after-lab1/plat-may/skills/customer-data-policy/)
+สิ่งที่ agent ย่อยของโต๊ะ `desks/plat-may/` ได้รับ · ผลจริง: [`work/`](_solution/desks-after-lab1/plat-may/work/) · [`skill`](_solution/desks-after-lab1/plat-may/skills/customer-data-policy/)
 
-```text
-ฉันคือ เมย์ อรุณรัตน์ (plat-may) ทีมกลาง (platform) ฝ่าย ทีมกลาง (platform) · นี่คือโต๊ะของฉัน (novatech/desks/plat-may/)
-อ่านการ์ดของฉันก่อน: ../../people/platform/plat-may.md
-1. ลงมือทำงานจริง 1 ชิ้น: ตรวจใบแจ้งหนี้ INV-2026-0142 ตามนโยบายข้อมูลลูกค้า
-   ข้อมูลที่ใช้: ../../company-kit/customer-data-policy.md, ../../company-kit/invoices/INV-2026-0142.md, ../../company-kit/brand-guide.md
-   เก็บผลงานไว้ใน work/
-2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ customer-data-policy ที่ .claude/skills/customer-data-policy/
-   - หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: plat-may, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)
-   - skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill
-จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง
-```
+> ฉันคือ เมย์ อรุณรัตน์ (plat-may) ทีมกลาง (platform) ฝ่าย ทีมกลาง (platform) · นี่คือโต๊ะของฉัน (novatech/desks/plat-may/)  
+> อ่านการ์ดของฉันก่อน: ../../people/platform/plat-may.md  
+> 1\. ลงมือทำงานจริง 1 ชิ้น: ตรวจใบแจ้งหนี้ INV-2026-0142 ตามนโยบายข้อมูลลูกค้า  
+> &emsp;ข้อมูลที่ใช้: ../../company-kit/customer-data-policy.md, ../../company-kit/invoices/INV-2026-0142.md, ../../company-kit/brand-guide.md  
+> &emsp;เก็บผลงานไว้ใน work/  
+> 2\. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ customer-data-policy ที่ .claude/skills/customer-data-policy/  
+> &emsp;\- หัวไฟล์มี name, description (ใช้คำที่ฉันชอบพิมพ์ในการ์ด) และ metadata: owner: plat-may, layer: personal, version, uses, next, follows (ชื่อ skill ของคนอื่นดูได้ใน ../../people/README.md)  
+> &emsp;\- skill เล็ก โฟกัสเรื่องเดียว และต้องใช้ได้ที่เครื่องคนอื่น: ความรู้ที่จำเป็นจาก company-kit ให้สรุปไว้ใน references/ ของ skill  
+> จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไรบ้าง และมีจุดไหนที่ต้องตัดสินใจเอง  
+
 
 </details>
 
@@ -938,6 +915,12 @@ metadata:
 
 ### 2.4 ดูของจริงใน Gitea
 
+🎬 **หลัง push แล้ว Gitea หน้าตาเป็นยังไง (12 วินาที)**
+
+![GIF LAB 2: ① plat-ken ดูด SKILL.md จากโต๊ะ sales-nida md-somchai fin-joy hr-fah ml-jay อ่านอย่างเดียว ② จัดเป็นคลังเดียว desks/plat-ken/org-skills/ มี marketplace.json plugins/core shared sales exec finance hr mlops sa dev CODEOWNERS build.py ③ git push origin main ขึ้น http://localhost:3300/novatech/org-skills.git new branch main ④ หน้า repo novatech/org-skills บน Gitea ⑤ โฟลเดอร์ plugins 11 แผนก ⑥ ไฟล์ CODEOWNERS plugins/sales → @sales-nida ⑦ ลอง push ตรงเข้า main ถูกปฏิเสธ Not allowed to push to protected branch main](img/lab2-push-flow.gif)
+
+<sub>ข้อความใน terminal และหน้าเว็บมาจากการ push คลังผลจริงของ LAB 2 ขึ้นบริษัทจำลองจริง (รวมการลอง push ตรงที่ถูกปฏิเสธ)</sub>
+
 | repo `novatech/org-skills` | `.gitea/CODEOWNERS`: โฟลเดอร์ไหน ใครรีวิว |
 |---|---|
 | ![GIF หน้า repo org-skills, โฟลเดอร์ plugins 11 แผนก และ SKILL.md ของ sales-proposal](img/lab2-repo.gif) | ![GIF ไฟล์ CODEOWNERS: plugins/sales → @sales-nida, plugins/dev → @dev-pond ... และหน้าตั้งค่า branch](img/lab2-codeowners.gif) |
@@ -959,13 +942,43 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 
 ## LAB 3 · ทุกโต๊ะติดตั้งแพ็กแผนก + Dev คนใหม่วันแรก 🤖 ×21
 
-![LAB 3 ติดตั้งแพ็กตามแผนก: ชั้น org-skills แจกกระเป๋า core + sales, core + dev, core + hr และ Dev คนใหม่ป้าย วันแรก ได้ core + dev ทำงานได้ทันที](img/lab3-packs.png)
+![LAB 3 ติดตั้งแพ็ก skill ให้ทุกโต๊ะ 3 ขั้น: 1 ผู้ดูแลบอกที่อยู่คลัง ติดป้าย novatech-skills ทุกโต๊ะ → 2 แต่ละคนติดตั้งแพ็กของตัวเองจากชั้น org-skills บน Gitea sales-nida ได้ core + sales, fin-joy ได้ core + finance, hr-fah ได้ core + hr → 3 ผู้ดูแลตรวจของจริง ใช้แว่นขยายตรวจทุกโต๊ะ เติม core ให้โต๊ะที่ขาด และเก็บ skill ส่วนตัวเก่าลงกล่อง archived (ภาพจำลอง)](img/lab3-install-flow.png)
+
+**LAB นี้ทำอะไร:** คลังกลางขึ้น Gitea แล้ว (LAB 2) ทีนี้ทุกโต๊ะต้อง **ติดตั้งไปใช้** โดยแต่ละคนได้เฉพาะของที่เกี่ยวกับตัวเอง
+
+| ขั้น | ใครทำ | ทำอะไร |
+|---|---|---|
+| ① บอกที่อยู่คลัง | ผู้ดูแลระบบ (ที่ `novatech/`) | ใส่ค่าให้ทุกโต๊ะรู้จักคลัง `novatech-skills` และเปิด `core` |
+| ② ติดตั้งแพ็กของตัวเอง | พนักงานทุกคน | ติดตั้ง `core` + plugin แผนกตัวเอง ให้ใช้ได้เฉพาะโต๊ะนั้น |
+| ③ ตรวจของจริง | ผู้ดูแลระบบ | ตรวจว่า **ติดตั้งแล้วจริง** ไม่ใช่แค่มีชื่อใน settings · เก็บ skill ส่วนตัวที่ซ้ำกับคลังกลาง |
+| 🧪 ทดลอง | Dev คนใหม่ (`dev-new`) | วันแรกที่มีแพ็ก vs ไม่มีแพ็ก ทำงานต่างกันแค่ไหน |
 
 🧑 **คิดก่อน** ถ้าทุกคนติดตั้ง skill ทั้ง 23 ตัว จะเกิดอะไรขึ้น (ทฤษฎีหัวข้อ 24.1 งบรายชื่อมีจำกัด คำอธิบายชนกัน) แล้วใครควรเห็นอะไร (หัวข้อ 21 ตาราง 5 ชั้น)
 
-ในบริษัทจริง admin ใส่ค่าใน managed settings ให้ทุกเครื่องครั้งเดียว (หัวข้อ 22.3) ในแล็บจำลองด้วยไฟล์แม่แบบ [`desks/_template/.claude/settings.json`](novatech/desks/_template/.claude/settings.json) ที่ให้ทุกโต๊ะรู้จักคลัง `novatech-skills` และเปิด `core`
+### 3.1 แพ็กตามแผนก: ใครได้อะไร
 
-**ขั้น 1 · ผู้ดูแลระบบ** (เปิด Claude Code ที่ `novatech/`)
+![LAB 3 ติดตั้งแพ็กตามแผนก: ชั้น org-skills แจกกระเป๋า core + sales, core + dev, core + hr และ Dev คนใหม่ป้าย วันแรก ได้ core + dev ทำงานได้ทันที (ภาพจำลอง)](img/lab3-packs.png)
+
+| ใคร | ติดตั้ง | เห็น skill |
+|---|---|---|
+| ทุกคน | `core` | `customer-data-policy` · `brand-guide` · `pricing-rules` · `skill-finder` |
+| ฝ่ายขาย (`sales-nida`, `sales-krit`) | + `sales` | `sales:sales-proposal` · `sales:follow-up-email` |
+| บัญชี (`fin-joy`, `fin-nok`) | + `finance` | `finance:pricing-calc` · `finance:invoice-check` |
+| Dev (`dev-pond`, `dev-mew`, `dev-new`) | + `dev` | `dev:project-scaffold` · `dev:coding-standard` |
+| … ทุกแผนกแบบเดียวกัน | + แผนกตัวเอง | รวมคนละ **6 จาก 23 skill** |
+
+ของที่ติดตั้งอยู่ตรงไหนในโต๊ะ
+
+| ไฟล์ | คืออะไร |
+|---|---|
+| `desks/<ชื่อ>/.claude/settings.json` | **รายชื่อ** คลังที่รู้จัก (`novatech-skills`) และ plugin ที่เปิดใช้ในโต๊ะนี้ · แม่แบบอยู่ที่ [`desks/_template/.claude/settings.json`](novatech/desks/_template/.claude/settings.json) |
+| ทะเบียนติดตั้งของ Claude Code (`~/.claude/plugins/installed_plugins.json`) | **ของที่ติดตั้งจริง** ว่า plugin ไหนลงไว้ที่โต๊ะไหน |
+
+> 🏢 ในบริษัทจริง admin ใส่ค่าใน managed settings ให้ทุกเครื่องครั้งเดียว (ทฤษฎีหัวข้อ 22.3) ในแล็บจำลองด้วยไฟล์แม่แบบในโต๊ะ
+
+### 3.2 ขั้น ① ผู้ดูแลบอกที่อยู่คลัง
+
+💬 **พรอมต์** (เปิด Claude Code ที่ `novatech/`)
 
 ![หน้าต่าง Claude Code วางพรอมต์ LAB 3 ขั้น 1](img/lab3-paste-admin.png)
 
@@ -974,21 +987,46 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 (ห้ามลบ skill ส่วนตัวที่มีอยู่แล้วในโต๊ะ) จบแล้วบอกว่าใส่ให้กี่โต๊ะ
 ```
 
-**ขั้น 2 · พนักงานแต่ละคน** (วางที่โต๊ะของตัวเอง)
+### 3.3 ขั้น ② ทุกคนติดตั้งแพ็กของตัวเอง
+
+💬 **พรอมต์** (ก๊อปอันนี้อันเดียว · เปิด Claude Code ที่ `novatech/` · ได้ครบทุกโต๊ะ)
+
+```text
+ฉันเป็นผู้ดูแลระบบ ช่วยติดตั้ง skill ของบริษัทให้พนักงานทุกโต๊ะใน desks/ (ข้าม _template)
+สำหรับแต่ละโต๊ะ ให้เปิด agent ย่อยแยก 1 ตัว (1 ตัว = แชตใหม่ของเจ้าของโต๊ะ) โฟลเดอร์ทำงานคือ desks/<user>/ แล้วส่งงานนี้ให้ทุกตัวอักษร:
+"ติดตั้ง skill ของบริษัทสำหรับแผนกของผม (ดูแผนกในการ์ด ../../people/ คลังอยู่ที่ http://localhost:3300/novatech/org-skills) ให้ใช้ได้เฉพาะโต๊ะนี้ แล้วบอกว่าตอนนี้ผมมี skill ของบริษัทอะไรใช้บ้าง"
+- agent แก้ไฟล์ได้เฉพาะใน desks/<user>/ ของตัวเอง · รันพร้อมกันครั้งละ 4 ตัว
+จบแล้วสรุปเป็นตาราง: user · แผนก · plugin ที่ติดตั้ง · skill ที่เห็น
+```
+
+| ส่วนของพรอมต์ | มีไว้ทำไม |
+|---|---|
+| agent ย่อย 1 ตัวต่อ 1 โต๊ะ | แต่ละคนติดตั้งในนามตัวเอง เหมือนเปิดแชตใหม่ที่โต๊ะของคนนั้น |
+| ดูแผนกจากการ์ด | Claude เลือก plugin ของแผนกเอง ไม่ต้องบอกทีละคน |
+| ใช้ได้เฉพาะโต๊ะนี้ | ติดตั้งระดับโปรเจกต์ (โต๊ะ) ไม่ปนกับโต๊ะของคนอื่น |
+
+👀 **ตัวอย่าง: งานที่ agent ย่อยของแต่ละโต๊ะได้รับ** (อ่านอย่างเดียว ไม่ต้องก๊อป)
 
 ![หน้าต่าง Claude Code วางพรอมต์ LAB 3 ขั้น 2](img/lab3-paste-desk.png)
 
-```text
-ติดตั้ง skill ของบริษัทสำหรับแผนกของผม (ดูแผนกในการ์ด ../../people/ คลังอยู่ที่ http://localhost:3300/novatech/org-skills) ให้ใช้ได้เฉพาะโต๊ะนี้
-แล้วบอกว่าตอนนี้ผมมี skill ของบริษัทอะไรใช้บ้าง
-```
+> ติดตั้ง skill ของบริษัทสำหรับแผนกของผม (ดูแผนกในการ์ด ../../people/ คลังอยู่ที่ http://localhost:3300/novatech/org-skills) ให้ใช้ได้เฉพาะโต๊ะนี้  
+> แล้วบอกว่าตอนนี้ผมมี skill ของบริษัทอะไรใช้บ้าง  
 
-✅ **ผลจริง ขั้น 1–2: ผู้ดูแล 35 วินาที · 21 โต๊ะติดตั้งแพ็กแผนกครบใน 4 นาที 50 วินาที** (พร้อมกันครั้งละ 4 โต๊ะ แต่ละโต๊ะ 38–69 วินาที) · [คำตอบของ Claude](_solution/lab3/claude-summaries.md)
+ข้อความเดียวกันทุกโต๊ะ Claude รู้ว่าเป็นใครและอยู่แผนกไหนจากชื่อโฟลเดอร์และการ์ด
 
-⚠️ **แต่พอเปิด Claude ใหม่ที่ทุกโต๊ะแล้วนับ skill ที่เห็นจริง: 13 จาก 21 โต๊ะไม่มี `core`**
-แม่แบบแค่ **เขียนชื่อ** `core` ไว้ใน settings แต่ไม่ได้ **ติดตั้ง** ให้ โต๊ะที่มี core คือโต๊ะที่ Claude ของคนนั้นสั่ง `install core` เองระหว่างขั้น 2 และทุกโต๊ะยังมี skill ส่วนตัวจาก LAB 1 ซ้อนอยู่ (เช่น `sales-proposal` คู่กับ `sales:sales-proposal`)
+✅ **ผลจริง ขั้น ①–②: ผู้ดูแล 35 วินาที · 21 โต๊ะติดตั้งแพ็กแผนกครบใน 4 นาที 50 วินาที** (พร้อมกันครั้งละ 4 โต๊ะ แต่ละโต๊ะ 38–69 วินาที) · [คำตอบของ Claude](_solution/lab3/claude-summaries.md)
 
-**ขั้น 3 · ผู้ดูแลตรวจซ้ำ** (ที่ `novatech/` เหมือนขั้น 1)
+> 🧪 **หมายเหตุผู้สอน:** รอบรันจริงวางพรอมต์ขั้น ② ทีละโต๊ะ (ข้อความในตัวอย่างด้านบน) ในรอบบริษัท 21 คน · พรอมต์รวมของขั้น ② ยังไม่ได้รันจริง
+
+### 3.4 ขั้น ③ ผู้ดูแลตรวจของจริง
+
+⚠️ **พอเปิด Claude ใหม่ที่ทุกโต๊ะแล้วนับ skill ที่เห็นจริง: 13 จาก 21 โต๊ะไม่มี `core`**
+
+![เขียนไว้ ≠ ติดตั้งแล้ว ต้องตรวจจากสิ่งที่ Claude เห็นจริง: ซ้าย เขียนไว้ใน settings มีการ์ด core ติดบนโต๊ะแต่ลิ้นชักว่างเปล่า หุ่นยนต์มองด้วยความกังวล · ขวา ติดตั้งแล้วจริง ลิ้นชักมีแฟ้มครบ มีกระเป๋า core บนเก้าอี้ หุ่นยนต์ยิ้มถือแฟ้ม (ภาพจำลอง)](img/lab3-written-vs-installed.png)
+
+แม่แบบแค่ **เขียนชื่อ** `core` ไว้ใน `settings.json` แต่ไม่ได้ **ติดตั้ง** ให้ โต๊ะที่มี core คือโต๊ะที่ Claude ของคนนั้นสั่ง `install core` เองระหว่างขั้น ② และทุกโต๊ะยังมี skill ส่วนตัวจาก LAB 1 ซ้อนอยู่ (เช่น `sales-proposal` คู่กับ `sales:sales-proposal`)
+
+💬 **พรอมต์** (ที่ `novatech/` เหมือนขั้น ①)
 
 ```text
 ตรวจทุกโต๊ะใน desks/ ว่ามี plugin core ติดตั้งใช้งานได้จริงไหม (ไม่ใช่แค่มีชื่อใน settings) ตัวไหนยังไม่มีให้ติดตั้งให้ครบ
@@ -996,7 +1034,7 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 จบแล้วสรุปเป็นตาราง: โต๊ะไหนเคยไม่มี core และย้าย skill ส่วนตัวของใครไปบ้าง
 ```
 
-✅ **ผลจริง ขั้น 3: 2 นาที 9 วินาที** Claude หาสาเหตุเจอเอง (ดูทะเบียนติดตั้ง `installed_plugins.json` ว่ามีโต๊ะไหนบ้าง แทนการเชื่อแค่ settings) ติดตั้ง core ให้ 13 โต๊ะที่ขาด และย้าย skill ส่วนตัว 19 ตัวไป `skills-archived/` หลังตรวจว่าทุกตัวมีฉบับเดียวกันในคลังกลางแล้ว
+✅ **ผลจริง ขั้น ③: 2 นาที 9 วินาที** Claude หาสาเหตุเจอเอง (ดูทะเบียนติดตั้ง `installed_plugins.json` ว่ามีโต๊ะไหนบ้าง แทนการเชื่อแค่ settings) ติดตั้ง core ให้ 13 โต๊ะที่ขาด และย้าย skill ส่วนตัว 19 ตัวไป `skills-archived/` หลังตรวจว่าทุกตัวมีฉบับเดียวกันในคลังกลางแล้ว
 
 นับใหม่ที่ทุกโต๊ะ (จากรายชื่อ skill ที่ Claude เห็นตอนเปิดแชต):
 
@@ -1008,7 +1046,9 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 | ชื่อไม่ชนกัน | skill จาก plugin มีชื่อแผนกนำหน้าเสมอ เช่น `sales:sales-proposal`, `dev:coding-standard` |
 | ฉบับซ้อน | ไม่เหลือ skill ส่วนตัวที่ซ้ำกับคลังกลาง |
 
-### 🧪 Dev คนใหม่วันแรก: มีแพ็ก vs ไม่มีแพ็ก
+### 3.5 🧪 Dev คนใหม่วันแรก: มีแพ็ก vs ไม่มีแพ็ก
+
+![คนใหม่วันแรก รู้วิธีของทีมทันที: ซ้าย ไม่มีแพ็ก dev-new วันแรกงงมีเครื่องหมายคำถามเต็มหัว หุ่นยนต์ยักไหล่ แผนได้ 1/12 · ขวา มีแพ็ก core + dev สะพายกระเป๋า core + dev หุ่นยนต์ถือแฟ้ม project-scaffold แผนได้ 12/12 มีโน้ตรูปกุญแจ token ติดถูก dev-mew ชูนิ้วอยู่ด้านหลัง (ภาพจำลอง)](img/lab3-newhire-concept.png)
 
 ทฤษฎีหัวข้อ 19 ขั้น 3 บอกว่า "คนใหม่วันแรก เปิด Claude แล้วมันรู้เลยว่าทีมให้ความสำคัญกับอะไร" ลองพิสูจน์ด้วยพรอมต์เดียวกัน 2 ครั้ง ในโฟลเดอร์ว่าง 2 โฟลเดอร์ที่ต่างกันแค่ติดตั้ง `core + dev` หรือไม่
 
