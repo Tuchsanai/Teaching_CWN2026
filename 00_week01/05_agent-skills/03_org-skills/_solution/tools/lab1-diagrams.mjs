@@ -57,31 +57,42 @@ ${dk('🤖', 'ml-jay', 'เจ หัวหน้าทีม ML', [['work/', W,
 <div class="foot">💡 ทุกคนอ่านของกลางชุดเดียวกัน แต่ <b>เขียนลงโต๊ะตัวเองเท่านั้น</b> skill จึงอยู่คนละโต๊ะ ใช้ร่วมกันไม่ได้ → นี่คือ "ต่างคนต่างเก็บ" ที่ LAB 2 จะรวมเป็นคลังกลาง</div>
 </body></html>`;
 
-// ② พรอมต์เดียว ใช้ได้ทุกโต๊ะ
+// ② พรอมต์เต็มรายคน: โครงเดียวกัน ต่างกันแค่ช่องที่ไฮไลต์ (ตัวอย่างของนิดา)
+const hl = (c, t) => `<span class="hl" style="background:${c}22;border-bottom:3px solid ${c}">${t}</span>`;
+const B = '#2563eb', O = '#ea580c', G = '#16a34a';
 const prompt = `<html><head><meta charset="utf-8"><style>${css}
-.p{margin:0 36px;display:flex;flex-direction:column;gap:12px}
-.blk{display:grid;grid-template-columns:200px 1fr;border-radius:16px;overflow:hidden;border:3px solid}
-.lab{display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:30px;font-weight:800;color:#fff;text-align:center;line-height:1.2}
-.lab small{font-size:19px;font-weight:600}
-.txt{background:#fff;padding:12px 18px;font-size:21px;line-height:1.55}
-.txt .q{font-family:'Leelawadee UI';background:#f8fafc;border-radius:8px;padding:6px 10px;display:block;color:#334155;margin-bottom:6px}
-.desks{margin:20px 36px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.d{background:#fff;border:2px solid #f59e0b;border-radius:14px;padding:10px 14px;font-size:20px;line-height:1.5}
-.d b{font-size:22px}
+.pr{margin:0 36px;background:#fff;border:2px solid #cbd5e1;border-radius:16px;padding:16px 20px;font-size:21px;line-height:1.9}
+.pr .l{display:block} .pr .i{display:block;padding-left:28px} .hl{border-radius:4px;padding:0 3px}
+.key{margin:14px 36px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.k{border-radius:14px;padding:10px 14px;font-size:20px;line-height:1.45;color:#fff} .k b{font-size:23px}
+.tbl{margin:16px 36px 0;border-collapse:collapse;width:calc(100% - 72px);font-size:19px;background:#fff}
+.tbl th{background:#0B2545;color:#fff;padding:8px 10px;text-align:left} .tbl td{border-bottom:1px solid #e2e8f0;padding:8px 10px}
+.tbl code{font-size:18px}
 </style></head><body>
-<h1>LAB 1 · พรอมต์เดียว วางได้ทุกโต๊ะ</h1>
-<div class="sub">พรอมต์มี 3 ส่วน = 3 ขั้นที่ทุกคนทำ · Claude รู้ว่าเราเป็นใครจาก <b>ชื่อโฟลเดอร์</b> ที่เปิดอยู่</div>
-<div class="p">
-<div class="blk" style="border-color:#2563eb"><div class="lab" style="background:#2563eb">① อ่าน<small>รู้ว่าเราเป็นใคร</small></div><div class="txt"><span class="q">"ผมเป็นเจ้าของโต๊ะนี้ (ชื่อโฟลเดอร์ = user ของผม) อ่านการ์ดของผมใน ../../people/ ก่อน"</span>📖 อ่านการ์ดตัวเอง → รู้ว่าเก่งอะไร ทำอะไรซ้ำ ชอบพิมพ์ว่าอะไร</div></div>
-<div class="blk" style="border-color:#ea580c"><div class="lab" style="background:#ea580c">② ทำงาน<small>จริง 1 ชิ้น</small></div><div class="txt"><span class="q">"ลงมือทำงานที่ผมทำซ้ำ 1 ชิ้นจริง ๆ ด้วยข้อมูลใน ../../company-kit/ … แล้วเก็บผลงานไว้ใน work/"</span>📖 ใช้ข้อมูลบริษัทจริง → ✍️ ผลงานลง <code>work/</code> · ทำก่อนแล้วค่อยเก็บ ไม่ให้ AI เดา</div></div>
-<div class="blk" style="border-color:#16a34a"><div class="lab" style="background:#16a34a">③ เก็บ<small>เป็น skill</small></div><div class="txt"><span class="q">"เก็บวิธีทำงานนี้เป็น skill ส่วนตัวที่ .claude/skills/&lt;ชื่อ skill ในการ์ด&gt;/"</span>✍️ <code>SKILL.md</code> + ความรู้ที่ต้องใช้สรุปไว้ใน <code>references/</code> (ให้ใช้ที่เครื่องอื่นได้)</div></div>
+<h1>LAB 1 · พรอมต์เต็มรายคน</h1>
+<div class="sub">ทุกคนใช้โครงเดียวกัน ต่างกันแค่ช่องที่ไฮไลต์ · ตัวอย่างพรอมต์ของนิดา (วางที่ <code>novatech/desks/sales-nida/</code>)</div>
+<div class="pr">
+<span class="l">${hl(B, 'ฉันคือ นิดา แก้วมณี (sales-nida) หัวหน้าทีมขาย ฝ่าย Sales')} · นี่คือโต๊ะของฉัน (novatech/desks/sales-nida/)</span>
+<span class="l">อ่านการ์ดของฉันก่อน: ${hl(B, '../../people/sales/sales-nida.md')}</span>
+<span class="l">1. ลงมือทำงานจริง 1 ชิ้น: ${hl(O, 'ร่าง proposal ให้ลูกค้าธนาคารตาม TOR ของ deal-001 พร้อมใบคิดราคา')}</span>
+<span class="i">ข้อมูลที่ใช้: ${hl(O, '../../company-kit/deal-001/tor-bank-queue.md, won-proposals/, price-list.csv …')}</span>
+<span class="i">เก็บผลงานไว้ใน work/</span>
+<span class="l">2. เก็บวิธีทำงานนี้เป็น skill ส่วนตัวชื่อ ${hl(G, 'sales-proposal')} ที่ ${hl(G, '.claude/skills/sales-proposal/')}</span>
+<span class="i">- หัวไฟล์มี name, description และ metadata (owner, layer: personal, version, uses, next, follows)</span>
+<span class="i">- skill เล็ก ใช้ได้ที่เครื่องคนอื่น: ความรู้จาก company-kit สรุปไว้ใน references/</span>
+<span class="l">จบแล้วสรุปสั้น ๆ: ทำงานอะไร ได้ไฟล์อะไร skill มีไฟล์อะไร จุดไหนตัดสินใจเอง</span>
 </div>
-<div class="desks">
-<div class="d"><b>💼 desks/sales-nida/</b><br>→ ทำ proposal ธนาคาร<br>→ skill <code>sales-proposal</code></div>
-<div class="d"><b>👔 desks/md-somchai/</b><br>→ พิจารณาดีล รพ.<br>→ skill <code>deal-approval</code></div>
-<div class="d"><b>🧾 desks/fin-joy/</b><br>→ คิดราคาและกำไร<br>→ skill <code>pricing-calc</code></div>
+<div class="key">
+<div class="k" style="background:${B}"><b>① ฉันคือใคร</b><br>ชื่อ · user · ตำแหน่ง · การ์ดของตัวเอง</div>
+<div class="k" style="background:${O}"><b>② ทำงานอะไร</b><br>งาน 1 ชิ้น + ไฟล์ข้อมูลใน company-kit</div>
+<div class="k" style="background:${G}"><b>③ เก็บเป็น skill ชื่ออะไร</b><br>ชื่อ skill + โฟลเดอร์ .claude/skills/</div>
 </div>
-<div class="foot">พรอมต์เดียวกันทุกตัวอักษร × 24 โต๊ะ · <b>1 โต๊ะ = 1 แชตใหม่</b> · แต่ละคนได้งานและ skill ของตัวเอง</div>
+<table class="tbl"><tr><th>เปิด Claude Code ที่</th><th>② งาน</th><th>③ skill</th></tr>
+<tr><td><code>desks/sales-nida/</code></td><td>ร่าง proposal ธนาคาร + ใบคิดราคา</td><td><code>sales-proposal</code></td></tr>
+<tr><td><code>desks/md-somchai/</code></td><td>พิจารณาดีล DS-2026-034 (+ โน้ตลับ notes/)</td><td><code>deal-approval</code></td></tr>
+<tr><td><code>desks/fin-joy/</code></td><td>คิดราคาและกำไร deal-001</td><td><code>pricing-calc</code></td></tr>
+<tr><td colspan="3" style="color:#475569">… ครบ 24 คน · <b>1 โต๊ะ = 1 แชตใหม่ = 1 พรอมต์ของคนนั้น</b></td></tr></table>
+<div class="foot"></div>
 </body></html>`;
 
 // ③ ตัวอย่าง 1 โต๊ะ: ผังโฟลเดอร์ทั้งโต๊ะหลัง LAB 1 ทุกไฟล์ พร้อมคำอธิบาย (ข้อมูลจาก _solution/desks-after-lab1 และ lab1/claude-summaries.md)
