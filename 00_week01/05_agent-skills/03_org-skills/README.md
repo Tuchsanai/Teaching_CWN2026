@@ -1826,7 +1826,6 @@ PR #4 ของผมใน novatech/org-skills ได้ approve แล้ว�
 
 PR C (บัญชีถูกยืม) ผู้สอนเตรียมเอง · PR D' แก้ผ่านหน้าเว็บ Gitea ไม่ใช้ Claude
 
-![หน้าต่าง Claude Code วางพรอมต์ LAB 6 PR A ที่โต๊ะ hr-oat](img/lab6-paste-pr.png)
 
 **PR A · hr-oat · 📂 `novatech/desks/hr-oat/` · แชตใหม่**
 
