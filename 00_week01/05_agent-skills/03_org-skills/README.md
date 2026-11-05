@@ -13,14 +13,14 @@
 |---|---|---|---|
 | 0 | ตั้งบริษัท: Gitea (คลังกลาง) + CI runner + พนักงาน 28 คน | 20, 22.2 | ~54 วินาที · 12 ทีม · เหลือ 2 container · GIF จาก VS Code + Gitea จริง |
 | 1 | 24 คนเก็บความเก่งของตัวเองเป็น skill ส่วนตัว | 16, 18, 21.1 | 24/24 skill · กติกาข้อมูลลูกค้าถูกคัดลอกไว้ 14 ที่ (นับจาก 19 โต๊ะแรก) |
-| 2 | ทีมกลางรวมเป็นคลัง `org-skills` (plugin marketplace) | 21, 22 | 11 plugin · 23 skill · ลบสำเนา 12 ไฟล์ |
+| 2 | ทีมกลางรวมเป็นคลัง `org-skills` (plugin marketplace) | 21, 22 | 12 plugin · 28 skill · 13 นาที · GIF ทีละขั้น |
 | 3 | ทุกโต๊ะติดตั้งแพ็กแผนก + Dev คนใหม่วันแรก | 19, 22.3, 24.4 | เห็น 6 จาก 23 skill · คนใหม่ 1/12 → 12/12 |
 | 4 | ดีลเดียววิ่งข้ามแผนก · **วางพรอมต์ครั้งเดียว** (ตอนต่อหลัง LAB 5) | 20.1, 25 | 3 โต๊ะหยิบ skill ถูกเอง 3/3 ใน 10 นาที · MD ตีกลับเรื่อง PDPA · ตอนต่อ 10 แชต 25 นาที อนุมัติแบบมีเงื่อนไข · GIF ทีละโต๊ะ |
 | 5 | ⭐ PR: คนหนึ่งแก้ skill ทุกคนเก่งขึ้น · **วางพรอมต์ครั้งเดียว** | 19, 22.2 | 10 ขั้น 22 นาที · รีวิว 5 ครั้งจาก 2 คน · krit ภาคผนวก PDPA 0/3 → 3/3 · GIF ทีละขั้น |
 | 6 | ⭐ SkillOps CI: ด่านตรวจ skill · **วางพรอมต์ครั้งเดียว** | 15, 17, 23 | รีวิว CI 3 รอบ เจอช่องโหว่ 4 จุด · eval 0.50 → 1.00 · PR อันตรายถูกด่าน ③ จับ · GIF ทีละขั้น + หน้าเว็บจริง |
 | 7 | หา skill ให้เจอ + กราฟผลกระทบ · **วางพรอมต์ครั้งเดียว** | 24, 25 | 2 โต๊ะหยิบ `skill-finder` เอง · เทียบ 5 วิธีค้น: BM25 80% → Claude 100% (hit@1) · GIF สร้างกราฟ 69 เส้น |
 
-> 🆕 **บริษัทขยายเป็น 28 คน 4 ชั้น** (เพิ่มผู้บริหารสาย 3 คน · ทีม Product 2 คน · น้องใหม่ Sales และ HR) · LAB 0, 3, 4, 4 (ต่อ), 5, 6, 7 รันใหม่ทั้งหมด (LAB 4–7 เป็นวางพรอมต์ครั้งเดียว) · LAB 1 รันเพิ่มเฉพาะ 5 โต๊ะใหม่ · ผลของ LAB 2 ยังเป็นรอบบริษัท 21 คน
+> 🆕 **บริษัทขยายเป็น 28 คน 4 ชั้น** (เพิ่มผู้บริหารสาย 3 คน · ทีม Product 2 คน · น้องใหม่ Sales และ HR) · LAB 0, 2, 3, 4, 4 (ต่อ), 5, 6, 7 รันใหม่ทั้งหมด (LAB 4–7 เป็นวางพรอมต์ครั้งเดียว) · LAB 1 รันเพิ่มเฉพาะ 5 โต๊ะใหม่ · ⚠️ LAB 3–7 รันก่อน LAB 2 รอบล่าสุด จึงยังใช้คลังรอบเดิม 11 plugin ([ต่างกันตรงไหน](#23-ผลจริง))
 
 ## 🧰 ก่อนเริ่ม
 
@@ -887,13 +887,13 @@ desks/sales-nida/             desks/sales-nida/
 
 ### 2.1 จากทุกโต๊ะ เป็นคลังเดียว
 
-[![LAB 2 จากทุกโต๊ะเป็นคลังเดียว: ก่อน ต่างคนต่างเก็บ desks/sales-nida/.claude/skills/sales-proposal/, sales-krit follow-up-email, md-somchai deal-approval, fin-joy pricing-calc, hr-fah jd-writer, ml-jay mlflow-experiment, plat-may customer-data-policy และโต๊ะอื่นทุกโต๊ะ → plat-ken อ่านอย่างเดียว → หลัง desks/plat-ken/org-skills/ มี .claude-plugin/marketplace.json สารบัญ 11 plugin · plugins/core/skills/ ชั้น 1 ทุกคนติดตั้ง customer-data-policy brand-guide pricing-rules skill-finder · shared/skills/ ชั้น 2 meeting-minutes · sales exec finance hr mlops sa dev qa devops ชั้น 3 แผนกละ 2 skill · .gitea/CODEOWNERS · scripts/build.py · push ขึ้น http://localhost:3300/novatech/org-skills · main ห้าม push ตรง ต้องผ่าน PR approve อย่างน้อย 1 คน](img/lab2-before-after.png)](img/lab2-before-after.png)
+[![LAB 2 จากทุกโต๊ะเป็นคลังเดียว: ก่อน ต่างคนต่างเก็บ desks/sales-nida/.claude/skills/sales-proposal/, md-somchai deal-approval, fin-joy pricing-calc และโต๊ะอื่นทุกโต๊ะ → plat-ken อ่านอย่างเดียว → หลัง desks/plat-ken/org-skills/ มี .claude-plugin/marketplace.json สารบัญ 12 plugin · plugins/core/skills/ ชั้น 1 ทุกคนติดตั้ง customer-data-policy brand-guide pricing-rules skill-finder · shared/skills/ ชั้น 2 meeting-minutes · sales exec product finance hr mlops sa dev qa devops ชั้น 3 · CODEOWNERS · scripts/build-catalog.py · push ขึ้น http://localhost:3300/novatech/org-skills · main ห้าม push ตรง ต้องผ่าน PR approve อย่างน้อย 1 คน](img/lab2-before-after.png)](img/lab2-before-after.png)
 
 | ชั้น | `layer` ในหัวไฟล์ | plugin | ใครติดตั้ง | ใครรีวิว (CODEOWNER) |
 |---|---|---|---|---|
-| 1 · องค์กร | `core` | `core` | **ทุกคน** | `plat-ken` (+ เจ้าของเรื่อง `plat-may`, `fin-joy`) |
+| 1 · องค์กร | `core` | `core` | **ทุกคน** | `plat-ken` (+ `fin-joy` เฉพาะ `pricing-rules`) |
 | 2 · ข้ามแผนก | `shared` | `shared` | ทุกแผนกที่ต้องใช้ | `plat-ken` |
-| 3 · แผนก | `department` | `sales` · `exec` · `finance` · `hr` · `mlops` · `sa` · `dev` · `qa` · `devops` (+ `product` ในบริษัท 28 คน) | คนในแผนกนั้น | หัวหน้าแผนก 👑 |
+| 3 · แผนก | `department` | `sales` · `exec` · `finance` · `hr` · `mlops` · `sa` · `product` · `dev` · `qa` · `devops` | คนในแผนกนั้น | หัวหน้าแผนก 👑 |
 
 ### 2.2 พรอมต์
 
@@ -915,6 +915,8 @@ desks/sales-nida/             desks/sales-nida/
    - 1 แผนก = 1 plugin (ดูแผนกใน ../../people/README.md)
    - plugin core = ของที่ทุกคนต้องใช้ ถ้าหลายคนเขียนกติกาเดียวกันซ้ำ (เช่น ข้อมูลลูกค้า แบรนด์ ราคา) ให้รวมเป็น skill เดียวใน core แล้วให้ skill เดิมอ้าง core แทนการคัดลอก
    - plugin shared = งานข้ามแผนก เช่น meeting-minutes
+   - รวมเฉพาะของที่ซ้ำกันหลาย skill · กฎที่มีอยู่ใน skill เดียวให้อยู่ที่เดิม และห้ามเติมกฎใหม่ให้ skill ของแผนกไหนเอง ถ้าเจอกฎที่แผนกหนึ่งควรรู้แต่ยังไม่รู้ ให้บอกในสรุป (หัวหน้าแผนกจะตัดสินผ่าน PR)
+   - สร้าง skill-finder ใน core (ฉันเป็นเจ้าของ) ตอบได้ว่าคลังมี skill อะไร แผนกไหนดูแล และแก้ตัวไหนกระทบใคร โดยอ่านจากหัวไฟล์ของทุก skill ผ่าน catalog.md ที่สคริปต์ในคลังสร้างให้
 3. ทำหัวไฟล์ให้เป็นแบบเดียวกันทั้งคลัง: layer ตามชั้นใหม่ · uses = skill ที่เรียกใช้ · next = งานถัดไป · follows = นโยบายที่ต้องทำตาม
 4. ให้หัวหน้าแผนกเป็น CODEOWNER ของ plugin แผนกตัวเอง
 5. ตรวจด้วย claude plugin validate จนผ่าน
@@ -929,82 +931,116 @@ desks/sales-nida/             desks/sales-nida/
 |---|---|
 | 1 อ่านอย่างเดียว | โต๊ะของคนอื่นคือคอมของเขา ทีมกลางเอาของมาจัด แต่ไม่ไปแก้ในเครื่องใคร |
 | 2 core / shared / แผนก | แต่ละคนเห็นแค่ของที่เกี่ยวกับตัวเอง (LAB 3) และกติกาที่ซ้ำเหลือที่เดียว (แก้ปัญหา 1 ของ LAB 1) |
+| 2 ห้ามเติมกฎใหม่ | ทีมกลางจัดของ แต่ไม่ตัดสินกฎของแผนกอื่น ถ้าเติมเอง จะไม่มีใครรีวิว (รอบแรก Claude เติมจริง ดูหมายเหตุด้านล่าง) |
+| 2 skill-finder | LAB 7 ใช้ตัวนี้หา skill ข้ามแผนก |
 | 3 หัวไฟล์แบบเดียวกัน | กราฟของ skill และการค้นหาใน LAB 7 จะได้ไม่เพี้ยน (แก้ปัญหา 2 ของ LAB 1) |
 | 4 CODEOWNER | การแก้ skill ของแผนกไหน ต้องให้หัวหน้าแผนกนั้นรีวิว (LAB 5) |
 | 5 validate | Claude Code อ่านคลังได้จริง ก่อนให้คนอื่นติดตั้ง |
 | 6–7 push + ยามของ main | ของจริงมีที่เดียวบน Gitea · ห้ามใครแก้ตรง ต้องผ่าน PR (ทฤษฎีหัวข้อ 22.2) |
 
 <details>
-<summary>🧪 หมายเหตุผู้สอน</summary>
+<summary>🧪 หมายเหตุผู้สอน: ทำไมพรอมต์มี 2 บรรทัดนี้</summary>
 
-ผลจริงด้านล่างรันด้วยพรอมต์ถ้อยคำเดิมแบบย่อหน้าเดียว ([`prompt.txt`](_solution/lab2/prompt.txt)) ในรอบบริษัท 21 คน (9 แผนก ยังไม่มีทีม Product) พรอมต์ด้านบนเรียงงานเดียวกันเป็นขั้น และเพิ่มคำว่า "อ่านอย่างเดียว" ให้ชัด (รอบจริง Claude ก็ไม่ได้แก้โต๊ะของใคร) ยังไม่ได้รันด้วยถ้อยคำใหม่
+รันจริง 3 รอบในบริษัทใหม่ทุกรอบ ([ตารางเทียบ 3 รอบ](_solution/lab2/run-2026-11-06/attempts.md))
+
+| รอบ | ต่างกันที่ | เกิดอะไร |
+|---|---|---|
+| 1 | พรอมต์เดิม | Claude **เติมกฎภาคผนวก PDPA ลง `sales-proposal` เอง** ดูเหมือนช่วย แต่ไม่มีใครรีวิว และ LAB 4 จะไม่ถูกตีกลับ LAB 5 จะไม่มีอะไรให้แก้ |
+| 2 | เพิ่ม "ห้ามเติมกฎใหม่" | กฎอยู่ที่เดิมแล้ว แต่ไม่ได้สร้าง `skill-finder` เพราะพรอมต์ไม่เคยสั่ง |
+| 3 ✅ | เพิ่ม "สร้าง skill-finder" | ได้ครบ · เป็นผลด้านล่าง |
 
 </details>
 
 ### 2.3 ผลจริง
 
-> ⚠️ **ผลด้านล่างมาจากรอบบริษัท 21 คน** (9 แผนก ยังไม่มีทีม Product) · ถ้าคุณรันกับบริษัท 28 คน ควรได้ **12 plugin** (มี `product` เพิ่ม) และ `exec` มี 5 skill (MD · ผู้ช่วย · ผู้บริหารสาย 3 คน) ตัวเลขอื่นต่างได้
+✅ **ผลจริง (บริษัท 28 คน): 13 นาที 15 วินาที · 34 คำสั่ง · 12 plugin · 28 skill** ([คำตอบเต็มของ Claude](_solution/lab2/run-2026-11-06/claude-summary.md) · [คลังที่ได้](_solution/org-skills-28-after-lab2/))
 
-✅ **ผลจริง: ~13 นาที · 57 คำสั่ง · 11 plugin · 23 skill** ([คำตอบเต็มของ Claude](_solution/lab2/claude-summary.md) · [คลังที่ได้](_solution/org-skills-after-lab2/))
+🎬 **ดูทีละขั้น**
+
+**① ดูด: อ่านทุกโต๊ะ ไม่แก้ของใคร**
+
+![GIF LAB 2 ขั้น 1 plat-ken: อ่าน skill ส่วนตัว 24 ตัวจาก 24 โต๊ะ พบกติกาข้อมูลลูกค้าซ้ำใน 17 skill กติกาแบรนด์ซ้ำใน 8 skill ราคาและ margin ซ้ำใน 8 skill และ price-list.csv 3 สำเนา ตรวจซ้ำหลังรันแล้ว skill ใน 24 โต๊ะเหมือนเดิมทุกไฟล์](img/lab2-step1.gif)
+
+**② จัดคลัง: ของซ้ำเหลือที่เดียว**
+
+![GIF LAB 2 ขั้น 2 plat-ken: core 4 skill customer-data-policy brand-guide pricing-rules skill-finder, shared 1 skill meeting-minutes, 10 แผนก 23 skill exec 5 product 2 แผนกอื่นแผนกละ 2 รวม 12 plugin 28 skill ลบไฟล์สำเนา 6 ไฟล์ ไฟล์ที่เหลือตัดส่วนซ้ำแล้วอ้าง core](img/lab2-step2.gif)
+
+**③ หัวไฟล์แบบเดียวกัน + เจ้าของแต่ละแผนก**
+
+![GIF LAB 2 ขั้น 3 plat-ken: layer จาก personal เป็น core shared department, follows เหลือแค่นโยบายใน core งานก่อนหน้าย้ายไปเป็น next, CODEOWNERS plugins/sales ไป sales-nida plugins/product ไป pm-beam](img/lab2-step3.gif)
+
+**④ ขึ้น Gitea + ตั้งยามให้ `main`**
+
+![GIF LAB 2 ขั้น 4 plat-ken: validate strict ผ่าน marketplace และ 12 plugin, ติดตั้งจาก Gitea จริงลง sales แล้ว core ตามมาเอง, git push origin main ถูกปฏิเสธ Not allowed to push to protected branch main, merge โดยไม่มี approve ก็ถูกปฏิเสธ](img/lab2-step4.gif)
+
+**⑤ เจอช่องโหว่ แต่ไม่เติมให้เอง**
+
+![GIF LAB 2 ขั้น 5 plat-ken: 13 นาที 15 วินาที 34 คำสั่ง สรุปว่า sales-nida ไม่รู้กฎภาคผนวก PDPA proposal ธนาคารจะถูก MD ตีกลับ, sales-nida และ exec-ploy ไม่รู้ว่าดีลธนาคารทุกมูลค่าต้องผ่าน MD, pipeline-review ไม่ได้ตรวจภาคผนวกเดียวกัน ไม่เติมให้เอง กฎของแผนกไหนหัวหน้าแผนกนั้นตัดสิน LAB 4 จะเห็นผล LAB 5 แก้ผ่าน PR](img/lab2-step5.gif)
 
 | plugin | ชั้น | CODEOWNER | skill |
 |---|---|---|---|
-| `core` | 1 องค์กร (ทุกคน) | `plat-ken` (+ `plat-may`, `fin-joy` เฉพาะเรื่องของตัวเอง) | `customer-data-policy` · `brand-guide` 🆕 · `pricing-rules` 🆕 · `skill-finder` 🆕 |
+| `core` | 1 องค์กร (ทุกคน) | `plat-ken` (+ `fin-joy` เฉพาะ `pricing-rules`) | `customer-data-policy` · `brand-guide` 🆕 · `pricing-rules` 🆕 · `skill-finder` 🆕 |
 | `shared` | 2 ข้ามแผนก | `plat-ken` | `meeting-minutes` 🆕 |
-| `exec` · `sales` · `sa` · `dev` · `qa` · `devops` · `mlops` · `hr` · `finance` | 3 แผนก | หัวหน้าแผนก 👑 | แผนกละ 2 skill (18 ตัวจาก LAB 1) |
+| `exec` | 3 แผนก | `exec-ploy` | `deal-approval` · `exec-deck` · `pipeline-review` · `tech-risk-review` · `cost-headcount-review` |
+| `sales` · `sa` · `product` · `dev` · `qa` · `devops` · `mlops` · `hr` · `finance` | 3 แผนก | หัวหน้าแผนก 👑 | แผนกละ 2 skill |
 
 ![ของที่ซ้ำ รวมไว้ที่เดียว: ก่อน 14 สำเนา เอกสารกติกาข้อมูลลูกค้าหลายฉบับกระจายบนหลายโต๊ะ บางฉบับเก่าบางฉบับมีเครื่องหมายคำถาม → หลัง 1 ที่ใน core หนังสือเล่มเดียวบนชั้น core และโฟลเดอร์ sales hr mlops finance exec ชี้ลูกศรมาที่เล่มนั้น (ภาพจำลอง)](img/lab2-dedupe.png)
 
 Claude รวมอะไรเป็น `core` และเพราะอะไร
 
-| skill ใน core | เดิมกระจายอยู่ที่ | ผล |
+| skill ใน core | เดิมซ้ำอยู่ใน | เหตุผล |
 |---|---|---|
-| `customer-data-policy` | สรุป PDPA คนละแบบ 8 skill | เหลือที่เดียว กติกาเฉพาะงานที่มีแค่ในบางสำเนาย้ายเป็นตาราง `doc-type-rules.md` ไม่มีข้อไหนหาย |
-| `brand-guide` | กติกาแบรนด์ 7 skill | ใช้คู่มือฉบับเต็มกับโลโก้ชุดเดียว |
-| `pricing-rules` | `price-list.csv` 3 สำเนาที่ **เหมือนกันทุกไบต์** + กฎกำไร 3 ชุด (sales, finance, exec) | สคริปต์คิดราคา 3 ตัวแก้ให้อ่านราคาจาก core ที่เดียว ทดสอบแล้วตัวเลขตรง (755,000 บาท · margin 36.8%) |
+| `customer-data-policy` | 17 skill | ห้ามเบอร์มือถือ/เลขบัตร และตาราง mask ถูกคัดลอกไปเกือบทุกแผนก ถ้านโยบายเปลี่ยนต้องไล่แก้ทุกที่ |
+| `brand-guide` | 8 skill | สี ฟอนต์ น้ำเสียง และชื่อบริษัท เป็นกติกาเดียวกันของเอกสารที่ส่งออก |
+| `pricing-rules` | 8 skill + `price-list.csv` 3 สำเนา | สูตร margin เกณฑ์อนุมัติ และสิทธิ์ส่วนลดถูกเขียนซ้ำ · สคริปต์คิดราคา 3 ตัวแก้ให้อ่านจาก core แล้ว Claude ทดสอบว่าผลตรงกับต้นฉบับ |
+| `skill-finder` | ของใหม่ | ตอบจาก `catalog.md` ที่ `scripts/build-catalog.py` สร้างจากหัวไฟล์ทุก skill |
 
-> 🔢 ตัวเลขนับคนละแบบ: LAB 1 นับ skill ที่มีกติกาข้อมูลลูกค้าปนอยู่ (14 จาก 19 โต๊ะ) ตารางนี้นับ skill ที่ Claude ใน LAB 2 พบว่ามีไฟล์สรุป PDPA เป็นสำเนา (8 skill) ส่วน 12 ไฟล์ด้านล่างคือไฟล์สำเนาที่ลบได้ทั้งไฟล์ รวมทุกเรื่อง (PDPA แบรนด์ ราคา)
+> 🔢 ตัวเลขนับคนละแบบ: LAB 1 (1.5) นับ 14 skill จากรอบ 19 โต๊ะ ส่วนตารางนี้ Claude นับจาก 24 โต๊ะ และนับทุก skill ที่มีกติกาปนอยู่ จึงได้ 17 · ลบได้ทั้งไฟล์แค่ 6 ไฟล์ ที่เหลือต้องตัดส่วนซ้ำออกจากในไฟล์
 
-และ **ลบไฟล์สำเนาทิ้ง 12 ไฟล์** skill ในแผนกเปลี่ยนไปอ้าง core ผ่าน `follows` แทน · หัวไฟล์ทุกตัวเป็นแบบเดียวกัน (เทียบกับ LAB 1 ปัญหา 2)
+หัวไฟล์ทุกตัวเป็นแบบเดียวกัน (เทียบกับ LAB 1 ปัญหา 2)
 
 ```markdown
 metadata:
   owner: sales-nida
-  plugin: sales
   layer: department          # เดิม personal
-  version: 1.1.0             # เดิม 1.0.0
-  uses: []                   # เดิม [pricing-calc] (ข้ามแผนก ติดตั้งไม่ครบทุกคน)
+  version: 1.0.0
+  uses: [pricing-calc]
   next: [deal-approval, follow-up-email, req-to-spec]
-  follows: [pricing-rules, brand-guide, customer-data-policy]   # นโยบายใน core
+  follows: [customer-data-policy, brand-guide, pricing-rules]   # นโยบายใน core
 ```
+
+👀 **สังเกต**
+- **จุดสำคัญของ LAB นี้คือ Claude ไม่เติมกฎให้เอง** มันเจอว่า `sales-proposal` ไม่รู้กฎภาคผนวก PDPA และเขียนบอกในสรุป ข้อแรกของ "กฎที่แผนกควรรู้แต่ยังไม่รู้" แล้วปล่อยให้หัวหน้าแผนกตัดสิน → LAB 4 จะเห็นผลของช่องโหว่นี้ และ LAB 5 แก้ผ่าน PR
+- **โต๊ะคนอื่นไม่ถูกแก้** ผู้สอนเทียบ skill ทั้ง 24 โต๊ะกับก่อนรันแล้ว เหมือนเดิมทุกไฟล์ · ของเดิมยังอยู่บนโต๊ะ เจ้าของลบเองหลังติดตั้ง (LAB 3)
+- **Claude ถามกลับเรื่อง repo สาธารณะ** ใคร ๆ ที่เข้าถึง Gitea นี้อ่านต้นทุนและเกณฑ์ margin ได้โดยไม่ต้อง login ในแล็บบน localhost รับได้ แต่ของจริงควรเป็น private
+- **CODEOWNERS แค่ขอรีวิว ไม่ได้บังคับ** Claude บอกเองว่าแผนกอื่นที่มีสิทธิ์เขียน approve แทนเจ้าของได้ ถ้าต้องการเข้มกว่านี้ต้องจำกัดผู้ approve (ใน LAB นี้ยังไม่ได้ตั้ง)
+- คำอธิบาย repo ในหน้า Gitea เป็นตัวอ่านไม่ออก เพราะส่งภาษาไทยผ่าน `curl` บน Windows โดยไม่ได้ตั้ง UTF-8 (ตัว repo และไฟล์ไม่เป็นอะไร)
+
+> ⚠️ **LAB 3–7 ยังใช้คลังรอบเดิม** ผลของ LAB 3–7 ด้านล่างรันก่อนรอบนี้ กับ [คลังรอบบริษัท 21 คน](_solution/org-skills-after-lab2/) ถ้าคุณทำต่อจากคลังของ LAB 2 นี้ จะต่างจากภาพ/ตารางดังนี้ (ยังไม่ได้รันต่อจริง)
+>
+> | เรื่อง | ผลใน README (คลังรอบเดิม) | คลังจาก LAB 2 นี้ |
+> |---|---|---|
+> | จำนวน | 11 plugin · 23 skill | 12 plugin · 28 skill |
+> | แพ็ก `product` | ยังไม่มี · ทีม Product ติดตั้งแค่ `core` | มี |
+> | skill ของผู้บริหารสาย | อยู่บนโต๊ะส่วนตัว | อยู่ใน `exec` |
+> | สคริปต์ในคลัง | `scripts/build.py` | `scripts/build-catalog.py` (พรอมต์ LAB 6 พูดถึง `build.py` ให้ใช้ตัวนี้แทน) |
+> | ไฟล์เจ้าของ | `.gitea/CODEOWNERS` | `CODEOWNERS` ที่รากคลัง |
 
 ### 2.4 ดูของจริงใน Gitea
 
-🎬 **หลัง push แล้ว Gitea หน้าตาเป็นยังไง (12 วินาที)**
+🎬 **หน้าเว็บจริงหลัง push + ลอง push ตรงเข้า `main` (32 วินาที)**
 
-![GIF LAB 2: ① plat-ken ดูด SKILL.md จากโต๊ะ sales-nida md-somchai fin-joy hr-fah ml-jay อ่านอย่างเดียว ② จัดเป็นคลังเดียว desks/plat-ken/org-skills/ มี marketplace.json plugins/core shared sales exec finance hr mlops sa dev CODEOWNERS build.py ③ git push origin main ขึ้น http://localhost:3300/novatech/org-skills.git new branch main ④ หน้า repo novatech/org-skills บน Gitea ⑤ โฟลเดอร์ plugins 11 แผนก ⑥ ไฟล์ CODEOWNERS plugins/sales → @sales-nida ⑦ ลอง push ตรงเข้า main ถูกปฏิเสธ Not allowed to push to protected branch main](img/lab2-push-flow.gif)
-
-<sub>ข้อความใน terminal และหน้าเว็บมาจากการ push คลังผลจริงของ LAB 2 ขึ้นบริษัทจำลองจริง (รวมการลอง push ตรงที่ถูกปฏิเสธ)</sub>
-
-| repo `novatech/org-skills` | `.gitea/CODEOWNERS`: โฟลเดอร์ไหน ใครรีวิว |
-|---|---|
-| ![GIF หน้า repo org-skills, โฟลเดอร์ plugins 11 แผนก และ SKILL.md ของ sales-proposal](img/lab2-repo.gif) | ![GIF ไฟล์ CODEOWNERS: plugins/sales → @sales-nida, plugins/dev → @dev-pond ... และหน้าตั้งค่า branch](img/lab2-codeowners.gif) |
+![GIF จากหน้า Gitea จริง: repo org-skills, โฟลเดอร์ plugins 12 ตัวมี product, ไฟล์ CODEOWNERS plugins/sales ไป sales-nida plugins/product ไป pm-beam pricing-rules ไป fin-joy, กติกา Disable Push ของ main และการ push ตรงด้วย token ของ plat-ken ที่ถูกปฏิเสธ Not allowed to push to protected branch main](img/lab2-real-gitea.gif)
 
 ![main มียาม ต้องผ่าน PR + approve: หุ่นยนต์ยามถือป้ายห้าม push ตรงหน้าประตู main คนที่โยนโฟลเดอร์ใส่ประตูตรง ๆ ถูกเด้งกลับ ส่วนอีกคนเดินผ่านซุ้ม PR แล้วผู้รีวิวชูนิ้ว approve ประตูจึงเปิด (ภาพจำลอง)](img/lab2-protect.png)
 
-![กติกาของ branch main: Disable Push (ห้าม push ตรง) และ Disable Force Push](img/lab2-protect-push.png)
-
-Claude ทดสอบกติกาเอง: ลอง push ตรงเข้า `main` แล้ว Gitea ตอบ `Not allowed to push to protected branch main` (แล้วลบ commit ทดสอบทิ้ง)
-
-👀 **สังเกต**
-- Claude **เขียนสคริปต์ `scripts/build.py --check` เพิ่มเอง** ให้สร้าง `marketplace.json`, `plugin.json`, `CODEOWNERS` และแค็ตตาล็อกจากหัวไฟล์ และไม่ยอมให้มีสำเนากติกากลางอยู่นอก core — นี่คือเมล็ดของ CI ใน LAB 6
-- Claude บอกเองว่า skill ที่เขียนใหม่ใน core (`brand-guide`, `pricing-rules`) **ควรให้เจ้าของเรื่องรีวิว** (`plat-may`, `fin-joy`) — AI ร่างได้ แต่คนต้องตรวจ (ทฤษฎีหัวข้อ 15)
-- คำอธิบาย repo ในหน้า Gitea เป็นตัวอ่านไม่ออก เพราะส่งภาษาไทยผ่าน `curl` บน Windows โดยไม่ได้ตั้ง UTF-8 (ตัว repo และไฟล์ไม่เป็นอะไร)
+Claude ทดสอบกติกาเอง: push ตรงถูกปฏิเสธ · merge โดยไม่มี approve ถูกปฏิเสธ · PR ทดสอบขอรีวิวจาก `sales-nida` และ `fin-joy` ถูกคน · จึงเหลือ **PR #1 ที่ปิดแล้ว** ค้างในประวัติ ไม่ต้องตกใจ
 
 <details>
 <summary>🧪 หมายเหตุผู้สอน</summary>
 
-รอบแรก LAB 2 สร้าง repo ไม่ได้ เพราะ `seed` ออก token ให้ทีมกลางแค่สิทธิ์เขียน repo ไม่มีสิทธิ์สร้าง repo ในองค์กร Claude **หยุดและถาม** แทนที่จะเอารหัสผ่านใน `.env` ไปออก token สิทธิ์สูงกว่าเอง ([บันทึกรอบแรก](_solution/lab2/attempt1-blocked-token.md)) · แก้ `seed` ให้ทีมกลางได้ `write:organization` แล้วรัน LAB 2 ใหม่ทั้งหมด ผลด้านบนคือรอบที่ 2
+- รอบบริษัท 21 คน LAB 2 สร้าง repo ไม่ได้ในครั้งแรก เพราะ `seed` ออก token ให้ทีมกลางแค่สิทธิ์เขียน repo Claude **หยุดและถาม** แทนที่จะเอารหัสผ่านใน `.env` ไปออก token สิทธิ์สูงกว่าเอง ([บันทึกรอบนั้น](_solution/lab2/attempt1-blocked-token.md)) · `seed` แก้แล้ว รอบนี้จึงไม่ติด · [ผลรอบ 21 คน](_solution/lab2/claude-summary.md) เก็บไว้เทียบ
+- รอบนี้รันด้วย `claude -p` ที่ `desks/plat-ken/` ของบริษัทที่เปิดใหม่ มีแค่ skill จาก [`desks-after-lab1`](_solution/desks-after-lab1/) และซ่อน plugin รอบเก่าของเครื่องไว้ระหว่างรัน ค่าใช้จ่ายรอบที่ใช้ $4.73
 
 </details>
 
@@ -1013,10 +1049,10 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 | ✅ | ตรวจที่ | ควรเห็น |
 |---|---|---|
 | ☐ | `http://localhost:3300/novatech/org-skills` | repo มีโฟลเดอร์ `plugins/` แยกแผนก และ `.claude-plugin/marketplace.json` |
-| ☐ | ไฟล์ `.gitea/CODEOWNERS` | `plugins/sales/` → `@sales-nida` และหัวหน้าแผนกอื่นครบ |
+| ☐ | ไฟล์ `CODEOWNERS` (ที่รากคลัง หรือ `.gitea/` ก็ใช้ได้) | `plugins/sales` → `@sales-nida` และหัวหน้าแผนกอื่นครบ |
 | ☐ | Settings → Branches | มีกติกาของ `main` (ห้าม push ตรง · approve อย่างน้อย 1 คน) |
 
-> **สรุป LAB 2:** ตอนนี้ skill ของทุกคนมี **ที่เดียว** บน Gitea แล้ว ซ้ำกันน้อยลง หัวไฟล์เป็นแบบเดียวกัน แต่ **ยังไม่มีใครติดตั้งไปใช้** → LAB 3 ทุกโต๊ะติดตั้งแพ็กของแผนกตัวเอง
+> **สรุป LAB 2:** ตอนนี้ skill ของทุกคนมี **ที่เดียว** บน Gitea แล้ว ซ้ำกันน้อยลง หัวไฟล์เป็นแบบเดียวกัน กฎของแต่ละแผนกยังอยู่ที่เดิม แต่ **ยังไม่มีใครติดตั้งไปใช้** → LAB 3 ทุกโต๊ะติดตั้งแพ็กของแผนกตัวเอง
 
 ---
 
@@ -1109,7 +1145,7 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 | 24 โต๊ะของแผนกที่มีแพ็ก (ผู้บริหาร 5 · Sales 3 · SA 2 · Dev 3 · QA 2 · DevOps 2 · ML 2 · HR 3 · บัญชี 2) | `core` + แผนกตัวเอง | 6 ตัว (core 4 + แผนก 2) |
 | `plat-ken` | `core` + `shared` | 5 ตัว |
 | `plat-may` | `core` | 4 ตัว |
-| `pm-beam` · `pm-gift` (ทีม Product) | `core` | 4 ตัว · ⚠️ คลังยังไม่มีแพ็ก `product` เพราะ LAB 2 รวมคลังตอนบริษัทยังไม่มีทีมนี้ |
+| `pm-beam` · `pm-gift` (ทีม Product) | `core` | 4 ตัว · ⚠️ รอบนี้คลังยังไม่มีแพ็ก `product` (ใช้คลังรอบเดิม) · LAB 2 รอบล่าสุดมีแล้ว |
 
 <details>
 <summary>👀 เบื้องหลัง: พรอมต์รุ่นแรกพลาดตรงไหน (ของจริง)</summary>
@@ -1158,7 +1194,7 @@ Claude ทดสอบกติกาเอง: ลอง push ตรงเข�
 
 </details>
 
-skill ส่วนตัวที่ **ยังเก็บไว้** 5 ตัว เพราะยังไม่มีในคลังกลาง: `cco-wit/pipeline-review` · `cfo-ying/cost-headcount-review` · `cto-nat/tech-risk-review` · `pm-beam/prd-writer` · `pm-gift/product-sunset` (เป็น skill ของคนที่เพิ่มเข้าบริษัทหลัง LAB 2) → ต้องให้ทีมกลางรวมเข้าคลังผ่าน PR (LAB 5) และเพิ่มแพ็ก `product`
+skill ส่วนตัวที่ **ยังเก็บไว้** 5 ตัว เพราะยังไม่มีในคลังกลาง: `cco-wit/pipeline-review` · `cfo-ying/cost-headcount-review` · `cto-nat/tech-risk-review` · `pm-beam/prd-writer` · `pm-gift/product-sunset` (เป็น skill ของคนที่เพิ่มเข้าบริษัทหลังคลังรอบเดิม · LAB 2 รอบล่าสุดรวมเข้าคลังแล้ว) → ต้องให้ทีมกลางรวมเข้าคลังผ่าน PR (LAB 5) และเพิ่มแพ็ก `product`
 
 | ตรวจ | ผล |
 |---|---|
@@ -2140,6 +2176,6 @@ Embedding และ Reranker รันบน GPU RTX 5090 ใน container ข�
 | path | คืออะไร |
 |---|---|
 | [`novatech/`](novatech/) | บริษัทจำลองที่ผู้เรียนเปิด Claude Code: `compose.yml`, `seed/`, `people/` (การ์ด 28 ใบ), `company-kit/` (ข้อมูลบริษัท), `desks/` |
-| [`_solution/`](_solution/) | ผลรันจริงทุก LAB: `labN/` (พรอมต์ + คำตอบของ Claude), `desks-after-lab1/`, `org-skills-after-lab2/`, `org-skills/` (คลังตอนจบ), `lab7/search-eval/` (เครื่องวัดการค้นหา), `tools/` (สคริปต์ที่ผู้สอนใช้รันและถ่ายภาพ) |
+| [`_solution/`](_solution/) | ผลรันจริงทุก LAB: `labN/` (พรอมต์ + คำตอบของ Claude), `desks-after-lab1/`, `org-skills-28-after-lab2/` (LAB 2 รอบล่าสุด), `org-skills-after-lab2/` (คลังรอบเดิมที่ LAB 3–7 ใช้), `org-skills/` (คลังตอนจบ), `lab7/search-eval/` (เครื่องวัดการค้นหา), `tools/` (สคริปต์ที่ผู้สอนใช้รันและถ่ายภาพ) |
 | [`img/`](img/) | ภาพแนวคิด (สร้างใหม่) · ภาพหน้าจอ/GIF จาก Gitea จริง · กราฟจากข้อมูลจริง |
 | [`DESIGN.md`](DESIGN.md) | แบบร่างก่อนรันจริง |

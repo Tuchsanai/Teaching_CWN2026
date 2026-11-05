@@ -1,5 +1,5 @@
 // ภาพประกอบ LAB 2 (กว้าง 1200px เรนเดอร์ 2 เท่า): ก่อน = skill กระจายทุกโต๊ะ → หลัง = คลัง org-skills ในโต๊ะ plat-ken → push ขึ้น Gitea
-// ข้อมูลจาก _solution/org-skills-after-lab2 (รอบบริษัท 21 คน: 9 แผนก + core + shared = 11 plugin)
+// ข้อมูลจาก _solution/org-skills-28-after-lab2 (รอบบริษัท 28 คน: 10 แผนก + core + shared = 12 plugin)
 // node lab2-diagrams.mjs <img-dir> <chromium.exe>
 import { join } from 'node:path';
 import { chromium } from 'playwright-core';
@@ -40,22 +40,22 @@ ${desks.map(([u, s]) => `<div class="bd"><b>desks/${u}/</b><br><code>.claude/ski
 <div class="arrow">➜<span>อ่าน<br>อย่างเดียว</span></div>
 <div class="after"><div class="ah">หลัง · <code>desks/plat-ken/org-skills/</code></div>
 ${R('.claude-plugin/', 'สารบัญของคลัง', 'meta')}
-${R('   marketplace.json', 'ชื่อคลัง <code>novatech-skills</code> + รายชื่อ 11 plugin', 'meta')}
+${R('   marketplace.json', 'ชื่อคลัง <code>novatech-skills</code> + รายชื่อ 12 plugin', 'meta')}
 ${R('plugins/', '1 แผนก = 1 plugin', '')}
 ${R('   core/skills/', T('ชั้น 1', '#ca8a04') + 'ทุกคนติดตั้ง: customer-data-policy · brand-guide · pricing-rules · skill-finder', 'l1')}
 ${R('   shared/skills/', T('ชั้น 2', '#0891b2') + 'งานข้ามแผนก: meeting-minutes', 'l2')}
 ${R('   sales/skills/', T('ชั้น 3', '#16a34a') + 'sales-proposal · follow-up-email', 'l3')}
-${R('   exec/skills/', T('ชั้น 3', '#16a34a') + 'deal-approval · exec-deck', 'l3')}
+${R('   exec/skills/', T('ชั้น 3', '#16a34a') + 'deal-approval · exec-deck · pipeline-review · tech-risk-review · cost-headcount-review', 'l3')}
 ${R('   finance/skills/', T('ชั้น 3', '#16a34a') + 'pricing-calc · invoice-check', 'l3')}
-${R('   hr/ · mlops/ · sa/ · dev/', T('ชั้น 3', '#16a34a') + 'แผนกละ 2 skill · qa/ · devops/ ก็เช่นกัน', 'l3')}
-${R('.gitea/CODEOWNERS', 'โฟลเดอร์ไหนใครรีวิว: <code>plugins/sales/</code> → <code>@sales-nida</code> …', 'meta')}
-${R('scripts/build.py', 'สร้าง marketplace.json · CODEOWNERS · แค็ตตาล็อก จากหัวไฟล์', 'meta')}
+${R('   product/ และแผนกอื่น', T('ชั้น 3', '#16a34a') + 'product · hr · mlops · sa · dev · qa · devops แผนกละ 2 skill', 'l3')}
+${R('CODEOWNERS', 'โฟลเดอร์ไหนใครรีวิว: <code>plugins/sales/</code> → <code>@sales-nida</code> …', 'meta')}
+${R('scripts/build-catalog.py', 'สร้างบัตรรายการ catalog.md จากหัวไฟล์ทุก skill', 'meta')}
 </div></div>
 <div class="push">
 <div class="pb"><b>⬆️ push ขึ้น Gitea</b><br><code>http://localhost:3300/novatech/org-skills</code><br>repo สาธารณะ ทุกโต๊ะดึงไปติดตั้งได้ (LAB 3)</div>
 <div class="pb"><b>🛡️ กติกาของ main</b><br>ห้าม push ตรง · ต้องผ่าน PR · approve อย่างน้อย 1 คน<br>ทดสอบแล้ว: push ตรงถูกปฏิเสธ</div>
 </div>
-<div class="foot">ผลรันจริง (รอบบริษัท 21 คน): 11 plugin · 23 skill · รวมกติกาที่ซ้ำเป็น core แล้วลบสำเนาทิ้ง 12 ไฟล์ · <code>desks/*/.claude/skills/</code> ของทุกคนยังอยู่เหมือนเดิม</div>
+<div class="foot">ผลรันจริง (บริษัท 28 คน): 12 plugin · 28 skill · รวมกติกาที่ซ้ำเป็น core แล้วลบสำเนาทิ้ง 6 ไฟล์ · <code>desks/*/.claude/skills/</code> ของทุกคนยังอยู่เหมือนเดิม</div>
 </body></html>`;
 
 const b = await chromium.launch({ executablePath: exe });
