@@ -1,0 +1,74 @@
+{
+ "lab": "LAB 7",
+ "steps": [
+  {
+   "id": "lab7-step1",
+   "who": "hr-fah",
+   "role": "HR",
+   "color": "#fed7aa",
+   "portrait": "../../../img/people/hr-fah.jpg",
+   "prompt": "มี skill ของบริษัทสำหรับทำ proposal ให้ลูกค้าไหม แผนกไหนดูแล ถ้าจะใช้ต้องติดตั้งอะไรบ้าง",
+   "reads": [
+    "catalog.md ของ skill-finder (บัตรรายการ)"
+   ],
+   "skill": "core:skill-finder",
+   "skillNote": "Claude หยิบเอง",
+   "time": "27 วินาที · 2 คำสั่ง",
+   "outputs": [
+    {
+     "file": "sales-proposal",
+     "note": "แผนก Sales · เจ้าของ sales-nida"
+    },
+    {
+     "file": "ติดตั้ง",
+     "note": "/plugin install sales@novatech-skills"
+    },
+    {
+     "file": "คำแนะนำ",
+     "note": "ไม่ควรติดตั้งแพ็ก Sales ถ้าแค่อยากรู้ · ส่งงานให้ Sales ดีกว่า"
+    }
+   ],
+   "verdict": {
+    "kind": "ok",
+    "text": "เจอ skill ของแผนกอื่น โดยไม่ต้องติดตั้ง",
+    "sub": "ข้อมูลมาจากบัตรรายการอย่างเดียว ไม่ได้เปิดของแผนกอื่น"
+   },
+   "next": ""
+  },
+  {
+   "id": "lab7-step2",
+   "who": "md-somchai",
+   "role": "MD",
+   "color": "#e9d5ff",
+   "portrait": "../../../img/people/md-somchai.jpg",
+   "prompt": "ถ้าผมจะเปลี่ยนกฎภาคผนวก PDPA ของลูกค้าธนาคาร (เช่น 72 ชั่วโมงเป็น 24 ชั่วโมง) จะกระทบ skill ไหนของบริษัทบ้าง และต้องแจ้งใคร",
+   "reads": [
+    "catalog.md (ตารางผลกระทบ)",
+    "โน้ตของ MD + skill ใน core และ exec"
+   ],
+   "skill": "core:skill-finder",
+   "skillNote": "Claude หยิบเอง",
+   "time": "46 วินาที · 5 คำสั่ง",
+   "outputs": [
+    {
+     "file": "ต้องแก้ 3 จุด",
+     "note": "deal-approval (SKILL + approval-rules) และ notes/deal-rules.md"
+    },
+    {
+     "file": "กระทบ",
+     "note": "sales-proposal (มากที่สุด) · pricing-calc · exec-deck"
+    },
+    {
+     "file": "ต้องแจ้ง",
+     "note": "exec-ploy (approve PR) · sales-nida · fin-joy · plat-may"
+    }
+   ],
+   "verdict": {
+    "kind": "warn",
+    "text": "รู้ว่ากระทบใคร · แต่มีจุดบอด",
+    "sub": "ไม่รู้ว่า sales-proposal ใช้ 24 ชม. ไปแล้วตั้งแต่ LAB 5 เพราะเปิด skill แผนกอื่นไม่ได้"
+   },
+   "next": ""
+  }
+ ]
+}
