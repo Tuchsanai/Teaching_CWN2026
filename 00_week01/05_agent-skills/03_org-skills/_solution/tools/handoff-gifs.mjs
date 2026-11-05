@@ -10,20 +10,21 @@ const spec = JSON.parse(readFileSync(specFile, 'utf8'));
 const base = dirname(resolve(specFile));
 const FPS = 10;
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const img = f => `data:image/png;base64,${readFileSync(resolve(base, f)).toString('base64')}`;
+const img = f => `data:image/${/\.jpe?g$/i.test(f) ? 'jpeg' : 'png'};base64,${readFileSync(resolve(base, f)).toString('base64')}`;
 const KIND = { ok: ['#dcfce7', '#166534', '✅'], bad: ['#fee2e2', '#991b1b', '❌'], warn: ['#fef9c3', '#854d0e', '⚠️'], info: ['#e0e7ff', '#3730a3', '➡️'] };
 
 function page(s, i, n) {
   const [vbg, vfg, vic] = KIND[s.verdict.kind] || KIND.info;
   const dots = Array.from({ length: n }, (_, k) => `<span class="dot ${k < i ? 'done' : k === i ? 'now' : ''}">${k + 1}</span>`).join('<i></i>');
   // art = ตัดส่วนหนึ่งของภาพแนวคิด: cx, cy = จุดกลาง (พิกเซลของภาพต้นฉบับ) · w = ความกว้างของภาพต้นฉบับ · zoom = ขยาย
-  const art = s.art ? (() => { const W = s.art.w * s.art.zoom; const x = 150 - s.art.cx * s.art.zoom, y = 125 - s.art.cy * s.art.zoom;
+  // portrait = ภาพบุคคลของเจ้าของโต๊ะ (img/people/<user>.jpg) แสดงกลางภาพแทนภาพแนวคิด และเป็นรูปเล็กบนแถบบน
+  const art = s.portrait ? `<div class="art" style="background:url(${img(s.portrait)}) center/cover"></div>` : s.art ? (() => { const W = s.art.w * s.art.zoom; const x = 150 - s.art.cx * s.art.zoom, y = 125 - s.art.cy * s.art.zoom;
     return `<div class="art" style="background-image:url(${img(s.art.file)});background-size:${W}px auto;background-position:${x}px ${y}px;background-repeat:no-repeat;background-color:#fff"></div>`; })() : '';
   return `<html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box}body{margin:0;width:1280px;height:720px;overflow:hidden;font-family:'Leelawadee UI','Segoe UI',sans-serif;background:#f6f7fb;color:#0B2545}
 .top{height:86px;background:#0B2545;color:#fff;display:flex;align-items:center;padding:0 30px;gap:22px}
 .top .lab{font-size:22px;opacity:.85}.top .who{font-size:32px;font-weight:700}.top .role{font-size:20px;background:${s.color};color:#0B2545;border-radius:14px;padding:4px 14px;font-weight:700}
-.top .sp{flex:1}.dots{display:flex;align-items:center}.dots i{width:22px;height:3px;background:#ffffff55}
+.top .sp{flex:1}.av{width:58px;height:58px;border-radius:50%;background-size:cover;background-position:center;border:3px solid #fff}.dots{display:flex;align-items:center}.dots i{width:22px;height:3px;background:#ffffff55}
 .dot{width:34px;height:34px;border-radius:50%;border:2px solid #ffffff88;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
 .dot.done{background:#22c55e;border-color:#22c55e}.dot.now{background:#f59e0b;border-color:#f59e0b;color:#0B2545}
 .col{position:absolute;top:110px;bottom:118px;border-radius:20px;background:#fff;box-shadow:0 4px 18px #0B254518;padding:18px 22px;opacity:0}
@@ -39,7 +40,7 @@ h3{margin:0 0 12px;font-size:22px;display:flex;gap:8px;align-items:center}
 .verdict{position:absolute;left:24px;right:24px;bottom:22px;height:80px;border-radius:18px;background:${vbg};color:${vfg};display:flex;align-items:center;gap:14px;padding:0 24px;font-size:24px;font-weight:700;opacity:0}
 .verdict small{display:block;font-size:17px;font-weight:400}.verdict .sp{flex:1}.verdict .next{font-size:19px;background:#fff;color:#0B2545;border-radius:12px;padding:8px 14px;white-space:nowrap}
 </style></head><body>
-<div class="top"><span class="lab">${esc(spec.lab)}</span><span class="who">${esc(s.who)}</span><span class="role">${esc(s.role)}</span><span class="sp"></span><div class="dots">${dots}</div></div>
+<div class="top"><span class="lab">${esc(spec.lab)}</span>${s.portrait ? `<span class="av" style="background-image:url(${img(s.portrait)})"></span>` : ''}<span class="who">${esc(s.who)}</span><span class="role">${esc(s.role)}</span><span class="sp"></span><div class="dots">${dots}</div></div>
 <div class="col in" id="cin"><h3>📥 Input</h3><div class="prompt" id="pr" data-full="${esc(s.prompt)}"></div>
 <div class="reads">${(s.reads || []).map(r => `<div>📄 ${esc(r)}</div>`).join('')}</div></div>
 <div class="col mid" id="cmid">${art}<div class="chip" id="chip">${esc(s.skill || '— ไม่ใช้ skill')}</div><div class="chipcap" id="chipcap">${esc(s.skillNote || 'Claude หยิบ skill นี้เอง')}</div><div class="arrow" id="arr">➜</div></div>
