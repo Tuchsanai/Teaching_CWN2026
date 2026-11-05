@@ -1,0 +1,108 @@
+{
+ "queries.json": {
+  "BM25": {
+   "n": 60,
+   "hit1": 98.3,
+   "hit5": 100.0,
+   "miss": []
+  },
+  "Embedding": {
+   "n": 60,
+   "hit1": 86.7,
+   "hit5": 98.3,
+   "miss": [
+    {
+     "q": "โปรเจกต์ใหม่ต้องรับคนเพิ่ม",
+     "expect": "hr:jd-writer",
+     "got": [
+      "dev:project-scaffold",
+      "hr:onboarding-pack",
+      "sales:sales-proposal"
+     ]
+    }
+   ]
+  },
+  "Hybrid": {
+   "n": 60,
+   "hit1": 96.7,
+   "hit5": 100.0,
+   "miss": []
+  },
+  "Hybrid + Reranker": {
+   "n": 60,
+   "hit1": 98.3,
+   "hit5": 100.0,
+   "miss": []
+  }
+ },
+ "queries-heldout.json": {
+  "BM25": {
+   "n": 60,
+   "hit1": 80.0,
+   "hit5": 95.0,
+   "miss": [
+    {
+     "q": "รีวิว deal summary 3 ตัวสัปดาห์นี้ให้หน่อย จัด priority แล้วบอก go / no-go พร้อมเหตุผลสั้นๆ",
+     "expect": "exec:deal-approval",
+     "got": [
+      "mlops:mlflow-experiment",
+      "devops:postmortem",
+      "devops:deploy-checklist"
+     ]
+    },
+    {
+     "q": "ช่วยทำ onboarding kit ให้ new hire หน่อย มี welcome email, first-week schedule แล้วก็ checklist เรื่อง account กับอุปกรณ์",
+     "expect": "hr:onboarding-pack",
+     "got": [
+      "core:skill-finder",
+      "shared:meeting-minutes",
+      "mlops:model-release"
+     ]
+    },
+    {
+     "q": "แต่ละแผนกส่ง skill มาให้ทีมกลาง บางอันซ้ำกัน บางอันเขียนไม่ครบ ต้องตรวจให้ได้มาตรฐานก่อนปล่อยเวอร์ชันใหม่ปลายเดือน ช่วยวางขั้นตอนตรวจให้หน่อย",
+     "expect": "core:skill-finder",
+     "got": [
+      "mlops:model-release",
+      "qa:bug-report",
+      "dev:coding-standard"
+     ]
+    }
+   ]
+  },
+  "Embedding": {
+   "n": 60,
+   "hit1": 78.3,
+   "hit5": 98.3,
+   "miss": [
+    {
+     "q": "ขอ job description ตำแหน่ง Senior DevOps Engineer มี responsibilities, qualifications, nice-to-have แล้วก็ benefits",
+     "expect": "hr:jd-writer",
+     "got": [
+      "devops:deploy-checklist",
+      "dev:project-scaffold",
+      "core:skill-finder"
+     ]
+    }
+   ]
+  },
+  "Hybrid": {
+   "n": 60,
+   "hit1": 83.3,
+   "hit5": 100.0,
+   "miss": []
+  },
+  "Hybrid + Reranker": {
+   "n": 60,
+   "hit1": 88.3,
+   "hit5": 100.0,
+   "miss": []
+  },
+  "LLM (Claude)": {
+   "n": 60,
+   "hit1": 100.0,
+   "hit5": 100.0,
+   "miss": []
+  }
+ }
+}
