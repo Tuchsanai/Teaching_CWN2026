@@ -1,5 +1,13 @@
 # Teaching CWN 2026
 
+<p align="center">
+  <a href="https://github.com/Tuchsanai/Teaching_CWN2026">
+    <img src="00_resource/repo_qr.png" alt="QR code ไปยัง repo Teaching_CWN2026" width="220">
+  </a>
+  <br>
+  📱 สแกน QR เพื่อเปิด repo นี้: <a href="https://github.com/Tuchsanai/Teaching_CWN2026">github.com/Tuchsanai/Teaching_CWN2026</a>
+</p>
+
 ## เปิด container `multi-account-devtool`
 
 💬 วางพรอมต์นี้ใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
