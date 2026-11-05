@@ -1,12 +1,18 @@
 # Teaching CWN 2026
 
+<h2 align="center">📱 สแกนเพื่อเข้าหน้าวิชานี้</h2>
+
 <p align="center">
   <a href="https://github.com/Tuchsanai/Teaching_CWN2026">
-    <img src="00_resource/repo_qr.png" alt="QR code ไปยัง repo Teaching_CWN2026" width="220">
+    <img src="00_resource/repo_qr.png" alt="QR code ไปยัง repo Teaching_CWN2026" width="360">
   </a>
-  <br>
-  📱 สแกน QR เพื่อเปิด repo นี้: <a href="https://github.com/Tuchsanai/Teaching_CWN2026">github.com/Tuchsanai/Teaching_CWN2026</a>
 </p>
+
+<p align="center">
+  <b><a href="https://github.com/Tuchsanai/Teaching_CWN2026">github.com/Tuchsanai/Teaching_CWN2026</a></b>
+</p>
+
+---
 
 ## เปิด container `multi-account-devtool`
 
