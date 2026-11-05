@@ -1,0 +1,394 @@
+{
+ "lab": "LAB 5 · PR แก้ skill",
+ "steps": [
+  {
+   "id": "lab5-step01-nida-open-pr",
+   "who": "sales-nida",
+   "role": "Sales · เปิด PR",
+   "color": "#fbcfe8",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 690,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "MD ตีกลับดีล deal-001 เพราะ proposal ไม่มีภาคผนวก PDPA … แก้ skill sales-proposal ในคลังกลาง ให้ใส่ภาคผนวกนี้ทุกครั้งที่ลูกค้าเป็นธนาคาร แล้วเปิด PR ให้ plat-may และ md-somchai รีวิว",
+   "reads": [
+    "deals/deal-001/approval.md (เหตุผลที่ MD ตีกลับ)",
+    "คลัง org-skills บน Gitea (ใช้ token ของนิดา)"
+   ],
+   "skill": "แก้ skill sales-proposal",
+   "skillNote": "แก้ที่คลังกลาง ไม่ใช่แค่ proposal ฉบับเดียว",
+   "time": "2 นาที 10 วินาที",
+   "outputs": [
+    {
+     "file": "PR #1 · 1.1.0 → 1.2.0",
+     "note": "เพิ่ม \"ภาคผนวก PDPA\" 3 ข้อ (DPA · ข้อมูลอยู่ในไทย · แจ้งเหตุ 72 ชม.)"
+    },
+    {
+     "file": "แก้ 3 ไฟล์",
+     "note": "SKILL.md · proposal-template.md · checklist.md"
+    },
+    {
+     "file": "ขอรีวิว",
+     "note": "plat-may (เจ้าของนโยบายข้อมูล) + md-somchai (เจ้าของกฎ)"
+    }
+   ],
+   "verdict": {
+    "kind": "info",
+    "text": "เปิด PR #1 แล้ว รอรีวิว 2 คน",
+    "sub": "build.py และ claude plugin validate ผ่าน"
+   },
+   "next": "➜ plat-may"
+  },
+  {
+   "id": "lab5-step02-may-review1",
+   "who": "plat-may",
+   "role": "รีวิวรอบ 1",
+   "color": "#ddd6fe",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1090,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "รีวิว PR #1 ใน novatech/org-skills ในฐานะเจ้าของนโยบายข้อมูลลูกค้า ถ้ามีจุดที่ต้องแก้ให้ request changes พร้อมเหตุผล ถ้าดีแล้วให้ approve",
+   "reads": [
+    "diff ของ PR #1 (3 ไฟล์)",
+    "core:customer-data-policy (นโยบายของตัวเอง)"
+   ],
+   "skill": "นโยบาย customer-data-policy",
+   "skillNote": "เปิดนโยบายใน core จากคลังมาเทียบ",
+   "time": "2 นาที 2 วินาที",
+   "outputs": [
+    {
+     "file": "🔴 ข้อ 3 แจ้งเหตุ 72 ชม. ผิดฝั่ง",
+     "note": "72 ชม. คือเส้นตายของธนาคาร (ผู้ควบคุมข้อมูล) เราต้องแจ้ง \"โดยไม่ชักช้า ไม่เกิน 24 ชม.\""
+    },
+    {
+     "file": "🔴 ย่อหน้าเปิด",
+     "note": "proposal ประกาศตัวเองเป็น DPA ไม่ได้ ต้องเขียนว่า \"จะลงนาม DPA ก่อนเริ่ม\""
+    },
+    {
+     "file": "🟡 ข้อเสนอ",
+     "note": "ภายหลังควรย้ายถ้อยคำไปไว้ใน core"
+    }
+   ],
+   "verdict": {
+    "kind": "bad",
+    "text": "Request changes",
+    "sub": "รีวิวด้วยความรู้กฎหมายที่ Sales ไม่มี"
+   },
+   "next": "➜ md-somchai"
+  },
+  {
+   "id": "lab5-step03-md-review1",
+   "who": "md-somchai",
+   "role": "รีวิวรอบ 1",
+   "color": "#e9d5ff",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1480,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "รีวิว PR #1 ในฐานะเจ้าของกฎภาคผนวก PDPA ว่าข้อความตรงกับกติกาของผมไหม ถ้าตรงให้ approve ถ้าไม่ตรงให้ request changes",
+   "reads": [
+    "โน้ตลับของ MD (notes/deal-rules.md)",
+    "diff ของ PR #1"
+   ],
+   "skill": "notes/deal-rules.md",
+   "skillNote": "เทียบกับกฎในโน้ตของตัวเองทีละข้อ",
+   "time": "1 นาที 15 วินาที",
+   "outputs": [
+    {
+     "file": "🔴 ขอบเขตแคบไป",
+     "note": "กฎใช้กับ \"ธนาคารหรือสถาบันการเงิน\" แต่ PR เขียนแค่ \"ธนาคาร\""
+    },
+    {
+     "file": "🔴 ชื่อหัวข้อ",
+     "note": "ต้องมีคำว่า \"ภาคผนวก PDPA\" ตรงตัว checklist จะได้ค้นเจอ"
+    },
+    {
+     "file": "✅ ส่วนที่ตรงแล้ว",
+     "note": "3 ข้อพอดี · ใส่ทุกครั้งแม้ TOR ไม่ขอ · 24 ชม. เข้มกว่ากฎ จึงยอมรับได้"
+    }
+   ],
+   "verdict": {
+    "kind": "bad",
+    "text": "Request changes",
+    "sub": "เจ้าของกฎตรวจถ้อยคำกับกฎของตัวเอง"
+   },
+   "next": "➜ sales-nida แก้"
+  },
+  {
+   "id": "lab5-step04-nida-fix1",
+   "who": "sales-nida",
+   "role": "แก้ตามรีวิว รอบ 1",
+   "color": "#fbcfe8",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 690,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "อ่านคอมเมนต์ทั้งหมดใน PR #1 แล้วแก้ตามนั้นใน PR เดิม push ขึ้นไป แล้วตอบคอมเมนต์ว่าแก้อะไรไปบ้าง",
+   "reads": [
+    "รีวิวของ plat-may และ md-somchai"
+   ],
+   "skill": "แก้ skill sales-proposal",
+   "skillNote": "push เพิ่มเข้า PR เดิม",
+   "time": "3 นาที 10 วินาที",
+   "outputs": [
+    {
+     "file": "commit 2bafbe1",
+     "note": "แจ้งเหตุ \"ไม่เกิน 24 ชม.\" + ช่วยธนาคารแจ้ง สคส. ใน 72 ชม."
+    },
+    {
+     "file": "ขอบเขต + ชื่อหัวข้อ",
+     "note": "\"ธนาคารหรือสถาบันการเงิน\" · หัวข้อ \"ภาคผนวก ก: ภาคผนวก PDPA\""
+    },
+    {
+     "file": "คอมเมนต์ใน PR",
+     "note": "ตอบผู้รีวิวทีละข้อว่าแก้อะไร"
+    }
+   ],
+   "verdict": {
+    "kind": "info",
+    "text": "ส่งกลับให้รีวิวรอบ 2",
+    "sub": "แก้ครบทั้ง 2 คนในครั้งเดียว"
+   },
+   "next": "➜ รีวิวรอบ 2"
+  },
+  {
+   "id": "lab5-step05-may-review2",
+   "who": "plat-may",
+   "role": "รีวิวรอบ 2",
+   "color": "#ddd6fe",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1090,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "รีวิว PR #1 รอบใหม่ (sales-nida แก้แล้ว)",
+   "reads": [
+    "diff ของ commit 2bafbe1"
+   ],
+   "skill": "นโยบาย customer-data-policy",
+   "skillNote": "เทียบกับนโยบายใน core",
+   "time": "2 นาที 11 วินาที",
+   "outputs": [
+    {
+     "file": "✅ ที่ผ่านแล้ว",
+     "note": "24 ชม. · ไม่อ้างเป็น DPA · ขอบเขตสถาบันการเงิน"
+    },
+    {
+     "file": "🔴 คำว่า \"ลูกค้า\" กำกวม",
+     "note": "ธนาคารอาจอ่านว่าหมายถึงเจ้าของข้อมูล → ใช้ \"ผู้ว่าจ้าง\" แทน (ให้ถ้อยคำทดแทนครบ)"
+    }
+   ],
+   "verdict": {
+    "kind": "bad",
+    "text": "Request changes อีก 1 จุด",
+    "sub": "ผู้รีวิวไม่ได้แค่ติ แต่เขียนถ้อยคำที่ถูกให้ด้วย"
+   },
+   "next": "➜ md-somchai"
+  },
+  {
+   "id": "lab5-step06-md-approve",
+   "who": "md-somchai",
+   "role": "รีวิวรอบ 2",
+   "color": "#e9d5ff",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1480,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "รีวิว PR #1 รอบใหม่ ในฐานะเจ้าของกฎภาคผนวก PDPA",
+   "reads": [
+    "โน้ตลับของ MD",
+    "diff ของ commit 2bafbe1"
+   ],
+   "skill": "notes/deal-rules.md",
+   "skillNote": "เทียบกับกฎในโน้ตของตัวเอง",
+   "time": "1 นาที 4 วินาที",
+   "outputs": [
+    {
+     "file": "✅ ตรงกฎแล้ว",
+     "note": "สถาบันการเงิน · ชื่อ \"ภาคผนวก PDPA\" · 3 ข้อพอดี"
+    },
+    {
+     "file": "✅ 24 ชม.",
+     "note": "เข้มกว่ากฎ 72 ชม. จึงผ่าน"
+    },
+    {
+     "file": "หมายเหตุ",
+     "note": "ถ้าแก้แค่คำว่า \"ผู้ว่าจ้าง\" ตาม DPO ไม่ต้องรอผมรีวิวซ้ำ"
+    }
+   ],
+   "verdict": {
+    "kind": "ok",
+    "text": "Approve (คนที่ 1)",
+    "sub": "ยังไม่ merge รอ plat-may"
+   },
+   "next": "➜ sales-nida แก้"
+  },
+  {
+   "id": "lab5-step07-nida-fix2",
+   "who": "sales-nida",
+   "role": "แก้ตามรีวิว รอบ 2",
+   "color": "#fbcfe8",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 690,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "อ่านคอมเมนต์ทั้งหมดใน PR #1 แล้วแก้ตามนั้นใน PR เดิม push ขึ้นไป แล้วตอบคอมเมนต์",
+   "reads": [
+    "รีวิวรอบ 2 ของ plat-may"
+   ],
+   "skill": "แก้ skill sales-proposal",
+   "skillNote": "push เพิ่มเข้า PR เดิม",
+   "time": "2 นาที 34 วินาที",
+   "outputs": [
+    {
+     "file": "commit ffc4bbb",
+     "note": "ใช้ถ้อยคำของ DPO ตรงทุกตัวอักษร: นิยาม \"ผู้ว่าจ้าง\" ครั้งเดียว"
+    },
+    {
+     "file": "คอมเมนต์ใน PR",
+     "note": "สรุปว่าแก้อะไร และ MD ไม่ต้องรีวิวซ้ำตามที่เขียนไว้"
+    }
+   ],
+   "verdict": {
+    "kind": "info",
+    "text": "ส่งกลับให้ plat-may รีวิวรอบ 3"
+   },
+   "next": "➜ plat-may"
+  },
+  {
+   "id": "lab5-step08-may-approve",
+   "who": "plat-may",
+   "role": "รีวิวรอบ 3",
+   "color": "#ddd6fe",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1090,
+    "cy": 440,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "รีวิว PR #1 รอบใหม่",
+   "reads": [
+    "diff ของ commit ffc4bbb"
+   ],
+   "skill": "นโยบาย customer-data-policy",
+   "skillNote": "เทียบกับนโยบายใน core",
+   "time": "1 นาที 18 วินาที",
+   "outputs": [
+    {
+     "file": "✅ เทียบด้วยสคริปต์",
+     "note": "บล็อกภาคผนวกตรงกับถ้อยคำที่เสนอทุกตัวอักษร"
+    },
+    {
+     "file": "✅ คำค้น 4 คำ",
+     "note": "ภาคผนวก PDPA · DPA · data residency · 24 ชั่วโมง ครบ"
+    }
+   ],
+   "verdict": {
+    "kind": "ok",
+    "text": "Approve (คนที่ 2)",
+    "sub": "ผู้รีวิวตรวจของจริงเอง ไม่เชื่อแค่สรุปของคนเปิด PR"
+   },
+   "next": "➜ sales-nida merge"
+  },
+  {
+   "id": "lab5-step09-nida-merge",
+   "who": "sales-nida",
+   "role": "merge",
+   "color": "#fbcfe8",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 810,
+    "cy": 800,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "PR #1 ของผม: plat-may กับ md-somchai approve ครบแล้วหรือยัง ถ้าครบให้ merge ได้เลย",
+   "reads": [
+    "สถานะรีวิวของ PR #1",
+    "diff ของ commit สุดท้าย"
+   ],
+   "skill": "— ไม่ใช้ skill",
+   "skillNote": "ตรวจว่า approve ครบก่อน merge",
+   "time": "1 นาที 3 วินาที",
+   "outputs": [
+    {
+     "file": "ตรวจ approve",
+     "note": "plat-may ที่ commit ล่าสุด · md-somchai ที่ commit ก่อนหน้า (เขียนไว้ว่าไม่ต้องรีวิวซ้ำ)"
+    },
+    {
+     "file": "merge commit f5c1935",
+     "note": "sales-proposal 1.2.0 เข้า main = ฉบับจริงของทั้งบริษัท"
+    }
+   ],
+   "verdict": {
+    "kind": "ok",
+    "text": "Merged · เปิด PR ถึง merge 16 นาที",
+    "sub": "รีวิว 5 ครั้ง จาก 2 คน · แก้ 2 รอบ"
+   },
+   "next": "➜ sales-krit"
+  },
+  {
+   "id": "lab5-step10-krit",
+   "who": "sales-krit",
+   "role": "ไม่ได้แก้อะไรเลย",
+   "color": "#fbcfe8",
+   "art": {
+    "file": "lab5-one-paste.png",
+    "cx": 1280,
+    "cy": 800,
+    "w": 1672,
+    "zoom": 0.6
+   },
+   "prompt": "อัปเดต skill ของบริษัทที่ติดตั้งในโต๊ะนี้ให้เป็นฉบับล่าสุด … จากนั้นทำ proposal ตาม TOR ../../company-kit/deal-002/tor-bank-dispute.md",
+   "reads": [
+    "คลัง org-skills ล่าสุด (PR #1 merge แล้ว)",
+    "TOR deal-002 ธนาคารรายใหม่"
+   ],
+   "skill": "sales-proposal 1.2.0",
+   "skillNote": "ใช้แม่แบบและสคริปต์ของ skill ฉบับใหม่",
+   "time": "2 นาที 24 วินาที",
+   "outputs": [
+    {
+     "file": "⚠️ plugin update ตอบ \"ล่าสุดแล้ว\"",
+     "note": "เลขเวอร์ชันของแพ็ก sales ยัง 1.0.0 → ถอนแล้วติดตั้งใหม่"
+    },
+    {
+     "file": "deal-002-proposal-ati-bank.md",
+     "note": "มี \"ภาคผนวก ก: ภาคผนวก PDPA\" ครบ 3 ข้อ"
+    },
+    {
+     "file": "ถ้อยคำในภาคผนวก",
+     "note": "\"ผู้ว่าจ้าง\" · แจ้งเหตุไม่เกิน 24 ชม. = ถ้อยคำที่ผู้รีวิวช่วยปรับ"
+    }
+   ],
+   "verdict": {
+    "kind": "ok",
+    "text": "krit เก่งขึ้นโดยไม่ได้แก้อะไรเลย",
+    "sub": "แก้ครั้งเดียวในคลังกลาง → เซลส์ทุกคนได้"
+   },
+   "next": "จบ LAB 5"
+  }
+ ]
+}
