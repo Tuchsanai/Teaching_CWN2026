@@ -3,7 +3,7 @@
 #  2 Embedding   = ค้นด้วยความหมาย BAAI/bge-m3 (รองรับภาษาไทย) · cosine similarity
 #  3 Hybrid      = รวมอันดับ BM25 + Embedding ด้วย Reciprocal Rank Fusion (k=60)
 #  4 + Reranker  = เอา 10 อันดับแรกของ Hybrid ให้ BAAI/bge-reranker-v2-m3 อ่านคำถามคู่กับการ์ดทีละใบแล้วจัดอันดับใหม่
-#  5 LLM         = Claude อ่านการ์ดครบ 23 ใบแล้วเลือก 5 ตัว (แบบที่ core:skill-finder ทำจริง) · ผลจาก llm.json
+#  5 LLM         = Claude อ่านการ์ดครบทุกใบแล้วเลือก 5 ตัว (แบบที่ core:skill-finder ทำจริง) · ผลจาก llm.json
 # ใช้: python compare.py <bm25.json> <llm.json> <out.json>
 import json, sys, time
 from sentence_transformers import SentenceTransformer, CrossEncoder

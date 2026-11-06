@@ -3,7 +3,7 @@ matplotlib.use('Agg'); import matplotlib.pyplot as plt
 plt.rcParams['font.family']='Leelawadee UI'
 IMG=r'C:/Users/oishi/Documents/GitHub/CWN/Teaching/00_week01/05_agent-skills/03_org-skills/img'
 team={p['user']:p['team'] for p in json.load(open('novatech/seed/people.json',encoding='utf-8'))['people']}
-pal={'exec':'#8e5ea2','sales':'#e4572e','sa':'#f2a541','dev':'#2f6fb3','qa':'#29a3a3','devops':'#4c9a2a','mlops':'#a05195','hr':'#d45087','finance':'#665191','platform':'#555555','core':'#222222','shared':'#999999'}
+pal={'exec':'#8e5ea2','sales':'#e4572e','sa':'#f2a541','dev':'#2f6fb3','qa':'#29a3a3','devops':'#4c9a2a','mlops':'#a05195','hr':'#d45087','finance':'#665191','platform':'#555555','core':'#222222','shared':'#999999','product':'#c2410c'}
 def lst(v):
     v=(v or '').strip()
     if v.startswith('['): return [x.strip() for x in v[1:-1].split(',') if x.strip()]

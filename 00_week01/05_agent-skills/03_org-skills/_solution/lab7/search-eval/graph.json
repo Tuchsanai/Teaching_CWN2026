@@ -57,6 +57,13 @@
       "layer": "department"
     },
     {
+      "id": "skill:cost-headcount-review",
+      "type": "skill",
+      "name": "cost-headcount-review",
+      "plugin": "exec",
+      "layer": "department"
+    },
+    {
       "id": "skill:deal-approval",
       "type": "skill",
       "name": "deal-approval",
@@ -67,6 +74,20 @@
       "id": "skill:exec-deck",
       "type": "skill",
       "name": "exec-deck",
+      "plugin": "exec",
+      "layer": "department"
+    },
+    {
+      "id": "skill:pipeline-review",
+      "type": "skill",
+      "name": "pipeline-review",
+      "plugin": "exec",
+      "layer": "department"
+    },
+    {
+      "id": "skill:tech-risk-review",
+      "type": "skill",
+      "name": "tech-risk-review",
       "plugin": "exec",
       "layer": "department"
     },
@@ -110,6 +131,20 @@
       "type": "skill",
       "name": "model-release",
       "plugin": "mlops",
+      "layer": "department"
+    },
+    {
+      "id": "skill:prd-writer",
+      "type": "skill",
+      "name": "prd-writer",
+      "plugin": "product",
+      "layer": "department"
+    },
+    {
+      "id": "skill:product-sunset",
+      "type": "skill",
+      "name": "product-sunset",
+      "plugin": "product",
       "layer": "department"
     },
     {
@@ -197,6 +232,11 @@
       "name": "ops-fon"
     },
     {
+      "id": "person:cfo-ying",
+      "type": "owner",
+      "name": "cfo-ying"
+    },
+    {
       "id": "person:md-somchai",
       "type": "owner",
       "name": "md-somchai"
@@ -205,6 +245,16 @@
       "id": "person:exec-ploy",
       "type": "owner",
       "name": "exec-ploy"
+    },
+    {
+      "id": "person:cco-wit",
+      "type": "owner",
+      "name": "cco-wit"
+    },
+    {
+      "id": "person:cto-nat",
+      "type": "owner",
+      "name": "cto-nat"
     },
     {
       "id": "person:fin-nok",
@@ -230,6 +280,16 @@
       "id": "person:ml-pim",
       "type": "owner",
       "name": "ml-pim"
+    },
+    {
+      "id": "person:pm-beam",
+      "type": "owner",
+      "name": "pm-beam"
+    },
+    {
+      "id": "person:pm-gift",
+      "type": "owner",
+      "name": "pm-gift"
     },
     {
       "id": "person:qa-bank",
@@ -270,13 +330,23 @@
     },
     {
       "from": "skill:customer-data-policy",
-      "to": "person:plat-may",
-      "type": "owned_by"
+      "to": "skill:invoice-check",
+      "type": "next"
     },
     {
-      "from": "skill:pricing-rules",
-      "to": "skill:pricing-calc",
+      "from": "skill:customer-data-policy",
+      "to": "skill:follow-up-email",
       "type": "next"
+    },
+    {
+      "from": "skill:customer-data-policy",
+      "to": "skill:sales-proposal",
+      "type": "next"
+    },
+    {
+      "from": "skill:customer-data-policy",
+      "to": "person:plat-may",
+      "type": "owned_by"
     },
     {
       "from": "skill:pricing-rules",
@@ -306,11 +376,6 @@
     {
       "from": "skill:project-scaffold",
       "to": "skill:coding-standard",
-      "type": "uses"
-    },
-    {
-      "from": "skill:project-scaffold",
-      "to": "skill:coding-standard",
       "type": "next"
     },
     {
@@ -322,6 +387,11 @@
       "from": "skill:project-scaffold",
       "to": "skill:deploy-checklist",
       "type": "next"
+    },
+    {
+      "from": "skill:project-scaffold",
+      "to": "skill:coding-standard",
+      "type": "follows"
     },
     {
       "from": "skill:project-scaffold",
@@ -355,17 +425,42 @@
     },
     {
       "from": "skill:postmortem",
-      "to": "skill:brand-guide",
-      "type": "follows"
-    },
-    {
-      "from": "skill:postmortem",
       "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
       "from": "skill:postmortem",
+      "to": "skill:brand-guide",
+      "type": "follows"
+    },
+    {
+      "from": "skill:postmortem",
       "to": "person:ops-fon",
+      "type": "owned_by"
+    },
+    {
+      "from": "skill:cost-headcount-review",
+      "to": "skill:exec-deck",
+      "type": "next"
+    },
+    {
+      "from": "skill:cost-headcount-review",
+      "to": "skill:deal-approval",
+      "type": "next"
+    },
+    {
+      "from": "skill:cost-headcount-review",
+      "to": "skill:jd-writer",
+      "type": "next"
+    },
+    {
+      "from": "skill:cost-headcount-review",
+      "to": "skill:pricing-rules",
+      "type": "follows"
+    },
+    {
+      "from": "skill:cost-headcount-review",
+      "to": "person:cfo-ying",
       "type": "owned_by"
     },
     {
@@ -375,22 +470,22 @@
     },
     {
       "from": "skill:deal-approval",
-      "to": "skill:invoice-check",
-      "type": "next"
-    },
-    {
-      "from": "skill:deal-approval",
       "to": "skill:jd-writer",
       "type": "next"
     },
     {
       "from": "skill:deal-approval",
-      "to": "skill:pricing-rules",
-      "type": "follows"
+      "to": "skill:invoice-check",
+      "type": "next"
     },
     {
       "from": "skill:deal-approval",
       "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:deal-approval",
+      "to": "skill:pricing-rules",
       "type": "follows"
     },
     {
@@ -405,6 +500,11 @@
     },
     {
       "from": "skill:exec-deck",
+      "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:exec-deck",
       "to": "skill:brand-guide",
       "type": "follows"
     },
@@ -415,13 +515,68 @@
     },
     {
       "from": "skill:exec-deck",
+      "to": "person:exec-ploy",
+      "type": "owned_by"
+    },
+    {
+      "from": "skill:pipeline-review",
+      "to": "skill:deal-approval",
+      "type": "next"
+    },
+    {
+      "from": "skill:pipeline-review",
+      "to": "skill:tech-risk-review",
+      "type": "next"
+    },
+    {
+      "from": "skill:pipeline-review",
+      "to": "skill:exec-deck",
+      "type": "next"
+    },
+    {
+      "from": "skill:pipeline-review",
       "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
-      "from": "skill:exec-deck",
-      "to": "person:exec-ploy",
+      "from": "skill:pipeline-review",
+      "to": "skill:pricing-rules",
+      "type": "follows"
+    },
+    {
+      "from": "skill:pipeline-review",
+      "to": "person:cco-wit",
       "type": "owned_by"
+    },
+    {
+      "from": "skill:tech-risk-review",
+      "to": "skill:deal-approval",
+      "type": "next"
+    },
+    {
+      "from": "skill:tech-risk-review",
+      "to": "skill:deploy-checklist",
+      "type": "next"
+    },
+    {
+      "from": "skill:tech-risk-review",
+      "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:tech-risk-review",
+      "to": "skill:pricing-rules",
+      "type": "follows"
+    },
+    {
+      "from": "skill:tech-risk-review",
+      "to": "person:cto-nat",
+      "type": "owned_by"
+    },
+    {
+      "from": "skill:invoice-check",
+      "to": "skill:cost-headcount-review",
+      "type": "next"
     },
     {
       "from": "skill:invoice-check",
@@ -445,12 +600,22 @@
     },
     {
       "from": "skill:pricing-calc",
-      "to": "skill:pricing-rules",
-      "type": "follows"
+      "to": "skill:pipeline-review",
+      "type": "next"
+    },
+    {
+      "from": "skill:pricing-calc",
+      "to": "skill:cost-headcount-review",
+      "type": "next"
     },
     {
       "from": "skill:pricing-calc",
       "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:pricing-calc",
+      "to": "skill:pricing-rules",
       "type": "follows"
     },
     {
@@ -465,12 +630,12 @@
     },
     {
       "from": "skill:jd-writer",
-      "to": "skill:brand-guide",
+      "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
       "from": "skill:jd-writer",
-      "to": "skill:customer-data-policy",
+      "to": "skill:brand-guide",
       "type": "follows"
     },
     {
@@ -481,21 +646,16 @@
     {
       "from": "skill:onboarding-pack",
       "to": "skill:skill-finder",
-      "type": "uses"
-    },
-    {
-      "from": "skill:onboarding-pack",
-      "to": "skill:skill-finder",
       "type": "next"
     },
     {
       "from": "skill:onboarding-pack",
-      "to": "skill:brand-guide",
+      "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
       "from": "skill:onboarding-pack",
-      "to": "skill:customer-data-policy",
+      "to": "skill:brand-guide",
       "type": "follows"
     },
     {
@@ -530,6 +690,11 @@
     },
     {
       "from": "skill:model-release",
+      "to": "skill:tech-risk-review",
+      "type": "next"
+    },
+    {
+      "from": "skill:model-release",
       "to": "skill:customer-data-policy",
       "type": "follows"
     },
@@ -539,8 +704,73 @@
       "type": "owned_by"
     },
     {
+      "from": "skill:prd-writer",
+      "to": "skill:req-to-spec",
+      "type": "next"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "skill:test-from-plan",
+      "type": "next"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "skill:pipeline-review",
+      "type": "next"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "skill:product-sunset",
+      "type": "next"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "skill:pricing-rules",
+      "type": "follows"
+    },
+    {
+      "from": "skill:prd-writer",
+      "to": "person:pm-beam",
+      "type": "owned_by"
+    },
+    {
+      "from": "skill:product-sunset",
+      "to": "skill:deal-approval",
+      "type": "next"
+    },
+    {
+      "from": "skill:product-sunset",
+      "to": "skill:deploy-checklist",
+      "type": "next"
+    },
+    {
+      "from": "skill:product-sunset",
+      "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:product-sunset",
+      "to": "skill:brand-guide",
+      "type": "follows"
+    },
+    {
+      "from": "skill:product-sunset",
+      "to": "person:pm-gift",
+      "type": "owned_by"
+    },
+    {
       "from": "skill:bug-report",
       "to": "skill:coding-standard",
+      "type": "next"
+    },
+    {
+      "from": "skill:bug-report",
+      "to": "skill:deploy-checklist",
       "type": "next"
     },
     {
@@ -561,6 +791,11 @@
     {
       "from": "skill:test-from-plan",
       "to": "skill:deploy-checklist",
+      "type": "next"
+    },
+    {
+      "from": "skill:test-from-plan",
+      "to": "skill:tech-risk-review",
       "type": "next"
     },
     {
@@ -590,12 +825,12 @@
     },
     {
       "from": "skill:arch-template",
-      "to": "skill:brand-guide",
+      "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
       "from": "skill:arch-template",
-      "to": "skill:customer-data-policy",
+      "to": "skill:brand-guide",
       "type": "follows"
     },
     {
@@ -625,7 +860,27 @@
     },
     {
       "from": "skill:req-to-spec",
+      "to": "skill:tech-risk-review",
+      "type": "next"
+    },
+    {
+      "from": "skill:req-to-spec",
+      "to": "skill:project-scaffold",
+      "type": "next"
+    },
+    {
+      "from": "skill:req-to-spec",
+      "to": "skill:mlflow-experiment",
+      "type": "next"
+    },
+    {
+      "from": "skill:req-to-spec",
       "to": "skill:customer-data-policy",
+      "type": "follows"
+    },
+    {
+      "from": "skill:req-to-spec",
+      "to": "skill:coding-standard",
       "type": "follows"
     },
     {
@@ -645,8 +900,8 @@
     },
     {
       "from": "skill:follow-up-email",
-      "to": "skill:brand-guide",
-      "type": "follows"
+      "to": "skill:pipeline-review",
+      "type": "next"
     },
     {
       "from": "skill:follow-up-email",
@@ -655,8 +910,18 @@
     },
     {
       "from": "skill:follow-up-email",
+      "to": "skill:brand-guide",
+      "type": "follows"
+    },
+    {
+      "from": "skill:follow-up-email",
       "to": "person:sales-krit",
       "type": "owned_by"
+    },
+    {
+      "from": "skill:sales-proposal",
+      "to": "skill:pricing-calc",
+      "type": "uses"
     },
     {
       "from": "skill:sales-proposal",
@@ -675,7 +940,7 @@
     },
     {
       "from": "skill:sales-proposal",
-      "to": "skill:pricing-rules",
+      "to": "skill:customer-data-policy",
       "type": "follows"
     },
     {
@@ -685,7 +950,7 @@
     },
     {
       "from": "skill:sales-proposal",
-      "to": "skill:customer-data-policy",
+      "to": "skill:pricing-rules",
       "type": "follows"
     },
     {
@@ -696,16 +961,6 @@
     {
       "from": "skill:meeting-minutes",
       "to": "skill:follow-up-email",
-      "type": "next"
-    },
-    {
-      "from": "skill:meeting-minutes",
-      "to": "skill:req-to-spec",
-      "type": "next"
-    },
-    {
-      "from": "skill:meeting-minutes",
-      "to": "skill:pricing-calc",
       "type": "next"
     },
     {

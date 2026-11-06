@@ -2,7 +2,7 @@
   {
     "name": "brand-guide",
     "plugin": "core",
-    "description": "กติกาแบรนด์โนวาเทค v3.2 ที่ทุกเอกสารส่งออกนอกบริษัทต้องทำตาม — สี ฟอนต์ น้ำเสียง (ตรง ชัด สั้น ไม่โอ้อวด ไม่มีอีโมจิ) การเขียนชื่อบริษัท ตัวเลขเงิน/VAT โครงสไลด์ โครงเอกสาร เลขที่เอกสาร NVT-<ประเภท>-<ปี>-<ลำดับ> และโลโก้ ใช้ตรวจหรือเขียน proposal, อีเมลลูกค้า, สไลด์, JD, จดหมาย, รายงานถึงลูกค้า ให้ตรงแบรนด์ หรือเมื่อผู้ใช้พิมพ์ \"ทำให้ตรงแบรนด์\", \"สีบริษัทคืออะไร\", \"เช็กน้ำเสียงเอกสารนี้\", \"ขอโลโก้\" — skill อื่นที่ส่งเอกสารออกนอกบริษัทอ้าง skill นี้แทนการคัดลอกกติกาแบรนด์ไปเก็บเอง",
+    "description": "คู่มือแบรนด์โนวาเทค v3.2 สี ฟอนต์ น้ำเสียง โครงสไลด์ โครงเอกสาร และการใช้โลโก้ เป็นต้นฉบับเดียวให้ skill อื่นอ้าง\nใช้เมื่อผู้ใช้ถาม \"สีแบรนด์คืออะไร\", \"ใช้ฟอนต์อะไร\", \"เขียนน้ำเสียงแบบบริษัท\", \"ทำสไลด์ตามแบรนด์บริษัท\" หรือเมื่อ skill อื่นอ้างถึง core:brand-guide",
     "metadata": {
       "owner": "plat-may",
       "layer": "core",
@@ -11,7 +11,7 @@
       "next": [],
       "follows": []
     },
-    "summary": "ขั้นตอน: รู้ประเภทเอกสาร — สไลด์ / เอกสาร (proposal, รายงาน, ใบแจ้งหนี้) / อีเมล / ประกาศ (JD, NOTICE) · ภายนอกหรือภายใน (ภายในใช้แค่ข้อ 3 น้ำเสียง + ข้อ 6 ชื่อบริษัท) | สำหรับ skill อื่นที่อ้าง skill นี้: ให้ระบุใน header ว่า follows: [brand-guide] และเขียนในขั้นตอนว่า \"ทำตาม brand-guide\" — ห้ามคัดลอกสี/ฟอนต์/น้ำเสียงไปไว้ใน references ของตัวเอง (เคยคัดลอกไว้ 7 ที่ แล้วเวอร์ชันไม่ตรงกัน)"
+    "summary": "1. สี (Colors): ห้ามใช้สีแดงสด (#FF0000) และไล่สี (gradient) ในเอกสารลูกค้า | 2. ฟอนต์ (Fonts): ภาษาไทยและอังกฤษ: IBM Plex Sans Thai (Google Fonts, ฟรี) | 3. น้ำเสียง (Tone of Voice): ตรง ชัด สั้น — ประโยคแรกของทุกหัวข้อบอกข้อสรุป แล้วค่อยให้รายละเอียด | 4. โครงสไลด์ (Slide Rules): อัตราส่วน 16:9, ขอบซ้ายขวา 48 px, โลโก้มุมขวาล่างทุกหน้า (ยกเว้นหน้าปก) | 5. โครงเอกสาร (Document Rules): หน้าปก: โลโก้, ชื่อเอกสาร, ชื่อลูกค้า, วันที่ (พ.ศ. | 6. โลโก้ (Logo Usage): ไฟล์: assets/logo.svg (สี Navy บนพื้นขาว) — ถ้าพื้นเข้มให้ใช้เวอร์ชันสีขาว (เปลี่ยน fill เป็น #FFFFFF)"
   },
   {
     "name": "customer-data-policy",
@@ -20,33 +20,35 @@
     "metadata": {
       "owner": "plat-may",
       "layer": "core",
-      "version": "1.1.0",
+      "version": "0.2.0",
       "uses": [],
-      "next": [],
+      "next": [
+        "invoice-check",
+        "follow-up-email",
+        "sales-proposal"
+      ],
       "follows": []
     },
-    "summary": "ขั้นตอน: รู้ก่อนว่าเอกสารไปไหน: ภายนอก (ลูกค้า/คนนอก) หรือภายในบริษัท และเป็นเอกสารประเภทอะไร ถ้าผู้ใช้ไม่บอก ให้เดาจากเนื้อหา (มีผู้ซื้อ = ใบแจ้งหนี้ภายนอก, \"โน้ตภายใน ยังไม่ส่งลูกค้า\" = ภายใน) แล้ว เขียนข้อสันนิษฐานไว้ในรายงาน | ตัดสินเองไม่ได้ ให้ส่งต่อคน: ข้อมูลอ่อนไหว ม.26 (สุขภาพ ศาสนา ชีวภาพ ประวัติอาชญากรรม) ในเอกสารใดก็ตาม → ตอบว่า \"ต้องให้ plat-may ดูเอง\" พร้อมบอกจุดที่เจอ | สำหรับ skill อื่นที่อ้าง skill นี้: นี่คือ สำเนาเดียว ของนโยบายข้อมูลลูกค้าในคลัง skill — skill ที่แตะข้อมูลลูกค้าให้ระบุ follows: [customer-data-policy] ใน header แล้วเรียก skill นี้ตอนตรวจก่อนส่ง ห้ามคัดลอกราย…"
+    "summary": "ขั้นตอน: รู้ก่อนว่าเอกสารไปไหน: ภายนอก (ลูกค้า/คนนอก) หรือภายในบริษัท และเป็นเอกสารประเภทอะไร ถ้าผู้ใช้ไม่บอก ให้เดาจากเนื้อหา (มีผู้ซื้อ = ใบแจ้งหนี้ภายนอก, \"โน้ตภายใน ยังไม่ส่งลูกค้า\" = ภายใน) แล้ว เขียนข้อสันนิษฐานไว้ในรายงาน | ตัดสินเองไม่ได้ ให้ส่งต่อคน: ข้อมูลอ่อนไหว ม.26 (สุขภาพ ศาสนา ชีวภาพ ประวัติอาชญากรรม) ในเอกสารใดก็ตาม → ตอบว่า \"ต้องให้ plat-may ดูเอง\" พร้อมบอกจุดที่เจอ"
   },
   {
     "name": "pricing-rules",
     "plugin": "core",
-    "description": "ตารางราคามาตรฐาน (price-list 16 รายการ ราคาขาย + ต้นทุน) และกฎกำไร margin-rules v2026.1 ของโนวาเทคฉบับเดียวของบริษัท — สูตร margin หลังส่วนลด, buffer 10% งาน fixed-price, เกณฑ์ 25%/15%, สิทธิ์ให้ส่วนลด 5/10%, ห้ามลด MA/hosting, VAT 7%, ห้ามแสดงต้นทุนในเอกสารลูกค้า ใช้เมื่อถาม \"ราคา man-day SA เท่าไหร่\", \"ส่วนลดเท่านี้ใครอนุมัติ\", \"margin ขั้นต่ำเท่าไหร่\", \"ต้องบวก buffer ไหม\" หรือเมื่อ skill อื่น (pricing-calc, sales-proposal, deal-approval) ต้องใช้ราคา/กฎกำไร — ไม่ใช่การคิดราคาทั้งดีล (นั่นคือ pricing-calc)",
+    "description": "กติกากลางเรื่องราคาของโนวาเทค ตารางราคาขายและต้นทุน สูตร margin เกณฑ์ผู้อนุมัติ สิทธิ์ให้ส่วนลด buffer งาน fixed-price และการแสดง VAT เป็นต้นฉบับเดียวให้ skill อื่นอ้าง\nใช้เมื่อต้องรู้ \"ราคาต่อ man-day เท่าไหร่\", \"margin เท่านี้ใครอนุมัติ\", \"ลดได้กี่เปอร์เซ็นต์\", \"ต้องบวก buffer ไหม\" หรือเมื่อ skill อื่นอ้างถึง core:pricing-rules",
     "metadata": {
       "owner": "fin-joy",
       "layer": "core",
       "version": "1.0.0",
       "uses": [],
-      "next": [
-        "pricing-calc"
-      ],
+      "next": [],
       "follows": []
     },
-    "summary": "ตอบคำถามราคา/กฎ: อ่านไฟล์ที่เกี่ยวข้องข้างบน แล้วตอบพร้อมอ้างรหัสรายการ (MD-SA) หรือหัวข้อใน margin-rules | สำหรับสคริปต์ของ skill อื่น: สคริปต์ pricing-calc/scripts/price_calc.py, sales-proposal/scripts/price.py, deal-approval/scripts/deal_check.py หา price-list.csv ของ skill นี้เองตามลำดับ: | เปลี่ยนราคา/กฎ: แก้ที่ skill นี้ที่เดียวผ่าน PR (CODEOWNER: fin-joy + ทีมกลาง) แล้วรันตัวอย่างตรวจท้าย margin-rules.md ด้วย pricing-calc ให้ได้ตัวเลขเดิม · ห้ามคัดลอก price-list ไปเก็บใน skill อื่น (เคยมี 3 สำเนาใน sales/finance/exec)"
+    "summary": "1. แหล่งราคา: ราคาขายและต้นทุนทุกบรรทัด ต้องมาจาก price-list.csv เท่านั้น (คอลัมน์ unit_price_thb และ cost_thb) | 2. สูตร: คิด margin หลังหักส่วนลด เสมอ | 3. เกณฑ์กำไร: เป้า margin เฉลี่ยทั้งบริษัทปี 2026 = 30% | 4. ส่วนลด (คิดจากราคาตาม price-list): ห้ามลดราคา MA (MA-*) และ cloud hosting (CL-*) เพราะต้นทุนผูกกับผู้ให้บริการ | 5. VAT และการแสดงผล: ราคาทุกตัวใน price-list ไม่รวม VAT | 6. ตัวอย่าง: ทีม SA 10 วัน + Dev 40 วัน + QA 15 วัน"
   },
   {
     "name": "skill-finder",
     "plugin": "core",
-    "description": "หา skill ของโนวาเทคที่ตรงกับงาน บอกว่าอยู่ plugin/แผนกไหน ใครดูแล ต้องติดตั้งแพ็กอะไร ทำงานต่อจากอะไรและส่งต่อให้ใคร และถ้าแก้ skill นี้จะกระทบ skill ไหนบ้าง จากแค็ตตาล็อกของคลัง org-skills (marketplace novatech-skills) ใช้เมื่อผู้ใช้ถาม \"มี skill สำหรับเรื่องนี้ไหม\", \"แผนกอื่นทำเรื่องนี้ยังไง\", \"ถ้าแก้ skill นี้กระทบใคร\", \"ต้องติดตั้งแพ็กไหน\", \"คนใหม่ต้องใช้ skill อะไร\"",
+    "description": "ตอบว่าคลัง novatech-skills มี skill อะไร แผนกไหนดูแล ควรใช้ตัวไหนกับงานนี้ และแก้ skill ตัวไหนแล้วกระทบใคร โดยอ่านจาก catalog ที่สร้างจากหัวไฟล์ของทุก skill\nใช้เมื่อผู้ใช้พิมพ์ \"มี skill สำหรับเรื่องนี้ไหม\", \"แผนกอื่นทำเรื่องนี้ยังไง\", \"skill นี้ใครดูแล\", \"ถ้าแก้ skill นี้กระทบใคร\" หรือ /skill-finder",
     "metadata": {
       "owner": "plat-ken",
       "layer": "core",
@@ -55,7 +57,7 @@
       "next": [],
       "follows": []
     },
-    "summary": "ขั้นตอน: อ่าน references/catalog.md ทั้งไฟล์ (ตาราง skill + ตารางผลกระทบ) | ชั้นของ skill (layer)"
+    "summary": "ขั้นตอน: อ่าน references/catalog.md | ความหมายของหัวไฟล์"
   },
   {
     "name": "coding-standard",
@@ -64,7 +66,7 @@
     "metadata": {
       "owner": "dev-pond",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "test-from-plan"
@@ -82,16 +84,15 @@
     "metadata": {
       "owner": "dev-mew",
       "layer": "department",
-      "version": "1.1.0",
-      "uses": [
-        "coding-standard"
-      ],
+      "version": "1.0.0",
+      "uses": [],
       "next": [
         "coding-standard",
         "test-from-plan",
         "deploy-checklist"
       ],
       "follows": [
+        "coding-standard",
         "customer-data-policy"
       ]
     },
@@ -104,7 +105,7 @@
     "metadata": {
       "owner": "ops-art",
       "layer": "department",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "uses": [],
       "next": [
         "postmortem"
@@ -122,17 +123,37 @@
     "metadata": {
       "owner": "ops-fon",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "exec-deck"
       ],
       "follows": [
-        "brand-guide",
-        "customer-data-policy"
+        "customer-data-policy",
+        "brand-guide"
       ]
     },
-    "summary": "Input: log/แชต/ticket ของเหตุ (ไฟล์ที่ผู้ใช้ชี้ หรือวางมา) — ถ้าไม่บอก ให้ถามว่าเหตุไหน อย่าเดา | ขั้นตอน: อ่านกติกา references/company-rules.md (Sev/SLA, มาตรฐาน alert, เหตุที่เคยเกิด) + skill customer-data-policy (core) และ skill brand-guide (core) สำหรับฉบับลูกค้า | Checklist ก่อนส่ง: ไม่มีชื่อคนผูกกับความผิด (ใช้บทบาท: Dev, DevOps, Sales, on-call) | สิ่งที่ต้องถามผู้ใช้ (อย่าตัดสินแทน): เลขที่เอกสาร (ถ้ายังไม่มีลำดับ ใช้ NVT-PM-<ปี>-<ลำดับ> และติดคำว่า \"ร่าง\")"
+    "summary": "Input: log/แชต/ticket ของเหตุ (ไฟล์ที่ผู้ใช้ชี้ หรือวางมา) — ถ้าไม่บอก ให้ถามว่าเหตุไหน อย่าเดา | ขั้นตอน: อ่านกติกา references/company-rules.md (Sev/SLA, มาตรฐาน alert, และลิงก์ไป core:customer-data-policy กับ core:brand-guide) | Checklist ก่อนส่ง: ไม่มีชื่อคนผูกกับความผิด (ใช้บทบาท: Dev, DevOps, Sales, on-call) | สิ่งที่ต้องถามผู้ใช้ (อย่าตัดสินแทน): เลขที่เอกสาร (ถ้ายังไม่มีลำดับ ใช้ NVT-PM-<ปี>-<ลำดับ> และติดคำว่า \"ร่าง\")"
+  },
+  {
+    "name": "cost-headcount-review",
+    "plugin": "exec",
+    "description": "สรุปรายได้ กำไรขั้นต้น ต้นทุน และกำลังคนรายเดือนของโนวาเทคให้ MD พร้อมคำแนะนำว่าควรรับคนเพิ่มไหมและเดือนหน้าเงินพอไหม\nได้รายงานภายใน 1 ไฟล์: สรุป 30 วินาที, ตารางเทียบเดือนก่อน/เป้า, สาเหตุ margin, ต้นทุนต่อตำแหน่ง, ผลต่อเงินสด, ข้อมูลที่ต้องขอ, เรื่องที่ MD ต้องตัดสิน\nใช้เมื่อผู้ใช้พูดว่า \"เดือนนี้กำไรเท่าไหร่\", \"ควรรับคนเพิ่มไหม\", \"สรุปต้นทุนคนให้ MD\", \"สรุปตัวเลขต้นเดือน\" หรือ /cost-headcount-review",
+    "metadata": {
+      "owner": "cfo-ying",
+      "layer": "department",
+      "version": "0.1.0",
+      "uses": [],
+      "next": [
+        "exec-deck",
+        "deal-approval",
+        "jd-writer"
+      ],
+      "follows": [
+        "pricing-rules"
+      ]
+    },
+    "summary": "ข้อห้าม (เช็กก่อนทำทุกครั้ง): ห้ามแต่งตัวเลข ไม่มีในข้อมูล = เขียน \"ยังไม่มีข้อมูล — ขอจาก ...\" (โดยเฉพาะ SG&A, เงินสด, ลูกหนี้, เงินเดือนจริง) | ขั้นตอน: ไฟล์ KPI รายเดือน (ปกติ company-kit/monthly-kpi.csv) คอลัมน์ดูที่ references/kpi-file.md ไม่เจอให้ถามผู้ใช้ | ส่งต่อ: ทำสไลด์ให้ MD → exec-deck (exec-ploy) · ดีลรออนุมัติที่มีผลต่อเงินสด → deal-approval (md-somchai) · ตัดสินรับคนแล้ว → jd-writer (hr-fah)"
   },
   {
     "name": "deal-approval",
@@ -141,16 +162,16 @@
     "metadata": {
       "owner": "md-somchai",
       "layer": "department",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "uses": [],
       "next": [
         "sales-proposal",
-        "invoice-check",
-        "jd-writer"
+        "jd-writer",
+        "invoice-check"
       ],
       "follows": [
-        "pricing-rules",
-        "customer-data-policy"
+        "customer-data-policy",
+        "pricing-rules"
       ]
     },
     "summary": "ขั้นตอน: อ่านสรุปดีล ดึง: ลูกค้า + ประเภท (ธนาคาร/สถาบันการเงินหรือไม่, มีข้อมูลอ่อนไหวไหม), รายการ man-day/บริการ, ส่วนลด, ระยะเวลา, ทีม, UAT, งวดเงิน, เครดิตเทอม, ค่าปรับ, ใครถือกี่โปรเจกต์ | หลักที่ MD ใช้: \"เหตุผลเชิงกลยุทธ์\" (ลูกค้าใหม่, reference, ได้งานต่อ) ใช้ได้เฉพาะช่วง margin 15–25% และต้องมีหลักฐาน (LOI/MOU/อีเมลลูกค้า) — คำพูดเซลส์อย่างเดียวไม่พอ"
@@ -162,18 +183,59 @@
     "metadata": {
       "owner": "exec-ploy",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "deal-approval"
       ],
       "follows": [
+        "customer-data-policy",
         "brand-guide",
-        "pricing-rules",
-        "customer-data-policy"
+        "pricing-rules"
       ]
     },
     "summary": "ขั้นตอน: หาข้อมูล (ถามผู้ใช้ถ้าหาไม่เจอ อย่าเดาตัวเลข) | โครง deck (ตายตัว) | ข้อห้าม: ไม่ตัดสินดีลแทน MD — ใส่แค่ข้อเท็จจริงและเกณฑ์ที่ดีลเข้า (การประเมินเป็นงานของ skill deal-approval) | Checklist ก่อนส่ง: ≤ 10 สไลด์ (ไม่รวมภาคผนวก) · ≤ 6 บรรทัดต่อสไลด์ · หัวสไลด์เป็นประโยคที่มีตัวเลข"
+  },
+  {
+    "name": "pipeline-review",
+    "plugin": "exec",
+    "description": "ทบทวน pipeline การขายและ roadmap ผลิตภัณฑ์ของสายธุรกิจ (Sales · SA · Product) ทุกวันจันทร์ในหน้าเดียว\nบอกว่าดีลไหนควรเร่ง ประคอง ตีกลับ หรือปล่อย, ดีลไหนเสี่ยงหลุด, และทีมขายกับทีม product ต้องคุยเรื่องอะไร พร้อมปฏิทินเส้นตาย 2 สัปดาห์\nใช้เมื่อผู้ใช้พูดว่า \"สรุป pipeline สัปดาห์นี้\", \"ดีลไหนเสี่ยงหลุด\", \"ทีมขายกับทีม product ต้องคุยเรื่องอะไร\" หรือ /pipeline-review",
+    "metadata": {
+      "owner": "cco-wit",
+      "layer": "department",
+      "version": "0.1.0",
+      "uses": [],
+      "next": [
+        "deal-approval",
+        "tech-risk-review",
+        "exec-deck"
+      ],
+      "follows": [
+        "customer-data-policy",
+        "pricing-rules"
+      ]
+    },
+    "summary": "ขั้นตอน: หา input ตาม references/sources.md — KPI เดือนล่าสุด, สรุปดีล, TOR, บันทึกประชุม, feedback/ลำดับฟีเจอร์ของ Product, รายชื่อลูกค้าผลิตภัณฑ์ · ไม่มีข้อมูล → ถาม อย่าแต่งตัวเลขหรือดีล | กติกาที่ห้ามข้าม: รายงานนี้เป็น เอกสารภายใน (มีต้นทุน/margin) ห้ามส่งลูกค้า และไม่ commit เว้นแต่ผู้ใช้สั่ง"
+  },
+  {
+    "name": "tech-risk-review",
+    "plugin": "exec",
+    "description": "ทบทวนความเสี่ยงทางเทคนิคของงานที่จะรับใหม่ (TOR / ดีล) หรืองานที่จะขึ้นระบบ (release) แล้วให้คำตัดสิน GO / GO with conditions / NO-GO\nพร้อมระดับความเสี่ยงรายด้าน หลักฐานจากเหตุการณ์ที่เคยพัง และเงื่อนไขที่มีเจ้าของรับผิดชอบ\nใช้เมื่อผู้ใช้ถามว่า \"งานนี้เสี่ยงทางเทคนิคตรงไหน\", \"ปล่อยขึ้นระบบได้ไหม\", \"ทีมรับงานนี้ไหวไหม\" หรือสั่ง /tech-risk-review",
+    "metadata": {
+      "owner": "cto-nat",
+      "layer": "department",
+      "version": "0.1.0",
+      "uses": [],
+      "next": [
+        "deal-approval",
+        "deploy-checklist"
+      ],
+      "follows": [
+        "customer-data-policy",
+        "pricing-rules"
+      ]
+    },
+    "summary": "1 · แยกโหมด: รับงานใหม่ (มี TOR / proposal / ดีล) → ตอบคำถาม \"เสี่ยงตรงไหน\" และ \"ทีมรับไหวไหม\" | 2 · หาข้อมูล: อ่านเอกสารของงานนั้นให้ครบ (TOR, release notes, test log, ผลการทดลองโมเดล) | 3 · ให้คะแนนรายด้าน: ไล่ทุกด้านใน references/risk-checklist.md และให้ระดับ 🔴 สูง / 🟠 กลาง / 🟡 ต่ำ / 🟢 ไม่มีประเด็น | 4 · ตัดสิน: เงื่อนไขแต่ละข้อต้องมี เจ้าของ (user) และ กำหนดเวลา ให้แบ่งเป็น \"ก่อนจุดตัดสินใจ\" กับ \"ระหว่างทำงาน\" | 5 · เขียนรายงาน: ใช้ references/report-template.md และให้คำตอบสั้นอยู่บนสุด อ่าน 30 วินาทีแล้วต้องรู้ว่าควรทำอะไร | กติกา: ทำตาม skill core:customer-data-policy: ห้ามคัดลอกเบอ…"
   },
   {
     "name": "invoice-check",
@@ -182,9 +244,11 @@
     "metadata": {
       "owner": "fin-nok",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
-      "next": [],
+      "next": [
+        "cost-headcount-review"
+      ],
       "follows": [
         "customer-data-policy"
       ]
@@ -198,15 +262,17 @@
     "metadata": {
       "owner": "fin-joy",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "sales-proposal",
-        "deal-approval"
+        "deal-approval",
+        "pipeline-review",
+        "cost-headcount-review"
       ],
       "follows": [
-        "pricing-rules",
-        "customer-data-policy"
+        "customer-data-policy",
+        "pricing-rules"
       ]
     },
     "summary": "ขั้นตอน: อ่านขอบเขต — TOR / SPEC ของ SA / สถาปัตยกรรม / โน้ตใน notes/ ถ้ามี · จดไว้: ระยะเวลา, งบลูกค้า (ก่อน VAT?), รวม hosting/MA ปีแรกไหม, SLA (24x7 หรือเวลาทำการ), fixed-price ไหม | ตอบคำถาม \"ดีลนี้กำไรเท่าไหร่\" จากสรุปดีลที่มีอยู่: ไม่ต้องคิดใหม่ทั้งหมด: แปลงตารางในสรุปดีลเป็น input (man-day ที่รวม buffer แล้ว → ตั้ง \"fixed_price\": false เพื่อไม่บวกซ้ำ) รัน script แล้วเทียบกับตัวเลขในเอกสาร · บอกถ้าไม่ตรง หรือไม่มี buffer / ส่วนลดเกินสิทธิ์"
@@ -218,14 +284,14 @@
     "metadata": {
       "owner": "hr-fah",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "onboarding-pack"
       ],
       "follows": [
-        "brand-guide",
-        "customer-data-policy"
+        "customer-data-policy",
+        "brand-guide"
       ]
     },
     "summary": "ขั้นตอน: เก็บข้อมูลตำแหน่ง — ต้องมีครบ: ชื่อตำแหน่ง, ทีม/โปรเจกต์, รหัส NVT-JOB, ช่วงเงินเดือน, ประสบการณ์, stack/ทักษะ, งานหลัก, ทีม+หัวหน้า, รูปแบบงาน, วันเริ่มงาน, ช่องทางสมัคร | ผลลัพธ์ที่ส่งกลับ: path ของ 2 ไฟล์"
@@ -237,16 +303,14 @@
     "metadata": {
       "owner": "hr-oat",
       "layer": "department",
-      "version": "0.2.0",
-      "uses": [
-        "skill-finder"
-      ],
+      "version": "0.1.0",
+      "uses": [],
       "next": [
         "skill-finder"
       ],
       "follows": [
-        "brand-guide",
-        "customer-data-policy"
+        "customer-data-policy",
+        "brand-guide"
       ]
     },
     "summary": "ขั้นตอน: เก็บข้อมูลจากคำสั่ง: แผนก, วันเริ่มงาน (ถ้าพูดว่า \"วันจันทร์\" = จันทร์ถัดไปจากวันนี้), ชื่อ, ตำแหน่ง ไม่รู้ข้อไหนให้ใส่ [...] แล้วทำต่อ ไม่ต้องหยุดถาม | ตรวจก่อนส่ง: ข้อ \"ปัญหาที่เคยเกิด\" ใน onboarding-rules ถูกกันไว้ครบ (แพ็กแผนกก่อนวันแรก, Gitea ไม่ส่งคำขอวันศุกร์ก่อนเริ่มงาน) | ไฟล์ใน skill: references/onboarding-rules.md — กติกาชุดต้อนรับ: ของทุกคน, ของแต่ละแผนก, ไทม์ไลน์, ปัญหาที่เคยเกิด, ผู้ติดต่อ"
@@ -258,7 +322,7 @@
     "metadata": {
       "owner": "ml-jay",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "model-release"
@@ -276,11 +340,12 @@
     "metadata": {
       "owner": "ml-pim",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "deploy-checklist",
-        "postmortem"
+        "postmortem",
+        "tech-risk-review"
       ],
       "follows": [
         "customer-data-policy"
@@ -289,16 +354,59 @@
     "summary": "ขั้นตอน: หาของที่จะปล่อย — ถามหรือหาเอง: รุ่นใหม่ (run id), รุ่นที่ใช้อยู่ใน production, ลูกค้า, data version, ผลทดลอง (MLflow / CSV ผลทดลอง / notes ของ DS) · ถ้าเป็นโมเดลพยากรณ์คิว อ่าน references/queue-forecast.md ก่อน | กติกา: ไม่ตัดสินแทนคน ในเรื่อง: ค่าเกณฑ์ที่ต่างจากค่าเริ่มต้น, วันสลับจริงที่ใกล้วันหยุดยาว, ยอมรับ known issue — ให้ใส่ในหัวข้อ \"เรื่องที่ต้องให้คนตัดสิน\""
   },
   {
+    "name": "prd-writer",
+    "plugin": "product",
+    "description": "เขียน PRD ฟีเจอร์ใหม่ของ NovaQueue v2 จากเสียงลูกค้าและตัวเลขการใช้งาน ให้ Dev/SA และ QA ใช้ต่อได้ทันที\n(ปัญหา+หลักฐาน, ตัวชี้วัด, ขอบเขต, user story + acceptance criteria, ผลกระทบต่อ v1) และจัดลำดับว่าฟีเจอร์ไหนควรทำก่อน\nใช้เมื่อผู้ใช้พูดว่า \"เขียน PRD ฟีเจอร์นี้ให้หน่อย\", \"สรุป feedback ลูกค้าเป็น requirement\", \"ฟีเจอร์ไหนควรทำก่อน\" หรือ /prd-writer",
+    "metadata": {
+      "owner": "pm-beam",
+      "layer": "department",
+      "version": "0.1.0",
+      "uses": [],
+      "next": [
+        "req-to-spec",
+        "test-from-plan",
+        "pipeline-review",
+        "product-sunset"
+      ],
+      "follows": [
+        "customer-data-policy",
+        "pricing-rules"
+      ]
+    },
+    "summary": "ขั้นตอน: หา input — feedback/ticket/ตัวเลขที่ผู้ใช้ให้ ถ้าไม่ให้ ลองหา company-kit/product/novaqueue-feedback-*.md และโน้ตใน notes/ · ไม่มีข้อมูลเลย → ถาม อย่าแต่งตัวเลข | กติกาที่ห้ามข้าม: ฟีเจอร์ใหม่ทำบน v2 เท่านั้น · ลูกค้า v1 ขอ → เสนอย้ายตามข้อเสนอมาตรฐาน | ตัวอย่างผลงานจริง: work/prd-novaqueue-line-queue-reminder.md (PRD-NQ-2026-11 เตือนก่อนถึงคิวผ่าน LINE) และ work/2026-11-feature-priority-novaqueue-v2.md บนโต๊ะ pm-beam"
+  },
+  {
+    "name": "product-sunset",
+    "plugin": "product",
+    "description": "ทำแผนเลิกให้บริการ (sunset / EOL) เวอร์ชันหรือฟีเจอร์เก่าของผลิตภัณฑ์โนวาเทค ให้ไม่ผิดสัญญา MA ของลูกค้าและลบข้อมูลถูกตาม PDPA\nได้แผนภายในพร้อมตารางตรวจกับนโยบาย ไทม์ไลน์ เรื่องที่ต้องให้ MD ตัดสิน และร่างประกาศถึงลูกค้า\nใช้เมื่อผู้ใช้พูดว่า \"ทำแผนปิดบริการเวอร์ชันเก่า\", \"ลูกค้ายังใช้ v1 อยู่กี่ราย\", \"ร่างประกาศเลิกให้บริการ\", \"ปิด/เลิก/EOL ฟีเจอร์นี้\" หรือ /product-sunset",
+    "metadata": {
+      "owner": "pm-gift",
+      "layer": "department",
+      "version": "0.1.0",
+      "uses": [],
+      "next": [
+        "deal-approval",
+        "deploy-checklist"
+      ],
+      "follows": [
+        "customer-data-policy",
+        "brand-guide"
+      ]
+    },
+    "summary": "ข้อห้าม (เช็กก่อนทำทุกครั้ง): แผนและประกาศเป็น ร่าง จนกว่า MD อนุมัติ ห้ามส่ง ห้ามบอกวันปิดกับลูกค้ารายใดก่อนอนุมัติ | ขั้นตอน: หาไฟล์ลูกค้าของเวอร์ชันที่จะปิด เช่น company-kit/product/<product>-<version>-customers.csv และไฟล์ overview ของผลิตภัณฑ์ ถ้าไม่เจอให้ถามผู้ใช้"
+  },
+  {
     "name": "bug-report",
     "plugin": "qa",
     "description": "เขียนรายงานบั๊กจาก test ที่ล้ม (log Playwright/CI, trace, server log, โน้ตทดสอบมือ) ให้ Dev ทำซ้ำได้ทุกครั้งโดยไม่ต้องถาม QA\nได้ไฟล์ markdown ตามแม่แบบทีม QA: ชื่อบอกอาการ+เงื่อนไข, Severity/Priority, ขั้นตอนทำซ้ำพร้อมค่าจริง, ผลที่คาด, ผลจริง, ความถี่, หลักฐาน, ข้อสังเกต, ผลกระทบ\nใช้เมื่อผู้ใช้พูดว่า \"เขียนรายงานบั๊กนี้ให้หน่อย\", \"สรุปบั๊กให้ dev แก้ได้\", \"แจ้งบั๊กพร้อมขั้นตอนทำซ้ำ\" หรือ /bug-report",
     "metadata": {
       "owner": "qa-bank",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
-        "coding-standard"
+        "coding-standard",
+        "deploy-checklist"
       ],
       "follows": [
         "customer-data-policy"
@@ -313,11 +421,12 @@
     "metadata": {
       "owner": "qa-mint",
       "layer": "department",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "uses": [],
       "next": [
         "bug-report",
-        "deploy-checklist"
+        "deploy-checklist",
+        "tech-risk-review"
       ],
       "follows": [
         "customer-data-policy"
@@ -332,7 +441,7 @@
     "metadata": {
       "owner": "sa-ice",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "project-scaffold",
@@ -340,8 +449,8 @@
         "sales-proposal"
       ],
       "follows": [
-        "brand-guide",
-        "customer-data-policy"
+        "customer-data-policy",
+        "brand-guide"
       ]
     },
     "summary": "ขั้นตอน: อ่าน input — spec จาก req-to-spec (ถ้ามี) หรือ TOR ตรง ๆ จดเป็นรายการ: ผู้ใช้แต่ละกลุ่ม, ช่องทาง, ระบบภายนอกที่ต้องเชื่อม (+ protocol), ข้อมูลอ่อนไหว, ข้อกำหนดความปลอดภัย/region, งาน async, ML/batch, SLA, ขนาดโหลด | สิ่งที่ห้ามทำ: ห้ามเริ่มจาก microservices หรือแยก service \"เพื่อความยืดหยุ่น\" โดยไม่เข้าเกณฑ์"
@@ -353,16 +462,20 @@
     "metadata": {
       "owner": "sa-ton",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "arch-template",
         "test-from-plan",
         "pricing-calc",
-        "sales-proposal"
+        "sales-proposal",
+        "tech-risk-review",
+        "project-scaffold",
+        "mlflow-experiment"
       ],
       "follows": [
-        "customer-data-policy"
+        "customer-data-policy",
+        "coding-standard"
       ]
     },
     "summary": "ขั้นตอน: อ่าน input — TOR/proposal ที่ผู้ใช้ให้ (ไฟล์หรือข้อความ) + โน้ตของผู้ใช้ใน notes/ ถ้ามี · ถ้าไม่ได้บอก deal ให้ใช้ชื่อโฟลเดอร์ work/<deal-id>-<ชื่อสั้น>/ | กติกา: ข้อมูลส่วนบุคคล (customer-data-policy): ห้ามคัดลอกเบอร์มือถือของผู้ประสานงานจาก TOR ลง SPEC — ใช้ชื่อ + อีเมลบริษัท และเขียนว่า \"เบอร์มือถือเก็บใน CRM\" · ข้อมูลทดสอบเป็น synthetic เสมอ · ตัวอย่างเลขบัตร/เบอร์ใช้แบบปิดบัง (1-XXXX-XXXXX-XX-3, 08X-XXX-1234)"
@@ -374,15 +487,16 @@
     "metadata": {
       "owner": "sales-krit",
       "layer": "department",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
         "sales-proposal",
-        "pricing-calc"
+        "pricing-calc",
+        "pipeline-review"
       ],
       "follows": [
-        "brand-guide",
-        "customer-data-policy"
+        "customer-data-policy",
+        "brand-guide"
       ]
     },
     "summary": "ขั้นตอน: หาวัตถุดิบ — บันทึกประชุม / TOR / อีเมลก่อนหน้า ถ้าไม่มี ให้ถามผู้ใช้แค่: ลูกค้าคือใคร คุยอะไรไว้ ต้องการให้เขาทำอะไรต่อ | จุดที่มักพลาด: คัดลอกเบอร์มือถือจากบันทึกประชุม/TOR ลงอีเมล (แม้ลูกค้าบอกให้โทรได้ ก็เก็บใน CRM เท่านั้น) | ต่อจากนี้: ลูกค้าตอบรับ / ได้ข้อมูลครบ → sales-proposal (นิดา)"
@@ -390,44 +504,44 @@
   {
     "name": "sales-proposal",
     "plugin": "sales",
-    "description": "ร่าง proposal (ข้อเสนอโครงการ) ลูกค้าองค์กร โดยเฉพาะธนาคาร จาก TOR — โครง 9 หัวข้อแบบที่ชนะมาแล้ว เน้นความปลอดภัยและ SLA ใส่ \"ภาคผนวก PDPA\" ทุกครั้งที่ลูกค้าเป็นธนาคาร คิดราคาจาก price-list พร้อมเช็ก margin/ส่วนลด/งบ และตัดข้อมูลส่วนบุคคลออก ใช้เมื่อผู้ใช้พิมพ์ \"ทำ proposal ให้ลูกค้าธนาคาร\", \"ร่างข้อเสนอโครงการตาม TOR\", \"ทำโปรให้ลูกค้าหน่อย\" หรือขอข้อเสนอ/ใบเสนอโครงการให้ลูกค้า",
+    "description": "ร่าง proposal (ข้อเสนอโครงการ) ลูกค้าองค์กร โดยเฉพาะธนาคาร จาก TOR — โครง 9 หัวข้อแบบที่ชนะมาแล้ว เน้นความปลอดภัยและ SLA ใส่ภาคผนวก PDPA ทุกครั้งเมื่อลูกค้าเป็นธนาคารหรือสถาบันการเงิน คิดราคาจาก price-list พร้อมเช็ก margin/ส่วนลด/งบ และตัดข้อมูลส่วนบุคคลออก ใช้เมื่อผู้ใช้พิมพ์ \"ทำ proposal ให้ลูกค้าธนาคาร\", \"ร่างข้อเสนอโครงการตาม TOR\", \"ทำโปรให้ลูกค้าหน่อย\" หรือขอข้อเสนอ/ใบเสนอโครงการให้ลูกค้า",
     "metadata": {
       "owner": "sales-nida",
       "layer": "department",
-      "version": "1.2.0",
-      "uses": [],
+      "version": "1.1.0",
+      "uses": [
+        "pricing-calc"
+      ],
       "next": [
         "deal-approval",
         "follow-up-email",
         "req-to-spec"
       ],
       "follows": [
-        "pricing-rules",
+        "customer-data-policy",
         "brand-guide",
-        "customer-data-policy"
+        "pricing-rules"
       ]
     },
-    "summary": "ขั้นตอน: อ่าน TOR แล้วจดลงตาราง \"ข้อ TOR → ความต้องการ → สิ่งที่เราส่งมอบ\": ขอบเขต, ระยะเวลา, งบ (รวมอะไรบ้าง), ข้อกำหนดความปลอดภัย, SLA, เอกสารที่ต้องยื่น, วันกำหนดยื่น | กติกาที่ห้ามพลาด: ราคา/ต้นทุนมาจาก price-list ของ skill pricing-rules (core) เท่านั้น (price.py อ่านไฟล์นั้นเอง) · margin < 15% = ห้ามส่ง · 15–25% → ส่งต่อ deal-approval (MD) | ต่อจากนี้: margin 15–25% หรือส่วนลด > 10% → deal-approval · ยื่นแล้ว → follow-up-email · ชนะดีล → req-to-spec"
+    "summary": "ขั้นตอน: อ่าน TOR แล้วจดลงตาราง \"ข้อ TOR → ความต้องการ → สิ่งที่เราส่งมอบ\": ขอบเขต, ระยะเวลา, งบ (รวมอะไรบ้าง), ข้อกำหนดความปลอดภัย, SLA, เอกสารที่ต้องยื่น, วันกำหนดยื่น | กติกาที่ห้ามพลาด: กติการาคาทั้งหมดอยู่ใน skill core:pricing-rules อ่านก่อนคิดราคา · margin < 15% = ห้ามส่ง · 15–25% → ส่งต่อ deal-approval (MD) | ต่อจากนี้: margin 15–25% หรือส่วนลด > 10% → deal-approval · ยื่นแล้ว → follow-up-email · ชนะดีล → req-to-spec"
   },
   {
     "name": "meeting-minutes",
     "plugin": "shared",
-    "description": "เรียบเรียงโน้ตประชุมดิบ (จดมือ แชต transcript) ของทุกแผนกเป็นบันทึกการประชุมแบบเดียวกันทั้งบริษัท — สรุป 3 บรรทัด, เรื่องที่ตัดสินแล้ว, action item ที่มีเจ้าของและวันกำหนดจริง, คำถามค้าง แยกฉบับภายในกับฉบับส่งผู้เข้าประชุมภายนอก (ตัดเบอร์มือถือ ความเห็นภายใน คู่แข่ง ตาม PDPA) ใช้เมื่อพิมพ์ \"สรุปประชุมให้หน่อย\", \"ทำ minutes\", \"บันทึกการประชุมจากโน้ตนี้\", \"action item จากประชุมมีอะไรบ้าง\" หรือส่งโน้ต/transcript ประชุมมา — ไม่ใช่การเขียนอีเมลติดตามลูกค้า (นั่นคือ follow-up-email ของ Sales)",
+    "description": "เรียบเรียงโน้ตหรือบทสนทนาจากการประชุมเป็นบันทึกประชุมที่ทุกแผนกใช้ต่อได้ บอกผู้เข้าประชุม สิ่งที่คุยกัน และงานติดตามพร้อมผู้รับผิดชอบและวันกำหนด\nใช้เมื่อผู้ใช้พิมพ์ \"สรุปการประชุมนี้\", \"ทำบันทึกประชุมให้หน่อย\", \"จด action item จากโน้ตนี้\" หรือ /meeting-minutes",
     "metadata": {
       "owner": "plat-ken",
       "layer": "shared",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "uses": [],
       "next": [
-        "follow-up-email",
-        "req-to-spec",
-        "pricing-calc"
+        "follow-up-email"
       ],
       "follows": [
         "customer-data-policy",
         "brand-guide"
       ]
     },
-    "summary": "ขั้นตอน: อ่านโน้ตทั้งหมด แล้วดึง: ชื่อประชุม/โครงการ/รหัสดีล, วัน-เวลา-สถานที่, ผู้เข้าประชุม (ฝั่ง + ตำแหน่ง), เรื่องที่คุย, เรื่องที่ตัดสินแล้ว, สิ่งที่ใครรับปาก, ตัวเลข (งบ วันที่ จำนวน) | ห้าม: ห้ามส่งไฟล์เอง — ร่างเท่านั้น เจ้าของประชุมเป็นคนส่ง"
+    "summary": "ขั้นตอน: รับโน้ตดิบ บทสนทนา หรือไฟล์ถอดเสียงจากผู้ใช้ และถามว่าบันทึกนี้ใช้ภายในหรือจะส่งให้คนนอก | โครงบันทึก | ต่อจากนี้: ถ้าเป็นการประชุมกับลูกค้าและต้องตามงาน ให้ส่งต่อ follow-up-email ในแผนก Sales"
   }
 ]

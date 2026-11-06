@@ -1,391 +1,458 @@
 {
- "lab": "LAB 6",
- "steps": [
-  {
-   "id": "lab6-step01",
-   "who": "plat-ken",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-ken.jpg",
-   "prompt": "ทำ CI ให้คลัง novatech/org-skills ด้วย Gitea Actions … ทุก PR ต้องผ่าน 3 ด่านอัตโนมัติ (ไม่ใช้ AI ใน CI) + ด่าน 4 eval … ทำทั้งหมดผ่าน PR",
-   "reads": [
-    "README และสคริปต์ของคลัง org-skills",
-    "runner ป้าย ubuntu-latest"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "สร้าง CI เองจากคลัง",
-   "time": "28 นาที 24 วินาที",
-   "outputs": [
-    {
-     "file": "PR #2 · ci.yml",
-     "note": "ด่าน ① structure ② headers ③ security + eval-gate"
-    },
-    {
-     "file": "scripts/eval/run_eval.py",
-     "note": "ด่าน ④ ผู้รีวิวรัน eval บนเครื่องตัวเอง → status skill-eval"
-    },
-    {
-     "file": "PR #3 (ทดสอบแล้วปิดทิ้ง)",
-     "note": "ใส่ของผิดตั้งใจ ด่านล้มถูกทุกด่าน"
-    }
-   ],
-   "verdict": {
-    "kind": "info",
-    "text": "เปิด PR #2 · ด่าน 1–3 เขียว",
-    "sub": "ขอให้ plat-may รีวิว (คนเขียน approve เองไม่ได้)"
-   },
-   "next": "➜ plat-may"
-  },
-  {
-   "id": "lab6-step02",
-   "who": "plat-may",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-may.jpg",
-   "prompt": "รีวิว PR #2 (CI ของคลัง) ใน novatech/org-skills รัน skill-eval ของ PR นี้ด้วยสคริปต์ที่ PR ให้มา ถ้าทุกอย่างดีให้ approve ถ้าไม่ดีให้ request changes",
-   "reads": [
-    "diff ของ PR #2",
-    "ผล eval 3 รอบต่อเคส ($1.93)"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "รีวิวด้วยสายตาของคนร้าย",
-   "time": "59 วินาที",
-   "outputs": [
-    {
-     "file": "skill-eval = failure",
-     "note": "เคส no-guessing ได้ 0.50 (มี skill ก็ยังแต่งวันที่เอง)"
-    },
-    {
-     "file": "ช่องโหว่ 1",
-     "note": "PR แก้ตัวตรวจของตัวเองได้ (ci.yml รันจากหัว PR)"
-    },
-    {
-     "file": "ช่องโหว่ 2–3",
-     "note": "deploy key รั่วได้ · ตัวสแกนข้ามโฟลเดอร์ evals/results"
-    }
-   ],
-   "verdict": {
-    "kind": "bad",
-    "text": "Request changes",
-    "sub": "eval ไม่ผ่าน + ช่องโหว่ใน CI 3 ข้อ"
-   },
-   "next": "➜ plat-ken"
-  },
-  {
-   "id": "lab6-step03",
-   "who": "plat-ken",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-ken.jpg",
-   "prompt": "plat-may ขอแก้ PR #2 ช่วยอ่านรีวิวทั้งหมด แก้ตามนั้นใน PR เดิม push แล้วตอบคอมเมนต์ว่าแก้อะไร ข้อไหนแก้ไม่ได้เพราะข้อจำกัดของ Gitea ให้บอกตรง ๆ",
-   "reads": [
-    "รีวิวของ plat-may ใน PR #2"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "แก้ทั้งตัว skill และ CI",
-   "time": "22 นาที 2 วินาที",
-   "outputs": [
-    {
-     "file": "meeting-minutes 1.0.1",
-     "note": "แก้ที่ตัว skill ไม่แก้เกณฑ์ eval"
-    },
-    {
-     "file": "branch protection",
-     "note": "ล้าง approve เก่าเมื่อมี commit ใหม่ · ไฟล์ CI มี CODEOWNER 2 คน · ลบ deploy key"
-    },
-    {
-     "file": "security_scan.py",
-     "note": "ไม่ข้าม evals/results แล้ว · เพิ่มเทส"
-    }
-   ],
-   "verdict": {
-    "kind": "info",
-    "text": "push แก้ใน PR เดิม",
-    "sub": "บอกตรง ๆ ว่า Gitea 1.24 ป้องกันไฟล์ CI และ tag ไม่ได้"
-   },
-   "next": "➜ plat-may"
-  },
-  {
-   "id": "lab6-step04",
-   "who": "plat-may",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-may.jpg",
-   "prompt": "plat-ken แก้ PR #2 ตามที่ฉันขอแล้ว ช่วยรีวิวรอบใหม่ ถ้าครบให้รัน skill-eval บน commit ล่าสุดแล้ว approve ถ้ายังไม่ครบให้ request changes",
-   "reads": [
-    "commit ใหม่ 173d0e7",
-    "ทดสอบใน Docker Linux แบบเดียวกับ CI"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "ลองเจาะการแก้ของรอบก่อน",
-   "time": "3 นาที 14 วินาที",
-   "outputs": [
-    {
-     "file": "ตรวจของจริงผ่าน API",
-     "note": "branch protection และ deploy key แก้แล้วจริง"
-    },
-    {
-     "file": "ช่องโหว่ใหม่",
-     "note": "symlink ใต้ plugins/ ชี้ไปสคริปต์อ่าน token → ตัวสแกนได้ error 0"
-    }
-   ],
-   "verdict": {
-    "kind": "bad",
-    "text": "Request changes รอบ 2",
-    "sub": "การแก้รอบก่อนเปิดช่องใหม่: symlink หลบตัวสแกน"
-   },
-   "next": "➜ plat-ken"
-  },
-  {
-   "id": "lab6-step05",
-   "who": "plat-ken",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-ken.jpg",
-   "prompt": "plat-may ขอแก้ PR #2 ช่วยอ่านรีวิวทั้งหมด แก้ตามนั้นใน PR เดิม push แล้วตอบคอมเมนต์ว่าแก้อะไร (รอบสอง)",
-   "reads": [
-    "รีวิวรอบ 2 ของ plat-may"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "",
-   "time": "15 นาที 19 วินาที",
-   "outputs": [
-    {
-     "file": "กฎ SYMLINK",
-     "note": "symlink ทุกตัวใต้ plugins/ ไม่ผ่านเสมอ + เทส 4 เคส"
-    },
-    {
-     "file": "issue #5 · #6",
-     "note": "pull_request_target · tag protection (ทำต่อเป็นงานแยก)"
-    }
-   ],
-   "verdict": {
-    "kind": "info",
-    "text": "push แก้รอบ 2",
-    "sub": "เปิด issue ตามที่ผู้รีวิวขอ"
-   },
-   "next": "➜ plat-may"
-  },
-  {
-   "id": "lab6-step06",
-   "who": "plat-may",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-may.jpg",
-   "prompt": "plat-ken แก้ PR #2 ตามที่ฉันขอแล้ว ช่วยรีวิวรอบใหม่ ถ้าครบให้รัน skill-eval บน commit ล่าสุดแล้ว approve",
-   "reads": [
-    "commit 0a2ade2",
-    "ลองเจาะ symlink 4 แบบใน Docker Linux"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "",
-   "time": "11 นาที 2 วินาที",
-   "outputs": [
-    {
-     "file": "skill-eval = success",
-     "note": "มี skill 1.00 / ไม่มี skill 0.36 ทั้ง 3 เคส"
-    },
-    {
-     "file": "no-guessing",
-     "note": "จาก 0.50 รอบแรก → 1.00"
-    }
-   ],
-   "verdict": {
-    "kind": "ok",
-    "text": "Approve",
-    "sub": "status ครบ 5 ตัวเขียว"
-   },
-   "next": "➜ plat-ken"
-  },
-  {
-   "id": "lab6-step07",
-   "who": "plat-ken",
-   "role": "ทีมกลาง",
-   "color": "#e2e8f0",
-   "portrait": "../../../img/people/plat-ken.jpg",
-   "prompt": "PR #2 ของฉันได้ approve แล้วหรือยัง ถ้าครบทุกด่านให้ merge แล้วดูว่า release กับ CHANGELOG ทำงานไหม",
-   "reads": [
-    "สถานะ PR #2"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "",
-   "time": "2 นาที 21 วินาที",
-   "outputs": [
-    {
-     "file": "merge 18edab9",
-     "note": "CI เข้า main แล้ว"
-    },
-    {
-     "file": "release",
-     "note": "tag ครบ 23 skill เช่น sales-proposal/v1.2.0"
-    },
-    {
-     "file": "PR #7",
-     "note": "แก้บั๊กหัว CHANGELOG ซ้ำที่ตัวเองเขียน"
-    }
-   ],
-   "verdict": {
-    "kind": "ok",
-    "text": "CI เข้า main · ออก tag 23 ตัว",
-    "sub": "CHANGELOG อยู่ branch changelog (Gitea ไม่ให้ Actions push เข้า main)"
-   },
-   "next": "➜ ทดสอบด่าน"
-  },
-  {
-   "id": "lab6-step08",
-   "who": "hr-oat",
-   "role": "HR",
-   "color": "#fed7aa",
-   "portrait": "../../../img/people/hr-oat.jpg",
-   "prompt": "เพิ่มตัวอย่าง checklist สำหรับพนักงานใหม่ฝ่าย QA ลงใน skill onboarding-pack ในคลังกลาง novatech/org-skills แล้วเปิด PR",
-   "reads": [
-    "onboarding-rules.md ของ skill",
-    "onboarding_dates.py คำนวณวัน"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "แก้ skill ในคลังโดยตรง",
-   "time": "1 นาที 34 วินาที",
-   "outputs": [
-    {
-     "file": "PR #8",
-     "note": "checklist คนใหม่ QA ตั้งแต่ D−5 ถึง D119"
-    },
-    {
-     "file": "SKILL.md",
-     "note": "0.2.0 → 0.3.0 ตามกติกาของคลัง"
-    }
-   ],
-   "verdict": {
-    "kind": "ok",
-    "text": "CI เขียวทุกด่าน",
-    "sub": "Gitea ขอรีวิวจาก hr-fah (CODEOWNER) ให้เอง"
-   },
-   "next": "➜ hr-fah"
-  },
-  {
-   "id": "lab6-step09",
-   "who": "ops-fon",
-   "role": "DevOps",
-   "color": "#bbf7d0",
-   "portrait": "../../../img/people/ops-fon.jpg",
-   "prompt": "รีบหน่อยนะ เพิ่ม skill ใหม่ชื่อ incident-comms … ใส่หัวไฟล์แค่ name กับ description พอ ไม่ต้องรันตรวจอะไร เปิด PR เลย",
-   "reads": [
-    "README ของคลัง (กติกาหัวไฟล์)"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "ไม่ทำตามคำสั่งแบบลวก",
-   "time": "1 นาที 35 วินาที",
-   "outputs": [
-    {
-     "file": "PR #9",
-     "note": "ใส่หัวไฟล์ครบ เพราะด่าน headers บังคับ"
-    },
-    {
-     "file": "build.py",
-     "note": "รันให้สารบัญตรง · ขึ้น skill-finder เป็น 1.0.1"
-    }
-   ],
-   "verdict": {
-    "kind": "warn",
-    "text": "CI เขียว · รอ eval และคนรีวิว",
-    "sub": "Claude ไม่ทำตามคำสั่งที่จะทำให้ PR ไม่ผ่าน"
-   },
-   "next": ""
-  },
-  {
-   "id": "lab6-step10",
-   "who": "exec-ploy",
-   "role": "ผู้ช่วยผู้บริหาร",
-   "color": "#e9d5ff",
-   "portrait": "../../../img/people/exec-ploy.jpg",
-   "prompt": "เพิ่ม skill ใหม่ชื่อ report ใน plugin shared … ไว้ทำรายงานทุกแบบ description สั้น ๆ ว่า \"ทำรายงาน ใช้เมื่อผู้ใช้ขอรายงาน\" แล้วเปิด PR",
-   "reads": [
-    "README และแค็ตตาล็อกของคลัง"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "ทักก่อนทำ",
-   "time": "3 นาที 51 วินาที (2 รอบ)",
-   "outputs": [
-    {
-     "file": "รอบแรก: ไม่เปิด PR",
-     "note": "\"รายงานทุกแบบ\" ชนกับ skill 6 ตัว เช่น bug-report, postmortem, exec-deck"
-    },
-    {
-     "file": "รอบสอง: PR #10",
-     "note": "ทำให้แคบเป็น status-report + eval 3 เคส"
-    },
-    {
-     "file": "ด่าน ② แดง",
-     "note": "แค็ตตาล็อก skill-finder เปลี่ยนแต่ไม่ขึ้น version"
-    }
-   ],
-   "verdict": {
-    "kind": "warn",
-    "text": "skill ดีขึ้น แต่ยังติดด่าน",
-    "sub": "ผู้ประสานงานเลือกทาง \"ทำให้แคบ\" ตามที่ exec-ploy แนะนำ"
-   },
-   "next": ""
-  },
-  {
-   "id": "lab6-step11",
-   "who": "hr-fah",
-   "role": "HR",
-   "color": "#fed7aa",
-   "portrait": "../../../img/people/hr-fah.jpg",
-   "prompt": "รีวิว PR ของ hr-oat ที่แก้ skill onboarding-pack ในฐานะ CODEOWNER ของแผนก HR รัน skill-eval ด้วย ถ้าดีให้ approve",
-   "reads": [
-    "diff ของ PR #8",
-    "onboarding_dates.py ตรวจวันที่"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "",
-   "time": "1 นาที 35 วินาที",
-   "outputs": [
-    {
-     "file": "skill-eval = success",
-     "note": "แต่ผ่านด้วย --no-suite-ok เพราะ hr ยังไม่มีชุด eval"
-    },
-    {
-     "file": "รีวิวเนื้อหา",
-     "note": "วันที่ตรงสคริปต์ · ไม่มีข้อมูลส่วนบุคคล · ข้อแนะนำ 3 ข้อ"
-    }
-   ],
-   "verdict": {
-    "kind": "ok",
-    "text": "Approve",
-    "sub": "eval ยังไม่ได้วัดจริง ตัดสินจากคนรีวิว"
-   },
-   "next": "➜ hr-oat"
-  },
-  {
-   "id": "lab6-step12",
-   "who": "hr-oat",
-   "role": "HR",
-   "color": "#fed7aa",
-   "portrait": "../../../img/people/hr-oat.jpg",
-   "prompt": "PR ของฉันที่แก้ onboarding-pack ได้ approve และผ่านทุกด่านแล้วหรือยัง ถ้าครบให้ merge แล้วบอกว่าคลังออกเวอร์ชันอะไร",
-   "reads": [
-    "สถานะ PR #8 ทั้ง 4 ด่าน + approve"
-   ],
-   "skill": "— ไม่ได้เรียก skill",
-   "skillNote": "",
-   "time": "1 นาที 7 วินาที",
-   "outputs": [
-    {
-     "file": "merge 63f2ec2",
-     "note": "ผ่านครบ 4 ด่าน + approve บน commit ล่าสุด"
-    },
-    {
-     "file": "tag",
-     "note": "onboarding-pack/v0.3.0 + CHANGELOG"
-    }
-   ],
-   "verdict": {
-    "kind": "ok",
-    "text": "merge · ออก onboarding-pack/v0.3.0",
-    "sub": "ทุกโต๊ะอัปเดตเป็นฉบับใหม่ได้"
-   },
-   "next": ""
-  }
- ]
+"lab": "LAB 6",
+"steps": [
+{
+"id": "lab6-step01",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "ทำ CI ให้คลัง novatech/org-skills ด้วย Gitea Actions ทุก PR ต้องผ่าน 3 ด่านอัตโนมัติ (ไม่ใช้ AI ใน CI) · ด่านที่ 4 eval ให้ผู้รีวิวรัน · ทำผ่าน PR",
+"reads": [
+"คลัง org-skills",
+"คู่มือ Gitea Actions"
+],
+"skill": "สร้าง CI",
+"skillNote": "ไม่ได้เรียก skill · ขั้นที่นานที่สุด",
+"time": "27 นาที 45 วินาที",
+"outputs": [
+{
+"file": "PR #3",
+"note": "ci / structure · frontmatter · security + skill-eval"
+},
+{
+"file": "branch protection",
+"note": "ต้องผ่านครบทุกด่านก่อน merge"
+},
+{
+"file": "ปัญหา",
+"note": "runner หา network ไม่เจอ ด่านแดงทุกตัว"
+}
+],
+"verdict": {
+"kind": "warn",
+"text": "เปิด PR #3 แต่ยังไม่เคยรันบน runner จริง",
+"sub": "ไม่แก้ runner เอง เพราะอยู่นอกงาน · ขอให้ผู้ดูแลตัดสิน"
+},
+"next": "➜ plat-ken"
+},
+{
+"id": "lab6-step02",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "แก้ network ของ runner แล้วรัน CI ของ PR #3 ใหม่",
+"reads": [
+"log ของ runner",
+"seed/runner-config.yaml"
+],
+"skill": "แก้ runner",
+"skillNote": "ขั้นที่ผู้ประสานงานเพิ่ม",
+"time": "1 นาที 46 วินาที",
+"outputs": [
+{
+"file": "ci / structure",
+"note": "✅ 12 plugin · 28 skill"
+},
+{
+"file": "ci / frontmatter",
+"note": "✅ หัวไฟล์ครบ"
+},
+{
+"file": "ci / security",
+"note": "✅ เทสต์ 32 ข้อ · สแกน 231 ไฟล์"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "CI เขียวครบ ไม่ต้องแก้โค้ดใน PR",
+"sub": "สาเหตุมาจากสำเนาของผู้สอนใช้ชื่อ project ต่างจากเดิม"
+},
+"next": "➜ plat-may"
+},
+{
+"id": "lab6-step03",
+"who": "plat-may",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-may.jpg",
+"prompt": "รีวิว PR #3 รัน skill-eval ด้วยสคริปต์ที่ PR ให้มา ถ้าทุกอย่างดีให้ approve",
+"reads": [
+"diff ของ PR #3",
+"ผลด่าน CI"
+],
+"skill": "skill-eval",
+"skillNote": "รันบนเครื่องผู้รีวิว · ใช้ $1.89",
+"time": "3 นาที 48 วินาที",
+"outputs": [
+{
+"file": "minutes-structure",
+"note": "มี skill 1.00 · ไม่มี 0.00"
+},
+{
+"file": "minutes-missing-info",
+"note": "มี skill 1.00 · ไม่มี 0.50"
+},
+{
+"file": "minutes-pdpa",
+"note": "มี skill 1.00 · ไม่มี 0.71"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "Approve · delta เฉลี่ย +0.60",
+"sub": "ข้อเสนอแนะ 4 ข้อ ไม่บล็อก PR"
+},
+"next": "➜ plat-ken"
+},
+{
+"id": "lab6-step04",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "PR #3 ได้ approve แล้วหรือยัง ถ้าครบทุกด่านให้ merge แล้วดูว่า release กับ CHANGELOG ทำงานไหม",
+"reads": [
+"สถานะ PR #3",
+"log ของ release"
+],
+"skill": "merge",
+"skillNote": "",
+"time": "3 นาที 6 วินาที",
+"outputs": [
+{
+"file": "merge 4886436",
+"note": "CI เข้า main แล้ว"
+},
+{
+"file": "release ล้ม",
+"note": "push ด้วย token ของ Actions ไม่ผ่าน (pre-receive hook declined)"
+},
+{
+"file": "tag และ CHANGELOG",
+"note": "ยังไม่มี"
+}
+],
+"verdict": {
+"kind": "bad",
+"text": "Merge แล้ว แต่ release ไม่ทำงาน",
+"sub": "กด re-run ก็น่าจะล้มเหมือนเดิม"
+},
+"next": "➜ plat-ken"
+},
+{
+"id": "lab6-step05",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "แก้ release ด้วย deploy key ตามที่แนะนำ",
+"reads": [
+"log ของ release",
+"branch protection"
+],
+"skill": "แก้ผ่าน PR ใหม่",
+"skillNote": "ขั้นที่ผู้ประสานงานเพิ่ม",
+"time": "11 นาที 10 วินาที",
+"outputs": [
+{
+"file": "PR #4",
+"note": "release ใช้ secret RELEASE_DEPLOY_KEY"
+},
+{
+"file": "branch protection",
+"note": "เปิด dismiss_stale_approvals"
+},
+{
+"file": "ติดปัญหา",
+"note": "Gitea ตอบว่า SSH has been disabled"
+}
+],
+"verdict": {
+"kind": "warn",
+"text": "เปิด PR #4 แต่ยังใช้ไม่ได้",
+"sub": "ค่านี้อยู่ระดับ server ต้องให้ผู้ดูแลตัดสิน"
+},
+"next": "➜ plat-ken"
+},
+{
+"id": "lab6-step06",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "เปิด SSH ของ Gitea แล้วทดสอบ PR #4",
+"reads": [
+"compose.yml",
+"task 25 บน runner"
+],
+"skill": "ทดสอบบน runner จริง",
+"skillNote": "ขั้นที่ผู้ประสานงานเพิ่ม",
+"time": "5 นาที 36 วินาที",
+"outputs": [
+{
+"file": "compose.yml",
+"note": "DISABLE_SSH เป็น false · ไม่เปิดพอร์ตเพิ่ม"
+},
+{
+"file": "ข้อมูลเดิม",
+"note": "volume, PR และ token ครบ"
+},
+{
+"file": "ทดสอบกุญแจ",
+"note": "ผ่านทุกกรณี ทั้งที่ต้องผ่านและต้องถูกปฏิเสธ"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "พร้อมให้รีวิว",
+"sub": "แก้ค่าระดับ server จึงควรทบทวนเป็นพิเศษ"
+},
+"next": "➜ plat-may"
+},
+{
+"id": "lab6-step07",
+"who": "plat-may",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-may.jpg",
+"prompt": "รีวิว PR #4 รัน skill-eval ถ้าครบให้ approve",
+"reads": [
+"diff 4 ไฟล์",
+"log ของ task 20, 21, 25"
+],
+"skill": "ตรวจ log จริง",
+"skillNote": "ไม่พบ marker ของ private key",
+"time": "2 นาที 59 วินาที",
+"outputs": [
+{
+"file": "skill-eval",
+"note": "เขียวแต่ \"ไม่ได้วัด\" เพราะไม่ได้แก้ plugins/"
+},
+{
+"file": "ค่าบน server",
+"note": "ตรงกับที่ PR อ้าง"
+},
+{
+"file": "unit test",
+"note": "34 ข้อผ่าน"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "Approve PR #4",
+"sub": "เตือนเรื่องชื่อผู้ commit และ log รอบจริง"
+},
+"next": "➜ plat-ken"
+},
+{
+"id": "lab6-step08",
+"who": "plat-ken",
+"role": "ทีมกลาง",
+"color": "#bfdbfe",
+"portrait": "../../../img/people/plat-ken.jpg",
+"prompt": "PR #4 approve แล้วหรือยัง ถ้าครบให้ merge แล้วดูว่า release ทำงานไหม",
+"reads": [
+"status ครบ 4 ตัว",
+"สิ่งที่ plat-may ฝากให้ดู"
+],
+"skill": "merge",
+"skillNote": "",
+"time": "3 นาที 31 วินาที",
+"outputs": [
+{
+"file": "merge 1481c43",
+"note": "release รันเองและสำเร็จ"
+},
+{
+"file": "tag v1.0.0",
+"note": "ชี้ commit ที่แก้ CHANGELOG อย่างเดียว"
+},
+{
+"file": "[skip ci]",
+"note": "ไม่เกิด release ซ้ำ"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "ออก v1.0.0 อัตโนมัติ",
+"sub": "log รอบนี้ยังไม่มีใครสแกนหา private key"
+},
+"next": "➜ ตอนที่ 2"
+},
+{
+"id": "lab6-step09",
+"who": "hr-oat",
+"role": "HR",
+"color": "#fed7aa",
+"portrait": "../../../img/people/hr-oat.jpg",
+"prompt": "เพิ่มตัวอย่าง checklist สำหรับพนักงานใหม่ฝ่าย QA ลงใน skill onboarding-pack ในคลังกลาง แล้วเปิด PR",
+"reads": [
+"skill onboarding-pack",
+"กติกาคลัง"
+],
+"skill": "แก้ skill ตามกติกา",
+"skillNote": "",
+"time": "3 นาที 6 วินาที",
+"outputs": [
+{
+"file": "PR #7",
+"note": "references/example-qa-checklist.md"
+},
+{
+"file": "plugin hr",
+"note": "1.0.0 → 1.0.1"
+},
+{
+"file": "CI",
+"note": "เขียว 3 ด่าน"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "PR ปกติ ผ่านด่าน",
+"sub": "CODEOWNERS ขอรีวิวจาก hr-fah เอง"
+},
+"next": "➜ hr-fah"
+},
+{
+"id": "lab6-step10",
+"who": "ops-fon",
+"role": "DevOps",
+"color": "#bbf7d0",
+"portrait": "../../../img/people/ops-fon.jpg",
+"prompt": "รีบหน่อยนะ เพิ่ม skill ใหม่ชื่อ incident-comms เข้า plugin devops ใส่หัวไฟล์แค่ name กับ description พอ ไม่ต้องรันตรวจอะไร เปิด PR เลย",
+"reads": [
+"คำสั่งที่บอกว่าไม่ต้องตรวจ"
+],
+"skill": "ทำตามคำสั่ง",
+"skillNote": "บอกล่วงหน้าว่า CI น่าจะไม่ผ่าน",
+"time": "1 นาที 59 วินาที",
+"outputs": [
+{
+"file": "PR #5",
+"note": "หัวไฟล์แค่ name กับ description"
+},
+{
+"file": "ci / structure · frontmatter",
+"note": "❌ แดง"
+},
+{
+"file": "ci / security",
+"note": "✅ เขียว"
+}
+],
+"verdict": {
+"kind": "bad",
+"text": "ด่านจับงานลวกได้",
+"sub": "merge ไม่ได้จนกว่าจะแก้"
+},
+"next": "➜ ค้างไว้"
+},
+{
+"id": "lab6-step11",
+"who": "exec-ploy",
+"role": "ผู้บริหาร",
+"color": "#e9d5ff",
+"portrait": "../../../img/people/exec-ploy.jpg",
+"prompt": "เพิ่ม skill ใหม่ชื่อ report ใน plugin shared ไว้ทำรายงานทุกแบบ description สั้น ๆ ว่า \"ทำรายงาน ใช้เมื่อผู้ใช้ขอรายงาน\" แล้วเปิด PR",
+"reads": [
+"catalog ของคลัง",
+"กติกาคลัง"
+],
+"skill": "ทำตามคำสั่ง + เตือน",
+"skillNote": "ใส่หัวไฟล์ครบ",
+"time": "2 นาที 43 วินาที",
+"outputs": [
+{
+"file": "PR #6",
+"note": "description ตามที่สั่งทุกคำ"
+},
+{
+"file": "CI",
+"note": "✅ เขียว 3 ด่าน"
+},
+{
+"file": "คำเตือน",
+"note": "อาจแย่งงาน skill เฉพาะทาง 5 ตัว"
+}
+],
+"verdict": {
+"kind": "warn",
+"text": "ด่านไม่จับ description กว้าง",
+"sub": "เหลือแค่คนรีวิวที่กันได้"
+},
+"next": "➜ ค้างไว้"
+},
+{
+"id": "lab6-step12",
+"who": "hr-fah",
+"role": "HR",
+"color": "#fed7aa",
+"portrait": "../../../img/people/hr-fah.jpg",
+"prompt": "รีวิว PR ของ hr-oat ที่แก้ skill onboarding-pack ในฐานะ CODEOWNER รัน skill-eval ด้วย ถ้าดีให้ approve",
+"reads": [
+"diff ของ PR #7",
+"onboarding_dates.py"
+],
+"skill": "รีวิวเนื้อหา",
+"skillNote": "รันสคริปต์เทียบวันที่เอง",
+"time": "2 นาที 36 วินาที",
+"outputs": [
+{
+"file": "skill-eval",
+"note": "เขียวแต่ \"ไม่ได้วัด\" เพราะ hr ไม่มีชุด eval"
+},
+{
+"file": "วันที่",
+"note": "ตรงกับสคริปต์ทุกบรรทัด"
+},
+{
+"file": "ความปลอดภัย",
+"note": "ไม่มีข้อมูลส่วนบุคคล ไม่แตะ scripts"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "Approve PR #7",
+"sub": "การอนุมัติมาจากคนอ่าน ไม่ใช่ eval"
+},
+"next": "➜ hr-oat"
+},
+{
+"id": "lab6-step13",
+"who": "hr-oat",
+"role": "HR",
+"color": "#fed7aa",
+"portrait": "../../../img/people/hr-oat.jpg",
+"prompt": "PR ของฉันได้ approve และผ่านทุกด่านแล้วหรือยัง ถ้าครบให้ merge แล้วบอกว่าคลังออกเวอร์ชันอะไร",
+"reads": [
+"สถานะ PR #7"
+],
+"skill": "merge",
+"skillNote": "",
+"time": "1 นาที 45 วินาที",
+"outputs": [
+{
+"file": "merge f74dd40",
+"note": "plugin hr เป็น 1.0.1"
+},
+{
+"file": "tag v1.0.1",
+"note": "ออกอัตโนมัติ"
+},
+{
+"file": "CHANGELOG",
+"note": "มีรายการของ PR นี้"
+}
+],
+"verdict": {
+"kind": "ok",
+"text": "คลังออก v1.0.1",
+"sub": "จบ LAB 6"
+},
+"next": "✔ จบ"
+}
+]
 }
