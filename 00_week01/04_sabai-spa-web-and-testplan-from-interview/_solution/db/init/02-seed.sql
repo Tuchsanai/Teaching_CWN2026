@@ -1,234 +1,266 @@
--- สบายใจ สปา · seed = TEST-DATA.md ทุกค่า
--- ไฟล์นี้เป็นแหล่งเดียวของ seed: db ใช้ตอน init และ web ใช้ซ้ำตอน POST /api/test/reset (หลัง TRUNCATE)
--- เวลาทุกค่าระบุ +07:00 (Asia/Bangkok) · ไม่มีคำสั่ง BEGIN/COMMIT ในไฟล์ (ผู้เรียกคุม transaction เอง)
+-- สบายใจ สปา · ข้อมูลตั้งต้นตาม TEST-DATA.md ทุกค่า · สร้างครั้งเดียว hash เป็น Argon2id จริง
+-- ฟังก์ชันเดียวนี้คือ seed ชุดเดียวของระบบ: docker init และ POST /api/test/reset เรียกตัวเดียวกัน
+-- ค่าที่คิดจากวันล็อก: C01–C06 และ Gift Card (วันล็อก − N) · U02, U05 เดือนเกิด · R01 ปี (TD-04, TD-07, TD-12, D-24)
+-- การจอง B01–B19 วันที่คงที่ · UUID คงที่: U=…0101+ · B=…0201+ · C=…0301+ · GC=…0401+
 
--- ── ผู้ใช้ U01–U08 + เจ้าของร้าน (รหัสผ่านเก็บเป็น bcrypt) ──────────────────────
-INSERT INTO customer (id, name, phone, email, line_id, birth_date, lang, lifetime_spend, points_balance, password_hash, role, created_on) VALUES
- (1, 'คุณนิดา',     '081-111-0001', 'nida@sabai.test',  'nida.line',  '1990-03-08', 'th', 12400.00,  99, '$2b$10$UjQAzM1g6o3y41YW6IrcpeDEyTvRQ2UA7VABSn6Z0GvglVm2h7Y9e', 'customer', '2026-01-15'),
- (2, 'คุณต้น',      '081-111-0002', 'ton@sabai.test',   'ton.line',   '1992-10-15', 'th', 30000.00,   0, '$2b$10$5Rf0kWb0SVGJqz6PgmqDaOZGgJbFZabLJufK2WDHlBHeVvzm4awrC', 'customer', '2025-06-01'),
- (3, 'คุณเมย์',     '081-111-0003', 'may@sabai.test',   NULL,         '1996-05-20', 'th',     0.00,   0, '$2b$10$3lt1L0gDdUCNDGH9K/eZEeoBGR2zp8/3/uZd0aAsWybmN.C3lkJA2', 'customer', '2026-10-09'),
- (4, 'คุณฝน',       '081-111-0004', 'fon@sabai.test',   'fon.line',   '1993-02-14', 'th',  9999.00, 250, '$2b$10$JQq794CzdkUgo0nZMduN1eKq5uKf9Rrfz7RDjmd9ZO4NYQfeb0e7a', 'customer', '2025-11-20'),
- (5, 'น้องแพร',     '081-111-0005', 'prae@sabai.test',  'prae.line',  '2001-10-03', 'th', 29999.00, 100, '$2b$10$FroQ3z4eFYWVVdtlnPO9Cu68d7DkTKs1PPVuNZ2Y.bhsZ4.OTf/za', 'customer', '2025-02-10'),
- (6, 'คุณวิภา',     '081-111-0006', 'vipa@sabai.test',  'vipa.line',  '1985-01-25', 'th', 45000.00, 199, '$2b$10$ozjbDSgDq8ZBZuzpjwR.pO670ZgyAB0w/WrSnV48JV8.ktlABK0hy', 'customer', '2024-12-01'),
- (7, 'คุณกานต์',    '081-111-0007', 'kan@sabai.test',   'kan.line',   '1988-07-07', 'th', 10000.00,   0, '$2b$10$MAl1Rp4j.D4ZhNEcuzzwHOgl9mFxGVfESYej84u4.lwRJF4blt/ge', 'customer', '2026-04-20'),
- (8, 'Mr. Li Wei',  '+86-138-0000-0008', 'liwei@sabai.test', NULL,  '1990-01-12', 'zh',     0.00,   0, '$2b$10$qPzycsoC9PWL8Eck1Iqru.t2J/yo0zgebkveM6qbou1R24Hy7K6Hu', 'customer', '2026-10-01'),
- (9, 'คุณจันทร์ (เจ้าของร้าน)', '02-123-4567', 'owner@sabai.test', NULL, NULL, 'th', 0.00, 0, '$2b$10$WyAoUFf8i3.mw/NDgALy7u47cDNpGd/jmoGObHXt88STMDfThe3bW', 'owner', '2024-01-01');
+CREATE OR REPLACE FUNCTION sabai_seed(p_now timestamptz) RETURNS void
+LANGUAGE plpgsql AS $seed$
+DECLARE
+  v_today date := (p_now AT TIME ZONE 'Asia/Bangkok')::date;
+  v_month int := extract(month FROM (p_now AT TIME ZONE 'Asia/Bangkok'))::int;
+  v_year  int := extract(year FROM (p_now AT TIME ZONE 'Asia/Bangkok'))::int;
+BEGIN
+  TRUNCATE app_settings, users, services, herbs, service_herbs, therapists, therapist_services,
+           therapist_reviews, hotels, course_purchases, gift_cards, bookings, booking_items,
+           gift_card_transactions, point_transactions, birthday_redemptions,
+           waist_measurements, before_after_photos
+    RESTART IDENTITY CASCADE;
 
--- ── บริการ S01–S07 · แพ็กเกจ P01 · คอร์ส K01 ─────────────────────────────────
-INSERT INTO service (id, code, name_th, name_en, name_zh, kind, duration_min, price, includes_transport) VALUES
- (1, 'S01', 'นวดไทย 60 นาที',     'Thai Massage 60',        '泰式按摩 60分钟', 'single',  60,  1000.00, FALSE),
- (2, 'S02', 'นวดไทย 90 นาที',     'Thai Massage 90',        '泰式按摩 90分钟', 'single',  90,  1400.00, FALSE),
- (3, 'S03', 'ประคบสมุนไพร',       'Herbal Compress',        '草药热敷',        'single',  60,  1200.00, FALSE),
- (4, 'S04', 'นวดน้ำมันอโรมา',     'Aroma Oil Massage',      '香薰精油按摩',    'single',  90,  2000.00, FALSE),
- (5, 'S05', 'นวดเท้า',            'Foot Massage',           '足部按摩',        'single',  60,   800.00, FALSE),
- (6, 'S06', 'ขัดผิวสมุนไพร',      'Herbal Body Scrub',      '草药身体磨砂',    'single',  60,  1500.00, FALSE),
- (7, 'S07', 'ทรีตเมนต์หน้า',      'Herbal Facial',          '草药面部护理',    'single',  60,  1800.00, FALSE),
- (8, 'P01', 'แพ็กเกจ Bangkok Relax', 'Bangkok Relax Package', '曼谷放松套餐',  'package', 120, 2900.00, TRUE),
- (9, 'K01', 'คอร์สกระชับสัดส่วน 10 แถม 1', 'Body Contouring Course', '塑形疗程', 'course', 60, 15000.00, FALSE);
+  INSERT INTO users (id, email, password_hash, role, full_name, phone, birth_date, lifetime_spend, points_balance) VALUES
+    ('00000000-0000-0000-0000-000000000101', 'nida@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$+q6CwIZM9u2FsKxo6Tf+Rg$DxUIl+z2MeL9JznOJvb2YP/HtTBhoVRz/Yd/mxUFuhE', 'CUSTOMER', 'คุณนิดา', '0810000001', DATE '1985-03-01', 12400, 99),
+    ('00000000-0000-0000-0000-000000000102', 'ton@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$wQah1pxkyfYu8e6Irc9QPA$tQRTByGJ0c8dSGwPtmhEYcZlOwe5YpsOymucPS26IsI', 'CUSTOMER', 'คุณต้น', '0810000002', make_date(1992, v_month, 1), 30000, 0),
+    ('00000000-0000-0000-0000-000000000103', 'fon@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$C/Vs7BIi3cO5A2A1Cwr98w$KWo0pvT3v1fXQgBCN8IeOZfhcDM0p1sd9Ou5CTdd7Dw', 'CUSTOMER', 'คุณฝน', '0810000003', DATE '1994-02-01', 9999, 250),
+    ('00000000-0000-0000-0000-000000000104', 'may@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$Z+DQMlDJAboanZin0zWcdg$bhLGoDC18n2bkI/cIE6mbWQl/ZuowkXxfPlCEPUKsmM', 'CUSTOMER', 'คุณเมย์', '0810000004', DATE '1997-05-01', 0, 0),
+    ('00000000-0000-0000-0000-000000000105', 'prae@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$VOIvIQd+T9lCmq/OgNSCiQ$sLG4uzBXYkboDK1Qz/97Ec7veQEZh6+3C3iyKsPF8RQ', 'CUSTOMER', 'น้องแพร', '0810000005', make_date(2003, v_month, 1), 29999, 100),
+    ('00000000-0000-0000-0000-000000000106', 'liwei@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$iAYTSIqf7W8fH9yorx9ghQ$sR20KwBNTA/Djw4OjPZvMKYg5ivCQ2rI6tQyybaY8Mw', 'CUSTOMER', 'Mr. Li Wei', '0810000006', DATE '1991-01-01', 0, 0),
+    ('00000000-0000-0000-0000-000000000107', 'owner@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$b0XM/fe1YCRJDZV3kwn3Pw$hiXwcrHMqNZRlpstDyYY4AUegXu9e0S918+ZBs0cB34', 'OWNER', 'คุณจันทร์', '021234567', NULL, 0, 0),
+    ('00000000-0000-0000-0000-000000000108', 'kan@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$7rY596+PNDzkmcryFlI/5A$LlfOLFhRSFKyytPltmAupfpZw03WLmWH1me+gt8utOU', 'CUSTOMER', 'คุณกานต์', '0810000008', DATE '1990-08-01', 10000, 101),
+    ('00000000-0000-0000-0000-000000000109', 'win@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$f0Dy16kPh3iD4uoR/AvU5g$0iI7XlsxdSkCvBRMtOmDOFEkW/yEyKthr8SOS+Na8FM', 'CUSTOMER', 'คุณวิน', '0810000009', DATE '1988-11-01', 10001, 199),
+    ('00000000-0000-0000-0000-000000000110', 'bee@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$hzhxGk/SoIHedMNPbRezYA$VsbdJ564q/tc5AzuXJdqfhiwrFLoObiyQfU6/uLX2DA', 'CUSTOMER', 'คุณบี', '0810000010', DATE '1986-09-01', 30001, 200),
+    ('00000000-0000-0000-0000-000000000111', 'por@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$CENpFbopKZyL9ekGgfiImQ$qsAYrMgTv2jCRCCuNURA0JyPmMECSI19L+TQFFoiEFM', 'CUSTOMER', 'คุณปอ', '0810000011', DATE '1995-06-01', 500, 1700),
+    ('00000000-0000-0000-0000-000000000112', 'muk@sabai.test', '$argon2id$v=19$m=19456,t=2,p=1$TSXJMfz2P6QYFIU10+dd5w$AxqHokKrH6eKD8YB9yWkEH1kI8RWmxy3y2kiNn/dmEM', 'CUSTOMER', 'คุณมุก', '0810000012', DATE '1993-06-01', 5000, 300);
 
--- ── สมุนไพร (FR-31 ห้ามว่าง) ────────────────────────────────────────────────
-INSERT INTO herb (id, name_th, name_en, name_zh) VALUES
- (1,  'ไพล',           'Plai (Thai ginger)', '泰国姜'),
- (2,  'ตะไคร้',        'Lemongrass',         '香茅'),
- (3,  'ขมิ้น',         'Turmeric',           '姜黄'),
- (4,  'มะกรูด',        'Kaffir lime',        '泰国青柠'),
- (5,  'มะลิ',          'Jasmine',            '茉莉'),
- (6,  'ตะไคร้หอม',     'Citronella',         '亚香茅'),
- (7,  'การบูร',        'Camphor',            '樟脑'),
- (8,  'เกลือสมุนไพร',  'Herbal salt',        '草本盐'),
- (9,  'มะขาม',         'Tamarind',           '罗望子'),
- (10, 'น้ำผึ้ง',       'Honey',              '蜂蜜'),
- (11, 'ว่านหางจระเข้', 'Aloe vera',          '芦荟'),
- (12, 'ทานาคา',        'Thanaka',            '黄香楝'),
- (13, 'ขิง',           'Ginger',             '生姜'),
- (14, 'พริกไทยดำ',     'Black pepper',       '黑胡椒');
+  INSERT INTO services (id, kind, name_th, name_en, name_zh, duration_minutes, price, image_path, sort_order) VALUES
+    ('S01', 'SERVICE', 'นวดไทย 60 นาที', 'Thai Massage 60', '泰式按摩 60分钟', 60, 1000, '/brand/services/svc-s01-thai60.jpg', 1),
+    ('S02', 'SERVICE', 'นวดไทย 90 นาที', 'Thai Massage 90', '泰式按摩 90分钟', 90, 1400, '/brand/services/svc-s02-thai90.jpg', 2),
+    ('S03', 'SERVICE', 'ประคบสมุนไพร', 'Herbal Compress', '草药热敷', 60, 1200, '/brand/services/svc-s03-compress.jpg', 3),
+    ('S04', 'SERVICE', 'นวดน้ำมันอโรมา', 'Aroma Oil Massage', '香薰精油按摩', 90, 2000, '/brand/services/svc-s04-aroma.jpg', 4),
+    ('S05', 'SERVICE', 'นวดเท้า', 'Foot Massage', '足部按摩', 60, 800, '/brand/services/svc-s05-foot.jpg', 5),
+    ('S06', 'SERVICE', 'ขัดผิวสมุนไพร', 'Herbal Body Scrub', '草药身体磨砂', 60, 1500, '/brand/services/svc-s06-scrub.jpg', 6),
+    ('S07', 'SERVICE', 'ทรีตเมนต์หน้า', 'Herbal Facial', '草药面部护理', 60, 1800, '/brand/services/svc-s07-facial.jpg', 7),
+    ('P01', 'PACKAGE', 'แพ็กเกจ Bangkok Relax', 'Bangkok Relax', '曼谷放松套餐', 120, 2900, '/brand/services/svc-p01-bangkok-relax.jpg', 8),
+    ('K01', 'COURSE', 'คอร์สกระชับสัดส่วน 10 แถม 1', 'Body Contouring Course', '塑形疗程', 60, 15000, '/brand/services/svc-k01-contour.jpg', 9);
 
-INSERT INTO service_herb (service_id, herb_id, sort_order) VALUES
- (1, 1, 1), (1, 2, 2),
- (2, 1, 1), (2, 2, 2),
- (3, 1, 1), (3, 3, 2), (3, 2, 3), (3, 4, 4),
- (4, 5, 1), (4, 6, 2), (4, 4, 3),
- (5, 1, 1), (5, 7, 2), (5, 8, 3),
- (6, 3, 1), (6, 9, 2), (6, 10, 3),
- (7, 11, 1), (7, 3, 2), (7, 12, 3),
- (8, 1, 1), (8, 3, 2), (8, 2, 3), (8, 4, 4),
- (9, 13, 1), (9, 14, 2), (9, 3, 3);
+  INSERT INTO herbs (id, name_th, name_en, name_zh, image_path) VALUES
+    (1, 'ไพล', 'Phlai', '紫姜', '/brand/herbs/herb-phlai.jpg'),
+    (2, 'ตะไคร้', 'Lemongrass', '香茅', '/brand/herbs/herb-lemongrass.jpg'),
+    (3, 'ขมิ้น', 'Turmeric', '姜黄', '/brand/herbs/herb-turmeric.jpg'),
+    (4, 'มะกรูด', 'Kaffir Lime', '泰国青柠', '/brand/herbs/herb-kaffir.jpg'),
+    (5, 'มะลิ', 'Jasmine', '茉莉', '/brand/herbs/herb-jasmine.jpg'),
+    (6, 'การบูร', 'Camphor', '樟脑', '/brand/herbs/herb-camphor.jpg'),
+    (7, 'ขิง', 'Ginger', '生姜', '/brand/herbs/herb-ginger.jpg'),
+    (8, 'มะขาม', 'Tamarind', '罗望子', '/brand/herbs/herb-tamarind.jpg'),
+    (9, 'น้ำผึ้ง', 'Honey', '蜂蜜', '/brand/herbs/herb-honey.jpg'),
+    (10, 'ว่านหางจระเข้', 'Aloe Vera', '芦荟', '/brand/herbs/herb-aloe.jpg'),
+    (11, 'ทานาคา', 'Thanaka', '黄香楝', '/brand/herbs/herb-thanaka.jpg'),
+    (12, 'พริกไทย', 'Pepper', '胡椒', '/brand/herbs/herb-pepper.jpg');
+  PERFORM setval(pg_get_serial_sequence('herbs', 'id'), 12);
 
--- ── นักบำบัด T01–T06 + บริการที่ทำได้ ─────────────────────────────────────────
-INSERT INTO therapist (id, code, name, name_en, name_zh, active) VALUES
- (1, 'T01', 'พี่สมศรี',     'Somsri',   '颂西',   TRUE),
- (2, 'T02', 'พี่มาลี',      'Malee',    '玛丽',   TRUE),
- (3, 'T03', 'พี่บุญมี',     'Boonmee',  '文米',   TRUE),
- (4, 'T04', 'พี่จันทร์เพ็ญ', 'Janpen',   '占彭',   TRUE),
- (5, 'T05', 'พี่ทองใบ',     'Thongbai', '通拜',   TRUE),
- (6, 'T06', 'พี่ดวงใจ',     'Duangjai', '端再',   TRUE);
+  INSERT INTO service_herbs (service_id, herb_id) VALUES
+    ('S01', 1),
+    ('S02', 1),
+    ('S03', 1),
+    ('S05', 1),
+    ('P01', 1),
+    ('K01', 1),
+    ('S01', 2),
+    ('S02', 2),
+    ('S03', 2),
+    ('S04', 2),
+    ('P01', 2),
+    ('S03', 3),
+    ('S06', 3),
+    ('S07', 3),
+    ('P01', 3),
+    ('S03', 4),
+    ('S04', 4),
+    ('P01', 4),
+    ('S04', 5),
+    ('S05', 6),
+    ('S05', 7),
+    ('K01', 7),
+    ('S06', 8),
+    ('S06', 9),
+    ('S07', 10),
+    ('S07', 11),
+    ('K01', 12);
 
-INSERT INTO therapist_service (therapist_id, service_id) VALUES
- (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 8), (1, 9),
- (2, 1), (2, 2), (2, 3), (2, 5), (2, 8),
- (3, 1), (3, 2), (3, 4), (3, 5), (3, 6),
- (4, 1), (4, 2), (4, 5), (4, 6), (4, 7),
- (5, 1), (5, 2), (5, 3), (5, 4), (5, 7), (5, 9),
- (6, 1), (6, 2), (6, 3), (6, 5), (6, 8);
+  INSERT INTO therapists (id, name_th, name_en, name_zh, title_th, title_en, title_zh, photo_path) VALUES
+    ('T01', 'พี่ศรี', 'P''Sri', '诗丽', 'หัวหน้านักบำบัด', 'Head Therapist', '首席理疗师', '/brand/people/staff-t01-sri.jpg'),
+    ('T02', 'พี่มาลี', 'P''Malee', '玛莉', 'นักบำบัด', 'Therapist', '理疗师', '/brand/people/staff-t02-malee.jpg'),
+    ('T03', 'พี่ภูมิ', 'P''Phum', '普姆', 'นักบำบัด', 'Therapist', '理疗师', '/brand/people/staff-t03-phum.jpg'),
+    ('T04', 'น้องฟ้า', 'Nong Fah', '法', 'นักบำบัดใหม่', 'New Therapist', '新理疗师', '/brand/people/staff-t04-fah.jpg'),
+    ('T05', 'พี่ทิว', 'P''Tiw', '蒂乌', 'นักบำบัด', 'Therapist', '理疗师', '/brand/people/staff-t05-tiw.jpg'),
+    ('T06', 'น้องแก้ว', 'Nong Kaew', '凯欧', 'นักบำบัด', 'Therapist', '理疗师', '/brand/people/staff-t06-kaew.jpg');
 
--- ── รีวิว 17 รายการ (booking_id NULL = รีวิวก่อนเปิดระบบ T9) ───────────────────
-INSERT INTO review (id, therapist_id, customer_id, booking_id, stars, comment) VALUES
- (1,  1, 1, NULL, 5, 'มือหนัก กำลังดี'),
- (2,  1, 2, NULL, 5, 'Excellent massage'),
- (3,  1, 6, NULL, 5, 'ประทับใจมาก'),
- (4,  2, 4, NULL, 5, 'นวดดีมาก'),
- (5,  2, 5, NULL, 4, 'ดี'),
- (6,  3, 1, NULL, 5, 'ผ่อนคลาย'),
- (7,  3, 2, NULL, 5, 'ดีมาก'),
- (8,  3, 4, NULL, 4, 'โอเค'),
- (9,  3, 6, NULL, 4, 'ดี'),
- (10, 3, 7, NULL, 4, 'พอใช้'),
- (11, 5, 1, NULL, 5, 'เชี่ยวชาญ'),
- (12, 5, 2, NULL, 5, 'ดีมาก'),
- (13, 5, 5, NULL, 5, 'หน้าใสขึ้น'),
- (14, 5, 6, NULL, 4, 'ดี'),
- (15, 5, 7, NULL, 4, 'ดี'),
- (16, 6, 4, NULL, 5, 'ใจดี'),
- (17, 6, 7, NULL, 3, 'เฉย ๆ');
+  INSERT INTO therapist_services (therapist_id, service_id) VALUES
+    ('T01', 'S01'),
+    ('T01', 'S02'),
+    ('T01', 'S03'),
+    ('T01', 'S04'),
+    ('T01', 'S05'),
+    ('T01', 'P01'),
+    ('T01', 'K01'),
+    ('T02', 'S01'),
+    ('T02', 'S02'),
+    ('T02', 'S03'),
+    ('T02', 'S05'),
+    ('T02', 'P01'),
+    ('T03', 'S01'),
+    ('T03', 'S02'),
+    ('T03', 'S04'),
+    ('T03', 'S05'),
+    ('T03', 'S06'),
+    ('T04', 'S01'),
+    ('T04', 'S02'),
+    ('T04', 'S05'),
+    ('T04', 'S06'),
+    ('T04', 'S07'),
+    ('T05', 'S01'),
+    ('T05', 'S02'),
+    ('T05', 'S03'),
+    ('T05', 'S04'),
+    ('T05', 'S07'),
+    ('T05', 'K01'),
+    ('T06', 'S01'),
+    ('T06', 'S02'),
+    ('T06', 'S03'),
+    ('T06', 'S05'),
+    ('T06', 'P01');
 
--- ── ห้อง Couple Suite ─────────────────────────────────────────────────────────
-INSERT INTO room (id, name, capacity) VALUES (1, 'Couple Suite', 2);
+  INSERT INTO therapist_reviews (therapist_id, stars) VALUES
+    ('T01', 5),
+    ('T01', 5),
+    ('T01', 5),
+    ('T02', 5),
+    ('T02', 4),
+    ('T03', 5),
+    ('T03', 5),
+    ('T03', 4),
+    ('T03', 4),
+    ('T03', 4),
+    ('T05', 5),
+    ('T05', 5),
+    ('T05', 5),
+    ('T05', 4),
+    ('T05', 4),
+    ('T06', 5),
+    ('T06', 3);
 
--- ── โรงแรม H01–H06 (ชื่อสมมติ) ────────────────────────────────────────────────
-INSERT INTO hotel (id, code, name, name_en, name_zh, distance_km) VALUES
- (1, 'H01', 'โรงแรมเรือนไทย ริเวอร์ไซด์', 'Ruen Thai Riverside Hotel', '泰屋河畔酒店',   2.0),
- (2, 'H02', 'โรงแรมบ้านสบาย สุขุมวิท',   'Baan Sabai Sukhumvit Hotel', '舒适之家素坤逸酒店', 5.0),
- (3, 'H03', 'โรงแรมดอกบัว สีลม',         'Dok Bua Silom Hotel',        '莲花是隆酒店',   5.1),
- (4, 'H04', 'โรงแรมกล้วยไม้ พาเลซ',      'Kluai Mai Palace Hotel',     '兰花宫殿酒店',   12.0),
- (5, 'H05', 'โรงแรมทองคำ แกรนด์',        'Thong Kham Grand Hotel',     '黄金大酒店',     15.0),
- (6, 'H06', 'โรงแรมสวนมะลิ บางนา',       'Suan Mali Bangna Hotel',     '茉莉花园邦纳酒店', 15.1);
+  INSERT INTO hotels (id, name_th, name_en, name_zh, distance_km) VALUES
+    ('H01', 'โรงแรมเรือนไทย ริเวอร์ไซด์', 'Ruen Thai Riverside Hotel', '泰屋河畔酒店', 2.0),
+    ('H02', 'โรงแรมบ้านสบาย สุขุมวิท', 'Baan Sabai Sukhumvit Hotel', '安逸之家素坤逸酒店', 5.0),
+    ('H03', 'โรงแรมดอกบัว สีลม', 'Dok Bua Silom Hotel', '莲花是隆酒店', 5.1),
+    ('H04', 'โรงแรมกล้วยไม้ พาเลซ', 'Kluai Mai Palace Hotel', '兰花宫酒店', 12.0),
+    ('H05', 'โรงแรมทองคำ แกรนด์', 'Thong Kham Grand Hotel', '金色大酒店', 15.0),
+    ('H06', 'โรงแรมสวนมะลิ บางนา', 'Suan Mali Bangna Hotel', '茉莉园邦纳酒店', 15.1);
 
--- ── คอร์สที่ซื้อแล้ว C01–C04 (ต้องมีก่อน booking ที่อ้างถึง) ──────────────────
-INSERT INTO course_purchase (id, code, customer_id, service_id, price, total_sessions, used_sessions, reserved_sessions, purchased_on, expires_on) VALUES
- (1, 'C01', 1, 9, 15000.00, 11,  4, 0, '2026-08-01', '2027-01-28'),
- (2, 'C02', 7, 9, 15000.00, 11, 10, 0, '2026-04-23', '2026-10-20'),
- (3, 'C03', 6, 9, 15000.00, 11, 11, 0, '2026-06-01', '2026-11-28'),
- (4, 'C04', 5, 9, 15000.00, 11,  6, 0, '2026-03-01', '2026-08-28');
+  INSERT INTO course_purchases (id, user_id, service_id, price_paid, total_sessions, used_sessions, reserved_sessions, purchased_on, expires_on, payment_status) VALUES
+    ('00000000-0000-0000-0000-000000000301', '00000000-0000-0000-0000-000000000101', 'K01', 15000, 11, 4, 0, v_today - 90, v_today - 90 + 180, 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000302', '00000000-0000-0000-0000-000000000108', 'K01', 15000, 11, 9, 0, v_today - 175, v_today - 175 + 180, 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000303', '00000000-0000-0000-0000-000000000109', 'K01', 15000, 11, 6, 0, v_today - 181, v_today - 181 + 180, 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000304', '00000000-0000-0000-0000-000000000110', 'K01', 15000, 11, 11, 0, v_today - 120, v_today - 120 + 180, 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000305', '00000000-0000-0000-0000-000000000111', 'K01', 15000, 11, 10, 0, v_today - 60, v_today - 60 + 180, 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000306', '00000000-0000-0000-0000-000000000112', 'K01', 15000, 11, 3, 1, v_today - 45, v_today - 45 + 180, 'SIMULATED');
 
--- ── การจองที่มีอยู่ B01–B13 ───────────────────────────────────────────────────
-INSERT INTO booking (id, code, customer_id, guest_name, guest_phone, contact_name, contact_phone, service_id, room_id, course_purchase_id,
-  booking_type, party_size, start_at, end_at, status,
-  gross_amount, discount_kind, discount_pct, discount_amount, points_redeemed, points_discount,
-  distance_km, vehicles, transport_fee, total_amount, giftcard_paid, other_paid, points_earned,
-  created_at, cancelled_at, completed_at) VALUES
- (1,  'B01', 4, NULL, NULL, 'คุณฝน', '081-111-0004', 1, NULL, NULL, 'single', 1,
-      '2026-10-12 14:00+07', '2026-10-12 15:00+07', 'confirmed',
-      1000.00, 'none', 0, 0, 0, 0, NULL, 0, 0, 1000.00, 0, 1000.00, 0, '2026-10-05 12:00+07', NULL, NULL),
- (2,  'B02', 2, NULL, NULL, 'คุณต้น', '081-111-0002', 2, 1, NULL, 'couple', 2,
-      '2026-10-17 19:00+07', '2026-10-17 20:30+07', 'confirmed',
-      2800.00, 'tier', 10, 280.00, 0, 0, NULL, 0, 0, 2520.00, 0, 2520.00, 0, '2026-10-06 20:00+07', NULL, NULL),
- (3,  'B03', NULL, 'คุณสมชาย', '081-000-0003', 'คุณสมชาย', '081-000-0003', 2, NULL, NULL, 'single', 1,
-      '2026-10-13 10:00+07', '2026-10-13 11:30+07', 'confirmed',
-      1400.00, 'none', 0, 0, 0, 0, NULL, 0, 0, 1400.00, 0, 1400.00, 0, '2026-10-07 09:00+07', NULL, NULL),
- (4,  'B04', 8, NULL, NULL, 'Mr. Li Wei', '+86-138-0000-0008', 1, NULL, NULL, 'group', 5,
-      '2026-10-14 16:00+07', '2026-10-14 17:00+07', 'confirmed',
-      5000.00, 'group', 10, 500.00, 0, 0, NULL, 0, 0, 4500.00, 0, 4500.00, 0, '2026-10-08 15:00+07', NULL, NULL),
- (5,  'B05', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 5, NULL, NULL, 'single', 1,
-      '2026-10-11 10:00+07', '2026-10-11 11:00+07', 'confirmed',
-      800.00, 'tier', 5, 40.00, 0, 0, NULL, 0, 0, 760.00, 0, 760.00, 0, '2026-10-03 18:00+07', NULL, NULL),
- (6,  'B06', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 1, NULL, NULL, 'single', 1,
-      '2026-10-10 15:00+07', '2026-10-10 16:00+07', 'confirmed',
-      1000.00, 'tier', 5, 50.00, 0, 0, NULL, 0, 0, 950.00, 0, 950.00, 0, '2026-10-04 18:00+07', NULL, NULL),
- (7,  'B07', 5, NULL, NULL, 'น้องแพร', '081-111-0005', 7, NULL, NULL, 'single', 1,
-      '2026-10-05 13:00+07', '2026-10-05 14:00+07', 'completed',
-      1800.00, 'birthday', 20, 360.00, 0, 0, NULL, 0, 0, 1440.00, 0, 1440.00, 14, '2026-10-01 10:00+07', NULL, '2026-10-05 14:00+07'),
- (8,  'B08', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 9, NULL, 1, 'course', 1,
-      '2026-08-05 11:00+07', '2026-08-05 12:00+07', 'completed',
-      0, 'none', 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0, '2026-08-01 12:00+07', NULL, '2026-08-05 12:00+07'),
- (9,  'B09', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 9, NULL, 1, 'course', 1,
-      '2026-08-19 11:00+07', '2026-08-19 12:00+07', 'completed',
-      0, 'none', 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0, '2026-08-06 12:00+07', NULL, '2026-08-19 12:00+07'),
- (10, 'B10', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 9, NULL, 1, 'course', 1,
-      '2026-09-02 11:00+07', '2026-09-02 12:00+07', 'completed',
-      0, 'none', 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0, '2026-08-20 12:00+07', NULL, '2026-09-02 12:00+07'),
- (11, 'B11', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 9, NULL, 1, 'course', 1,
-      '2026-09-16 11:00+07', '2026-09-16 12:00+07', 'cancelled',
-      0, 'none', 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0, '2026-09-03 12:00+07', '2026-09-10 09:00+07', NULL),
- (12, 'B12', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 9, NULL, 1, 'course', 1,
-      '2026-09-23 11:00+07', '2026-09-23 12:00+07', 'completed',
-      0, 'none', 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0, '2026-09-10 12:00+07', NULL, '2026-09-23 12:00+07'),
- (13, 'B13', 1, NULL, NULL, 'คุณนิดา', '081-111-0001', 4, NULL, NULL, 'single', 1,
-      '2026-09-30 18:00+07', '2026-09-30 19:30+07', 'completed',
-      2000.00, 'tier', 5, 100.00, 0, 0, NULL, 0, 0, 1900.00, 0, 1900.00, 19, '2026-09-25 12:00+07', NULL, '2026-09-30 19:30+07');
+  INSERT INTO gift_cards (id, code, design, initial_value, balance, purchased_on, expires_on, delivery_channel, payment_status) VALUES
+    ('00000000-0000-0000-0000-000000000401', 'GIFT-ACTIVE', 'ORCHID', 2000, 2000, v_today - 30, v_today - 30 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000402', 'GIFT-BAL-400', 'LOTUS', 1000, 400, v_today - 100, v_today - 100 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000403', 'GIFT-BAL-1', 'GOLD', 500, 1, v_today - 50, v_today - 50 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000404', 'GIFT-BAL-0', 'ORCHID', 500, 0, v_today - 50, v_today - 50 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000405', 'GIFT-EXP364', 'LOTUS', 1000, 1000, v_today - 364, v_today - 364 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000406', 'GIFT-EXP365', 'GOLD', 1000, 1000, v_today - 365, v_today - 365 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000407', 'GIFT-EXP366', 'ORCHID', 1000, 1000, v_today - 366, v_today - 366 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000408', 'GIFT-500', 'ORCHID', 500, 500, v_today - 10, v_today - 10 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000409', 'GIFT-1000', 'GOLD', 1000, 1000, v_today - 10, v_today - 10 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000410', 'GIFT-899', 'LOTUS', 899, 899, v_today - 10, v_today - 10 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000411', 'GIFT-900', 'LOTUS', 900, 900, v_today - 10, v_today - 10 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000412', 'GIFT-901', 'LOTUS', 901, 901, v_today - 10, v_today - 10 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000413', 'GIFT-2199', 'GOLD', 2199, 2199, v_today - 10, v_today - 10 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000414', 'GIFT-2200', 'GOLD', 2200, 2200, v_today - 10, v_today - 10 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000415', 'GIFT-2201', 'GOLD', 2201, 2201, v_today - 10, v_today - 10 + 365, 'LINE', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000416', 'GIFT-REFUND', 'ORCHID', 1000, 500, v_today - 40, v_today - 40 + 365, 'EMAIL', 'SIMULATED'),
+    ('00000000-0000-0000-0000-000000000417', 'GIFT-EXPREF', 'LOTUS', 500, 200, v_today - 366, v_today - 366 + 365, 'LINE', 'SIMULATED');
 
-INSERT INTO booking_slot (id, booking_id, therapist_id, period, active) VALUES
- (1,  1,  3, '[2026-10-12 14:00+07, 2026-10-12 15:00+07)', TRUE),
- (2,  2,  1, '[2026-10-17 19:00+07, 2026-10-17 20:30+07)', TRUE),
- (3,  2,  2, '[2026-10-17 19:00+07, 2026-10-17 20:30+07)', TRUE),
- (4,  3,  6, '[2026-10-13 10:00+07, 2026-10-13 11:30+07)', TRUE),
- (5,  4,  1, '[2026-10-14 16:00+07, 2026-10-14 17:00+07)', TRUE),
- (6,  4,  2, '[2026-10-14 16:00+07, 2026-10-14 17:00+07)', TRUE),
- (7,  4,  3, '[2026-10-14 16:00+07, 2026-10-14 17:00+07)', TRUE),
- (8,  4,  4, '[2026-10-14 16:00+07, 2026-10-14 17:00+07)', TRUE),
- (9,  4,  5, '[2026-10-14 16:00+07, 2026-10-14 17:00+07)', TRUE),
- (10, 5,  4, '[2026-10-11 10:00+07, 2026-10-11 11:00+07)', TRUE),
- (11, 6,  2, '[2026-10-10 15:00+07, 2026-10-10 16:00+07)', TRUE),
- (12, 7,  5, '[2026-10-05 13:00+07, 2026-10-05 14:00+07)', TRUE),
- (13, 8,  1, '[2026-08-05 11:00+07, 2026-08-05 12:00+07)', TRUE),
- (14, 9,  5, '[2026-08-19 11:00+07, 2026-08-19 12:00+07)', TRUE),
- (15, 10, 1, '[2026-09-02 11:00+07, 2026-09-02 12:00+07)', TRUE),
- (16, 11, 5, '[2026-09-16 11:00+07, 2026-09-16 12:00+07)', FALSE),
- (17, 12, 5, '[2026-09-23 11:00+07, 2026-09-23 12:00+07)', TRUE),
- (18, 13, 3, '[2026-09-30 18:00+07, 2026-09-30 19:30+07)', TRUE);
+  INSERT INTO bookings (id, booking_code, user_id, guest_name, guest_phone, service_id, booking_type, party_size, start_at, end_at, is_couple_suite, status, full_price, discount_percent, discount_source, discount_amount, points_redeemed, points_discount, service_net, hotel_id, distance_km, cars, transport_fee, gift_card_id, gift_card_amount, pay_at_shop, course_purchase_id, points_earned, completed_at, created_at) VALUES
+    ('00000000-0000-0000-0000-000000000201', 'SJHIST01', '00000000-0000-0000-0000-000000000101', NULL, NULL, 'K01', 'SINGLE', 1, TIMESTAMPTZ '2026-03-24 14:00:00+07', TIMESTAMPTZ '2026-03-24 15:00:00+07', false, 'COMPLETED', 0, 0, 'NONE', 0, 0, 0, 0, NULL, NULL, 0, 0, NULL, 0, 0, '00000000-0000-0000-0000-000000000301', 0, TIMESTAMPTZ '2026-03-24 15:00:00+07', TIMESTAMPTZ '2026-03-24 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000202', 'SJHIST02', '00000000-0000-0000-0000-000000000101', NULL, NULL, 'K01', 'SINGLE', 1, TIMESTAMPTZ '2026-04-14 14:00:00+07', TIMESTAMPTZ '2026-04-14 15:00:00+07', false, 'COMPLETED', 0, 0, 'NONE', 0, 0, 0, 0, NULL, NULL, 0, 0, NULL, 0, 0, '00000000-0000-0000-0000-000000000301', 0, TIMESTAMPTZ '2026-04-14 15:00:00+07', TIMESTAMPTZ '2026-04-14 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000203', 'SJHIST03', '00000000-0000-0000-0000-000000000101', NULL, NULL, 'K01', 'SINGLE', 1, TIMESTAMPTZ '2026-05-05 14:00:00+07', TIMESTAMPTZ '2026-05-05 15:00:00+07', false, 'COMPLETED', 0, 0, 'NONE', 0, 0, 0, 0, NULL, NULL, 0, 0, NULL, 0, 0, '00000000-0000-0000-0000-000000000301', 0, TIMESTAMPTZ '2026-05-05 15:00:00+07', TIMESTAMPTZ '2026-05-05 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000204', 'SJHIST04', '00000000-0000-0000-0000-000000000101', NULL, NULL, 'K01', 'SINGLE', 1, TIMESTAMPTZ '2026-05-26 14:00:00+07', TIMESTAMPTZ '2026-05-26 15:00:00+07', false, 'COMPLETED', 0, 0, 'NONE', 0, 0, 0, 0, NULL, NULL, 0, 0, NULL, 0, 0, '00000000-0000-0000-0000-000000000301', 0, TIMESTAMPTZ '2026-05-26 15:00:00+07', TIMESTAMPTZ '2026-05-26 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000205', 'SJTEST05', '00000000-0000-0000-0000-000000000109', NULL, NULL, 'S01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-15 13:00:00+07', TIMESTAMPTZ '2026-06-15 14:00:00+07', false, 'CONFIRMED', 1000, 5, 'TIER', 50, 0, 0, 950, NULL, NULL, 0, 0, NULL, 0, 950, NULL, 0, NULL, TIMESTAMPTZ '2026-06-15 13:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000206', 'SJTEST06', NULL, 'คุณทดสอบ หนึ่ง', '0890000001', 'S05', 'SINGLE', 1, TIMESTAMPTZ '2026-06-15 15:00:00+07', TIMESTAMPTZ '2026-06-15 16:00:00+07', false, 'CONFIRMED', 800, 0, 'NONE', 0, 0, 0, 800, NULL, NULL, 0, 0, NULL, 0, 800, NULL, 0, NULL, TIMESTAMPTZ '2026-06-15 15:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000207', 'SJTEST07', '00000000-0000-0000-0000-000000000101', NULL, NULL, 'S01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-16 10:00:00+07', TIMESTAMPTZ '2026-06-16 11:00:00+07', false, 'CONFIRMED', 1000, 5, 'TIER', 50, 0, 0, 950, NULL, NULL, 0, 0, NULL, 0, 950, NULL, 0, NULL, TIMESTAMPTZ '2026-06-16 10:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000208', 'SJTEST08', '00000000-0000-0000-0000-000000000112', NULL, NULL, 'K01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-18 11:00:00+07', TIMESTAMPTZ '2026-06-18 12:00:00+07', false, 'CONFIRMED', 0, 0, 'NONE', 0, 0, 0, 0, NULL, NULL, 0, 0, NULL, 0, 0, '00000000-0000-0000-0000-000000000306', 0, NULL, TIMESTAMPTZ '2026-06-18 11:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000209', 'SJTEST09', NULL, 'คุณทดสอบ สอง', '0890000002', 'S01', 'COUPLE', 2, TIMESTAMPTZ '2026-06-20 18:00:00+07', TIMESTAMPTZ '2026-06-20 19:00:00+07', true, 'CONFIRMED', 2000, 0, 'NONE', 0, 0, 0, 2000, NULL, NULL, 0, 0, NULL, 0, 2000, NULL, 0, NULL, TIMESTAMPTZ '2026-06-20 18:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000210', 'SJTEST10', NULL, 'คุณทดสอบ สาม', '0890000003', 'S01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-22 14:00:00+07', TIMESTAMPTZ '2026-06-22 15:00:00+07', false, 'CONFIRMED', 1000, 0, 'NONE', 0, 0, 0, 1000, NULL, NULL, 0, 0, NULL, 0, 1000, NULL, 0, NULL, TIMESTAMPTZ '2026-06-22 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000211', 'SJTEST11', NULL, 'คุณทดสอบ สาม', '0890000003', 'S06', 'SINGLE', 1, TIMESTAMPTZ '2026-06-23 16:00:00+07', TIMESTAMPTZ '2026-06-23 17:00:00+07', false, 'CONFIRMED', 1500, 0, 'NONE', 0, 0, 0, 1500, NULL, NULL, 0, 0, NULL, 0, 1500, NULL, 0, NULL, TIMESTAMPTZ '2026-06-23 16:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000212', 'SJTEST12', NULL, 'คุณทดสอบ สี่', '0890000004', 'S07', 'SINGLE', 1, TIMESTAMPTZ '2026-06-23 16:00:00+07', TIMESTAMPTZ '2026-06-23 17:00:00+07', false, 'CONFIRMED', 1800, 0, 'NONE', 0, 0, 0, 1800, NULL, NULL, 0, 0, NULL, 0, 1800, NULL, 0, NULL, TIMESTAMPTZ '2026-06-23 16:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000213', 'SJTEST13', NULL, 'Ms. Test Tourist', '0890000005', 'P01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-24 10:00:00+07', TIMESTAMPTZ '2026-06-24 12:00:00+07', false, 'CONFIRMED', 2900, 0, 'NONE', 0, 0, 0, 2900, 'H01', 2.0, 1, 0, NULL, 0, 2900, NULL, 0, NULL, TIMESTAMPTZ '2026-06-24 10:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000214', 'SJTEST14', NULL, 'คุณทดสอบ สี่', '0890000004', 'S06', 'SINGLE', 1, TIMESTAMPTZ '2026-06-24 12:00:00+07', TIMESTAMPTZ '2026-06-24 13:00:00+07', false, 'CONFIRMED', 1500, 0, 'NONE', 0, 0, 0, 1500, NULL, NULL, 0, 0, NULL, 0, 1500, NULL, 0, NULL, TIMESTAMPTZ '2026-06-24 12:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000215', 'SJTEST15', '00000000-0000-0000-0000-000000000112', NULL, NULL, 'S04', 'SINGLE', 1, TIMESTAMPTZ '2026-06-25 14:00:00+07', TIMESTAMPTZ '2026-06-25 15:30:00+07', false, 'CONFIRMED', 2000, 20, 'BIRTHDAY', 400, 200, 100, 1500, 'H04', 12.0, 1, 300, '00000000-0000-0000-0000-000000000416', 500, 1300, NULL, 0, NULL, TIMESTAMPTZ '2026-06-25 14:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000216', 'SJTEST16', NULL, 'คุณทดสอบ หก', '0890000006', 'S01', 'GROUP', 6, TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', false, 'CONFIRMED', 6000, 10, 'GROUP', 600, 0, 0, 5400, 'H04', 12.0, 2, 600, NULL, 0, 6000, NULL, 0, NULL, TIMESTAMPTZ '2026-06-26 12:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000217', 'SJTEST17', NULL, 'คุณทดสอบ หนึ่ง', '0890000001', 'S04', 'SINGLE', 1, TIMESTAMPTZ '2026-06-28 11:00:00+07', TIMESTAMPTZ '2026-06-28 12:30:00+07', false, 'CONFIRMED', 2000, 0, 'NONE', 0, 0, 0, 2000, NULL, NULL, 0, 0, NULL, 0, 2000, NULL, 0, NULL, TIMESTAMPTZ '2026-06-28 11:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000218', 'SJTEST18', NULL, 'คุณทดสอบ สอง', '0890000002', 'S04', 'SINGLE', 1, TIMESTAMPTZ '2026-06-28 11:00:00+07', TIMESTAMPTZ '2026-06-28 12:30:00+07', false, 'CONFIRMED', 2000, 0, 'NONE', 0, 0, 0, 2000, NULL, NULL, 0, 0, NULL, 0, 2000, NULL, 0, NULL, TIMESTAMPTZ '2026-06-28 11:00:00+07' - INTERVAL '7 days'),
+    ('00000000-0000-0000-0000-000000000219', 'SJTEST19', NULL, 'คุณทดสอบ เจ็ด', '0890000007', 'S01', 'SINGLE', 1, TIMESTAMPTZ '2026-06-30 17:00:00+07', TIMESTAMPTZ '2026-06-30 18:00:00+07', false, 'CONFIRMED', 1000, 0, 'NONE', 0, 0, 0, 1000, NULL, NULL, 0, 0, '00000000-0000-0000-0000-000000000417', 300, 700, NULL, 0, NULL, TIMESTAMPTZ '2026-06-30 17:00:00+07' - INTERVAL '7 days');
 
--- ── รอบเอว 4 จุดของ C01 (FR-16) ───────────────────────────────────────────────
-INSERT INTO waist_measurement (id, course_purchase_id, booking_id, measured_on, waist_cm) VALUES
- (1, 1, 8,  '2026-08-05', 82.0),
- (2, 1, 9,  '2026-08-19', 81.0),
- (3, 1, 10, '2026-09-02', 79.5),
- (4, 1, 12, '2026-09-23', 78.0);
+  INSERT INTO booking_items (booking_id, person_no, therapist_id, period, slot_active) VALUES
+    ('00000000-0000-0000-0000-000000000201', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-03-24 14:00:00+07', TIMESTAMPTZ '2026-03-24 15:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000202', 1, 'T05', tstzrange(TIMESTAMPTZ '2026-04-14 14:00:00+07', TIMESTAMPTZ '2026-04-14 15:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000203', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-05-05 14:00:00+07', TIMESTAMPTZ '2026-05-05 15:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000204', 1, 'T05', tstzrange(TIMESTAMPTZ '2026-05-26 14:00:00+07', TIMESTAMPTZ '2026-05-26 15:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000205', 1, 'T02', tstzrange(TIMESTAMPTZ '2026-06-15 13:00:00+07', TIMESTAMPTZ '2026-06-15 14:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000206', 1, 'T03', tstzrange(TIMESTAMPTZ '2026-06-15 15:00:00+07', TIMESTAMPTZ '2026-06-15 16:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000207', 1, 'T02', tstzrange(TIMESTAMPTZ '2026-06-16 10:00:00+07', TIMESTAMPTZ '2026-06-16 11:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000208', 1, 'T05', tstzrange(TIMESTAMPTZ '2026-06-18 11:00:00+07', TIMESTAMPTZ '2026-06-18 12:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000209', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-06-20 18:00:00+07', TIMESTAMPTZ '2026-06-20 19:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000209', 2, 'T05', tstzrange(TIMESTAMPTZ '2026-06-20 18:00:00+07', TIMESTAMPTZ '2026-06-20 19:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000210', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-06-22 14:00:00+07', TIMESTAMPTZ '2026-06-22 15:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000211', 1, 'T03', tstzrange(TIMESTAMPTZ '2026-06-23 16:00:00+07', TIMESTAMPTZ '2026-06-23 17:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000212', 1, 'T04', tstzrange(TIMESTAMPTZ '2026-06-23 16:00:00+07', TIMESTAMPTZ '2026-06-23 17:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000213', 1, 'T02', tstzrange(TIMESTAMPTZ '2026-06-24 10:00:00+07', TIMESTAMPTZ '2026-06-24 12:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000214', 1, 'T03', tstzrange(TIMESTAMPTZ '2026-06-24 12:00:00+07', TIMESTAMPTZ '2026-06-24 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000215', 1, 'T03', tstzrange(TIMESTAMPTZ '2026-06-25 14:00:00+07', TIMESTAMPTZ '2026-06-25 15:30:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 2, 'T02', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 3, 'T03', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 4, 'T04', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 5, 'T05', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000216', 6, 'T06', tstzrange(TIMESTAMPTZ '2026-06-26 12:00:00+07', TIMESTAMPTZ '2026-06-26 13:00:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000217', 1, 'T01', tstzrange(TIMESTAMPTZ '2026-06-28 11:00:00+07', TIMESTAMPTZ '2026-06-28 12:30:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000218', 1, 'T03', tstzrange(TIMESTAMPTZ '2026-06-28 11:00:00+07', TIMESTAMPTZ '2026-06-28 12:30:00+07', '[)'), true),
+    ('00000000-0000-0000-0000-000000000219', 1, 'T06', tstzrange(TIMESTAMPTZ '2026-06-30 17:00:00+07', TIMESTAMPTZ '2026-06-30 18:00:00+07', '[)'), true);
 
--- ── รูป before/after ของ C01 (สัดส่วนร่างกาย ไม่มีใบหน้า · ไฟล์อยู่นอก public/) ──
-INSERT INTO body_photo (id, course_purchase_id, phase, storage_key) VALUES
- (1, 1, 'before', 'c01-before.webp'),
- (2, 1, 'after',  'c01-after.webp');
+  -- การใช้บัตรก่อนข้อมูลตั้งต้น booking NULL และการหักจาก B15, B19
+  INSERT INTO gift_card_transactions (gift_card_id, booking_id, type, amount, created_at) VALUES
+    ('00000000-0000-0000-0000-000000000402', NULL, 'REDEEM', 600, p_now),
+    ('00000000-0000-0000-0000-000000000403', NULL, 'REDEEM', 499, p_now),
+    ('00000000-0000-0000-0000-000000000404', NULL, 'REDEEM', 500, p_now),
+    ('00000000-0000-0000-0000-000000000416', '00000000-0000-0000-0000-000000000215', 'REDEEM', 500, p_now),
+    ('00000000-0000-0000-0000-000000000417', '00000000-0000-0000-0000-000000000219', 'REDEEM', 300, p_now);
 
--- ── Gift Card GC01–GC05 + รายการเคลื่อนไหว ───────────────────────────────────
-INSERT INTO gift_card (id, code, buyer_id, face_value, balance, design, channel, recipient, message, purchased_on, expires_on) VALUES
- (1, 'SABAI-GC-2000', 4, 2000.00, 2000.00, 'lotus',  'line',  'แม่ของคุณฝน (LINE: mom.fon)', 'สุขสันต์วันแม่ค่ะ', '2026-10-01', '2027-10-01'),
- (2, 'SABAI-GC-PART', 6, 3000.00, 1250.00, 'gold',   'email', 'vipa@sabai.test', NULL, '2026-06-15', '2027-06-15'),
- (3, 'SABAI-GC-LAST', 2, 1000.00,  500.00, 'orchid', 'email', 'ton@sabai.test',  NULL, '2025-10-10', '2026-10-10'),
- (4, 'SABAI-GC-EXP',  5, 1000.00, 1000.00, 'lotus',  'line',  'prae.line',       NULL, '2025-10-09', '2026-10-09'),
- (5, 'SABAI-GC-ZERO', 4,  500.00,    0.00, 'gold',   'line',  'fon.line',        NULL, '2026-09-01', '2027-09-01');
+  -- R03
+  INSERT INTO point_transactions (user_id, booking_id, type, points, created_at) VALUES
+    ('00000000-0000-0000-0000-000000000112', '00000000-0000-0000-0000-000000000215', 'REDEEM', -200, p_now);
 
-INSERT INTO gift_card_txn (id, gift_card_id, booking_id, amount, created_at) VALUES
- (1, 2, NULL, -1750.00, '2026-08-20 15:00+07'),
- (2, 3, NULL,  -500.00, '2026-03-14 13:00+07'),
- (3, 5, NULL,  -500.00, '2026-09-15 17:00+07');
+  -- R01 ปีตามวันล็อก · R02 ผูก B15
+  INSERT INTO birthday_redemptions (user_id, benefit_year, booking_id, released_at) VALUES
+    ('00000000-0000-0000-0000-000000000105', v_year, NULL, NULL),
+    ('00000000-0000-0000-0000-000000000112', 2026, '00000000-0000-0000-0000-000000000215', NULL);
 
--- ── แต้ม: point_txn รวมแล้วเท่ากับ points_balance ของแต่ละคน ──────────────────
-INSERT INTO point_txn (id, customer_id, booking_id, points, reason, created_at) VALUES
- (1, 1, NULL, 80,  'opening', '2026-01-15 10:00+07'),
- (2, 1, 13,   19,  'earn',    '2026-09-30 19:30+07'),
- (3, 4, NULL, 250, 'opening', '2025-11-20 10:00+07'),
- (4, 5, NULL, 86,  'opening', '2025-02-10 10:00+07'),
- (5, 5, 7,    14,  'earn',    '2026-10-05 14:00+07'),
- (6, 6, NULL, 199, 'opening', '2024-12-01 10:00+07');
+  INSERT INTO waist_measurements (user_id, measured_on, waist_cm) VALUES
+    ('00000000-0000-0000-0000-000000000101', '2026-03-17', 82.0),
+    ('00000000-0000-0000-0000-000000000101', '2026-04-07', 81.0),
+    ('00000000-0000-0000-0000-000000000101', '2026-04-28', 79.5),
+    ('00000000-0000-0000-0000-000000000101', '2026-05-19', 78.0);
 
--- ── สิทธิ์เดือนเกิดที่ใช้แล้ว: U05 ต.ค. 2026 (นัด B07) ───────────────────────────
-INSERT INTO birthday_use (customer_id, year_month, booking_id) VALUES (5, 202610, 7);
+  INSERT INTO before_after_photos (user_id, kind, taken_on, file_path) VALUES
+    ('00000000-0000-0000-0000-000000000101', 'BEFORE', '2026-03-17', 'public/placeholder/nida-before-body.jpg'),
+    ('00000000-0000-0000-0000-000000000101', 'AFTER', '2026-05-19', 'public/placeholder/nida-after-body.jpg');
 
--- ── "วันนี้" ของโหมดทดสอบ (NFR-13 · TEST-DATA §1) ─────────────────────────────
-INSERT INTO app_setting (key, value) VALUES ('test_today', '2026-10-10T10:00:00+07:00');
+  -- R04 เก็บเป็น ISO +07:00 ตามวันล็อก
+  INSERT INTO app_settings (key, value) VALUES
+    ('locked_now', to_char(p_now AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD"T"HH24:MI:SS') || '+07:00');
+END;
+$seed$;
 
--- ── ตั้งลำดับ id ต่อจาก seed ──────────────────────────────────────────────────
-SELECT setval(pg_get_serial_sequence('customer', 'id'), 9);
-SELECT setval(pg_get_serial_sequence('service', 'id'), 9);
-SELECT setval(pg_get_serial_sequence('herb', 'id'), 14);
-SELECT setval(pg_get_serial_sequence('therapist', 'id'), 6);
-SELECT setval(pg_get_serial_sequence('review', 'id'), 17);
-SELECT setval(pg_get_serial_sequence('room', 'id'), 1);
-SELECT setval(pg_get_serial_sequence('hotel', 'id'), 6);
-SELECT setval(pg_get_serial_sequence('course_purchase', 'id'), 4);
-SELECT setval(pg_get_serial_sequence('booking', 'id'), 13);
-SELECT setval(pg_get_serial_sequence('booking_slot', 'id'), 18);
-SELECT setval(pg_get_serial_sequence('waist_measurement', 'id'), 4);
-SELECT setval(pg_get_serial_sequence('body_photo', 'id'), 2);
-SELECT setval(pg_get_serial_sequence('gift_card', 'id'), 5);
-SELECT setval(pg_get_serial_sequence('gift_card_txn', 'id'), 3);
-SELECT setval(pg_get_serial_sequence('point_txn', 'id'), 6);
+SELECT sabai_seed('2026-06-15T10:00:00+07:00');

@@ -1,442 +1,336 @@
-# SPEC · เว็บ สบายใจ สปา · Sabai Jai Wellness Spa
+# SPEC · สบายใจ สปา (Sabai Jai Wellness Spa)
 
-อ้างอิง: REQUIREMENTS.md (FR-01–35, BR-01–20, NFR-01–18) · DESIGN.md (D1–D15) · TEST-DATA.md (seed, E01–E90, T1–T17)
-สแตก: Next.js 15 App Router + TypeScript · PostgreSQL 16 ผ่าน `pg` (SQL ตรง ไม่ใช้ ORM) · Docker compose 2 โปรเจกต์ (`db/`, `web/`) บน network `sabai-net`
+เอกสารสำหรับคนทดสอบ · รหัส FR/BR/NFR อยู่ใน `../REQUIREMENTS.md` · ค่าขอบ E อยู่ใน `../TEST-DATA.md` ข้อ 7
 
----
+## 1. วิธีเปิดเว็บ
 
-## 1. วิธีรัน (PowerShell)
+ต้องมี Docker Desktop · ใช้คำสั่งเดียวกันทั้ง Windows (PowerShell) และ macOS (Terminal) · ไม่มีไฟล์ `.sh` ที่ต้องรัน
 
-```powershell
-# 0) อยู่ที่โฟลเดอร์รากของโปรเจกต์ (ที่มี db/ และ web/)
-# 1) หยุด container อื่นที่จับพอร์ต 3000 หรือ 5433 (stop อย่างเดียว ไม่ลบ)
-docker ps --format "{{.Names}} {{.Ports}}"
-docker stop <ชื่อ container ที่จับพอร์ต>        # ถ้ามี เช่น petshop
-
-# 2) network ร่วม
-docker network inspect sabai-net *> $null; if (-not $?) { docker network create sabai-net }
-
-# 3) ฐานข้อมูล → รอ healthy
-docker compose -f db/compose.yaml up -d
-docker inspect -f "{{.State.Health.Status}}" sabai-db
-
-# 4) เว็บ (build ไม่ต่อ db) → รอ healthy
-docker compose -f web/compose.yaml up -d --build
-docker inspect -f "{{.State.Health.Status}}" sabai-web
-
-# 5) ตรวจ
-Invoke-RestMethod http://localhost:3000/api/health          # ok=True db=True
-cd web; node scripts/check-rules.mjs; cd ..                  # ผ่าน 90 / 90 ข้อ (ต้องใช้ Node ≥ 22.18 บนเครื่อง)
-
-# รีเซ็ตข้อมูลทดสอบ + ล็อกวันนี้
-Invoke-RestMethod -Method Post http://localhost:3000/api/test/reset -ContentType "application/json" -Body '{"now":"2026-10-10T10:00:00+07:00"}'
-
-# เปิดโหมดบั๊ก / ปิด
-$env:BUG_MODE = "1"; docker compose -f web/compose.yaml up -d --force-recreate
-$env:BUG_MODE = "0"; docker compose -f web/compose.yaml up -d --force-recreate
-
-# ล้างฐานข้อมูลทั้งหมดแล้วเริ่มใหม่ (ลบ volume)
-docker compose -f db/compose.yaml down -v
+```
+docker network create sabai-net        # มีแล้วข้ามได้
+cd db  && docker compose up -d --wait
+cd ../web && docker compose up -d --wait --build
 ```
 
-สคริปต์ช่วยทุกตัวเป็น `node scripts/*.mjs` (ไม่มีไฟล์ .sh):
+เปิด http://localhost:3000 (Windows: `start http://localhost:3000` · macOS: `open http://localhost:3000`)
 
-| สคริปต์ | ใช้ทำอะไร |
-|---|---|
-| `node scripts/check-rules.mjs` | ยิง API ตรวจ E01–E90 (reset ก่อนทุกเคส) + unit test เรียก `lib/rules` ตรง · env `BASE_URL` (ค่าเริ่มต้น `http://localhost:3000`) |
-| `node scripts/resize.mjs <dir>` | ย่อรูปจาก Codex → webp (`public/assets`, รูป body → `private/photos`) |
-
-## 2. Environment
-
-| ตัวแปร | ที่ | ค่าเริ่มต้น | ความหมาย |
-|---|---|---|---|
-| `DATABASE_URL` | web | `postgres://sabai:sabai@sabai-db:5432/sabai` | ต่อ db ภายใน `sabai-net` (นอก docker: `postgres://sabai:sabai@localhost:5433/sabai`) |
-| `HOSTNAME` | web | `0.0.0.0` | ให้ Next standalone ฟังทุก interface |
-| `PORT` | web | `3000` | |
-| `TZ` | web, db | `Asia/Bangkok` | |
-| `BUG_MODE` | web | `0` | `1` = เปิดบั๊กที่ตั้งใจใส่ 3 ตัว (เฉลยใน `BUGS.md`) · อ่านผ่าน `lib/flags.ts` จุดเดียว |
-| `ALLOW_TEST_RESET` | web | `1` | `1` = เปิด `/api/test/*`, ใช้ `app_setting.test_today` เป็นนาฬิกา, แสดงบัญชีทดสอบในหน้า login, ปุ่มรีเซ็ตใน /admin · `0` = ปิดทั้งหมด (`/api/test/reset` ตอบ 404) |
-| `SESSION_SECRET` | web | `sabai-jai-local-session-secret-2026` (compose) | กุญแจลงลายเซ็น cookie `sabai_session` (HMAC-SHA256) |
-| `TODAY` | web | ว่าง | นาฬิกาสำรอง เช่น `2026-10-10T10:00` (ไม่มีโซน = เวลาไทย) ใช้เมื่อไม่มี `app_setting.test_today` |
-| `SEED_SQL_PATH` | web (image) | `/app/sql/02-seed.sql` | seed ที่ reset เรียก (คัดลอกจาก `db/init/02-seed.sql` ตอน build ผ่าน `additional_contexts`) |
-| `PHOTO_DIR` | web (image) | `/app/private/photos` | ที่เก็บรูป before/after (นอก public) |
-| `POSTGRES_USER/PASSWORD/DB` | db | `sabai` / `sabai` / `sabai` | |
-
-นาฬิกา (`lib/clock.ts`, NFR-13): `app_setting.test_today` (เมื่อ `ALLOW_TEST_RESET=1`) → env `TODAY` → เวลาจริง · seed ตั้ง `test_today = 2026-10-10T10:00:00+07:00` · กฎที่ใช้วันที่ทุกข้อ (BR-03/07/13/14/16) เรียก `clock()` เท่านั้น
-
----
-
-## 3. หน้าเว็บ
-
-ทุกหน้ามี header (โลโก้ · ปุ่มเพลง · ปุ่มภาษา ไทย/English/中文 · เข้าสู่ระบบ/ออกจากระบบ · เมนู) · footer (เวลาเปิด เบอร์ร้าน 02-123-4567) · ปุ่มแชทลอย · `<html data-ready="true|false" data-bug-mode="0|1" lang="th|en|zh">`
-
-| path | ทำอะไร | FR |
+| ตัวแปร (`web/docker-compose.yml`) | ค่าเริ่มต้น | ความหมาย |
 |---|---|---|
-| `/` | hero ลายกล้วยไม้/บัว · อารมณ์วันนี้ 4 แบบ → บริการแนะนำ + ปุ่มจอง · บริการยอดนิยม · ลิงก์แบบทดสอบ/วิเคราะห์ผิว/แชท | FR-27, FR-32 |
-| `/services` | บริการทั้งหมด (ชื่อ เวลา ราคา สมุนไพร) + ปุ่มจอง | FR-31 |
-| `/book` | จอง 4 ขั้น: ① บริการ+แบบ (เดี่ยว/คู่/กลุ่ม/แพ็กเกจ/จองด้วยคอร์ส)+จำนวนคน ② วัน (พรุ่งนี้–+30) + รอบว่าง + นักบำบัด (เดี่ยว) · ปุ่ม "ดูห้อง 360°" เมื่อจองคู่ ③ ข้อมูลติดต่อ + แลกแต้ม/เดือนเกิด/Gift Card/รถรับส่ง/คอร์ส (ราคาจาก `/api/price`) ④ สรุป: สมุนไพร + ราคาแยกบรรทัด + ค่ารถ (จำนวนคัน) ก่อนปุ่มยืนยัน → ข้อความยืนยัน · query: `service`, `type`, `people` | FR-01–06, 10, 12, 14, 20–23, 31–33 |
-| `/package` | Bangkok Relax: ราคาต่อคน · สิ่งที่ได้ 3 อย่าง · คำนวณราคารวมตามจำนวนคน · ปุ่มจอง | FR-21 |
-| `/therapists` | นักบำบัด คะแนนเฉลี่ย 1 ตำแหน่ง จำนวนรีวิว · ตัวกรอง "4.5 ดาวขึ้นไป" (`?min=4.5` เปิดตัวกรองไว้) | FR-08 |
-| `/transport` | คำนวณค่ารถรับส่ง: เลือกโรงแรม H01–H06 หรือพิมพ์ระยะ + จำนวนคน → ค่ารถ จำนวนคัน | FR-22 |
-| `/giftcard` | ซื้อ Gift Card (มูลค่า ลาย 3 แบบ ส่ง LINE/email แบบจำลอง แสดงข้อความที่ "ส่ง") · ตรวจยอด/วันหมดอายุ | FR-19, FR-20 |
-| `/chat` | ผู้ช่วยแชท: ถามเวลาเปิด ราคา 3 ภาษา · จองผ่านแชท (บริการเดี่ยว) ด้วย API เดียวกับเว็บ | FR-25, FR-26 |
-| `/quiz` | แบบทดสอบ 4 ข้อ แถบ 1/4…4/4 → แพ็กเกจแนะนำ 1 รายการ + เหตุผล + ปุ่มจอง | FR-28 |
-| `/skin` | ข้อความแจ้งก่อนเลือกรูป → เลือกเซลฟี่ (หรือภาพตัวอย่างของร้าน) → วิเคราะห์ด้วย Canvas ในเครื่อง → ทรีตเมนต์แนะนำ 1–3 · ภาพจำลองก่อน/หลัง + ป้าย "ภาพจำลอง ผลจริงแต่ละคนต่างกัน" | FR-29, FR-30 |
-| `/login` | ล็อกอินอีเมล+รหัสผ่าน (โหมดทดสอบแสดงบัญชี seed) · `?next=` | — |
-| `/account` | ระดับ ส่วนลด ยอดสะสม ข้อความ "อีก ฿X ถึง …"/"อยู่ระดับสูงสุดแล้ว" · แต้มคงเหลือ · สถานะเดือนเกิด · นัดและประวัติ (ล่าสุด→เก่าสุด, "ยกเลิก") + ปุ่มยกเลิก (กดไม่ได้เมื่อ < 24 ชม. + เบอร์ร้าน) · ไม่มีช่องอัปโหลดรูป | FR-07, 09, 11, 12, 17, 35 |
-| `/wallet` | คอร์ส "เหลือ X จาก 11 ครั้ง" วันหมดอายุ อีก N วัน/หมดอายุแล้ว · ปุ่มจองด้วยคอร์ส · กราฟรอบเอว + "ลดไปแล้ว X ซม." · รูป before/after (เฉพาะเจ้าของ) · ปุ่มซื้อคอร์ส | FR-13–16, 18 |
-| `/admin` | (owner) ตารางคิวรายวัน · "ใช้บริการเสร็จ" (ให้แต้ม, ตัดครั้งคอร์ส, บันทึกรอบเอว) · ปุ่ม "รีเซ็ตข้อมูลทดสอบ" (โหมดทดสอบ) | D3, D5, D11, FR-09, FR-14, FR-16 |
+| `ALLOW_TEST_RESET` | 1 | ปุ่มรีเซ็ต ล็อกเวลา · 0 = API ทดสอบตอบ 404 ปุ่มหาย นาฬิกาใช้เวลาจริง |
+| `BUG_MODE` | 0 | โหมดฝึกทดสอบของผู้สอน · เปลี่ยนแล้ว `docker compose up -d` ไม่ต้อง build ใหม่ · อ่านค่าปัจจุบันได้จาก `<html data-bug-mode>` |
+| `FEATURE_SKIN_PREVIEW` | 1 | ภาพจำลองก่อน/หลัง (FR-76, D-26) |
+| `SESSION_SECRET` | ค่าทดสอบ | ลายเซ็น cookie |
 
----
+ฐานข้อมูล: container `sabai-db` · volume `sabai-pgdata` · เครื่องเราเข้าได้ที่ `127.0.0.1:5433` (ผู้ใช้/รหัส/ฐาน `sabai`) · `web/` คุยผ่าน `sabai-db:5432`
+รันซ้ำจากศูนย์: `docker compose down` แล้วลบ volume `sabai-pgdata` จึงรัน init ใหม่ · ปกติใช้ปุ่มรีเซ็ตพอ
 
-## 4. กฎร้าน → ไฟล์/ฟังก์ชัน
+ทดสอบ: `cd web && npx vitest run` (unit test) · `node scripts/verify-edges.mjs http://localhost:3000` (ค่าขอบผ่าน API)
 
-ฟังก์ชันบริสุทธิ์ทั้งหมดอยู่ใน `lib/rules/*` (ไม่แตะ db · เงินเป็นสตางค์ integer) · ราคาที่เก็บจริงคิดที่เซิร์ฟเวอร์ (`lib/server/booking.ts`)
+## 2. เครื่องมือทดสอบ
 
-| รหัส | กฎ | ไฟล์ / ฟังก์ชัน |
+- `<html lang data-ready data-bug-mode>`: `data-ready` เริ่ม `false` เป็น `true` หลัง hydrate ให้รอค่านี้ก่อนกด
+- `POST /api/test/reset {"now":"<ISO>"}` ล้างกลับเป็น seed และล็อกวันนี้ · ไม่ส่งใช้ `2026-06-15T10:00:00+07:00`
+- `POST /api/test/lock {"now":"<ISO>"}` ล็อกอย่างเดียว ปรับเดือนเกิด U02, U05 และปีของ R01 (D-24) · คอร์สและบัตรคิดใหม่เมื่อรีเซ็ต
+- แผงท้ายหน้า: `reset-test-data` · `lock-today` (ช่องวันเวลา) · `lock-today-submit` · `test-now`
+
+## 3. ผู้ใช้ seed (12 บัญชี · TD-05)
+
+| รหัส | อีเมล | รหัสผ่าน | ชื่อ | ยอดสะสม | ระดับ | แต้ม | เดือนเกิด | หมายเหตุ |
+|---|---|---|---|---:|---|---:|---|---|
+| U01 | nida@sabai.test | Nida#2026 | คุณนิดา | 12,400 | Gold | 99 | มี.ค. | C01 เหลือ 7 จาก 11 · รอบเอว · ประวัติ 4 · B07 |
+| U02 | ton@sabai.test | Ton#2026 | คุณต้น | 30,000 | Platinum | 0 | ตามวันล็อก | ยังไม่ใช้สิทธิ์เดือนเกิด |
+| U03 | fon@sabai.test | Fon#2026 | คุณฝน | 9,999 | Silver | 250 | ก.พ. | ครบ 5 ขั้น |
+| U04 | may@sabai.test | May#2026 | คุณเมย์ | 0 | Silver | 0 | พ.ค. | สมาชิกใหม่ |
+| U05 | prae@sabai.test | Prae#2026 | น้องแพร | 29,999 | Gold | 100 | ตามวันล็อก | ใช้สิทธิ์เดือนเกิดแล้ว |
+| U06 | liwei@sabai.test | LiWei#2026 | Mr. Li Wei | 0 | Silver | 0 | ม.ค. | โหมด /zh |
+| U07 | owner@sabai.test | Owner#2026 | คุณจันทร์ | 0 | — | 0 | — | บัญชีร้าน OWNER |
+| U08 | kan@sabai.test | Kan#2026 | คุณกานต์ | 10,000 | Gold | 101 | ส.ค. | C02 ใกล้หมดอายุ |
+| U09 | win@sabai.test | Win#2026 | คุณวิน | 10,001 | Gold | 199 | พ.ย. | C03 หมดอายุ · B05 |
+| U10 | bee@sabai.test | Bee#2026 | คุณบี | 30,001 | Platinum | 200 | ก.ย. | C04 เหลือ 0 |
+| U11 | por@sabai.test | Por#2026 | คุณปอ | 500 | Silver | 1,700 | มิ.ย. | C05 เหลือ 1 |
+| U12 | muk@sabai.test | Muk#2026 | คุณมุก | 5,000 | Silver | 300 | มิ.ย. | C06 กันไว้ 1 · B08, B15 |
+
+แขก G1–G7 และรหัสการจอง `SJTEST05`–`SJTEST19`, `SJHIST01`–`SJHIST04` ดู TEST-DATA ข้อ 6 · UUID คงที่: U01–U12 `…0101`–`…0112` · B01–B19 `…0201`–`…0219` · C01–C06 `…0301`–`…0306`
+Gift Card 17 ใบ ดู TEST-DATA ข้อ 6.6 เช่น `GIFT-500` `GIFT-1000` `GIFT-EXP365`
+
+## 4. หน้าเว็บ (`/th` `/en` `/zh` · `/` ไป `/th` · `/admin` ไป `/th/admin`)
+
+| Path | เนื้อหา | รหัส |
 |---|---|---|
-| BR-01 | เปิด 10:00–22:00 รอบทุก 30 นาที จบ ≤ 22:00 | `lib/rules/slots.ts` `buildSlots()`, `isValidStartTime()` |
-| BR-02 | นักบำบัด 1 คิว/เวลา `[start,end)` | `lib/rules/overlap.ts` `overlaps()`, `freeTherapists()` + db `EXCLUDE booking_slot_no_overlap` |
-| BR-03 | จองได้ +1 ถึง +30 วัน | `lib/rules/dates.ts` `isBookableDate()`, `bookableRange()` |
-| BR-04 | คู่ 2 คนพอดี · Couple Suite 1 คู่/ช่วง | `lib/rules/party.ts` `checkParty()` + `lib/server/booking.ts` `roomBusy()` + db `EXCLUDE booking_room_no_overlap` |
-| BR-05 | กลุ่ม 3–6 · 7+ โทรร้าน · นักบำบัดต้องพอ | `lib/rules/party.ts` `checkParty()` · `createBooking()` |
-| BR-06 | กลุ่ม ≥ 4 ลด 10% (ไม่ใช้กับแพ็กเกจ) | `lib/rules/pricing.ts` `bestPercent()` |
-| BR-07 | ยกเลิกได้เมื่อเหลือ ≥ 24 ชม. | `lib/rules/cancel.ts` `canCancel()` · `cancelBooking()` |
-| BR-08 | คะแนนเฉลี่ยทศนิยม 1 (ปัดครึ่งขึ้น) · กรอง ≥ 4.5 | `lib/rules/rating.ts` `ratingTenths()`, `roundAverage()`, `passesRatingFilter()` |
-| BR-09 | แต้ม = floor(ยอดจ่าย ÷ 100) หลังส่วนลด ไม่รวมรถ − Gift Card | `lib/rules/points.ts` `pointsFor()`, `earnBase()` · ให้ตอนร้านกดเสร็จ `completeBooking()` |
-| BR-10 | 100 แต้ม = ฿50 เป็นก้อน ไม่ติดลบ | `lib/rules/points.ts` `maxRedeemBlocks()`, `redeemPoints()` |
-| BR-11 | Silver/Gold/Platinum | `lib/rules/tier.ts` `tierOf()`, `TIER_PCT` |
-| BR-12 | "อีก ฿X ถึง …" / "อยู่ระดับสูงสุดแล้ว" | `lib/rules/tier.ts` `nextTier()` · `lib/server/customer.ts` `tierInfo()` |
-| BR-13 | เดือนเกิด 20% 1 ครั้ง/เดือน ตามวันนัด เดี่ยว/คู่/กลุ่ม | `lib/rules/birthday.ts` `birthdayEligible()` + db PK `birthday_use` |
-| BR-14 | คอร์ส 11 ครั้ง 180 วัน (วันหมดอายุยังใช้ได้) | `lib/rules/course.ts` `courseExpiry()`, `canUseCourse()`, `courseRemaining()` · กันครั้งตอนจอง (`reserved_sessions`) ตัดจริงตอนเสร็จ (D5) |
-| BR-15 | Gift Card ฿500–฿10,000 จำนวนเต็ม | `lib/rules/giftcard.ts` `isValidFaceValue()` + db CHECK |
-| BR-16 | Gift Card 365 วัน (ตรวจจากวันจ่าย T14) ใช้หลายครั้ง | `lib/rules/giftcard.ts` `giftCardExpiry()`, `giftCardStatus()`, `applyGiftCard()` |
-| BR-17 | ≤ 5 กม. ฟรี · ≤ 15 กม. ฿300/คัน · > 15 ไม่รับ | `lib/rules/transport.ts` `transportQuote()` |
-| BR-18 | คันละ 4 คน | `lib/rules/transport.ts` `vehiclesFor()` |
-| BR-19 | Bangkok Relax ฿2,900 × คน รถรวมแล้ว | `lib/rules/pricing.ts` `calcPrice()` (type `package`) + `transportQuote(…, true)` |
-| BR-20 | ① เต็ม → ② % สูงสุด 1 อัน → ③ แต้ม → ④ รถ → ⑤ Gift Card/อื่น · สรุป = เก็บจริง | `lib/rules/pricing.ts` `calcPrice()` · `createBooking()` ตรวจ `quotedTotal` (409 ถ้าไม่เท่า) |
+| `/{locale}` | หน้าแรก: hero, เรื่องราว, ทีมบำบัด, แกลเลอรี, รีวิวลูกค้าตัวอย่าง, ตัวเลขจริง, อารมณ์วันนี้ | FR-61, 62, 67 · NFR-02, 05, 06 |
+| `/services` · `/services/{id}` | เมนู 9 รายการ ราคา สมุนไพร รายละเอียด | FR-01, 63, 64 |
+| `/herbs` | สมุนไพร 12 ชนิด | FR-63, 64 |
+| `/packages/bangkok-relax` | แพ็กเกจ ฿2,900/คน | FR-51, 52 · BR-30, 37 |
+| `/therapists` | นักบำบัด T01–T06 ตัวกรอง 4.5 ดาว | FR-07, 71 · BR-47–49 |
+| `/team` | ทีมงานรวมน้องบัว คุณจันทร์ | FR-61 |
+| `/reviews` | รีวิวเก่าและรีวิวลูกค้าตัวอย่าง | FR-71, 72 |
+| `/gallery` · `/about` | แกลเลอรี · เรื่องราวร้าน | FR-61 |
+| `/booking` | จอง 3 หน้าจอ (ระบบ 4 ขั้น) | FR-02–11, 14–19, 27–33, 39, 52–54 · NFR-03, 11 |
+| `/booking/cancel` | แขกยกเลิกด้วยรหัสและเบอร์ | FR-24, 26 |
+| `/login` · `/register` | เข้าสู่ระบบ · สมัคร | FR-12, 13, 73 |
+| `/account` · `/account/history` | ระดับ ยอด แต้ม นัด ยกเลิก · ประวัติ | FR-20–25, 34–36, 45 |
+| `/wallet` | คอร์ส กราฟรอบเอว before/after บัตร | FR-37, 38, 40–46 |
+| `/admin` | คิวรายวัน ใช้บริการเสร็จ | FR-77–80 |
+| `/gift-cards` · `/shuttle` | ซื้อบัตร ตรวจยอด · รถรับส่ง | FR-30, 47–50, 53–55 |
+| `/quiz` · `/mood` | แบบทดสอบ 4 ข้อ · อารมณ์ 3 แบบ | FR-67–70 · BR-50 |
+| `/skin` | วิเคราะห์ผิวในเครื่อง ภาพจำลอง | FR-74–76 · NFR-09 |
+| `/tour` | ทัวร์ 360° | FR-65 · NFR-04 |
+| ทุกหน้า | สลับภาษา แชต เพลง | FR-56–60, 66 · NFR-10 |
 
-| FR | ไฟล์หลัก |
-|---|---|
-| FR-01–06, 10, 12, 14, 20–23, 31 | `components/BookingWizard.tsx`, `app/book/page.tsx`, `lib/server/booking.ts` (`availableSlots`, `buildQuote`, `createBooking`), `app/api/slots`, `app/api/price`, `app/api/bookings` |
-| FR-07, FR-17 | `components/MyBookings.tsx`, `lib/server/customer.ts` `myBookings()`, `cancelBooking()` |
-| FR-08 | `components/TherapistList.tsx`, `lib/server/catalog.ts` `listTherapists()` |
-| FR-09, FR-11, FR-12 | `app/account/page.tsx`, `lib/server/customer.ts` `accountSummary()` |
-| FR-13, FR-15, FR-16, FR-18 | `app/wallet/page.tsx`, `components/WaistChart.tsx`, `lib/server/customer.ts` `wallet()`, `lib/server/store.ts` `buyCourse()`, `photoForViewer()`, `app/api/photos/[id]` |
-| FR-19, FR-20 | `components/GiftCardShop.tsx`, `lib/server/store.ts` `buyGiftCard()`, `giftCardInfo()` |
-| FR-21 | `app/package/page.tsx`, `components/PackageCalc.tsx` |
-| FR-22 | `components/TransportCalc.tsx`, `app/api/transport` |
-| FR-24 | `components/LangSwitcher.tsx`, `lib/i18n.ts` (cookie `lang`) |
-| FR-25, FR-26 | `components/ChatBox.tsx`, `lib/bot/chat.ts` (เรียก `buildQuote`/`createBooking` ตัวเดียวกับเว็บ) |
-| FR-27 | `components/MoodPicker.tsx`, `lib/bot/mood.ts` |
-| FR-28 | `components/Quiz.tsx`, `lib/bot/quiz.ts` |
-| FR-29, FR-30 | `components/SkinAnalyzer.tsx` (Canvas ในเบราว์เซอร์ ไม่อัปโหลด ไม่เก็บ storage) |
-| FR-32 | `components/ThaiOrnament.tsx`, `app/globals.css` |
-| FR-33 | `components/Tour360.tsx` (pointer events = เมาส์ + นิ้ว, ลูกศรคีย์บอร์ด) |
-| FR-34 | `components/MusicToggle.tsx` (Web Audio API เริ่มเมื่อกดปุ่มเท่านั้น) |
-| FR-35 | ไม่มี `<input type="file">` ยกเว้นหน้า `/skin` (เซลฟี่ไม่ถูกเก็บ) · db ไม่มีคอลัมน์รูปโปรไฟล์ |
+deep link จอง: `/booking?service=S02&party=2&therapist=T01&course=<id>` · ยกเลิก: `/booking/cancel?code=SJTEST10`
 
-ข้อเสนอจาก DESIGN ที่ใช้: D1 ยกเลิก ≥ 24 ชม. คืนครั้ง · D2 คืนแต่ใช้ไม่ได้หลังหมดอายุ · D3 มี /admin · D4 คืนสิทธิ์เดือนเกิดถ้ายังไม่เลยเดือนนั้น · D5 กันครั้งตอนจอง ตัดตอนเสร็จ · D6 คอร์ส 60 นาที · D7 "ใครก็ได้" = คนว่าง id น้อยสุด · D8 ยกเลิกทั้งนัด · D9/T3 ไม่ล็อกอินจองด้วยชื่อ+เบอร์ ไม่ได้แต้ม · D10 ไม่ต่อระบบจ่ายจริง (`other_paid` = จ่ายที่ร้าน) · D11 แต้มให้ตอนร้านกดเสร็จ · D12 ทุกคนทำงาน 10:00–22:00 · D13 ราคาต่าง → 409 กลับไปดูสรุป · D14 แชทขอชื่อ+เบอร์ (ถ้าล็อกอินใช้บัญชี) · D15 รูปเก็บนอก web root เสิร์ฟผ่าน API ตรวจเจ้าของ
+## 5. กฎหลัก
 
-สมมติฐานเพิ่มที่โค้ดใช้ (เอกสารไม่ระบุ): ยอดสะสมเพิ่มตอนร้านกดเสร็จด้วยยอดจ่ายไม่รวมค่ารถ (A10) · การซื้อคอร์สนับยอดสะสมทันที (E61) และไม่ได้แต้ม (A8) · Gift Card ที่หมดอายุ/ยอด ฿0 ใบสรุปแสดง error แต่ไม่หักบัตร และจองต่อได้โดยจ่ายช่องทางอื่นเต็มจำนวน · แลกแต้มใช้ก้อนเท่าที่จำเป็น (ยอด ฿80 แลก 2 ก้อนลดได้ ฿80) · แพ็กเกจแลกแต้มได้ · แชทจองได้เฉพาะบริการเดี่ยว 1 คน · เบอร์ร้าน 02-123-4567 (สมมติ)
+ละเอียดทุกตัวเลขใน `REQUIREMENTS.md` ข้อ 2 · สรุปตามโค้ด:
 
----
-
-## 5. ข้อความ error (คำต่อคำ 3 ภาษา)
-
-API ตอบ `{"error": "<CODE>", "message": "<ข้อความ>", ...}` ภาษาตาม cookie `lang` (ไม่มี = ไทย) · CODE ที่มี `phone` จะแนบ `"phone":"02-123-4567"`
-
-| CODE | HTTP | ไทย | English | 中文 |
-|---|---|---|---|---|
-| `SLOT_TAKEN` | 409 | เวลานี้ถูกจองแล้ว | This time is already booked | 该时段已被预订 |
-| `GROUP_CALL_SHOP` (+phone) | 422 | กลุ่ม 7 คนขึ้นไป กรุณาโทรหาร้าน | Groups of 7 or more, please call the shop | 7人及以上团体请致电本店 |
-| `OUT_OF_AREA` | 422 | อยู่นอกพื้นที่รับส่ง | Outside the pickup area | 超出接送范围 |
-| `GC_EXPIRED` | (ใน `giftCardError` ของใบสรุป / สถานะบัตร) | บัตรหมดอายุแล้ว | This card has expired | 此卡已过期 |
-| `GC_EMPTY` | (ใน `giftCardError`) | บัตรนี้ไม่มียอดคงเหลือ | This card has no balance left | 此卡余额为零 |
-| `GC_NOT_FOUND` | 422 / 404 | ไม่พบ Gift Card นี้ | Gift card not found | 未找到该礼品卡 |
-| `GC_VALUE` | 422 | มูลค่าต้องเป็นจำนวนเต็ม ฿500–฿10,000 | Value must be a whole number from ฿500 to ฿10,000 | 面值须为 500–10,000 泰铢的整数 |
-| `GC_FIELDS` | 422 | กรุณาเลือกลาย ช่องทาง และกรอกผู้รับ | Please choose a design, channel and recipient | 请选择卡面、发送方式并填写收件人 |
-| `DATE_OUT_OF_RANGE` | 422 | เลือกวันได้ตั้งแต่พรุ่งนี้ถึงอีก 30 วัน | Choose a date from tomorrow up to 30 days ahead | 只能选择明天起30天内的日期 |
-| `SLOT_INVALID` | 422 | ไม่มีรอบเวลานี้ | This time slot does not exist | 没有这个时段 |
-| `SINGLE_ONE` | 422 | จองเดี่ยวได้ 1 คน | Single booking is for 1 person | 单人预约限1人 |
-| `COUPLE_NEEDS_2` | 422 | จองคู่ต้องมี 2 คนพอดี (3 คนขึ้นไปให้จองกลุ่ม) | Couple booking needs exactly 2 people (3+ please book a group) | 双人预约须为2人（3人以上请团体预约） |
-| `GROUP_TOO_SMALL` | 422 | จองกลุ่มต้องมี 3–6 คน (1–2 คนให้จองเดี่ยวหรือคู่) | Group booking needs 3–6 people (1–2 please book single or couple) | 团体预约需3–6人（1–2人请单人或双人预约） |
-| `BAD_PEOPLE` | 422 | จำนวนคนไม่ถูกต้อง | Invalid number of people | 人数无效 |
-| `THERAPIST_INVALID` | 422 | นักบำบัดที่เลือกทำบริการนี้ไม่ได้ | The selected therapist does not offer this service | 所选理疗师不提供此服务 |
-| `SERVICE_INVALID` | 422 | ไม่พบบริการนี้ หรือแบบการจองไม่ตรงกับบริการ | Service not found or does not match the booking type | 未找到服务或与预约类型不符 |
-| `PRICE_CHANGED` | 409 | ราคาเปลี่ยน กรุณาตรวจสอบสรุปอีกครั้ง | The price has changed, please review the summary again | 价格已变更，请重新确认汇总 |
-| `CANCEL_TOO_LATE` (+phone) | 422 | เหลือเวลาน้อยกว่า 24 ชม. ยกเลิกเองไม่ได้ กรุณาโทรหาร้าน | Less than 24 hours left — please call the shop to cancel | 距离预约不足24小时，无法自行取消，请致电本店 |
-| `CANCEL_NOT_ALLOWED` | 422 | นัดนี้ยกเลิกไม่ได้ | This appointment cannot be cancelled | 此预约无法取消 |
-| `COURSE_UNAVAILABLE` | 422 | ใช้คอร์สนี้ไม่ได้ (เหลือ 0 ครั้งหรือหมดอายุ) | This course cannot be used (0 sessions left or expired) | 此疗程无法使用（剩余0次或已过期） |
-| `POINTS_NOT_ENOUGH` | 422 | แต้มไม่พอแลก | Not enough points | 积分不足 |
-| `BIRTHDAY_UNAVAILABLE` | 422 | ใช้ส่วนลดเดือนเกิดไม่ได้ | Birthday discount is not available | 无法使用生日折扣 |
-| `CONTACT_REQUIRED` | 422 | กรุณากรอกชื่อและเบอร์โทร | Please enter your name and phone | 请填写姓名和电话 |
-| `QUOTE_REQUIRED` | 422 | ต้องส่งยอดที่แสดงในหน้าสรุป (quotedTotal) | quotedTotal from the summary is required | 需要提供汇总金额 quotedTotal |
-| `BAD_DISTANCE` | 422 | ระยะทางไม่ถูกต้อง | Invalid distance | 距离无效 |
-| `BAD_REQUEST` | 422 | ข้อมูลไม่ถูกต้อง | Invalid request | 请求无效 |
-| `NOT_CONFIRMED` | 422 | นัดนี้ไม่ได้อยู่ในสถานะยืนยัน | This appointment is not confirmed | 此预约不是已确认状态 |
-| `LOGIN_REQUIRED` | 401 | กรุณาเข้าสู่ระบบ | Please log in | 请登录 |
-| `LOGIN_FAILED` | 401 | อีเมลหรือรหัสผ่านไม่ถูกต้อง | Incorrect email or password | 邮箱或密码错误 |
-| `FORBIDDEN` | 403 | ไม่มีสิทธิ์เข้าถึง | Access denied | 无权访问 |
-| `NOT_FOUND` | 404 | ไม่พบข้อมูล | Not found | 未找到 |
-| `SERVER` | 500 | ระบบขัดข้อง กรุณาลองใหม่ | Something went wrong, please try again | 系统错误，请重试 |
-
-ข้อความบนหน้าจอที่ไม่ใช่ error แต่ใช้ตรวจบ่อย:
-
-| key | ไทย | English | 中文 |
+| เรื่อง | กฎ | รหัส | โค้ด |
 |---|---|---|---|
-| ยืนยันการจอง | จองสำเร็จ! รหัสการจอง {code} | Booking confirmed! Code {code} | 预约成功！预约号 {code} |
-| ระดับถัดไป | อีก ฿{X} ถึง {Gold/Platinum} | ฿{X} more to {tier} | 还差 ฿{X} 升级到 {tier} |
-| ระดับสูงสุด | อยู่ระดับสูงสุดแล้ว | You are at the top tier | 已是最高等级 |
-| Wallet | เหลือ {r} จาก {t} ครั้ง | {r} of {t} sessions left | 剩余 {r} / {t} 次 |
-| รอบเอว | ลดไปแล้ว {x} ซม. | Reduced {x} cm | 已减少 {x} 厘米 |
-| ยกเลิกไม่ได้ (บัญชี) | เหลือน้อยกว่า 24 ชม. ยกเลิกเองไม่ได้ กรุณาโทรหาร้าน | Less than 24 hours left. Please call the shop | 不足24小时，无法自行取消，请致电本店 |
-| สถานะนัด | ยืนยัน / ยกเลิก / ใช้บริการแล้ว | Confirmed / Cancelled / Completed | 已确认 / 已取消 / 已完成 |
-| ภาพจำลอง | ภาพจำลอง ผลจริงแต่ละคนต่างกัน | Simulation only — actual results vary by person | 仅为模拟效果，实际效果因人而异 |
-| ส่ง Gift Card (จำลอง) | ส่งบัตรทาง {LINE/อีเมล} ถึง {ผู้รับ} แล้ว (จำลอง — ไม่ได้ส่งจริง) | Card sent via {channel} to {to} (simulated — not actually sent) | 已通过 {channel} 发送给 {to}（模拟，未实际发送） |
-| ไม่มีรีวิว | ยังไม่มีรีวิว | No reviews yet | 暂无评价 |
+| รอบ | เริ่ม 10:00 ทุก 30 นาที จบไม่เกิน 22:00 | BR-01, 02 | `lib/rules/slots.ts` |
+| ช่วงวัน | พรุ่งนี้ถึงวันนี้ + 30 | BR-03, 04 | `lib/rules/booking-window.ts`, `lib/booking/availability.ts` |
+| คิว | นักบำบัด 1 คิว พัก 0 นาที · Couple Suite 1 ห้อง | BR-05–07 | EXCLUDE ใน `db/init/01-schema.sql` |
+| ประเภท | 1 SINGLE · 2 COUPLE · 3–6 GROUP · ≥7 โทรร้าน | BR-08–12 | `lib/booking/create.ts` |
+| ใครก็ได้ | คะแนนปัดแล้วสูงสุด · 0 รีวิวหลังสุด · เท่ากันรหัสน้อย | FR-08, 09 | `lib/rules/assign.ts` |
+| ราคา | เต็ม → % มากสุด 1 อัน → แต้ม → ค่ารถ → บัตร · ปัดลงบาทเต็ม | BR-13, 29–33 | `lib/pricing/rules.ts` |
+| แต้ม | ฿100 = 1 แต้ม · 100 แต้ม = ฿50 ชุดละ 100 · ไม่เกินค่าบริการ | BR-15–20 | `lib/pricing/rules.ts` |
+| ระดับ | Gold ≥ ฿10,000 (5%) · Platinum ≥ ฿30,000 (10%) คำนวณจากยอด | BR-21–24 | `tierFromSpend`, `lib/admin/complete.ts` |
+| เดือนเกิด | 20% เดือนของวันนัด ปีละครั้ง กดเอง S01–S07 | BR-25–28 | `birthdayEligibility` |
+| รถ | ≤5.0 ฟรี · ≤15.0 ฿300/คัน · >15.0 ไม่รับ · 4 คน/คัน · ทศนิยมไม่เกิน 1 | BR-34–38 | `shuttleFee`, `parseDistanceKm` |
+| คอร์ส | 11 ครั้ง 180 วัน ดูวันนัด กันตอนจอง ตัดตอนกดเสร็จ | BR-39, 40, 45 | `courseValidOn`, `lib/admin/complete.ts` |
+| Gift Card | ฿500–฿10,000 จำนวนเต็ม 365 วัน ดูวันจอง | BR-41–45 | `lib/wallet/`, `giftCardValidOn` |
+| ยกเลิก | เหลืออย่างน้อย 24:00 คืนครบทุกสิทธิ์ | BR-14, FR-22 | `lib/booking/cancel.ts` |
+| รีวิว | เฉลี่ยปัด 1 ตำแหน่ง ≥4.5 ผ่าน 0 รีวิวไม่ผ่าน | BR-47–49 | `lib/rules/rating.ts` |
+| AI | กฎตายตัวทุกตัว | NFR-14 | `lib/rules/{mood,quiz,chat,skin}.ts` |
 
----
+## 6. ข้อความ error คำต่อคำ
 
-## 6. API
+ทุก API ตอบ `{"error":{"code","message"}}` ตามภาษาของ request · หน้าเว็บแสดงด้วย `data-testid="error-<code>"` · 3 ภาษาอยู่ใน `src/i18n/errors.ts`
 
-ทุกเส้นตอบ JSON · เงินในฟิลด์ตัวเลขเป็น **บาท** (เช่น `1187.5`) · ฟิลด์ `*Label` เป็นข้อความแสดงผล (`฿1,187.50`) · auth = cookie `sabai_session` (httpOnly) จาก `/api/auth/login`
+| code | HTTP | ไทย |
+|---|---:|---|
+| `validation` | 400 | ข้อมูลไม่ถูกต้อง |
+| `unauthorized` | 401 | กรุณาเข้าสู่ระบบ |
+| `forbidden` | 403 | ไม่มีสิทธิ์เข้าถึง |
+| `not-found` | 404 | ไม่พบข้อมูล |
+| `internal` | 500 | ระบบขัดข้อง กรุณาลองใหม่ |
+| `slot-taken` | 409 | เวลานี้ถูกจองแล้ว |
+| `same-day-call` | 422 | จองวันนี้ในเว็บไม่ได้ กรุณาโทร 02-123-4567 |
+| `date-out-of-range` | 422 | จองได้ตั้งแต่พรุ่งนี้ถึง 30 วันข้างหน้า |
+| `invalid-slot` | 422 | ไม่มีรอบเวลานี้ |
+| `party-too-large-call` | 422 | จอง 7 คนขึ้นไปในเว็บไม่ได้ กรุณาโทร 02-123-4567 |
+| `not-enough-therapists` | 409 | นักบำบัดที่ทำบริการนี้ว่างไม่ครบจำนวนคน |
+| `therapist-cannot-perform` | 422 | นักบำบัดคนนี้ไม่ได้ทำบริการนี้ |
+| `price-changed` | 409 | ราคาเปลี่ยน กรุณาดูสรุปอีกครั้ง |
+| `guest-info-required` | 422 | กรุณากรอกชื่อและเบอร์โทร |
+| `phone-invalid` | 422 | เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก |
+| `service-not-found` | 404 | ไม่พบบริการนี้ |
+| `course-required` | 422 | บริการนี้จองได้ด้วยคอร์สเท่านั้น |
+| `course-not-found` | 404 | ไม่พบคอร์สนี้ |
+| `course-used-up` | 409 | คอร์สนี้ใช้ครบแล้ว |
+| `course-expired` | 422 | หมดอายุสำหรับวันนี้ |
+| `course-one-person` | 422 | จองด้วยคอร์สได้ครั้งละ 1 คน |
+| `course-login-required` | 401 | กรุณาเข้าสู่ระบบเพื่อใช้คอร์ส |
+| `booking-not-found` | 404 | ไม่พบการจอง |
+| `cancel-too-late` | 422 | เหลือเวลาไม่ถึง 24 ชม. ยกเลิกเองไม่ได้ กรุณาโทร 02-123-4567 |
+| `booking-not-cancellable` | 409 | การจองนี้เสร็จแล้วหรือยกเลิกแล้ว |
+| `points-not-enough` | 422 | แต้มไม่พอ ต้องมีอย่างน้อย 100 แต้ม |
+| `points-not-multiple` | 422 | แลกแต้มได้เป็นชุดละ 100 แต้มเท่านั้น |
+| `points-exceed-service` | 422 | ส่วนลดจากแต้มเกินค่าบริการ |
+| `points-login-required` | 401 | กรุณาเข้าสู่ระบบเพื่อแลกแต้ม |
+| `distance-required` | 422 | กรุณาเลือกโรงแรมหรือกรอกระยะทาง |
+| `distance-invalid` | 422 | ระยะทางต้องไม่ติดลบ และมีทศนิยมไม่เกิน 1 ตำแหน่ง |
+| `distance-too-far` | 422 | ระยะเกิน 15.0 กม. ไม่รับรถรับส่ง |
+| `hotel-not-found` | 404 | ไม่พบโรงแรมนี้ |
+| `giftcard-not-found` | 404 | ไม่พบ Gift Card นี้ |
+| `giftcard-expired` | 422 | Gift Card หมดอายุแล้ว |
+| `giftcard-empty` | 422 | Gift Card ไม่มีมูลค่าเหลือ |
+| `giftcard-amount-invalid` | 422 | มูลค่าต้องเป็นจำนวนเต็ม ฿500–฿10,000 |
+| `giftcard-design-invalid` | 422 | กรุณาเลือกลายกล้วยไม้ บัว หรือทอง |
+| `giftcard-channel-invalid` | 422 | กรุณาเลือกส่งทาง LINE หรือ email |
+| `invalid-credentials` | 401 | อีเมลหรือรหัสผ่านไม่ถูกต้อง |
+| `email-taken` | 409 | อีเมลนี้สมัครแล้ว |
+| `email-invalid` | 422 | รูปแบบอีเมลไม่ถูกต้อง |
+| `password-too-short` | 422 | รหัสผ่านต้องมีอย่างน้อย 8 ตัว |
+| `name-required` | 422 | กรุณากรอกชื่อ |
+| `birth-date-invalid` | 422 | กรุณากรอกวันเกิดให้ถูกต้อง |
+| `already-completed` | 409 | กดใช้บริการเสร็จไปแล้ว |
+| `quiz-incomplete` | 422 | กรุณาตอบให้ครบ 4 ข้อ |
+| `quiz-too-many` | 422 | แบบทดสอบมี 4 ข้อเท่านั้น |
+| `quiz-invalid-answer` | 422 | คำตอบไม่ถูกต้อง |
+| `mood-invalid` | 422 | ไม่มีอารมณ์นี้ในรายการ |
 
-| method | path | body / query | ตอบกลับ | สถานะ |
-|---|---|---|---|---|
-| GET | `/api/health` | — | `{"ok":true,"db":true}` (ต่อ db ไม่ได้ → `db:false` ไม่ throw) | 200 |
-| POST | `/api/test/reset` | `{"now"?: ISO}` (ไม่ส่ง = `2026-10-10T10:00:00+07:00`) | `{"ok":true,"now":"2026-10-10T10:00:00+07:00"}` · TRUNCATE ทุกตาราง + รัน seed ใน transaction เดียว | 200 · 422 now ผิด · 404 เมื่อ `ALLOW_TEST_RESET≠1` |
-| GET | `/api/test/today` | — | `{"now","today"}` | 200 · 404 |
-| POST | `/api/auth/login` | `{"email","password"}` | `{"ok":true,"user":{id,name,email,role}}` + Set-Cookie | 200 · 401 `LOGIN_FAILED` |
-| POST | `/api/auth/logout` | — | `{"ok":true}` | 200 |
-| GET | `/api/services` | `?lang=` | `{"services":[{code,name,kind,durationMin,price,herbs[],image}]}` | 200 |
-| GET | `/api/therapists` | `?min=4.5` `?service=S01` | `{"therapists":[{code,name,rating:"5.0"\|null,ratingTenths,reviewCount,passes45,services[]}]}` | 200 |
-| GET | `/api/hotels` | — | `{"hotels":[{code,name,distanceKm}]}` | 200 |
-| GET | `/api/slots` | `service, date, type=single\|couple\|group\|package\|course, people` | `{"date","min","max","durationMin","slots":[{time,endTime,available,therapists:[{code,name}]}]}` (รอบที่จบเกิน 22:00 ไม่อยู่ในรายการ) | 200 · 422 (`DATE_OUT_OF_RANGE`, `SERVICE_INVALID`, party codes) |
-| POST | `/api/price` | BookingInput (ด้านล่าง ไม่ต้องมี quotedTotal) | ใบสรุป: `gross, discountKind, discountPct, discountAmount, pointsRedeemed, pointsDiscount, subtotal, distanceKm, vehicles, transportFee, total, totalLabel, giftcardPaid, otherPaid, pointsToEarn, lines[{key,label,amount,display}], birthdayAvailable, maxRedeemBlocks, pointsBalance, course, giftCard{status,balance,balanceAfter}, giftCardError{code,message}\|null, service{herbs}` | 200 · 401 (คอร์ส/แลกแต้มต้องล็อกอิน) · 422 |
-| POST | `/api/bookings` | BookingInput + `quotedTotal` | `{"bookingId","code":"B14","status":"confirmed","total","totalLabel","therapists":["T06"],"therapistNames","message":"จองสำเร็จ! รหัสการจอง B14","detail","quote"}` | 201 · 409 `SLOT_TAKEN` / `PRICE_CHANGED` (แนบ `total`, `quote`) · 422 · 401 |
-| POST | `/api/bookings/:id/cancel` | `:id` = เลข id หรือ `B05` | `{"ok":true,"bookingId","code","status":"cancelled"}` | 200 · 401 · 403 (นัดคนอื่น) · 404 · 422 `CANCEL_TOO_LATE` (+phone) / `CANCEL_NOT_ALLOWED` |
-| GET | `/api/me` | — | `{id,name,email,role,points,maxRedeemBlocks,tier,tierLabel,tierPct,lifetimeSpend,nextTier,remainingToNext,tierMessage,birthMonth,birthdayThisMonth:"none"\|"available"\|"used"}` | 200 · 401 |
-| GET | `/api/me/bookings` | — | `{"bookings":[{id,code,serviceName,date,time,endTime,therapists[],status,statusLabel,total,totalLabel,viaCourse,canCancel,cancelBlockedReason}]}` เรียงล่าสุด→เก่าสุด | 200 · 401 |
-| GET | `/api/wallet` | — | `{"courses":[{id,code,total,used,reserved,remaining,remainingLabel,purchasedOn,expiresOn,daysLeft,expired,usable}],"waist":[{date,cm}],"waistReducedCm","photos":[{id,phase,url}]}` | 200 · 401 |
-| POST | `/api/courses` | — | `{id,code,price:15000,total:11,remaining:11,purchasedOn,expiresOn,message}` · ยอดสะสม +฿15,000 | 201 · 401 |
-| GET | `/api/photos/:id` | — | ไฟล์รูป (image/webp, no-store) | 200 · 401 ไม่ล็อกอิน · 403 ไม่ใช่เจ้าของ · 404 |
-| POST | `/api/giftcards` | `{"value":int,"design":"orchid\|lotus\|gold","channel":"line\|email","recipient","message"?}` | `{code,value,design,channel,recipient,purchasedOn,expiresOn,expiresLabel,simulated:true,sentMessage,preview}` | 201 · 422 `GC_VALUE`/`GC_FIELDS` |
-| GET | `/api/giftcards/:code` | — | `{code,faceValue,balance,balanceLabel,design,purchasedOn,expiresOn,status:"ok"\|"expired"\|"empty",message}` | 200 · 404 `GC_NOT_FOUND` |
-| GET | `/api/transport` | `distance` หรือ `hotel=H04`, `people` (1–6), `package=1` | `{distanceKm,people,vehicles,perVehicle,fee,feeLabel,free}` | 200 · 422 `OUT_OF_AREA` / `BAD_DISTANCE` / `BAD_PEOPLE` |
-| POST | `/api/chat` | `{"message","state"?}` (ส่ง `state` จากคำตอบก่อนกลับมาทุกครั้ง) | `{"reply","lang","state",booking?:{bookingId,code,total}}` | 200 · 422 |
-| GET | `/api/mood` | `mood=stressed\|tired\|aches\|insomnia` | `{mood,reason,services:[…]}` (1–3 รายการ) | 200 · 422 |
-| GET | `/api/quiz` | — | `{"questions":[{id,text,options[{value,label}]}]}` (4 ข้อ) | 200 |
-| POST | `/api/quiz` | `{"answers":{"goal","time","pressure","stay"}}` | `{code,name,price,image,reason}` | 200 · 422 |
-| GET | `/api/admin/bookings` | `date=YYYY-MM-DD` | `{date,today,bookings:[{id,code,time,customer,member,service,type,people,therapists[],status,total,totalLabel,viaCourse,pointsEarned}]}` | 200 · 401 · 403 (ไม่ใช่ owner) |
-| POST | `/api/admin/bookings/:id/complete` | `{"waistCm"?: number}` | `{ok,bookingId,code,status:"completed",pointsEarned}` (แต้ม BR-09 + ยอดสะสม · คอร์ส reserved−1 used+1 · บันทึกรอบเอว) | 200 · 401 · 403 · 404 · 422 `NOT_CONFIRMED` |
+ข้อความอื่นคำต่อคำ: "ยังไม่มีรีวิว" · "ภาพจำลอง ผลจริงอาจต่างกัน" · "เหลือ 7 ครั้ง จาก 11 ครั้ง" · "อีก ฿17,600 ถึง Platinum" · "ลดลง 4.0 ซม." · "ใช้บริการเสร็จ" · เบอร์ร้าน 02-123-4567 · โหมด 中文 แสดงเงินเป็น "1,000 泰铢" เพราะ ฿ อยู่ในช่วงอักขระที่ NFR-07 ตรวจ
 
-**BookingInput**
+## 7. API
 
-```json
-{
-  "type": "single | couple | group | package | course",
-  "serviceCode": "S01",            // package → P01, course → K01 (ละได้)
-  "people": 1,                     // couple = 2, group = 3–6, package = 1–6
-  "date": "2026-10-20", "time": "10:00",
-  "therapists": ["T04"],           // ไม่ส่ง = ระบบจัดคนว่าง id น้อยสุด (D7) · ถ้าส่งต้องเท่าจำนวนคน
-  "contactName": "…", "contactPhone": "…",   // จำเป็นเมื่อไม่ล็อกอิน
-  "redeemBlocks": 0,               // จำนวนก้อน 100 แต้ม
-  "useBirthday": false,
-  "giftCardCode": "SABAI-GC-2000",
-  "hotelCode": "H04",              // หรือ "distanceKm": 12.0
-  "coursePurchaseId": 1,           // type course (ไม่ส่ง = คอร์สที่ใช้ได้และหมดอายุก่อน)
-  "quotedTotal": 3800              // POST /api/bookings เท่านั้น: ต้องเท่ายอดที่คิดใหม่ ไม่งั้น 409
-}
-```
+รายละเอียด request/response และลำดับตรวจอยู่ใน `API-CONTRACT.md` · type จริงใน `src/types/index.ts`
 
----
+| Method · Path | หน้าที่ | สิทธิ์ |
+|---|---|---|
+| GET `/api/health` | `{"ok":true,"db":true}` · ต่อ DB ไม่ได้ 503 | ทุกคน |
+| GET `/api/clock` | เวลาและช่วงจอง | ทุกคน |
+| GET `/api/services` `/api/herbs` `/api/hotels` | ข้อมูลร้าน | ทุกคน |
+| GET `/api/therapists?service=&minRating=` | นักบำบัด | ทุกคน |
+| GET `/api/availability?service=&date=&party=&therapist=&course=` | รอบว่าง | ทุกคน |
+| POST `/api/quote` | คิดราคา 5 ขั้น | ทุกคน |
+| POST `/api/bookings` · GET `/api/bookings/{id}` | จอง · ดูของตัวเอง | ทุกคน · เจ้าของ |
+| POST `/api/bookings/{id}/cancel` · `/api/bookings/cancel-guest` | ยกเลิก | เจ้าของ · รหัส+เบอร์ |
+| POST `/api/auth/register` `/login` `/logout` | บัญชี | ทุกคน |
+| GET `/api/me` `/api/me/history` `/api/me/bookings` · GET `/api/wallet` | ข้อมูลตัวเอง | สมาชิก |
+| POST `/api/courses/purchase` | ซื้อคอร์ส | สมาชิก |
+| POST `/api/gift-cards` · GET `/api/gift-cards/{code}` | ซื้อ · ตรวจยอด | ทุกคน |
+| GET `/api/admin/schedule?date=` · POST `/api/admin/bookings/{id}/complete` | หลังร้าน | OWNER |
+| POST `/api/mood` · GET,POST `/api/quiz` · POST `/api/chat` | กฎตายตัว | ทุกคน |
+| POST `/api/test/reset` `/api/test/lock` | ทดสอบ | เมื่อ `ALLOW_TEST_RESET=1` ไม่งั้น 404 |
 
-## 7. ผู้ใช้ seed
+## 8. data-testid ทั้งหมด
 
-| รหัส | อีเมล | รหัสผ่าน | ใช้ทดสอบ |
-|---|---|---|---|
-| U01 | nida@sabai.test | Nida@2026 | Gold ฿12,400 · 99 แต้ม (แลกไม่ได้) · คอร์ส C01 เหลือ 7/11 · กราฟรอบเอว 4 จุด · รูป before/after · ประวัติ 8 แถว · ยกเลิก B05 (24 ชม.) / B06 (วันนี้) |
-| U02 | ton@sabai.test | Ton@2026 | Platinum ฿30,000 · เกิด ต.ค. ยังไม่ใช้สิทธิ์ · จองคู่ B02 · GC03 |
-| U03 | may@sabai.test | May@2026 | สมาชิกใหม่ Silver ฿0 ไม่มีนัด · ซื้อคอร์สใหม่ (E61) |
-| U04 | fon@sabai.test | Fon@2026 | Silver ฿9,999 · 250 แต้ม · เจ้าของ GC01 (฿2,000) GC05 (฿0) · B01 |
-| U05 | prae@sabai.test | Prae@2026 | Gold ฿29,999 · 100 แต้ม · ใช้สิทธิ์เดือนเกิด ต.ค. แล้ว · C04 หมดอายุ · GC04 หมดอายุ |
-| U06 | vipa@sabai.test | Vipa@2026 | Platinum ฿45,000 · 199 แต้ม · C03 เหลือ 0 · GC02 |
-| U07 | kan@sabai.test | Kan@2026 | Gold ฿10,000 · C02 เหลือ 1 หมดอายุ 20 ต.ค. |
-| U08 | liwei@sabai.test | LiWei@2026 | นักท่องเที่ยว ภาษา zh · กลุ่ม B04 · แพ็กเกจ รถรับส่ง |
-| owner | owner@sabai.test | Owner@2026 | role owner → `/admin` ตารางคิว + กดใช้บริการเสร็จ + รีเซ็ต |
-| (ไม่ล็อกอิน) | — | — | จองด้วยชื่อ+เบอร์ (ไม่ได้แต้ม) · B03 คุณสมชาย 081-000-0003 |
+ไล่จากโค้ดจริง · `<ค่า>` คือส่วนที่เป็นรหัส เช่น `booking-service-S01` `booking-slot-20-00` `therapist-card-T01` `admin-complete-SJTEST05` · ค่าเดียวกันทุกภาษา · error ใช้ `error-<code>`
 
-Gift Card: `SABAI-GC-2000` (GC01) · `SABAI-GC-PART` (GC02) · `SABAI-GC-LAST` (GC03 วันนี้วันสุดท้าย) · `SABAI-GC-EXP` (GC04 หมดอายุ) · `SABAI-GC-ZERO` (GC05 ยอด ฿0)
-โรงแรม: H01 2.0 · H02 5.0 · H03 5.1 · H04 12.0 · H05 15.0 · H06 15.1 กม.
+**อื่น ๆ** (9)
 
----
+`<ค่า>-<ค่า>` · `<ค่า>-distance` · `<ค่า>-hint` · `<ค่า>-hotel` · `<ค่า>-mode-distance` · `<ค่า>-mode-hotel` · `<ค่า>-picker` · `<ค่า>-rules` · `<ค่า>-toggle`
 
-## 8. data-testid
+**about** (19)
 
-ทุกปุ่ม/ช่องกรอกมีชื่อที่ `getByRole` หาได้ (ข้อความ, `<label>` หรือ `aria-label`) · `{code}` = รหัสบริการ/นัด/คอร์ส เช่น `S01`, `B05`, `C01` · `{HH:MM}` เช่น `20:30`
+`about-book-link` · `about-gallery-link` · `about-herbs-link` · `about-herbs-photo` · `about-hero` · `about-hours` · `about-interview-photo` · `about-owner-name` · `about-owner-photo` · `about-phone` · `about-promise-<ค่า>` · `about-promises` · `about-quote` · `about-quote-text` · `about-story` · `about-story-feel` · `about-story-herbs` · `about-team-link` · `about-visit`
 
-### ทุกหน้า (layout)
+**account** (39)
 
-| testid | คืออะไร |
-|---|---|
-| `brand-link` | โลโก้ → หน้าแรก |
-| `music-toggle` | ปุ่มเปิด/ปิดเพลง (`aria-pressed`, `data-playing="true|false"`) |
-| `lang-switcher` · `lang-th` `lang-en` `lang-zh` | กลุ่มปุ่มภาษา / ปุ่มแต่ละภาษา (`aria-pressed`) |
-| `nav-login` · `logout-button` | เข้าสู่ระบบ / ออกจากระบบ |
-| `nav-toggle` | ปุ่มเมนู (มือถือ, `aria-expanded`) |
-| `nav-home` `nav-services` `nav-book` `nav-package` `nav-therapists` `nav-giftcard` `nav-transport` `nav-chat` `nav-quiz` `nav-skin` `nav-account` `nav-wallet` `nav-admin` | ลิงก์เมนู (account/wallet เมื่อล็อกอิน · admin เมื่อเป็น owner) |
-| `footer-phone` | เบอร์ร้านท้ายหน้า |
-| `chat-fab` | ปุ่มแชทลอย |
+`account-admin` · `account-birth-date` · `account-birth-readonly` · `account-book` · `account-booking-<ค่า>` · `account-booking-code-<ค่า>` · `account-booking-date-<ค่า>` · `account-booking-party-<ค่า>` · `account-booking-service-<ค่า>` · `account-booking-shuttle-<ค่า>` · `account-booking-time-<ค่า>` · `account-booking-total-<ค่า>` · `account-bookings` · `account-call-<ค่า>` · `account-call-link-<ค่า>` · `account-cancel-<ค่า>` · `account-cancel-confirm-<ค่า>` · `account-cancel-done` · `account-cancel-keep-<ค่า>` · `account-cancel-panel-<ค่า>` · `account-email` · `account-history-link` · `account-lifetime-note` · `account-loading` · `account-logout` · `account-name` · `account-next-tier` · `account-no-reschedule` · `account-owner-note` · `account-page` · `account-phone` · `account-points` · `account-retry` · `account-spend` · `account-tier` · `account-title` · `account-upcoming-empty` · `account-wallet-link` · `account-whole-only-<ค่า>`
 
-### `/` หน้าแรก
+**admin** (27)
 
-| testid | คืออะไร |
-|---|---|
-| `home-hero` · `home-title` | hero / หัวข้อ |
-| `home-book` · `home-package` | ปุ่มจองคิว / ดูแพ็กเกจ |
-| `mood-section` | กล่องอารมณ์วันนี้ |
-| `mood-stressed` `mood-tired` `mood-aches` `mood-insomnia` | ปุ่มอารมณ์ (`role=radio`, `aria-checked`) |
-| `mood-result` · `mood-reason` | ผลแนะนำ / เหตุผล |
-| `mood-rec-{code}` · `mood-book-{code}` | บริการที่แนะนำ / ปุ่มจองต่อ |
-| `home-svc-{code}` · `home-book-{code}` | การ์ดบริการยอดนิยม / ปุ่มจอง |
-| `home-quiz` `home-skin` `home-chat` | ลิงก์ไปแบบทดสอบ/วิเคราะห์ผิว/แชท |
+`admin-booking-<ค่า>` · `admin-complete-<ค่า>` · `admin-count` · `admin-course-<ค่า>` · `admin-customer-<ค่า>` · `admin-date` · `admin-date-label` · `admin-empty` · `admin-forbidden` · `admin-guest-<ค่า>` · `admin-loading` · `admin-login-required` · `admin-member-<ค่า>` · `admin-page` · `admin-party-<ค่า>` · `admin-pay-<ค่า>` · `admin-phone-<ค่า>` · `admin-points-<ค่า>` · `admin-result-<ค่า>` · `admin-schedule` · `admin-service-<ค่า>` · `admin-status-<ค่า>` · `admin-therapist-<ค่า>` · `admin-therapist-queue-<ค่า>` · `admin-therapists` · `admin-therapists-<ค่า>` · `admin-time-<ค่า>`
 
-### `/services`
+**booking** (89)
 
-| testid | คืออะไร |
-|---|---|
-| `service-card-{code}` | การ์ดบริการ |
-| `service-name-{code}` · `service-price-{code}` · `service-herbs-{code}` | ชื่อ / ราคา / รายการสมุนไพร |
-| `service-book-{code}` | ปุ่มจอง |
+`booking-assigned-<ค่า>` · `booking-auto-assign-note` · `booking-birthday-reason` · `booking-birthday-result` · `booking-call-shop` · `booking-call-shop-link` · `booking-code` · `booking-confirm` · `booking-confirm-amount` · `booking-confirmation` · `booking-course-lock` · `booking-course-login` · `booking-course-panel` · `booking-course-remaining<ค่า>` · `booking-course-status-<ค่า>` · `booking-date` · `booking-date-chip-<ค่า>` · `booking-date-range` · `booking-discount-source` · `booking-done-guest` · `booking-done-no-cancel` · `booking-done-pickup` · `booking-done-service` · `booking-done-therapists` · `booking-done-when` · `booking-extra-<ค่า>` · `booking-extra-shuttle` · `booking-flow` · `booking-giftcard-apply` · `booking-giftcard-code` · `booking-giftcard-info` · `booking-giftcard-remove` · `booking-guest-name` · `booking-guest-note` · `booking-guest-phone` · `booking-line-discount` · `booking-line-full-price` · `booking-line-giftcard` · `booking-line-points` · `booking-line-transport` · `booking-link-account` · `booking-link-cancel` · `booking-login-link` · `booking-member-note` · `booking-no-online-payment` · `booking-no-reschedule` · `booking-party-<ค่า>` · `booking-party-max` · `booking-party-note` · `booking-pay-at-shop` · `booking-points-balance` · `booking-points-dec` · `booking-points-earned` · `booking-points-inc` · `booking-points-max` · `booking-points-none` · `booking-points-value` · `booking-progress` · `booking-quote-loading` · `booking-quote-need-input` · `booking-quote-stale` · `booking-recap` · `booking-recap-party` · `booking-recap-service` · `booking-recap-therapist` · `booking-recap-when` · `booking-retry` · `booking-same-day-call-link` · `booking-screen-1` · `booking-screen-2` · `booking-screen-3` · `booking-service-<ค่า>` · `booking-shuttle` · `booking-slot-<ค่า>` · `booking-slot-gone` · `booking-slots-empty` · `booking-slots-pick-date` · `booking-step1-hint` · `booking-step1-next` · `booking-step2-back` · `booking-step2-hint` · `booking-step2-next` · `booking-therapist-<ค่า>` · `booking-therapist-any` · `booking-therapist-rating-<ค่า>` · `booking-toggle-<ค่า>` · `booking-under24h-warning` · `booking-use-birthday` · `booking-use-course<ค่า>`
 
-### `/book` จอง 4 ขั้น
+**cancel** (13)
 
-| testid | คืออะไร |
-|---|---|
-| `book-step-indicator` | "ขั้นที่ n จาก 4" (`data-step`) |
-| `book-type-single` `book-type-couple` `book-type-group` `book-type-package` `book-type-course` | radio แบบการจอง (`book-type-label-*` = label) |
-| `book-service` | select บริการ |
-| `book-people` | จำนวนคน (คู่/กลุ่ม/แพ็กเกจ) |
-| `book-service-herbs` | สมุนไพรของบริการที่เลือก (ขั้น 1) |
-| `book-tour-open` · `book-tour-open-2` | ปุ่ม "ดูห้อง 360°" (ขั้น 1 / ขั้น 2 เมื่อจองคู่) |
-| `book-next-1` `book-next-2` `book-next-3` | ปุ่มถัดไป |
-| `book-back-2` `book-back-3` `book-back-4` | ปุ่มย้อนกลับ |
-| `book-error` · `book-error-message` | กล่อง error (`data-error-code`) / ข้อความ |
-| `shop-phone` | เบอร์ร้านใน error (กลุ่ม 7+) |
-| `book-date` | วันที่ (`min`/`max` = พรุ่งนี้ถึง +30) |
-| `book-slots` · `book-slot-{HH:MM}` | กลุ่มรอบว่าง / ปุ่มรอบ (`aria-pressed`) |
-| `book-no-slots` | ข้อความไม่มีรอบว่าง |
-| `book-therapist` | select นักบำบัด (จองเดี่ยว) |
-| `book-contact-name` · `book-contact-phone` | ชื่อ / เบอร์ |
-| `book-course` · `book-course-none` | select คอร์ส / ข้อความไม่มีคอร์สที่ใช้ได้ |
-| `book-points` · `book-points-info` · `book-points-none` | select จำนวนครั้งแลกแต้ม (disabled เมื่อแต้ม < 100) / แต้มที่มี / ข้อความแต้มไม่พอ |
-| `book-birthday` · `book-birthday-label` | checkbox ส่วนลดเดือนเกิด (แสดงเมื่อเข้าเงื่อนไข) |
-| `book-giftcard` · `book-giftcard-apply` | รหัส Gift Card / ปุ่มใช้บัตร |
-| `book-giftcard-info` · `book-giftcard-after` · `book-giftcard-error` | ยอดในบัตร / ยอดคงเหลือหลังใช้ / error บัตร (`data-error-code`) |
-| `book-transport` · `book-hotel` · `book-distance` | checkbox รถรับส่ง / select โรงแรม / ระยะทาง |
-| `book-quote-error` · `book-quote-error-message` | error จากใบเสนอราคา (เช่น อยู่นอกพื้นที่รับส่ง) |
-| `book-quote-total` | ยอดสุทธิล่าสุด (ขั้น 3) |
-| `book-summary` | กล่องสรุปขั้น 4 |
-| `summary-service` · `summary-when` | บริการ / วันเวลา |
-| `book-herbs` | สมุนไพรในหน้ายืนยัน (FR-31) |
-| `summary-lines` | ตารางราคา |
-| `summary-line-{key}` · `summary-amount-{key}` | แถว / จำนวนเงิน (`data-amount` บาท) · key: `gross` `discount` `points` `transport` `total` `giftcard` `other` `course` |
-| `summary-total` | ยอดสุทธิ (`data-amount`) |
-| `book-earn-points` | แต้มที่จะได้หลังใช้บริการ |
-| `book-course-after` | "เหลือ X จาก 11 ครั้ง" หลังจองด้วยคอร์ส |
-| `book-confirm` | ปุ่มยืนยันการจอง |
-| `booking-done` · `booking-confirmation` | กล่อง/ข้อความยืนยัน "จองสำเร็จ! รหัสการจอง B14" |
-| `booking-detail` · `booking-therapists` · `booking-code` | รายละเอียด / นักบำบัด / รหัส (hidden) |
-| `book-again` | จองอีกครั้ง |
-| `tour-dialog` · `tour-view` · `tour-angle` · `tour-close` | ทัวร์ 360° (`tour-view` เป็น `role=slider`, `data-angle` 0–359) |
+`cancel-account-link` · `cancel-call-shop` · `cancel-code` · `cancel-form` · `cancel-phone` · `cancel-rebook` · `cancel-refund-giftcard` · `cancel-result` · `cancel-result-code` · `cancel-result-service` · `cancel-result-when` · `cancel-rule` · `cancel-submit`
 
-### `/package`
+**chat** (15)
 
-| testid | คืออะไร |
-|---|---|
-| `package-card` · `package-title` · `package-price` | การ์ด / ชื่อ / ราคาต่อคน (`data-amount`) |
-| `package-includes` · `package-item-1..3` | สิ่งที่ได้ 3 อย่าง |
-| `package-people` · `package-total` · `package-book` | จำนวนคน / ราคารวม (`data-amount`) / ปุ่มจอง |
+`chat-booking-<ค่า>` · `chat-booking-code-<ค่า>` · `chat-close` · `chat-error` · `chat-input` · `chat-log` · `chat-message-<ค่า>` · `chat-open` · `chat-panel` · `chat-quote-<ค่า>` · `chat-quote-total-<ค่า>` · `chat-send` · `chat-suggest-<ค่า>` · `chat-typing` · `chat-welcome`
 
-### `/therapists`
+**error** (1)
 
-| testid | คืออะไร |
-|---|---|
-| `filter-45` | checkbox "4.5 ดาวขึ้นไป" |
-| `therapist-count` | "แสดง n คน" |
-| `therapist-{T01}` · `therapist-name-{T01}` | การ์ด / ชื่อ |
-| `therapist-rating-{T01}` | คะแนน "5.0" หรือ "ยังไม่มีรีวิว" |
-| `therapist-reviews-{T01}` · `therapist-book-{T01}` | จำนวนรีวิว / ปุ่มจอง |
+`error-<code>`
 
-### `/transport`
+**floating** (1)
 
-| testid | คืออะไร |
-|---|---|
-| `transport-rule` | ข้อความกติกา |
-| `transport-hotel` · `transport-distance` · `transport-people` · `transport-calc` | โรงแรม / ระยะ / จำนวนคน / ปุ่มคำนวณ |
-| `transport-result` · `transport-fee` · `transport-vehicles` | ผล / ค่ารถ (`data-amount`) / จำนวนคัน |
-| `transport-error` | "อยู่นอกพื้นที่รับส่ง" |
+`floating-book`
 
-### `/giftcard`
+**footer** (3)
 
-| testid | คืออะไร |
-|---|---|
-| `gc-value` | มูลค่า |
-| `gc-design-orchid` `gc-design-lotus` `gc-design-gold` | radio ลาย (`gc-design-label-*` = label) |
-| `gc-preview` | ตัวอย่างบัตร |
-| `gc-channel-line` `gc-channel-email` | radio ช่องทาง (`gc-channel-label-*` = label) |
-| `gc-recipient` · `gc-message` · `gc-submit` | ผู้รับ / ข้อความ / ปุ่มซื้อและส่ง |
-| `gc-error` | error (มูลค่า/ข้อมูลไม่ครบ) |
-| `gc-result` · `gc-sent` · `gc-code` · `gc-expires` · `gc-preview-text` | ผล / ข้อความ "ส่ง" (จำลอง) / รหัส / วันหมดอายุ / ข้อความที่ส่ง |
-| `gc-check-code` · `gc-check-submit` | ช่องรหัส / ปุ่มตรวจยอด |
-| `gc-check-result` · `gc-check-status` · `gc-check-balance` · `gc-check-expires` · `gc-check-error` | ผล (`data-status`) / "ใช้ได้" หรือ "บัตรหมดอายุแล้ว" / ยอด / วันหมดอายุ / ไม่พบบัตร |
+`footer` · `footer-link-<ค่า>` · `footer-phone`
 
-### `/chat` `/quiz` `/skin`
+**gallery** (6)
 
-| testid | คืออะไร |
-|---|---|
-| `chat-log` · `chat-bot-msg` · `chat-user-msg` | กล่องข้อความ / ข้อความผู้ช่วย / ข้อความผู้ใช้ |
-| `chat-input` · `chat-send` | ช่องพิมพ์ / ปุ่มส่ง |
-| `quiz` · `quiz-progress` · `quiz-question` | แบบทดสอบ / "ข้อ n/4" (`data-current`) / คำถาม |
-| `quiz-option-{value}` · `quiz-back` | ตัวเลือก / ย้อนกลับ |
-| `quiz-result` · `quiz-package` · `quiz-reason` · `quiz-book` · `quiz-restart` | ผล / แพ็กเกจ (`data-code`) / เหตุผล / ปุ่มจอง / ทำใหม่ |
-| `skin-notice` · `skin-accept` | ข้อความแจ้งก่อนเลือกรูป / ปุ่มรับทราบ |
-| `skin-file` · `skin-sample` | input รูปเซลฟี่ / ใช้ภาพตัวอย่าง |
-| `skin-type` · `skin-metrics` | ผลวิเคราะห์ (`data-type`) / ค่าที่วัด |
-| `skin-recs` · `skin-rec-{code}` · `skin-book-{code}` | ทรีตเมนต์แนะนำ / ปุ่มจอง |
-| `skin-sim` · `sim-label` | ภาพจำลองก่อน/หลัง / ป้าย "ภาพจำลอง ผลจริงแต่ละคนต่างกัน" |
+`gallery-book-link` · `gallery-caption-<ค่า>` · `gallery-grid` · `gallery-hero` · `gallery-item-<ค่า>` · `gallery-tour-link`
 
-### `/login` `/account` `/wallet`
+**giftcard** (34)
 
-| testid | คืออะไร |
-|---|---|
-| `login-email` · `login-password` · `login-submit` · `login-error` · `test-accounts` | ฟอร์มล็อกอิน / รายชื่อบัญชีทดสอบ |
-| `account-login` · `wallet-login` | ปุ่มไปล็อกอิน (เมื่อยังไม่ล็อกอิน) |
-| `account-hello` | "สวัสดี {ชื่อ}" |
-| `account-tier-card` · `account-tier` · `account-tier-pct` · `account-spend` · `account-tier-message` | ระดับ (`data-tier`) / ส่วนลด / ยอดสะสม (`data-amount`) / "อีก ฿X ถึง …" |
-| `account-points` | แต้มคงเหลือ (`data-points`) |
-| `account-birthday` | สถานะเดือนเกิด (`data-state="available|used"`) |
-| `account-wallet-link` | ไป Wallet |
-| `history-list` · `booking-{B05}` | รายการนัด/ประวัติ / แถว (`data-status`) |
-| `booking-service-{B05}` `booking-date-{B05}` `booking-therapist-{B05}` `booking-paid-{B05}` `booking-status-{B05}` | บริการ / วันเวลา / นักบำบัด / ราคาที่จ่าย / สถานะ ("ยกเลิก") |
-| `cancel-{B05}` · `cancel-confirm-{B05}` · `cancel-abort-{B05}` | ปุ่มยกเลิก (disabled เมื่อ < 24 ชม.) / ยืนยัน / ย้อนกลับ |
-| `cancel-blocked-{B05}` · `cancel-phone-{B05}` · `cancel-result-{B05}` | ข้อความให้โทรหาร้าน / เบอร์ / ผลยกเลิก |
-| `course-{C01}` · `course-remaining-{C01}` · `course-expires-{C01}` | การ์ดคอร์ส (`data-remaining`, `data-expired`) / "เหลือ 7 จาก 11 ครั้ง" / วันหมดอายุ |
-| `course-days-{C01}` · `course-expired-{C01}` · `course-book-{C01}` | "อีก N วัน" (`data-days`) / "หมดอายุแล้ว" / ปุ่มจองด้วยคอร์ส (disabled เมื่อใช้ไม่ได้) |
-| `wallet-empty` | ยังไม่มีคอร์ส |
-| `waist-chart` · `waist-point-{0..}` · `waist-reduced` · `waist-empty` | กราฟ / จุด (`data-date`, `data-cm`) / "ลดไปแล้ว X ซม." (`data-cm`) / ไม่มีข้อมูล |
-| `body-photos` · `body-photo-before` · `body-photo-after` | รูป before/after |
-| `buy-course` · `buy-course-result` | ปุ่มซื้อคอร์ส / ผล |
+`giftcard-amount` · `giftcard-amount-<ค่า>` · `giftcard-buy-section` · `giftcard-channel-<ค่า>` · `giftcard-check-balance` · `giftcard-check-code` · `giftcard-check-expires` · `giftcard-check-form` · `giftcard-check-initial` · `giftcard-check-result` · `giftcard-check-section` · `giftcard-check-status` · `giftcard-check-submit` · `giftcard-design-<ค่า>` · `giftcard-form` · `giftcard-hero` · `giftcard-hero-cta` · `giftcard-message` · `giftcard-pay-total` · `giftcard-preview` · `giftcard-preview-amount` · `giftcard-recipient` · `giftcard-result` · `giftcard-result-book` · `giftcard-result-channel` · `giftcard-result-code` · `giftcard-result-design` · `giftcard-result-expires` · `giftcard-result-message` · `giftcard-result-status` · `giftcard-result-value` · `giftcard-simulated-note` · `giftcard-submit` · `giftcard-terms`
 
-### `/admin`
+**header** (11)
 
-| testid | คืออะไร |
-|---|---|
-| `admin-forbidden` · `admin-login` | ไม่มีสิทธิ์ / ปุ่มล็อกอิน |
-| `admin-today` · `admin-date` | วันนี้ของระบบ / เลือกวันที่ |
-| `admin-table` · `admin-empty` | ตารางคิว / ไม่มีคิว |
-| `admin-row-{B05}` · `admin-status-{B05}` | แถว (`data-status`) / สถานะ |
-| `admin-waist-{B08}` | รอบเอว (นัดคอร์ส) |
-| `admin-complete-{B05}` · `admin-result-{B05}` | ปุ่ม "ใช้บริการเสร็จ" / ผล "+N แต้ม" |
-| `admin-reset` · `admin-reset-result` | ปุ่มรีเซ็ตข้อมูลทดสอบ / ผล |
+`header` · `header-account` · `header-admin` · `header-book` · `header-lang-<ค่า>` · `header-login` · `header-logo` · `header-menu-toggle` · `header-nav-<ค่า>` · `header-skip-link` · `header-wallet`
+
+**herbs** (9)
+
+`herbs-card-<ค่า>` · `herbs-cta` · `herbs-hero` · `herbs-list` · `herbs-name-<ค่า>` · `herbs-section` · `herbs-service-<ค่า>-<ค่า>` · `herbs-services-<ค่า>` · `herbs-services-link`
+
+**history** (14)
+
+`history-back` · `history-book` · `history-code-<ค่า>` · `history-date-<ค่า>` · `history-empty` · `history-item-<ค่า>` · `history-list` · `history-loading` · `history-page` · `history-points-<ค่า>` · `history-retry` · `history-service-<ค่า>` · `history-title` · `history-total-<ค่า>`
+
+**home** (35)
+
+`home-closing` · `home-closing-book` · `home-closing-tour` · `home-gallery` · `home-gallery-<ค่า>` · `home-gallery-all` · `home-hero` · `home-hero-book` · `home-hero-dot-<ค่า>` · `home-hero-pause` · `home-hero-scroll` · `home-hero-services` · `home-hero-slide-<ค่า>` · `home-mood` · `home-package` · `home-package-link` · `home-package-price` · `home-review-<ค่า>` · `home-review-badge-<ค่า>` · `home-reviews` · `home-reviews-all` · `home-service-<ค่า>` · `home-service-price-<ค่า>` · `home-services` · `home-services-all` · `home-stat-<ค่า>` · `home-stats` · `home-story` · `home-story-about` · `home-story-herbs` · `home-team` · `home-therapist-<ค่า>` · `home-therapist-rating-<ค่า>` · `home-therapist-services-<ค่า>` · `home-therapists-all`
+
+**lock** (2)
+
+`lock-today` · `lock-today-submit`
+
+**login** (5)
+
+`login-email` · `login-form` · `login-password` · `login-submit` · `login-to-register`
+
+**mood** (11)
+
+`mood-<ค่า>` · `mood-book` · `mood-error` · `mood-heading` · `mood-intro` · `mood-loading` · `mood-price` · `mood-reason` · `mood-result` · `mood-section` · `mood-service-name`
+
+**music** (3)
+
+`music-audio` · `music-note` · `music-toggle`
+
+**not** (1)
+
+`not-found-home`
+
+**package** (14)
+
+`package-book` · `package-book-bottom` · `package-cta` · `package-duration` · `package-herbs` · `package-hero` · `package-include-<ค่า>` · `package-includes` · `package-price` · `package-rule-<ค่า>` · `package-rules` · `package-services-link` · `package-shop` · `package-shuttle-link`
+
+**quiz** (16)
+
+`quiz-book` · `quiz-error` · `quiz-hint` · `quiz-intro` · `quiz-load-error` · `quiz-loading` · `quiz-option-<ค่า>-<ค่า>` · `quiz-price` · `quiz-progress` · `quiz-question-<ค่า>` · `quiz-reason` · `quiz-restart` · `quiz-result` · `quiz-retry` · `quiz-service-name` · `quiz-submit`
+
+**register** (9)
+
+`register-birth-date` · `register-birth-note` · `register-email` · `register-form` · `register-name` · `register-password` · `register-phone` · `register-submit` · `register-to-login`
+
+**reset** (1)
+
+`reset-test-data`
+
+**reviews** (17)
+
+`reviews-card-<ค่า>` · `reviews-cta` · `reviews-cta-book` · `reviews-customer-<ค่า>` · `reviews-customers` · `reviews-hero` · `reviews-name-<ค่า>` · `reviews-note` · `reviews-quote-<ค่า>` · `reviews-rating-<ค่า>` · `reviews-sample-badge-<ค่า>` · `reviews-star-<ค่า>-<ค่า>` · `reviews-stars-<ค่า>` · `reviews-testimonial-<ค่า>` · `reviews-testimonials` · `reviews-therapists` · `reviews-therapists-link`
+
+**service** (26)
+
+`service-back` · `service-book-<ค่า>` · `service-buy-<ค่า>` · `service-card-<ค่า>` · `service-detail-<ค่า>` · `service-detail-page-<ค่า>` · `service-duration-<ค่า>` · `service-herb-<ค่า>-<ค่า>` · `service-herbs-<ค่า>` · `service-herbs-link` · `service-herbs-section` · `service-image-<ค่า>` · `service-includes-<ค่า>` · `service-last-slot-<ค่า>` · `service-max-party-<ค่า>` · `service-name-<ค่า>` · `service-note-<ค่า>` · `service-package-<ค่า>` · `service-price-<ค่า>` · `service-therapist-<ค่า>` · `service-therapist-book-<ค่า>` · `service-therapist-name-<ค่า>` · `service-therapist-rating-<ค่า>` · `service-therapists-<ค่า>` · `service-therapists-link` · `service-therapists-section`
+
+**services** (7)
+
+`services-featured` · `services-herbs-link` · `services-hero` · `services-list` · `services-more` · `services-quiz-link` · `services-treatments`
+
+**shuttle** (19)
+
+`shuttle-book-link` · `shuttle-calc-form` · `shuttle-calc-section` · `shuttle-calc-submit` · `shuttle-hero` · `shuttle-hero-cta` · `shuttle-hotel-distance-<ค่า>` · `shuttle-hotel-fee-<ค่า>` · `shuttle-hotel-row-<ค่า>` · `shuttle-hotels` · `shuttle-hotels-loading` · `shuttle-hotels-retry` · `shuttle-hotels-section` · `shuttle-package-link` · `shuttle-party` · `shuttle-result` · `shuttle-result-cars` · `shuttle-result-fee` · `shuttle-rules-section`
+
+**skin** (23)
+
+`skin-book` · `skin-brightness` · `skin-cleared` · `skin-disclaimer` · `skin-error` · `skin-file` · `skin-file-label` · `skin-herb-<ค่า>` · `skin-herbs` · `skin-intro` · `skin-preview` · `skin-preview-after` · `skin-preview-before` · `skin-preview-note` · `skin-price` · `skin-privacy-notice` · `skin-reason` · `skin-reset` · `skin-result` · `skin-service` · `skin-service-name` · `skin-status` · `skin-use-sample`
+
+**team** (11)
+
+`team-about-link` · `team-front` · `team-grid` · `team-group-photo` · `team-hero` · `team-link-<ค่า>` · `team-member-<ค่า>` · `team-name-<ค่า>` · `team-note-<ค่า>` · `team-therapists` · `team-title-<ค่า>`
+
+**test** (2)
+
+`test-now` · `test-panel`
+
+**therapist** (9)
+
+`therapist-book-<ค่า>` · `therapist-card-<ค่า>` · `therapist-name-<ค่า>` · `therapist-rating-<ค่า>` · `therapist-review-count-<ค่า>` · `therapist-service-<ค่า>-<ค่า>` · `therapist-services-<ค่า>` · `therapist-stars-<ค่า>` · `therapist-title-<ค่า>`
+
+**therapists** (5)
+
+`therapists-count` · `therapists-filter` · `therapists-filter-all` · `therapists-grid` · `therapists-hero`
+
+**tour** (8)
+
+`tour-angle` · `tour-book` · `tour-book-section` · `tour-hint` · `tour-intro` · `tour-rotate-left` · `tour-rotate-right` · `tour-viewport`
+
+**wallet** (39)
+
+`wallet-buy-confirm-panel` · `wallet-buy-course` · `wallet-buy-course-cancel` · `wallet-buy-course-confirm` · `wallet-buy-panel` · `wallet-buy-price` · `wallet-buy-success` · `wallet-course-<ค่า>` · `wallet-course-book-<ค่า>` · `wallet-course-expired-<ค่า>` · `wallet-course-expires-<ค่า>` · `wallet-course-remaining-<ค่า>` · `wallet-course-reserved-<ค่า>` · `wallet-course-used-<ค่า>` · `wallet-course-used-up-<ค่า>` · `wallet-courses` · `wallet-courses-empty` · `wallet-giftcard-<ค่า>` · `wallet-giftcard-balance-<ค่า>` · `wallet-giftcard-code-<ค่า>` · `wallet-giftcard-expired-<ค่า>` · `wallet-giftcard-expires-<ค่า>` · `wallet-giftcard-initial-<ค่า>` · `wallet-giftcard-no-balance-<ค่า>` · `wallet-giftcards` · `wallet-giftcards-buy` · `wallet-giftcards-empty` · `wallet-history-link` · `wallet-loading` · `wallet-page` · `wallet-photo-<ค่า>` · `wallet-photo-badge-<ค่า>` · `wallet-photos` · `wallet-results` · `wallet-waist` · `wallet-waist-chart` · `wallet-waist-point-<ค่า>` · `wallet-waist-range` · `wallet-waist-reduced`
+
+## 9. สมมติฐานที่ใช้
+
+ใช้ A-xx, D-xx, TD-xx ตามที่เขียนในเอกสาร · จุดที่เอกสารชนกันตัดสินตามคำสั่งงาน: `ALLOW_TEST_RESET` แทน `TEST_MODE` · `cust-*.jpg` ขึ้นเฉพาะส่วนรีวิวพร้อมป้าย "ลูกค้าตัวอย่าง" · หน้าจอง 3 หน้าจอ · seed 12 บัญชี · ตำแหน่ง 3 ภาษา · อารมณ์ 3 แบบ · `mood-glow.jpg` ใช้ที่หน้าวิเคราะห์ผิว
+รายละเอียดการต่องานอยู่ใน `CONTRACT-NOTES/`
