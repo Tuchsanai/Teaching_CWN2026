@@ -131,6 +131,32 @@ th{color:var(--navy);background:#eaf0f8}
 .doors{width:300px;display:flex;flex-direction:column;gap:12px;justify-content:center}
 .door{background:#fff;border:1px solid var(--line);border-left:6px solid var(--orange);border-radius:12px;padding:12px 16px;font-size:18px;line-height:1.4;color:var(--muted)}
 .door b{display:block;font-size:22px;color:var(--navy);font-family:var(--mono)}
+/* story timeline */
+.story{background:linear-gradient(160deg,#0b1424 0%,#1a1630 100%);color:#fff}
+.story.good{background:linear-gradient(160deg,#0b1f1c 0%,#0d2a3a 100%)}
+.tl{display:flex;flex-direction:column;gap:12px;margin-top:6px;border-left:3px solid rgba(255,255,255,.2);padding-left:26px;margin-left:10px}
+.ev{display:flex;gap:22px;align-items:center;position:relative}
+.ev::before{content:"";position:absolute;left:-36px;width:16px;height:16px;border-radius:50%;background:#7f93b5}
+.ev.bad::before{background:#ff6b6b}.ev.ok::before{background:#5fd68f}.ev.end::before{background:var(--orange);width:20px;height:20px;left:-38px}
+.ev .t{font-family:var(--mono);font-size:24px;color:#9fb6dd;width:86px;flex:none}
+.ev .b{font-size:25px;line-height:1.45;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 20px;color:#e9f0ff}
+.ev.bad .b{border-color:rgba(255,107,107,.45)}
+.ev.ok .b{border-color:rgba(95,214,143,.45)}
+.ev.end .b{background:rgba(240,138,36,.18);border-color:rgba(240,138,36,.6)}
+.ev .who{display:block;font-size:17px;color:#ffb27a;margin-bottom:2px}
+.story b{color:#fff}
+/* root cause */
+.root{display:flex;align-items:center;gap:22px;flex:1}
+.pains{display:flex;flex-direction:column;gap:14px;width:330px}
+.pc{background:var(--red-soft);border:1px solid #f3b4b4;color:#9b1c1c;border-radius:14px;padding:16px 20px;font-size:23px;font-weight:600}
+.arrow{font-size:56px;color:var(--orange);font-weight:700}
+.cause{width:300px;background:var(--navy);color:#dfe8f7;border-radius:22px;padding:30px 26px;font-size:26px;line-height:1.5;text-align:center}
+.cause b{color:#ffcf9e}
+.lbl{font-size:17px;letter-spacing:.06em;color:var(--orange);font-weight:700;margin-bottom:10px}
+.want{flex:1;background:#fff;border:3px solid var(--teal);border-radius:22px;padding:24px 28px}
+.want h3{font-size:34px;color:var(--teal);margin:0 0 10px}
+.want ul{list-style:none;padding:0}
+.want li{font-size:23px;margin:9px 0}
 /* chrome */
 #bar{position:fixed;left:0;bottom:0;height:5px;background:var(--orange);transition:width .3s;z-index:5}
 #hud{position:fixed;right:18px;bottom:16px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--font)}
@@ -154,163 +180,149 @@ body.ov #ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr
 <body>
 <div id="stage"><div id="deck">
 
-<!-- ================= เปิดเรื่อง ================= -->
+<!-- ================= เปิดเรื่อง (สร้างใหม่) ================= -->
 <section class="slide cover" data-title="ปก" style="background-image:url('assets/slides/cover-student.jpg')">
   <div class="shade"></div>
   <div class="inner">
     <div class="kicker" style="color:#7fd3ff">สัปดาห์ที่ 2 · ก่อนเริ่มทำ LAB</div>
-    <h1><span class="nw">ก่อนจะปล่อยให้ AI ลงมือทำงาน</span><br><span class="nw">เราต้องมี "ห้องทดลอง" ของตัวเอง</span></h1>
-    <div class="sub">สร้าง Linux container <b>devtools</b> ด้วย Docker<br>แล้วให้ Claude Code ช่วยสร้างและทำงานข้างในให้</div>
+    <h1><span class="nw">ห้องทดลองของเรา</span></h1>
+    <div class="sub" style="font-size:32px;color:#fff;margin-top:14px">เราเดฟผ่าน Claude กันอยู่แล้ว<br>แต่ทำไม Claude ควรทำงานใน Linux container?</div>
+    <div class="sub" style="font-size:22px">Docker · VS Code · Claude Code · container <b>devtools</b></div>
     <div class="hint">กด <span class="kbd">→</span> เพื่อเริ่ม · <span class="kbd">F</span> เต็มจอ · <span class="kbd">O</span> ดูทุกหน้า</div>
   </div>
 </section>
 
-<section class="slide hook" data-title="ลองนึกภาพ">
-  <h1>ลองนึกภาพ… อาจารย์บอกให้ทั้งห้อง<br>พิมพ์ <span class="em">คำสั่งเดียวกัน</span> พร้อมกัน 40 เครื่อง</h1>
-  <p>จะมีกี่เครื่องที่ได้ผลเหมือนกันจริง ๆ?<br>และถ้าคำสั่งนั้นพิมพ์โดย AI ที่ลงมือรันเองบนเครื่องของคุณล่ะ?</p>
+<section class="slide story" data-title="โปรเจกต์กลุ่ม 4 คน">
+  <div class="kicker" style="color:#ffb27a">สถานการณ์ที่เจอบ่อย · ทุกคนเดฟผ่าน Claude อยู่แล้ว</div>
+  <h2 style="color:#fff">กลุ่ม 4 คน · Windows 2 · Mac 2 · ต่างคนต่างให้ Claude เขียนโค้ด</h2>
+  <div class="tl">
+    <div class="ev"><div class="t">วันที่ 1</div><div class="b">แบ่งงานกัน แต่ละคนเปิด Claude บนเครื่องตัวเอง ทุกคนบอกว่า "เสร็จแล้ว รันได้!"</div></div>
+    <div class="ev bad"><div class="t">วันที่ 2</div><div class="b"><span class="who">💬 Ploy (Windows)</span>"สคริปต์ .sh ที่ Claude ของ Mac เขียนมา เครื่องเรารันไม่ได้เลย"</div></div>
+    <div class="ev bad"><div class="t">วันที่ 2</div><div class="b"><span class="who">💬 Ton (Mac)</span>"โค้ดของ Ploy ใช้พาธ C:\ … พอมาเครื่องเราก็พัง"</div></div>
+    <div class="ev bad"><div class="t">วันที่ 3</div><div class="b"><span class="who">💬 Mild</span>"Claude เครื่องเราลง Python คนละเวอร์ชันกับของเพื่อน ผลรันไม่ตรงกัน"</div></div>
+    <div class="ev bad"><div class="t">วันที่ 3</div><div class="b"><span class="who">💬 Best</span>"ให้ Claude แปลงข้าม OS อีกรอบ… แถมเครื่องเต็มไปด้วยแพ็กเกจที่มันลงไว้"</div></div>
+    <div class="ev end"><div class="t">สรุป</div><div class="b"><b>Claude เก่งเท่ากันทุกเครื่อง แต่ "พื้น" ที่มันยืนทำงานไม่เหมือนกัน</b></div></div>
+  </div>
+  <p class="cap" style="color:#7f93b5">ตัวละครสมมติ เพื่อเล่าสถานการณ์ที่พบบ่อย</p>
 </section>
 
-<!-- ================= องก์ 1: ปัญหา ================= -->
-<section class="slide" data-title="ปัญหา 1: ของผมรันได้นะ">
-  <div class="kicker red">ปัญหาที่ 1 · เครื่องใครเครื่องมัน</div>
+<section class="slide" data-title="ปัญหา 1: เครื่องใครเครื่องมัน">
+  <div class="kicker red">ปัญหาที่ 1 · Claude ตัวเดียวกัน แต่เครื่องไม่เหมือนกัน</div>
   <h2>"เอ๊ะ ของผมรันได้นะ!"</h2>
   <div class="row">
     <div class="col c3"><div class="fig photo"><img src="assets/slides/pain-my-machine.jpg" alt="ห้องแล็บที่แต่ละเครื่องขึ้น error ต่างกัน"></div>
       <div class="cap">ภาพจำลอง สร้างด้วย Imagegen</div></div>
     <div class="col c2 vc">
       <div class="mach">
-        <div><b>เครื่อง 1</b>Python 3.12 ✅</div>
-        <div class="y"><b>เครื่อง 2</b>Python 3.8 ⚠️</div>
-        <div class="x"><b>เครื่อง 3</b>ไม่มี Node.js ❌</div>
-        <div><b>เครื่อง 4</b>ครบ ✅</div>
-        <div class="y"><b>เครื่อง 5</b>Git รุ่นเก่า ⚠️</div>
-        <div class="x"><b>เครื่อง 6</b>PATH ผิด ❌</div>
-        <div><b>เครื่อง 7</b>ครบ ✅</div>
-        <div class="x"><b>เครื่อง 8</b>ติดตั้งไม่ผ่าน ❌</div>
+        <div><b>Windows</b>Python 3.12 ✅</div>
+        <div class="y"><b>Mac</b>Python 3.9 ⚠️</div>
+        <div class="x"><b>Windows</b>ไม่มี Node.js ❌</div>
+        <div><b>Mac</b>ครบ ✅</div>
+        <div class="y"><b>Windows</b>Git รุ่นเก่า ⚠️</div>
+        <div class="x"><b>Windows</b>PATH ผิด ❌</div>
+        <div><b>Mac</b>ครบ ✅</div>
+        <div class="x"><b>Mac</b>ติดตั้งไม่ผ่าน ❌</div>
       </div>
-      <p class="small" style="margin-top:22px">ถ้าทุกคนไล่ติดตั้ง Python, Node.js, Git บน Windows กันเอง เวอร์ชันและการตั้งค่าจะไม่เหมือนกันสักเครื่อง</p>
-      <div class="note bad small">ผลคือครึ่งคาบหมดไปกับการแก้เครื่อง แทนที่จะได้เรียน และอาจารย์ก็ช่วยตรวจได้ยาก เพราะแต่ละเครื่องพังคนละแบบ</div>
+      <p class="small" style="margin-top:22px">Claude ใช้เครื่องมือที่มีอยู่บนเครื่องนั้น หรือติดตั้งเพิ่มเอง เครื่องแต่ละคนจึงมี Python, Node.js, Git คนละเวอร์ชัน คนละการตั้งค่า</p>
+      <div class="note bad small">พรอมต์เดียวกัน แต่ผลรันต่างกันในแต่ละเครื่อง เพื่อนช่วยกันดูก็ยาก อาจารย์ก็ช่วยตรวจยาก</div>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="ปัญหา 2: คำสั่งพูดภาษา Linux">
-  <div class="kicker red">ปัญหาที่ 2 · ภาษาไม่ตรงกัน</div>
-  <h2>คำสั่งใน LAB พูด "ภาษา Linux"</h2>
+<section class="slide" data-title="ปัญหา 2: ภาษาไม่ตรงกัน">
+  <div class="kicker red">ปัญหาที่ 2 · งานติดนิสัยของ OS</div>
+  <h2>สิ่งที่ Claude สร้าง ติดนิสัย OS ของเครื่องนั้นมาด้วย</h2>
   <div class="row">
-    <div class="col c3 vc">
-<pre style="font-size:23px;line-height:1.7;padding:30px 32px"><span class="dim">PS C:\Users\student&gt;</span> chmod +x start.sh
-<span class="err">The term 'chmod' is not recognized as the name of a cmdlet,
-function, script file, or operable program.</span>
-
+    <div class="col c3" style="gap:16px">
+<pre style="font-size:17px"><span class="dim">PS C:\Users\student&gt;</span> chmod +x start.sh
+<span class="err">The term 'chmod' is not recognized as the name of a cmdlet, function,
+script file, or operable program.</span>
 <span class="dim">PS C:\Users\student&gt;</span> export PATH="$HOME/.local/bin:$PATH"
-<span class="err">The term 'export' is not recognized as the name of a cmdlet,
-function, script file, or operable program.</span></pre>
-      <p class="cap">ข้อความ error จริงจาก Windows PowerShell เมื่อพิมพ์คำสั่ง Linux ที่ใช้ในบทเรียนนี้</p>
+<span class="err">The term 'export' is not recognized as the name of a cmdlet, function,
+script file, or operable program.</span></pre>
+      <table style="font-size:18px">
+        <tr><th>เรื่อง</th><th>Windows</th><th>macOS</th><th>Linux (LAB)</th></tr>
+        <tr><td>ขึ้นบรรทัดใหม่</td><td>CRLF</td><td>LF</td><td>LF</td></tr>
+        <tr><td>พาธไฟล์</td><td><code>C:\Users\…</code></td><td><code>/Users/…</code></td><td><code>/workspace/…</code></td></tr>
+        <tr><td>สคริปต์</td><td>.ps1 / .bat</td><td>.sh (zsh)</td><td>.sh (bash)</td></tr>
+        <tr><td>ชื่อไฟล์ตัวเล็ก-ใหญ่</td><td>ไม่แยก</td><td>ปกติไม่แยก</td><td>แยก</td></tr>
+      </table>
     </div>
     <div class="col c2 vc">
-      <p>LAB ส่วนใหญ่ใช้ <b>Bash</b>, พาธแบบ <code>/workspace</code>, สิทธิ์ไฟล์ และสคริปต์ติดตั้งของ Linux</p>
-      <p>บน Windows ต้อง "แปล" คำสั่งทีละบรรทัด และแก้ความต่างระหว่างระบบเอง</p>
-      <div class="note info small">ถ้าเราทำงานใน Linux ตั้งแต่แรก คำสั่งในตัวอย่างก็ <b>ก๊อปไปวางแล้วใช้ได้เลย</b> เวลาที่เหลือก็เอาไปเรียนเนื้อหาจริง</div>
+      <div class="fig photo" style="flex:none;height:300px"><img src="assets/slides/pain-cross-os.jpg" alt="นักศึกษาสองคนส่งไฟล์ข้ามเครื่องแล้วเกิด error"></div>
+      <p class="small" style="margin-top:16px">Claude บน Windows ก็เขียนแบบ Windows บน Mac ก็เขียนแบบ Mac ส่วนคำสั่งใน LAB และ server จริงเป็น Linux</p>
+      <div class="note bad small">ส่งงานข้ามกันทีไร ต้องเสียเวลา "แปลง" ให้รันได้ ต่อให้ AI เก่งแค่ไหนก็ตาม</div>
+      <p class="cap">กล่องดำคือ error จริงจาก Windows PowerShell · ภาพจำลองสร้างด้วย Imagegen</p>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="ปัญหา 3: ลองผิดลองถูกจนเครื่องพัง">
-  <div class="kicker red">ปัญหาที่ 3 · กลัวพัง</div>
-  <h2>ลองผิดลองถูก… จนเครื่องหลักพัง</h2>
+<section class="slide" data-title="ปัญหา 3: พังและขยะเต็มเครื่อง">
+  <div class="kicker red">ปัญหาที่ 3 · ร่องรอยบนเครื่องหลัก</div>
+  <h2>Claude ทิ้งของไว้บนเครื่องหลัก… จนพังและไม่ปลอดภัย</h2>
   <div class="row">
     <div class="col c3"><div class="fig photo"><img src="assets/slides/pain-broken-setup.jpg" alt="นักศึกษาเครียดหน้าจอที่เต็มไปด้วย error"></div>
       <div class="cap">ภาพจำลอง สร้างด้วย Imagegen</div></div>
     <div class="col c2 vc">
-      <p>การเรียนต้องได้ลอง: ติดตั้งแพ็กเกจ เปลี่ยนการตั้งค่า เชื่อมบริการใหม่ ๆ</p>
+      <p class="small">ทุกครั้งที่ให้ Claude ลองติดตั้ง ลองตั้งค่า หรือเชื่อมบริการใหม่ ๆ บนเครื่องหลักของเรา…</p>
       <ul class="small">
-        <li>แพ็กเกจทับกัน เวอร์ชันชนกัน</li>
-        <li>PATH เละ เรียกโปรแกรมไม่เจอ</li>
-        <li>ถอนออกไม่หมด เหลือขยะในเครื่อง</li>
+        <li>แพ็กเกจชนกัน PATH เละ เรียกโปรแกรมไม่เจอ</li>
+        <li>cache, <code>node_modules</code>, <code>.venv</code> กระจายเต็มเครื่อง</li>
+        <li>ไฟล์ตั้งค่าและ token ที่ทดลองสร้าง ค้างอยู่โดยไม่รู้ตัว</li>
+        <li>ถอนไม่หมด เสี่ยงด้านความปลอดภัย</li>
       </ul>
-      <div class="note bad small" style="margin-top:18px">ทางเดียวที่ชัวร์คือลงใหม่ทั้งเครื่อง ใช้เวลาหลายชั่วโมง และอาจทำให้งานวิชาอื่นพังไปด้วย</div>
+      <div class="note bad small" style="margin-top:16px">ทางเดียวที่ชัวร์คือลงใหม่ทั้งเครื่อง ใช้เวลาหลายชั่วโมง และงานวิชาอื่นอาจพังไปด้วย</div>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="ปัญหา 4: AI ลงมือทำจริง">
-  <div class="kicker red">ปัญหาที่ 4 · AI ยุคใหม่ไม่ได้แค่ตอบ</div>
-  <h2>AI อย่าง Claude Code และ Codex "ลงมือทำจริง"</h2>
-  <div class="row">
-    <div class="col c3"><div class="fig photo"><img src="assets/slides/pain-ai-robot.jpg" alt="หุ่นยนต์ทำงานในห้องกระจก นักศึกษามองจากข้างนอก"></div>
-      <div class="cap">ภาพจำลอง สร้างด้วย Imagegen: ให้ AI ทำงานในกล่องของมัน แยกจากเครื่องหลัก</div></div>
-    <div class="col c2 vc">
-      <p>AI agent ไม่ได้แค่พิมพ์คำแนะนำ แต่ <b>รัน shell เอง</b> ติดตั้งแพ็กเกจ สร้างและลบไฟล์ได้จริง</p>
-      <p>สิ่งที่ต้อง "เข้ากันได้" จึงเป็น <b>เครื่องมือที่นำคำสั่งไปรัน</b> เช่น shell, runtime, ไลบรารี ไม่ใช่ตัวข้อความพรอมต์</p>
-      <div class="note info small">เราอยากให้ AI มีพื้นที่ทดลองของตัวเอง ที่ถ้าพลาดก็ลบทิ้งแล้วสร้างใหม่ได้ ไม่กระทบไฟล์ส่วนตัวบน Windows</div>
-      <p class="cap">หมายเหตุ: Windows ใช้ AI ได้ปกติ และ Linux ไม่ได้ทำให้โมเดลฉลาดขึ้น เราแค่เลือก environment ที่ตรงกับ workflow ของวิชา</p>
+<section class="slide cover" data-title="จุดหักเห: AI ลงมือเอง" style="background-image:url('assets/slides/pain-ai-robot.jpg')">
+  <div class="shade" style="background:linear-gradient(90deg,rgba(8,16,32,.96) 0%,rgba(8,16,32,.85) 48%,rgba(8,16,32,.2) 80%)"></div>
+  <div class="inner" style="justify-content:center;max-width:980px">
+    <div class="kicker" style="color:#ffb27a">ปัญหาที่ 4 · และมันทำทั้งหมดนี้ได้เร็วมาก</div>
+    <h1 style="font-size:58px">คนที่พิมพ์คำสั่ง<br>ไม่ใช่เราอีกต่อไปแล้ว</h1>
+    <div class="sub">Claude Code และ Codex ไม่ได้แค่ตอบคำถาม แต่ <b>รัน shell เอง</b> ติดตั้งแพ็กเกจ สร้างและลบไฟล์ได้จริง ทั้งตอนที่ทำถูก… และตอนที่พลาด</div>
+    <div class="sub" style="font-size:34px;color:#fff;font-weight:700;margin-top:30px">คำถามคือ เราจะให้มันทำงาน "ที่ไหน"?</div>
+    <div class="sub" style="font-size:18px;color:#9fb6dd;margin-top:26px">Windows และ Mac ใช้ AI ได้ปกติ และ Linux ไม่ได้ทำให้โมเดลฉลาดขึ้น เราแค่ต้องการพื้นที่ที่ปลอดภัยและเหมือนกันทุกคน · ภาพจำลอง สร้างด้วย Imagegen</div>
+  </div>
+</section>
+
+<section class="slide" data-title="รากของปัญหา">
+  <div class="kicker">ถอยออกมามองภาพรวม</div>
+  <h2>ทุกปัญหามีรากเดียวกัน</h2>
+  <div class="root">
+    <div class="pains">
+      <div class="pc">🖥️ ผลรันไม่ตรงกัน</div>
+      <div class="pc">🗣️ งานติดนิสัย OS</div>
+      <div class="pc">🗑️ ขยะและความเสี่ยง</div>
+      <div class="pc">🤖 ลงมือบนเครื่องจริง</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="cause"><div class="lbl">รากของปัญหา</div>Claude ของแต่ละคน<br>ทำงานบน<br><b>"เครื่องส่วนตัว"</b><br>ที่ไม่มีใครเหมือนกัน<br>และพังไม่ได้</div>
+    <div class="arrow">→</div>
+    <div class="want"><div class="lbl">สิ่งที่ต้องการ</div><h3>ให้ Claude ทุกคนทำงานบนพื้นเดียวกัน</h3>
+      <ul>
+        <li>👯 เหมือนกันทุกคน ไม่ว่า Windows หรือ Mac</li>
+        <li>🐧 เป็น Linux แบบเดียวกับ LAB และ server</li>
+        <li>🔁 พังแล้วรีเซ็ตได้ในไม่กี่นาที</li>
+        <li>🧪 AI และขยะทั้งหมดอยู่ในกล่อง</li>
+        <li>🤝 แชร์โค้ดและพรอมต์ให้เพื่อนแล้วรันได้เลย</li>
+      </ul>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="ปัญหา 5: AI เดียวกัน คนละ OS">
-  <div class="kicker red">ปัญหาที่ 5 · เครื่องมือ AI เหมือนกัน แต่คนละ OS</div>
-  <h2>เพื่อนใช้ Mac เราใช้ Windows… ส่งงานกันทีไรพังทุกที</h2>
-  <div class="row">
-    <div class="col c2"><div class="fig photo"><img src="assets/slides/pain-cross-os.jpg" alt="นักศึกษาสองคนใช้คอมคนละแบบ ส่งไฟล์งานข้ามกันแล้วเกิด error"></div>
-      <div class="cap">ภาพจำลอง สร้างด้วย Imagegen</div></div>
-    <div class="col c3 vc">
-      <p class="small">Claude Code / Codex เขียนโค้ดและรันคำสั่ง <b>บน OS ของเครื่องนั้น</b> งานที่ได้จึงติดนิสัยของ OS นั้นมาด้วย</p>
-      <table style="font-size:19px">
-        <tr><th>เรื่อง</th><th>Windows</th><th>macOS</th><th>ใน devtools</th></tr>
-        <tr><td>ขึ้นบรรทัดใหม่</td><td>CRLF</td><td>LF</td><td><b>LF เหมือนกันหมด</b></td></tr>
-        <tr><td>พาธไฟล์</td><td><code>C:\Users\…</code></td><td><code>/Users/…</code></td><td><b><code>/workspace/…</code></b></td></tr>
-        <tr><td>สคริปต์</td><td>.ps1 / .bat</td><td>.sh (zsh)</td><td><b>.sh (bash)</b></td></tr>
-        <tr><td>ชื่อไฟล์ตัวเล็ก-ใหญ่</td><td>ไม่แยก</td><td>ปกติไม่แยก</td><td><b>แยก (เหมือน server)</b></td></tr>
-      </table>
-      <div class="note bad small" style="margin-top:16px">ต่อให้ AI เก่งแค่ไหน ก็ต้องเสียเวลามา "แปลง" ให้รันข้าม OS ได้ทุกครั้งที่ส่งงานกัน</div>
-    </div>
+<section class="slide story good" data-title="ถ้า Claude ทำงานบนพื้นเดียวกัน">
+  <div class="kicker" style="color:#7fe0a8">ย้อนเวลาใหม่ · กลุ่มเดิม แต่ Claude ทุกคนทำงานใน Linux container เดียวกัน</div>
+  <h2 style="color:#fff">คนเดิม เครื่องเดิม… ผลลัพธ์ต่างไปโดยสิ้นเชิง</h2>
+  <div class="tl">
+    <div class="ev"><div class="t">วันที่ 1</div><div class="b">ทุกคนให้ Claude ทำงานใน container <b>devtools</b> ที่สร้างจาก image เดียวกัน</div></div>
+    <div class="ev ok"><div class="t">วันที่ 2</div><div class="b">รวมโค้ดกัน Windows หรือ Mac ก็รันได้ทันที เพราะทุกงานเกิดบน Linux เดียวกัน ✅</div></div>
+    <div class="ev ok"><div class="t">วันที่ 2</div><div class="b">ส่งพรอมต์ที่ใช้ได้ให้เพื่อน เพื่อนวางแล้วได้ผลเหมือนกัน ✅</div></div>
+    <div class="ev ok"><div class="t">วันที่ 3</div><div class="b">Claude ลงแพ็กเกจผิด → ลบ container แล้วสร้างใหม่ เครื่องหลักสะอาดเหมือนเดิม ✅</div></div>
+    <div class="ev end ok"><div class="t">สรุป</div><div class="b"><b>เวลาที่เคยเสียไปกับการแปลงและแก้เครื่อง กลายเป็นเวลาทำงานจริง</b> 🎉</div></div>
   </div>
-</section>
-
-<section class="slide" data-title="ปัญหา 5 (ต่อ): ขยะและความปลอดภัย">
-  <div class="kicker red">ปัญหาที่ 5 (ต่อ) · ร่องรอยที่ AI ทิ้งไว้</div>
-  <h2>แถม AI ยังทิ้งของไว้ในเครื่องหลักของเรา</h2>
-  <div class="row">
-    <div class="col">
-      <div class="card" style="border-color:#f3b4b4;background:var(--red-soft);flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px 36px">
-        <h3 style="color:var(--red)">❌ ทำงานบนเครื่องหลักโดยตรง</h3>
-        <ul style="font-size:24px;line-height:1.6">
-          <li>แพ็กเกจที่ติดตั้งแบบ global ปนกับโปรแกรมของเรา</li>
-          <li>cache และโฟลเดอร์อย่าง <code>node_modules</code>, <code>.venv</code> กระจายเต็มเครื่อง</li>
-          <li>ไฟล์ตั้งค่าและ token ที่ทดลองสร้าง ค้างอยู่โดยไม่รู้ตัว</li>
-          <li>ลบไม่หมด และเสี่ยงด้านความปลอดภัย</li>
-        </ul>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card" style="border-color:#a7dcb8;background:var(--green-soft);flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px 36px">
-        <h3 style="color:var(--green)">✅ ทำงานใน container</h3>
-        <ul style="font-size:24px;line-height:1.6">
-          <li>ทุกอย่างที่ AI สร้างหรือติดตั้ง <b>อยู่ในกล่อง</b></li>
-          <li>เครื่องหลัก Windows / Mac สะอาดเหมือนเดิม</li>
-          <li>ไม่ต้องการแล้ว ลบ container ทีเดียวหมด</li>
-          <li>ทุกคนอยู่ใน Linux เดียวกัน <b>แชร์โค้ด คำสั่ง และพรอมต์ให้เพื่อนแล้วรันได้เหมือนกัน</b></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <p class="cap" style="margin-top:14px">หมายเหตุ: ถ้าเชื่อมโฟลเดอร์จากเครื่องหลักเข้า container ไฟล์ในโฟลเดอร์นั้นก็ถูกแก้ได้ และชุดนี้ใช้ <code>--privileged</code> จึงแยกได้ดีขึ้นแต่ไม่ใช่ 100%</p>
-</section>
-
-<section class="slide" data-title="สิ่งที่เราต้องการ">
-  <div class="kicker">สรุปปัญหา</div>
-  <h2>สิ่งที่เราต้องการจริง ๆ คือ…</h2>
-  <div class="grid g3" style="margin-top:6px">
-    <div class="card need"><div class="ic">👯</div><h3>เหมือนกันทุกเครื่อง</h3><p>เริ่มจากเครื่องมือชุดเดียวกัน อาจารย์ช่วยได้ง่าย</p></div>
-    <div class="card need"><div class="ic">🐧</div><h3>พูดภาษา Linux</h3><p>คำสั่งใน LAB ก๊อปไปวางแล้วใช้ได้ทันที</p></div>
-    <div class="card need"><div class="ic">🔁</div><h3>พังแล้วรีเซ็ตได้</h3><p>ลบทิ้งแล้วสร้างใหม่ในไม่กี่นาที</p></div>
-    <div class="card need"><div class="ic">🧪</div><h3>มีกล่องให้ AI ทดลอง</h3><p>ขยะและร่องรอยทั้งหมดอยู่ในกล่อง ไม่ปนเครื่องหลัก</p></div>
-    <div class="card need"><div class="ic">🤝</div><h3>แชร์งานข้าม OS ได้ทันที</h3><p>Windows หรือ Mac ก็ทำงานใน Linux เดียวกัน</p></div>
-    <div class="card need"><div class="ic">☁️</div><h3>ต่อยอดไป cloud</h3><p>ส่งงานไป AI / GPU และ deploy บน Linux ได้</p></div>
-  </div>
-  <div class="quote" style="margin-top:30px;text-align:center">ทั้งหมดนี้รวมอยู่ในของสิ่งเดียว <span class="mark">→</span></div>
+  <div class="quote" style="color:#fff;font-size:34px;margin-top:22px">"พื้นเดียวกัน" นี้ทำได้จริง ด้วยของสิ่งเดียว <span class="mark">→</span></div>
 </section>
 
 <!-- ================= องก์ 2: คำตอบ ================= -->
