@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ห้องทดลองของเรา</title>
+<title>ห้องทดลองของเรา: Docker, VS Code และ container devtools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -205,7 +205,16 @@ body.ov #ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr
 #ov .th span{color:var(--orange);font-weight:700;margin-right:6px}
 #check label{font-size:24px;display:flex;gap:14px;align-items:center;cursor:pointer;line-height:1.4}
 #check input{width:26px;height:26px;accent-color:var(--teal);flex:none}
-@media print{#hud,#help,#bar,.zone{display:none}}
+@page{size:1600px 900px;margin:0}
+@media print{
+  html,body{overflow:visible;height:auto;background:#fff}
+  #hud,#help,#bar,.zone,#ov,pre .copy,.cover .hint{display:none!important}
+  #stage{position:static;display:block}
+  #deck{transform:none!important;width:1600px;height:auto}
+  .slide{display:flex!important;position:relative;width:1600px;height:900px;border-radius:0;animation:none!important;page-break-after:always;break-after:page}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -217,6 +226,7 @@ body.ov #ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr
   <div class="inner">
     <div class="kicker" style="color:#7fd3ff">สัปดาห์ที่ 2 · ก่อนเริ่มทำ LAB</div>
     <h1><span class="nw">ห้องทดลองของเรา</span></h1>
+    <div class="sub" style="font-size:30px;color:#7fd3ff;margin-top:6px">เตรียมสภาพแวดล้อมทดลองด้วย Docker และ VS Code</div>
     <div class="sub" style="font-size:32px;color:#fff;margin-top:14px">เราเดฟผ่าน Claude กันอยู่แล้ว<br>แต่ทำไม Claude ควรทำงานใน Linux container?</div>
     <div class="sub" style="font-size:22px">Docker · VS Code · Claude Code · container <b>devtools</b></div>
     <div class="hint">กด <span class="kbd">→</span> เพื่อเริ่ม · <span class="kbd">F</span> เต็มจอ · <span class="kbd">O</span> ดูทุกหน้า</div>
