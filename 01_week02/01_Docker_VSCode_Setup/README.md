@@ -58,7 +58,7 @@ Container แยกกระบวนการและระบบไฟล์�
 
 ## 1. ติดตั้ง Docker Desktop บน Windows
 
-เริ่มจากดาวน์โหลดและติดตั้ง Docker Desktop บนเครื่องของผู้เรียนก่อนสร้าง container หากติดตั้งไว้แล้ว ให้ตรวจสถานะพร้อมใช้งานตามหัวข้อ 1.3
+เริ่มจากดาวน์โหลดและติดตั้ง Docker Desktop บนเครื่องของผู้เรียนก่อนสร้าง container หากติดตั้งไว้แล้ว ให้ตรวจสถานะพร้อมใช้งานตามหัวข้อ 1.4
 
 ### 1.1 เปิดเว็บไซต์และเลือกไฟล์ดาวน์โหลด
 
@@ -92,21 +92,37 @@ Container แยกกระบวนการและระบบไฟล์�
 
 หากระบบแจ้งปัญหา WSL หรือข้อกำหนดเครื่อง ให้ดูวิธีแก้ใน [คู่มือติดตั้ง Docker Desktop สำหรับ Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-ภาพถัดไปเป็นตัวอย่างโปรแกรมที่ติดตั้งและเปิดใช้งานสำเร็จแล้ว:
+### 1.4 เปิด Docker Desktop และตรวจด้วย PowerShell
 
+ภาพเคลื่อนไหวด้านล่างแสดงขั้นตอนทั้งหมดหลังติดตั้งเสร็จ: ดับเบิลคลิกไอคอน **Docker Desktop** บนหน้าจอ → รอให้โปรแกรมเปิดขึ้นมาจนขึ้น **Engine running** → เปิด **PowerShell** แล้วพิมพ์ `docker --version` และ `docker info`
 
-![Docker Desktop จริง แสดง Engine running และ container devtools](assets/01-docker-desktop-redacted.png)
+![ภาพเคลื่อนไหวจริง ดับเบิลคลิกไอคอน Docker Desktop รอ Engine running แล้วเปิด PowerShell พิมพ์ docker --version และ docker info](assets/01-docker-desktop-open-check.gif)
 
-*ภาพที่ 1: สังเกต Engine running ที่มุมล่างซ้าย ภาพนี้ถ่ายหลังสร้าง devtools แล้ว ผู้เริ่มต้นอาจยังเห็นรายการว่าง*
+*อัดจากหน้าจอจริง (ประมาณ 32 วินาที วนซ้ำ) ช่วงรอโปรแกรมเปิดเร่งความเร็ว 2 เท่า พื้นหลังและไอคอนอื่นบนเดสก์ท็อปถูกแทนด้วยวอลเปเปอร์ที่สร้างด้วย Imagegen เพื่อซ่อนข้อมูลส่วนตัว และเบลออวาตาร์บัญชีกับบรรทัด ID ของ engine ไว้ ส่วนหน้าต่าง Docker Desktop และผลใน PowerShell เป็นของจริง*
 
-เปิด **PowerShell บน Windows** แล้วตรวจ:
+**1) ดับเบิลคลิกไอคอน Docker Desktop** บนหน้าจอ หรือค้นหา **Docker Desktop** จาก Start menu แล้วรอให้หน้าต่างโปรแกรมเปิดขึ้นมา ครั้งแรกอาจใช้เวลาสักครู่
+
+**2) ตรวจมุมล่างซ้ายของหน้าต่าง** ต้องขึ้น **Engine running** ถ้าเพิ่งติดตั้งใหม่ หน้า **Containers** จะว่าง และขึ้นข้อความ *Your running containers show up here* เพราะยังไม่ได้สร้าง container ใด ๆ ซึ่งถือว่าปกติ
+
+![Docker Desktop หลังติดตั้ง หน้า Containers ว่าง และมุมล่างซ้ายขึ้น Engine running](assets/01-docker-desktop-empty.png)
+
+*ภาพที่ 1: Docker Desktop จริงหลังเปิดโปรแกรม ยังไม่มี container ใด ๆ กรอบสีแดงคือสถานะ Engine running (เบลออวาตาร์บัญชีไว้) เมนูบางรายการอาจต่างกันตามเวอร์ชันและการตั้งค่า เช่น Kubernetes จะแสดงเฉพาะเมื่อเปิดใช้งาน*
+
+**3) เปิด PowerShell บน Windows** (ค้นหา *PowerShell* จาก Start menu) แล้วพิมพ์ทีละคำสั่ง:
 
 ```powershell
 docker --version
 docker info
 ```
 
-คำสั่งแรกตรวจ CLI ส่วนคำสั่งที่สองต้องแสดงข้อมูล Server ได้ด้วย หากติดต่อ daemon ไม่ได้ ให้รอ Docker Desktop พร้อมก่อน
+- `docker --version` ตรวจว่ามีโปรแกรม Docker CLI แล้ว จะได้ผลประมาณ `Docker version 29.x.x, build ...`
+- `docker info` ต้องแสดงข้อมูลส่วน **Server** ได้ด้วย เช่น `Operating System: Docker Desktop`, `CPUs`, `Total Memory` แปลว่า CLI ติดต่อ Docker Engine ได้สำเร็จ
+
+![ผลจริงของ docker info ใน PowerShell แสดงข้อมูลฝั่ง Server](assets/01-powershell-docker-info.png)
+
+*ภาพที่ 2: ช่วงท้ายของผล `docker info` จริง ข้อมูลยาวจึงเลื่อนขึ้นไป ส่วนบนสุดคือ Client ส่วนที่เห็นคือข้อมูลฝั่ง Server (เบลอบรรทัด ID ไว้) ตัวเลขอย่าง CPUs, Memory และเวอร์ชันจะต่างกันตามเครื่อง*
+
+หาก `docker info` ขึ้นข้อผิดพลาดว่าติดต่อ daemon ไม่ได้ (เช่น *error during connect* หรือ *Cannot connect to the Docker daemon*) แปลว่า engine ยังไม่พร้อม ให้รอจน Docker Desktop ขึ้น **Engine running** แล้วรันคำสั่งอีกครั้ง
 
 ## 2. เตรียม VS Code
 
