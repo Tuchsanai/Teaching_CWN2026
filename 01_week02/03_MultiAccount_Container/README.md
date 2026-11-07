@@ -1,88 +1,105 @@
-# LAB 001 · ส่วนที่ 2: สร้าง image หลายบัญชีของเราเองจาก Dockerfile ด้วย Claude Code app
+# LAB 001 · ส่วนที่ 2: การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile
 
-> 📽️ **สไลด์ประกอบการสอน:** [Multi_Account_Container_Slides.html](Multi_Account_Container_Slides.html) (ฉบับ PDF: [Multi_Account_Container_Slides.pdf](Multi_Account_Container_Slides.pdf)) เปิดด้วยเบราว์เซอร์บนเครื่อง กด **← →** เปลี่ยนหน้า **F** เต็มจอ **O** ดูทุกหน้า
+## 1. ที่มาของปัญหา: ข้อจำกัดของการติดตั้งใน container ที่กำลังทำงาน
 
-เวลาโดยประมาณ: 45–60 นาที (ส่วนใหญ่คือรอ Claude เขียน Dockerfile และ build ครั้งแรก)
+ใน[ส่วนที่ 1](../02_Setup_Multi_Account/README.md) ระบบหลายบัญชี (`yolo1`–`yolo5`, `cyolo1`–`cyolo5`, skill กลาง และ Playwright MCP) ถูกติดตั้งลงใน container `devtools` **ขณะที่ container กำลังทำงาน** ทุกอย่างที่ติดตั้งจึงอยู่ในชั้นข้อมูลที่เขียนได้ (writable layer) ของ container นั้นเพียงแห่งเดียว แนวทางนี้ใช้งานได้ แต่มีข้อจำกัด 3 ด้าน
 
-**สิ่งที่จะได้:** image ชื่อ `my-multi-account:1.0` ที่ **เราสร้างเองจาก Dockerfile** เปิด container จาก image นี้เมื่อไรก็มี `yolo1`–`yolo5` (Claude Code), `cyolo1`–`cyolo5` (Codex CLI), skill กลาง และ **Playwright MCP + Chromium** พร้อมใช้ทันที ไม่ต้องวางพรอมต์ติดตั้งซ้ำ ทุกขั้นสั่งจาก **Claude Code app** บนเครื่องเรา **ไม่ใช้ SSH แล้ว**
+| ด้าน | ข้อจำกัด |
+|---|---|
+| **ความคงทน (persistence)** | เมื่อลบ container หรือเครื่องเสียหาย คำสั่ง `yolo`/`cyolo`, Playwright + Chromium และข้อมูลล็อกอินทุกบัญชีจะสูญหายไปพร้อมกัน ต้องติดตั้งและล็อกอินใหม่ทั้งหมด |
+| **การทำซ้ำได้ (reproducibility)** | สิ่งที่นำไปใช้ซ้ำได้มีเพียงพรอมต์ ไม่มีสิ่งที่ส่งต่อให้เครื่องอื่นใช้ได้ทันที |
+| **ความสอดคล้องระหว่างเครื่อง (consistency)** | AI เขียน installer ขึ้นใหม่ทุกครั้งที่ได้รับพรอมต์ ผลลัพธ์ของแต่ละเครื่องจึงอาจต่างกัน |
 
-ต่อจาก: [บท Docker + VS Code](../01_Docker_VSCode_Setup/README.md) (Docker Desktop + Claude Code app) และ [ส่วนที่ 1 · ปรับ devtools ให้รองรับหลายบัญชี](../02_Setup_Multi_Account/README.md) (เข้าใจ `yolo1`, `cyolo1`, `shared`)
+![ภาพจำลอง: นักศึกษานั่งหน้าจอในห้องปฏิบัติการตอนกลางคืน หน้าจอแสดง Error: No such container: devtools และแถบติดตั้งใหม่ที่ 12%](img/photo-01-rebuild-problem.jpg)
 
-## ปัญหาของส่วนที่ 1: ของดีอยู่ในกล่องที่ลบได้
+*(ภาพจำลอง) เมื่อ container ถูกลบ ระบบที่ติดตั้งไว้ทั้งหมดต้องเริ่มติดตั้งใหม่ตั้งแต่ต้น*
 
-ในส่วนที่ 1 เราให้ Claude **ติดตั้งระบบหลายบัญชีลงใน container `devtools` ที่กำลังรันอยู่** ได้ผลดี แต่ทุกอย่างอยู่ในกล่องใบนั้นใบเดียว
+![ภาพจำลอง: นักศึกษา 3 คนใช้เอกสารขั้นตอนชุดเดียวกัน แต่หน้าจอแสดงผล PASS, FAIL และกำลังติดตั้ง 47% ต่างกัน](img/photo-02-inconsistent-results.jpg)
 
-![ภาพจำลอง: นักศึกษานั่งกุมหัวตอนตีสอง หน้าจอขึ้น container not found ต้องวางพรอมต์ตั้งค่าใหม่อีกรอบ](img/pain-01-rebuild-again.jpg)
+*(ภาพจำลอง) ใช้พรอมต์ชุดเดียวกัน แต่ได้ผลลัพธ์ต่างกัน เพราะ installer ถูกสร้างขึ้นใหม่ในแต่ละครั้ง*
 
-*ภาพจำลอง สร้างด้วย Imagegen*
+แนวทางแก้ไขคือเปลี่ยนจาก "ติดตั้งลงใน container ที่กำลังทำงาน" เป็น "**กำหนดสภาพแวดล้อมไว้ใน Dockerfile แล้ว build เป็น image**" เพื่อให้ทุก container ที่สร้างจาก image นี้มีองค์ประกอบเหมือนกันทุกครั้ง
 
-- **ลบ container หรือเครื่องพัง = เริ่มใหม่หมด:** คำสั่ง `yolo`/`cyolo`, Playwright + Chromium และล็อกอินทุกบัญชีหายไปพร้อมกล่อง ต้องวางพรอมต์ใหม่ รอติดตั้งใหม่ แล้วล็อกอินใหม่ทีละบัญชี
-- **เปลี่ยนเครื่องหรือแชร์ให้เพื่อน = ทำซ้ำทุกเครื่อง:** ไม่มีอะไรให้หยิบไปใช้ต่อ นอกจากพรอมต์
-- **ผลไม่เหมือนกันทุกครั้ง:** AI เขียน installer ใหม่ทุกครั้งที่วางพรอมต์ แต่ละเครื่องจึงได้ของที่ต่างกันเล็กน้อย บางเครื่องผ่าน บางเครื่องพัง
+## 2. เปรียบเทียบ 3 แบบของการเตรียมสภาพแวดล้อม
 
-![ภาพจำลอง: นักศึกษา 3 คนทำตามพรอมต์เดียวกัน คนหนึ่งผ่าน คนหนึ่ง error อีกคนยังติดตั้งไม่เสร็จ](img/pain-02-team-different.jpg)
+บทเรียนใน `01_week02` เตรียมสภาพแวดล้อมสำหรับทำงานกับ AI ไว้ 3 แบบ แต่ละแบบต่อยอดจากแบบก่อนหน้า
 
-*ภาพจำลอง สร้างด้วย Imagegen*
+![แบบที่ 1 container devtools มีเฉพาะเครื่องมือพื้นฐาน, แบบที่ 2 ใช้ docker exec ติดตั้ง yolo1–5 และ cyolo1–5 เพิ่มลงใน devtools ที่กำลังทำงาน, แบบที่ 3 build Dockerfile เป็น image my-multi-account:1.0 แล้ว docker run ได้ container ที่ติดตั้งครบและพร้อมใช้ทันที](img/concept-01-three-approaches.png)
 
-## ทางออก: อบลง image ครั้งเดียว
-
-แทนที่จะติดตั้งในกล่องที่รันอยู่ เราให้ Claude **เขียนสูตร (Dockerfile)** แล้ว **build เป็น image** ครั้งเดียว จากนั้นจะเปิด container กี่ครั้ง กี่เครื่อง ก็ได้ของชุดเดียวกันทุกครั้ง
-
-![LAB 01 devtools เครื่องมือพื้นฐาน, ส่วนที่ 1 ติดตั้งเพิ่มในกล่องที่รันอยู่, ส่วนที่ 2 อบลง image ครั้งเดียวใช้ได้ทุกที่](img/concept-01-lab-journey.png)
-
-เหมือนการทำร้านแฟรนไชส์:
-
-![แฟรนไชส์: Dockerfile = คู่มือสูตร, image = ครัวสำเร็จรูป, container = สาขาที่เปิดใช้, volume = ตู้เซฟเก็บล็อกอิน](img/concept-02-franchise-analogy.jpg)
-
-| คำ | เทียบกับ | ในแลปนี้ |
-|---|---|---|
-| **Dockerfile** | คู่มือสูตร | `_solution/MultiAccountDevtool/Dockerfile` ที่ Claude เขียน |
-| **image** | ครัวสำเร็จรูปที่ประกอบเสร็จแล้ว | `my-multi-account:1.0` |
-| **container** | สาขาที่เปิดใช้งาน | `my-multi-account` ลบแล้วเปิดใหม่ได้เสมอ |
-| **volume** | ตู้เซฟเก็บบัตรพนักงาน | `ai-accounts` เก็บล็อกอิน skill และ MCP กลาง ไม่หายเมื่อลบ container |
-
-![ภาพเคลื่อนไหว: Dockerfile ถูก build เป็น image my-multi-account:1.0 แล้ว docker run ได้ container ที่พร้อมใช้เหมือนกันทั้งเครื่องเรา เครื่องเพื่อน และตอนลบแล้วสร้างใหม่ โดยล็อกอินมาจาก volume ai-accounts](img/gif-build-once.gif)
-
-*ภาพเคลื่อนไหวจำลองแนวคิด*
-
-ข้างใน image มี 4 ชั้น ส่วนข้อมูลที่ต้องเก็บถาวรอยู่นอก image:
-
-![ภายใน my-multi-account:1.0 มี 4 ชั้น: Ubuntu + Docker + Node.js + JupyterLab จาก LAB 01, Claude Code + Codex CLI, Playwright MCP + Chromium, yolo1–5 cyolo1–5 ai-accounts-setup ต่อกับ volume ai-accounts ที่เก็บล็อกอิน skills และ MCP กลาง และโฟลเดอร์ ./workspace ไม่มี SSH](img/concept-03-inside-image.png)
-
-*ภาพแนวคิด (Imagegen) ชื่อ installer ในภาพเป็นชื่อทั่วไป ในการรันจริง Claude ตั้งชื่อว่า `multi-account-install`*
-
-## ไม่มี SSH แล้ว: คุมทุกอย่างผ่าน Claude Code app
-
-แลปก่อน ๆ มีทั้ง SSH (`root`/`passwd`, key `devtoolSSH`) และ JupyterLab ตั้งแต่ส่วนที่ 1 เราเห็นแล้วว่า **Claude Code app สั่งงานใน container ได้เองด้วย `docker exec`** ส่วนเราใช้ JupyterLab ในเบราว์เซอร์ตอนล็อกอิน SSH จึงไม่จำเป็นอีกต่อไป แลปนี้ตัดออกทั้งหมด (ไม่มี `openssh-server`, ไม่มีพอร์ต 22, ไม่มีโฟลเดอร์ key)
-
-![แบบเดิมใช้ SSH ด้วยรหัสผ่านและ key ถูกขีดฆ่า แบบ LAB 03 ใช้ Claude Code app สั่ง docker exec และใช้ JupyterLab ในเบราว์เซอร์](img/concept-05-no-ssh.png)
-
-## ภาพรวมการทดลอง
-
-![5 ขั้น: build image, run container, ล็อกอินใน JupyterLab, ทดสอบ skill + MCP, ลบแล้วสร้างใหม่ในไม่กี่วินาที ทุกขั้นสั่งจาก Claude Code app](img/concept-04-lab-flow.png)
-
-| ขั้น | ทำที่ไหน | ใครทำ | เวลารันจริง |
+| | แบบที่ 1 · devtools | แบบที่ 2 · devtools + ติดตั้งภายหลัง | แบบที่ 3 · build จาก Dockerfile |
 |---|---|---|---|
-| **1 · build image** | 💻 Claude Code app | Claude | ~28 นาที (build ครั้งสุดท้าย 5 นาที) |
-| **2 · เปิด container จาก image** | 💻 Claude Code app | Claude | ~1 นาที |
-| **3 · ล็อกอิน + ให้ Claude ตรวจ** | 🖥️ JupyterLab → 💻 Claude Code app | เรา + Claude | ~15 นาที |
-| **4 · ทดสอบ skill/MCP ข้ามบัญชี (พร้อมกัน)** | 💻 Claude Code app | Claude | ~5 นาที |
-| **5 · ลบแล้วสร้างใหม่ (พิสูจน์)** | 💻 Claude Code app | Claude | ~3 นาที |
+| บทเรียน | [01_Docker_VSCode_Setup](../01_Docker_VSCode_Setup/README.md) | [02_Setup_Multi_Account](../02_Setup_Multi_Account/README.md) | บทนี้ |
+| จุดเริ่มต้น | image สำเร็จรูป `tuchsanai/devtools:2569_1` | container `devtools` จากแบบที่ 1 | Dockerfile |
+| สิ่งที่มีใน container | เครื่องมือพื้นฐาน: Ubuntu, Python, Node.js, Git, Docker, JupyterLab | เครื่องมือพื้นฐาน + ระบบหลายบัญชี | เครื่องมือพื้นฐาน + ระบบหลายบัญชี |
+| ระบบหลายบัญชีเข้ามาอย่างไร | ไม่มี | ติดตั้งภายหลังผ่าน `docker exec` | ติดตั้งไว้ตั้งแต่ขั้น build |
+| ข้อมูลล็อกอินเก็บที่ | – | ภายใน container | volume `ai-accounts` |
+| เมื่อ container ถูกลบ | สร้างใหม่ได้เครื่องมือพื้นฐานชุดเดิม | ต้องติดตั้งและล็อกอินใหม่ | `docker run` ใหม่แล้วพร้อมใช้ทันที |
 
-**ก่อนเริ่ม ตรวจ 3 อย่าง:** Docker Desktop ขึ้น **Engine running** · Claude Code app ล็อกอินแล้ว · มีพื้นที่ดิสก์ว่างอย่างน้อย ~10 GB (image ~4.5 GB + build cache)
+ภาพเคลื่อนไหวด้านล่างแสดงขั้นตอนของแต่ละแบบ และผลที่เกิดขึ้นเมื่อ container ถูกลบ
 
-**เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `03_MultiAccount_Container` ของรีโปนี้ ข้างในมีวัตถุดิบ 2 อย่าง
+![ภาพเคลื่อนไหว: ขั้นตอนของแบบที่ 1, 2 และ 3 ตามลำดับ และผลเมื่อลบ container ของแต่ละแบบ](img/gif-three-approaches.gif)
+
+*ภาพเคลื่อนไหวประกอบแนวคิด เวลาของแบบที่ 2 มาจากผลรันจริงในส่วนที่ 1 (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที) ตัวเลขของแบบที่ 3 มาจากการรันจริงในบทนี้*
+
+## 3. องค์ประกอบของ Docker ที่ใช้ในบทนี้
+
+![Dockerfile ผ่าน docker build เป็น image ที่อ่านได้อย่างเดียว แล้ว docker run ได้หลาย container ที่ต่อกับ volume สำหรับเก็บข้อมูลถาวร](img/concept-02-docker-terms.png)
+
+| องค์ประกอบ | ความหมาย | ในบทนี้ |
+|---|---|---|
+| **Dockerfile** | ไฟล์ข้อความที่ระบุขั้นตอนการสร้าง image ทีละคำสั่ง | `MultiAccountDevtool/Dockerfile` ที่ Claude เขียน |
+| **image** | ผลลัพธ์จากการ build เป็นต้นแบบที่อ่านได้อย่างเดียว (read-only) | `my-multi-account:1.0` |
+| **container** | ตัวที่ทำงานจริง สร้างจาก image และมีชั้นข้อมูลที่เขียนได้ของตัวเอง ลบแล้วข้อมูลในชั้นนี้หายไปด้วย | `my-multi-account` |
+| **volume** | พื้นที่เก็บข้อมูลที่ Docker จัดการแยกจาก container ข้อมูลยังคงอยู่แม้ลบ container | `ai-accounts` → `/root/ai-accounts` |
+| **bind mount** | การเชื่อมโฟลเดอร์บนเครื่องเข้าไปใน container | `./workspace` → `/workspace` |
+
+เมื่อ build image แล้ว จะสร้าง container จาก image นี้กี่ครั้ง หรือบนเครื่องใดก็ได้ ทุกครั้งจะได้โปรแกรมชุดเดียวกัน ส่วนข้อมูลล็อกอินเป็นของแต่ละเครื่อง เก็บใน volume ของเครื่องนั้น
+
+![ภาพเคลื่อนไหว: Dockerfile ถูก build เป็น image my-multi-account:1.0 แล้ว docker run เป็น container บนเครื่องผู้เรียน เครื่องเพื่อนร่วมทีม และ container ที่สร้างใหม่หลังลบ โดยเครื่องผู้เรียนใช้ volume ai-accounts ตัวเดียวกัน](img/gif-build-once.gif)
+
+*ภาพเคลื่อนไหวประกอบแนวคิด คำสั่งใน Dockerfile เป็นสรุปย่อ ดูฉบับเต็มได้ที่ [`_solution/MultiAccountDevtool/Dockerfile`](_solution/MultiAccountDevtool/Dockerfile)*
+
+### 3.1 โครงสร้างของ image `my-multi-account:1.0`
+
+image ประกอบด้วยชั้น (layer) ซ้อนกัน แต่ละชั้นเกิดจากคำสั่งใน Dockerfile ส่วนข้อมูลที่ต้องเก็บถาวรอยู่นอก image
+
+![ภายใน image my-multi-account:1.0 มี 4 ชั้น ได้แก่ ชั้นพื้นฐาน Ubuntu 24.04, Docker-in-Docker, Python, Node.js 22, JupyterLab; Claude Code 2.1.319 และ Codex CLI 0.167.0; Playwright MCP 0.0.84, Chromium และฟอนต์ไทย; yolo1–5, cyolo1–5 และ multi-account-install ด้านบนเป็น container layer ที่เขียนได้ ด้านขวาคือ volume ai-accounts ที่ /root/ai-accounts เก็บล็อกอิน skills และ MCP กลาง ด้านซ้ายคือ ./workspace ที่ /workspace เก็บไฟล์งานและหลักฐาน](img/concept-03-image-layers.png)
+
+| ส่วน | เก็บอะไร | เมื่อลบ container |
+|---|---|---|
+| **ชั้นของ image** (4 ชั้น) | โปรแกรมทั้งหมด: ชั้นพื้นฐานเดียวกับ devtools, Claude Code + Codex CLI, Playwright MCP + Chromium + ฟอนต์ไทย และระบบหลายบัญชี | ยังอยู่ (เป็นส่วนของ image) |
+| **container layer** | ไฟล์ที่เกิดขึ้นระหว่างทำงานซึ่งไม่ได้อยู่ใน volume หรือ bind mount | หายไป |
+| **volume `ai-accounts`** | ข้อมูลล็อกอินของทุกบัญชี skill กลาง และ MCP กลาง | ยังอยู่ |
+| **`./workspace`** | ไฟล์งานและหลักฐานการทดลอง (อยู่บนเครื่องเรา) | ยังอยู่ |
+
+ทุกครั้งที่ container เริ่มทำงาน `multi-account-install` จะเตรียมโครงสร้างใน volume โดยไม่เขียนทับข้อมูลเดิม image จึง**ไม่มีข้อมูลล็อกอินอยู่ภายใน** และแชร์ให้ผู้อื่นได้โดยไม่เปิดเผยบัญชีของเรา
+
+## 4. ภาพรวมขั้นตอนการทดลอง
+
+![ขั้นตอนการทดลอง 5 ขั้นที่สั่งจาก Claude Code app: build image, run container, ล็อกอิน, ทดสอบ skill + MCP, ลบและสร้างใหม่](img/concept-04-lab-flow.png)
+
+| ขั้น | ทำที่ไหน | ผู้ดำเนินการ | เวลารันจริง |
+|---|---|---|---|
+| **1 · build image** | Claude Code app | Claude | ~28 นาที (build ครั้งสุดท้าย 5 นาที) |
+| **2 · สร้าง container จาก image** | Claude Code app | Claude | ~1 นาที |
+| **3 · ล็อกอินและตรวจสถานะ** | JupyterLab → Claude Code app | ผู้เรียน + Claude | ~15 นาที |
+| **4 · ทดสอบ skill/MCP ข้ามบัญชีแบบขนาน** | Claude Code app | Claude | ~5 นาที |
+| **5 · ลบ container แล้วสร้างใหม่** | Claude Code app | Claude | ~3 นาที |
+
+**ตรวจก่อนเริ่ม:** Docker Desktop แสดง **Engine running** · Claude Code app ล็อกอินแล้ว · มีพื้นที่ดิสก์ว่างอย่างน้อย ~10 GB (image ~4.5 GB + build cache)
+
+**เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `03_MultiAccount_Container` ของรีโปนี้ ซึ่งมีวัตถุดิบ 2 อย่าง
 
 ```text
 03_MultiAccount_Container/
-├── 00_Devtool_Container/     ← Dockerfile ของ devtools จาก LAB 01 (ตัด SSH ออกแล้ว) = จุดเริ่มต้น
+├── 00_Devtool_Container/     ← Dockerfile ของ devtools = จุดเริ่มต้น
 ├── prompt_multi_account.md   ← สเปกระบบหลายบัญชี (ชุดเดียวกับส่วนที่ 1)
-└── _solution/                ← เฉลยจากการรันจริง (อยากให้ Claude ทำเองทั้งหมด ให้ย้ายโฟลเดอร์นี้ออกไปก่อน)
+└── _solution/                ← เฉลยจากการรันจริง (หากต้องการให้ Claude ทำเองทั้งหมด ให้ย้ายโฟลเดอร์นี้ออกก่อน)
 ```
 
-## ขั้นที่ 1 · 💻 ให้ Claude สร้าง image ของเราเอง (~30 นาที)
+## ขั้นที่ 1 · ให้ Claude สร้าง image (~30 นาที)
 
-วางพรอมต์ทั้งกรอบใน Claude Code app (Ctrl+V) → Enter → อนุญาตคำสั่ง `docker` เมื่อถูกถาม แล้วรอจน Claude สรุปผล
+วางพรอมต์ทั้งกรอบใน Claude Code app (Ctrl+V) → Enter → อนุญาตคำสั่ง `docker` เมื่อระบบถาม แล้วรอจน Claude สรุปผล
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ build image ใน Claude Code app, Claude อ่านสเปก คัดลอก 00_Devtool_Container แก้ Dockerfile แล้ว docker build และทดสอบ จนได้ตารางผล](img/desktop-step1-build.gif)
 
@@ -117,31 +134,31 @@ build ด้วย: docker build -t my-multi-account:1.0 ./MultiAccountDevtool
 เสร็จแล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ขนาด image และเวลา build แล้วหยุด
 ```
 
-**ทำไมพรอมต์เขียนแบบนี้**
+**หลักการออกแบบพรอมต์**
 
-- **ให้วัตถุดิบชัด:** เริ่มจาก Dockerfile ของ LAB 01 + สเปกเดิมจากส่วนที่ 1 Claude จึงไม่ต้องเดาว่าระบบหลายบัญชีหน้าตาเป็นอย่างไร
-- **แยกของที่อยู่ใน image กับของที่อยู่ใน volume:** โปรแกรมอบลง image ส่วนล็อกอินอยู่ใน volume ถ้าล็อกอินติดไปกับ image แล้วแชร์ให้เพื่อน = แจกบัญชีของเรา
-- **ห้ามแตะของเดิม + ทดสอบด้วย container/volume ทดสอบแล้วลบทิ้ง:** เครื่องเราไม่เลอะ และไม่เสี่ยงทำล็อกอินจริงเสีย
-- **ให้รายงาน PASS/FAIL/SKIP:** ตรวจผลได้เอง ไม่ต้องเชื่อคำพูดของ AI
+- **ระบุวัตถุดิบให้ชัดเจน:** เริ่มจาก Dockerfile ของ devtools และสเปกเดิมจากส่วนที่ 1 Claude จึงไม่ต้องคาดเดาโครงสร้างของระบบหลายบัญชี
+- **แยกสิ่งที่อยู่ใน image ออกจากสิ่งที่อยู่ใน volume:** โปรแกรมอยู่ใน image ส่วนข้อมูลล็อกอินอยู่ใน volume หากข้อมูลล็อกอินติดไปกับ image การแชร์ image ก็เท่ากับเปิดเผยบัญชีของเรา
+- **ไม่แตะทรัพยากรเดิม:** ทดสอบด้วย container และ volume ทดสอบแล้วลบทิ้ง จึงไม่กระทบระบบเดิมและข้อมูลล็อกอินจริง
+- **รายงานเป็น PASS/FAIL/SKIP:** ผู้เรียนตรวจสอบผลจากหลักฐานได้ ไม่ต้องอาศัยคำบอกเล่าของ AI
 
 **ผลจริง** (7 พ.ย. 2026 · ~28 นาที): **9 PASS · 0 FAIL · 1 SKIP** (ข้อที่ต้องล็อกอิน) image ขนาด **4.47 GB** build ใหม่แบบไม่ใช้ cache ใช้ **302 วินาที** ได้ Claude Code 2.1.319, Codex 0.167.0, Playwright MCP 0.0.84
 
 ![ผลจริงจาก Claude: ตาราง PASS/SKIP 10 รายการ ขนาด image 4.47GB เวลา build 302 วินาที และข้อควรรู้](img/desktop-step1-result.png)
 
-*ข้อความคำตอบจริงของ Claude จัดหน้าใหม่ให้อ่านง่าย ระหว่างทาง Claude build รอบแรก ตรวจ `--help` ของ CLI จริงใน container ทิ้งได้ เขียน installer แล้ว build รอบสุดท้ายแบบไม่ใช้ cache เพื่อจับเวลา เป็นเรื่องปกติ*
+*ข้อความคำตอบจริงของ Claude จัดหน้าใหม่ให้อ่านง่าย ระหว่างทาง Claude build รอบแรก ตรวจ `--help` ของ CLI จริงใน container ชั่วคราว เขียน installer แล้ว build รอบสุดท้ายแบบไม่ใช้ cache เพื่อจับเวลา*
 
-สิ่งที่ Claude สร้าง (เก็บเป็นเฉลยไว้ที่ [`_solution/MultiAccountDevtool/`](_solution/MultiAccountDevtool/))
+ไฟล์ที่ Claude สร้าง (เก็บเป็นเฉลยไว้ที่ [`_solution/MultiAccountDevtool/`](_solution/MultiAccountDevtool/))
 
 ```text
 MultiAccountDevtool/
-├── Dockerfile               ← สูตรเดิมของ LAB 01 + 4 ชั้นใหม่ (CLI, Playwright, ฟอนต์ไทย, ระบบหลายบัญชี)
+├── Dockerfile               ← Dockerfile ของ devtools + 4 ชั้นใหม่ (CLI, Playwright, ฟอนต์ไทย, ระบบหลายบัญชี)
 ├── start.sh                 ← dockerd + multi-account-install (ทุกครั้งที่ start) + jupyter lab
 ├── multi-account/           ← installer, wrapper ของ yoloN/cyoloN, ตัวแปลง MCP ให้ Codex
 ├── docker-compose.yml       ← ทางเลือก: build + run ด้วยคำสั่งเดียว
 └── setup-report.md · login-guide.md · checklist.md   ← รายงาน 3 ไฟล์ตามสเปก
 ```
 
-## ขั้นที่ 2 · 💻 เปิด container จาก image (~1 นาที)
+## ขั้นที่ 2 · สร้าง container จาก image (~1 นาที)
 
 ```text
 เปิด container my-multi-account จาก image my-multi-account:1.0 ที่เพิ่ง build
@@ -157,13 +174,13 @@ MultiAccountDevtool/
 
 ![ภาพเคลื่อนไหว: วางพรอมต์เปิด container ใน Claude Code app แล้ว Claude docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน](img/desktop-step2-run.gif)
 
-**ผลจริง** (~1 นาที): JupyterLab ตอบ 200 ใน **1.96 วินาที** หลังสั่ง `docker run` คำสั่งครบ 10 ตัว และ `cyolo1 mcp list` เห็น `playwright` ทันที เพราะทุกอย่างอยู่ใน image แล้ว
+**ผลจริง** (~1 นาที): JupyterLab ตอบ 200 ใน **1.96 วินาที** หลังสั่ง `docker run` คำสั่งครบ 10 ตัว และ `cyolo1 mcp list` แสดง `playwright` ทันที เนื่องจากโปรแกรมทั้งหมดอยู่ใน image แล้ว
 
 ![ผลจริงจาก Claude: container my-multi-account พร้อมใน 1.96 วินาที ตารางเวอร์ชันและสถานะล็อกอิน 10 บัญชี และ cyolo1 mcp list](img/desktop-step2-result.png)
 
-*เครื่องตัวอย่างใช้ volume `ai-accounts` ที่เคยล็อกอินไว้แล้ว 5 บัญชี จึงเห็น ✅ ตั้งแต่ยังไม่ล็อกอินในแลปนี้ (ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3) MCP `rea` มาจากแลปอื่นที่เคยติดตั้งไว้ใน volume เดียวกัน*
+*เครื่องตัวอย่างใช้ volume `ai-accounts` ที่เคยล็อกอินไว้แล้ว 5 บัญชี จึงแสดง ✅ ตั้งแต่ยังไม่ได้ล็อกอินในแลปนี้ (ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3) MCP `rea` มาจากแลปอื่นที่เคยติดตั้งไว้ใน volume เดียวกัน*
 
-ลองเปิด JupyterLab ด้วยตัวเอง: http://localhost:8886/lab → **Terminal** แล้ววางคำสั่งตรวจ
+ตรวจด้วยตนเองได้ที่ http://localhost:8886/lab → **Terminal** แล้ววางคำสั่ง
 
 ```bash
 for a in yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf '%-7s ' $a; $a --version; done
@@ -172,24 +189,24 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ![ภาพเคลื่อนไหวจริงจาก JupyterLab ของ my-multi-account: เปิด localhost:8886/lab, เปิด Terminal, เวอร์ชันครบ 10 คำสั่ง, which และ cyolo1 mcp list เห็น playwright, ตารางล็อกอิน](img/jupyter-step2-check.gif)
 
-*ภาพหน้าจอจริงจาก container ที่รันจากขั้นที่ 2*
+*ภาพหน้าจอจริงจาก container ที่สร้างในขั้นที่ 2*
 
-## ขั้นที่ 3 · 🖥️ ล็อกอิน แล้ว 💻 ให้ Claude ตรวจ (~15 นาที)
+## ขั้นที่ 3 · ล็อกอินและให้ Claude ตรวจสถานะ (~15 นาที)
 
-### 3.1 · ล็อกอินใน JupyterLab: 1 บัญชี = 1 แท็บ Terminal
+### 3.1 · ล็อกอินใน JupyterLab: 1 บัญชีต่อ 1 แท็บ Terminal
 
-วิธีเหมือนส่วนที่ 1 ทุกอย่าง (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ส่วนที่ 1 · ขั้นที่ 3.1](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) ทำอย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
+วิธีเดียวกับส่วนที่ 1 (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ส่วนที่ 1 · ขั้นที่ 3.1](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
 
 | พิมพ์ | หน้าจอล็อกอิน | เลือก |
 |---|---|---|
 | `yolo1` … `yolo5` | Select login method | **Claude account with subscription** → ยืนยันในเบราว์เซอร์ → **Yes, I trust this folder** → `/exit` |
-| `cyolo1` … `cyolo5` | Choose how you want to use Codex | **Sign in with ChatGPT** หรือ `cyolo1 login --device-auth` ถ้าเบราว์เซอร์ส่งผลกลับไม่ได้ |
+| `cyolo1` … `cyolo5` | Choose how you want to use Codex | **Sign in with ChatGPT** หรือ `cyolo1 login --device-auth` หากเบราว์เซอร์ส่งผลกลับไม่ได้ |
 
-**ต่างจากส่วนที่ 1 ตรงไหน:** ล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ในตัว container จึงล็อกอิน **ครั้งเดียว** แล้วใช้ได้ตลอด แม้ลบ container หรือ build image ใหม่ (พิสูจน์ในขั้นที่ 5)
+**ความต่างจากส่วนที่ 1:** ข้อมูลล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ใน container จึงล็อกอินเพียง**ครั้งเดียว** และยังใช้ได้แม้ลบ container หรือ build image ใหม่ (ทดสอบในขั้นที่ 5)
 
-> **ล็อกอินเองเสมอ** ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือใคร
+> **ผู้เรียนต้องล็อกอินด้วยตนเองเสมอ** ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือผู้อื่น
 
-### 3.2 · ให้ Claude ตรวจว่าล็อกอินครบหรือยัง
+### 3.2 · ให้ Claude ตรวจสถานะล็อกอิน
 
 ```text
 ช่วยตรวจสถานะล็อกอินทุกบัญชีใน container my-multi-account ทำผ่าน docker exec เท่านั้น ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ใด ๆ
@@ -204,13 +221,13 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ![ผลจริงจาก Claude: ล็อกอินแล้ว 5 บัญชี ยังไม่ล็อกอิน 5 บัญชี พร้อมวิธีล็อกอินบัญชีที่เหลือ](img/desktop-step3-result.png)
 
-*ผลจริง (~20 วินาที) เครื่องตัวอย่างล็อกอินไว้ 5 บัญชี ขั้นที่ 4 ต้องมีอย่างน้อย 1 บัญชีต่อฝั่ง (แนะนำฝั่งละ 2 เพื่อเทียบรหัส)*
+*ผลจริง (~20 วินาที) เครื่องตัวอย่างล็อกอินไว้ 5 บัญชี ขั้นที่ 4 ต้องมีอย่างน้อย 1 บัญชีต่อ CLI (แนะนำ CLI ละ 2 บัญชีเพื่อเทียบรหัส)*
 
-## ขั้นที่ 4 · 💻 ทดสอบ skill + MCP ข้ามบัญชี แบบรันพร้อมกัน (~5 นาที)
+## ขั้นที่ 4 · ทดสอบ skill และ MCP ข้ามบัญชีแบบขนาน (~5 นาที)
 
-แต่ละบัญชีเรียก skill กลาง `shared-check` และใช้ **Playwright MCP** เปิด Google Flights ค้น BKK → Tokyo เอง แล้วเก็บภาพหน้าจอ **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน** ต่างจากส่วนที่ 1 ตรงที่ **ทุกบัญชีรันพร้อมกัน** ซึ่งเป็นเหตุผลที่เรามีหลายบัญชีตั้งแต่แรก
+แต่ละบัญชีเรียก skill กลาง `shared-check` และใช้ **Playwright MCP** เปิด Google Flights ค้นหาเที่ยวบิน BKK → Tokyo แล้วบันทึกภาพหน้าจอ **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน** ต่างจากส่วนที่ 1 ตรงที่**ทุกบัญชีทำงานพร้อมกัน** ซึ่งเป็นวัตถุประสงค์หลักของการมีหลายบัญชี
 
-พรอมต์มี 2 ส่วน: **เหนือเส้น `====`** = งานของ Claude ใน Claude Code app (ตรวจล็อกอิน เลือกบัญชี สั่งรันพร้อมกัน สรุป) · **ใต้เส้น `====`** = งานที่แต่ละบัญชีทำเองข้างใน container
+พรอมต์มี 2 ส่วน: **เหนือเส้น `====`** คืองานของ Claude ใน Claude Code app (ตรวจล็อกอิน เลือกบัญชี สั่งรันพร้อมกัน สรุปผล) และ**ใต้เส้น `====`** คืองานที่แต่ละบัญชีทำภายใน container
 
 ```text
 ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชีใน container my-multi-account
@@ -257,11 +274,11 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 | cyolo1 | `…codex-4e38203a` | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 | 108 วินาที |
 | cyolo2 | เหมือน cyolo1 | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 | 98 วินาที |
 
-**อ่านผลอย่างไร**
+**การตีความผล**
 
-- **skill กลางใช้ได้จริง:** คนละบัญชีแต่ CLI เดียวกันได้รหัสเดียวกัน = อ่าน `shared-check` จากไฟล์เดียวกันใน `shared` (รหัสสุ่มตอนติดตั้ง ของผู้เรียนจะต่างจากนี้)
-- **MCP กลางใช้ได้จริง:** ทุกบัญชีเรียก tool ของ `playwright` เอง (`browser_navigate`, `browser_type`, `browser_take_screenshot` ฯลฯ)
-- **ทำงานพร้อมกันได้:** 4 บัญชีใช้ Chromium แยกกันคนละตัวใน container เดียว ไม่ชนกัน เวลารวมจึงใกล้กับบัญชีที่ช้าที่สุด (175 วินาที) บวกเวลาที่ Claude ใช้ตรวจและสรุป
+- **skill กลางใช้งานได้:** บัญชีต่างกันแต่ใช้ CLI เดียวกันได้รหัสเดียวกัน แสดงว่าอ่าน `shared-check` จากไฟล์เดียวกันใน `shared` (รหัสสุ่มตอนติดตั้ง ของผู้เรียนจะต่างจากนี้)
+- **MCP กลางใช้งานได้:** ทุกบัญชีเรียก tool ของ `playwright` ได้เอง (`browser_navigate`, `browser_type`, `browser_take_screenshot` ฯลฯ)
+- **ทำงานพร้อมกันได้:** 4 บัญชีใช้ Chromium แยกกันใน container เดียวโดยไม่ชนกัน เวลารวมจึงใกล้เคียงกับบัญชีที่ช้าที่สุด (175 วินาที) บวกเวลาที่ Claude ใช้ตรวจและสรุป
 
 หลักฐานอยู่บนเครื่องเราที่ `./workspace/multi-account/evidence/<บัญชี>/` (เพราะ map `./workspace` ไว้ในขั้นที่ 2) แต่ละโฟลเดอร์มี `1-open.png`, `2-search.png`, `3-results.png` และ `run.log`
 
@@ -271,11 +288,11 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 *ภาพจริงที่แต่ละบัญชีบันทึกเอง ภาพของ cyolo1 กับ cyolo2 เหมือนกันทุกพิกเซล เพราะทำขั้นตอนเดียวกันบนหน้าเว็บเดียวกันในนาทีเดียวกัน (แต่ละบัญชีเขียนไฟล์ของตัวเองคนละเวลา) ราคาของผู้เรียนจะต่างตามวันที่ค้นหา*
 
-## ขั้นที่ 5 · 💻 พิสูจน์: ลบ container แล้วสร้างใหม่ (3 นาที)
+## ขั้นที่ 5 · ทดสอบความคงทน: ลบ container แล้วสร้างใหม่ (~3 นาที)
 
-นี่คือเหตุผลที่เราทำแลปนี้ ในส่วนที่ 1 ถ้าลบ `devtools` ต้องวางพรอมต์ตั้งค่าใหม่ (~5 นาที) ติดตั้ง Playwright ใหม่ และล็อกอินใหม่ทุกบัญชี ลองดูว่าแลปนี้เป็นอย่างไร
+ขั้นนี้ทดสอบข้อจำกัดด้านความคงทนที่กล่าวไว้ในหัวข้อ 1 โดยตรง ในแบบที่ 2 การลบ `devtools` ทำให้ต้องติดตั้งระบบหลายบัญชีใหม่และล็อกอินใหม่ทุกบัญชี ขั้นนี้ตรวจว่าแบบที่ 3 คืนสภาพได้อย่างไร
 
-![ลบ container ได้ ล็อกอินไม่หาย: container เก่าลงถังด้วย docker rm -f, volume ai-accounts เก็บล็อกอิน yolo1 cyolo1 ไว้, container ใหม่จาก image ต่อสายเข้า volume เดิม](img/concept-06-volume-keeps-login.png)
+![ลบ container my-multi-account ด้วย docker rm -f แล้ว volume ai-accounts ยังเก็บล็อกอินของ yolo1–5 และ cyolo1–5 ไว้ครบ container ใหม่จาก image my-multi-account:1.0 ต่อเข้ากับ volume เดิม](img/concept-05-volume-persistence.png)
 
 ```text
 พิสูจน์ว่าทุกอย่างถูกอบไว้ใน image แล้ว ด้วยการลบ container my-multi-account แล้วสร้างใหม่
@@ -290,53 +307,54 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ลบแล้วสร้างใหม่ใน Claude Code app แล้วได้ตารางก่อนลบและหลังสร้างใหม่](img/desktop-step5-recreate.gif)
 
-**ผลจริง** (7 พ.ย. 2026 · ~3 นาที): ลบจน JupyterLab ตอบ 200 ใช้ **3.27 วินาที** (ลบ 0.84 + สร้าง 0.71 + รอ 1.73) เวอร์ชัน CLI, `playwright`, skill `shared-check`, สถานะล็อกอินทั้ง 10 บัญชี และไฟล์ใน `evidence` **เหมือนก่อนลบทุกบรรทัด** และ `yolo1` / `cyolo1` ตอบ "พร้อม" ได้ทันที (13.5 / 5.6 วินาที) โดยไม่ต้องล็อกอินใหม่
+**ผลจริง** (7 พ.ย. 2026 · ~3 นาที): ตั้งแต่ลบจน JupyterLab ตอบ 200 ใช้ **3.27 วินาที** (ลบ 0.84 + สร้าง 0.71 + รอ 1.73) เวอร์ชัน CLI, `playwright`, skill `shared-check`, สถานะล็อกอินทั้ง 10 บัญชี และไฟล์ใน `evidence` **เหมือนก่อนลบทุกรายการ** และ `yolo1` / `cyolo1` ตอบ "พร้อม" ได้ทันที (13.5 / 5.6 วินาที) โดยไม่ต้องล็อกอินใหม่
 
 ![ผลจริงจาก Claude: ตารางก่อนลบและหลังสร้างใหม่ ทุกรายการเหมือนเดิม เวลา 3.27 วินาที และคอลัมน์บอกว่าแต่ละอย่างเก็บอยู่ใน image, volume หรือ ./workspace](img/desktop-step5-result.png)
 
-*คอลัมน์ "เก็บอยู่ที่" ในคำตอบคือหัวใจของแลปนี้: **โปรแกรมอยู่ใน image · ล็อกอินและ skill อยู่ใน volume · งานอยู่ใน `./workspace`** ไม่มีอะไรสำคัญอยู่ในตัว container เลย จึงลบได้ไม่ต้องกลัว ประโยคแรกของคำตอบที่บอกว่า "พิสูจน์ไม่ได้ว่าทุกอย่างอบไว้ใน image" มาจาก MCP `rea` ที่เครื่องตัวอย่างเคยเพิ่มไว้ใน volume จากแลปอื่น ซึ่งดาวน์โหลดผ่าน `npx` ตอนใช้งาน ผู้เรียนที่เริ่มจาก volume ใหม่จะไม่มี MCP ตัวนี้ (ข้อคิด: ถ้า MCP ตัวไหนใช้ประจำ ให้อบลง image ด้วย)*
+*คอลัมน์ "เก็บอยู่ที่" ในคำตอบสรุปหลักการของบทนี้: **โปรแกรมอยู่ใน image · ล็อกอินและ skill อยู่ใน volume · ไฟล์งานอยู่ใน `./workspace`** ไม่มีข้อมูลสำคัญอยู่ใน container จึงลบได้โดยไม่สูญเสียข้อมูล ประโยคแรกของคำตอบที่ระบุว่า "พิสูจน์ไม่ได้ว่าทุกอย่างอบไว้ใน image" มาจาก MCP `rea` ที่เครื่องตัวอย่างเคยเพิ่มไว้ใน volume จากแลปอื่น ซึ่งดาวน์โหลดผ่าน `npx` ขณะใช้งาน ผู้เรียนที่เริ่มจาก volume ใหม่จะไม่มี MCP ตัวนี้ (ข้อสังเกต: MCP ที่ใช้เป็นประจำควรติดตั้งไว้ใน image ด้วย)*
 
-![เทียบเมื่อ container ถูกลบ: ส่วนที่ 1 ต้องตั้งค่าใหม่และล็อกอินใหม่ ส่วนที่ 2 docker run ใหม่แล้วพร้อมใช้ทันที](img/gif-pain-vs-solution.gif)
+ภาพเคลื่อนไหวด้านล่างเปรียบเทียบเวลาในการคืนสภาพของแบบที่ 2 และแบบที่ 3
 
-*ภาพเคลื่อนไหวเทียบเวลา ตัวเลขฝั่งส่วนที่ 2 มาจากการรันจริงในขั้นนี้ ฝั่งส่วนที่ 1 มาจากผลจริงในบทนั้น*
+![ภาพเคลื่อนไหว: เมื่อ container ถูกลบ แบบที่ 2 ต้องติดตั้งและล็อกอินใหม่รวมประมาณ 20 นาที แบบที่ 3 docker run ใหม่พร้อมใช้ใน 3.27 วินาที](img/gif-recreate-compare.gif)
 
-![ภาพจำลอง: นักศึกษาคนเดิมนั่งพิงเก้าอี้ยิ้มสบายใจ หน้าจอขึ้นเครื่องหมายถูกครบ yolo1–5 และ cyolo1–5 ข้างกล่อง my-multi-account:1.0](img/solution-01-ready-in-seconds.jpg)
+*ตัวเลขของแบบที่ 3 วัดจริงในขั้นนี้ ตัวเลขของแบบที่ 2 มาจากผลรันจริงในส่วนที่ 1 (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที)*
 
-*ภาพจำลอง สร้างด้วย Imagegen*
+![ภาพจำลอง: นักศึกษา 3 คนในห้องปฏิบัติการ หน้าจอทั้งสามแสดง my-multi-account:1.0 yolo1-5 OK cyolo1-5 OK playwright OK และ ready in 3.27 s เหมือนกัน](img/photo-03-reproducible-team.jpg)
 
-## สรุป: ส่วนที่ 1 vs ส่วนที่ 2
+*(ภาพจำลอง) ทุกเครื่องที่สร้าง container จาก image เดียวกันได้สภาพแวดล้อมเหมือนกัน*
 
-| | ส่วนที่ 1 · ติดตั้งใน container ที่รันอยู่ | ส่วนที่ 2 · อบลง image ของเราเอง |
+## สรุป: แบบที่ 2 เทียบกับแบบที่ 3
+
+| | แบบที่ 2 · ติดตั้งใน container ที่กำลังทำงาน | แบบที่ 3 · build จาก Dockerfile |
 |---|---|---|
 | ระบบหลายบัญชีอยู่ที่ | ใน container `devtools` | ใน image `my-multi-account:1.0` |
-| ล็อกอินอยู่ที่ | ใน container (หายเมื่อลบ) | ใน volume `ai-accounts` (ไม่หาย) |
-| ลบ container แล้ว | วางพรอมต์ใหม่ + ติดตั้งใหม่ + ล็อกอินใหม่ | `docker run` ใหม่ พร้อมใช้ใน 3.27 วินาที |
-| เปิดเครื่องใหม่ / แชร์เพื่อน | ทำซ้ำทุกเครื่อง ผลอาจต่างกัน | build จาก Dockerfile เดียวกัน หรือ push image ให้ทีม pull ได้ของชุดเดียวกัน |
-| เข้าไปทำงานข้างใน | SSH หรือ JupyterLab | Claude Code app (`docker exec`) + JupyterLab ไม่มี SSH |
+| ข้อมูลล็อกอินอยู่ที่ | ใน container (หายเมื่อลบ) | ใน volume `ai-accounts` (คงอยู่) |
+| เมื่อลบ container | ติดตั้งใหม่ + ล็อกอินใหม่ | `docker run` ใหม่ พร้อมใช้ใน 3.27 วินาที |
+| เครื่องใหม่ / แชร์ให้ทีม | ทำซ้ำทุกเครื่อง ผลอาจต่างกัน | build จาก Dockerfile เดียวกัน หรือ push image ให้ทีม pull ได้ชุดเดียวกัน |
 
 ## ข้อควรรู้
 
-- **ล็อกอินอยู่ใน volume:** `docker rm -f my-multi-account` ปลอดภัย แต่ `docker volume rm ai-accounts` หรือ `docker system prune --volumes` = ล็อกอินหายทุกบัญชี
-- **JupyterLab ไม่มีรหัสผ่าน:** Terminal ในนั้นเข้าถึง credential ทุกบัญชีได้ ถ้าไม่ต้องการให้เครื่องอื่นในเครือข่ายเข้าได้ ให้ใช้ `-p 127.0.0.1:8886:8888` หรือตั้ง `-e JUPYTER_PASSWORD=...` (ทั้งสองเรื่อง Claude เตือนเองในผลขั้นที่ 1–2)
-- **image ห้ามมีล็อกอิน:** ถ้าจะ push image ขึ้น Docker Hub ให้ทีมใช้ ตรวจก่อนเสมอว่าไม่มี credential ติดไป (Claude ตรวจไว้แล้วในขั้นที่ 1 ข้อ "ไม่มีข้อมูลล็อกอินใน image")
-- **แยกบัญชีระดับโฟลเดอร์:** ทุกบัญชีรันเป็น `root` คนเดียวกัน ไม่ใช่ OS isolation
-- **anonymous volume ของ Docker-in-Docker:** `docker rm -f` ทิ้ง volume ของ `/var/lib/docker` ไว้ ใช้ `docker rm -f -v my-multi-account` ถ้าต้องการลบทิ้งด้วย (ไม่แตะ `ai-accounts` เพราะเป็น named volume)
-- **ไม่อยาก build เอง:** ใช้ image สำเร็จรูปของผู้สอน `tuchsanai/multi-account-devtool:2569_1` ผ่านสกิล `/maccount` ได้ (ใช้ volume `ai-accounts` เดียวกัน)
+- **ข้อมูลล็อกอินอยู่ใน volume:** `docker rm -f my-multi-account` ปลอดภัย แต่ `docker volume rm ai-accounts` หรือ `docker system prune --volumes` จะลบข้อมูลล็อกอินทุกบัญชี
+- **JupyterLab ไม่มีรหัสผ่าน:** Terminal ใน JupyterLab เข้าถึง credential ทุกบัญชีได้ หากไม่ต้องการให้เครื่องอื่นในเครือข่ายเข้าถึง ให้ใช้ `-p 127.0.0.1:8886:8888` หรือตั้ง `-e JUPYTER_PASSWORD=...` (Claude แจ้งเตือนทั้งสองเรื่องไว้ในผลขั้นที่ 1–2)
+- **image ต้องไม่มีข้อมูลล็อกอิน:** ก่อน push image ขึ้น Docker Hub ให้ตรวจทุกครั้งว่าไม่มี credential ติดไป (Claude ตรวจไว้แล้วในขั้นที่ 1 ข้อ "ไม่มีข้อมูลล็อกอินใน image")
+- **การแยกบัญชีเป็นระดับโฟลเดอร์:** ทุกบัญชีทำงานในฐานะ `root` คนเดียวกัน ไม่ใช่การแยกสิทธิ์ระดับระบบปฏิบัติการ
+- **anonymous volume ของ Docker-in-Docker:** `docker rm -f` จะเหลือ volume ของ `/var/lib/docker` ไว้ ใช้ `docker rm -f -v my-multi-account` หากต้องการลบด้วย (ไม่กระทบ `ai-accounts` เพราะเป็น named volume)
+- **image สำเร็จรูป:** หากไม่ต้องการ build เอง ใช้ image ของผู้สอน `tuchsanai/multi-account-devtool:2569_1` ผ่านสกิล `/maccount` ได้ (ใช้ volume `ai-accounts` เดียวกัน)
 
 ## คำสั่งที่ใช้บ่อย
 
-🖥️ บนเครื่อง (หรือสั่ง Claude Code app เป็นภาษาคนก็ได้)
+บนเครื่อง (หรือสั่ง Claude Code app เป็นภาษาธรรมชาติ)
 
 ```bash
 docker logs -f my-multi-account          # ดู log ตอน start
-docker exec -it my-multi-account bash    # เข้า shell ใน container (แทน SSH)
+docker exec -it my-multi-account bash    # เข้า shell ใน container
 docker stop my-multi-account             # หยุด
 docker start my-multi-account            # เริ่มใหม่
 docker rm -f my-multi-account            # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
 docker build -t my-multi-account:1.0 _solution/MultiAccountDevtool   # build จากเฉลย
 ```
 
-🖥️ ใน container (JupyterLab Terminal)
+ใน container (JupyterLab Terminal)
 
 ```bash
 yolo1 auth status         # สถานะล็อกอิน Claude

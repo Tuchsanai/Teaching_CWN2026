@@ -1,8 +1,8 @@
-# DevTools Base Container (จุดเริ่มต้นของ LAB 03)
+# DevTools Base Container (จุดเริ่มต้นของ LAB 001 ส่วนที่ 2)
 
-สูตร `Dockerfile` ของ `devtools` จาก LAB 01 ที่ **ตัด SSH ออกแล้ว** เพราะตั้งแต่ LAB 02 เราสั่งงานทุกอย่างผ่าน **Claude Code app** (`docker exec`) และใช้ **JupyterLab** ในเบราว์เซอร์แทน
+`Dockerfile` ของ `devtools` ซึ่งเป็นชั้นพื้นฐานของ image `my-multi-account:1.0` สั่งงานผ่าน **Claude Code app** (`docker exec`) และใช้ **JupyterLab** ในเบราว์เซอร์
 
-LAB 03 ให้ AI คัดลอกโฟลเดอร์นี้ไปเป็น `MultiAccountDevtool/` แล้วเติมระบบหลายบัญชี + Playwright MCP ลงไป **ห้ามแก้โฟลเดอร์นี้โดยตรง**
+ในขั้นที่ 1 ของ [LAB 001 ส่วนที่ 2](../README.md) Claude จะคัดลอกโฟลเดอร์นี้เป็น `MultiAccountDevtool/` แล้วเพิ่มระบบหลายบัญชีและ Playwright MCP ลงไป **ห้ามแก้โฟลเดอร์นี้โดยตรง**
 
 | หมวด | รายละเอียด |
 |------|------------|
@@ -23,12 +23,12 @@ LAB 03 ให้ AI คัดลอกโฟลเดอร์นี้ไปเ
 └── .dockerignore
 ```
 
-## ลองใช้เดี่ยว ๆ (ไม่จำเป็นสำหรับ LAB 03)
+## ลองใช้แยกต่างหาก (ไม่จำเป็นสำหรับบทเรียนนี้)
 
 ```bash
 docker build -t devtools-base:local .
 docker run -dit --name devtools-base --privileged -p 8888:8888 devtools-base:local
-docker exec -it devtools-base bash     # เข้า shell (แทน SSH)
+docker exec -it devtools-base bash     # เข้า shell ใน container
 docker rm -f devtools-base             # ลบเมื่อเลิกใช้
 ```
 
