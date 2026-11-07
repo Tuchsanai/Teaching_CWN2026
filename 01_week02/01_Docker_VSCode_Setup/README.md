@@ -34,6 +34,18 @@ Windows ใช้พัฒนาซอฟต์แวร์ได้ แต่�
 
 แทนที่จะให้ทุกคนไล่ติดตั้ง Python, Node.js, Git และเครื่องมือระบบบน Windows แยกกัน เราใช้ image ของวิชาเป็นต้นแบบ แล้วสร้าง container สำหรับทำ LAB ช่วยลดความต่างของเครื่องมือและทำให้ผู้สอนอธิบายหรือช่วยตรวจปัญหาได้ง่ายขึ้น แนวทางนี้สอดคล้องกับ [Docker ที่ใช้จัดสภาพแวดล้อมการพัฒนาให้เป็นมาตรฐาน](https://docs.docker.com/get-started/docker-overview/) และ [VS Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers)
 
+**container `devtools` สร้างมาจากไหน?** ทั้งหมดเริ่มจากโฟลเดอร์ [`00_Devtool_Container`](https://github.com/Tuchsanai/Teaching_CWN2026/tree/main/01_week02/01_Docker_VSCode_Setup/00_Devtool_Container) ใน GitHub ของวิชา (อยู่ในรีโปนี้ที่ [00_Devtool_Container/](00_Devtool_Container/readme.md)) ซึ่งมีไฟล์สำคัญคือ **Dockerfile** ทำหน้าที่เป็น "สูตร" บอกทีละขั้นว่าให้เริ่มจาก Ubuntu 24.04 แล้วติดตั้ง Python, Node.js, Git, Docker-in-Docker, JupyterLab และ SSH ส่วน `start.sh` เป็นสคริปต์ที่เปิดบริการเหล่านี้ทุกครั้งที่ container เริ่มทำงาน
+
+![หน้าโฟลเดอร์ 00_Devtool_Container บน GitHub มีไฟล์ Dockerfile start.sh docker-compose.yml และ jupyter_overrides.json](assets/00-github-devtool-folder.png)
+
+*ภาพจริงจากหน้า GitHub ของวิชา กรอบแดงคือ Dockerfile (เบลออวาตาร์บัญชีไว้)*
+
+ผู้สอนนำสูตรนี้ไป **build** เป็น image ชื่อ `tuchsanai/devtools:2569_1` แล้วเก็บไว้บน Docker Hub ผู้เรียนจึงไม่ต้อง build เอง แค่ **run** image นี้ก็ได้ container `devtools` ที่มีเครื่องมือครบ ตามขั้นตอนในหัวข้อ 3 ใครอยากลอง build เองก็ทำตาม [readme ของโฟลเดอร์](00_Devtool_Container/readme.md) ได้
+
+![แผนภาพ โฟลเดอร์ 00_Devtool_Container มี Dockerfile ผ่าน docker build เป็น image tuchsanai/devtools:2569_1 แล้ว docker run เป็น container devtools](assets/00-dockerfile-to-devtools.png)
+
+*ภาพแนวคิด: สร้างด้วย Imagegen โค้ดในกรอบด้านล่างเป็นตัวอย่างย่อของ Dockerfile จริง ดูฉบับเต็มได้ที่ [Dockerfile](00_Devtool_Container/Dockerfile)*
+
 อย่างไรก็ตาม การติดตั้งเพิ่มภายหลังยังทำให้สภาพแวดล้อมต่างกันได้ หากต้องการทำซ้ำให้ใกล้เคียงเดิม ควรใช้ image รุ่นเดียวกัน บันทึกคำสั่งติดตั้ง และระบุเวอร์ชันแพ็กเกจของแต่ละ LAB
 
 ### 3) ทดลองผิดพลาดแล้วเริ่มใหม่ได้เป็นขั้นตอน
@@ -342,3 +354,39 @@ codex
 ทำขั้นตอนเข้าสู่ระบบตามที่เครื่องมือแสดงเมื่อใช้ครั้งแรก ภาพในหัวข้อ 6.2 และ 6.3 ยืนยันการติดตั้งจากเวอร์ชัน ยังไม่ใช่ผลการเข้าสู่ระบบหรือส่งงานให้ AI
 
 ทั้ง **VS Code → Terminal** และ **JupyterLab → Terminal** เป็นสองทางเข้าถึง shell ภายใน devtools เดียวกัน เลือกใช้ตามสะดวก
+
+## 7. อีกวิธี: สั่งงานใน container ผ่าน Claude Code Desktop
+
+นอกจากเปิด Terminal เองแล้ว เรายังใช้ **Claude Code Desktop** บน Windows สั่งงานใน container ได้ด้วย โดยไม่ต้องจำคำสั่ง Docker แค่บอกเป็นภาษาคนว่าอยากให้ทำอะไร Claude จะเปิด container `devtools` ให้ (ถ้ายังปิดอยู่) แล้วเข้าไปรันคำสั่งข้างในแทนเรา จากนั้นสรุปผลกลับมาให้อ่าน
+
+วิธีนี้เหมาะกับงานสั้น ๆ เช่น เช็กเวอร์ชัน สร้างไฟล์ หรือรันสคริปต์ทดสอบ ส่วนงานที่ต้องพิมพ์โต้ตอบเยอะ ใช้ Terminal ในหัวข้อ 5 หรือ 6 จะสะดวกกว่า เงื่อนไขคือต้องสร้าง container `devtools` ตามหัวข้อ 3 ไว้ก่อนแล้ว และ Docker Desktop ต้องขึ้น **Engine running**
+
+**ขั้นตอน:** เปิด Claude Code Desktop → เริ่ม **New session** → คัดลอกพรอมต์ด้านล่างไปวางในช่องพิมพ์ (Ctrl+V) → กด Enter
+
+![ภาพเคลื่อนไหว วางพรอมต์ใน Claude Code Desktop ด้วย Ctrl+V แล้วกด Enter](assets/07-claude-desktop-paste.gif)
+
+*ภาพเคลื่อนไหวจำลองขั้นตอนวางพรอมต์ (ประมาณ 7 วินาที วนซ้ำ) ข้อความพรอมต์ตรงกับด้านล่างทุกตัวอักษร*
+
+💬 **พรอมต์**
+
+![หน้าต่าง Claude Code Desktop วางพรอมต์สั่งงานใน container devtools](assets/07-claude-desktop-paste.png)
+
+```text
+ช่วยเปิด container ชื่อ devtools ในเครื่องผม ถ้ายังปิดอยู่ให้เปิดก่อน
+แล้วเข้าไปทำงานข้างใน container นั้น
+
+1. บอกว่าข้างในเป็น Linux อะไร มี Python, Node.js, Git, Claude Code และ Codex เวอร์ชันไหน
+2. สร้างไฟล์ /workspace/hello.py ให้พิมพ์ว่า Hello from devtools แล้วลองรันให้ดู
+
+สรุปผลเป็นตารางสั้น ๆ
+```
+
+✅ **ผลจริง** ก่อนรัน เราสั่งหยุด container ไว้ก่อน Claude จึงเห็นว่า `devtools` ปิดอยู่และเปิดให้เอง จากนั้นรายงานว่าข้างในเป็น **Ubuntu 24.04.5 LTS** มี Python 3.12.3, Node.js v22.23.2, Git 2.55.0, Claude Code 2.1.319 และ codex-cli 0.167.0 แล้วสร้าง `/workspace/hello.py` และรันได้ผล `Hello from devtools`
+
+![ผลจริงจาก Claude: เปิด container devtools ตารางเวอร์ชันเครื่องมือ และผลรัน hello.py](assets/07-claude-desktop-result.png)
+
+*ผลจริงจากการรันพรอมต์นี้ด้วย Claude Code (Opus) บน Windows เครื่องตัวอย่าง จัดหน้าใหม่ให้อ่านง่าย ข้อความคำตอบไม่ได้แก้ เวอร์ชันที่ผู้เรียนได้อาจใหม่กว่า*
+
+สังเกตว่า Claude เตือนเรื่องเดียวกับหัวข้อ 6.3 คือ `claude` ติดตั้งแล้วแต่ยังไม่อยู่ใน PATH ของ shell ในบางกรณี ถ้าต้องการ ให้สั่งต่อในแชตเดิมว่า "ช่วยเพิ่ม PATH ให้พิมพ์ claude ได้เลยใน container" ได้ทันที
+
+ข้อควรระวัง: พรอมต์นี้สั่งให้ Claude รันคำสั่งบนเครื่องจริง ถ้าไม่ได้ใช้โหมด Bypass permissions ระบบจะถามก่อนรันแต่ละคำสั่ง ให้อ่านคำสั่งก่อนกดอนุญาตทุกครั้ง
