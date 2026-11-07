@@ -1,4 +1,4 @@
-# my-multi-account:1.0
+# multi-account:1.0
 
 Image สำหรับใช้ Claude Code และ Codex CLI หลายบัญชีใน container เดียว ต่อยอดจาก `00_Devtool_Container` (ไม่มี SSH)
 
@@ -29,14 +29,14 @@ MultiAccountDevtool/
 ## เริ่มใช้
 
 ```bash
-docker build -t my-multi-account:1.0 ./MultiAccountDevtool
+docker build -t multi-account:1.0 ./MultiAccountDevtool
 
-docker run -d --name my-multi-account --privileged \
+docker run -d --name multi-account --privileged \
   -p 127.0.0.1:8888:8888 \
-  -v my-multi-account-accounts:/root/ai-accounts \
-  my-multi-account:1.0
+  -v multi-account-accounts:/root/ai-accounts \
+  multi-account:1.0
 
-docker exec -it my-multi-account yolo1
+docker exec -it multi-account yolo1
 ```
 
 - JupyterLab: <http://localhost:8888/lab> ไม่มีรหัสผ่าน จึงผูก port กับ `127.0.0.1` ถ้าเปิดให้เครื่องอื่นเข้าให้เพิ่ม `-e JUPYTER_PASSWORD=...`

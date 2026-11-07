@@ -1,4 +1,4 @@
-# Setup Report: my-multi-account:1.0
+# Setup Report: multi-account:1.0
 
 Image ที่ทดสอบ: `sha256:d7052b3169da…` ขนาด 4.47GB, build แบบ `--no-cache` ใช้เวลา 302 วินาที
 

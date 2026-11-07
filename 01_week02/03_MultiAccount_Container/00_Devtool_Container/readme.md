@@ -1,6 +1,6 @@
 # DevTools Base Container (จุดเริ่มต้นของการสร้าง image ระบบหลายบัญชี)
 
-`Dockerfile` ของ `devtools` ซึ่งเป็นชั้นพื้นฐานของ image `my-multi-account:1.0` สั่งงานผ่าน **Claude Code app** (`docker exec`) และใช้ **JupyterLab** ในเบราว์เซอร์
+`Dockerfile` ของ `devtools` ซึ่งเป็นชั้นพื้นฐานของ image `multi-account:1.0` สั่งงานผ่าน **Claude Code app** (`docker exec`) และใช้ **JupyterLab** ในเบราว์เซอร์
 
 ในขั้นที่ 1 ของบท [การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile](../README.md) Claude จะคัดลอกโฟลเดอร์นี้เป็น `MultiAccountDevtool/` แล้วเพิ่มระบบหลายบัญชีและ Playwright MCP ลงไป **ห้ามแก้โฟลเดอร์นี้โดยตรง**
 

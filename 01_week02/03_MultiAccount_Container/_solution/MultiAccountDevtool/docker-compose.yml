@@ -1,6 +1,6 @@
-# docker-compose.yml — รัน my-multi-account (หลายบัญชี AI + JupyterLab + Docker-in-Docker · ไม่มี SSH)
+# docker-compose.yml — รัน multi-account (หลายบัญชี AI + JupyterLab + Docker-in-Docker · ไม่มี SSH)
 #
-#   docker compose up -d          # ใช้ image my-multi-account:1.0 (build ถ้ายังไม่มี)
+#   docker compose up -d          # ใช้ image multi-account:1.0 (build ถ้ายังไม่มี)
 #   docker compose up -d --build  # build จาก Dockerfile ในโฟลเดอร์นี้ใหม่
 #   docker compose down           # หยุดและลบ container (บัญชีใน volume ยังอยู่)
 #
@@ -11,11 +11,11 @@
 # ถ้าจะเปิดให้เครื่องอื่นเข้า ให้ตั้ง JUPYTER_PASSWORD ก่อน
 
 services:
-  my-multi-account:
-    image: my-multi-account:1.0
+  multi-account:
+    image: multi-account:1.0
     build: .
-    container_name: my-multi-account
-    hostname: my-multi-account
+    container_name: multi-account
+    hostname: multi-account
     privileged: true            # จำเป็นสำหรับ Docker-in-Docker (dockerd ข้างใน)
     stdin_open: true            # -i
     tty: true                   # -t  → start.sh จะเปิด bash ให้เมื่อ attach
@@ -31,6 +31,6 @@ services:
 
 volumes:
   accounts:
-    name: my-multi-account-accounts
+    name: multi-account-accounts
   dind:
-    name: my-multi-account-dind
+    name: multi-account-dind

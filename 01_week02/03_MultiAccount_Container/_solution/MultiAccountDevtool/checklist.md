@@ -42,7 +42,7 @@
 | เปิดพร้อมกันได้ | เปิด `cyolo1`, `cyolo2`, `yolo1`, `yolo2` พร้อมกันใน pty แต่ละ process มี config root ของตัวเอง; MCP 2 ตัวทำงานพร้อมกันได้ | PASS | ทดสอบก่อนล็อกอิน |
 | `.bashrc` และ Git ไม่ถูกแก้ | `.bashrc`, `.profile` ยังเป็นวันที่ของ base image และไม่มีคำว่า claude/local/bin; ไม่มี `~/.gitconfig` | PASS | |
 | Git ปกติ | `git 2.56.0`, `init` + `commit` ผ่าน | PASS | |
-| ห้ามแตะของเดิม | container/volume ก่อนและหลังเหมือนกัน, `devtools` ยัง Up, image เดิมมี ID เดิม, ไม่ได้ใช้ `prune`, ไม่ได้ mount `ai-accounts` | PASS | เพิ่มเฉพาะ `my-multi-account:1.0` และ build cache |
+| ห้ามแตะของเดิม | container/volume ก่อนและหลังเหมือนกัน, `devtools` ยัง Up, image เดิมมี ID เดิม, ไม่ได้ใช้ `prune`, ไม่ได้ mount `ai-accounts` | PASS | เพิ่มเฉพาะ `multi-account:1.0` และ build cache |
 | `--strict-config` กับ `config.toml` ที่สร้าง | `cyolo4 --strict-config exec` รันผ่าน; ส่วน `mcp list` ขึ้น `not supported for codex mcp` | PASS | เป็นข้อจำกัดของ Codex ไม่ใช่ image |
 
 ## ต้องล็อกอิน
