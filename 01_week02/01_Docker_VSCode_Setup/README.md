@@ -146,21 +146,23 @@ docker info
 
 *เครื่องตัวอย่างติดตั้งแล้วจึงแสดง Disable / Uninstall เครื่องที่ยังไม่มีส่วนขยายจะเห็น Install ในบริเวณเดียวกัน*
 
-**ตรวจว่าแถบ Dev Containers ขึ้นมาแล้ว**
+**ติดตั้ง Container Tools แล้วเปิดแถบ Containers**
 
-เมื่อติดตั้งเสร็จ ปุ่มจะเปลี่ยนเป็น **Disable / Uninstall** และที่แถบด้านซ้ายจะมีไอคอน **Remote Explorer** (รูปจอคอมพิวเตอร์) เพิ่มขึ้นมา คลิกไอคอนนี้ แถบด้านข้างจะเปิดหัวข้อ **Dev Containers** ขึ้นมา แปลว่าส่วนขยายพร้อมใช้งานแล้ว ถ้ายังไม่มี container ก็จะเห็นข้อความแนะนำวิธีเริ่มต้นและปุ่ม **Open Folder in Container** แทน
+เมื่อ Dev Containers ติดตั้งเสร็จ ปุ่มจะเปลี่ยนเป็น **Disable / Uninstall** จากนั้นค้นหา **Container Tools** ของ **Microsoft** ในช่องค้นหาเดิม แล้วกด **Install**
 
-ภาพเคลื่อนไหวด้านล่างแสดงทั้งขั้นตอนตั้งแต่เปิด Extensions จนแถบ Dev Containers ขึ้นมา:
+ติดตั้งเสร็จแล้ว ที่แถบด้านซ้ายจะมี **ไอคอนรูปกล่อง (Containers)** เพิ่มขึ้นมา คลิกไอคอนนี้ แถบด้านข้างจะแสดงหัวข้อ **Containers**, **Images**, **Registries** และ **Networks** แปลว่า VS Code มองเห็น Docker บนเครื่องแล้ว แถบนี้เป็นที่เดียวกับที่ใช้ตรวจ container `devtools` ในหัวข้อ 4 และใช้ **Attach Visual Studio Code** ในหัวข้อ 5 ถ้ายังไม่เคยสร้าง container หัวข้อ Containers จะยังว่าง ซึ่งถือว่าปกติ
 
-![ภาพเคลื่อนไหวจริง เปิด Extensions ค้นหา Dev Containers กด Install แล้วคลิก Remote Explorer จนแถบ Dev Containers ขึ้นมา](assets/02-vscode-dev-containers-install.gif)
+ภาพเคลื่อนไหวด้านล่างแสดงทั้งขั้นตอน ตั้งแต่เปิด Extensions จนแถบ Containers ขึ้นมา:
 
-*อัดจากหน้าจอจริงด้วย VS Code โปรไฟล์ใหม่ที่ยังไม่มีส่วนขยาย (ประมาณ 30 วินาที วนซ้ำ) ช่วงรอหลังติดตั้งเร่งความเร็ว ครอปเฉพาะหน้าต่าง VS Code และเบลอรายชื่อ Dev Volumes ของเครื่องตัวอย่างไว้*
+![ภาพเคลื่อนไหวจริง ติดตั้ง Dev Containers และ Container Tools แล้วคลิกไอคอนรูปกล่องจนแถบ Containers ขึ้นมา](assets/02-vscode-dev-containers-install.gif)
 
-![แถบ Dev Containers ใน Remote Explorer หลังติดตั้งส่วนขยายเสร็จ](assets/02-dev-containers-panel.png)
+*อัดจากหน้าจอจริงด้วย VS Code โปรไฟล์ใหม่ที่ยังไม่มีส่วนขยาย (ประมาณ 46 วินาที วนซ้ำ) ช่วงรอหลังติดตั้งเร่งความเร็ว และครอปเฉพาะหน้าต่าง VS Code*
 
-*ผลที่ต้องได้: ไอคอน Remote Explorer ที่แถบซ้าย (กรอบแดงล่าง) และแถบ Dev Containers ที่เปิดขึ้นมา (กรอบแดงบน) ส่วน Dev Volumes จะแสดงเฉพาะเมื่อเครื่องมี volume อยู่แล้ว (ในภาพเบลอไว้)*
+![แถบ Containers ของ Container Tools หลังติดตั้งเสร็จ](assets/02-container-tools-panel.png)
 
-เตรียม **Container Tools** ของ Microsoft เพื่อแสดงรายการ container และ **Claude Code** ของ Anthropic เพื่อรับพรอมป์ในหัวข้อถัดไป โดยติดตั้งผ่าน Extensions เช่นเดียวกัน แล้วเข้าสู่ระบบ Claude Code ด้วยบัญชีของตนเอง
+*ผลที่ต้องได้: ไอคอนรูปกล่องที่แถบซ้าย (กรอบแดงเล็ก) และแถบ Containers ที่เปิดขึ้นมา (กรอบแดงใหญ่) รายการใน Images จะต่างกันตาม image ที่แต่ละเครื่องมีอยู่ เครื่องที่ยังไม่เคย pull image ใด ๆ จะเห็นว่าง*
+
+ติดตั้ง **Claude Code** ของ Anthropic ผ่าน Extensions แบบเดียวกัน เพื่อใช้รับพรอมป์ในหัวข้อถัดไป แล้วเข้าสู่ระบบ Claude Code ด้วยบัญชีของตนเอง
 
 ## 3. สร้าง container ผ่าน Claude Code ใน VS Code
 
