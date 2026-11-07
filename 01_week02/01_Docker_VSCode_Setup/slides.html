@@ -311,9 +311,9 @@ body.ov #ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr
 
 <section class="slide" data-title="หน้าตาของคำตอบ">
   <div class="kicker">คำตอบ</div>
-  <h2>เครื่องของเรา → container → ต่อยอดไปข้างนอก</h2>
-  <div class="fig"><img src="assets/00-why-linux-container-v3.png" alt="เครื่องของเรา เชื่อม Linux container ที่ติดตั้งเครื่องมือพร้อม แล้วต่อไปยัง cloud"></div>
-  <div class="cap">ภาพแนวคิด สร้างด้วย Imagegen: container มี Bash, Python, Node.js, Git, Docker, Claude Code / Codex พร้อมใช้ และส่งงานไป AI model, GPU server หรือ deploy ขึ้น cloud ได้</div>
+  <h2>ใช้เครื่องมือไหนก็ได้ → container เดียวกัน → ต่อยอดไปข้างนอก</h2>
+  <div class="fig"><img src="assets/00-why-linux-container-v4.png" alt="Windows หรือ macOS ใช้ VS Code, Claude Code หรือ ChatGPT / Codex สั่งงานเข้า Linux container แล้วต่อไปยัง cloud"></div>
+  <div class="cap">ภาพแนวคิด สร้างด้วย Imagegen: Windows หรือ macOS จะสั่งงานผ่าน VS Code, Claude Code หรือ ChatGPT / Codex ก็ได้ ทุกทางเข้า container เดียวกันที่มี Bash, Python, Node.js, Git, Docker, Claude Code / Codex พร้อมใช้ และส่งงานไป AI model, GPU server หรือ deploy ขึ้น cloud ได้</div>
 </section>
 
 <section class="slide" data-title="ก่อน-หลังมี container">
@@ -460,6 +460,23 @@ WORKDIR /workspace
         <div class="step"><span class="num">3</span><p><b>Deploy ขึ้น cloud</b><br>server ส่วนใหญ่เป็น Linux เหมือนกัน</p></div>
       </div>
       <div class="note small" style="margin-top:24px">container ไม่ได้ต่อ cloud ให้เอง ทุกบริการต้องมีบัญชี สิทธิ์ และ API key และมีค่าใช้จ่ายตามการใช้งาน</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="devtools = ศูนย์ควบคุม">
+  <div class="kicker">มองไกลกว่าห้องเรียน</div>
+  <h2>devtools เป็น "ศูนย์ควบคุม" ระบบหลายเครื่องได้</h2>
+  <div class="row">
+    <div class="col c3"><div class="fig"><img src="assets/00-devtools-control-hub.png" alt="สั่งงานจาก Claude Code หรือ VS Code เข้า devtools แล้ว devtools รีโมทไปสร้างและดูแล Frontend, Backend AI Chatbot, Database และโมเดลอื่น"></div>
+      <div class="cap">ภาพแนวคิด สร้างด้วย Imagegen เครื่องข้างนอกเป็นตัวอย่างของระบบใน LAB ถัด ๆ ไป</div></div>
+    <div class="col c2 vc">
+      <div class="steps">
+        <div class="step"><span class="num">1</span><p class="small">เราสั่งงานจาก <b>Claude Code</b> หรือ <b>VS Code</b> บน Windows / Mac</p></div>
+        <div class="step"><span class="num">2</span><p class="small">คำสั่งไปทำงานใน <b>devtools</b> ซึ่งเป็น Linux มีเครื่องมือครบ</p></div>
+        <div class="step"><span class="num">3</span><p class="small">devtools รีโมทออกไปผ่าน <b>SSH / API / deploy</b> เพื่อสร้างและดูแล Frontend, Backend AI chatbot (เช่นโมเดล Qwen บน GPU), Database และโมเดลอื่น ที่เชื่อมกันเป็นเครือข่าย</p></div>
+      </div>
+      <div class="note info small" style="margin-top:20px">ไม่ต้องติดตั้งเครื่องมือดูแลระบบทั้งหมดบนเครื่องหลัก ทุกอย่างคุมจาก container ที่เดียว</div>
     </div>
   </div>
 </section>
