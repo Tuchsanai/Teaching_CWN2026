@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         iputils-ping \
         dnsutils \
         git \
-        openssh-server \
         tzdata \
         python3 \
         python3-pip \
@@ -64,7 +63,7 @@ RUN install -d /workspace
 
 # ------------------------------------------------------------------
 # JupyterLab + extensions (ติดตั้งลง system python เพื่อให้ kernel เห็น
-# package เดียวกับที่ใช้ใน terminal / SSH)
+# package เดียวกับที่ใช้ใน terminal)
 #   - jupytext                : เปิด .py / .md เป็น notebook ได้ (pair notebook <-> script)
 #   - jupyterlab-git          : Git UI ใน sidebar
 #   - jupyterlab-lsp          : autocomplete / hover / diagnostics (python-lsp-server)
@@ -128,25 +127,15 @@ EOF
 #   * คลิกขวาที่ terminal จะมีเมนู Copy / Paste
 COPY jupyter_overrides.json /usr/local/share/jupyter/lab/settings/overrides.json
 
-# ตั้งรหัสผ่าน root = passwd และเปิดให้ login ผ่าน SSH ได้ทั้ง password และ key
-#   - password : ssh root@localhost -p 2222            (password: passwd)
-#   - key      : ssh -i ssh/devtoolSSH root@localhost -p 2222
-#     start.sh จะนำ public key จาก /etc/devtools/ssh/devtoolSSH.pub (mount มาจาก ./ssh บน host)
-#     ไปใส่ใน /root/.ssh/authorized_keys ทุกครั้งที่ container start
-RUN echo 'root:passwd' | chpasswd \
- && mkdir -p /etc/ssh/sshd_config.d /etc/devtools/ssh \
- && install -d -m 700 /root/.ssh \
- && printf 'PermitRootLogin yes\nPasswordAuthentication yes\nPubkeyAuthentication yes\n' \
-      > /etc/ssh/sshd_config.d/10-root-login.conf
 
-# start script: sshd + dockerd + jupyter lab (ไม่มีรหัสผ่าน เว้นแต่ตั้ง $JUPYTER_PASSWORD)
+# start script: dockerd + jupyter lab (ไม่มีรหัสผ่าน เว้นแต่ตั้ง $JUPYTER_PASSWORD)
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 VOLUME /var/lib/docker
 
-# 22=ssh, 8888=jupyterlab
-EXPOSE 22 8888
+# 8888=jupyterlab (ไม่มี SSH — สั่งงานผ่าน docker exec / Claude Code app)
+EXPOSE 8888
 
 WORKDIR /workspace
 
