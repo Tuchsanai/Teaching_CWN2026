@@ -146,6 +146,20 @@ docker info
 
 *เครื่องตัวอย่างติดตั้งแล้วจึงแสดง Disable / Uninstall เครื่องที่ยังไม่มีส่วนขยายจะเห็น Install ในบริเวณเดียวกัน*
 
+**ตรวจว่าแถบ Dev Containers ขึ้นมาแล้ว**
+
+เมื่อติดตั้งเสร็จ ปุ่มจะเปลี่ยนเป็น **Disable / Uninstall** และที่แถบด้านซ้ายจะมีไอคอน **Remote Explorer** (รูปจอคอมพิวเตอร์) เพิ่มขึ้นมา คลิกไอคอนนี้ แถบด้านข้างจะเปิดหัวข้อ **Dev Containers** ขึ้นมา แปลว่าส่วนขยายพร้อมใช้งานแล้ว ถ้ายังไม่มี container ก็จะเห็นข้อความแนะนำวิธีเริ่มต้นและปุ่ม **Open Folder in Container** แทน
+
+ภาพเคลื่อนไหวด้านล่างแสดงทั้งขั้นตอนตั้งแต่เปิด Extensions จนแถบ Dev Containers ขึ้นมา:
+
+![ภาพเคลื่อนไหวจริง เปิด Extensions ค้นหา Dev Containers กด Install แล้วคลิก Remote Explorer จนแถบ Dev Containers ขึ้นมา](assets/02-vscode-dev-containers-install.gif)
+
+*อัดจากหน้าจอจริงด้วย VS Code โปรไฟล์ใหม่ที่ยังไม่มีส่วนขยาย (ประมาณ 30 วินาที วนซ้ำ) ช่วงรอหลังติดตั้งเร่งความเร็ว ครอปเฉพาะหน้าต่าง VS Code และเบลอรายชื่อ Dev Volumes ของเครื่องตัวอย่างไว้*
+
+![แถบ Dev Containers ใน Remote Explorer หลังติดตั้งส่วนขยายเสร็จ](assets/02-dev-containers-panel.png)
+
+*ผลที่ต้องได้: ไอคอน Remote Explorer ที่แถบซ้าย (กรอบแดงล่าง) และแถบ Dev Containers ที่เปิดขึ้นมา (กรอบแดงบน) ส่วน Dev Volumes จะแสดงเฉพาะเมื่อเครื่องมี volume อยู่แล้ว (ในภาพเบลอไว้)*
+
 เตรียม **Container Tools** ของ Microsoft เพื่อแสดงรายการ container และ **Claude Code** ของ Anthropic เพื่อรับพรอมป์ในหัวข้อถัดไป โดยติดตั้งผ่าน Extensions เช่นเดียวกัน แล้วเข้าสู่ระบบ Claude Code ด้วยบัญชีของตนเอง
 
 ## 3. สร้าง container ผ่าน Claude Code ใน VS Code
