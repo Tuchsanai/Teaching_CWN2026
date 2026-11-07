@@ -81,13 +81,13 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 
 ### 1.1 · input และกระบวนการ
 
-**เหตุผลที่ต้องทำขั้นนี้:** ในแบบที่ 2 ระบบหลายบัญชีถูกติดตั้งลงใน container ที่กำลังทำงานด้วยมือ เมื่อลบ container คำสั่ง `yolo1–5` และ `cyolo1–5` จะหายไป และต้องติดตั้งตามรายการเดิมซ้ำทุกครั้ง
+**เหตุผลที่ต้องทำขั้นนี้:** ในแบบที่ 2 ผู้เรียนแต่ละคนติดตั้งระบบหลายบัญชีลงใน container ของตนเองด้วยมือตามรายการบนกระดาน ผลที่ได้จึงต่างกันในแต่ละเครื่อง บางเครื่องไม่มีคำสั่ง `yolo1` บางเครื่องไม่มี Playwright ผู้สอนต้องเดินแก้ไขทีละเครื่อง และเมื่อลบ container ก็ต้องติดตั้งใหม่ทั้งหมด
 
-![ผู้สอนนั่งกุมขมับหน้าจอที่แสดงว่าหลังสั่ง docker rm -f devtools แล้วเรียก yolo1 ได้ผล command not found บนโต๊ะมีรายการติดตั้งด้วยมือ 5 ข้อที่ต้องทำซ้ำ และกระดาษโน้ตเขียนว่าติดตั้งเป็นครั้งที่ 4 ของสัปดาห์](img/photo-04-step1-why.jpg)
+![ห้องปฏิบัติการคอมพิวเตอร์ที่ผู้เรียนติดตั้งระบบหลายบัญชีด้วยมือตามรายการ 5 ข้อบนกระดาน จอสามเครื่องที่อยู่ติดกันแสดงผลต่างกัน คือ yolo1: command not found, playwright: not installed และ yolo1-5 OK ผู้เรียนยกมือขอความช่วยเหลือ ขณะที่ผู้สอนกำลังช่วยผู้เรียนอีกคน](img/photo-04-step1-why.jpg)
 
-**กระบวนการ:** ขั้นนี้นำรายการติดตั้งดังกล่าวมาเขียนเป็นสเปก แล้วให้ Claude ใช้สเปกนั้นร่วมกับ Dockerfile มาตรฐานสร้างโฟลเดอร์ `MultiAccountDevtool/` และ build เป็น image เพียงครั้งเดียว
+**กระบวนการ:** ขั้นนี้นำรายการติดตั้งดังกล่าวมาเขียนเป็นสเปก แล้วให้ Claude ใช้สเปกนั้นร่วมกับ Dockerfile มาตรฐานสร้างโฟลเดอร์ `MultiAccountDevtool/` และ build เป็น image เพียงครั้งเดียว ถ้าการทดสอบไม่ผ่าน Claude จะกลับไปแก้ Dockerfile แล้ว build ใหม่ ทุกเครื่องที่รัน image นี้จะได้สภาพแวดล้อมเหมือนกัน
 
-![กระบวนการจริงของขั้นที่ 1: input คือ 00_Devtool_Container (Dockerfile มาตรฐาน) และ prompt_multi_account.md (สเปก) Claude Code app คัดลอกและแก้ Dockerfile ได้โฟลเดอร์ MultiAccountDevtool จากนั้น docker build ได้ image multi-account:1.0 ขนาด 4.47 GB และทดสอบได้ 9 PASS 0 FAIL 1 SKIP ใช้เวลา build 302 วินาที](img/concept-06-step1-process.png)
+![ระบบของขั้นที่ 1: input คือ 00_Devtool_Container (Dockerfile มาตรฐาน) และ prompt_multi_account.md (สเปกระบบหลายบัญชี) Claude Code app คัดลอก แก้ Dockerfile build และทดสอบ ถ้าไม่ผ่านจะวนกลับไปแก้ Dockerfile output คือโฟลเดอร์ MultiAccountDevtool และ image multi-account:1.0 ขนาด 4.47 GB ผลทดสอบ 9 PASS 0 FAIL 1 SKIP](img/concept-06-step1-process.png)
 
 | input | บทบาท | เนื้อหา |
 |---|---|---|
