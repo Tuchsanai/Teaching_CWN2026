@@ -254,6 +254,14 @@ Claude บอกว่าเสร็จแล้ว ต่อไปเราเ
 - `shared/skills` และ `shared/mcp` ไม่ได้ถูก CLI อ่านเอง คำสั่ง `yolo`/`cyolo` เป็นตัวเชื่อมให้ทุกครั้งที่เปิด และไม่มี token หรือข้อมูลล็อกอินอยู่ในส่วนกลาง
 - การแยก config เป็นการจัดระเบียบภายใต้ผู้ใช้ Linux เดียวกัน ไม่ใช่การแยกสิทธิ์ OS
 
+#### MCP พื้นฐานที่ติดตั้งมาให้: Playwright
+
+ในขั้นที่ 1 Claude ติดตั้ง **Playwright MCP** พร้อม Chromium แบบไม่มีหน้าจอ (headless) ไว้ใน `shared/mcp` แล้ว ทุกบัญชีทั้ง `yolo` และ `cyolo` จึงใช้ได้ทันที ไม่ต้องติดตั้งเองอีก MCP ตัวนี้ทำให้ AI **เปิดเว็บ กรอกฟอร์ม กดปุ่ม และถ่ายภาพหน้าจอ** ได้เอง ซึ่งจะใช้ทดสอบในขั้นที่ 4
+
+![MCP พื้นฐาน Playwright ติดตั้งครั้งเดียวใน shared/mcp ของ devtools ทุกบัญชี yolo1 ถึง yolo5 และ cyolo1 ถึง cyolo5 ใช้ร่วมกัน](img/mcp-01-playwright-included.png)
+
+*ภาพแนวคิด สร้างด้วย Imagegen ไฟล์จริงคือ `shared/mcp/playwright.json` (Claude) และ `shared/mcp/playwright.toml` (Codex) ดูได้ในหัวข้อ 4.1*
+
 เปิดดูใน File Browser: `/` → **root** → **ai-accounts** จะเห็น **.Claude** และ **.Codex**
 
 ![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
@@ -282,6 +290,12 @@ Claude บอกว่าเสร็จแล้ว ต่อไปเราเ
 
 ### 2.5 · 🔍 ตรวจว่าคำสั่งใช้ได้จริง
 
+ภาพเคลื่อนไหวด้านล่างคือลำดับทั้งหมดตั้งแต่เปิด JupyterLab จาก VS Code จนพิมพ์คำสั่งตรวจ
+
+![ภาพเคลื่อนไหว: คลิกขวา devtools ใน VS Code เลือก Open in External Browser, คลิก Terminal ใน JupyterLab, พิมพ์ which yolo1 cyolo1 และ yolo1 ถึง yolo3 กับ cyolo1 ถึง cyolo3 --version](img/open-jupyter-versions.gif)
+
+*ภาพแรกคือขั้น VS Code จากบทที่แล้ว ภาพที่เหลือบันทึกจาก JupyterLab จริงของ `devtools` หลังขั้นที่ 1 (7 พ.ย. 2026)*
+
 คัดลอกคำสั่งทั้งกรอบ วางใน 🖥️ Terminal แล้วกด **Enter**:
 ```bash
 which yolo1 cyolo1
@@ -290,10 +304,9 @@ yolo2 --version; cyolo2 --version
 yolo3 --version; cyolo3 --version
 ```
 
-![ภาพเคลื่อนไหวจริง: which yolo1 cyolo1 ชี้ไป /usr/local/bin และแต่ละบัญชีแสดงเวอร์ชัน Claude Code กับ codex-cli](img/devtools-after-versions.gif)
+ต้องเห็น `/usr/local/bin/yolo1` และเวอร์ชันครบทุกบรรทัด ถ้าขึ้น `command not found` แปลว่าขั้นที่ 1 ยังไม่สำเร็จ ให้กลับไปดูตารางสรุปของ Claude
 
-*บันทึกจาก JupyterLab Terminal จริงหลังขั้นที่ 1 ต้องเห็น `/usr/local/bin/yolo1` และเวอร์ชันครบทุกบรรทัด ถ้าขึ้น `command not found` แปลว่าขั้นที่ 1 ยังไม่สำเร็จ ให้กลับไปดูตารางสรุปของ Claude*
-
+> **ระวัง:** `--version` บอกแค่ว่า **คำสั่งพร้อมใช้** ยังไม่ได้บอกว่า **ล็อกอินแล้ว** ทุกบัญชีจะแสดงเวอร์ชันได้แม้ยังไม่ล็อกอิน การตรวจล็อกอินทำในหัวข้อ 3.3
 
 ## ขั้นที่ 3 · 🖥️ ล็อกอินทีละบัญชีใน JupyterLab (~15 นาที)
 
@@ -302,6 +315,19 @@ yolo3 --version; cyolo3 --version
 ทำตามลำดับ **พิมพ์คำสั่งเปิดโปรแกรมใน Terminal → ล็อกอิน → เข้าหน้าสนทนา → เลือกโมเดล**
 
 ผู้เรียนยืนยันตัวตนในเบราว์เซอร์ด้วยตัวเอง ไม่ส่งรหัสหรือข้อมูลบัญชีให้ AI
+
+**หลักง่าย ๆ: 1 บัญชี = 1 แท็บ Terminal** กด **+ → Terminal** เพื่อเปิดแท็บใหม่ แล้วพิมพ์ชื่อบัญชีที่ต้องการ บัญชีที่ยังไม่ล็อกอินจะเข้าหน้าเลือกวิธีล็อกอินทันที
+
+![ภาพเคลื่อนไหวจริง: เปิด Terminal แล้วพิมพ์ yolo4 เข้าหน้า Select login method ของ Claude, เปิด Terminal ใหม่แล้วพิมพ์ cyolo3 เข้าหน้า Sign in with ChatGPT ของ Codex](img/login-screens.gif)
+
+*บันทึกจาก JupyterLab จริง ใช้ `yolo4` และ `cyolo3` ซึ่งยังไม่ได้ล็อกอิน จึงเห็นหน้าล็อกอินของจริง ภาพหยุดก่อนยืนยันตัวตน และไม่มีการล็อกอินแทนผู้ใช้*
+
+| ในแท็บ Terminal พิมพ์ | จะเข้าหน้า | เลือก |
+|---|---|---|
+| `yolo1` … `yolo5` | **Select login method** ของ Claude Code | **1. Claude account with subscription** แล้วยืนยันในเบราว์เซอร์ |
+| `cyolo1` … `cyolo5` | **Choose how you want to use Codex** | **Sign in with ChatGPT** หรือ **Sign in with Device Code** ถ้าเบราว์เซอร์ส่งผลกลับเข้า container ไม่ได้ |
+
+หัวข้อ 3.1 และ 3.2 อธิบายทีละหน้าจอด้วย `yolo1` และ `cyolo1` บัญชีอื่นทำเหมือนกัน
 
 ---
 
@@ -401,9 +427,33 @@ cyolo1
 
 ---
 
+### 3.3 · 💻 ให้ Claude Code Desktop ตรวจว่าล็อกอินครบหรือยัง
+
+ล็อกอินเสร็จแล้ว ไม่ต้องพิมพ์คำสั่งตรวจเอง กลับไปที่ **Claude Code Desktop** แล้ววางพรอมต์นี้ พรอมต์บอกไว้แล้วว่าต้องใช้คำสั่งไหน (`yoloN auth status` และ `cyoloN login status`) และห้ามแสดงอีเมลหรือ token
+
+##### 📋 พรอมต์ตรวจสถานะล็อกอิน (วางใน 💻 Claude Code Desktop แล้ว Enter)
+```text
+ช่วยตรวจสถานะล็อกอินทุกบัญชีใน container devtools ทำผ่าน docker exec เท่านั้น ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ใด ๆ
+- Claude: yolo1 ถึง yolo5 ใช้คำสั่ง yoloN auth status แล้วดูเฉพาะค่า "loggedIn"
+- Codex: cyolo1 ถึง cyolo5 ใช้คำสั่ง cyoloN login status
+สรุปเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
+ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
+(พิมพ์ yoloN แล้วเลือก Claude account with subscription / พิมพ์ cyoloN หรือ cyoloN login --device-auth)
+```
+
+![ผลจริงจาก Claude: ตารางสถานะล็อกอิน 10 บัญชี yolo1 ถึง yolo3 cyolo1 cyolo2 ล็อกอินแล้ว ที่เหลือยังไม่ล็อกอิน พร้อมวิธีล็อกอิน](img/desktop-login-check-result.png)
+
+*ผลจริงจากการรันพรอมต์นี้ (7 พ.ย. 2026 ใช้เวลาประมาณ 5 วินาที) ข้อความคำตอบของ Claude จัดหน้าใหม่ให้อ่านง่าย ในเครื่องตัวอย่างล็อกอินไว้ 5 บัญชี Claude จึงบอกวิธีล็อกอิน 5 บัญชีที่เหลือ*
+
+ขั้นที่ 4 ต้องใช้อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2` ถ้าตารางยังไม่ครบ ให้กลับไปล็อกอินในแท็บ Terminal ของบัญชีนั้นก่อน
+
 ## ขั้นที่ 4 · 💻 ให้ Claude Code Desktop ทดสอบข้ามบัญชี (~15 นาที)
 
 ใช้ตรวจว่า skill `shared-check` และ Playwright MCP ที่ตั้งไว้ใน `shared` เรียกใช้ได้จริงจากหลายบัญชี และให้ Playwright บันทึกภาพหน้าเว็บจริงเป็นหลักฐาน ต้องล็อกอิน `yolo1`, `yolo2`, `cyolo1`, `cyolo2` ให้ครบก่อน หากเบราว์เซอร์ส่งผลล็อกอิน Codex กลับเข้า container ไม่ได้ ให้ใช้ `cyolo1 login --device-auth` แทน
+
+![ขั้นที่ 4: AI ในบัญชี yolo1 สั่งงานเป็นภาษาคน ผ่าน Playwright MCP ไปยัง Chromium ใน container เปิด Google Flights กรอก BKK ไป Tokyo แล้วเก็บหลักฐาน 3 ภาพ](img/mcp-02-playwright-step4.png)
+
+*ภาพแนวคิด สร้างด้วย Imagegen: ในขั้นนี้ AI ของแต่ละบัญชีใช้ Playwright MCP ที่ติดตั้งไว้แล้ว เปิดเว็บจริงจากใน container เอง*
 
 ### 4.1 · 🖥️ ตรวจการเชื่อม shared ใน Terminal ก่อน
 
@@ -421,13 +471,18 @@ cyolo1 mcp list 2>/dev/null
 
 ### 4.2 · 📋 พรอมต์ทดสอบ (วางใน 💻 Claude Code Desktop)
 
-กลับไปที่ Claude Code Desktop จะใช้เซสชันเดิมจากขั้นที่ 1 หรือเปิด **New session** ก็ได้ แล้ววางข้อความทั้งกรอบ Claude จะใช้ `docker exec` สั่งพรอมต์ตรวจช่วงล่าง (ใต้เส้น `====`) ให้ทีละบัญชีข้างใน container เก็บภาพหน้าเว็บ และสรุปผลรวม การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
+กลับไปที่ Claude Code Desktop จะใช้เซสชันเดิมจากขั้นที่ 1 หรือเปิด **New session** ก็ได้ แล้ววางข้อความทั้งกรอบ ข้อ 0 ของพรอมต์ให้ Claude **ตรวจสถานะล็อกอินก่อน** ถ้ายังไม่ครบจะหยุดและบอกว่าต้องล็อกอินบัญชีไหน ถ้าครบแล้ว Claude จะใช้ `docker exec` สั่งพรอมต์ตรวจช่วงล่าง (ใต้เส้น `====`) ให้ทีละบัญชีข้างใน container เก็บภาพหน้าเว็บ และสรุปผลรวม การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
 
 ![หน้าต่าง Claude Code Desktop วางพรอมต์ทดสอบ skill และ MCP ข้าม 4 บัญชี](img/desktop-verify-paste.png)
 
 ```text
-ฉันล็อกอิน yolo1 yolo2 cyolo1 cyolo2 ใน container devtools แล้ว ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี
-ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า
+ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี yolo1 yolo2 cyolo1 cyolo2 ใน container devtools
+ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
+0. ตรวจสถานะล็อกอินทุกบัญชีก่อน: yoloN auth status และ cyoloN login status
+   แสดงเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล องค์กร หรือ token
+   ถ้ามีบัญชีใดยังไม่ล็อกอิน ให้หยุดทันที แจ้งเตือนว่าต้องล็อกอินบัญชีไหน
+   พร้อมวิธีล็อกอินใน JupyterLab Terminal (พิมพ์ yoloN แล้วเลือก Claude account with subscription / cyoloN login --device-auth)
+   ห้ามทำข้อถัดไปจนกว่าจะล็อกอินครบ
 1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง /workspace/multi-account/verify-prompt.txt ใน container
 2. รันทีละบัญชีจาก shell ใน container (โฟลเดอร์ /workspace/multi-account):
    yolo1 -p "$(cat verify-prompt.txt)", yolo2 เช่นเดียวกัน,
@@ -456,13 +511,19 @@ cyolo1 mcp list 2>/dev/null
    เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
 ```
 
+**ถ้ายังล็อกอินไม่ครบ Claude จะหยุดที่ข้อ 0** ภาพด้านล่างคือผลจริงเมื่อลองเปลี่ยนบรรทัดแรกเป็นบัญชีที่ยังไม่ล็อกอิน (`yolo4`, `cyolo3`) Claude ไม่ทำข้อ 1–4 และบอกวิธีล็อกอินให้แทน
+
+![ผลจริงเมื่อยังล็อกอินไม่ครบ: Claude ตรวจข้อ 0 พบ yolo4 และ cyolo3 ยังไม่ล็อกอิน จึงหยุดและบอกวิธีล็อกอิน](img/desktop-verify-warn-result.png)
+
+*ผลจริงจากการทดลอง (7 พ.ย. 2026) ข้อความคำตอบจัดหน้าใหม่ให้อ่านง่าย*
+
 หากต้องการทดสอบเองทีละบัญชี ให้คัดลอกเฉพาะข้อความใต้เส้น `====` ไปวางใน 💬 ช่องสนทนาของบัญชีนั้นใน JupyterLab Terminal
 
 ### 4.3 · ผลจริงจาก Claude Code Desktop (7 พ.ย. 2026)
 
-พรอมต์นี้รันจริงหลังล็อกอิน 4 บัญชี Claude รันทีละบัญชี (yolo1 130 วินาที, yolo2 122 วินาที, cyolo1 96 วินาที, cyolo2 96 วินาที) รวมประมาณ **10 นาที**
+พรอมต์นี้รันจริงหลังล็อกอิน 4 บัญชี Claude ตรวจล็อกอินก่อน (ครบทั้ง 4 บัญชี) แล้วรันทีละบัญชี (yolo1 146 วินาที, yolo2 222 วินาที, cyolo1 113 วินาที, cyolo2 89 วินาที) รวมประมาณ **10 นาที**
 
-![ผลจริงจาก Claude: ตาราง 4 บัญชี yolo1 yolo2 cyolo2 PASS ส่วน cyolo1 FAIL เพราะ Google Flights error รหัส shared-check ตรงกันตาม CLI](img/desktop-verify-result.png)
+![ผลจริงจาก Claude: ข้อ 0 ล็อกอินครบ 4 บัญชี ผลทดสอบ yolo1 cyolo1 cyolo2 PASS ส่วน yolo2 FAIL เพราะ Google Flights error รหัส shared-check ตรงกันตาม CLI](img/desktop-verify-result.png)
 
 *ข้อความคำตอบจริงของ Claude จัดหน้าใหม่ให้อ่านง่าย ตัดรายละเอียดบางบรรทัดออก*
 
@@ -470,19 +531,19 @@ cyolo1 mcp list 2>/dev/null
 
 - **skill ส่วนกลางใช้ได้จริง:** `yolo1` กับ `yolo2` เป็นคนละบัญชี แต่ได้รหัสเดียวกัน `SHARED_SKILL_OK-claude-5b7b8d3ed923` ส่วน `cyolo1` กับ `cyolo2` ได้ `SHARED_SKILL_OK-codex-89b4c3fde329` เหมือนกัน แปลว่าทุกบัญชีอ่าน skill จากไฟล์เดียวกันใน `shared` (รหัสนี้สุ่มตอนติดตั้ง ของผู้เรียนจะต่างจากนี้)
 - **MCP ส่วนกลางใช้ได้จริง:** ทุกบัญชีเรียก tool ของ server `playwright` (`browser_navigate`, `browser_type`, `browser_take_screenshot` ฯลฯ) ได้เอง
-- **cyolo1 FAIL ไม่ได้แปลว่าการตั้งค่าผิด:** config root, skill และ MCP ของ cyolo1 ผ่านหมด แต่ Google Flights ตอบ "Oops, something went wrong." ในรอบนั้น นี่คือความต่างระหว่าง **ระบบของเรา** กับ **เว็บภายนอก**
+- **yolo2 FAIL ไม่ได้แปลว่าการตั้งค่าผิด:** config root, skill และ MCP ของ yolo2 ผ่านหมด แต่ Google Flights ตอบ "Oops, something went wrong." ในรอบนั้น (yolo1 ก็เจอครั้งหนึ่งแต่กด Reload แล้วผ่าน) นี่คือความต่างระหว่าง **ระบบของเรา** กับ **เว็บภายนอก**
 
-![ภาพจริงรอบแรกของ cyolo1: Google Flights กรอกเงื่อนไขครบแต่ขึ้น Oops something went wrong และปุ่ม Reload](img/evidence-cyolo1-attempt1-error.png)
+![ภาพจริงรอบแรกของ yolo2: Google Flights กรอกเงื่อนไขครบแต่ขึ้น Oops something went wrong และปุ่ม Reload](img/evidence-yolo2-attempt1-error.png)
 
-*ภาพ `3-results.png` ของ cyolo1 รอบแรก ภาพจริงจาก Playwright MCP ไม่ได้ตกแต่ง*
+*ภาพ `3-results.png` ของ yolo2 รอบแรก ภาพจริงจาก Playwright MCP ไม่ได้ตกแต่ง*
 
-**ถ้าเจอแบบนี้ ให้รันเฉพาะบัญชีนั้นซ้ำ** เช่น พิมพ์ใน Claude Code Desktop ว่า "รัน cyolo1 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน" ในการทดลองจริงรอบที่ 2 ของ cyolo1 ใช้เวลา 97 วินาที ได้รหัสเดิม `...codex-89b4c3fde329` และได้ผลเที่ยวบินครบ จึงผ่านทั้ง 4 บัญชี
+**ถ้าเจอแบบนี้ ให้รันเฉพาะบัญชีนั้นซ้ำ** เช่น พิมพ์ใน Claude Code Desktop ว่า "รัน yolo2 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน" ในการทดลองจริง yolo2 รอบที่ 2 ใช้เวลา 124 วินาที ได้รหัสเดิม `...claude-5b7b8d3ed923` และได้ผลเที่ยวบินครบ จึงผ่านทั้ง 4 บัญชี (การทดลองอีกรอบก่อนหน้านี้ cyolo1 ก็เจอแบบเดียวกันและผ่านเมื่อรันซ้ำ เว็บภายนอกล่มเป็นครั้งคราวได้)
 
 | บัญชี | config root | รหัสจาก `shared-check` | Playwright MCP | เที่ยวบินอันดับ 1 |
 |---|---|---|---|---|
 | yolo1 | `.Claude/yolo1` | `SHARED_SKILL_OK-claude-5b7b8d3ed923` | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
-| yolo2 | `.Claude/yolo2` | เหมือน yolo1 | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
-| cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-89b4c3fde329` | รอบ 1 เว็บ error → รอบ 2 PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+| yolo2 | `.Claude/yolo2` | เหมือน yolo1 | รอบ 1 เว็บ error → รอบ 2 PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+| cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-89b4c3fde329` | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
 | cyolo2 | `.Codex/cyolo2` | เหมือน cyolo1 | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
 
 ### 4.4 · 🖼️ ดูภาพหน้าเว็บจริงที่ Playwright เก็บไว้
