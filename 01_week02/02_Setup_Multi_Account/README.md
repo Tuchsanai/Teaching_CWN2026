@@ -423,6 +423,8 @@ cyolo1 mcp list 2>/dev/null
 
 กลับไปที่ Claude Code Desktop จะใช้เซสชันเดิมจากขั้นที่ 1 หรือเปิด **New session** ก็ได้ แล้ววางข้อความทั้งกรอบ Claude จะใช้ `docker exec` สั่งพรอมต์ตรวจช่วงล่าง (ใต้เส้น `====`) ให้ทีละบัญชีข้างใน container เก็บภาพหน้าเว็บ และสรุปผลรวม การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
 
+![หน้าต่าง Claude Code Desktop วางพรอมต์ทดสอบ skill และ MCP ข้าม 4 บัญชี](img/desktop-verify-paste.png)
+
 ```text
 ฉันล็อกอิน yolo1 yolo2 cyolo1 cyolo2 ใน container devtools แล้ว ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี
 ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า
@@ -456,49 +458,61 @@ cyolo1 mcp list 2>/dev/null
 
 หากต้องการทดสอบเองทีละบัญชี ให้คัดลอกเฉพาะข้อความใต้เส้น `====` ไปวางใน 💬 ช่องสนทนาของบัญชีนั้นใน JupyterLab Terminal
 
-### 4.3 · 🖼️ ดูภาพหน้าเว็บจริงที่ Playwright เก็บไว้
+### 4.3 · ผลจริงจาก Claude Code Desktop (7 พ.ย. 2026)
 
-เปิด **File Browser** ของ JupyterLab ไปที่ `/workspace/multi-account/evidence/` จะมีโฟลเดอร์ย่อยตามบัญชี แต่ละโฟลเดอร์มีภาพ 3 ภาพ ดับเบิลคลิกเพื่อดูในแท็บใหม่
+พรอมต์นี้รันจริงหลังล็อกอิน 4 บัญชี Claude รันทีละบัญชี (yolo1 130 วินาที, yolo2 122 วินาที, cyolo1 96 วินาที, cyolo2 96 วินาที) รวมประมาณ **10 นาที**
+
+![ผลจริงจาก Claude: ตาราง 4 บัญชี yolo1 yolo2 cyolo2 PASS ส่วน cyolo1 FAIL เพราะ Google Flights error รหัส shared-check ตรงกันตาม CLI](img/desktop-verify-result.png)
+
+*ข้อความคำตอบจริงของ Claude จัดหน้าใหม่ให้อ่านง่าย ตัดรายละเอียดบางบรรทัดออก*
+
+**อ่านผลอย่างไร:**
+
+- **skill ส่วนกลางใช้ได้จริง:** `yolo1` กับ `yolo2` เป็นคนละบัญชี แต่ได้รหัสเดียวกัน `SHARED_SKILL_OK-claude-5b7b8d3ed923` ส่วน `cyolo1` กับ `cyolo2` ได้ `SHARED_SKILL_OK-codex-89b4c3fde329` เหมือนกัน แปลว่าทุกบัญชีอ่าน skill จากไฟล์เดียวกันใน `shared` (รหัสนี้สุ่มตอนติดตั้ง ของผู้เรียนจะต่างจากนี้)
+- **MCP ส่วนกลางใช้ได้จริง:** ทุกบัญชีเรียก tool ของ server `playwright` (`browser_navigate`, `browser_type`, `browser_take_screenshot` ฯลฯ) ได้เอง
+- **cyolo1 FAIL ไม่ได้แปลว่าการตั้งค่าผิด:** config root, skill และ MCP ของ cyolo1 ผ่านหมด แต่ Google Flights ตอบ "Oops, something went wrong." ในรอบนั้น นี่คือความต่างระหว่าง **ระบบของเรา** กับ **เว็บภายนอก**
+
+![ภาพจริงรอบแรกของ cyolo1: Google Flights กรอกเงื่อนไขครบแต่ขึ้น Oops something went wrong และปุ่ม Reload](img/evidence-cyolo1-attempt1-error.png)
+
+*ภาพ `3-results.png` ของ cyolo1 รอบแรก ภาพจริงจาก Playwright MCP ไม่ได้ตกแต่ง*
+
+**ถ้าเจอแบบนี้ ให้รันเฉพาะบัญชีนั้นซ้ำ** เช่น พิมพ์ใน Claude Code Desktop ว่า "รัน cyolo1 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน" ในการทดลองจริงรอบที่ 2 ของ cyolo1 ใช้เวลา 97 วินาที ได้รหัสเดิม `...codex-89b4c3fde329` และได้ผลเที่ยวบินครบ จึงผ่านทั้ง 4 บัญชี
+
+| บัญชี | config root | รหัสจาก `shared-check` | Playwright MCP | เที่ยวบินอันดับ 1 |
+|---|---|---|---|---|
+| yolo1 | `.Claude/yolo1` | `SHARED_SKILL_OK-claude-5b7b8d3ed923` | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+| yolo2 | `.Claude/yolo2` | เหมือน yolo1 | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+| cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-89b4c3fde329` | รอบ 1 เว็บ error → รอบ 2 PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+| cyolo2 | `.Codex/cyolo2` | เหมือน cyolo1 | PASS | Vietjet · 9 ชม. · แวะ 1 · THB 5,956 |
+
+### 4.4 · 🖼️ ดูภาพหน้าเว็บจริงที่ Playwright เก็บไว้
+
+เปิด **File Browser** ของ JupyterLab ไปที่ `/workspace/multi-account/evidence/` จะมีโฟลเดอร์ตามบัญชี แต่ละโฟลเดอร์มีภาพ 3 ภาพและ `run.log` ดับเบิลคลิกภาพเพื่อเปิดดูในแท็บใหม่
+
+![File Browser ใน JupyterLab เปิด evidence/yolo1 เห็น 1-open 2-search 3-results run.log และเปิดภาพผลเที่ยวบิน](img/devtools-evidence-folder.png)
+
+*ภาพจริงจาก JupyterLab หลังขั้นที่ 4*
 
 | ภาพ | ต้องเห็นอะไร | พิสูจน์อะไร |
 |---|---|---|
 | `1-open.png` | หน้า Google Flights โหลดครบ | Chromium ของ Playwright MCP เข้าถึงเว็บจริงได้จากบัญชีนั้น |
-| `2-search.png` | ช่อง BKK → Tokyo, One way, Economy, 1 adult และวันที่ 15 ของเดือนถัดไป | MCP กรอกฟอร์มบนหน้าเว็บได้ |
+| `2-search.png` | Bangkok BKK → Tokyo, One way, Economy, 1 คน และวันที่ 15 ของเดือนถัดไป | MCP กรอกฟอร์มบนหน้าเว็บได้ |
 | `3-results.png` | รายการเที่ยวบินพร้อมเวลาและราคา | การค้นหาทำงานจริง ไม่ใช่คำตอบที่โมเดลเดา |
 
-ภาพของแต่ละบัญชีควรคล้ายกัน แต่ราคาและลำดับเที่ยวบินอาจต่างกันตามเวลาที่ค้นหา หากบัญชีใดไม่มีภาพ `3-results.png` ให้ดูในตารางสรุปว่าติดขั้นไหน
+ภาพเคลื่อนไหวด้านล่างคือภาพจริง 3 ภาพของ `yolo1` เรียงตามลำดับ
 
-ภาพต่อไปนี้คือภาพจริงที่ Playwright MCP ของบัญชี `yolo1` บันทึกไว้ในการทดสอบวันที่ 29 กันยายน 2026 ไม่ได้ตกแต่งภาพ รอบนั้นตั้งค่าจากใน JupyterLab แทน Claude Code Desktop แต่โครงสร้างโฟลเดอร์ ชื่อ skill/MCP และพรอมต์ตรวจใต้เส้น `====` เหมือนกันทุกตัวอักษร
+![ภาพเคลื่อนไหวจากภาพจริงของ yolo1: เปิด Google Flights, กรอก BKK ไป Tokyo วันอังคาร 15 ธันวาคม, ผลค้นหา Top flights](img/evidence-yolo1.gif)
 
-![yolo1-1-open: Playwright เปิดหน้า Google Flights ได้จริงจาก container](img/devtools-web-yolo1-open.png)
+*ประกอบจากภาพจริง 3 ภาพที่ Playwright MCP ของ yolo1 บันทึก (ภาพละ 3 วินาที) ไม่ได้ตกแต่ง*
 
-![yolo1-2-search: กรอก One way, 1 คน, Economy, Bangkok BKK ไป Tokyo วันที่ Thu Oct 15 ก่อนกด Search](img/devtools-web-yolo1-search.png)
+![yolo1-1-open: Playwright เปิดหน้า Google Flights ได้จริงจาก container](img/evidence-yolo1-1-open.png)
 
-![yolo1-3-results: ผลค้นหา Top flights จริงพร้อมเวลา จำนวนแวะ และราคา THB](img/devtools-web-yolo1-results.png)
+![yolo1-2-search: กรอก One way, 1 คน, Economy, Bangkok BKK ไป Tokyo วันที่ Tue Dec 15 ก่อนกด Search](img/evidence-yolo1-2-search.png)
 
-ภาพรวมผลค้นหา (`3-results.png`) ของทั้ง 4 บัญชี แต่ละช่องครอปเฉพาะส่วนบนของภาพจริงและเพิ่มแถบชื่อบัญชีกับ config root ทั้ง 4 บัญชีเห็นเที่ยวบินชุดเดียวกัน แปลว่า Playwright MCP จาก `shared` ทำงานได้ทั้งฝั่ง Claude และ Codex
+![yolo1-3-results: ผลค้นหา Top flights จริงพร้อมเวลา จำนวนแวะ และราคา THB](img/evidence-yolo1-3-results.png)
 
-![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2](img/devtools-web-results-4accounts.png)
+ภาพรวมผลค้นหา (`3-results.png`) ของทั้ง 4 บัญชี แต่ละช่องครอปเฉพาะส่วนรายการเที่ยวบินของภาพจริงและเพิ่มแถบชื่อบัญชี ทั้ง 4 บัญชีเห็นเที่ยวบินชุดเดียวกัน แปลว่า Playwright MCP จาก `shared` ทำงานได้ทั้งฝั่ง Claude และ Codex ราคาและลำดับของผู้เรียนจะต่างจากนี้ตามวันที่ค้นหา
 
-### 4.4 · ผลการทดลองจริง (29 กันยายน 2026)
+![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2 ได้ผลชุดเดียวกัน](img/evidence-results-4accounts.png)
 
-ภาพต่อไปนี้ถ่ายจาก JupyterLab Terminal ของ container ทดลองหลังล็อกอินบัญชีจริง ส่งพรอมต์ด้วยวิธี shell และครอปเฉพาะส่วนผลลัพธ์
-
-![yolo1 ได้รหัส SHARED_SKILL_OK-claude จาก skill และค้นเที่ยวบินผ่าน playwright MCP สำเร็จ](img/devtools-shared-yolo1.png)
-
-![yolo2 เป็นอีกบัญชีแต่ได้รหัส skill เดียวกับ yolo1 และค้นเที่ยวบินผ่าน playwright MCP สำเร็จ](img/devtools-shared-yolo2.png)
-
-![cyolo1 ได้รหัส SHARED_SKILL_OK-codex จาก skill และเรียก tool mcp__playwright__ สำเร็จ](img/devtools-shared-cyolo1.png)
-
-![cyolo2 เป็นอีกบัญชีแต่ได้รหัส skill เดียวกับ cyolo1 และเรียก tool mcp__playwright__ สำเร็จ](img/devtools-shared-cyolo2.png)
-
-| บัญชี | config root | รหัสจาก `shared-check` | Playwright MCP |
-|---|---|---|---|
-| yolo1 | `.Claude/yolo1` | `SHARED_SKILL_OK-claude-…` | PASS |
-| yolo2 | `.Claude/yolo2` | รหัสเดียวกับ yolo1 | PASS |
-| cyolo1 | `.Codex/cyolo1` | `SHARED_SKILL_OK-codex-…` | PASS |
-| cyolo2 | `.Codex/cyolo2` | รหัสเดียวกับ cyolo1 | PASS |
-
-**อ่านผลอย่างไร:** บัญชีต่างกันแต่ได้รหัสเดียวกัน แปลว่าอ่าน skill จากไฟล์เดียวกันใน `shared` และการเรียก tool ชื่อ `playwright` แปลว่า MCP ส่วนกลางถูกโหลดในบัญชีนั้น รหัสและราคาของแต่ละเครื่องจะต่างจากภาพ เพราะรหัสสุ่มตอนติดตั้งและราคาเปลี่ยนตามเวลา
-
-**ข้อควรรู้:** Claude เรียก skill ผ่านเครื่องมือ `Skill` ส่วน Codex ไม่มีเครื่องมือแยก จะเปิด `SKILL.md` จาก path ที่ CLI ระบุในรายการ skill ซึ่งเป็นกลไกปกติของ Codex คำตอบของโมเดลเป็นเพียงคำบอกเล่า หากต้องการหลักฐานการเรียกจริง ให้ตรวจ log ของ session ใน `$CLAUDE_CONFIG_DIR/projects/` หรือ `$CODEX_HOME/sessions/`
+**ข้อควรรู้:** Claude เรียก skill ผ่านเครื่องมือ `Skill` ส่วน Codex ไม่มีเครื่องมือแยก จะเปิด `SKILL.md` จาก path ที่ CLI ระบุในรายการ skill ซึ่งเป็นกลไกปกติของ Codex คำตอบของโมเดลเป็นเพียงคำบอกเล่า หลักฐานที่แน่นอนกว่าคือ `run.log` และภาพใน `evidence/` หรือ log ของ session ใน `$CLAUDE_CONFIG_DIR/projects/` หรือ `$CODEX_HOME/sessions/`
