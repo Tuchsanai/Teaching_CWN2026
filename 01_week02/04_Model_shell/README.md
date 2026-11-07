@@ -4,7 +4,7 @@
 
 **ทำอย่างไร:** วางพรอมต์ใน **Claude Code app** ทีละการทดลอง Claude เขียนสคริปต์ลงใน container `my-multi-account` แล้วรันให้ ผู้เรียนอ่านสคริปต์ ดูผลจริง และดู GIF ว่าข้อมูลวิ่งไปทางไหน
 
-**ต้องมีก่อน:** container `my-multi-account` จาก [LAB 001 ส่วนที่ 2](../03_MultiAccount_Container/README.md) ที่ล็อกอินแล้วอย่างน้อย `yolo1`, `yolo2`, `yolo3`, `cyolo1`, `cyolo2` (มีน้อยกว่านี้ก็ได้ พรอมต์สั่งให้ Claude แทนด้วยบัญชีที่ล็อกอินแล้วของ CLI เดียวกัน)
+**ต้องมีก่อน:** container `my-multi-account` จาก บท [การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile](../03_MultiAccount_Container/README.md) ที่ล็อกอินแล้วอย่างน้อย `yolo1`, `yolo2`, `yolo3`, `cyolo1`, `cyolo2` (มีน้อยกว่านี้ก็ได้ พรอมต์สั่งให้ Claude แทนด้วยบัญชีที่ล็อกอินแล้วของ CLI เดียวกัน)
 
 | การทดลอง | รูปแบบการไหลของข้อมูล | เวลารันจริง |
 |---|---|---|
@@ -48,7 +48,7 @@
 
 ![ภาพเคลื่อนไหว: วางพรอมต์การทดลอง 1 ใน Claude Code app แล้ว Claude เขียนสคริปต์ใน container รัน และสรุปตาราง](img/desktop-exp1.gif)
 
-> ไฟล์ที่ Claude เขียนอยู่ใน `/workspace/shell-lab/` ของ container ซึ่งคือโฟลเดอร์ `03_MultiAccount_Container/workspace/shell-lab/` บนเครื่องเรา (map ไว้ใน LAB 001 ส่วนที่ 2) เปิดดูได้ทั้งใน VS Code และ File Browser ของ JupyterLab
+> ไฟล์ที่ Claude เขียนอยู่ใน `/workspace/shell-lab/` ของ container ซึ่งคือโฟลเดอร์ `03_MultiAccount_Container/workspace/shell-lab/` บนเครื่องเรา (map ไว้ในบท 03_MultiAccount_Container) เปิดดูได้ทั้งใน VS Code และ File Browser ของ JupyterLab
 
 ภาพรวม 3 รูปแบบที่จะต่อบัญชีเข้าด้วยกันในการทดลอง 2–4:
 

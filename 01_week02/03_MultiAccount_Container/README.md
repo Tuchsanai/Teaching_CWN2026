@@ -1,8 +1,8 @@
-# LAB 001 · ส่วนที่ 2: การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile
+# การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile
 
 ## 1. ที่มาของปัญหา: ข้อจำกัดของการติดตั้งใน container ที่กำลังทำงาน
 
-ใน[ส่วนที่ 1](../02_Setup_Multi_Account/README.md) ระบบหลายบัญชี (`yolo1`–`yolo5`, `cyolo1`–`cyolo5`, skill กลาง และ Playwright MCP) ถูกติดตั้งลงใน container `devtools` **ขณะที่ container กำลังทำงาน** ทุกอย่างที่ติดตั้งจึงอยู่ในชั้นข้อมูลที่เขียนได้ (writable layer) ของ container นั้นเพียงแห่งเดียว แนวทางนี้ใช้งานได้ แต่มีข้อจำกัด 3 ด้าน
+ในบท [`02_Setup_Multi_Account`](../02_Setup_Multi_Account/README.md) ระบบหลายบัญชี (`yolo1`–`yolo5`, `cyolo1`–`cyolo5`, skill กลาง และ Playwright MCP) ถูกติดตั้งลงใน container `devtools` **ขณะที่ container กำลังทำงาน** ทุกอย่างที่ติดตั้งจึงอยู่ในชั้นข้อมูลที่เขียนได้ (writable layer) ของ container นั้นเพียงแห่งเดียว แนวทางนี้ใช้งานได้ แต่มีข้อจำกัด 3 ด้าน
 
 | ด้าน | ข้อจำกัด |
 |---|---|
@@ -10,13 +10,9 @@
 | **การทำซ้ำได้ (reproducibility)** | สิ่งที่นำไปใช้ซ้ำได้มีเพียงพรอมต์ ไม่มีสิ่งที่ส่งต่อให้เครื่องอื่นใช้ได้ทันที |
 | **ความสอดคล้องระหว่างเครื่อง (consistency)** | AI เขียน installer ขึ้นใหม่ทุกครั้งที่ได้รับพรอมต์ ผลลัพธ์ของแต่ละเครื่องจึงอาจต่างกัน |
 
-![ภาพจำลอง: นักศึกษานั่งหน้าจอในห้องปฏิบัติการตอนกลางคืน หน้าจอแสดง Error: No such container: devtools และแถบติดตั้งใหม่ที่ 12%](img/photo-01-rebuild-problem.jpg)
+![ภาพเคลื่อนไหว: container devtools ที่ติดตั้ง yolo1–5, cyolo1–5, Playwright MCP และข้อมูลล็อกอินเพิ่มภายหลัง ถูกลบด้วย docker rm -f ทำให้ทุกอย่างสูญหาย จากนั้นใช้พรอมต์เดิมติดตั้งใหม่บน 3 เครื่องได้ผล PASS, FAIL และกำลังติดตั้งต่างกัน สรุปเป็นข้อจำกัด 3 ด้าน ได้แก่ ความคงทน การทำซ้ำได้ และความสอดคล้อง](img/gif-pain-points.gif)
 
-*(ภาพจำลอง) เมื่อ container ถูกลบ ระบบที่ติดตั้งไว้ทั้งหมดต้องเริ่มติดตั้งใหม่ตั้งแต่ต้น*
-
-![ภาพจำลอง: นักศึกษา 3 คนใช้เอกสารขั้นตอนชุดเดียวกัน แต่หน้าจอแสดงผล PASS, FAIL และกำลังติดตั้ง 47% ต่างกัน](img/photo-02-inconsistent-results.jpg)
-
-*(ภาพจำลอง) ใช้พรอมต์ชุดเดียวกัน แต่ได้ผลลัพธ์ต่างกัน เพราะ installer ถูกสร้างขึ้นใหม่ในแต่ละครั้ง*
+*ภาพเคลื่อนไหวประกอบแนวคิด (ประมาณ 16 วินาที) เวลาติดตั้ง ~5 นาทีมาจากผลรันจริงในบท `02_Setup_Multi_Account` ส่วนเวลาล็อกอิน ~15 นาทีเป็นเวลาโดยประมาณ ผลของเครื่อง A, B และ C เป็นตัวอย่างประกอบ*
 
 แนวทางแก้ไขคือเปลี่ยนจาก "ติดตั้งลงใน container ที่กำลังทำงาน" เป็น "**กำหนดสภาพแวดล้อมไว้ใน Dockerfile แล้ว build เป็น image**" เพื่อให้ทุก container ที่สร้างจาก image นี้มีองค์ประกอบเหมือนกันทุกครั้ง
 
@@ -39,7 +35,7 @@
 
 ![ภาพเคลื่อนไหว: ขั้นตอนของแบบที่ 1, 2 และ 3 ตามลำดับ และผลเมื่อลบ container ของแต่ละแบบ](img/gif-three-approaches.gif)
 
-*ภาพเคลื่อนไหวประกอบแนวคิด เวลาของแบบที่ 2 มาจากผลรันจริงในส่วนที่ 1 (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที) ตัวเลขของแบบที่ 3 มาจากการรันจริงในบทนี้*
+*ภาพเคลื่อนไหวประกอบแนวคิด เวลาของแบบที่ 2 มาจากผลรันจริงในบท `02_Setup_Multi_Account` (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที) ตัวเลขของแบบที่ 3 มาจากการรันจริงในบทนี้*
 
 ## 3. องค์ประกอบของ Docker ที่ใช้ในบทนี้
 
@@ -88,49 +84,111 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 
 **ตรวจก่อนเริ่ม:** Docker Desktop แสดง **Engine running** · Claude Code app ล็อกอินแล้ว · มีพื้นที่ดิสก์ว่างอย่างน้อย ~10 GB (image ~4.5 GB + build cache)
 
-**เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `03_MultiAccount_Container` ของรีโปนี้ ซึ่งมีวัตถุดิบ 2 อย่าง
+**เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `03_MultiAccount_Container` ของรีโปนี้
 
 ```text
 03_MultiAccount_Container/
-├── 00_Devtool_Container/     ← Dockerfile ของ devtools = จุดเริ่มต้น
-├── prompt_multi_account.md   ← สเปกระบบหลายบัญชี (นำมาจากส่วนที่ 1)
+├── 00_Devtool_Container/     ← Dockerfile มาตรฐานของ devtools (input ที่ 1)
+├── prompt_multi_account.md   ← สเปกระบบหลายบัญชี (input ที่ 2)
 └── _solution/                ← เฉลยจากการรันจริง (หากต้องการให้ Claude ทำเองทั้งหมด ให้ย้ายโฟลเดอร์นี้ออกก่อน)
 ```
 
-[`prompt_multi_account.md`](prompt_multi_account.md) คือสเปกระบบหลายบัญชีที่นำมาจากพรอมต์ของ[ส่วนที่ 1 · ขั้นที่ 1](../02_Setup_Multi_Account/README.md#ขั้นที่-1---ให้-claude-code-desktop-ตั้งค่าหลายบัญชี-10-นาที) (หัวข้อ "เป้าหมาย" ถึง "รายงาน") ส่วนที่ 1 ใช้สเปกนี้ติดตั้งลงใน container ที่กำลังทำงาน ส่วนบทนี้ใช้สเปกเดียวกันเป็นข้อกำหนดของ image ระบบหลายบัญชีของทั้งสองแบบจึงมีโครงสร้างเหมือนกัน ต่างกันเพียงวิธีติดตั้ง
-
 ## ขั้นที่ 1 · ให้ Claude สร้าง image (~30 นาที)
 
-วางพรอมต์ทั้งกรอบใน Claude Code app (Ctrl+V) → Enter → อนุญาตคำสั่ง `docker` เมื่อระบบถาม แล้วรอจน Claude สรุปผล
+### 1.1 · input และกระบวนการ
+
+Claude ใช้ input 2 อย่างสร้างโฟลเดอร์ `MultiAccountDevtool/` แล้ว build เป็น image
+
+![input ที่ 1 คือโฟลเดอร์ 00_Devtool_Container ที่มี Dockerfile มาตรฐานและ start.sh (Ubuntu 24.04, Docker-in-Docker, Python, Node.js 22, JupyterLab) input ที่ 2 คือ prompt_multi_account.md ที่ระบุ yolo1–5, cyolo1–5, shared skills + MCP, Playwright MCP + Chromium และกติกา ทดสอบ รายงาน Claude Code app คัดลอกเป็น MultiAccountDevtool แก้ Dockerfile ตามสเปก docker build และทดสอบ ได้โฟลเดอร์ MultiAccountDevtool และ image my-multi-account:1.0](img/concept-06-step1-process.png)
+
+| input | บทบาท | เนื้อหา |
+|---|---|---|
+| [`00_Devtool_Container/`](00_Devtool_Container/readme.md) | ฐานของ image | `Dockerfile` และ `start.sh` ของ devtools: Ubuntu 24.04, Docker-in-Docker, Python, Node.js 22, JupyterLab |
+| [`prompt_multi_account.md`](prompt_multi_account.md) | ข้อกำหนดของระบบหลายบัญชี | สิ่งที่ต้องมีใน image และเกณฑ์ทดสอบ (ดูข้อ 1.2) |
+
+### 1.2 · เนื้อหาของ `prompt_multi_account.md`
+
+สเปกนี้นำมาจากพรอมต์[ขั้นที่ 1 ของบท `02_Setup_Multi_Account`](../02_Setup_Multi_Account/README.md#ขั้นที่-1---ให้-claude-code-desktop-ตั้งค่าหลายบัญชี-10-นาที) บทดังกล่าวใช้สเปกนี้ติดตั้งลงใน container ที่กำลังทำงาน ส่วนบทนี้ใช้เป็นข้อกำหนดของ image ระบบหลายบัญชีของทั้งสองบทจึงมีโครงสร้างเหมือนกัน
+
+| หัวข้อ | สาระ |
+|---|---|
+| เป้าหมาย | คำสั่ง `yolo1`–`yolo5` (Claude Code) และ `cyolo1`–`cyolo5` (Codex CLI) แยกโฟลเดอร์ต่อบัญชี และโฟลเดอร์ `shared` สำหรับ skill และ MCP กลาง |
+| กติกา | แยก credential ต่อบัญชี installer รันซ้ำได้โดยไม่ทับของเดิม MCP ตัวแรกคือ Playwright และ skill ตัวอย่าง `shared-check` |
+| ข้อเท็จจริงจากการทดลอง | ข้อควรรู้เฉพาะของแต่ละ CLI ที่พบจากการรันจริง เพื่อไม่ต้องลองผิดลองถูก |
+| ทดสอบ | เกณฑ์ PASS/FAIL/SKIP |
+| รายงาน | `setup-report.md`, `login-guide.md`, `checklist.md` |
+
+ข้อความเต็มของไฟล์:
+
+```text
+ตรวจ --help ของเวอร์ชันจริงก่อนใช้ env/flag ห้ามเดา
+
+## เป้าหมาย (BASE=/root/ai-accounts)
+- yolo1..yolo5   → claude --dangerously-skip-permissions  (CLAUDE_CONFIG_DIR=$BASE/.Claude/yoloN)
+- cyolo1..cyolo5 → codex --dangerously-bypass-approvals-and-sandbox  (CODEX_HOME=$BASE/.Codex/cyoloN)
+- wrapper วางใน /usr/local/bin ให้พิมพ์ได้ทันที ส่งต่อ "$@" ครบ แจ้งชัดถ้าโฟลเดอร์บัญชีไม่มี ไม่พิมพ์ secret
+- $BASE/.Claude/shared และ $BASE/.Codex/shared มี skills/ และ mcp/ แก้ครั้งเดียว ทุกบัญชีของ CLI นั้นเห็นตอนเปิดครั้งถัดไป
+
+## กติกา
+- แยก credential/config/session ต่อบัญชี เปิดพร้อมกันได้ ใช้ CLAUDE_CONFIG_DIR/CODEX_HOME เท่านั้น ห้ามเปลี่ยน $HOME
+- Codex ใช้ file-based credential ต่อ CODEX_HOME ห้ามแชร์ credential ใน shared
+- สร้าง installer เป็นไฟล์ใน container รันซ้ำได้ ไม่เขียนทับ credential/config เดิม ห้ามแก้ .bashrc/Git/SSH
+- MCP ส่วนกลางตัวแรก: Playwright (@playwright/mcp) + Chromium ติดตั้งครั้งเดียว
+- skill ตัวอย่าง shared-check: ตอบ SHARED_SKILL_OK-<tool>-<ค่าสุ่มตอนติดตั้ง> ซึ่งมีในไฟล์ skill เท่านั้น
+
+## ข้อเท็จจริงจากการทดลอง (ตรวจว่ายังจริงกับเวอร์ชันนี้)
+- root ต้องตั้ง IS_SANDBOX=1; CODEX_HOME ต้อง mkdir -p ก่อน
+- Claude: skill อ่านจาก $CLAUDE_CONFIG_DIR/skills; MCP ส่งผ่าน --mcp-config=<ไฟล์> (ต้องมี =)
+  ห้าม symlink .claude.json (มีสถานะล็อกอิน); claude mcp list ไม่แสดง MCP นี้ ให้ตรวจด้วย /mcp
+- Codex: skill อ่านจาก $CODEX_HOME/skills และเขียน skills/.system เอง ห้าม symlink ทั้งโฟลเดอร์
+  MCP ส่งด้วย -c mcp_servers.<name>={...} (ใช้กับ codex mcp list ได้)
+- Playwright ใน root container: --browser chromium --headless --isolated --no-sandbox และ --output-dir นอกโฟลเดอร์งาน
+  ติดตั้ง Chromium ด้วย playwright ในแพ็กเกจ @playwright/mcp ให้เวอร์ชันตรงกัน (อาจต้อง install-deps)
+
+## ทดสอบใน container (PASS/FAIL/SKIP ตามจริง)
+- 10 คำสั่ง --version ครบ, config root คนละโฟลเดอร์, installer รอบ 2 ไม่ทำลายของเดิม
+- cyoloN mcp list เห็น playwright, skill shared-check ทุกบัญชี readlink -f ไปไฟล์เดียวกันใน shared
+- อะไรที่ต้องล็อกอิน = SKIP
+
+## รายงาน (ห้ามมี secret)
+- setup-report.md: โครงสร้างโฟลเดอร์, wrapper, แต่ละ CLI อ่าน skill/MCP จากไหน, ข้อจำกัด
+- login-guide.md: ล็อกอินทีละบัญชีใน JupyterLab Terminal
+- checklist.md: รายการ | หลักฐาน | PASS/FAIL/SKIP
+เสร็จแล้วสรุปเป็นตารางสั้น ๆ แล้วหยุดรอ ห้ามล็อกอินแทนฉัน
+```
+
+### 1.3 · วางพรอมต์
+
+วางพรอมต์ทั้งกรอบใน Claude Code app (Ctrl+V) → Enter → อนุญาตคำสั่ง `docker` เมื่อระบบถาม แล้วรอจน Claude สรุปผล พรอมต์อ้างถึง input ทั้ง 2 อย่างในหัวข้อ "วัตถุดิบ"
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ build image ใน Claude Code app, Claude อ่านสเปก คัดลอก 00_Devtool_Container แก้ Dockerfile แล้ว docker build และทดสอบ จนได้ตารางผล](img/desktop-step1-build.gif)
 
 ```text
-ช่วยสร้าง Docker image ของผมเองชื่อ my-multi-account:1.0 ให้เปิดมาแล้วใช้หลายบัญชี AI ได้ทันที
-ทำบนเครื่องผมในโฟลเดอร์นี้ ใช้คำสั่ง docker ได้ แต่ห้ามลบ หยุด หรือแก้ container / image / volume ที่มีอยู่แล้ว
+ช่วยสร้าง Docker image ชื่อ my-multi-account:1.0 ที่เปิดมาแล้วใช้หลายบัญชี AI ได้ทันที
+ทำในโฟลเดอร์นี้ ใช้คำสั่ง docker ได้ แต่ห้ามลบ หยุด หรือแก้ container / image / volume ที่มีอยู่
 (ห้าม docker system prune และห้ามแตะ volume ai-accounts)
 
 วัตถุดิบ
-- ./00_Devtool_Container = Dockerfile ของ devtools จาก LAB 01 (ไม่มี SSH) คัดลอกเป็น ./MultiAccountDevtool แล้วแก้ในนั้นเท่านั้น
-  ถ้ามี ./MultiAccountDevtool อยู่แล้ว ให้ตรวจเทียบสเปกแล้วแก้เฉพาะที่ขาด
+- ./00_Devtool_Container = Dockerfile มาตรฐานของ devtools คัดลอกเป็น ./MultiAccountDevtool แล้วแก้ในนั้นเท่านั้น
+  ถ้ามี ./MultiAccountDevtool อยู่แล้ว ให้เทียบกับสเปกแล้วแก้เฉพาะที่ขาด
 - ./prompt_multi_account.md = สเปกระบบหลายบัญชี ทุกข้อต้องเป็นจริงใน image
   ส่วน "ข้อเท็จจริงจากการทดลอง" ให้ตรวจกับ --help ของเวอร์ชันจริงก่อนใช้
 
-สิ่งที่ต้องอบลงใน image
+สิ่งที่ต้องอยู่ใน image
 - Claude Code, Codex CLI, Playwright MCP (pin เวอร์ชัน) + Chromium + ฟอนต์ไทย
-- installer และคำสั่ง yolo1..5 / cyolo1..5 ใน /usr/local/bin พิมพ์ได้ทันทีทั้งใน JupyterLab Terminal และ docker exec
+- installer และคำสั่ง yolo1..5 / cyolo1..5 ใน /usr/local/bin ใช้ได้ทั้งใน JupyterLab Terminal และ docker exec
 - ห้ามมีข้อมูลล็อกอินใน image: /root/ai-accounts เป็น volume และ installer รันทุกครั้งที่ container start โดยไม่ทับของเดิม
-- ไม่ต้องมี SSH (ผมคุมทุกอย่างผ่าน Claude Code app) คง Docker-in-Docker และ JupyterLab ไว้
+- คง Docker-in-Docker และ JupyterLab ไว้
 
 build ด้วย: docker build -t my-multi-account:1.0 ./MultiAccountDevtool
 
-ทดสอบด้วย container และ volume ทดสอบชื่อใหม่ของตัวเอง แล้วลบทิ้งเมื่อเสร็จ (PASS/FAIL/SKIP ตามจริง)
+ทดสอบด้วย container และ volume ทดสอบชื่อใหม่ แล้วลบทิ้งเมื่อเสร็จ (PASS/FAIL/SKIP ตามจริง)
 - yolo1..5 / cyolo1..5 --version ครบ 10 คำสั่ง และ config root คนละโฟลเดอร์
 - skill shared-check ทุกบัญชีชี้ไปไฟล์เดียวกันใน shared และ cyolo1 mcp list เห็น playwright
 - Playwright MCP ผ่าน stdio เปิด https://example.com แล้ว screenshot ได้
 - installer รอบ 2 ไม่ทับของเดิม และลบ container แล้วสร้างใหม่ ของใน volume ยังอยู่
 - JupyterLab /lab ตอบ 200
-อะไรที่ต้องล็อกอิน = SKIP ห้ามล็อกอินแทนผม
+ข้อที่ต้องล็อกอิน = SKIP ห้ามล็อกอินแทนผม
 
 เขียนรายงานตามหัวข้อ "รายงาน" ของสเปกไว้ใน ./MultiAccountDevtool (ห้ามมี secret)
 เสร็จแล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ขนาด image และเวลา build แล้วหยุด
@@ -138,10 +196,12 @@ build ด้วย: docker build -t my-multi-account:1.0 ./MultiAccountDevtool
 
 **หลักการออกแบบพรอมต์**
 
-- **ระบุวัตถุดิบให้ชัดเจน:** เริ่มจาก Dockerfile ของ devtools และสเปกเดิมจากส่วนที่ 1 Claude จึงไม่ต้องคาดเดาโครงสร้างของระบบหลายบัญชี
-- **แยกสิ่งที่อยู่ใน image ออกจากสิ่งที่อยู่ใน volume:** โปรแกรมอยู่ใน image ส่วนข้อมูลล็อกอินอยู่ใน volume หากข้อมูลล็อกอินติดไปกับ image การแชร์ image ก็เท่ากับเปิดเผยบัญชีของเรา
-- **ไม่แตะทรัพยากรเดิม:** ทดสอบด้วย container และ volume ทดสอบแล้วลบทิ้ง จึงไม่กระทบระบบเดิมและข้อมูลล็อกอินจริง
-- **รายงานเป็น PASS/FAIL/SKIP:** ผู้เรียนตรวจสอบผลจากหลักฐานได้ ไม่ต้องอาศัยคำบอกเล่าของ AI
+- **ระบุ input ชัดเจน:** Claude ไม่ต้องคาดเดาฐานของ image หรือโครงสร้างระบบหลายบัญชี
+- **แยก image ออกจาก volume:** โปรแกรมอยู่ใน image ข้อมูลล็อกอินอยู่ใน volume การแชร์ image จึงไม่เปิดเผยบัญชี
+- **ไม่แตะทรัพยากรเดิม:** ทดสอบด้วย container และ volume ชั่วคราวแล้วลบทิ้ง
+- **รายงานเป็น PASS/FAIL/SKIP:** ตรวจผลจากหลักฐานได้ ไม่ต้องอาศัยคำบอกเล่าของ AI
+
+### 1.4 · ผลจริง
 
 **ผลจริง** (7 พ.ย. 2026 · ~28 นาที): **9 PASS · 0 FAIL · 1 SKIP** (ข้อที่ต้องล็อกอิน) image ขนาด **4.47 GB** build ใหม่แบบไม่ใช้ cache ใช้ **302 วินาที** ได้ Claude Code 2.1.319, Codex 0.167.0, Playwright MCP 0.0.84
 
@@ -197,14 +257,14 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ### 3.1 · ล็อกอินใน JupyterLab: 1 บัญชีต่อ 1 แท็บ Terminal
 
-วิธีเดียวกับส่วนที่ 1 (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ส่วนที่ 1 · ขั้นที่ 3.1](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
+วิธีเดียวกับบท `02_Setup_Multi_Account` (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ขั้นที่ 3.1 ของบทดังกล่าว](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
 
 | พิมพ์ | หน้าจอล็อกอิน | เลือก |
 |---|---|---|
 | `yolo1` … `yolo5` | Select login method | **Claude account with subscription** → ยืนยันในเบราว์เซอร์ → **Yes, I trust this folder** → `/exit` |
 | `cyolo1` … `cyolo5` | Choose how you want to use Codex | **Sign in with ChatGPT** หรือ `cyolo1 login --device-auth` หากเบราว์เซอร์ส่งผลกลับไม่ได้ |
 
-**ความต่างจากส่วนที่ 1:** ข้อมูลล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ใน container จึงล็อกอินเพียง**ครั้งเดียว** และยังใช้ได้แม้ลบ container หรือ build image ใหม่ (ทดสอบในขั้นที่ 5)
+**ความต่างจากแบบที่ 2:** ข้อมูลล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ใน container จึงล็อกอินเพียง**ครั้งเดียว** และยังใช้ได้แม้ลบ container หรือ build image ใหม่ (ทดสอบในขั้นที่ 5)
 
 > **ผู้เรียนต้องล็อกอินด้วยตนเองเสมอ** ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือผู้อื่น
 
@@ -227,7 +287,7 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ## ขั้นที่ 4 · ทดสอบ skill และ MCP ข้ามบัญชีแบบขนาน (~5 นาที)
 
-แต่ละบัญชีเรียก skill กลาง `shared-check` และใช้ **Playwright MCP** เปิด Google Flights ค้นหาเที่ยวบิน BKK → Tokyo แล้วบันทึกภาพหน้าจอ **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน** ต่างจากส่วนที่ 1 ตรงที่**ทุกบัญชีทำงานพร้อมกัน** ซึ่งเป็นวัตถุประสงค์หลักของการมีหลายบัญชี
+แต่ละบัญชีเรียก skill กลาง `shared-check` และใช้ **Playwright MCP** เปิด Google Flights ค้นหาเที่ยวบิน BKK → Tokyo แล้วบันทึกภาพหน้าจอ **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน** ต่างจากแบบที่ 2 ตรงที่**ทุกบัญชีทำงานพร้อมกัน** ซึ่งเป็นวัตถุประสงค์หลักของการมีหลายบัญชี
 
 พรอมต์มี 2 ส่วน: **เหนือเส้น `====`** คืองานของ Claude ใน Claude Code app (ตรวจล็อกอิน เลือกบัญชี สั่งรันพร้อมกัน สรุปผล) และ**ใต้เส้น `====`** คืองานที่แต่ละบัญชีทำภายใน container
 
@@ -265,7 +325,7 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ทดสอบใน Claude Code app, Claude เลือก yolo1 yolo2 cyolo1 cyolo2 รันพร้อมกัน แล้วได้ตารางผล PASS ทั้ง 4 บัญชี](img/desktop-step4-test.gif)
 
-**ผลจริง** (7 พ.ย. 2026 · **5 นาที 20 วินาที** สำหรับ 4 บัญชีพร้อมกัน · ส่วนที่ 1 รันทีละบัญชีใช้ ~10 นาที)
+**ผลจริง** (7 พ.ย. 2026 · **5 นาที 20 วินาที** สำหรับ 4 บัญชีพร้อมกัน · แบบที่ 2 ในบท `02_Setup_Multi_Account` รันทีละบัญชีใช้ ~10 นาที)
 
 ![ผลจริงจาก Claude: ทั้ง 4 บัญชี PASS รหัส shared-check ตรงกันตาม CLI และเที่ยวบินอันดับ 1 Vietjet THB 5,956](img/desktop-step4-result.png)
 
@@ -319,7 +379,7 @@ which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
 
 ![ภาพเคลื่อนไหว: เมื่อ container ถูกลบ แบบที่ 2 ต้องติดตั้งและล็อกอินใหม่รวมประมาณ 20 นาที แบบที่ 3 docker run ใหม่พร้อมใช้ใน 3.27 วินาที](img/gif-recreate-compare.gif)
 
-*ตัวเลขของแบบที่ 3 วัดจริงในขั้นนี้ ตัวเลขของแบบที่ 2 มาจากผลรันจริงในส่วนที่ 1 (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที)*
+*ตัวเลขของแบบที่ 3 วัดจริงในขั้นนี้ ตัวเลขของแบบที่ 2 มาจากผลรันจริงในบท `02_Setup_Multi_Account` (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที)*
 
 ![ภาพจำลอง: นักศึกษา 3 คนในห้องปฏิบัติการ หน้าจอทั้งสามแสดง my-multi-account:1.0 yolo1-5 OK cyolo1-5 OK playwright OK และ ready in 3.27 s เหมือนกัน](img/photo-03-reproducible-team.jpg)
 
