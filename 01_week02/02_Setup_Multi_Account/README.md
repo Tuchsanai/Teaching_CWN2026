@@ -1,8 +1,8 @@
-# LAB 001 · ส่วนที่ 1: ใช้งานหลายบัญชีผ่าน JupyterLab (Claude Code + Codex CLI)
+# LAB 001 · ส่วนที่ 1: ปรับ devtools ให้รองรับหลายบัญชีด้วย Claude Code Desktop (Claude Code + Codex CLI)
 
-เวลาโดยประมาณสำหรับส่วนนี้: 35–50 นาที ขึ้นอยู่กับการตั้งค่าหลายบัญชีและล็อกอิน
+เวลาโดยประมาณสำหรับส่วนนี้: 40–55 นาที ขึ้นอยู่กับการล็อกอินแต่ละบัญชี
 
-**สิ่งที่จะได้:** container `devtools` เครื่องเดียวที่มีบัญชี AI หลายบัญชีทั้ง Claude Code และ Codex พร้อมให้แบ่งงานใหญ่ไปทำพร้อมกัน โดยใช้ skill และ MCP ชุดเดียวกันทุกบัญชี
+**สิ่งที่จะได้:** container `devtools` ตัวเดิมจากบทที่แล้ว ถูกปรับโครงสร้างข้างในให้มีบัญชี AI หลายบัญชีทั้ง Claude Code และ Codex พร้อมให้แบ่งงานใหญ่ไปทำพร้อมกัน โดยใช้ skill และ MCP ชุดเดียวกันทุกบัญชี ทั้งหมดสั่งจาก Claude Code Desktop บน Windows
 
 บทเรียนที่เชื่อมโยง: [AI Agent Routing](../ai-agent-routing.html) หัวข้อ 1.0 และ 4.0–4.3
 
@@ -35,7 +35,7 @@
 
 - **ครัว** คือ container `devtools`
 - **เชฟแต่ละคน** คือบัญชี `yolo1`–`yolo5` (Claude Code) และ `cyolo1`–`cyolo5` (Codex CLI)
-- **สูตรและเครื่องมือกลาง** คือ skill และ MCP ใน `shared` ที่ทุกบัญชีใช้ร่วมกัน (ตั้งค่าในขั้นที่ 2)
+- **สูตรและเครื่องมือกลาง** คือ skill และ MCP ใน `shared` ที่ทุกบัญชีใช้ร่วมกัน (ตั้งค่าในขั้นที่ 1)
 
 ภาพเคลื่อนไหวด้านล่างเทียบงานใหญ่ 6 ชิ้นแบบทำในบัญชีเดียว กับแบบแบ่งให้ 6 บัญชีใน container เดียว
 
@@ -65,217 +65,239 @@ Claude กับ Codex ถนัดงานต่างกัน เมื่�
 
 บัญชีเหล่านี้จะใช้ต่อในบทเรียนถัด ๆ ไปที่แบ่งงานใหญ่ให้ multi-agent ส่วนใน LAB นี้เราจะ **เตรียมครัวให้พร้อม**: ตั้งค่าบัญชี ล็อกอิน เลือกโมเดล และพิสูจน์ว่า skill กับ MCP ใช้ร่วมกันได้ทุกบัญชี
 
-## 0 · ก่อนเริ่ม · ใช้ JupyterLab จาก LAB ก่อนหน้า
+## จุดเริ่มต้น: ตอนนี้ devtools ยังเป็น Linux ธรรมดา
 
-แลปนี้ทำทุกขั้นผ่าน **Terminal ใน JupyterLab ของ Linux container `devtools`** ที่เตรียมจาก [บท Docker และ VS Code](../01_Docker_VSCode_Setup/README.md) ให้ Docker และ container ทำงานอยู่ก่อนเริ่ม
+ใน [บทที่แล้ว](../01_Docker_VSCode_Setup/README.md) เราสร้าง container `devtools` จาก image `tuchsanai/devtools:2569_1` ข้างในเป็น Ubuntu ที่ติดตั้ง Python, Node.js, Git, Docker, JupyterLab, Claude Code และ Codex ไว้พร้อมแล้ว
 
-### 0.1 · เปิด JupyterLab จาก VS Code (ทบทวนหัวข้อ 6.1 ของ LAB ก่อนหน้า)
+![container devtools สร้างมาจาก Dockerfile ใน GitHub ของวิชา build เป็น image แล้ว run เป็น container](../01_Docker_VSCode_Setup/assets/00-dockerfile-to-devtools.png)
 
-1. ในหน้าต่าง **VS Code บนเครื่องผู้เรียน** เปิดแถบ **Containers** ทางซ้าย
-2. คลิกขวาที่ container **devtools** แล้วเลือก **Open in External Browser**
-3. เลือก **8888 localhost:8885** โดย `8888` คือพอร์ตภายใน container และ `8885` คือพอร์ตบนเครื่องผู้เรียน หาก LAB ก่อนหน้าใช้พอร์ตอื่น ให้เลือกรายการที่แมปจาก `8888` มายังพอร์ตนั้น
-4. เบราว์เซอร์จะเปิด JupyterLab หากต้องการเปิดเอง สามารถเข้า [JupyterLab](http://localhost:8885/lab) โดยปรับพอร์ตให้ตรงกับที่ใช้จริง
+*ภาพจากบทที่แล้ว: ที่มาของ container `devtools`*
 
-![คลิกขวาที่ devtools ใน VS Code เลือก Open in External Browser แล้วเลือกพอร์ต JupyterLab](img/jupyter-open-from-vscode.png)
+แต่ image นี้ **ไม่ได้ออกแบบมาให้มีหลายบัญชี** ภาพด้านล่างคือ Terminal ใน JupyterLab ของ `devtools` ก่อนเริ่ม LAB นี้ มี `claude` กับ `codex` แล้ว แต่ยังไม่มีโฟลเดอร์ `~/ai-accounts` และยังไม่มีคำสั่ง `yolo` / `cyolo`
 
-*นำภาพจากหัวข้อ 6.1 ของ LAB ก่อนหน้ามาใช้ซ้ำ: ภาพจากหน้าจอจริงที่ปรับด้วย Imagegen เพื่อซ่อนรายการที่ไม่เกี่ยวข้องและเน้นจุดที่ต้องเลือก*
+![Terminal จริงใน devtools ก่อนปรับ: มี claude และ codex แต่ไม่มี ai-accounts และไม่มีคำสั่ง yolo1 cyolo1](img/devtools-before-plain.png)
 
-เมื่อเปิด JupyterLab แล้ว ไปขั้นที่ 1 เพื่อคลิก Terminal ตามภาพ จากนั้นใช้ Terminal นี้ทำขั้นที่ 2
+*ภาพจริงจาก container `devtools` ที่เพิ่งสร้างตามบทที่แล้ว (7 พ.ย. 2026) ก่อนรันพรอมต์ของ LAB นี้*
 
-**อ่านสัญลักษณ์ให้ถูก:** 🖥️ Terminal / shell หมายถึง Terminal ใน JupyterLab ส่วน 💬 ช่องสนทนา AI หมายถึงหน้าสนทนาของ Claude Code หรือ Codex CLI ที่เปิดอยู่ใน Terminal นั้น คำสั่ง Bash พิมพ์ที่ shell; พรอมต์ยาวและคำสั่ง `/login` หรือ `/model` พิมพ์ในหน้าสนทนาของ CLI ที่ระบุ ไม่ต้องสร้าง Notebook หรือวางคำสั่งในเซลล์ Python
+### เป้าหมาย: ปรับโครงสร้างข้างใน ขณะที่ container ยังรันอยู่
 
-Terminal ทำงานบนเครื่องที่รัน Jupyter server ซึ่งในแลปนี้คือ container ไม่ใช่บนเบราว์เซอร์ ตาม [เอกสาร JupyterLab Terminal](https://jupyterlab.readthedocs.io/en/stable/user/terminal.html) การล็อกอินอาจเปิดหน้าเว็บแยก ให้ผู้เรียนยืนยันตัวตนเองแล้วกลับมาทำงานใน Terminal
+เราจะ **ไม่สร้าง image ใหม่และไม่ลบ container** แต่จะเพิ่มโครงสร้างเข้าไปใน `devtools` ตัวเดิม ได้แก่ โฟลเดอร์แยกต่อบัญชี โฟลเดอร์ `shared` สำหรับ skill และ MCP ที่ใช้ร่วมกัน และคำสั่งสั้น `yolo1`–`yolo5` กับ `cyolo1`–`cyolo5`
 
-### 0.2 · เส้นทางการเรียนรู้
+![ก่อนและหลัง: devtools เดิมเป็น Linux ธรรมดาล็อกอินได้ทีละบัญชี หลังปรับมีโฟลเดอร์ ai-accounts แยก yolo และ cyolo พร้อม shared และคำสั่งใน /usr/local/bin](img/arch-01-before-after.png)
 
-| ส่วน | เนื้อหา | เอกสาร |
-|---|---|---|
-| **1 · ตั้งค่าหลายบัญชีและใช้งานเบื้องต้น** | ขั้นที่ 1–3: เปิด Claude Code ตั้งค่าหลายบัญชี ล็อกอิน เลือกโมเดล และตรวจ skill/MCP ส่วนกลาง | ไฟล์นี้ |
+*ภาพแนวคิด สร้างด้วย Imagegen ชื่อโฟลเดอร์และตำแหน่งคำสั่งตรงกับผลการรันจริงในขั้นที่ 1*
 
-ทำตามขั้นที่ 1–3 เพื่อใช้เครื่องมือที่มีอยู่แล้วกับบัญชีที่แยกการตั้งค่ากัน
+### ใครเป็นคนปรับ? Claude Code Desktop จากข้างนอก
 
-## ขั้นที่ 1 · เปิด Terminal ใน JupyterLab (~5 นาที)
+ใน LAB นี้เราไม่ต้องเข้าไปพิมพ์คำสั่ง Linux เอง เราใช้ **Claude Code Desktop บน Windows** ตัวเดียวกับที่ใช้สร้าง container ในบทที่แล้ว แค่วางพรอมต์ Claude จะส่งคำสั่งเข้าไปทำงานใน container ด้วย `docker exec devtools …` (คำสั่งของ Docker ที่ใช้ "สั่งงานข้างใน container ที่กำลังรันอยู่") แล้วสร้างโครงสร้างทั้งหมดให้
 
-ใช้เครื่องมือที่ติดตั้งไว้ใน `devtools` จาก LAB ก่อนหน้า ไม่ต้องติดตั้งซ้ำหรือสร้างโฟลเดอร์เพิ่มด้วยตนเอง
+![Claude Code Desktop บน Windows ส่งคำสั่ง docker exec เข้าไปใน devtools ที่กำลังรัน เพื่อสร้างโฟลเดอร์ คำสั่ง yolo/cyolo และติดตั้ง skill กับ MCP กลาง](img/arch-02-desktop-outside.png)
 
-### 1.1 · คลิก Terminal ในหน้า Launcher
+*ภาพแนวคิด สร้างด้วย Imagegen*
 
-คลิก **Terminal** ในกลุ่ม **Other** ตามวงกลมและลูกศรในภาพ หากไม่เห็นหน้า Launcher ให้กดปุ่ม **+** ก่อน
+สิ่งเดียวที่ Claude **ทำแทนไม่ได้** คือการล็อกอินบัญชี เพราะต้องยืนยันตัวตนในเบราว์เซอร์ด้วยตัวเราเอง ขั้นนี้จึงทำใน JupyterLab Terminal ข้างใน container
 
-![วงกลมและลูกศรชี้ปุ่ม Terminal ในกลุ่ม Other ของ JupyterLab Launcher](img/jupyter-launcher-terminal-highlight.png)
+## ภาพรวมการทดลอง
 
-*ภาพ Launcher จาก LAB ก่อนหน้า เพิ่มวงกลม ลูกศร และคำกำกับด้วย Imagegen เพื่อชี้ตำแหน่งที่ต้องคลิก*
+![ขั้นตอนการทดลอง 4 ขั้น: วางพรอมต์ใน Claude Code Desktop, ตรวจผลใน JupyterLab, ล็อกอินทีละบัญชี, ทดสอบข้ามบัญชี](img/arch-03-protocol.png)
 
-**หลังคลิก:** จะมีแท็บ Terminal เปิดขึ้นมา พร้อม shell สำหรับพิมพ์คำสั่งภายใน container
+*ภาพแนวคิด สร้างด้วย Imagegen*
 
-## ขั้นที่ 2 · ให้ Claude Code ตั้งค่าหลายบัญชี (~20 นาที)
+ภาพเคลื่อนไหวด้านล่างแสดงลำดับทั้ง 4 ขั้น: ข้างนอก (Windows) และข้างใน (container) ทำงานส่งต่อกันอย่างไร
 
-ให้ Claude Code ตรวจเครื่องมือที่ติดตั้งไว้จาก LAB ก่อนหน้า และสร้างคำสั่ง `yolo1`–`yolo5` กับ `cyolo1`–`cyolo5` สำหรับใช้งานหลายบัญชี โดยแยกข้อมูลแต่ละบัญชีและยังไม่ล็อกอินบัญชีเหล่านี้
+![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code Desktop, Claude ใช้ docker exec สร้างโฟลเดอร์และคำสั่งใน devtools, เราล็อกอินใน JupyterLab, Claude ทดสอบทุกบัญชีจนผ่าน](img/arch-04-protocol-flow.gif)
 
-ใช้ Terminal ที่เปิดจากขั้นที่ 1 สำหรับตั้งค่าด้วยพรอมต์ด้านล่าง โดยเปิด Claude Code ด้วยคำสั่ง `claude` และล็อกอินบัญชีตัวช่วยตั้งค่าให้พร้อมก่อนวางพรอมต์ บัญชีแยกทั้ง 10 ช่องจะให้ผู้เรียนล็อกอินเองในขั้นที่ 3 **เปิดเซสชันตั้งค่านี้ค้างไว้** เพราะจะกลับมาใช้ทดสอบต่อในหัวข้อ 3.3
+*ภาพเคลื่อนไหวอธิบายลำดับ (ประมาณ 22 วินาที วนซ้ำ) ไม่ใช่การบันทึกหน้าจอจริง*
 
-### 2.1 · ทำไมเราต้องใช้พรอมต์ตั้งค่าชุดนี้?
+| ขั้น | ทำที่ไหน | ใครทำ | หลักฐานว่าสำเร็จ |
+|---|---|---|---|
+| **1 · วางพรอมต์ตั้งค่า** | 💻 Claude Code Desktop (ข้างนอก) | Claude | ตารางสรุป PASS/FAIL/SKIP และไฟล์รายงานใน `/workspace/multi-account/` |
+| **2 · ตรวจผลข้างใน** | 🖥️ JupyterLab ของ `devtools` | เรา | เห็นโฟลเดอร์ `ai-accounts` และ `yolo1 --version` ใช้ได้ |
+| **3 · ล็อกอินทีละบัญชี** | 🖥️ JupyterLab Terminal | เรา | เข้าหน้าสนทนาได้ และเลือกโมเดลได้ |
+| **4 · ทดสอบข้ามบัญชี** | 💻 Claude Code Desktop (ข้างนอก) | Claude | ทุกบัญชีได้รหัส skill เดียวกัน และ Playwright MCP เก็บภาพเว็บจริงได้ |
 
-ลองนึกว่ามีลิ้นชักแยกตามบัญชี: คำสั่ง `yolo1` เลือกลิ้นชักของ Claude บัญชีที่ 1 ส่วน `yolo2` เลือกบัญชีที่ 2 ใช้โปรแกรม CLI เดิม แต่ชี้ไปยังข้อมูลคนละชุด ผู้เรียนจึงไม่ต้องจำคำสั่งกำหนดโฟลเดอร์ยาว ๆ ทุกครั้ง หลักเดียวกันใช้กับ `cyolo1`–`cyolo5` ของ Codex
+**อ่านสัญลักษณ์ให้ถูก:** 💻 คือหน้าต่าง Claude Code Desktop บน Windows, 🖥️ คือ Terminal ใน JupyterLab ของ `devtools`, 💬 คือช่องสนทนาของ Claude Code หรือ Codex ที่เปิดอยู่ใน Terminal นั้น
 
-![เหตุผลที่ตั้งค่าหลายบัญชีผ่าน JupyterLab Terminal ใน Linux container](img/multi-account-01-why.png)
+## 0 · ก่อนเริ่ม (~3 นาที)
 
-*ภาพแนวคิดสร้างด้วย Imagegen ไม่ใช่ภาพหน้าจอหรือหลักฐานว่าติดตั้งแล้ว ภาพแสดงบางบัญชีเพื่อให้อ่านง่าย; พรอมต์สร้างช่องบัญชีเครื่องมือละ 5 ช่อง*
+ตรวจ 3 อย่างนี้ก่อน:
+
+1. **Docker Desktop** ขึ้น **Engine running** (ทบทวนหัวข้อ 1.4 ของบทที่แล้ว)
+2. container **`devtools`** กำลังรัน: ใน VS Code แถบ **Containers** ต้องเห็น `devtools` มีสามเหลี่ยมสีเขียว
+3. **Claude Code Desktop** บน Windows ล็อกอินแล้ว (บัญชีนี้เป็นตัวช่วยตั้งค่า ไม่ใช่หนึ่งในบัญชี yolo)
+
+![แถบ Containers ใน VS Code แสดง container devtools กำลังรัน](../01_Docker_VSCode_Setup/assets/03-vscode-devtools-running.png)
+
+*ภาพจากบทที่แล้ว หัวข้อ 3.2*
+
+## ขั้นที่ 1 · 💻 ให้ Claude Code Desktop ปรับโครงสร้างข้างใน (~10 นาที)
+
+### 1.1 · ทำไมพรอมต์ต้องเขียนแบบนี้?
+
+ลองนึกว่ามีลิ้นชักแยกตามบัญชี: คำสั่ง `yolo1` เลือกลิ้นชักของ Claude บัญชีที่ 1 ส่วน `yolo2` เลือกบัญชีที่ 2 ใช้โปรแกรม CLI เดิม แต่ชี้ไปยังข้อมูลคนละชุด หลักเดียวกันใช้กับ `cyolo1`–`cyolo5` ของ Codex
 
 | สิ่งที่พรอมต์กำหนด | ช่วยผู้เรียนอย่างไร |
 |---|---|
-| คำสั่งสั้นแยกตามบัญชี | เลือกบัญชีได้ชัด และเปิด Terminal หลายแท็บเพื่อใช้คนละบัญชีได้ |
-| โฟลเดอร์การตั้งค่าต่อบัญชี | ลดการปะปนของการตั้งค่าและประวัติ โดยต้องตรวจวิธีเก็บ credential ของ CLI ด้วย |
-| Skills/MCP ส่วนกลางต่อเครื่องมือ | ดูแลต้นฉบับร่วมกันได้ เมื่อเชื่อมด้วยวิธีที่ CLI รองรับ |
-| ตรวจเวอร์ชันและ help ก่อนสร้าง | ให้ AI สร้างคำสั่งแยกบัญชีให้ตรงกับเครื่องมือที่ติดตั้งไว้แล้ว |
-| ติดตั้งซ้ำได้และมีรายงาน | ตรวจสอบผลได้ และลดโอกาสเขียนทับการตั้งค่าเดิม |
+| ทำทุกอย่างผ่าน `docker exec` และห้ามหยุด/ลบ container | ปรับ `devtools` ตัวเดิมขณะรัน ไฟล์งานเดิมยังอยู่ครบ และไม่แตะเครื่อง Windows |
+| คำสั่งสั้นแยกตามบัญชีใน `/usr/local/bin` | พิมพ์ `yolo1` หรือ `cyolo1` ได้ทันทีในทุก Terminal ไม่ต้องแก้ PATH |
+| โฟลเดอร์การตั้งค่าต่อบัญชี | ข้อมูลล็อกอิน การตั้งค่า และประวัติของแต่ละบัญชีไม่ปนกัน |
+| Skills/MCP ส่วนกลางต่อเครื่องมือ | แก้ที่ `shared` ครั้งเดียว ทุกบัญชีของ CLI นั้นเห็น |
+| ข้อเท็จจริงจากการทดลอง + ตรวจ `--help` ก่อน | ให้ Claude ไม่เดา flag และไม่ต้องลองผิดลองถูกนาน |
+| installer รันซ้ำได้ + รายงานในไฟล์ | ตรวจผลย้อนหลังได้ และรันซ้ำโดยไม่ทำลายของเดิม |
 
-ข้อดีเหล่านี้เป็นเหตุผลของการออกแบบแลป ไม่ใช่ผลทดสอบของเครื่องผู้เรียน พรอมต์สร้างตัวช่วยเลือกบัญชีที่มีอยู่ ไม่ได้สมัครบัญชีหรือเพิ่มสิทธิ์ใช้งานให้ และผู้เรียนต้องล็อกอินแต่ละบัญชีเอง
+ข้อดีเหล่านี้เป็นเหตุผลของการออกแบบแลป พรอมต์สร้างตัวช่วยเลือกบัญชีที่มีอยู่ ไม่ได้สมัครบัญชีหรือเพิ่มสิทธิ์ใช้งานให้
 
-### 2.2 · โฟลเดอร์ที่ได้ และความหมายของส่วนกลาง
+### 1.2 · วางพรอมต์ใน Claude Code Desktop
 
-![โครงสร้าง ai-accounts แยก Claude และ Codex พร้อมโฟลเดอร์รายบัญชีและ shared](img/multi-account-02-folders.png)
+**ขั้นตอน:** เปิด Claude Code Desktop → เริ่ม **New session** → คัดลอกพรอมต์ทั้งกรอบด้านล่างไปวาง (Ctrl+V) → กด Enter แล้วรอจน Claude สรุปผล
 
-*ภาพแนวคิดสร้างด้วย Imagegen แสดงโครงสร้างเป้าหมายตามพรอมต์ โดย `shared` เป็นโฟลเดอร์ระดับเดียวกับโฟลเดอร์บัญชีภายในแต่ละ CLI*
+![ภาพเคลื่อนไหว วางพรอมต์ปรับโครงสร้าง devtools ใน Claude Code Desktop ด้วย Ctrl+V แล้วกด Enter](img/desktop-setup-paste.gif)
 
-- พรอมต์จะสร้างโฟลเดอร์การตั้งค่าบัญชีใต้ `~/ai-accounts` ส่วนรายงานจะเขียนในโฟลเดอร์ปัจจุบันที่เปิด Claude Code ไม่ต้องสร้างโฟลเดอร์เตรียมเอง
-- Claude Code เลือกโฟลเดอร์การตั้งค่าด้วย `CLAUDE_CONFIG_DIR` ซึ่งเอกสารระบุว่าใช้กับหลายบัญชีพร้อมกันได้ ดู [Claude Code environment variables](https://code.claude.com/docs/en/env-vars)
-- Codex เลือกที่เก็บการตั้งค่าและสถานะด้วย `CODEX_HOME` ดู [Codex configuration](https://learn.chatgpt.com/docs/config-file/config-advanced) ส่วน credential อาจเก็บเป็นไฟล์หรือในระบบจัดเก็บของ OS จึงต้องตรวจโหมดที่ใช้ ดู [Codex authentication](https://learn.chatgpt.com/docs/auth)
-- การตั้งชื่อโฟลเดอร์ `shared/skills` หรือ `shared/mcp` ไม่ทำให้ CLI อ่านเอง ต้องมีวิธีเชื่อมที่รองรับ และไม่รวม token หรือข้อมูลล็อกอินไว้ในส่วนกลาง
-- การแยก config เป็นการจัดระเบียบภายใต้ผู้ใช้ Linux เดียวกัน ไม่ใช่การแยกสิทธิ์ OS; ไฟล์โครงการและการตั้งค่าระดับโครงการอาจยังใช้ร่วมกันได้
+*ภาพเคลื่อนไหวจำลองขั้นตอนวางพรอมต์ (ประมาณ 7 วินาที วนซ้ำ) ข้อความพรอมต์ตรงกับกรอบด้านล่างทุกตัวอักษร*
 
-### 2.3 · จากคำสั่งสั้นไปถึงบัญชีที่เลือก
+![หน้าต่าง Claude Code Desktop วางพรอมต์ปรับโครงสร้าง devtools ให้รองรับหลายบัญชี](img/desktop-setup-paste.png)
 
-![คำสั่ง yolo และ cyolo ผ่าน wrapper เพื่อเลือกโฟลเดอร์บัญชีก่อนเปิด CLI](img/multi-account-03-commands.png)
-
-*ภาพแนวคิดสร้างด้วย Imagegen: wrapper คือสคริปต์ตัวช่วยที่ตั้งค่าโฟลเดอร์บัญชีแล้วเรียกโปรแกรม CLI; พาธในภาพอยู่ภายใต้ `~/ai-accounts`*
-
-หลังตั้งค่าและล็อกอินแล้ว `yolo1` เปิด Claude ด้วยข้อมูลบัญชีที่ 1 ส่วน `yolo2` เปิดด้วยข้อมูลบัญชีที่ 2 และ `cyolo1` เปิด Codex ด้วยข้อมูลบัญชีที่ 1 คำสั่งเหล่านี้สร้างโดยแลป ไม่ใช่คำสั่งมาตรฐานของ Linux
-
-หากต้องการเปลี่ยนบัญชีใน Terminal เดิม ให้ออกจาก CLI กลับมาที่ shell แล้วเรียกคำสั่งของบัญชีถัดไป หรือเปิด Terminal อีกแท็บเพื่อใช้พร้อมกัน การพิมพ์ชื่อ wrapper ในช่องสนทนา AI ไม่ใช่การสลับบัญชีของโปรแกรมที่กำลังเปิดอยู่
-
-### 2.4 · วางพรอมต์ตรงไหนใน JupyterLab?
-
-#### 2.4.1 · พิมพ์คำสั่งเปิด Claude ใน Terminal ก่อน
-
-ใช้ Terminal ที่เปิดจากหัวข้อ 1.1 โดยอยู่ในโฟลเดอร์งานที่ต้องการ แล้วพิมพ์ `claude` และกด Enter เพื่อเปิดโปรแกรม
-
-![พิมพ์ claude ใน Terminal ของ JupyterLab เพื่อเปิด Claude Code](img/devtools-open-claude-simple.png)
-
-#### 2.4.2 · ล็อกอินบัญชีตัวช่วยตั้งค่าให้พร้อม
-
-หากเปิดครั้งแรก ให้เลือกธีมตามหน้าจอ จากนั้นเลือก **Claude account with subscription** และยืนยันบัญชีของตนเองในเบราว์เซอร์ หากล็อกอินไว้แล้วให้ไปขั้นถัดไปได้
-
-![หน้าล็อกอิน Claude Code ภายใน Terminal ของ JupyterLab บน devtools](img/devtools-claude-login-jupyter.png)
-
-
-#### 2.4.3 · วางพรอมต์ในช่องสนทนาของ Claude
-
-เมื่อเห็นช่องสนทนาพร้อมใช้งาน ให้คัดลอกข้อความทั้งกรอบด้านล่าง วางใน **ช่องสนทนาของ Claude Code ภายใน Terminal** แล้วกด Enter หากวางไม่ได้ ให้ลอง **Shift + คลิกขวา → Paste** ตามที่เบราว์เซอร์รองรับ รอ Claude ทำงานและสรุปรายงาน แล้วตรวจผลตามรายการท้ายขั้นนี้
-
-##### 2.4.3.1 · 📋 พรอมต์สำหรับคัดลอก (คัดลอกทั้งกรอบ วางใน 💬 ช่องสนทนา AI แล้ว Enter)
+##### 📋 พรอมต์สำหรับคัดลอก (วางใน 💻 Claude Code Desktop แล้ว Enter)
 ```text
-สร้างระบบหลายบัญชีใน Linux container devtools (ใช้ผ่าน JupyterLab Terminal)
-Claude Code และ Codex CLI ติดตั้งไว้แล้ว ห้ามติดตั้งซ้ำ ตรวจ --version ก่อน ถ้าไม่พบให้รายงานปัญหา PATH แล้วหยุด
-ห้ามอ่าน README ของ LAB เพื่อหาเฉลย ตรวจ official docs และ --help ของเวอร์ชันจริงก่อน ห้ามเดา env/path/flag
+ช่วยปรับโครงสร้างข้างใน container ชื่อ devtools ที่กำลังรันอยู่ ให้รองรับหลายบัญชี AI
+ทำทุกอย่างข้างใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์บนเครื่อง Windows ห้ามหยุด ลบ หรือสร้าง container ใหม่
+ถ้า devtools ไม่ได้รันอยู่ ให้รายงานแล้วหยุด
 
-BASE_PATH="$HOME/ai-accounts"   # แก้ที่นี่ที่เดียว
+ข้างในมี Claude Code และ Codex CLI แล้ว ห้ามติดตั้งซ้ำ ตรวจ --version ก่อน
+ตรวจ --help ของเวอร์ชันจริงก่อนใช้ env/flag ห้ามเดา
 
-## เป้าหมาย
-- yolo1..yolo5   → claude --dangerously-skip-permissions  (CLAUDE_CONFIG_DIR=$BASE_PATH/.Claude/yoloN)
-- cyolo1..cyolo5 → codex --dangerously-bypass-approvals-and-sandbox  (CODEX_HOME=$BASE_PATH/.Codex/cyoloN)
-- $BASE_PATH/.Claude/shared และ .Codex/shared มี skills/ และ mcp/mcp.json ({"mcpServers":{...}}) แก้ครั้งเดียว ทุกบัญชีของ CLI นั้นเห็นตอนเปิดครั้งถัดไป โดยไม่ต้องรัน installer ซ้ำ
-- wrapper ส่งต่อ "$@" ครบ แจ้งชัดถ้าโฟลเดอร์บัญชีไม่มี ไม่พิมพ์ secret
+## เป้าหมาย (BASE=/root/ai-accounts)
+- yolo1..yolo5   → claude --dangerously-skip-permissions  (CLAUDE_CONFIG_DIR=$BASE/.Claude/yoloN)
+- cyolo1..cyolo5 → codex --dangerously-bypass-approvals-and-sandbox  (CODEX_HOME=$BASE/.Codex/cyoloN)
+- wrapper วางใน /usr/local/bin ให้พิมพ์ได้ทันที ส่งต่อ "$@" ครบ แจ้งชัดถ้าโฟลเดอร์บัญชีไม่มี ไม่พิมพ์ secret
+- $BASE/.Claude/shared และ $BASE/.Codex/shared มี skills/ และ mcp/ แก้ครั้งเดียว ทุกบัญชีของ CLI นั้นเห็นตอนเปิดครั้งถัดไป
 
 ## กติกา
 - แยก credential/config/session ต่อบัญชี เปิดพร้อมกันได้ ใช้ CLAUDE_CONFIG_DIR/CODEX_HOME เท่านั้น ห้ามเปลี่ยน $HOME
-- Codex ใช้ file-based credential ต่อ CODEX_HOME ระบุสิ่งที่ยังร่วมกัน (project config, ผู้ใช้ Linux) ห้ามอ้างว่าเป็น OS isolation
-- ห้ามแก้ .bashrc/Git/SSH ถ้าต้องเพิ่ม PATH ให้ขอยืนยันก่อน
-- installer รันซ้ำได้ ไม่เขียนทับ credential/config เดิม ห้ามแชร์ credential ใน shared
+- Codex ใช้ file-based credential ต่อ CODEX_HOME ห้ามแชร์ credential ใน shared
+- สร้าง installer เป็นไฟล์ใน container รันซ้ำได้ ไม่เขียนทับ credential/config เดิม ห้ามแก้ .bashrc/Git/SSH
 - MCP ส่วนกลางตัวแรก: Playwright (@playwright/mcp) + Chromium ติดตั้งครั้งเดียว
-- skill ตัวอย่าง shared-check: ตอบ SHARED_SKILL_OK-<tool>-<ค่าสุ่มตอนติดตั้ง> ซึ่งมีในไฟล์นี้เท่านั้น
+- skill ตัวอย่าง shared-check: ตอบ SHARED_SKILL_OK-<tool>-<ค่าสุ่มตอนติดตั้ง> ซึ่งมีในไฟล์ skill เท่านั้น
 
 ## ข้อเท็จจริงจากการทดลอง (ตรวจว่ายังจริงกับเวอร์ชันนี้)
 - root ต้องตั้ง IS_SANDBOX=1; CODEX_HOME ต้อง mkdir -p ก่อน
 - Claude: skill อ่านจาก $CLAUDE_CONFIG_DIR/skills; MCP ส่งผ่าน --mcp-config=<ไฟล์> (ต้องมี =)
   ห้าม symlink .claude.json (มีสถานะล็อกอิน); claude mcp list ไม่แสดง MCP นี้ ให้ตรวจด้วย /mcp
 - Codex: skill อ่านจาก $CODEX_HOME/skills และเขียน skills/.system เอง ห้าม symlink ทั้งโฟลเดอร์
-  ห้ามใช้ ~/.agents/skills เป็นทางลัด; MCP ส่งด้วย -c mcp_servers.<name>={...} (ใช้กับ codex mcp list ได้)
+  MCP ส่งด้วย -c mcp_servers.<name>={...} (ใช้กับ codex mcp list ได้)
 - Playwright ใน root container: --browser chromium --headless --isolated --no-sandbox และ --output-dir นอกโฟลเดอร์งาน
-  ติดตั้ง Chromium ด้วย playwright ในแพ็กเกจ @playwright/mcp ให้เวอร์ชันตรงกัน
-- Codex ใน container ล็อกอินด้วย codex login --device-auth; login status ไม่ยืนยัน token ให้ทดสอบด้วย codex exec
+  ติดตั้ง Chromium ด้วย playwright ในแพ็กเกจ @playwright/mcp ให้เวอร์ชันตรงกัน (อาจต้อง install-deps)
 
-## ทดสอบ (PASS/FAIL/SKIP ตามจริง)
-- 10 คำสั่ง --version ครบ, config root คนละโฟลเดอร์ (find), installer รอบ 2 ไม่ทำลายของเดิม, Git/SSH ปกติ
+## ทดสอบใน container (PASS/FAIL/SKIP ตามจริง)
+- 10 คำสั่ง --version ครบ, config root คนละโฟลเดอร์, installer รอบ 2 ไม่ทำลายของเดิม
 - cyoloN mcp list เห็น playwright, skill shared-check ทุกบัญชี readlink -f ไปไฟล์เดียวกันใน shared
 - อะไรที่ต้องล็อกอิน = SKIP
 
-## รายงาน (ห้ามมี secret) ในโฟลเดอร์ปัจจุบัน
-- setup-report.md: config root, ตำแหน่ง credential, แต่ละ CLI อ่าน skill/MCP จากไหน และเชื่อม shared อย่างไร, ข้อจำกัด
-- login-guide.md: ล็อกอินทีละบัญชี และวิธีตรวจ skill/MCP หลังล็อกอิน
-- checklist.md: รายการ | หลักฐาน | PASS/FAIL/SKIP | เหตุผล
-เสร็จแล้วแสดงสาระสำคัญเป็นตาราง แล้วหยุดรอ ห้ามล็อกอินแทนฉัน ห้ามทำขั้นถัดไปเอง
+## รายงาน (ห้ามมี secret) เขียนไว้ใน container ที่ /workspace/multi-account/
+- setup-report.md: โครงสร้างโฟลเดอร์, wrapper, แต่ละ CLI อ่าน skill/MCP จากไหน, ข้อจำกัด
+- login-guide.md: ล็อกอินทีละบัญชีใน JupyterLab Terminal
+- checklist.md: รายการ | หลักฐาน | PASS/FAIL/SKIP
+เสร็จแล้วสรุปเป็นตารางสั้น ๆ แล้วหยุดรอ ห้ามล็อกอินแทนฉัน
 ```
 
-![ขยายข้อความพรอมต์ตั้งค่าหลายบัญชีในช่องป้อน Claude Code บน JupyterLab ของ devtools](img/devtools-prompt-expanded.png)
+### 1.3 · ผลจริงจากการรันพรอมต์
 
-ภาพหน้าจอจริงจาก JupyterLab ของคอนเทนเนอร์ `devtools` แสดงช่วงต้นของพรอมต์ในช่องป้อน โดยขยายข้อความที่ CLI ย่อไว้เป็น `[Pasted text …]` ด้วยการวางข้อความเดิมอีกครั้งตามตัวเลือก `Paste again to expand` ของเวอร์ชันที่ใช้ ภาพนี้ถ่ายจากพรอมต์ฉบับก่อนย่อ ข้อความจึงต่างจากกรอบด้านบนเล็กน้อย สำหรับการทำแลป ให้ตรวจพรอมต์ครบแล้วกด Enter เพื่อเริ่มทำงาน
+พรอมต์นี้รันจริงกับ `devtools` ที่เพิ่งสร้างตามบทที่แล้ว (7 พ.ย. 2026 · Claude Code 2.1.319, codex-cli 0.167.0) ใช้เวลาประมาณ **5 นาที** ได้ผล **18 PASS · 0 FAIL · 4 SKIP** ข้อที่ SKIP คือข้อที่ต้องล็อกอินก่อน ซึ่งเราจะทำในขั้นที่ 3–4
 
-### 2.5 · ผลหลังส่งพรอมต์และตั้งค่าเสร็จ (การสาธิตจริงใน devtools)
+![ผลจริงจาก Claude: ตาราง PASS/SKIP การตั้งค่าหลายบัญชีใน devtools และรายการไฟล์ใน container](img/desktop-setup-result.png)
 
-หลังวางพรอมต์แล้วกด Enter ให้รอ Claude ตรวจเครื่องมือ สร้างตัวติดตั้ง และทดสอบจนแสดงสรุปผล ภาพต่อไปนี้เป็นผลจากการรันจริงในคอนเทนเนอร์ `devtools` วันที่ 23 กันยายน 2026 ไม่ใช่ภาพจำลอง
+*ข้อความคำตอบจริงของ Claude จัดหน้าใหม่ให้อ่านง่าย ตัดรายละเอียดบางบรรทัดออก ผลที่ผู้เรียนได้อาจต่างเล็กน้อยตามเวอร์ชัน*
 
-![Claude สรุปผลตั้งค่าหลายบัญชีเสร็จใน JupyterLab ของ devtools](img/devtools-setup-complete.png)
+สิ่งที่เกิดขึ้นระหว่างทาง (เป็นเรื่องปกติ Claude แก้ได้เอง):
 
-**ถ้า Claude ถามยืนยันการเพิ่ม PATH:** installer อาจวาง wrapper ไว้ในโฟลเดอร์ที่ยังไม่อยู่ใน PATH (เช่น `~/ai-accounts/bin`) แล้วหยุดถามตามกติกาในพรอมต์ ให้ตอบยืนยันในช่องสนทนา เพื่อให้พิมพ์ `yolo1` หรือ `cyolo1` ได้ตรง ๆ ในหัวข้อ 2.7 และขั้นที่ 3
+- Claude ติดตั้ง Playwright MCP และ Chromium พร้อม system library ที่ image ยังไม่มี (`playwright install --with-deps chromium`)
+- บน Windows, Bash ของ Claude Code Desktop (Git Bash) อาจแปลง path อย่าง `/workspace/...` ผิดตอนส่งเข้า `docker exec` Claude ตรวจพบแล้วรันใหม่ด้วย `MSYS_NO_PATHCONV=1` เอง
+- ข้อเท็จจริงทุกข้อในพรอมต์ (เช่น ต้องตั้ง `IS_SANDBOX=1` เมื่อเป็น root) ยังเป็นจริงกับเวอร์ชันนี้
 
-Claude อาจต้องติดตั้ง system library ของ Chromium เพิ่ม (`playwright install-deps chromium`) เพราะ image `devtools` ยังไม่มี ข้อนี้เป็นเรื่องปกติและจะแจ้งไว้ใน `setup-report.md`
+## ขั้นที่ 2 · 🖥️ ตรวจผลข้างใน devtools ผ่าน JupyterLab (~10 นาที)
 
-### 2.6 · เปิดดูโฟลเดอร์ที่สร้างจริงผ่าน File Browser
+Claude บอกว่าเสร็จแล้ว ต่อไปเราเข้าไปดูด้วยตาตัวเองว่าข้างใน container เปลี่ยนจริง
 
-#### 2.6.1 · เปิดโฟลเดอร์ ai-accounts
+### 2.1 · เปิด JupyterLab และ Terminal
 
-1. คลิกไอคอนรูปโฟลเดอร์ **File Browser** ที่แถบซ้ายสุดของ JupyterLab
-2. กลับไปที่โฟลเดอร์บนสุด `/` แล้วดับเบิลคลิก **root** จากนั้นดับเบิลคลิก **ai-accounts**
-3. ตรวจแถบตำแหน่งด้านบนให้เป็น **/ root / ai-accounts /** ตามวงกลมสีแดง ภายในจะเห็นโฟลเดอร์ **.Claude** และ **.Codex**
+1. ในหน้าต่าง **VS Code** เปิดแถบ **Containers** คลิกขวาที่ **devtools** แล้วเลือก **Open in External Browser**
+2. เลือก **8888 localhost:8885** (หรือเปิด [JupyterLab](http://localhost:8885/lab) เอง โดยปรับพอร์ตให้ตรงกับที่ใช้จริง)
+
+![คลิกขวาที่ devtools ใน VS Code เลือก Open in External Browser แล้วเลือกพอร์ต JupyterLab](img/jupyter-open-from-vscode.png)
+
+*ภาพจากหัวข้อ 6.1 ของบทที่แล้ว ปรับด้วย Imagegen เพื่อซ่อนรายการที่ไม่เกี่ยวข้อง*
+
+3. ที่หน้า Launcher คลิก **Terminal** ในกลุ่ม **Other** (ถ้าไม่เห็น Launcher ให้กดปุ่ม **+** ก่อน)
+
+![วงกลมและลูกศรชี้ปุ่ม Terminal ในกลุ่ม Other ของ JupyterLab Launcher](img/jupyter-launcher-terminal-highlight.png)
+
+### 2.2 · ดูรายงานที่ Claude เขียนไว้
+
+ใน File Browser ทางซ้าย ไปที่ `/` → **workspace** → **multi-account** จะเห็นไฟล์ 4 ไฟล์ ดับเบิลคลิก **checklist.md** เพื่อดูหลักฐานทีละข้อ
+
+![File Browser แสดง checklist.md install-multi-account.sh login-guide.md setup-report.md และเปิด checklist.md](img/devtools-after-report-folder.png)
+
+*ภาพจริงจาก JupyterLab หลังรันพรอมต์ขั้นที่ 1*
+
+| ไฟล์ | ใช้ทำอะไร |
+|---|---|
+| `checklist.md` | รายการทดสอบ หลักฐาน และ PASS/FAIL/SKIP |
+| `setup-report.md` | โครงสร้างโฟลเดอร์ คำสั่ง wrapper และที่มาของ skill/MCP |
+| `login-guide.md` | วิธีล็อกอินทีละบัญชี (ใช้ในขั้นที่ 3) |
+| `install-multi-account.sh` | ตัวติดตั้งที่ Claude เขียน รันซ้ำได้โดยไม่ทำลายของเดิม |
+
+### 2.3 · โฟลเดอร์ที่ได้ และความหมายของส่วนกลาง
+
+- โฟลเดอร์ของแต่ละบัญชีอยู่ใต้ `/root/ai-accounts` (`~/ai-accounts`) แยก `.Claude` กับ `.Codex`
+- Claude Code เลือกโฟลเดอร์การตั้งค่าด้วย `CLAUDE_CONFIG_DIR` ซึ่งเอกสารระบุว่าใช้กับหลายบัญชีพร้อมกันได้ ดู [Claude Code environment variables](https://code.claude.com/docs/en/env-vars)
+- Codex เลือกที่เก็บการตั้งค่าและสถานะด้วย `CODEX_HOME` ดู [Codex configuration](https://learn.chatgpt.com/docs/config-file/config-advanced) ส่วน credential ตั้งให้เก็บเป็นไฟล์ในโฟลเดอร์ของแต่ละบัญชี ดู [Codex authentication](https://learn.chatgpt.com/docs/auth)
+- `shared/skills` และ `shared/mcp` ไม่ได้ถูก CLI อ่านเอง คำสั่ง `yolo`/`cyolo` เป็นตัวเชื่อมให้ทุกครั้งที่เปิด และไม่มี token หรือข้อมูลล็อกอินอยู่ในส่วนกลาง
+- การแยก config เป็นการจัดระเบียบภายใต้ผู้ใช้ Linux เดียวกัน ไม่ใช่การแยกสิทธิ์ OS
+
+เปิดดูใน File Browser: `/` → **root** → **ai-accounts** จะเห็น **.Claude** และ **.Codex**
 
 ![ขยาย File Browser พร้อมวงกลมที่ root ai-accounts และลูกศรชี้ลำดับการเปิดดู .Claude และ .Codex](img/devtools-folder-navigation.png)
 
-#### 2.6.2 · เปิดดูบัญชี Claude และ shared
-
-ดับเบิลคลิก **.Claude** ใน File Browser จะเห็น **yolo1–yolo5** และ **shared** ตามโครงสร้างในหัวข้อ 2.2 ตรวจแถบตำแหน่งให้ลงท้ายด้วย **ai-accounts / .Claude /**
+ดับเบิลคลิก **.Claude** จะเห็น **yolo1–yolo5** และ **shared** และใน **shared** มี **mcp** กับ **skills**
 
 ![File Browser ใน JupyterLab แสดงโฟลเดอร์จริง yolo1 ถึง yolo5 และ shared ภายใน .Claude](img/devtools-claude-account-folders-annotated.png)
 
-ดับเบิลคลิก **shared** จะเห็นโฟลเดอร์ **mcp** และ **skills** ของ Claude
-
 ![โฟลเดอร์ mcp และ skills จริงภายใน .Claude shared ใน JupyterLab](img/devtools-claude-shared-folders-annotated.png)
 
-#### 2.6.3 · เปิดดูบัญชี Codex และ shared
-
-กลับไปที่ **ai-accounts** โดยคลิกแถบตำแหน่งด้านบน หากชื่อถูกย่อเป็น **…** ให้คลิกตำแหน่งนั้นเพื่อกลับขึ้นไป จากนั้นดับเบิลคลิก **.Codex** จะเห็น **cyolo1–cyolo5** และ **shared** ตามโครงสร้างในหัวข้อ 2.2
+กลับไปที่ **ai-accounts** แล้วเปิด **.Codex** จะเห็น **cyolo1–cyolo5** และ **shared** แบบเดียวกัน
 
 ![File Browser ใน JupyterLab แสดงโฟลเดอร์จริง cyolo1 ถึง cyolo5 และ shared ภายใน .Codex](img/devtools-codex-account-folders-annotated.png)
 
-ดับเบิลคลิก **shared** จะเห็นโฟลเดอร์ **mcp** และ **skills** ของ Codex
-
 ![โฟลเดอร์ mcp และ skills จริงภายใน .Codex shared ใน JupyterLab](img/devtools-codex-shared-folders-annotated.png)
 
-### 2.7 · 🔍 จุดที่ผู้เรียนต้องตรวจ (🖥️ เปิด Terminal อีกแท็บใน JupyterLab)
+*ภาพโฟลเดอร์ 4 ภาพนี้มาจากการรันครั้งก่อน (23 ก.ย. 2026) การรันใหม่ 7 พ.ย. 2026 ได้ชื่อโฟลเดอร์ชุดเดียวกันทุกโฟลเดอร์*
 
-กด **+ → Terminal** เพื่อเปิดอีกแท็บ คัดลอกคำสั่งทั้งสามบรรทัดในกรอบด้านล่าง วางพร้อมกันใน Terminal แล้วกด **Enter** เพื่อรันทั้งชุด:
+### 2.4 · จากคำสั่งสั้นไปถึงบัญชีที่เลือก
+
+![คำสั่ง yolo และ cyolo ผ่าน wrapper เพื่อเลือกโฟลเดอร์บัญชีก่อนเปิด CLI](img/multi-account-03-commands.png)
+
+*ภาพแนวคิดสร้างด้วย Imagegen: wrapper คือสคริปต์ตัวช่วยที่ตั้งค่าโฟลเดอร์บัญชีแล้วเรียกโปรแกรม CLI*
+
+`yolo1` เปิด Claude ด้วยข้อมูลบัญชีที่ 1 ส่วน `cyolo1` เปิด Codex ด้วยข้อมูลบัญชีที่ 1 คำสั่งเหล่านี้สร้างโดยแลป ไม่ใช่คำสั่งมาตรฐานของ Linux หากต้องการเปลี่ยนบัญชีใน Terminal เดิม ให้ออกจาก CLI กลับมาที่ shell แล้วเรียกคำสั่งของบัญชีถัดไป หรือเปิด Terminal อีกแท็บเพื่อใช้พร้อมกัน
+
+### 2.5 · 🔍 ตรวจว่าคำสั่งใช้ได้จริง
+
+คัดลอกคำสั่งทั้งกรอบ วางใน 🖥️ Terminal แล้วกด **Enter**:
 ```bash
+which yolo1 cyolo1
 yolo1 --version; cyolo1 --version
 yolo2 --version; cyolo2 --version
 yolo3 --version; cyolo3 --version
 ```
 
-![วางคำสั่งทั้งสามบรรทัดพร้อมกันแล้วกด Enter แสดงผลเวอร์ชันครบหกคำสั่งใน JupyterLab](img/devtools-versions-block-paste.png)
+![ภาพเคลื่อนไหวจริง: which yolo1 cyolo1 ชี้ไป /usr/local/bin และแต่ละบัญชีแสดงเวอร์ชัน Claude Code กับ codex-cli](img/devtools-after-versions.gif)
+
+*บันทึกจาก JupyterLab Terminal จริงหลังขั้นที่ 1 ต้องเห็น `/usr/local/bin/yolo1` และเวอร์ชันครบทุกบรรทัด ถ้าขึ้น `command not found` แปลว่าขั้นที่ 1 ยังไม่สำเร็จ ให้กลับไปดูตารางสรุปของ Claude*
 
 
-## ขั้นที่ 3 · ล็อกอินและตรวจการแชร์ข้ามบัญชี (~15 นาที)
+## ขั้นที่ 3 · 🖥️ ล็อกอินทีละบัญชีใน JupyterLab (~15 นาที)
 
-ใช้บัญชี `yolo1` และ `cyolo1` จากขั้นที่ 2 ผ่าน JupyterLab Terminal โดยใช้โฟลเดอร์งานเดียวกับตอนตั้งค่าในขั้นที่ 2 ตลอดแลป ทำหัวข้อ 3.1 ของ Claude Code แล้วทำหัวข้อ 3.2 ของ Codex จากนั้นกลับไปเซสชันตั้งค่าเพื่อทดสอบในหัวข้อ 3.3
+ขั้นนี้ Claude ทำแทนไม่ได้ ต้องเป็นเราที่ยืนยันตัวตนเอง ใช้ JupyterLab Terminal ของ `devtools` จากขั้นที่ 2 ทำหัวข้อ 3.1 ของ Claude Code แล้วทำหัวข้อ 3.2 ของ Codex ต้องล็อกอินอย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2` เพื่อใช้ทดสอบในขั้นที่ 4
 
 ทำตามลำดับ **พิมพ์คำสั่งเปิดโปรแกรมใน Terminal → ล็อกอิน → เข้าหน้าสนทนา → เลือกโมเดล**
 
@@ -313,7 +335,7 @@ yolo1
 
 ![Claude Code ให้ยืนยันโฟลเดอร์งานใน JupyterLab](img/devtools-yolo1-trust.png)
 
-คำสั่ง yolo1 จากขั้นที่ 2 เปิดโหมด Bypass Permissions หากมีหน้าขอยืนยันในคอนเทนเนอร์แลปที่เตรียมไว้ ให้เลือก **Yes, I accept** เพื่อทำต่อ เมื่อยืนยันแล้ว แถบด้านล่างของหน้าสนทนาจะแสดง **bypass permissions on** ตามภาพ
+คำสั่ง yolo1 จากขั้นที่ 1 เปิดโหมด Bypass Permissions หากมีหน้าขอยืนยันในคอนเทนเนอร์แลปที่เตรียมไว้ ให้เลือก **Yes, I accept** เพื่อทำต่อ เมื่อยืนยันแล้ว แถบด้านล่างของหน้าสนทนาจะแสดง **bypass permissions on** ตามภาพ
 
 ![หน้าแรกหลังเปิด yolo1 ใน JupyterLab พร้อมช่องสนทนาว่างและแถบ bypass permissions on](img/devtools-yolo1-fresh-ready.png)
 
@@ -331,7 +353,7 @@ yolo1
 
 ![เลือก Fable และ Medium effort จากเมนูจริงใน JupyterLab](img/devtools-fable-select-medium.png)
 
-พิมพ์ `/exit` เพื่อกลับ shell แล้วล็อกอิน `yolo2` ด้วยวิธีเดียวกัน เพื่อใช้ทดสอบข้ามบัญชีในหัวข้อ 3.3
+พิมพ์ `/exit` เพื่อกลับ shell แล้วล็อกอิน `yolo2` ด้วยวิธีเดียวกัน เพื่อใช้ทดสอบข้ามบัญชีในขั้นที่ 4
 
 ---
 
@@ -375,67 +397,68 @@ cyolo1
 
 ![เลือกระดับ Medium ของ Astra](img/devtools-astra-effort.png)
 
-พิมพ์ `/exit` เพื่อกลับ shell แล้วล็อกอิน `cyolo2` ด้วยวิธีเดียวกัน เพื่อใช้ทดสอบข้ามบัญชีในหัวข้อ 3.3
+พิมพ์ `/exit` เพื่อกลับ shell แล้วล็อกอิน `cyolo2` ด้วยวิธีเดียวกัน เพื่อใช้ทดสอบข้ามบัญชีในขั้นที่ 4
 
 ---
 
-### 3.3 · ตรวจการแชร์ Skill และ MCP ข้ามบัญชี (หลังล็อกอิน)
+## ขั้นที่ 4 · 💻 ให้ Claude Code Desktop ทดสอบข้ามบัญชี (~15 นาที)
 
 ใช้ตรวจว่า skill `shared-check` และ Playwright MCP ที่ตั้งไว้ใน `shared` เรียกใช้ได้จริงจากหลายบัญชี และให้ Playwright บันทึกภาพหน้าเว็บจริงเป็นหลักฐาน ต้องล็อกอิน `yolo1`, `yolo2`, `cyolo1`, `cyolo2` ให้ครบก่อน หากเบราว์เซอร์ส่งผลล็อกอิน Codex กลับเข้า container ไม่ได้ ให้ใช้ `cyolo1 login --device-auth` แทน
 
-#### 3.3.1 · 🖥️ ตรวจการเชื่อม shared ใน Terminal
+### 4.1 · 🖥️ ตรวจการเชื่อม shared ใน Terminal ก่อน
 
 ```bash
-for a in yolo1 yolo2 cyolo1 cyolo2; do printf "%-7s " $a; $a --version 2>/dev/null; done
-ls -l ~/ai-accounts/.Claude/yolo1/skills ~/ai-accounts/.Codex/cyolo1/skills/ | grep -E "skills|shared"
+ls -l ~/ai-accounts/.Claude/yolo1/skills ~/ai-accounts/.Codex/cyolo1/skills | grep shared
+ls ~/ai-accounts/.Claude/shared/mcp ~/ai-accounts/.Codex/shared/mcp
 cyolo1 mcp list 2>/dev/null
 ```
 
-ต้องเห็นว่า `yolo1/skills` ชี้ไป `../shared/skills` ส่วน `cyolo1/skills/shared-check` ชี้ไป `.Codex/shared/skills/shared-check` และ `cyolo1 mcp list` มี `playwright` สำหรับ Claude จะเห็น MCP จาก `--mcp-config` ด้วยคำสั่ง `/mcp` ในหน้าสนทนาเท่านั้น ไม่แสดงใน `claude mcp list`
+ต้องเห็นว่า `shared-check` ของทั้ง `yolo1` และ `cyolo1` ชี้ไปที่ `shared/skills/shared-check` ของ CLI นั้น ใน `shared/mcp` มีไฟล์ `playwright` และ `cyolo1 mcp list` มี `playwright` สถานะ `enabled` สำหรับ Claude จะเห็น MCP นี้ด้วยคำสั่ง `/mcp` ในหน้าสนทนาเท่านั้น ไม่แสดงใน `claude mcp list`
 
-![ตรวจเวอร์ชัน ลิงก์ skill ไปยัง shared และ MCP playwright ของ cyolo1 ใน JupyterLab Terminal](img/devtools-shared-setup.png)
+![ตรวจลิงก์ skill shared-check ไปยัง shared ไฟล์ MCP playwright และ cyolo1 mcp list ใน JupyterLab Terminal](img/devtools-after-shared-links.png)
 
-#### 3.3.2 · 📋 พรอมต์ทดสอบต่อจากเซสชันตั้งค่า (วางใน 💬 เซสชัน Claude จากขั้นที่ 2)
+*ภาพจริงจาก JupyterLab Terminal หลังขั้นที่ 1 (7 พ.ย. 2026)*
 
-กลับไปที่แท็บ Terminal ของเซสชัน Claude ที่ใช้ตั้งค่าในขั้นที่ 2 (ถ้าปิดไปแล้ว ให้พิมพ์ `claude --continue` ในโฟลเดอร์งานเดิม) แล้ววางข้อความทั้งกรอบ Claude จะส่งพรอมต์ตรวจช่วงล่างไปให้ทีละบัญชี เก็บภาพหน้าเว็บ และสรุปผลรวม การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
+### 4.2 · 📋 พรอมต์ทดสอบ (วางใน 💻 Claude Code Desktop)
+
+กลับไปที่ Claude Code Desktop จะใช้เซสชันเดิมจากขั้นที่ 1 หรือเปิด **New session** ก็ได้ แล้ววางข้อความทั้งกรอบ Claude จะใช้ `docker exec` สั่งพรอมต์ตรวจช่วงล่าง (ใต้เส้น `====`) ให้ทีละบัญชีข้างใน container เก็บภาพหน้าเว็บ และสรุปผลรวม การทดสอบนี้ **ค้นหาเที่ยวบินอย่างเดียว ไม่จองและไม่ชำระเงิน**
 
 ```text
-ฉันล็อกอิน yolo1 yolo2 cyolo1 cyolo2 แล้ว ทดสอบ skill/MCP ส่วนกลางข้ามบัญชีต่อจากเซสชันนี้
-1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง ~/verify-prompt.txt
-2. รันทีละบัญชีจาก shell: yolo1 -p "$(cat ~/verify-prompt.txt)", yolo2 เช่นเดียวกัน,
-   cyolo1 exec --skip-git-repo-check "$(cat ~/verify-prompt.txt)", cyolo2 เช่นเดียวกัน
-   รันแบบ foreground ทีละบัญชี (ไม่ใช้ background) timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
-3. คัดลอกภาพ screenshot ที่แต่ละบัญชีรายงานไปเป็น ./evidence/<บัญชี>/1-open.png, 2-search.png, 3-results.png
-   พร้อม log คำตอบเป็น ./evidence/<บัญชี>/run.log ห้ามแก้ไฟล์ตั้งค่า
-4. สรุปตารางรวม บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
+ฉันล็อกอิน yolo1 yolo2 cyolo1 cyolo2 ใน container devtools แล้ว ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี
+ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า
+1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง /workspace/multi-account/verify-prompt.txt ใน container
+2. รันทีละบัญชีจาก shell ใน container (โฟลเดอร์ /workspace/multi-account):
+   yolo1 -p "$(cat verify-prompt.txt)", yolo2 เช่นเดียวกัน,
+   cyolo1 exec --skip-git-repo-check "$(cat verify-prompt.txt)", cyolo2 เช่นเดียวกัน
+   รันแบบ foreground ทีละบัญชี timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
+3. คัดลอกภาพที่แต่ละบัญชีรายงานไปเป็น /workspace/multi-account/evidence/<บัญชี>/1-open.png, 2-search.png, 3-results.png
+   พร้อม log คำตอบเป็น run.log ในโฟลเดอร์เดียวกัน
+4. สรุปตาราง บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
    บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
 ====
 ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
 
 1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
-2. ใช้ skill $shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
+2. ใช้ skill shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
    ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
 3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
    เปิด https://www.google.com/travel/flights?hl=en
    ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
    ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
    ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
-4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น (ไม่ใช่ทั้งหน้า) 3 ภาพ
-   ตั้งชื่อนำหน้าด้วยชื่อโฟลเดอร์ config root เช่น yolo1-1-open.png: <บัญชี>-1-open.png (หน้าเว็บเปิดได้),
-   <บัญชี>-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา), <บัญชี>-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
-5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว:
-   - config root
-   - รหัสจาก skill shared-check
-   - ชื่อ MCP server และชื่อ tool ที่เรียกจริง
-   - ภาพหน้าจอ 3 ภาพ (path)
-   - เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
+4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น 3 ภาพ
+   ตั้งชื่อ <บัญชี>-1-open.png (หน้าเว็บเปิดได้), <บัญชี>-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา),
+   <บัญชี>-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
+5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว: config root, รหัสจาก skill shared-check,
+   ชื่อ MCP server และชื่อ tool ที่เรียกจริง, ภาพหน้าจอ 3 ภาพ (path),
+   เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
 ```
 
-หากต้องการทดสอบเองทีละบัญชี ให้คัดลอกเฉพาะข้อความใต้เส้น `====` ไปวางใน 💬 ช่องสนทนาของบัญชีนั้น ใน Codex คำว่า `$shared-check` คือการเรียก skill ตามชื่อ
+หากต้องการทดสอบเองทีละบัญชี ให้คัดลอกเฉพาะข้อความใต้เส้น `====` ไปวางใน 💬 ช่องสนทนาของบัญชีนั้นใน JupyterLab Terminal
 
-#### 3.3.3 · 🖼️ ดูภาพหน้าเว็บจริงที่ Playwright เก็บไว้
+### 4.3 · 🖼️ ดูภาพหน้าเว็บจริงที่ Playwright เก็บไว้
 
-เปิด **File Browser** ของ JupyterLab ไปที่โฟลเดอร์งาน แล้วเปิด `evidence/` จะมีโฟลเดอร์ย่อยตามบัญชี แต่ละโฟลเดอร์มีภาพ 3 ภาพ ดับเบิลคลิกเพื่อดูในแท็บใหม่
+เปิด **File Browser** ของ JupyterLab ไปที่ `/workspace/multi-account/evidence/` จะมีโฟลเดอร์ย่อยตามบัญชี แต่ละโฟลเดอร์มีภาพ 3 ภาพ ดับเบิลคลิกเพื่อดูในแท็บใหม่
 
 | ภาพ | ต้องเห็นอะไร | พิสูจน์อะไร |
 |---|---|---|
@@ -445,7 +468,7 @@ cyolo1 mcp list 2>/dev/null
 
 ภาพของแต่ละบัญชีควรคล้ายกัน แต่ราคาและลำดับเที่ยวบินอาจต่างกันตามเวลาที่ค้นหา หากบัญชีใดไม่มีภาพ `3-results.png` ให้ดูในตารางสรุปว่าติดขั้นไหน
 
-ภาพต่อไปนี้คือภาพจริงที่ Playwright MCP ของบัญชี `yolo1` บันทึกไว้ในการทดสอบวันที่ 29 กันยายน 2026 บน container ใหม่ที่ตั้งค่าด้วยพรอมต์ 2.4.3.1 ฉบับนี้ ไม่ได้ตกแต่งภาพ
+ภาพต่อไปนี้คือภาพจริงที่ Playwright MCP ของบัญชี `yolo1` บันทึกไว้ในการทดสอบวันที่ 29 กันยายน 2026 ไม่ได้ตกแต่งภาพ รอบนั้นตั้งค่าจากใน JupyterLab แทน Claude Code Desktop แต่โครงสร้างโฟลเดอร์ ชื่อ skill/MCP และพรอมต์ตรวจใต้เส้น `====` เหมือนกันทุกตัวอักษร
 
 ![yolo1-1-open: Playwright เปิดหน้า Google Flights ได้จริงจาก container](img/devtools-web-yolo1-open.png)
 
@@ -457,7 +480,7 @@ cyolo1 mcp list 2>/dev/null
 
 ![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2](img/devtools-web-results-4accounts.png)
 
-#### 3.3.4 · ผลการทดลองจริง (29 กันยายน 2026)
+### 4.4 · ผลการทดลองจริง (29 กันยายน 2026)
 
 ภาพต่อไปนี้ถ่ายจาก JupyterLab Terminal ของ container ทดลองหลังล็อกอินบัญชีจริง ส่งพรอมต์ด้วยวิธี shell และครอปเฉพาะส่วนผลลัพธ์
 
