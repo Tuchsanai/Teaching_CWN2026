@@ -210,6 +210,10 @@ MultiAccountDevtool/
 
 ## ขั้นที่ 2 · สร้าง container จาก image (~1 นาที)
 
+ขั้นที่ 1 ได้ image `multi-account:1.0` ซึ่งเป็นแม่แบบแบบอ่านอย่างเดียว ยังใช้งานโดยตรงไม่ได้ ขั้นนี้ใช้ `docker run` สร้าง container จาก image นั้นเพื่อนำมาใช้งานจริง แต่ละ option ของคำสั่งกำหนดว่า container จะเชื่อมกับเครื่องของเราอย่างไร
+
+![image multi-account:1.0 จากขั้นที่ 1 ผ่านคำสั่ง docker run ได้ container multi-account สถานะ running ที่มี yolo1–5 · cyolo1–5, Playwright MCP และ JupyterLab ตัวเลือก --name ตั้งชื่อ container, --privileged เปิด Docker-in-Docker, -p 8886:8888 เปิด JupyterLab ที่ localhost:8886/lab ซึ่งพร้อมใน 1.96 วินาที, -v ai-accounts เชื่อม volume เก็บล็อกอิน skills และ MCP, -v ./workspace เชื่อมโฟลเดอร์ไฟล์งาน](img/concept-07-step2-run.png)
+
 ```text
 เปิด container multi-account จาก image multi-account:1.0 ที่เพิ่ง build
 - ถ้ามี container ชื่อนี้อยู่แล้ว ให้ลบแล้วสร้างใหม่ ห้ามลบ volume ai-accounts (เก็บล็อกอินทุกบัญชี)
@@ -229,17 +233,6 @@ MultiAccountDevtool/
 ![ผลจริงจาก Claude: container multi-account พร้อมใน 1.96 วินาที ตารางเวอร์ชันและสถานะล็อกอิน 10 บัญชี และ cyolo1 mcp list](img/desktop-step2-result.png)
 
 *เครื่องตัวอย่างใช้ volume `ai-accounts` ที่เคยล็อกอินไว้แล้ว 5 บัญชี จึงแสดง ✅ ตั้งแต่ยังไม่ได้ล็อกอินในแลปนี้ (ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3) MCP `rea` มาจากแลปอื่นที่เคยติดตั้งไว้ใน volume เดียวกัน*
-
-ตรวจด้วยตนเองได้ที่ http://localhost:8886/lab → **Terminal** แล้ววางคำสั่ง
-
-```bash
-for a in yolo1 yolo2 yolo3 yolo4 yolo5 cyolo1 cyolo2 cyolo3 cyolo4 cyolo5; do printf '%-7s ' $a; $a --version; done
-which yolo1 cyolo1 claude codex playwright-mcp; cyolo1 mcp list | head -4
-```
-
-![ภาพเคลื่อนไหวจริงจาก JupyterLab ของ multi-account: เปิด localhost:8886/lab, เปิด Terminal, เวอร์ชันครบ 10 คำสั่ง, which และ cyolo1 mcp list เห็น playwright, ตารางล็อกอิน](img/jupyter-step2-check.gif)
-
-*ภาพหน้าจอจริงจาก container ที่สร้างในขั้นที่ 2*
 
 ## ขั้นที่ 3 · ล็อกอินและให้ Claude ตรวจสถานะ (~15 นาที)
 
