@@ -81,9 +81,13 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 
 ### 1.1 · input และกระบวนการ
 
-Claude ใช้ input 2 อย่างสร้างโฟลเดอร์ `MultiAccountDevtool/` แล้ว build เป็น image
+**เหตุผลที่ต้องทำขั้นนี้:** ในแบบที่ 2 ระบบหลายบัญชีถูกติดตั้งลงใน container ที่กำลังทำงานด้วยมือ เมื่อลบ container คำสั่ง `yolo1–5` และ `cyolo1–5` จะหายไป และต้องติดตั้งตามรายการเดิมซ้ำทุกครั้ง
 
-![input ที่ 1 คือโฟลเดอร์ 00_Devtool_Container ที่มี Dockerfile มาตรฐานและ start.sh (Ubuntu 24.04, Docker-in-Docker, Python, Node.js 22, JupyterLab) input ที่ 2 คือ prompt_multi_account.md ที่ระบุ yolo1–5, cyolo1–5, shared skills + MCP, Playwright MCP + Chromium และกติกา ทดสอบ รายงาน Claude Code app คัดลอกเป็น MultiAccountDevtool แก้ Dockerfile ตามสเปก docker build และทดสอบ ได้โฟลเดอร์ MultiAccountDevtool และ image multi-account:1.0](img/concept-06-step1-process.png)
+![ผู้สอนนั่งกุมขมับหน้าจอที่แสดงว่าหลังสั่ง docker rm -f devtools แล้วเรียก yolo1 ได้ผล command not found บนโต๊ะมีรายการติดตั้งด้วยมือ 5 ข้อที่ต้องทำซ้ำ และกระดาษโน้ตเขียนว่าติดตั้งเป็นครั้งที่ 4 ของสัปดาห์](img/photo-04-step1-why.jpg)
+
+**กระบวนการ:** ขั้นนี้นำรายการติดตั้งดังกล่าวมาเขียนเป็นสเปก แล้วให้ Claude ใช้สเปกนั้นร่วมกับ Dockerfile มาตรฐานสร้างโฟลเดอร์ `MultiAccountDevtool/` และ build เป็น image เพียงครั้งเดียว
+
+![กระบวนการจริงของขั้นที่ 1: input คือ 00_Devtool_Container (Dockerfile มาตรฐาน) และ prompt_multi_account.md (สเปก) Claude Code app คัดลอกและแก้ Dockerfile ได้โฟลเดอร์ MultiAccountDevtool จากนั้น docker build ได้ image multi-account:1.0 ขนาด 4.47 GB และทดสอบได้ 9 PASS 0 FAIL 1 SKIP ใช้เวลา build 302 วินาที](img/concept-06-step1-process.png)
 
 | input | บทบาท | เนื้อหา |
 |---|---|---|
