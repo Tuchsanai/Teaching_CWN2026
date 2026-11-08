@@ -1,5 +1,7 @@
 # TEST-REPORT — yolo · cyolo · agent-team
 
+> รายงานจากการรันจริงในขั้นที่ 1 ตอนนั้นสเปกฉบับแรกให้สร้าง `install.sh` ด้วย ภายหลังตัด `install.sh` ออก เพราะการคัดลอกโฟลเดอร์สกิลไปวางใน `shared/skills` ก็ใช้งานได้ทันที (wrapper ของ `yoloN`/`cyoloN` เชื่อมสกิลให้เองเมื่อเปิดบัญชี) เนื้อหาของสกิลทั้ง 3 โฟลเดอร์ไม่เปลี่ยน
+
 - วันที่ 2026-11-08 06:38–07:10 (+07) · container `multi-account` · Claude Code 2.1.319 · codex-cli 0.167.0 · Python 3.12.3
 - ติดตั้งจาก `/tmp/skills` (สำเนาของ `./skills`) ด้วย `install.sh` ลง `/root/ai-accounts/.{Claude,Codex}/shared/skills`
 - งานทดสอบใช้ `difficulty 1` ทั้งหมด (Claude `haiku`/`low`, Codex `gpt-6.1-sol`/`low`) รวมหัวหน้าทีม

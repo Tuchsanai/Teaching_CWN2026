@@ -1,7 +1,7 @@
 """macore.py - shared core of the yolo / cyolo / agent-team skills.
 
 An identical copy lives in yolo/scripts/ and cyolo/scripts/ so each skill works on its own.
-install.sh refuses to install if the two copies differ. Python 3.8+ stdlib only.
+Keep the two copies identical when editing. Python 3.8+ stdlib only.
 
 Holds: account discovery, how to launch an account, the ledger (one JSON line per call,
 never the prompt text or a secret), error classification, the difficulty table,

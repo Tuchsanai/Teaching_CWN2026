@@ -6,7 +6,7 @@
 
 - บัญชีอยู่ที่ `/root/ai-accounts/.Codex/cyoloN` = `CODEX_HOME` (volume `ai-accounts`)
 - `cyolo1`–`cyolo5` เป็น wrapper ตั้ง `CODEX_HOME`, `--dangerously-bypass-approvals-and-sandbox`, `-c cli_auth_credentials_store="file"` และแปลง MCP จาก `shared/mcp/mcp.json` ให้ · ไม่มี wrapper → `macore.launch()` เรียก `codex` ตรงด้วย env เดียวกัน
-- `$CODEX_HOME/skills` เป็น**โฟลเดอร์จริง** มี symlink รายสกิล `../../shared/skills/<สกิล>` และ Codex เขียน `skills/.system` เอง → ห้าม symlink ทั้งโฟลเดอร์ · wrapper สร้าง symlink ของสกิลใหม่ให้ทุกครั้งที่เรียก (`link_shared_skills`) และ `install.sh` สร้างให้ทันทีหลังติดตั้ง
+- `$CODEX_HOME/skills` เป็น**โฟลเดอร์จริง** มี symlink รายสกิล `../../shared/skills/<สกิล>` และ Codex เขียน `skills/.system` เอง → ห้าม symlink ทั้งโฟลเดอร์ · wrapper สร้าง symlink ของสกิลใหม่ให้ทุกครั้งที่เรียก (`link_shared_skills`)
 - ห้ามเรียก `codex` เปล่าโดยไม่กำหนด `CODEX_HOME` (จะใช้โปรไฟล์อื่น)
 
 ## เรียกงานเดียว

@@ -87,8 +87,6 @@
 
 ```text
 skills/
-├── install.sh            ติดตั้งลง shared ของทั้งสอง CLI
-├── README.md · TEST-REPORT.md
 ├── yolo/        SKILL.md · scripts/ · references/
 ├── cyolo/       SKILL.md · scripts/ · references/
 └── agent-team/  SKILL.md · scripts/team.py · references/
@@ -177,7 +175,7 @@ skills/
 
 สกิลถูกติดตั้งไว้ใน `/root/ai-accounts/.Claude/shared/skills` และ `/root/ai-accounts/.Codex/shared/skills` ซึ่งอยู่ใน **volume `ai-accounts`** ทุกบัญชีลิงก์เข้ามาที่นี่ สกิลจึงคงอยู่แม้ลบ container แต่เมื่อย้ายไป**เครื่องใหม่**หรือสร้าง **volume ใหม่** สกิลเหล่านี้จะไม่ติดไปด้วย จึงเก็บโฟลเดอร์ `skills/` สำรองไว้**นอก container** แล้วคัดลอกไปติดตั้งได้ทันทีโดยไม่ต้องสร้างสกิลใหม่
 
-![สกิลเก็บไว้ที่ไหน: เครื่องเดิม ลบ container แล้วสกิลยังอยู่ใน volume ai-accounts · เครื่องใหม่ volume ใหม่ยังไม่มีสกิล คัดลอก ./skills ที่สำรองไว้นอก container ด้วย install.sh ติดตั้งในไม่กี่วินาที](img/concept-04-skill-storage.png)
+![สกิลเก็บไว้ที่ไหน: เครื่องเดิม ลบ container แล้วสกิลยังอยู่ใน volume ai-accounts · เครื่องใหม่ volume ใหม่ยังไม่มีสกิล คัดลอกโฟลเดอร์ ./skills ที่สำรองไว้นอก container ติดตั้งในไม่กี่วินาที](img/concept-04-skill-storage.png)
 
 | ที่เก็บ | อยู่ที่ไหน | เมื่อลบ container | เมื่อย้ายเครื่อง / volume ใหม่ |
 |---|---|---|---|
@@ -185,17 +183,19 @@ skills/
 | `shared/skills` | volume `ai-accounts` | ยังอยู่ | ไม่ติดไป |
 | container | ชั้นที่เขียนได้ของ container | หายไป | ไม่ติดไป |
 
-![ติดตั้งสกิลจากโฟลเดอร์สำรอง 2 วิธี: วิธีที่ 1 สั่ง Claude Code app ด้วย docker cp + install.sh, วิธีที่ 2 ลากวางใน JupyterLab 2 ที่ ลง .Claude/shared/skills และ .Codex/shared/skills ทุกบัญชีเห็นสกิลทันที](img/concept-06-install-methods.png)
+![ติดตั้งสกิล = คัดลอกโฟลเดอร์ 2 วิธี: วิธีที่ 1 สั่ง Claude Code app ด้วย docker cp, วิธีที่ 2 ลากทีละโฟลเดอร์ใน JupyterLab ลง .Claude/shared/skills และ .Codex/shared/skills เปิดบัญชีแล้ว wrapper เชื่อมสกิลให้เอง ไม่ต้องรันสคริปต์ติดตั้ง](img/concept-06-install-methods.png)
+
+โฟลเดอร์สำรองมี**แค่ 3 โฟลเดอร์สกิล** ไม่มีสคริปต์ติดตั้ง เมื่อเปิดบัญชี `yoloN` หรือ `cyoloN` ครั้งถัดไป wrapper ใน image จะเชื่อมสกิลจาก `shared/skills` ให้บัญชีนั้นเอง
 
 ## 5. ภาพรวมขั้นตอนการทดลอง
 
 | ขั้น | ทำที่ไหน | เวลารันจริง |
 |---|---|---|
 | **1 · ให้ Claude สร้างสกิลจากสเปก** | Claude Code app | ~33 นาที |
-| **2 · ติดตั้งสกิลจากโฟลเดอร์สำรอง** | Claude Code app (หรือลากวางใน JupyterLab) | 39 วินาที |
+| **2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์** | Claude Code app (หรือลากวางใน JupyterLab) | 68 วินาที |
 | **3 · ทดสอบงานทีมชุดเดิมอีกครั้ง** | Claude Code app | 181.9 วินาที |
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | ~3 นาที (run 64 วินาที) |
-| **5 · ติดตั้งบนเครื่องที่ยังไม่มี volume** | Claude Code app | ~2 นาที (ติดตั้ง 1.59 วินาที) |
+| **5 · ติดตั้งบนเครื่องที่ยังไม่มี volume** | Claude Code app | ~2.5 นาที (ติดตั้ง 3.84 วินาที) |
 
 **ต้องมีก่อน:** container `multi-account` จาก[บทก่อนหน้า](../03_MultiAccount_Container/README.md) กำลังรัน และล็อกอินอย่างน้อย 1 บัญชี Claude และ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
 
@@ -214,7 +214,7 @@ skills/
 
 | input | บทบาท |
 |---|---|
-| [`prompt_skill_spec.md`](prompt_skill_spec.md) | สเปกของสกิล 3 ตัว: ข้อเท็จจริงของแต่ละ CLI ที่ตรวจจริงแล้ว, รูปแบบการทำงานร่วมกัน, การบริหารโทเค็น, การสลับหัวหน้าทีม, ledger, install.sh และเกณฑ์ทดสอบ |
+| [`prompt_skill_spec.md`](prompt_skill_spec.md) | สเปกของสกิล 3 ตัว: ข้อเท็จจริงของแต่ละ CLI ที่ตรวจจริงแล้ว, รูปแบบการทำงานร่วมกัน, การบริหารโทเค็น, การสลับหัวหน้าทีม, ledger, การติดตั้งด้วยการคัดลอก และเกณฑ์ทดสอบ |
 | [`reference/`](reference/) | สกิล `yolo` / `cyolo` ชุดเดิม (ไฟล์เดียวยาวประมาณ 44 KB ต่อสกิล) ใช้เป็นแหล่งความรู้ที่วัดมาแล้ว |
 
 | หัวข้อในสเปก | สาระ |
@@ -223,11 +223,11 @@ skills/
 | ผู้ใช้ 2 ฝั่ง | ใน container และ Claude Code app บน host (ผ่าน `docker exec`) |
 | ข้อเท็จจริงจากการทดลอง | flag ที่ถูก, การปิด stdin, exit code ไม่ใช่ตัวบอกผล, `auth status` ไม่ตรงจริง, ตำแหน่งโควตา |
 | agent-team | run directory, รูปแบบพื้นฐาน 5 แบบ, ขั้นสูง 5 แบบ, บริหารโทเค็นลูกทีม, สลับหัวหน้าทีม |
-| ledger / install.sh / ทดสอบ / รายงาน | ฟิลด์ที่ต้องเก็บ, การติดตั้งที่รันซ้ำได้, เกณฑ์ PASS/FAIL/SKIP |
+| ledger / การติดตั้ง / ทดสอบ / รายงาน | ฟิลด์ที่ต้องเก็บ, ติดตั้งด้วยการคัดลอกโฟลเดอร์อย่างเดียว, เกณฑ์ PASS/FAIL/SKIP |
 
 ### 1.2 · วางพรอมต์
 
-![ภาพเคลื่อนไหว: วางพรอมต์สร้างสกิลใน Claude Code app, Claude อ่านสเปกและสกิลเดิม เขียน skills/yolo cyolo agent-team ติดตั้งและทดสอบทุกรูปแบบ แล้วเขียน TEST-REPORT.md](img/desktop-step1-build.gif)
+![ภาพเคลื่อนไหว: วางพรอมต์สร้างสกิลใน Claude Code app, Claude อ่านสเปกและสกิลเดิม เขียน skills/yolo cyolo agent-team คัดลอกเข้า container และทดสอบทุกรูปแบบ แล้วเขียน TEST-REPORT.md](img/desktop-step1-build.gif)
 
 ```text
 ช่วยสร้างสกิลชุดใหม่ที่ทำให้ AI ใช้ระบบหลายบัญชีใน container multi-account ได้เต็มประสิทธิภาพ
@@ -239,9 +239,9 @@ skills/
 - container multi-account ที่กำลังรัน = ที่ทดสอบจริง (บัญชีที่พร้อมอาจมีไม่ครบ ให้ตรวจเอง)
 
 สร้างไว้ใน ./skills (นอก container นี่คือต้นฉบับที่เก็บสำรอง)
-ทดสอบ: คัดลอก ./skills ไปที่ /tmp/skills ใน container แล้วรัน install.sh ติดตั้งลง shared ทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
+ทดสอบ: คัดลอกโฟลเดอร์สกิลใน ./skills ไปวางที่ shared ของทั้งสองฝั่งใน container แล้วทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
 ใช้บัญชีอย่างประหยัด (haiku/low กับงานทดสอบ) ข้อที่ต้องใช้บัญชีที่ไม่พร้อม = SKIP
-เขียน skills/TEST-REPORT.md แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และเวลาที่ใช้ แล้วหยุด
+เขียน ./TEST-REPORT.md (นอกโฟลเดอร์ skills) แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และเวลาที่ใช้ แล้วหยุด
 ```
 
 **หลักการออกแบบพรอมต์**
@@ -255,42 +255,48 @@ skills/
 
 **ผลจริง** (8 พ.ย. 2026 · ~33 นาที): **PASS 17 · SKIP 1** ผ่านทุกรูปแบบการทำงานร่วมกัน รวมถึงการสลับหัวหน้าทีมทั้งเชิงรุกและเชิงรับ
 
-![ผลจริงจาก Claude: ตารางทดสอบ 18 ข้อ PASS 17 SKIP 1 ครอบคลุม install.sh, ตรวจความพร้อม, relay, fan-out, graph, review loop, board, สถิติ, debate, router, failover, human gate, งบโทเค็นลูกทีม, สลับหัวหน้าเชิงรุกและเชิงรับ, เรียกจาก host และสร้างภาพ](img/desktop-step1-result.png)
+![ผลจริงจาก Claude: ตารางทดสอบ 18 ข้อ PASS 17 SKIP 1 ครอบคลุมการติดตั้ง, ตรวจความพร้อม, relay, fan-out, graph, review loop, board, สถิติ, debate, router, failover, human gate, งบโทเค็นลูกทีม, สลับหัวหน้าเชิงรุกและเชิงรับ, เรียกจาก host และสร้างภาพ](img/desktop-step1-result.png)
 
-*คำตอบจริงของ Claude เป็นภาษาอังกฤษ แปลและจัดหน้าใหม่เป็นภาษาไทย รายงานฉบับเต็มอยู่ที่ [`_solution/skills/TEST-REPORT.md`](_solution/skills/TEST-REPORT.md) · SKIP คือสถานะ "ล็อกอินแล้วแต่หมดอายุ" ที่ไม่มีบัญชีใดอยู่ในสถานะนั้นขณะทดสอบ*
+*คำตอบจริงของ Claude เป็นภาษาอังกฤษ แปลและจัดหน้าใหม่เป็นภาษาไทย รายงานฉบับเต็มอยู่ที่ [`_solution/TEST-REPORT.md`](_solution/TEST-REPORT.md) · SKIP คือสถานะ "ล็อกอินแล้วแต่หมดอายุ" ที่ไม่มีบัญชีใดอยู่ในสถานะนั้นขณะทดสอบ · รอบจริงใช้สเปกฉบับแรกที่ให้สร้าง `install.sh` ด้วย (ข้อ 1 ในตาราง) ภายหลังตัดออก เพราะการคัดลอกโฟลเดอร์ใช้งานได้ทันที (ขั้นที่ 2 และ 5) พรอมต์และสเปกด้านบนเป็นฉบับปรับแล้ว เนื้อหาของสกิลทั้ง 3 โฟลเดอร์ไม่เปลี่ยน*
 
 ไฟล์ที่ Claude สร้างเก็บไว้ที่ [`_solution/skills/`](_solution/skills/) เปิดอ่าน [`agent-team/SKILL.md`](_solution/skills/agent-team/SKILL.md) เพื่อดูตัวอย่าง `SKILL.md` ที่สั้นและเปิดด้วยตาราง "ต้องการ → คำสั่ง"
 
-## ขั้นที่ 2 · ติดตั้งสกิลจากโฟลเดอร์สำรอง (39 วินาที)
+## ขั้นที่ 2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์ (68 วินาที)
+
+ติดตั้ง = คัดลอกโฟลเดอร์ `yolo`, `cyolo` และ `agent-team` ไปวางใน `shared/skills` ทั้งฝั่ง Claude และ Codex **ไม่ต้องรันสคริปต์ติดตั้ง**
 
 ### วิธีที่ 1 · สั่ง Claude Code app
 
-![ภาพเคลื่อนไหว: วางพรอมต์ติดตั้งใน Claude Code app, Claude ใช้ docker cp คัดลอก ./skills แล้วรัน install.sh ตรวจทุกบัญชีและ team.py check](img/desktop-step2-install.gif)
+![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude ใช้ docker cp คัดลอก 3 โฟลเดอร์ลงทั้งสองฝั่ง เปิดแต่ละบัญชีด้วย --version ตรวจทุกบัญชีและ team.py check](img/desktop-step2-install.gif)
 
 ```text
-ติดตั้งสกิลจาก ./skills ลง container multi-account
-- คัดลอกโฟลเดอร์ ./skills เข้า container แล้วรัน install.sh
-- ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็นสกิล yolo, cyolo และ agent-team
-- ตรวจความพร้อมของทุกบัญชีด้วยคำสั่ง check ของสกิล agent-team
-สรุปเป็นตาราง สกิล | ฝั่ง Claude | ฝั่ง Codex พร้อมรายชื่อบัญชีที่พร้อมใช้งาน แล้วหยุด
+ติดตั้งสกิลจาก ./skills ลง container multi-account ด้วยการคัดลอกโฟลเดอร์อย่างเดียว
+- คัดลอกโฟลเดอร์ yolo, cyolo และ agent-team ใน ./skills ไปวางที่ /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ใน container
+- เปิดแต่ละบัญชีหนึ่งครั้งด้วย yoloN --version และ cyoloN --version (wrapper จะเชื่อมสกิลให้แต่ละบัญชีเอง)
+- ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็น SKILL.md ของทั้ง 3 สกิล และตรวจความพร้อมด้วยคำสั่ง check ของสกิล agent-team
+สรุปเป็นตาราง สกิล | ฝั่ง Claude | ฝั่ง Codex แล้วหยุด
 ```
 
-![ผลจริงจาก Claude: ทั้ง 10 บัญชีมองเห็นสกิล yolo cyolo agent-team ครบ 5/5 ทั้งฝั่ง Claude และ Codex](img/desktop-step2-result.png)
+![ผลจริงจาก Claude Code app: คัดลอกด้วย docker cp ไม่มีอะไรถูกเขียนทับ ทั้ง 10 บัญชีตอบ --version ปกติ wrapper สร้างลิงก์รายสกิลให้ฝั่ง Codex และทุกบัญชีเห็น SKILL.md ครบ 5/5 ทั้งสองฝั่ง](img/desktop-step2-result.png)
 
-*ผลจริง ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก*
-
-หากใช้สกิลที่เตรียมไว้แล้ว ให้เปลี่ยน `./skills` ในพรอมต์เป็น `./_solution/skills`
+*ผลจริง ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก · ใช้สกิลที่เตรียมไว้: เปลี่ยน `./skills` ในพรอมต์เป็น `./_solution/skills`*
 
 ### วิธีที่ 2 · ลากวางใน JupyterLab
 
-ลากโฟลเดอร์ `yolo`, `cyolo` และ `agent-team` **ทีละโฟลเดอร์** ไปวาง 2 ที่ตามตารางด้านล่าง (เปิดลิงก์ในเบราว์เซอร์ แล้วลากโฟลเดอร์จากเครื่องไปวางในแผงไฟล์ด้านซ้ายของ JupyterLab)
+เปิด File Explorer ที่โฟลเดอร์ `04_MultiAccount_Skill\_solution\skills` (หรือ `skills` ที่สร้างในขั้นที่ 1) วางคู่กับ JupyterLab แล้วลาก `yolo`, `cyolo` และ `agent-team` **ทีละโฟลเดอร์** ไปปล่อยในพื้นที่ว่างของแถบไฟล์ ทำ 2 ที่
 
-| ปลายทาง | ใช้กับ |
-|---|---|
-| http://localhost:8886/lab/tree/root/ai-accounts/.Claude/shared/skills | `yolo1–5` |
-| http://localhost:8886/lab/tree/root/ai-accounts/.Codex/shared/skills | `cyolo1–5` |
+![ลากวางปลายทางที่ 1: File Explorer ที่ 04_MultiAccount_Skill > _solution > skills มี yolo cyolo agent-team ลาก agent-team ไปปล่อยในกรอบเส้นประของ JupyterLab ที่ / root / ai-accounts / .Claude / shared / skills / ซึ่งมี shared-check yolo cyolo แล้ว ลากทีละโฟลเดอร์](img/drag-1-claude.png)
 
-หลังลากวาง เรียก `cyolo1` หนึ่งครั้ง (wrapper จะสร้าง link รายสกิลของฝั่ง Codex ให้) หรือรัน `install.sh` ใน Terminal เพื่อให้แน่ใจว่าทุกบัญชีเห็นสกิล
+![ลากวางปลายทางที่ 2: ลากโฟลเดอร์เดียวกันไปที่ / root / ai-accounts / .Codex / shared / skills / ใน JupyterLab](img/drag-2-codex.png)
+
+| ปลายทาง | เปิดใน JupyterLab | ใช้กับ |
+|---|---|---|
+| 1 | http://localhost:8886/lab/tree/root/ai-accounts/.Claude/shared/skills | `yolo1–5` |
+| 2 | http://localhost:8886/lab/tree/root/ai-accounts/.Codex/shared/skills | `cyolo1–5` |
+
+- **ลากทีละโฟลเดอร์:** ลากหลายโฟลเดอร์พร้อมกันอาจได้โฟลเดอร์ไม่ครบ
+- **อย่าปล่อยบนชื่อโฟลเดอร์อื่น** เช่น `shared-check` จะกลายเป็นวางเข้าไปข้างในโฟลเดอร์นั้น
+- **ลากวางครบแล้ว** ให้เปิด `yolo1` และ `cyolo1` หนึ่งครั้ง wrapper จะเชื่อมสกิลให้บัญชีนั้นเอง
 
 ## ขั้นที่ 3 · ทดสอบงานทีมชุดเดิมอีกครั้ง (181.9 วินาที)
 
@@ -347,35 +353,35 @@ skills/
 
 ไฟล์ของ run นี้ (`state.json`, `handoff.md`, `board.md`, `ledger.jsonl`) อยู่ใน `workspace/.agent-team/<run_id>/` บนเครื่องเรา เปิด `handoff.md` เพื่อดูใบส่งเวรที่หัวหน้าแต่ละคนเขียนให้คนถัดไป
 
-## ขั้นที่ 5 · ติดตั้งบนเครื่องที่ยังไม่มี volume (~2 นาที)
+## ขั้นที่ 5 · ติดตั้งบนเครื่องที่ยังไม่มี volume (~2.5 นาที)
 
-ขั้นนี้จำลองเครื่องใหม่ด้วย volume ใหม่ที่ยังไม่มีสกิล แล้วติดตั้งจากโฟลเดอร์สำรอง
+ขั้นนี้จำลองเครื่องใหม่ด้วย volume ใหม่ที่ยังไม่มีสกิล แล้วติดตั้งด้วยการคัดลอกโฟลเดอร์สำรองอย่างเดียว
 
-![ภาพเคลื่อนไหว: เครื่องใหม่ volume ใหม่ยังไม่มีสกิล คัดลอก ./skills เข้า container แล้ว install.sh วางสกิลทั้งฝั่ง Claude และ Codex ทุกบัญชีเห็นสกิลทันที ผลจริง 1.59 วินาที](img/gif-new-machine.gif)
+![ภาพเคลื่อนไหว: เครื่องใหม่ volume ใหม่ยังไม่มีสกิล คัดลอกโฟลเดอร์ yolo cyolo agent-team ลงทั้งฝั่ง Claude และ Codex เปิดบัญชีแล้ว wrapper เชื่อมสกิลให้เอง ทุกบัญชีเห็นสกิลทันที ผลจริง 3.84 วินาที](img/gif-new-machine.gif)
 
 ```text
-จำลองเครื่องใหม่ที่ยังไม่มี volume ai-accounts แล้วติดตั้งสกิลจากโฟลเดอร์สำรอง ./skills
-- สร้าง volume ai-accounts-new และ container multi-account-new จาก image multi-account:1.0 (พอร์ต 8889 · --privileged)
+จำลองเครื่องใหม่ที่ยังไม่มี volume ai-accounts แล้วติดตั้งสกิลจากโฟลเดอร์สำรอง ./skills ด้วยการคัดลอกอย่างเดียว
+- สร้าง volume ai-accounts-new และ container multi-account-new จาก image multi-account:1.0 (พอร์ต 8890 · --privileged)
 - ตรวจว่าใน container ใหม่ยังไม่มีสกิล yolo, cyolo, agent-team
-- ติดตั้งจาก ./skills (docker cp + install.sh) และจับเวลาตั้งแต่เริ่มคัดลอกจนตรวจเสร็จ
+- คัดลอกโฟลเดอร์ทั้ง 3 ไปที่ .Claude/shared/skills และ .Codex/shared/skills แล้วเปิดแต่ละบัญชีหนึ่งครั้ง (yoloN / cyoloN --version) จับเวลาตั้งแต่เริ่มคัดลอกจนตรวจเสร็จ
 - ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็นสกิลครบ และ team.py check ทำงานได้ (บัญชีใหม่ยังไม่ได้ล็อกอินเป็นเรื่องปกติ)
 - เสร็จแล้วลบ container multi-account-new และ volume ai-accounts-new ทิ้ง ห้ามแตะ container multi-account และ volume ai-accounts
 สรุปเป็นตาราง ก่อนติดตั้ง | หลังติดตั้ง และเวลาที่ใช้ แล้วหยุด
 ```
 
-![ภาพเคลื่อนไหว: Claude สร้าง volume และ container ใหม่ ตรวจก่อนติดตั้ง คัดลอก ./skills แล้ว install.sh พบว่า yolo1–5 มองไม่เห็นสกิล จึงแก้ install.sh และทดสอบใหม่ ได้ 30/30 แล้วลบของทดลองทิ้ง](img/desktop-step5-newmachine.gif)
+![ภาพเคลื่อนไหว: Claude สร้าง volume และ container ใหม่ ตรวจก่อนติดตั้ง คัดลอก 3 โฟลเดอร์ลง 2 ปลายทาง เปิดบัญชีด้วย --version ตรวจ 10 บัญชีและ team.py check แล้วลบของทดลองทิ้ง](img/desktop-step5-newmachine.gif)
 
-**ผลจริง:** ติดตั้งเสร็จใน **1.59 วินาที** (คัดลอก 0.39 · install.sh 0.55 · ตรวจทุกบัญชี 0.65) ทุกบัญชีเห็นสกิลครบ 30/30
+**ผลจริง:** ติดตั้งเสร็จใน **3.84 วินาที** (คัดลอก 1.84 · เปิดบัญชีให้ wrapper เชื่อมสกิล 1.17 · ตรวจทุกบัญชี 0.83) ทุกบัญชีเห็นสกิลครบ
 
-![ผลจริงจาก Claude: ตารางก่อนและหลังติดตั้ง สกิลใน shared จากมีแค่ shared-check เป็นครบ 4 สกิล บัญชีที่เห็นสกิลจาก 0/5 เป็น 5/5 ทั้งสองฝั่ง SKILL.md อ่านได้ 30/30 และเวลา 1.59 วินาที](img/desktop-step5-result.png)
+![ผลจริงจาก Claude Code app: ตารางก่อนและหลังติดตั้ง สกิลใน shared จากมีแค่ shared-check เป็นครบ 4 สกิล yolo1–5 และ cyolo1–5 เห็นสกิลครบ 3/3 และเวลาแยกตามขั้นรวม 3.84 วินาที](img/desktop-step5-result.png)
 
-**สิ่งที่ขั้นนี้พบ:** `install.sh` รอบแรกติดตั้งแล้ว `yolo1–5` มองไม่เห็นสกิล เพราะใน volume ใหม่ โฟลเดอร์ `skills` ของบัญชี Claude เป็นโฟลเดอร์จริง ไม่ใช่ symlink เหมือน volume เดิม Claude แก้ `install.sh` ให้สร้าง link รายสกิลให้ทั้งสองฝั่ง แล้วทดสอบใหม่บน volume ว่าง การทดสอบติดตั้งบนเครื่องใหม่จริงจึงจำเป็น เพราะสภาพแวดล้อมของเครื่องเดิมอาจซ่อนปัญหาไว้ (ไฟล์ใน `_solution/skills/` เป็นฉบับที่แก้แล้ว)
+ใน volume ใหม่ โฟลเดอร์ `skills` ของบัญชี Claude เป็นโฟลเดอร์จริง ไม่ใช่ symlink เหมือน volume เดิม การติดตั้งด้วยการคัดลอกยังใช้ได้ เพราะ wrapper สร้างลิงก์รายสกิลให้ทุกครั้งที่เปิดบัญชี
 
-ติดตั้งเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `04_MultiAccount_Skill`):
+ติดตั้งเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `04_MultiAccount_Skill` ทีละบรรทัด):
 
 ```bash
-docker cp ./_solution/skills multi-account:/tmp/skills
-docker exec multi-account bash /tmp/skills/install.sh
+for d in .Claude .Codex; do for s in yolo cyolo agent-team; do docker cp ./_solution/skills/$s multi-account:/root/ai-accounts/$d/shared/skills/; done; done
+docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyolo$n --version; done'
 ```
 
 ## สรุป
@@ -387,7 +393,7 @@ docker exec multi-account bash /tmp/skills/install.sh
 | การทำงานร่วมกัน | สั่งทีละตัว ยัดข้อมูลลง prompt | relay · fan-out · graph · review · board · ขั้นสูง |
 | สถิติ | ต้องเดา | ledger ทุกครั้งที่เรียก + โควตาพร้อมเวลาของข้อมูล |
 | หัวหน้าหรือลูกทีมโควตาหมด | งานค้างหรือหาย | สลับหัวหน้าและย้ายงานโดยงานไม่หาย |
-| เครื่องใหม่ | สร้างใหม่ | คัดลอกโฟลเดอร์สำรอง ติดตั้ง 1.59 วินาที |
+| เครื่องใหม่ | สร้างใหม่ | คัดลอกโฟลเดอร์สำรอง ติดตั้ง 3.84 วินาที |
 | งานทีมชุดเดียวกัน | 810.2 วินาที | 181.9 วินาที |
 
 ## ข้อควรรู้
@@ -396,8 +402,8 @@ docker exec multi-account bash /tmp/skills/install.sh
 - **บัญชีทุกตัวรันแบบข้าม permission:** ใช้กับงานที่อนุญาตเท่านั้น และตรวจผลของ agent อื่นซ้ำเสมอ
 - **ไม่ retry งานที่เสียโทเค็นอัตโนมัติ:** งานที่ล้มหลังใช้โทเค็นไปแล้วจะหยุดและรายงาน
 - **Git Bash บน Windows แปลง path `/root/...`:** เมื่อสั่ง `docker exec` จาก Git Bash ให้เขียน `//root/...` หรือใช้ PowerShell
-- **แก้สกิลที่ต้นฉบับ:** แก้ใน `skills/` บนเครื่องเรา แล้วรัน `install.sh` ใหม่ (รันซ้ำได้ สกิลเดิมที่ต่างกันถูกสำรองไว้ก่อนเขียนทับ)
-- **`macore.py` มี 2 สำเนา** ใน `yolo/scripts` และ `cyolo/scripts` เพื่อให้แต่ละสกิลใช้เดี่ยว ๆ ได้ แก้แล้วต้องคัดลอกให้ตรงกัน (`install.sh` ตรวจให้)
+- **แก้สกิลที่ต้นฉบับ:** แก้ใน `skills/` บนเครื่องเรา แล้วคัดลอกทับใน `shared/skills` อีกครั้ง
+- **`macore.py` มี 2 สำเนา** ใน `yolo/scripts` และ `cyolo/scripts` เพื่อให้แต่ละสกิลใช้เดี่ยว ๆ ได้ แก้แล้วต้องคัดลอกให้ตรงกัน
 
 ## คำสั่งที่ใช้บ่อย
 
