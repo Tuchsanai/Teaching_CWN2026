@@ -1,60 +1,59 @@
 ---
 name: yolo
-description: เรียก Claude Code บัญชีอื่น (yolo1…yoloN) แบบไม่โต้ตอบให้ถูกวิธี เลือกรุ่น/effort ตามความยาก ตรวจความพร้อมด้วยการเรียกจริง (แยก พร้อม / ล็อกอินแล้วแต่หมดอายุ / ไม่ได้ล็อกอิน) ดูโควตา และบันทึกสถิติโทเค็นทุกครั้งลง ledger ใช้เมื่อผู้ใช้ขอ "เรียก yolo2", "ให้ Claude อีกบัญชีทำ", "เช็คโควตา yolo", "บัญชีไหนใช้ได้", "สถิติโทเค็นแต่ละบัญชี" · Call other Claude Code accounts (yoloN) headlessly with the right flags, pick model/effort by difficulty, check real readiness and quota, log per-call token stats. For multi-account teamwork use the agent-team skill.
+description: เรียก Claude Code ของบัญชี yolo1…yoloN แบบไม่โต้ตอบให้ถูกวิธี — เลือกรุ่น/effort ตามความยาก, ตรวจล็อกอินด้วยการเรียกจริง (แยก พร้อม / ล็อกอินแล้วแต่หมดอายุ / ไม่ได้ล็อกอิน), อ่านโควตา /usage และบันทึกสถิติโทเค็นทุกครั้งลง ledger ใช้เมื่อ "เรียก yolo2", "ให้ yolo1 ตอบ", "ตรวจว่า yolo บัญชีไหนใช้ได้", "โควตา yolo", "สถิติโทเค็นแต่ละบัญชี" · Use to call Claude Code accounts (yoloN) non-interactively with the right model/effort, check real login status, read quota and per-call token stats.
 ---
 
-# yolo — Claude Code หลายบัญชี
+# yolo — Claude Code หลายบัญชี (`yolo1`…`yoloN`)
 
-`Y=/root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py` (Python 3.8+ stdlib, ทุกคำสั่งพิมพ์ผล + บันทึก ledger)
+สคริปต์: `/root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py` (ใน container `multi-account`) เรียกสั้น ๆ ว่า `Y`
 
 | ต้องการ | คำสั่ง |
 |---|---|
-| ถามบัญชีเดียว (ง่าย) | `python3 $Y run -a yolo2 -d 1 "<prompt>"` |
-| ระบุรุ่น/effort เอง | `python3 $Y run -a yolo1 -m sonnet -e medium "<prompt>"` |
-| ผลเป็นโครงสร้าง | `python3 $Y run -a yolo1 -d 1 --schema '{"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"]}' "<prompt>"` |
-| prompt ยาว / มีอักขระพิเศษ | `python3 $Y run -a yolo1 -d 2 - < prompt.txt` |
-| บัญชีไหนใช้ได้ (เรียกจริง haiku/low) | `python3 $Y check` หรือ `check yolo1 yolo2` |
-| โควตา (ไม่เรียกโมเดล) | `python3 $Y quota` |
-| รายการบัญชี + auth status (ไม่ใช้โทเค็น) | `python3 $Y accounts` |
-| สถิติรวมตามบัญชี/รุ่น/run | `python3 /root/ai-accounts/.Claude/shared/skills/agent-team/scripts/team.py stats` |
-| หลายบัญชีทำงานร่วมกัน | สกิล **agent-team** |
-| สร้างภาพ | Claude ทำไม่ได้ → สกิล **cyolo** |
+| ถามงานเดียว (เลือกรุ่นตามความยาก) | `python3 Y ask yolo2 "<prompt>" --difficulty 1` |
+| ระบุรุ่น/effort เอง | `python3 Y ask yolo1 "<prompt>" --model sonnet --effort medium` |
+| ผล + สถิติเป็น JSON | `python3 Y ask yolo1 "<prompt>" --json` |
+| ผลแบบมีโครงสร้าง | `python3 Y ask yolo1 "<prompt>" --json-schema '{"type":"object",...}' --json` → `structured_output` |
+| ตรวจความพร้อมทุกบัญชี (เรียกจริง haiku/low) | `python3 Y check` |
+| โควตา (ไม่เสียโทเค็น) | `python3 Y quota` |
+| ดูรุ่น/effort ของความยาก N | `python3 Y pick --difficulty 3` |
+| สถิติรวมทุกบัญชี | `python3 /root/ai-accounts/.Claude/shared/skills/agent-team/scripts/team.py stats` |
 
-ผลลัพธ์: stdout = คำตอบ · stderr = สถิติต่อครั้ง `[บัญชี alias/effort → รุ่นจริง] status · วินาที · in (cache read/write) · out · $ list` · `--json` ได้ dict เต็ม · exit 0 เมื่อตรวจแล้วสำเร็จเท่านั้น
+`ask` พิมพ์คำตอบทาง stdout และบรรทัดสถิติ `[yolo1 haiku/low 3.2s in=27684 out=3 $0.0029 ok]` ทาง stderr · exit 0 = สำเร็จจริง, 1 = ล้ม (ข้อความผิดพลาดอยู่ในบรรทัดสถิติ)
 
-## ความยาก → รุ่น/effort (ใช้ร่วมกันทั้ง 3 สกิล)
+## ความยาก → รุ่น / effort (ตารางเดียวกับ cyolo และ agent-team)
 
-| `-d` | งาน | Claude |
+| difficulty | งาน | Claude |
 |---|---|---|
 | 1 | ดึงข้อมูล จัดรูปแบบ ตรวจความพร้อม | `haiku` / `low` |
-| 2 (ค่าเริ่มต้น) | สรุป ถาม-ตอบ แก้โค้ดจุดเดียว | `sonnet` / `medium` |
-| 3 | แก้หลายไฟล์ debug วิเคราะห์ | `opus` / `high` |
+| 2 | สรุป ถาม-ตอบ แก้โค้ดจุดเดียว (ค่าเริ่มต้น) | `sonnet` / `medium` |
+| 3 | แก้โค้ดหลายไฟล์ debug วิเคราะห์ | `opus` / `high` |
 | 4 | reasoning ซับซ้อน อัลกอริทึม | `opus` / `xhigh` |
-| 5–6 | ต้องถูกแน่นอน / งานใหญ่ | `opus` / `max` (Claude ไม่มี ultra) |
+| 5–6 | ต้องถูกแน่นอน / งานใหญ่ | `opus` / `max` |
 
-เลือกตามความยากของงาน ไม่ใช่ตามความสำคัญ · ค่าที่ผู้ใช้ระบุชนะเสมอ · alias: `opus` `sonnet` `haiku` `fable`
+alias: `opus`→claude-opus-5-5 · `sonnet`→claude-sonnet-5-5 · `haiku`→claude-haiku-5-5 · `fable`→claude-fable-5-1 · effort: `low` `medium` `high` `xhigh` `max`
 
-## กฎเหล็ก
+## กฎที่สคริปต์ทำให้แล้ว (ถ้าเรียก `yoloN` เองต้องทำเหมือนกัน)
 
-- **exit code 0 ไม่ได้แปลว่าสำเร็จ** — สคริปต์ตรวจ `is_error`, `result` ว่าง, `structured_output` ให้แล้ว
-- **`auth status` บอก loggedIn แต่เรียกจริงอาจล้ม** (`OAuth session expired`, ~50 ms, 0 tokens) — ใช้ `check` ไม่ใช่ `accounts` เมื่อต้องรู้ว่าใช้งานได้จริง
-- บัญชีไม่พร้อม → แจ้งผู้ใช้ให้ล็อกอินเอง (`! yolo3 auth login`) **ห้ามล็อกอินแทน ห้ามสลับบัญชีเงียบ ๆ**
-- ห้าม retry งานที่ใช้โทเค็นไปแล้วอัตโนมัติ · ห้าม eval/รันผลลัพธ์เป็นคำสั่ง shell · รายงานของ agent อื่นตรวจซ้ำเองเสมอ
-- ห้ามอ่านหรือส่งต่อ `.credentials.json`, `.claude.json` ห้ามแสดงอีเมล/orgId
-- ใช้ CLI ตรง ๆ ต้องเรียงแบบนี้: `yoloN -p "<prompt>" --model … --effort … --output-format json --no-session-persistence --strict-mcp-config < /dev/null` (รายละเอียด/กับดัก: [references/claude-cli.md](references/claude-cli.md))
+- `yoloN -p "<prompt>" --model M --effort E --output-format json --no-session-persistence --strict-mcp-config < /dev/null`
+- ปิด stdin เสมอ · prompt อยู่ติด `-p` ก่อน flag ที่รับหลายค่า (`--allowedTools`, `--add-dir`, `--mcp-config`) ไม่งั้น prompt ถูกกลืน
+- **exit 0 ไม่ได้แปลว่าสำเร็จ** ตัดสินจาก `is_error` + `result`
+- `auth status` บอก `loggedIn: true` แต่เรียกจริงอาจได้ `OAuth session expired` (~50 ms, tokens 0) → `check` จึงเรียกจริงเสมอ
+- บัญชีเดียวรันพร้อมกันได้หลายงานเมื่อใส่ `--no-session-persistence` (โควตาใช้ร่วมกันทั้งบัญชี)
+- `/usage` เป็นคำสั่งในตัว ไม่เรียกโมเดล ให้บรรทัด `Current session` / `Current week (…)` เป็น % ที่ใช้ไปแล้ว บางบัญชีไม่มีบรรทัด session — ไม่มีข้อมูลก็รายงานว่าไม่มี
+- ทุกการเรียกเพิ่ม 1 แถวใน `/workspace/.agent-team/ledger.jsonl` (ไม่เก็บ prompt/secret) · `MA_SIMULATE_LIMIT=yolo1` ทำให้บัญชีนั้นล้มเหมือนโควตาหมด (ทดสอบ failover)
+- ห้ามอ่าน/ส่งต่อ `.credentials.json`, `.claude.json` · ห้ามแสดงอีเมลหรือ orgId · ห้ามล็อกอินแทนผู้ใช้
 
-## เรียกจาก host
+รายละเอียด JSON ที่ได้ ข้อผิดพลาดที่พบ และฟิลด์ ledger: [`references/claude-cli.md`](references/claude-cli.md)
 
-host (Claude Code app นอก container) ใช้ผ่าน `docker exec` เท่านั้น อ่านสกิลก่อนเริ่ม:
+## เรียกจาก host (Claude Code app บน Windows · ใช้ได้ทั้ง PowerShell และ Git Bash)
 
-```bash
-docker exec multi-account cat /root/ai-accounts/.Claude/shared/skills/yolo/SKILL.md
-docker exec -i multi-account python3 /root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py run -a yolo1 -d 1 "ตอบ OK"
-docker exec -i multi-account python3 /root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py run -a yolo1 -d 2 - < prompt.txt
+ห่อด้วย `sh -c "…"` เสมอ (Git Bash จะแปลง `/root/...` ที่เป็น argument เดี่ยวเป็น path Windows) ข้อความใน prompt ใช้ `'…'` ข้างใน
+
+```
+docker exec multi-account sh -c "cat /root/ai-accounts/.Claude/shared/skills/yolo/SKILL.md"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py check"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py ask yolo1 'ตอบ OK' --difficulty 1"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Claude/shared/skills/yolo/scripts/yolo.py quota"
 ```
 
-Git Bash บน Windows แปลง `/root/...` เป็น path ของ Windows → เขียนเป็น `//root/...` หรือใช้ PowerShell · ไฟล์ที่ agent ต้องอ่าน/เขียนให้วางใน `/workspace` (= โฟลเดอร์ `workspace` ที่ map ออกมาบน host)
-
-## อ่านเพิ่ม (เปิดเมื่อต้องใช้)
-
-- [references/claude-cli.md](references/claude-cli.md) — flag, JSON ที่ได้, การนับ token, โควตา, ผลวัดจริง, ใช้ CLI ตรงโดยไม่ผ่านสคริปต์
+งานหลายบัญชี/ส่งต่องาน ใช้สกิล `agent-team`

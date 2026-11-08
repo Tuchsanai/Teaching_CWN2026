@@ -1,108 +1,75 @@
-# กราฟงาน (graph.json)
+# กราฟงาน — ฟิลด์ทั้งหมดและรูปแบบขั้นสูง
 
-```json
-{"goal": "<ข้อความ>", "defaults": {"difficulty": 1, "timeout": 300}, "nodes": [ {…}, … ]}
-```
+ไฟล์กราฟเป็น object `{"goal", "defaults", "board", "nodes": [...]}` หรือ list ของงานเฉย ๆ · `defaults` ถูกเติมให้ทุกงานที่ไม่ได้ระบุ · `"board": false` ปิดการแทรก board ใน prompt
 
-`defaults` ถูกเติมให้ทุก node ที่ไม่ได้ระบุเอง · node ต้องประกาศหลัง node ที่มันขึ้นด้วย
+## ฟิลด์ของงาน
 
-## ฟิลด์ของ node
-
-| ฟิลด์ | ค่า | หมายเหตุ |
+| field | ชนิด | ความหมาย |
 |---|---|---|
-| `id` | `[A-Za-z0-9_.-]+` | ชื่อไฟล์ผล `out/<id>.md` |
-| `prompt` | ข้อความ | ใช้ `{{id}}` / `{{file:id}}` ได้ |
-| `type` | `task` (ค่าเริ่มต้น) · `review` · `debate` · `best_of` | |
-| `account` | `yoloN` · `cyoloN` · `yolo` · `cyolo` · `any` (ค่าเริ่มต้น) | บัญชีเจาะจง = pinned ไม่ย้ายอัตโนมัติ |
-| `depends_on` | `["a","b"]` | template เพิ่มให้เอง |
-| `difficulty` | 1–6 | ตารางความยาก (ค่าเริ่มต้น 2) |
-| `model`, `effort` | ระบุตรง | `model` ของ Claude ใช้เฉพาะเมื่อได้บัญชี yolo และกลับกัน |
-| `expect` | `int` `number` `json` `text` `regex:<pattern>` | ตรวจก่อนส่งต่อ ไม่ผ่าน = งานล้ม |
-| `schema` | JSON schema | ผลแบบมีโครงสร้าง (Claude `--json-schema`, Codex `--output-schema` แบบ strict) |
-| `image` | absolute path `.png` | ไป cyolo เสมอ ตรวจ PNG signature |
-| `kind` | `image` `code_review` `long_doc` | คำใบ้ให้ router (ไม่ใส่ = เดาจาก prompt) |
-| `approve` | `true` | human gate |
-| `progress` | `true` | สั่งให้เขียนความคืบหน้าลง `msgs/<id>__progress.md` (อัตโนมัติเมื่อ difficulty ≥ 3) |
-| `cwd`, `timeout` | path, วินาที | ค่าเริ่มต้น cwd = `<run>/work` |
-| review | `reviewer`, `criteria`, `max_rounds` (3), `review_difficulty` | `account` = ผู้ทำ |
-| debate | `candidates` (`["yolo","cyolo"]`), `judge` (`any`), `judge_difficulty` | |
-| best_of | `candidates` หรือ `n` + `candidate_account`, `criteria`, `judge` | |
+| `id` | str | ไม่ซ้ำ ใช้ใน placeholder (`a-z0-9_.-`) |
+| `prompt` | str | คำสั่งงาน รองรับ `{{id}}` `{{file:id}}` `{{account:id}}` `{{run_dir}}` `{{board}}` |
+| `account` | str | `yoloN` / `cyoloN` (pinned) · `yolo`/`claude` · `cyolo`/`codex` · `any` (ค่าเริ่มต้น) |
+| `depends_on` | list | id ที่ต้องสำเร็จก่อน (placeholder เพิ่มให้อัตโนมัติ) |
+| `expect` | str | `text` · `int` · `number` · `json` · `regex:<pat>` (มี group 1 = ค่าที่ส่งต่อ) · `contains:<s>` · `png` |
+| `difficulty` | 1–6 | เลือกรุ่น/effort (ค่าเริ่มต้น 2 หรือ `run --difficulty`) |
+| `model`, `effort` | str | ระบุตรง; `model` ผูกงานกับฝั่งของรุ่นนั้น (`haiku` → Claude, `gpt-6.1-sol` → Codex) |
+| `kind` | str | `image` · `code_review` · `doc` · `code` (code/difficulty≥3 สั่งให้เขียนความคืบหน้าลง `msgs/`) |
+| `cwd` | str | โฟลเดอร์ทำงาน absolute (สร้างให้) และบอกใน prompt |
+| `output` | str | path ของภาพ (kind image) ค่าเริ่มต้น `out/<id>.png` |
+| `schema` | object | ผลแบบมีโครงสร้าง (Claude `--json-schema`, Codex `--output-schema` ต้อง strict) |
+| `timeout` | int | วินาที (ค่าเริ่มต้น 600) |
+| `approve` | bool | human gate |
 
-ค่าที่ส่งต่อ (`{{id}}`): `task` = ผลที่ผ่าน `expect` · `debate` = คำตอบที่ผู้ตัดสินสรุป · `best_of` = ผลของผู้ชนะ · `review` = ฉบับที่ APPROVED
+## prompt ที่ worker ได้รับ
 
-## รูปแบบ
-
-### relay ข้าม CLI (A → B → C)
-
-```json
-{"defaults": {"difficulty": 1}, "nodes": [
- {"id": "a", "account": "cyolo", "prompt": "คำนวณ 7*6", "expect": "int"},
- {"id": "b", "account": "yolo",  "prompt": "นำ {{a}} บวก 100", "expect": "int"},
- {"id": "c", "account": "cyolo", "prompt": "นำ {{b}} คูณ 3", "expect": "int"}]}
+```
+[ทีม <run> · งาน <id> · บัญชี <acct>]
+โฟลเดอร์ทำงาน (absolute path): …          (ถ้ามี cwd)
+กระดานความรู้กลาง (…/board.md): …          (ถ้ามีข้อค้นพบ ≤1500 ตัวอักษร ไม่งั้นบอก path)
+ถ้าพบข้อเท็จจริงที่งานอื่นควรรู้ ให้เขียนเป็นบรรทัดขึ้นต้นด้วย BOARD:
+---
+<prompt ที่แทน placeholder แล้ว>
+(รูปแบบคำตอบ: จำนวนเต็มอย่างเดียว)          (ตาม expect)
 ```
 
-ทุกทอดเขียน `msgs/a__b.md`, `msgs/b__c.md` · ผู้เรียกต้องตรวจทุกทอดด้วยการคำนวณอิสระเสมอ
+บรรทัด `BOARD:` ถูกตัดออกจากคำตอบก่อนตรวจ `expect` และต่อท้าย `board.md` พร้อมผู้เขียน/เวลา
 
-### fan-out / fan-in
-
-```json
-{"nodes": [
- {"id": "p1", "account": "yolo1",  "prompt": "สรุปข้อดีของ X 3 ข้อ"},
- {"id": "p2", "account": "yolo2",  "prompt": "สรุปข้อเสียของ X 3 ข้อ"},
- {"id": "p3", "account": "cyolo1", "prompt": "ยกตัวอย่างการใช้ X 3 ข้อ"},
- {"id": "merge", "account": "any", "prompt": "รวมไฟล์ {{file:p1}} {{file:p2}} {{file:p3}} เป็นรายงานเดียว"}]}
-```
-
-### graph (DAG) ส่งข้อมูลยาวด้วยไฟล์
-
-node ใดก็ได้มี `depends_on` หลายตัว งานที่พร้อมรันพร้อมกัน · ข้อมูลยาวส่งด้วย `{{file:id}}` แล้วสั่งให้ผู้รับอ่านไฟล์/ใช้เชลล์ประมวลผลเอง (เร็วและถูกกว่าการยัดข้อมูลลง prompt) · `{{id}}` ที่ยาวเกิน 2000 ตัวอักษรถูกปฏิเสธ
-
-### review loop
+## review loop
 
 ```json
-{"id": "fn", "type": "review", "account": "yolo", "reviewer": "cyolo", "max_rounds": 3,
- "prompt": "เขียนฟังก์ชัน Python add(a, b)", "criteria": "มี type hints และ docstring"}
+{"id": "essay", "type": "review", "account": "yolo", "reviewer": "cyolo", "max_rounds": 3,
+ "prompt": "เขียนย่อหน้า 3 ประโยคเรื่อง …",
+ "review_prompt": "ตรวจว่า 3 ประโยคพอดีและมีคำว่า X"}
 ```
+รอบละ 2 การเรียก (ผู้ทำ + ผู้ตรวจ) · รอบถัดไปผู้ทำได้ความเห็นผู้ตรวจและ path ของร่างเดิม · ผล: `out/essay.md` (ฉบับสุดท้าย), `out/essay.rN.md`, `out/essay.review.md` · ครบ `max_rounds` โดยไม่ APPROVED = "ไม่ผ่านการตรวจ" · ผู้ตรวจค่าเริ่มต้นคือฝั่งตรงข้ามกับผู้ทำ
 
-ผู้ทำส่งร่าง → `out/fn.r1.md` → ผู้ตรวจอ่านไฟล์ ตอบ `APPROVED` หรือรายการที่ต้องแก้ → ผู้ทำแก้จากร่างเดิม … จนได้ `APPROVED` หรือครบ `max_rounds` (= งานล้ม) · บทสนทนาอยู่ใน `msgs/fn.worker__fn.reviewer.md` และกลับกัน
-
-### board (แชร์ความรู้)
-
-ทุก prompt ได้ข้อค้นพบบน `board.md` (≤ 3000 ตัวอักษรแทรกให้ ยาวกว่านั้นให้ path) และคำสั่งให้ใส่ `BOARD: <ข้อเท็จจริง>` ท้ายคำตอบ · scheduler ตัดบรรทัดนั้นออกจากผลแล้วต่อท้ายลง board พร้อมผู้เขียนและเวลา · คนเพิ่มเองได้: `team.py note "…" --run <id>`
-
-### debate / ตรวจไขว้
+## debate / ตรวจไขว้
 
 ```json
-{"id": "q", "type": "debate", "candidates": ["yolo", "cyolo"], "judge": "yolo",
- "prompt": "มีจำนวนเฉพาะกี่ตัวที่น้อยกว่า 100"}
+{"id": "q", "type": "debate", "prompt": "จำนวนเฉพาะระหว่าง 1–100 มีกี่ตัว ใช้เชลล์คำนวณ", "accounts": ["yolo", "cyolo"], "judge": "yolo"}
 ```
+ขยายเป็น `q.1` (yolo), `q.2` (cyolo) รันพร้อมกัน แล้ว `q` = ผู้ตัดสินตอบ JSON `{"final", "winner", "reason"}` (ต้องมี reason) · `{{q}}` ในงานถัดไปได้ JSON นั้น
 
-ผู้ตอบแต่ละฝั่งเขียน `out/q.c1.md`, `out/q.c2.md` · ผู้ตัดสิน (คนละบัญชีกับผู้ตอบถ้าได้) ตรวจเองแล้วตอบ JSON `{answer, winner, agree, reason}` → `out/q.judge.json`, `out/q.md`
-
-### best-of-N + judge
+## best-of-N + judge
 
 ```json
-{"id": "slogan", "type": "best_of", "candidates": ["yolo1", "yolo2", "cyolo1"], "judge": "cyolo2",
- "criteria": "สั้นไม่เกิน 8 คำ จำง่าย ตรงกับสินค้า", "prompt": "คิดสโลแกนร้านกาแฟ 1 ประโยค"}
+{"id": "slogan", "type": "best_of", "n": 3, "accounts": ["yolo1", "yolo2", "cyolo1"],
+ "prompt": "คิดสโลแกนสั้นสำหรับ …", "criteria": "สั้น จำง่าย ตรงโจทย์", "judge": "cyolo"}
 ```
+`slogan.1..N` → ผู้ตัดสินตอบ `{"best": "B", "scores": {...}, "reason": "…"}` · ผลงานที่ชนะคัดลอกไป `out/slogan.best.md`
 
-ผู้ตัดสินให้คะแนนทุกคน `{scores:[{candidate,score,note}], best, reason}` ค่าที่ส่งต่อคือผลของผู้ชนะ
+## router (`account: any`)
 
-### router (`account: "any"`)
+ลำดับการตัดสิน: `kind: image` หรือ prompt มี "สร้างภาพ/image generation" → cyolo (ผูกฝั่ง) · `kind: code_review` หรือ "ตรวจโค้ด/code review" → Codex · `kind: doc|long|summary|writing` หรือ prompt > 4000 ตัวอักษร → Claude · นอกนั้นเลือกจากทุกบัญชีที่พร้อม: งานในคิวน้อยสุด → โควตาใช้ไปน้อยสุด → tokens ใน run น้อยสุด · เหตุผลอยู่ใน `state.json` (`route`) และบรรทัด `a → yolo1 (…)` ตอนเริ่ม
 
-| ชนิดงาน | ไปที่ | ตัดสินจาก |
-|---|---|---|
-| ภาพ | cyolo | `image`, `kind: image`, คำว่า สร้างภาพ/วาดภาพ/.png |
-| ตรวจโค้ด | Codex | `kind: code_review`, คำว่า ตรวจโค้ด/review code/หาบั๊ก |
-| เอกสารยาว | Claude | `kind: long_doc`, prompt > 4000 ตัวอักษร, อ้างไฟล์ > 20 KB, คำว่า สรุปเอกสาร |
-| อื่น ๆ | ฝั่งที่โควตาเหลือมากกว่า | quota.json |
+## failover
 
-เหตุผลของ router อยู่ใน `state.json` (`nodes.<id>.route`) และ `board.md`
+งานที่ล้มเพราะโควตาหมด/rate limit/ล็อกอินหมดอายุ (tokens = 0) → บัญชีนั้นถูกตั้ง "ใช้ไม่ได้" งานย้ายไปบัญชีอื่นฝั่งเดียวกันก่อน (ไม่มีจึงข้ามฝั่ง ถ้า `account: any`) · บันทึก `worker_switch` · งานที่ระบุบัญชีเองไม่ย้าย: หยุดและรายงาน · ทดสอบด้วย `MA_SIMULATE_LIMIT=yolo1 python3 team.py run g.json`
 
-### human gate
+## human gate
 
-```json
-{"id": "deploy", "approve": true, "depends_on": ["build"], "prompt": "…"}
-```
+`"approve": true` → สถานะ "รออนุมัติ" (งานอิสระอื่นรันต่อ) · ถ้าไม่มีอะไรรันแล้ว `run` จบ (exit 0) และบอกคำสั่ง · อนุมัติ: `team.py approve --run <id> <งาน>` (สร้าง `approvals/<งาน>`) แล้ว `team.py run --resume <id>` · หรือรันด้วย `--wait-approval 600` ให้รอไฟล์เอง
 
-เมื่อพร้อมรัน → สถานะ `waiting_approval` + `msgs/deploy__human.md` บอกวิธีอนุมัติ · งานอื่นที่ไม่ขึ้นกับมันรันต่อ · อนุมัติ: `team.py approve deploy --run <id>` (หรือสร้าง `approvals/deploy.ok`) · รอเกิน `gate_timeout` (3600 s) → `blocked`
+## resume
+
+`run --resume <id> [graph.json] [--set id.field=value]` · งานสำเร็จไม่รันซ้ำ (ไม่มีแถวใหม่ใน ledger) · งานล้ม/ถูกบล็อก/รูปแบบไม่ผ่านรันใหม่ · แก้ `prompt`/`expect`/`account`/`difficulty`… ได้จากไฟล์กราฟ (จับคู่ด้วย id) หรือ `--set` · ถ้าแก้แค่ `expect` ของงานที่รูปแบบไม่ผ่าน จะตรวจคำตอบเดิมใหม่โดยไม่เรียกโมเดล

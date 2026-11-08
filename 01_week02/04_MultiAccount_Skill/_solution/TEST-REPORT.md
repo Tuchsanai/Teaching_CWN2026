@@ -1,71 +1,77 @@
-# TEST-REPORT — yolo · cyolo · agent-team
+# TEST-REPORT — สกิล yolo · cyolo · agent-team
 
-> รายงานจากการรันจริงในขั้นที่ 1 ตอนนั้นสเปกฉบับแรกให้สร้าง `install.sh` ด้วย ภายหลังตัด `install.sh` ออก เพราะการคัดลอกโฟลเดอร์สกิลไปวางใน `shared/skills` ก็ใช้งานได้ทันที (wrapper ของ `yoloN`/`cyoloN` เชื่อมสกิลให้เองเมื่อเปิดบัญชี) เนื้อหาของสกิลทั้ง 3 โฟลเดอร์ไม่เปลี่ยน
+> รายงานจริงจากขั้นที่ 1 (สร้างจากศูนย์ด้วย `prompt_skill_spec.md` + `prompt_skill_hints.md` ไม่มี `reference/`) ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก ผลเทียบกับสกิลชุดเดิมอยู่ใน [BENCHMARK.md](BENCHMARK.md)
 
-- วันที่ 2026-11-08 06:38–07:10 (+07) · container `multi-account` · Claude Code 2.1.319 · codex-cli 0.167.0 · Python 3.12.3
-- ติดตั้งจาก `/tmp/skills` (สำเนาของ `./skills`) ด้วย `install.sh` ลง `/root/ai-accounts/.{Claude,Codex}/shared/skills`
-- งานทดสอบใช้ `difficulty 1` ทั้งหมด (Claude `haiku`/`low`, Codex `gpt-6.1-sol`/`low`) รวมหัวหน้าทีม
-- หลักฐานทุก run อยู่ที่ `/workspace/.agent-team/<run>/` (= `C:\t\s04\workspace\.agent-team\` บน host) · ภาพที่ `workspace/matest-out/`
-- ไม่มี secret ในรายงานนี้: ไม่ได้อ่าน `.credentials.json` / `.claude.json` / `auth.json` ไม่ได้ล็อกอินแทน ไม่ได้สร้าง/หยุด/ลบ container หรือ volume
+- วันที่ 2026-11-08 · 11:20–12:03 (≈ 43 นาที รวมสร้างและทดสอบ)
+- container `multi-account` (Claude Code 2.1.319 · codex-cli 0.167.0 · Python 3.12.3)
+- ติดตั้ง: `docker cp` โฟลเดอร์ `skills/yolo`, `skills/cyolo`, `skills/agent-team` ลง `/root/ai-accounts/.Claude/shared/skills/` และ `/root/ai-accounts/.Codex/shared/skills/` (สำเนาทั้งสองฝั่งตรงกัน `diff -r` = same) ไม่ได้สร้าง/หยุด/ลบ container หรือ volume ไม่ได้อ่าน credential ไม่ได้ล็อกอินแทน
+- บัญชีที่ตรวจด้วยการเรียกจริง: แยกได้ครบ 3 สถานะ (พร้อม / ล็อกอินแล้วแต่หมดอายุ / ไม่ได้ล็อกอิน) · ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก
+- งานทดสอบทั้งหมดใช้ `haiku/low` (Claude) และ `gpt-6.1-sol/low` (Codex) · ตัวทดสอบแบบผู้ใช้จริงใช้ `yolo2 sonnet/low` ตามสเปก
+- ledger ช่วงทดสอบ: 197 การเรียกผ่านสกิล (haiku 118 · gpt-6.1-sol 79) · input 7.44 M (ส่วนใหญ่เป็น cache) · output 47.8 k · $0.29 ราคาตามรายการ · โควตาหลังทดสอบ: yolo1 week 23% · yolo2 session 1% / week 3% · cyolo1/2 primary 2% (ข้อมูล ณ 10:12 เพราะงานทดสอบเป็น ephemeral)
 
-## สถานะบัญชี (ตรวจด้วยการเรียกจริง)
+## ผลทดสอบตามหัวข้อ "ทดสอบใน container" ของสเปก
 
-| บัญชี | สถานะ | หมายเหตุ |
-|---|---|---|
-| yolo1, yolo2 | พร้อม | `max` / `team` · haiku "ตอบ OK" 4–5 s |
-| cyolo1, cyolo2 | พร้อม | Logged in using ChatGPT · 4–5 s |
-| yolo3–5, cyolo3–5 | ไม่ได้ล็อกอิน | ผู้ใช้ต้องล็อกอินเอง (`yoloN auth login` / `cyoloN login`) |
+| รายการ | ผล | หลักฐาน | เวลา |
+|---|---|---|---|
+| คัดลอกแล้วเปิดแต่ละบัญชีหนึ่งครั้ง ทุกบัญชีเห็นสกิลทั้ง 3 | PASS | เปิด `yoloN/cyoloN --version` ทั้ง 10 บัญชี (wrapper รัน `link_shared_skills`) แล้ว `skills/<สกิล>/SKILL.md` อ่านได้ 30/30 · cyolo3 มี symlink `agent-team`, `cyolo`, `yolo` → `../../shared/skills/…` | 2 s |
+| ตรวจความพร้อมด้วยการเรียกจริง แยก 3 สถานะ | PASS | `team.py check`: แยก พร้อม / "ล็อกอินแล้วแต่หมดอายุ" (`OAuth session expired`) / ไม่ได้ล็อกอิน · exit 0 | 6 s |
+| งานเดียว Claude + Codex ผลถูก และ ledger ครบฟิลด์ | PASS | `yolo.py ask yolo1 "7*6…"` → 42 · `cyolo.py ask cyolo1 …` → 42 · แถว ledger มีครบ 19 ฟิลด์ของสเปก + `event` ไม่มีข้อความ prompt | 8 s |
+| relay ข้าม CLI 3 ทอด | PASS | run `t-relay`: yolo1 → **42**, cyolo1 → **142**, yolo2 → **426** (ตรวจอิสระ 7×6=42, 42+100=142, 142×3=426) · regression `t-relay2` ได้เท่าเดิม | 12 s |
+| fan-out 3 บัญชี + fan-in | PASS | run `t-multi`: yolo1 144, yolo2 225, cyolo2 441 → cyolo1 รวม **810** (= 144+225+441) | 27 s (ทั้งกราฟ 18 งาน) |
+| graph ส่งข้อมูลยาวผ่าน `{{file:node}}` | PASS | `longdata` (seq 1..400, 1,492 ตัวอักษร) → `sumfile` อ่านไฟล์เองได้ **80200** (= 400·401/2) | ใน t-multi |
+| review loop จบด้วย APPROVED ภายใน max_rounds | PASS | `rv`: yolo2 เขียน, cyolo2 ตรวจ → `APPROVED` รอบที่ 1 จาก max 3 (`out/rv.review.md`) | ใน t-multi |
+| board: งานที่สองใช้ข้อเท็จจริงของงานแรก | PASS | `fact` (yolo1) เขียน `BOARD: รหัสลับโปรเจกต์ = ORCHID-7731` → `board.md` · `usefact` (cyolo1) ตอบ **ORCHID-7731** (expect regex ผ่าน) | ใน t-multi |
+| สรุปสถิติแล้วผลรวมตรงกับ ledger | PASS | `team.py stats --run t-multi`: 19 ครั้ง · in 532,767 · out 3,607 · $0.0322 · 102.6 s = ผลรวมคำนวณอิสระจาก ledger ตรงทุกค่า | 1 s |
+| debate (Claude vs Codex + ผู้ตัดสิน) และ best-of-N | PASS | debate `deb`: yolo1 & cyolo2 ตอบ 15 → ผู้ตัดสิน `{"final":"15 ตัว","winner":"tie","reason":…}` (จำนวนเฉพาะ < 50 = 15 ถูก) · best_of `bo` 3 บัญชี → `{"best":"A","scores":{"A":9,"B":7,"C":6},"reason":…}` + `out/bo.best.md` | ใน t-multi |
+| router เลือกฝั่งถูก + failover เมื่อจำลองบัญชีล้ม | PASS | router: `kind:image`→cyolo1, `code_review`→cyolo2, `doc`→yolo2 · `MA_SIMULATE_LIMIT=yolo1` (t-failover2): y2, y4 ย้าย yolo1→yolo2 (`worker_switch` ใน state/board/ledger) งาน `pin` ที่ระบุ yolo1 เอง **ไม่ย้าย** หยุดและรายงาน, exit 1 | 15 s |
+| human gate หยุดรอจนมีไฟล์อนุมัติแล้วรันต่อ | PASS | t-gate: g2 "รออนุมัติ" run จบ exit 0 พร้อมคำสั่ง → `approve --run t-gate g2` → `run --resume` g2 = 10 · g1 ไม่มีแถว ledger ใหม่ (1 แถว) | 15 s |
+| บริหารโทเค็นลูกทีม (งบต่ำ → งานถัดไปย้าย, status "หยุดรับงาน") | PASS | t-budget `--worker-token-budget yolo1=1 --per-account 1`: w2 ของ yolo1 ทำจนจบ → `yolo1 หยุดรับงานใหม่` → w4 ย้าย yolo1→yolo2 · `status`: yolo1 "หยุดรับงาน (เกินงบโทเค็นลูกทีม 58019 > 1)" | 21 s |
+| สลับหัวหน้าเชิงรุก | PASS | t-demo1: yolo1 งบ 1 token → คำสั่งแรกตอบ "งบหัวหน้าหมด" → checkpoint (มี) → cyolo1 (ข้ามฝั่ง) ทำต่อจาก handoff.md จนจบ | ใน demo |
+| สลับหัวหน้าเชิงรับ | PASS | t-demo1: yolo2 ถูก kill หลัง dispatch 8 งาน → yolo1 รับช่วงจาก state.json · งาน t1–t8 ที่สั่งไปแล้ว **สำเร็จครบ 8/8** ไม่มีงานหาย/แจกซ้ำ | ใน demo |
+| สาธิตครบในคำสั่งเดียว (งานตัวอย่าง + `--goal` ใหม่) | PASS | `lead --demo --lead-model haiku` (t-demo1): เชิงรับ + เชิงรุก + ย้ายงาน t7 cyolo2→cyolo1 · ตรวจผลอิสระสูตรคูณ **96/96** · 59 s · `--goal` "คำอธิบาย Python/Go/Rust/JavaScript" (t-demo2): ครบ 3 เหตุการณ์ ไฟล์ Markdown 4 หัวข้อ · 69 s | 59 s / 69 s |
+| เรียกจาก host ผ่าน docker exec ทุกบรรทัดใน SKILL.md (Git Bash) | PASS | Git Bash (ไม่ตั้ง `MSYS_NO_PATHCONV`) รันทุกบรรทัดของ 3 SKILL.md: cat ×3, check ×3, ask ×2, quota ×2, image, docker cp + run, status, stats, lead --demo (96/96, 61 s), ls out · ทุกคำสั่ง exit 0 · stdin `run - < graph.json` ผ่าน · PowerShell: ask (ภาษาไทย), docker cp + run, status ผ่าน | ~3 นาที |
+| `run` จบด้วยตาราง + โควตา และ `--resume` รันเฉพาะงานที่ล้ม | PASS | t-resume2: r2 `expect contains:…` ไม่ผ่าน (คำตอบเก็บใน out/r2.md) r3 ถูกบล็อก → `--resume --set r2.expect=text` ตรวจคำตอบเดิมผ่านโดยไม่เรียกซ้ำ รันเฉพาะ r3 · ledger นับต่องาน r1:1 r2:1 r3:1 (งานที่สำเร็จไม่มีแถวใหม่) | 16 s |
+| ทดสอบแบบผู้ใช้จริง (ก)(ข)(ค) | PASS (หลังปรับ) | ดูหัวข้อถัดไป · รอบสุดท้าย 0 คำสั่งล้ม ไม่เปิดโค้ดสกิล | 55–88 s ต่อโจทย์ |
+| สร้างภาพเล็ก 1 ภาพผ่าน cyolo ตรวจว่าเป็น PNG จริง | PASS | `cyolo.py image cyolo1 … /workspace/pic.png` → 8 ไบต์แรก `89 50 4e 47 0d 0a 1a 0a` (1.05 MB) · ในกราฟ `t-failover/out/pic.png` ก็เป็น PNG | 27 s |
+| ข้อที่ต้องใช้บัญชีที่ไม่พร้อม | SKIP (บางส่วน) | ไม่มีบัญชีที่ `auth status` = loggedIn true แต่ token หมดอายุ จึงทดสอบกรณีนี้ตรง ๆ ไม่ได้ (yolo3 หมดอายุแต่ auth status = false — สคริปต์จัดเป็น "ล็อกอินแล้วแต่หมดอายุ" จากข้อความ `OAuth session expired`) · ทุกข้ออื่นใช้เฉพาะบัญชีที่พร้อม | – |
 
-## ผลทดสอบ (หัวข้อ "ทดสอบ" ของสเปก)
+## ทดสอบแบบผู้ใช้จริง (yolo2 · sonnet/low · stream-json · อ่านเฉพาะ agent-team/SKILL.md)
 
-| # | รายการ | ผล | หลักฐาน | เวลา |
-|---|---|---|---|---|
-| 1 | `install.sh` 2 รอบ ผลเหมือนเดิม ทุกบัญชีเห็นทั้ง 3 สกิล | PASS | รอบ 1 เขียน 6 (Claude/Codex × 3) + สร้าง symlink รายสกิลให้ cyolo1–5 · รอบ 2 "เขียนใหม่: ไม่มี / ไม่ต้องสำรอง" · 10/10 บัญชี × 3 `SKILL.md` อ่านได้ · เนื้อหาเปลี่ยน → สำรองไป `.skill-backup-20261108-065737/` ก่อนเขียนทับ · ไม่มี `__pycache__` · ทดสอบเพิ่ม: agent yolo2 และ cyolo1 ตอบว่าเห็นสกิล yolo, cyolo, agent-team | 0.2 s |
-| 2 | ตรวจความพร้อมทุกบัญชีด้วยการเรียกจริง แยก 3 สถานะ | PASS (บางส่วน) | `team.py check --recheck`: พร้อม 4 · ไม่ได้ล็อกอิน 6 · สถานะ "ล็อกอินแล้วแต่หมดอายุ" **ไม่มีบัญชีใดอยู่ในสถานะนี้** จึงตรวจได้แค่ตัวจำแนก: ข้อความจริงจาก yolo3 (`Failed to authenticate: OAuth session expired…`, 45 ms, 0 tokens) และ 401 ของ Codex → `auth` → "หมดอายุ" เมื่อ `loggedIn=true` | 6.1 s |
-| 3 | งานเดียว Claude + Codex ผลถูก ledger ครบฟิลด์ | PASS | `17*23`: yolo2 → 391 (4.0 s, $0.0028 list) · cyolo2 → 391 (4.0 s) · `--schema` yolo1 → `{"answer": 391}` · 19 ฟิลด์ตามสเปกครบทุกแถว ไม่มีข้อความ prompt ใน ledger (มีแค่ `prompt_chars`) | 4–6 s |
-| 4 | relay ข้าม CLI 3 ทอด 42 → 142 → 426 | PASS | `t1-relay`: cyolo1 42 → yolo2 142 → cyolo2 426 · ตรวจอิสระ `a==7*6`, `b==a+100`, `c==b*3` จริงทั้ง 3 · `msgs/a__b.md`, `msgs/b__c.md` · ซ้ำจาก host (`t6-host`) ได้เท่าเดิม | 10.8 s |
-| 5 | fan-out 3 บัญชี + fan-in | PASS | `t1-fanout`, `t7-fanout`: f1 yolo1 = 55, f2 yolo2 = 120, f3 cyolo1 = 1024 เริ่มวินาทีเดียวกัน (06:58:52) → sum cyolo2 = 1199 = 55+120+1024 | 8.4 s |
-| 6 | graph ส่งข้อมูลยาวผ่าน `{{file:node}}` | PASS | `t2-graph`, `t7-graph`: data (3,892 ตัวอักษร) → total cyolo1 = 500500 และ evens yolo1 = 500 (ขนานกัน) → final = 500000 ตรงกับการคำนวณอิสระ · node `bad` ที่แทรก `{{data}}` ตรง ๆ ถูกปฏิเสธ "ยาว 3892 ตัวอักษร ใช้ {{file:data}}" (ตั้งใจให้ล้ม) | 20.6–21.4 s |
-| 7 | review loop จบด้วย APPROVED ภายใน max_rounds | PASS | `t1-review`: ผู้ทำ yolo2 ผู้ตรวจ cyolo1 · รอบ 1 ถูกตีกลับ (ขาด type hints / docstring ไทย / doctest) · รอบ 2 `APPROVED` (max 3) · `out/fn.r1.md`, `fn.r2.md`, `msgs/fn.worker__fn.reviewer.md` | 27.4 s |
-| 8 | board: งานที่สองใช้ข้อเท็จจริงจากงานแรก | PASS | `t1-board`, `t7-board`: scout (cyolo1) เขียน `BOARD: รหัสลับของภารกิจคือ ZEBRA-7314` → `board.md` · user (yolo2) ไม่ได้รับค่าใน prompt ตอบ `ZEBRA-7314` จากกระดาน | 8.1–9.3 s |
-| 9 | สรุปสถิติแล้วผลรวมตรงกับ ledger | PASS | `team.py stats --json` เทียบกับสคริปต์รวมแยก (ไม่ import team.py): ledger รวม 79 calls และ ledger ของ `t2-graph` — total ทุกชนิดโทเค็น, cost, by_account, ผลรวม by_run ตรงทั้งหมด | <1 s |
-| 10 | debate (Claude vs Codex + ผู้ตัดสิน) และ best-of-N พร้อมเหตุผล | PASS | `t2-judge` debate: yolo2 vs cyolo1 ผู้ตัดสิน yolo1 → `answer` 25, `agree: true`, เหตุผล "ตัวประกอบเฉพาะไม่เกิน 7…" (ตรวจอิสระ: จำนวนเฉพาะ < 100 = 25) · best-of: yolo1, yolo2, cyolo1 ผู้ตัดสิน cyolo2 (Codex `--output-schema`) ให้คะแนน 6 / 7 / 6.5 เลือก c2 พร้อมเหตุผล | 25.6 s |
-| 11 | router เลือกฝั่งถูก + failover เมื่อจำลองบัญชีล้ม | PASS | `t2-router`: ภาพ → cyolo1 · ตรวจโค้ด → cyolo2 · สรุปเอกสาร 30 KB → yolo2 · งานทั่วไป → ฝั่งโควตาเหลือมาก · `t3-failover4` (`MA_SIMULATE_LIMIT=yolo1`): fo2 yolo1 `limit` → ย้ายไป yolo2 (`worker_switch` ใน state.json, board.md, ledger) · `pin` ที่ระบุ yolo1 เอง **ไม่ย้าย** หยุดพร้อมรายงาน (ล้มตามที่ออกแบบ) · ค่า 42/42 ตรวจอิสระถูก | 31.4 s / 4.6 s |
-| 12 | human gate หยุดรอไฟล์อนุมัติแล้วรันต่อ | PASS | `t4-gate` (`--detach`): gate เป็น `waiting_approval` ที่ 6 s, รอต่อ 20 s ไม่มีแถว ledger ของ gate ขณะที่ `side` รันจบ · `team.py approve gate` → gate รันได้ 26 (= 25+1) | 32 s |
-| 13 | บริหารโทเค็นลูกทีม (งบต่ำ → ย้ายงานถัดไป, status "หยุดรับงาน") | PASS | `t3-budget --worker-token-budget yolo2=1000`: w1 รันบน yolo2 จบปกติ (27,867 tokens) → `worker_pause` → w3 ย้าย yolo2 → yolo1 (`worker_switch`) · `team.py status`: yolo2 = "หยุดรับงาน (ใช้โทเค็นใน run นี้ 27867 ≥ งบ 1000)" | 10.4 s |
-| 14 | สลับหัวหน้าเชิงรุก (งบหัวหน้าต่ำ) | PASS | `t5-lead-pro --lead-token-budget 1`: รอบ 1 yolo2 add a, b + dispatch + checkpoint → สลับ yolo2 → yolo1 (88,990 ≥ 1) · รอบ 2 yolo1 อ่าน handoff.md, wait, finish **142** | 19 s |
-| 15 | สลับหัวหน้าเชิงรับ (หัวหน้าล้มกลางคัน) | PASS | `MA_SIMULATE_CRASH=lead_after_dispatch`: `t5-lead-re` yolo1 ถูกฆ่าหลัง dispatch → cyolo1 (หัวหน้า Codex) จบ 142 · `t5-lead-re2` → yolo2 (เลือกอัตโนมัติ ฝั่งเดียวกันก่อน) จบ 142 · งาน a, b ถูกเพิ่มครั้งเดียวและรันจบ **หลัง** หัวหน้าตาย (07:05:16, 07:05:21 > 07:05:13) | 19–23 s |
-| 16 | เรียกสคริปต์จาก host ผ่าน `docker exec` | PASS | จาก Git Bash บน host: `head SKILL.md` · `yolo.py run` → "pong" (3.4 s) · `team.py run - < relay.json` → 42/142/426 · `cyolo.py image` | 3–27 s |
-| 17 | สร้างภาพเล็ก 1 ภาพผ่าน cyolo ตรวจว่าเป็น PNG จริง | PASS | `robot.png` (router, cyolo1) signature `\211 P N G \r \n 032 \n` 1199×1312 · `host-cat.png` (cyolo2 จาก host) ผ่านการตรวจ signature ในสคริปต์ และเปิดดูแล้วเป็นแมวสีส้มบนพื้นขาวตามสั่ง | 27 s |
-| 18 | ข้อที่ต้องใช้บัญชีที่ไม่พร้อม | SKIP | ไม่มีข้อทดสอบใดบังคับใช้ yolo3–5 / cyolo3–5 · สถานะ "ล็อกอินแล้วแต่หมดอายุ" ทดสอบกับบัญชีจริงไม่ได้ (ดูข้อ 2) | – |
+| รอบ | โจทย์ | คำสั่ง (ทั้งหมด / Bash) | ล้ม | เวลา | ผล | สาเหตุที่มาจากสกิล |
+|---|---|---|---|---|---|---|
+| 1 | (ก) ขนาน 2 บัญชี → ตรวจ → แก้ + unittest → ตาราง + โควตา | 4 / 2 | 1 | 79 s | สำเร็จหลัง resume | agent ระบุ reviewer = yolo3 (ไม่พร้อม) → run ทำ 2 งานแรกแล้วล้มกลางทาง |
+| 1 | (ข) สาธิตสลับหัวหน้า + ย้ายงาน กับเป้าหมายใหม่ (คำศัพท์ 4 หมวด) | 3 / 2 | 0 | 69 s | ครบ 3 เหตุการณ์ | – |
+| 1 | (ค) fan-out + debate + ภาพ ในกราฟเดียว | 3 / 2 | 0 | 72 s | สำเร็จหลัง resume | worker ตอบเป็นบรรทัด `BOARD:` อย่างเดียว → สคริปต์ตัดทิ้งแล้วนับว่า "คำตอบว่าง" |
+| 2 | (ก) ซ้ำ | 4 / 3 | 0 | 74 s | 4/4 PASS (unittest 8 tests) | – |
+| 2 | (ข) ซ้ำ | 3 / 2 | 0 | 88 s | สลับครบ แต่ t1–t4 ล้ม | หัวหน้า haiku ใส่ `"difficulty": "easy"` → `int()` error ในสคริปต์ |
+| 2 | (ค) ซ้ำ | 4 / 3 | 0 | 55 s | 8/8 · debate 735 (ถูก) · ภาพ PNG | – |
+| 3 | (ข) ซ้ำหลังแก้ | 3 / 2 | 0 | 62 s | ครบ 3 เหตุการณ์ 4/4 งานสำเร็จ | – |
 
-สรุป: **PASS 17 · SKIP 1** (ข้อ 2 ผ่านเฉพาะส่วนที่มีบัญชีให้ทดสอบ)
+ไม่มี agent ตัวใดเปิด `scripts/` หรือ `references/` (Read มีแค่ SKILL.md) · ทุกโจทย์จบใน 2–3 คำสั่ง Bash
 
-## ข้อค้นพบระหว่างทดสอบ (และสิ่งที่แก้)
+สิ่งที่ปรับตามผลทดสอบ:
+1. `run` ตรวจบัญชีที่ผู้ใช้ระบุเอง (`account`/`reviewer`) ก่อนเริ่ม ถ้าไม่พร้อมจะไม่เริ่ม (ยังไม่เสียโทเค็น) และบอกบัญชีที่พร้อม · SKILL.md แนะนำ `yolo`/`cyolo`/`any` เป็นหลัก
+2. คำตอบที่มีแต่บรรทัด `BOARD:` ใช้เป็นคำตอบด้วย (ไม่ทิ้ง) และเปลี่ยนคำสั่งใน prompt เป็น "เพิ่มต่อท้ายคำตอบ ไม่ใช่แทนคำตอบ"
+3. แปลงค่าที่ชนิดผิด (`difficulty: "easy"`/`"2"`, `timeout`, `depends_on` เป็น string) ให้ใช้ได้ ทั้งใน `run` และ `dispatch` และ prompt ของหัวหน้าระบุว่า difficulty เป็นตัวเลข
+4. ตารางสรุปแทน `|` และขึ้นบรรทัดใหม่ในช่องค่า (ผู้ทดสอบรายงานว่าตารางถูกตัด)
+5. ระหว่างพัฒนา: แยกฟิลด์บัญชีที่ระบุ (`account`) ออกจากบัญชีที่ได้รับ (`assigned`) — เดิม failover ย้ายงานกลับไปบัญชีเดิม · `--demo` ให้ลูกทีมงบต่ำรับ 2 งานแรก จึงเกิดการย้ายงานแน่นอนแม้เป้าหมายมีงานน้อย · `MA_SIMULATE_LIMIT` ไม่ปลอมโควตา (บัญชีดูปกติจนเรียกจริงแล้วล้ม จึงทดสอบ failover เชิงรับได้)
 
-| เรื่อง | รายละเอียด |
+## ข้อเท็จจริงที่ต่างจาก hints / หมายเหตุ
+
+- yolo3: `auth status` = `loggedIn: false` แต่เรียกจริงได้ `OAuth session expired and could not be refreshed` (hints บอกว่ากรณีหมดอายุ auth status = true) → สคริปต์จัดเป็น "ล็อกอินแล้วแต่หมดอายุ" เมื่อข้อความมีคำว่า expired
+- yolo1 `/usage` ไม่มีบรรทัด `Current session` (ตรงกับ hints) → ใช้ `Current week (all models)` ตัดสินแทน
+- `-c model_reasoning_effort=ultra` กับ `gpt-6.1-sol` CLI รับได้ (exit 0) → ส่ง ultra เฉพาะรุ่นที่ `models_cache.json` ประกาศว่ารองรับ ไม่งั้นลดเป็น max พร้อม `effort_note`
+- ข้อมูลโควตา Codex ค้างที่ 10:12 เพราะทุกการเรียกเป็น `--ephemeral` — รายงานพร้อมเวลาของข้อมูลเสมอ และมี `cyolo.py quota --refresh`
+- `agent-team/SKILL.md` = 13.0 KB (≈ 7.9 k ตัวอักษร; ภาษาไทยใช้ 3 ไบต์/ตัวอักษร) จากร่างแรก 16.9 KB รายละเอียดย้ายไป `references/`
+- ใน PowerShell `| Select-Object -First N` ตัด pipe ทำให้ docker exec คืน 255 — เป็นผลจากคำสั่งตัดผลของผู้ทดสอบ ไม่ใช่สกิล
+
+## ไฟล์ที่สร้าง
+
+| ที่ | ไฟล์ |
 |---|---|
-| Codex ไม่ล็อกอิน | 0.167.0 retry 401 ราว 15 s แล้ว `turn.failed` **exit 1** (สเปกเดิมบอกอาจ exit 0) — สคริปต์ไม่ใช้ exit code ตัดสินอยู่แล้ว |
-| โควตา Claude | yolo1 ไม่มีบรรทัด `Current session` มีแค่ `Current week` → รายงานเท่าที่มี ไม่เดา · โควตา Codex มาจาก rollout เวลา 06:24/06:35 (งาน ephemeral ไม่อัปเดต) รายงานพร้อมเวลาของข้อมูล |
-| haiku/low จัดรูปแบบ | ตอบ "50 − 8 = 42" แทนค่าล้วน → validator `int`/`number` รับเฉพาะรูปสมการบรรทัดเดียวที่ลงท้าย `= N` (ข้อความอื่นยังปฏิเสธ) |
-| haiku/low คำนวณผิด 1 ครั้ง | "12+30" ตอบ 30 เมื่อลองเปลี่ยนคำสั่งรูปแบบเป็น "จำนวนเต็มตัวเดียว ห้ามมีสมการ" → ย้อนกลับเป็นคำสั่งเดิม (ถูกทุกครั้งหลังจากนั้น) · ยืนยันกฎ "ตรวจผลด้วยการคำนวณอิสระเสมอ" |
-| งบลูกทีม | การตรวจความพร้อมไม่นับเป็นงานของลูกทีม (ไม่งั้นบัญชีถูกหยุดก่อนเริ่มงาน) |
-| Git Bash บน host | แปลง `/root/...` และ `/tmp/...` ใน argument เป็น path Windows → ใช้ `//root/...` หรือ PowerShell (เพิ่มในหัวข้อ "เรียกจาก host" ของทุก SKILL.md) |
-| JupyterLab | สร้าง `.ipynb_checkpoints` ในโฟลเดอร์สกิลที่ติดตั้งแล้ว → install.sh ถือว่าต่างและสำรองก่อนเขียนทับ (ปลอดภัย) |
-
-## การใช้บัญชี (ledger รวม ณ 07:08)
-
-| บัญชี | ครั้ง | input (รวม cache) | output | $ list |
-|---|---|---|---|---|
-| yolo1 | 26 | 711,960 | 3,263 | 0.071 |
-| yolo2 | 35 | 1,280,695 | 10,922 | 0.127 |
-| cyolo1 | 26 | 662,521 | 1,314 | – |
-| cyolo2 | 16 | 376,324 | 851 | – |
-| **รวม** | **103** (สำเร็จ 93 · ล้ม 10 = จำลองโควตาหมด 8 + หัวหน้าถูกฆ่าโดยตั้งใจ 2) | 3,031,500 (cache read 1,899,364) | 16,350 | **0.198** |
-
-ค่าใช้จ่ายเป็นราคาตามรายการของ Claude ไม่ใช่ยอดจ่ายจริงของ subscription · Codex ไม่มีข้อมูลค่าใช้จ่าย · โควตาหลังทดสอบ: yolo1 week 22%, yolo2 session 0% / week 2%, cyolo1–2 primary 1%
-
-## สิ่งที่ค้างอยู่ใน container / volume
-
-- `/tmp/skills` (ต้นทางติดตั้งตามสเปก) · `/workspace/.agent-team/` (run ทดสอบ t1–t7 + ledger, quota, readiness cache) · `/workspace/matest-out/` (ภาพทดสอบ 2 ภาพ)
-- `/root/ai-accounts/.skill-backup-20261108-065737 … 070954` (8 โฟลเดอร์) = สำรองจากการติดตั้งซ้ำระหว่างพัฒนา (เวอร์ชันเก่าของ 3 สกิลนี้ + `.ipynb_checkpoints`) ลบได้ถ้าไม่ต้องการ · `.skill-backup-20261108` เดิม (yolo/cyolo ชุดเก่า) ไม่ได้แตะ
+| `./skills/yolo/` | `SKILL.md` · `scripts/yolo.py` · `references/claude-cli.md` |
+| `./skills/cyolo/` | `SKILL.md` · `scripts/cyolo.py` · `references/codex-cli.md` |
+| `./skills/agent-team/` | `SKILL.md` · `scripts/team.py` · `references/graph.md` · `references/leader.md` · `references/files.md` |
+| `./tests/` | กราฟที่ใช้ทดสอบ (`relay.json`, `multi.json`, `failover*.json`, `gate.json`, `budget.json`, `resume.json`, `pinbad.json`, `boardonly.json`, `graph.json`, `host-demo.txt`) — นอกโฟลเดอร์ skills |
+| `./TEST-REPORT.md` | ไฟล์นี้ |
+| ใน container | สำเนาสกิลใน shared ทั้งสองฝั่ง · run ทดสอบใน `/workspace/.agent-team/` (t-relay, t-multi, t-failover, t-gate, t-budget, t-resume2, t-demo1, t-demo2 …) · `/workspace/pic.png`, `/workspace/ut-a/` (ผลของผู้ทดสอบ) · `/tmp/tg/`, `/tmp/ut-*` |

@@ -1,62 +1,59 @@
 ---
 name: cyolo
-description: เรียก OpenAI Codex CLI บัญชี cyolo1…cyoloN แบบไม่โต้ตอบให้ถูกวิธี เลือกรุ่นและ effort จาก models_cache.json ตามความยาก (ลดระดับอัตโนมัติเมื่อรุ่นไม่รองรับ) สร้างภาพ (image generation — ทำได้เฉพาะฝั่งนี้) ตรวจความพร้อมด้วยการเรียกจริง ดูโควตาจาก rollout และบันทึกสถิติโทเค็นทุกครั้ง ใช้เมื่อผู้ใช้ขอ "เรียก cyolo1", "ให้ cyolo ตรวจ", "ให้ Codex/GPT ทำ", "สร้างภาพ/gen รูป", "เช็คโควตา codex", "สถิติโทเค็นแต่ละบัญชี" · Call Codex accounts (cyoloN) headlessly, pick model/effort from models_cache.json, generate images, check readiness/quota, log per-call stats. For multi-account teamwork use agent-team.
+description: เรียก Codex CLI ของบัญชี cyolo1…cyoloN แบบไม่โต้ตอบ — เลือกรุ่น/effort จาก models_cache.json (ลดระดับที่รุ่นไม่รองรับให้เอง), สร้างภาพ PNG, ตรวจล็อกอินจริง, อ่านโควตา rate_limits พร้อมเวลาของข้อมูล และบันทึกสถิติโทเค็นทุกครั้งลง ledger ใช้เมื่อ "ให้ cyolo ตรวจ", "เรียก cyolo1", "สร้างภาพด้วย codex", "โควตา codex", "สถิติโทเค็นแต่ละบัญชี" · Use to call Codex CLI accounts (cyoloN) non-interactively, pick model/effort, generate images, check login, quota and token stats.
 ---
 
-# cyolo — Codex CLI หลายบัญชี + สร้างภาพ
+# cyolo — Codex CLI หลายบัญชี (`cyolo1`…`cyoloN`)
 
-`X=/root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py` (สำเนาเดียวกันอยู่ที่ `/root/ai-accounts/.Claude/shared/skills/cyolo/…`)
+สคริปต์: `/root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py` (ใน container `multi-account`; สำเนาเดียวกันอยู่ที่ `/root/ai-accounts/.Claude/shared/skills/cyolo/`) เรียกสั้น ๆ ว่า `X`
 
 | ต้องการ | คำสั่ง |
 |---|---|
-| ถามบัญชีเดียว (ง่าย) | `python3 $X run -a cyolo1 -d 1 "<prompt>"` |
-| ระบุรุ่น/effort เอง | `python3 $X run -a cyolo2 -m gpt-6-luna -e high "<prompt>"` |
-| ผลเป็น JSON ตาม schema | `python3 $X run -a cyolo1 -d 1 --schema '<json schema แบบ strict>' "<prompt>"` |
-| prompt ยาว | `python3 $X run -a cyolo1 -d 2 - < prompt.txt` |
-| **สร้างภาพ** | `python3 $X image -a cyolo1 --out /workspace/x.png "<รายละเอียดภาพ แจกแจงทุกเงื่อนไขเป็นข้อ>"` |
-| รุ่นและ effort ที่รองรับ | `python3 $X models -a cyolo1` |
-| บัญชีไหนใช้ได้ (เรียกจริง) | `python3 $X check` |
-| โควตา (อ่านไฟล์ ฟรี) | `python3 $X quota` · ข้อมูลเก่าเกิน → `quota --refresh` (เรียกสั้น 1 ครั้ง ใช้โทเค็นเล็กน้อย) |
-| สถิติรวมตามบัญชี/รุ่น/run | `python3 /root/ai-accounts/.Codex/shared/skills/agent-team/scripts/team.py stats` |
-| หลายบัญชีทำงานร่วมกัน (รวม Claude) | สกิล **agent-team** |
+| ถามงานเดียว (effort ตามความยาก) | `python3 X ask cyolo1 "<prompt>" --difficulty 1` |
+| ระบุรุ่น/effort | `python3 X ask cyolo2 "<prompt>" -m gpt-6.1-sol --effort high` |
+| ผล + สถิติเป็น JSON | `python3 X ask cyolo1 "<prompt>" --json` |
+| ผลแบบมีโครงสร้าง | `python3 X ask cyolo1 "<prompt>" --output-schema /path/schema.json` (schema แบบ strict) |
+| สร้างภาพ PNG | `python3 X image cyolo1 "<เงื่อนไขภาพเป็นข้อ ๆ>" /workspace/out/pic.png` |
+| ตรวจความพร้อม | `python3 X check` |
+| โควตา (+เวลาของข้อมูล) | `python3 X quota` · อัปเดตด้วย `python3 X quota --refresh` (เรียกสั้น 1 ครั้ง) |
+| รุ่นและ effort ที่รองรับ | `python3 X models` |
 
-ผลลัพธ์: stdout = คำตอบ · stderr = สถิติต่อครั้ง `[บัญชี รุ่น/effort · ลดจาก…] status · วินาที · in (cached) · out (reasoning)` · `--json` ได้ dict เต็ม · exit 0 เมื่อตรวจแล้วสำเร็จเท่านั้น
+`ask` พิมพ์คำตอบทาง stdout, บรรทัดสถิติทาง stderr `[cyolo1 gpt-6.1-sol/low 4.5s in=17790 (cached 12288) out=5 reasoning=0 ok]` · exit 0 = สำเร็จจริง
 
-## ความยาก → effort (ใช้ร่วมกันทั้ง 3 สกิล)
+## ความยาก → effort (ตารางเดียวกับ yolo และ agent-team)
 
-| `-d` | งาน | Codex effort |
+| difficulty | งาน | Codex effort |
 |---|---|---|
-| 1 | ดึงข้อมูล จัดรูปแบบ ตรวจความพร้อม · **สร้างภาพ** | `low` |
-| 2 (ค่าเริ่มต้น) | สรุป ถาม-ตอบ แก้โค้ดจุดเดียว | `medium` |
-| 3 | แก้หลายไฟล์ debug วิเคราะห์ | `high` |
-| 4 | reasoning ซับซ้อน อัลกอริทึม | `xhigh` |
+| 1 | ดึงข้อมูล จัดรูปแบบ ตรวจความพร้อม · สร้างภาพ | `low` |
+| 2 | สรุป ถาม-ตอบ แก้โค้ดจุดเดียว (ค่าเริ่มต้น) | `medium` |
+| 3 | แก้โค้ดหลายไฟล์ debug วิเคราะห์ | `high` |
+| 4 | reasoning ซับซ้อน | `xhigh` |
 | 5 | ต้องถูกแน่นอน | `max` |
-| 6 | งานใหญ่ที่ควรแตกงานย่อยเอง | `ultra` (รุ่นไม่รองรับ → ลดเป็น `max` และบันทึก `effort_from`) |
+| 6 | งานใหญ่ที่ควรแตกงานย่อยเอง | `ultra` (ถ้ารุ่นรองรับ ไม่งั้นลดเป็น `max` และบันทึก `effort_note`) |
 
-รุ่นเริ่มต้น `gpt-6.1-sol` (ถ้าไม่มีใน cache ใช้รุ่นแรกที่ `visibility=list`) · รายการจริงอ่านจาก `$CODEX_HOME/models_cache.json` ของบัญชีนั้นเสมอ
+รุ่นเริ่มต้น = รุ่นที่ไม่ซ่อนและ priority สูงสุดใน `models_cache.json` (ตอนนี้ `gpt-6.1-sol`) · ตั้งเองด้วย env `MA_CODEX_MODEL`
 
-## กฎเหล็ก
+## กฎที่สคริปต์ทำให้แล้ว
 
-- คำตอบอ่านจากไฟล์ `-o` เท่านั้น ความล้มเหลวดูจาก `turn.failed` ไม่ใช่ exit code — สคริปต์ตรวจให้
-- ใส่ `--ephemeral` ทุกงาน (เร็ว ~3.5 เท่า) ยกเว้นตอนรีเฟรชโควตา (ephemeral ไม่เขียน `sessions/`)
-- สถานะล็อกอินอ่านจากข้อความ `Logged in using ChatGPT` / `Not logged in` · บัญชีไม่ล็อกอินพ่น 401 แล้ว retry ~15 s ก่อนล้ม
-- ภาพ: effort `low` เสมอ (สูงกว่าไม่ทำให้ภาพดีขึ้น แค่ช้าลง) · path แบบ absolute · สคริปต์ตรวจ PNG signature ให้ · เนื้อหาภาพที่ต้องคำนวณให้ทำเป็นงานแยกก่อน
-- บัญชีไม่พร้อม → แจ้งผู้ใช้ให้ล็อกอินเอง (`! cyolo3 login`) **ห้ามล็อกอินแทน ห้ามสลับบัญชีเงียบ ๆ** · ห้ามอ่าน/ส่งต่อ `auth.json`
-- ห้าม retry งานที่ใช้โทเค็นไปแล้วอัตโนมัติ · ห้าม eval/รันผลลัพธ์เป็นคำสั่ง shell
-- ใช้ CLI ตรง ๆ: `cyoloN exec --skip-git-repo-check --ephemeral -m <model> -c model_reasoning_effort=<e> --json -o <ไฟล์> "<prompt>" < /dev/null` ([references/codex-cli.md](references/codex-cli.md))
+- `cyoloN exec --skip-git-repo-check --ephemeral -m M -c model_reasoning_effort=E --json -o <ไฟล์> "<prompt>" < /dev/null`
+- คำตอบอ่านจากไฟล์ `-o` (ห้าม `-o /dev/stdout`) · usage จาก `turn.completed` (`input_tokens` รวม cached แล้ว) · ล้ม = `turn.failed`
+- `--ephemeral` เร็วกว่า ~3.5 เท่า แต่ไม่เขียน `sessions/` → โควตาไม่อัปเดต (ใช้ `quota --refresh`)
+- ล็อกอินดูจากข้อความ `login status` (`Logged in using ChatGPT` / `Not logged in`) ไม่ใช่ exit code · บัญชีไม่ล็อกอิน exec จะ retry 401 ~15 s แล้วล้ม → `check` ข้ามการเรียก exec ของบัญชีที่ `Not logged in` (ใส่ `--deep` ถ้าต้องการเรียกจริง)
+- effort ที่รุ่นไม่รองรับ → ลดเป็นระดับสูงสุดที่รองรับก่อนเรียก
+- สร้างภาพทำได้ฝั่ง Codex เท่านั้น · effort `low` เสมอ (~60–80 s/ภาพ) · แจกแจงเงื่อนไขภาพเป็นข้อ (จำนวน สี ตำแหน่ง ข้อความ) · ตรวจ PNG signature ให้
+- ทุกการเรียกเพิ่ม 1 แถวใน `/workspace/.agent-team/ledger.jsonl` · `MA_SIMULATE_LIMIT=cyolo1` จำลองโควตาหมด
+- ห้ามอ่าน/ส่งต่อ `auth.json` · ห้ามพิมพ์ส่วน `identity` ของ models_cache · ห้ามล็อกอินแทนผู้ใช้
 
-## เรียกจาก host
+รายละเอียด JSONL, โควตา และภาพ: [`references/codex-cli.md`](references/codex-cli.md)
 
-host (Claude Code app นอก container) ใช้ผ่าน `docker exec` เท่านั้น อ่านสกิลก่อนเริ่ม:
+## เรียกจาก host (ใช้ได้ทั้ง PowerShell และ Git Bash)
 
-```bash
-docker exec multi-account cat /root/ai-accounts/.Codex/shared/skills/cyolo/SKILL.md
-docker exec -i multi-account python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py run -a cyolo1 -d 1 "ตอบ OK"
-docker exec -i multi-account python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py image -a cyolo1 --out /workspace/cat.png "แมวสีส้ม มินิมอล"
+```
+docker exec multi-account sh -c "cat /root/ai-accounts/.Codex/shared/skills/cyolo/SKILL.md"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py check"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py ask cyolo1 'ตอบ OK' --difficulty 1"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py image cyolo1 'วงกลมสีแดง 1 วงกลางพื้นขาว' /workspace/pic.png"
+docker exec multi-account sh -c "python3 /root/ai-accounts/.Codex/shared/skills/cyolo/scripts/cyolo.py quota"
 ```
 
-Git Bash บน Windows แปลง `/root/...` เป็น path ของ Windows → เขียนเป็น `//root/...` หรือใช้ PowerShell · ภาพ/ไฟล์ที่เขียนลง `/workspace` จะอยู่ในโฟลเดอร์ `workspace` ที่ map ออกมาบน host
-
-## อ่านเพิ่ม (เปิดเมื่อต้องใช้)
-
-- [references/codex-cli.md](references/codex-cli.md) — flag, JSONL events, โควตาใน rollout, models_cache, การสร้างภาพ, ผลวัดจริง
+งานหลายบัญชี ใช้สกิล `agent-team`
