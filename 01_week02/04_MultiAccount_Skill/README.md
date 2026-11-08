@@ -195,7 +195,6 @@ skills/
 | **2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์** | Claude Code app (หรือลากวางใน JupyterLab) | 68 วินาที |
 | **3 · ทดสอบงานทีมชุดเดิมอีกครั้ง** | Claude Code app | 181.9 วินาที |
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | ~3 นาที (run 64 วินาที) |
-| **5 · ติดตั้งบนเครื่องที่ยังไม่มี volume** | Claude Code app | ~2.5 นาที (ติดตั้ง 3.84 วินาที) |
 
 **ต้องมีก่อน:** container `multi-account` จาก[บทก่อนหน้า](../03_MultiAccount_Container/README.md) กำลังรัน และล็อกอินอย่างน้อย 1 บัญชี Claude และ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
 
@@ -281,6 +280,13 @@ skills/
 
 *ผลจริง ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก · ใช้สกิลที่เตรียมไว้: เปลี่ยน `./skills` ในพรอมต์เป็น `./_solution/skills`*
 
+คัดลอกเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `04_MultiAccount_Skill` ทีละบรรทัด) ใช้ได้ทั้งเครื่องเดิมและเครื่องใหม่ที่เพิ่งสร้าง volume:
+
+```bash
+for d in .Claude .Codex; do for s in yolo cyolo agent-team; do docker cp ./_solution/skills/$s multi-account:/root/ai-accounts/$d/shared/skills/; done; done
+docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyolo$n --version; done'
+```
+
 ### วิธีที่ 2 · ลากวางใน JupyterLab
 
 เปิด File Explorer ที่โฟลเดอร์ `04_MultiAccount_Skill\_solution\skills` (หรือ `skills` ที่สร้างในขั้นที่ 1) วางคู่กับ JupyterLab แล้วลาก `yolo`, `cyolo` และ `agent-team` **ทีละโฟลเดอร์** ไปปล่อยในพื้นที่ว่างของแถบไฟล์ ทำ 2 ที่
@@ -353,37 +359,6 @@ skills/
 
 ไฟล์ของ run นี้ (`state.json`, `handoff.md`, `board.md`, `ledger.jsonl`) อยู่ใน `workspace/.agent-team/<run_id>/` บนเครื่องเรา เปิด `handoff.md` เพื่อดูใบส่งเวรที่หัวหน้าแต่ละคนเขียนให้คนถัดไป
 
-## ขั้นที่ 5 · ติดตั้งบนเครื่องที่ยังไม่มี volume (~2.5 นาที)
-
-ขั้นนี้จำลองเครื่องใหม่ด้วย volume ใหม่ที่ยังไม่มีสกิล แล้วติดตั้งด้วยการคัดลอกโฟลเดอร์สำรองอย่างเดียว
-
-![ภาพเคลื่อนไหว: เครื่องใหม่ volume ใหม่ยังไม่มีสกิล คัดลอกโฟลเดอร์ yolo cyolo agent-team ลงทั้งฝั่ง Claude และ Codex เปิดบัญชีแล้ว wrapper เชื่อมสกิลให้เอง ทุกบัญชีเห็นสกิลทันที ผลจริง 3.84 วินาที](img/gif-new-machine.gif)
-
-```text
-จำลองเครื่องใหม่ที่ยังไม่มี volume ai-accounts แล้วติดตั้งสกิลจากโฟลเดอร์สำรอง ./skills ด้วยการคัดลอกอย่างเดียว
-- สร้าง volume ai-accounts-new และ container multi-account-new จาก image multi-account:1.0 (พอร์ต 8890 · --privileged)
-- ตรวจว่าใน container ใหม่ยังไม่มีสกิล yolo, cyolo, agent-team
-- คัดลอกโฟลเดอร์ทั้ง 3 ไปที่ .Claude/shared/skills และ .Codex/shared/skills แล้วเปิดแต่ละบัญชีหนึ่งครั้ง (yoloN / cyoloN --version) จับเวลาตั้งแต่เริ่มคัดลอกจนตรวจเสร็จ
-- ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็นสกิลครบ และ team.py check ทำงานได้ (บัญชีใหม่ยังไม่ได้ล็อกอินเป็นเรื่องปกติ)
-- เสร็จแล้วลบ container multi-account-new และ volume ai-accounts-new ทิ้ง ห้ามแตะ container multi-account และ volume ai-accounts
-สรุปเป็นตาราง ก่อนติดตั้ง | หลังติดตั้ง และเวลาที่ใช้ แล้วหยุด
-```
-
-![ภาพเคลื่อนไหว: Claude สร้าง volume และ container ใหม่ ตรวจก่อนติดตั้ง คัดลอก 3 โฟลเดอร์ลง 2 ปลายทาง เปิดบัญชีด้วย --version ตรวจ 10 บัญชีและ team.py check แล้วลบของทดลองทิ้ง](img/desktop-step5-newmachine.gif)
-
-**ผลจริง:** ติดตั้งเสร็จใน **3.84 วินาที** (คัดลอก 1.84 · เปิดบัญชีให้ wrapper เชื่อมสกิล 1.17 · ตรวจทุกบัญชี 0.83) ทุกบัญชีเห็นสกิลครบ
-
-![ผลจริงจาก Claude Code app: ตารางก่อนและหลังติดตั้ง สกิลใน shared จากมีแค่ shared-check เป็นครบ 4 สกิล yolo1–5 และ cyolo1–5 เห็นสกิลครบ 3/3 และเวลาแยกตามขั้นรวม 3.84 วินาที](img/desktop-step5-result.png)
-
-ใน volume ใหม่ โฟลเดอร์ `skills` ของบัญชี Claude เป็นโฟลเดอร์จริง ไม่ใช่ symlink เหมือน volume เดิม การติดตั้งด้วยการคัดลอกยังใช้ได้ เพราะ wrapper สร้างลิงก์รายสกิลให้ทุกครั้งที่เปิดบัญชี
-
-ติดตั้งเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `04_MultiAccount_Skill` ทีละบรรทัด):
-
-```bash
-for d in .Claude .Codex; do for s in yolo cyolo agent-team; do docker cp ./_solution/skills/$s multi-account:/root/ai-accounts/$d/shared/skills/; done; done
-docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyolo$n --version; done'
-```
-
 ## สรุป
 
 | | ไม่มีสกิล | มีสกิล |
@@ -393,7 +368,7 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 | การทำงานร่วมกัน | สั่งทีละตัว ยัดข้อมูลลง prompt | relay · fan-out · graph · review · board · ขั้นสูง |
 | สถิติ | ต้องเดา | ledger ทุกครั้งที่เรียก + โควตาพร้อมเวลาของข้อมูล |
 | หัวหน้าหรือลูกทีมโควตาหมด | งานค้างหรือหาย | สลับหัวหน้าและย้ายงานโดยงานไม่หาย |
-| เครื่องใหม่ | สร้างใหม่ | คัดลอกโฟลเดอร์สำรอง ติดตั้ง 3.84 วินาที |
+| เครื่องใหม่ / volume ใหม่ | สร้างสกิลใหม่ | คัดลอกโฟลเดอร์สำรองไปวาง (ขั้นที่ 2) |
 | งานทีมชุดเดียวกัน | 810.2 วินาที | 181.9 วินาที |
 
 ## ข้อควรรู้
