@@ -6,7 +6,7 @@
 
 **สไลด์ประกอบการสอน:** [Multi_Account_Devtools_Slides.html](Multi_Account_Devtools_Slides.html) (เปิดในเบราว์เซอร์ กด ← → เปลี่ยนหน้า) · [ฉบับ PDF](Multi_Account_Devtools_Slides.pdf)
 
-บทเรียนที่เชื่อมโยง: [AI Agent Routing](../ai-agent-routing.html) หัวข้อ 1.0 และ 4.0–4.3 · ขอบเขต: Claude Code และ Codex CLI เท่านั้น
+ขอบเขต: Claude Code และ Codex CLI เท่านั้น
 
 ## ทำไมต้องมีหลายบัญชี?
 
