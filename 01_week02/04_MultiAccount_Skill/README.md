@@ -1,5 +1,7 @@
 # การสร้างสกิลสำหรับระบบหลายบัญชี (yolo · cyolo · agent-team)
 
+**สไลด์ประกอบการสอน:** [MultiAccount_Skill_Slides.html](MultiAccount_Skill_Slides.html) (เปิดในเบราว์เซอร์ กด ← → เปลี่ยนหน้า) · [ฉบับ PDF](MultiAccount_Skill_Slides.pdf)
+
 บทนี้ต่อจาก [การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile](../03_MultiAccount_Container/README.md) container `multi-account` มีคำสั่ง `yolo1–5` (Claude Code) และ `cyolo1–5` (Codex CLI) ครบแล้ว บทนี้สร้าง **สกิล** ที่ทำให้ AI ใช้คำสั่งเหล่านี้ได้ถูกวิธี ทำงานร่วมกันเป็นทีม และรู้สถิติการใช้งานของทุกบัญชี
 
 ## 1. ปัญหา: มีคำสั่งครบ แต่ AI ยังใช้ไม่เป็น
