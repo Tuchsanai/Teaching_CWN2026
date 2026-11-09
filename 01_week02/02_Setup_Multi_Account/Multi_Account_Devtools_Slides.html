@@ -225,7 +225,7 @@ body.ov #ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr
 <section class="slide cover" data-title="ปก" style="background-image:url('img/slides/slide-cover.jpg')">
   <div class="shade"></div>
   <div class="inner">
-    <div class="kicker" style="color:#7fd3ff">สัปดาห์ที่ 2 · LAB 001 ส่วนที่ 1</div>
+    <div class="kicker" style="color:#7fd3ff">สัปดาห์ที่ 2 · Setup Multi Account</div>
     <h1><span class="nw">หลายบัญชี AI</span><br><span class="nw">ในห้องทดลองเดียว</span></h1>
     <div class="sub" style="font-size:30px;color:#7fd3ff;margin-top:10px">ปรับ devtools ให้รองรับ Claude Code + Codex หลายบัญชี</div>
     <div class="sub" style="font-size:32px;color:#fff;margin-top:14px">งานใหญ่เกินบัญชีเดียว…<br>จะแบ่งงานให้ AI หลายบัญชีช่วยกันได้อย่างไร?</div>
@@ -571,67 +571,50 @@ yolo3 --version; cyolo3 --version</pre>
   <p>ทุกบัญชีเรียก skill กลาง <b>shared-check</b> และใช้ <b>Playwright MCP</b> เปิด Google Flights ค้น BKK → Tokyo เอง · <b>ค้นหาอย่างเดียว ไม่จอง ไม่จ่าย</b></p>
 </section>
 
-<section class="slide" data-title="ขั้น 4: AI เปิดเว็บเอง">
-  <div class="kicker">ขั้นที่ 4 · เบื้องหลัง</div>
-  <h2>AI → Playwright MCP → Chromium ใน container</h2>
-  <div class="fig"><img src="img/mcp-02-playwright-step4.png" alt="AI ใช้ Playwright MCP เปิดเว็บจริงแล้วเก็บหลักฐาน 3 ภาพ"></div>
+<section class="slide" data-title="ขั้น 4: เช็กบัญชีก่อน">
+  <div class="kicker">ขั้นที่ 4 · ขั้น 1</div>
+  <h2>เช็กก่อนว่าบัญชีพร้อมไหม</h2>
+  <div class="fig"><img src="img/step4-01-check-accounts.png" alt="ตรวจทีละบัญชี ครบไปต่อ ไม่ครบหยุด"></div>
+</section>
+
+<section class="slide" data-title="ขั้น 4: ลอง skill และ MCP">
+  <div class="kicker">ขั้นที่ 4 · ขั้น 2</div>
+  <h2>แต่ละบัญชีลองใช้ skill และ MCP กลาง</h2>
+  <div class="fig"><img src="img/step4-02-skill-mcp-flights.png" alt="แต่ละบัญชีใช้ shared-check และ Playwright MCP ค้น Google Flights"></div>
 </section>
 
 <section class="slide" data-title="ขั้น 4: พรอมต์ทดสอบ">
-  <div class="kicker">ขั้นที่ 4 · ข้อ 0 = ตรวจล็อกอินก่อนเสมอ</div>
-  <h2>ล็อกอินไม่ครบ → Claude หยุดและบอกวิธีแก้</h2>
+  <div class="kicker">ขั้นที่ 4 · ขั้น 1 = ตรวจล็อกอินก่อนเสมอ</div>
+  <h2>ล็อกอินไม่ครบ → Claude หยุดและบอกเรา</h2>
   <div class="row">
     <div class="col">
-<pre class="prompt"><button class="copy">คัดลอก</button>ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี yolo1 yolo2 cyolo1 cyolo2 ใน container devtools
-ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-0. ตรวจสถานะล็อกอินทุกบัญชีก่อน: yoloN auth status และ cyoloN login status
-   แสดงเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล องค์กร หรือ token
-   ถ้ามีบัญชีใดยังไม่ล็อกอิน ให้หยุดทันที แจ้งเตือนว่าต้องล็อกอินบัญชีไหน
-   พร้อมวิธีล็อกอินใน JupyterLab Terminal (พิมพ์ yoloN แล้วเลือก Claude account with subscription / cyoloN login --device-auth)
-   ห้ามทำข้อถัดไปจนกว่าจะล็อกอินครบ
-1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง /workspace/multi-account/verify-prompt.txt ใน container
-2. รันทีละบัญชีจาก shell ใน container (โฟลเดอร์ /workspace/multi-account):
-   yolo1 -p "$(cat verify-prompt.txt)", yolo2 เช่นเดียวกัน,
-   cyolo1 exec --skip-git-repo-check "$(cat verify-prompt.txt)", cyolo2 เช่นเดียวกัน
-   รันแบบ foreground ทีละบัญชี timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
-3. คัดลอกภาพที่แต่ละบัญชีรายงานไปเป็น /workspace/multi-account/evidence/&lt;บัญชี&gt;/1-open.png, 2-search.png, 3-results.png
-   พร้อม log คำตอบเป็น run.log ในโฟลเดอร์เดียวกัน
-4. สรุปตาราง บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
-   บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
-====
-ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
+<pre class="prompt"><button class="copy">คัดลอก</button>ทดสอบบัญชี yolo1 yolo2 cyolo1 cyolo2 ใน container devtools ผ่าน docker exec ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ตั้งค่า
 
-1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
-2. ใช้ skill shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
-   ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
-3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
-   เปิด https://www.google.com/travel/flights?hl=en
-   ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
-   ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
-   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
-4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น 3 ภาพ
-   ตั้งชื่อ &lt;บัญชี&gt;-1-open.png (หน้าเว็บเปิดได้), &lt;บัญชี&gt;-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา),
-   &lt;บัญชี&gt;-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
-5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว: config root, รหัสจาก skill shared-check,
-   ชื่อ MCP server และชื่อ tool ที่เรียกจริง, ภาพหน้าจอ 3 ภาพ (path),
-   เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)</pre>
-      <div class="cap">เลื่อนดูพรอมต์เต็มในกรอบ หรือกด "คัดลอก"</div>
+ขั้น 1 ตรวจล็อกอิน: ใช้ yoloN auth status และ cyoloN login status
+สรุปตาราง บัญชี | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมลหรือ token ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้หยุดแล้วบอกฉัน
+
+ขั้น 2 ให้ทีละบัญชีทำ "งาน" ข้างล่าง ในโฟลเดอร์ /workspace/multi-account (timeout บัญชีละ 15 นาที)
+ใช้คำสั่ง yoloN -p "งาน" หรือ cyoloN exec --skip-git-repo-check "งาน" โดยแทน NAME ด้วยชื่อบัญชี
+
+งาน: ใช้ skill shared-check แล้วบอกรหัสที่ได้ จากนั้นใช้ Playwright MCP เท่านั้น เปิด https://www.google.com/travel/flights?hl=en ค้นเที่ยวบินเที่ยวเดียว BKK ไป Tokyo วันที่ 15 ของเดือนหน้า ค้นหาอย่างเดียว ห้ามจอง แล้วบันทึกภาพหน้าผลค้นหาเป็น /workspace/multi-account/evidence/NAME.png และบอกเที่ยวบินอันดับ 1 ถ้าเว็บ error ให้บอกตามจริง
+
+ขั้น 3 บัญชีไหนเว็บ error ให้รันบัญชีนั้นซ้ำอีก 1 รอบ
+แล้วสรุปตาราง บัญชี | รหัส shared-check | เที่ยวบินอันดับ 1 | PASS/FAIL</pre>
     </div>
-    <div class="col"><div class="fig"><img src="img/desktop-verify-warn-result.png" alt="ผลจริงเมื่อยังล็อกอินไม่ครบ Claude หยุดที่ข้อ 0"></div>
-      <div class="cap">ผลจริงเมื่อลองใส่บัญชีที่ยังไม่ล็อกอิน (yolo4, cyolo3): Claude ไม่ทำข้อ 1–4</div></div>
+    <div class="col"><div class="fig"><img src="img/desktop-verify-warn-result.png" alt="ผลจริงเมื่อยังล็อกอินไม่ครบ Claude หยุดที่ขั้น 1"></div>
+      <div class="cap">ผลจริงเมื่อลองใส่บัญชีที่ยังไม่ล็อกอิน (yolo4, cyolo3): Claude ไม่ทำขั้น 2–3</div></div>
   </div>
 </section>
 
 <section class="slide" data-title="ขั้น 4: ผลจริง">
-  <div class="kicker">ขั้นที่ 4 · ผลจริง (7 พ.ย. 2026 · ~10 นาที)</div>
+  <div class="kicker">ขั้นที่ 4 · ผลจริง (9 พ.ย. 2026 · ~8 นาที)</div>
   <h2>คนละบัญชี… แต่ได้รหัสเดียวกัน</h2>
-  <div class="fig" style="flex:none;max-height:390px"><img src="img/slides/verify-result-table.png" alt="ผลจริงจาก Claude ตาราง 4 บัญชี" style="max-height:390px"></div>
+  <div class="fig" style="flex:none;max-height:390px"><img src="img/desktop-verify-result.png" alt="ผลจริงจาก Claude ตาราง 4 บัญชี" style="max-height:390px"></div>
   <div class="grid g3" style="gap:16px;margin-top:22px">
     <div class="note ok small"><b>skill กลาง:</b> yolo1 = yolo2 ได้ <code>…claude-5b7b8d3ed923</code> · cyolo1 = cyolo2 ได้ <code>…codex-89b4c3fde329</code> → อ่านจากไฟล์เดียวกันใน <code>shared</code></div>
-    <div class="note ok small"><b>MCP กลาง:</b> ทุกบัญชีเรียก <code>browser_navigate</code> <code>browser_type</code> <code>browser_take_screenshot</code> ได้เอง</div>
-    <div class="note bad small"><b>yolo2 FAIL?</b> skill และ MCP ผ่าน แต่ Google Flights ตอบ error ในรอบนั้น… หน้าถัดไป</div>
+    <div class="note ok small"><b>MCP กลาง:</b> ทุกบัญชีเปิด Google Flights ผ่าน Playwright MCP และเห็นเที่ยวบินอันดับ 1 เหมือนกัน</div>
+    <div class="note bad small"><b>cyolo2 รอบ 2?</b> รอบแรก Google Flights ตอบ error พรอมต์จึงรันซ้ำให้… หน้าถัดไป</div>
   </div>
-  <p class="cap">ข้อความคำตอบจริงของ Claude ตัดเฉพาะส่วนตาราง</p>
 </section>
 
 <section class="slide" data-title="ขั้น 4: อ่าน FAIL ให้เป็น">
@@ -639,29 +622,31 @@ yolo3 --version; cyolo3 --version</pre>
   <h2>ระบบของเราพัง หรือเว็บภายนอกพัง?</h2>
   <div class="row">
     <div class="col c3"><div class="fig"><img src="img/slides/yolo2-error-crop.png" alt="ภาพจริง Google Flights Oops something went wrong"></div>
-      <div class="cap">ภาพจริงรอบแรกของ yolo2 จาก Playwright MCP: กรอกเงื่อนไขครบ แต่เว็บตอบ "Oops, something went wrong."</div></div>
+      <div class="cap">ภาพจริงเมื่อเว็บภายนอก error: กรอกเงื่อนไขครบ แต่เว็บตอบ "Oops, something went wrong."</div></div>
     <div class="col c2 vc">
-      <div class="note"><b>รันเฉพาะบัญชีนั้นซ้ำ</b> เช่น "รัน yolo2 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน"</div>
+      <div class="note">พรอมต์รันซ้ำให้ 1 รอบ <b>ถ้ายัง FAIL</b> สั่งเพิ่ม เช่น "รัน yolo2 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน"</div>
       <table style="margin-top:16px;font-size:20px">
         <tr><th>บัญชี</th><th>ผล</th></tr>
         <tr><td>yolo1</td><td style="color:var(--green)"><b>PASS</b></td></tr>
-        <tr><td>yolo2</td><td>รอบ 1 เว็บ error → <b style="color:var(--green)">รอบ 2 PASS</b> (124 วินาที)</td></tr>
+        <tr><td>yolo2</td><td style="color:var(--green)"><b>PASS</b></td></tr>
         <tr><td>cyolo1</td><td style="color:var(--green)"><b>PASS</b></td></tr>
-        <tr><td>cyolo2</td><td style="color:var(--green)"><b>PASS</b></td></tr>
+        <tr><td>cyolo2</td><td>รอบ 1 เว็บ error → <b style="color:var(--green)">รอบ 2 PASS</b></td></tr>
       </table>
     </div>
   </div>
 </section>
 
-<section class="slide" data-title="ขั้น 4: หลักฐาน (GIF)">
+<section class="slide" data-title="ขั้น 4: เปรียบเทียบ 4 บัญชี (GIF)">
   <div class="kicker">ขั้นที่ 4 · /workspace/multi-account/evidence/</div>
+  <h2>เปรียบเทียบ 4 บัญชีพร้อมกัน ทีละขั้น</h2>
+  <div class="fig flat"><img src="img/evidence-compare-4accounts.gif" alt="ภาพเคลื่อนไหวเปรียบเทียบ 4 บัญชีทีละขั้น"></div>
+  <div class="cap">GIF จากการรันเพิ่มอีกรอบที่สั่งให้แต่ละบัญชีเก็บภาพทุกขั้น · ราคาของผู้เรียนจะต่างตามวันที่ค้นหา</div>
+</section>
+
+<section class="slide" data-title="ขั้น 4: หลักฐานรายบัญชี (GIF)">
+  <div class="kicker">ขั้นที่ 4 · หลักฐานรายบัญชี</div>
   <h2>หลักฐานจริง ไม่ใช่คำตอบที่โมเดลเดา</h2>
-  <div class="row">
-    <div class="col"><div class="fig flat"><img src="img/evidence-yolo1.gif" alt="ภาพเคลื่อนไหวหลักฐาน 3 ภาพของ yolo1"></div>
-      <div class="cap">ภาพจริง 3 ภาพของ yolo1: เปิดเว็บ → กรอก BKK → Tokyo 15 ธ.ค. → ผลเที่ยวบิน</div></div>
-    <div class="col"><div class="fig"><img src="img/evidence-results-4accounts.png" alt="ผลค้นหาของ 4 บัญชีได้ชุดเดียวกัน"></div>
-      <div class="cap">ทั้ง 4 บัญชีเห็นเที่ยวบินชุดเดียวกัน · Vietjet THB 5,956 (ราคาของผู้เรียนจะต่างตามวันที่ค้นหา)</div></div>
-  </div>
+  <div class="grid g2" style="gap:10px 24px"><div><div class="fig flat"><img src="img/evidence-yolo1.gif" alt="ภาพเคลื่อนไหวจริงของ yolo1" style=max-height:280px></div><div class="cap" style="text-align:center"><b>yolo1</b></div></div><div><div class="fig flat"><img src="img/evidence-yolo2.gif" alt="ภาพเคลื่อนไหวจริงของ yolo2" style=max-height:280px></div><div class="cap" style="text-align:center"><b>yolo2</b></div></div><div><div class="fig flat"><img src="img/evidence-cyolo1.gif" alt="ภาพเคลื่อนไหวจริงของ cyolo1" style=max-height:280px></div><div class="cap" style="text-align:center"><b>cyolo1</b></div></div><div><div class="fig flat"><img src="img/evidence-cyolo2.gif" alt="ภาพเคลื่อนไหวจริงของ cyolo2" style=max-height:280px></div><div class="cap" style="text-align:center"><b>cyolo2</b></div></div></div>
 </section>
 
 <!-- ================= ปิดท้าย ================= -->
@@ -675,7 +660,7 @@ yolo3 --version; cyolo3 --version</pre>
     <label class="card"><input type="checkbox"><span>ล็อกอิน <code>yolo1</code> <code>yolo2</code> <code>cyolo1</code> <code>cyolo2</code> แล้ว</span></label>
     <label class="card"><input type="checkbox"><span>Claude ตรวจล็อกอินแล้วขึ้น "ล็อกอินแล้ว" ครบ</span></label>
     <label class="card"><input type="checkbox"><span>ขั้นที่ 4: บัญชี CLI เดียวกันได้รหัส shared-check เดียวกัน</span></label>
-    <label class="card"><input type="checkbox"><span>มีภาพ 3 ภาพใน <code>evidence/</code> ทุกบัญชี</span></label>
+    <label class="card"><input type="checkbox"><span>มีภาพผลค้นหาใน <code>evidence/</code> ทุกบัญชี</span></label>
     <label class="card"><input type="checkbox"><span>รู้ว่าเว็บ error = รันบัญชีนั้นซ้ำ ไม่ใช่ตั้งค่าใหม่</span></label>
   </div>
   <p class="cap" style="margin-top:16px">คลิกช่องเพื่อติ๊กระหว่างเรียน (ไม่บันทึกถาวร)</p>

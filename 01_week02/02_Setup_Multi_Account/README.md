@@ -148,60 +148,43 @@
 
 ## ขั้นที่ 4 · 💻 ให้ Claude Code Desktop ทดสอบ skill/MCP ข้ามบัญชี (~15 นาที)
 
-![ขั้นที่ 4: AI ในบัญชี yolo1 สั่งงานเป็นภาษาคน ผ่าน Playwright MCP ไปยัง Chromium ใน container เปิด Google Flights กรอก BKK ไป Tokyo แล้วเก็บหลักฐาน 3 ภาพ](img/mcp-02-playwright-step4.png)
+![ขั้น 1: Claude Code Desktop ตรวจทีละบัญชีใน devtools ถ้าครบ 4 บัญชีไปทดสอบต่อ ถ้ามีบัญชียังไม่ล็อกอินให้หยุดแล้วไปล็อกอินใน JupyterLab](img/step4-01-check-accounts.png)
+
+![ขั้น 2: ทีละบัญชีใช้ skill shared-check ได้รหัสกลาง ใช้ Playwright MCP เปิด Google Flights ค้น BKK ไป Tokyo แล้วเก็บภาพและสรุป PASS/FAIL ค้นหาอย่างเดียว ไม่จอง ไม่จ่ายเงิน](img/step4-02-skill-mcp-flights.png)
 
 ### 4.1 · วางพรอมต์ทดสอบ
 
 > [!IMPORTANT]
-> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter (ค้นหาเที่ยวบินอย่างเดียว ไม่จอง)**
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชี yolo1 yolo2 cyolo1 cyolo2 ใน container devtools
-> ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-> 0. ตรวจสถานะล็อกอินทุกบัญชีก่อน: yoloN auth status และ cyoloN login status
->    แสดงเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล องค์กร หรือ token
->    ถ้ามีบัญชีใดยังไม่ล็อกอิน ให้หยุดทันที แจ้งเตือนว่าต้องล็อกอินบัญชีไหน
->    พร้อมวิธีล็อกอินใน JupyterLab Terminal (พิมพ์ yoloN แล้วเลือก Claude account with subscription / cyoloN login --device-auth)
->    ห้ามทำข้อถัดไปจนกว่าจะล็อกอินครบ
-> 1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง /workspace/multi-account/verify-prompt.txt ใน container
-> 2. รันทีละบัญชีจาก shell ใน container (โฟลเดอร์ /workspace/multi-account):
->    yolo1 -p "$(cat verify-prompt.txt)", yolo2 เช่นเดียวกัน,
->    cyolo1 exec --skip-git-repo-check "$(cat verify-prompt.txt)", cyolo2 เช่นเดียวกัน
->    รันแบบ foreground ทีละบัญชี timeout บัญชีละ 15 นาที รอจนจบก่อนไปบัญชีถัดไป
-> 3. คัดลอกภาพที่แต่ละบัญชีรายงานไปเป็น /workspace/multi-account/evidence/<บัญชี>/1-open.png, 2-search.png, 3-results.png
->    พร้อม log คำตอบเป็น run.log ในโฟลเดอร์เดียวกัน
-> 4. สรุปตาราง บัญชี | config root | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | ภาพที่ได้ | PASS/FAIL
->    บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
-> ====
-> ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
+> ทดสอบบัญชี yolo1 yolo2 cyolo1 cyolo2 ใน container devtools ผ่าน docker exec ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ตั้งค่า
 >
-> 1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
-> 2. ใช้ skill shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
->    ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
-> 3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
->    เปิด https://www.google.com/travel/flights?hl=en
->    ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
->    ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
->    ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
-> 4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น 3 ภาพ
->    ตั้งชื่อ <บัญชี>-1-open.png (หน้าเว็บเปิดได้), <บัญชี>-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา),
->    <บัญชี>-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
-> 5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว: config root, รหัสจาก skill shared-check,
->    ชื่อ MCP server และชื่อ tool ที่เรียกจริง, ภาพหน้าจอ 3 ภาพ (path),
->    เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)
+> ขั้น 1 ตรวจล็อกอิน: ใช้ yoloN auth status และ cyoloN login status
+> สรุปตาราง บัญชี | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมลหรือ token ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้หยุดแล้วบอกฉัน
+>
+> ขั้น 2 ให้ทีละบัญชีทำ "งาน" ข้างล่าง ในโฟลเดอร์ /workspace/multi-account (timeout บัญชีละ 15 นาที)
+> ใช้คำสั่ง yoloN -p "งาน" หรือ cyoloN exec --skip-git-repo-check "งาน" โดยแทน NAME ด้วยชื่อบัญชี
+>
+> งาน: ใช้ skill shared-check แล้วบอกรหัสที่ได้ จากนั้นใช้ Playwright MCP เท่านั้น เปิด https://www.google.com/travel/flights?hl=en ค้นเที่ยวบินเที่ยวเดียว BKK ไป Tokyo วันที่ 15 ของเดือนหน้า ค้นหาอย่างเดียว ห้ามจอง แล้วบันทึกภาพหน้าผลค้นหาเป็น /workspace/multi-account/evidence/NAME.png และบอกเที่ยวบินอันดับ 1 ถ้าเว็บ error ให้บอกตามจริง
+>
+> ขั้น 3 บัญชีไหนเว็บ error ให้รันบัญชีนั้นซ้ำอีก 1 รอบ
+> แล้วสรุปตาราง บัญชี | รหัส shared-check | เที่ยวบินอันดับ 1 | PASS/FAIL
 > ```
 
-ถ้ายังล็อกอินไม่ครบ Claude จะหยุดและบอกว่าต้องล็อกอินบัญชีไหน
+ถ้ายังล็อกอินไม่ครบ Claude จะหยุดที่ขั้น 1
 
-![ผลจริงเมื่อยังล็อกอินไม่ครบ: Claude ตรวจข้อ 0 พบ yolo4 และ cyolo3 ยังไม่ล็อกอิน จึงหยุดและบอกวิธีล็อกอิน](img/desktop-verify-warn-result.png)
+![ผลจริงเมื่อยังล็อกอินไม่ครบ: Claude พบ yolo4 และ cyolo3 ยังไม่ล็อกอิน จึงหยุดที่ขั้น 1](img/desktop-verify-warn-result.png)
 
 ### 4.2 · ผลจริง
 
-![ผลจริงจาก Claude: ข้อ 0 ล็อกอินครบ 4 บัญชี ผลทดสอบ yolo1 cyolo1 cyolo2 PASS ส่วน yolo2 FAIL เพราะ Google Flights error รหัส shared-check ตรงกันตาม CLI](img/desktop-verify-result.png)
+![ผลจริงจาก Claude: ผ่านครบ 4 บัญชี yolo1 yolo2 ได้รหัส claude เดียวกัน cyolo1 cyolo2 ได้รหัส codex เดียวกัน และเห็นเที่ยวบินอันดับ 1 เหมือนกัน](img/desktop-verify-result.png)
 
-บัญชีของ CLI เดียวกันต้องได้รหัส `shared-check` เดียวกัน ถ้า skill และ MCP ผ่าน แต่เว็บขึ้น error แบบนี้ เป็นปัญหาของเว็บภายนอก ให้รันเฉพาะบัญชีนั้นซ้ำ
+บัญชีของ CLI เดียวกันต้องได้รหัส `shared-check` เดียวกัน ถ้าเว็บขึ้น error แบบนี้เป็นปัญหาของเว็บภายนอก พรอมต์จะรันบัญชีนั้นซ้ำให้ 1 รอบ
 
-![ภาพจริงรอบแรกของ yolo2: Google Flights กรอกเงื่อนไขครบแต่ขึ้น Oops something went wrong และปุ่ม Reload](img/evidence-yolo2-attempt1-error.png)
+![ภาพจริงเมื่อเว็บภายนอก error: Google Flights กรอกเงื่อนไขครบแต่ขึ้น Oops something went wrong และปุ่ม Reload](img/evidence-yolo2-attempt1-error.png)
+
+ถ้ายัง FAIL ให้สั่งรันเฉพาะบัญชีนั้นอีกครั้ง
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop (เปลี่ยน yolo2 เป็นบัญชีที่ FAIL)**
@@ -210,10 +193,18 @@
 > รัน yolo2 ซ้ำอีกรอบด้วยพรอมต์เดิม แล้วอัปเดตหลักฐาน
 > ```
 
-### 4.3 · ดูหลักฐานที่ Playwright เก็บไว้
+### 4.3 · เปรียบเทียบหลักฐานทั้ง 4 บัญชี
 
-ใน File Browser ไปที่ `/workspace/multi-account/evidence/` แต่ละบัญชีมีภาพ 3 ภาพและ `run.log`
+ใน File Browser ไปที่ `/workspace/multi-account/evidence/` แต่ละบัญชีมีภาพผลค้นหาของตัวเอง
 
-![ภาพเคลื่อนไหวจากภาพจริงของ yolo1: เปิด Google Flights, กรอก BKK ไป Tokyo วันอังคาร 15 ธันวาคม, ผลค้นหา Top flights](img/evidence-yolo1.gif)
+![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2 ได้เที่ยวบินอันดับ 1 เหมือนกัน](img/evidence-results-4accounts.png)
 
-![ผลค้นหาเที่ยวบินจาก Playwright MCP ของ yolo1 yolo2 cyolo1 cyolo2 เรียงเป็นตาราง 2x2 ได้ผลชุดเดียวกัน](img/evidence-results-4accounts.png)
+GIF ด้านล่างมาจากการรันเพิ่มอีกรอบที่สั่งให้แต่ละบัญชีเก็บภาพทุกขั้น มุมซ้ายบนของภาพบอกว่ามาจากบัญชีไหน
+
+![ภาพเคลื่อนไหวเปรียบเทียบ 4 บัญชีพร้อมกันทีละขั้น: เปิดเว็บ กรอกเส้นทาง เลือกวันที่ และผลค้นหา](img/evidence-compare-4accounts.gif)
+
+| yolo1 | yolo2 |
+|---|---|
+| ![ภาพเคลื่อนไหวจริงของ yolo1](img/evidence-yolo1.gif) | ![ภาพเคลื่อนไหวจริงของ yolo2](img/evidence-yolo2.gif) |
+| **cyolo1** | **cyolo2** |
+| ![ภาพเคลื่อนไหวจริงของ cyolo1](img/evidence-cyolo1.gif) | ![ภาพเคลื่อนไหวจริงของ cyolo2](img/evidence-cyolo2.gif) |
