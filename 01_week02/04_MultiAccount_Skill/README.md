@@ -16,10 +16,6 @@
 
 ![ขั้นที่ 4 ต่อจากขั้นที่ 3 ส่วนที่ 2 จาก 2: FAN-OUT แตกงาน โจทย์ parse_duration ให้ Claude เขียน a_claude.py และ Codex เขียน a_codex.py พร้อมกัน FAN-IN รวมผล ทั้งสองไฟล์เข้าหา Codex อีกบัญชีเพื่อตรวจเลือกและบอกจุดที่ต้องแก้ แก้และทดสอบ Claude แก้เป็น final.py ทดสอบ 5 กรณี แล้วได้ตารางผลจริง เวลา tokens โควตา](img/concept-16-team-fan-out-fan-in.png)
 
-งานของทีมมี 4 ขั้น
-
-![ก่อนมีสกิล งานทีม 4 ขั้น: Claude Code app บน host สั่งผ่าน docker exec เข้า container multi-account ขั้นที่ 1 บัญชี Claude และ Codex เขียน parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py ขั้นที่ 2 บัญชี Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ ขั้นที่ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี ขั้นที่ 4 Claude Code app สรุปตารางบัญชี เวลา tokens และโควตาจากผลจริง](img/concept-12-team-task.png)
-
 เปิด Claude Code app เลือก **Code** → **New session** → โฟลเดอร์ `04_MultiAccount_Skill` แล้ววางพรอมต์
 
 > [!IMPORTANT]
