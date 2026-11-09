@@ -1,48 +1,33 @@
 # 04_MultiAccount_Skill
 
-**สไลด์:** [HTML](MultiAccount_Skill_Slides.html) · [PDF](MultiAccount_Skill_Slides.pdf)
-
-ใช้ container `multi-account` จาก [03_MultiAccount_Container](../03_MultiAccount_Container/README.md) สร้างสกิลให้ AI สั่ง `yolo1–5` และ `cyolo1–5` เป็นทีม พร้อมสถิติของทุกบัญชี
-
-> [!CAUTION]
-> **ต้องมี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` ก่อน** ถ้าไม่มีทั้งสองตัว จะทำบทนี้ไม่ได้เลย ให้ build จาก[บท 03](../03_MultiAccount_Container/README.md) หรือดึงจาก Docker Hub ตาม[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-แล้วเปิด-container)
-
 ## 1. ปัญหา: มีคำสั่งครบ แต่ AI ยังใช้ไม่เป็น
 
-คำสั่ง `yolo2` หรือ `cyolo1` เปิด Claude Code หรือ Codex ของบัญชีนั้นได้ทันที แต่การให้ AI อีกตัวสั่งงานบัญชีเหล่านี้แบบอัตโนมัติต้องรู้รายละเอียดอีกมาก: ต้องใส่ flag ใด ต้องปิด input อย่างไร ผลลัพธ์อยู่ที่ไหน บัญชีไหนใช้ได้จริง และโควตาเหลือเท่าไร AI ที่ไม่มีความรู้เหล่านี้จึงต้องลองผิดลองถูกใหม่ทุกครั้ง
-
-![ภาพจำลอง: วิศวกรนั่งกอดอกหน้าจอที่เต็มไปด้วยความพยายามที่ล้มเหลว yolo2 --help, cyolo1 exec ค้างรอ input, Error: OAuth session expired และ tokens used: ??? อีกจอเป็นแผนผังบัญชีที่ลูกศรพันกันพร้อมเครื่องหมายคำถาม](img/photo-01-pain.jpg)
-
-*(ภาพจำลอง)*
+`yolo2` หรือ `cyolo1` เปิดบัญชีได้ทันที แต่ AI ที่จะสั่งบัญชีเหล่านี้ต้องรู้ว่าใส่ flag อะไร ผลลัพธ์อยู่ที่ไหน บัญชีไหนใช้ได้จริง และโควตาเหลือเท่าไร เมื่อไม่รู้ก็ต้องลองผิดลองถูกใหม่ทุกครั้ง
 
 ![มีคำสั่งครบ แต่ AI ยังใช้ไม่เป็น: เพนพอยต์ 6 ข้อ เรียกผิดวิธี, สถานะล็อกอินไม่ตรงจริง, ประสานงานไม่เป็น, ไม่มีสถิติ, ลองผิดลองถูกทุกครั้ง และหัวหน้าทีมโควตาหมด](img/concept-01-pain-points.png)
 
-| เพนพอยต์ | สิ่งที่เกิดขึ้นจริง |
-|---|---|
-| เรียกผิดวิธี | `codex exec` ที่ไม่ปิด stdin จะค้างรอ input · ไม่ใส่ `-p` จะเปิดโหมดโต้ตอบ · exit code 0 ไม่ได้แปลว่าสำเร็จ |
-| สถานะล็อกอินไม่ตรงจริง | `auth status` ตอบ `loggedIn: true` แต่เรียกจริงได้ `OAuth session expired` |
-| ประสานงานไม่เป็น | สั่งทีละบัญชีแล้วรอ · ยัดข้อมูลยาวลง prompt · ไม่มีที่แชร์ความรู้ระหว่างกัน |
-| ไม่มีสถิติ | ไม่รู้ว่าแต่ละบัญชีใช้โทเค็น เวลา และโควตาไปเท่าไร |
-| ลองผิดลองถูกทุกครั้ง | เปิด `--help` ซ้ำ เขียนสคริปต์ช่วยใหม่ทุกครั้ง ช้าและเปลืองโทเค็น |
-| หัวหน้าทีมโควตาหมด | แผนงานอยู่ในบริบทแชตของหัวหน้า เมื่อบัญชีหัวหน้าหยุด งานที่ค้างหายไปด้วย |
+### 1.1 ทดลองก่อนมีสกิล
 
-### 1.1 ทดลองก่อนมีสกิล: Claude Code app สั่งทีมใน container
-
-ทุกการทดลองในบทนี้เริ่มจาก**วางพรอมต์ใน Claude Code app** แล้ว Claude Code app เข้าไปทำงานใน container ผ่าน `docker exec` การทดลองนี้ให้ Claude Code app เป็นหัวหน้าทีม สั่งบัญชี Claude และ Codex ใน container ทำงาน 4 ขั้น โดย**ใน container ยังไม่มีสกิล**
-
-![ก่อนมีสกิล งานทีม 4 ขั้น: Claude Code app บน host สั่งผ่าน docker exec เข้า container multi-account ขั้นที่ 1 บัญชี Claude และ Codex เขียน parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py ขั้นที่ 2 บัญชี Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ ขั้นที่ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี ขั้นที่ 4 Claude Code app สรุปตารางบัญชี เวลา tokens และโควตาจากผลจริง](img/concept-12-team-task.png)
-
-หลังกด Enter พรอมต์จะทำงานตามลำดับนี้: เข้า container ด้วย `docker exec` → หาสกิลตาม path ที่กำหนด → สร้างโฟลเดอร์ทำงาน `/workspace/team-demo` → ให้แต่ละบัญชีทำงานจริง รอบนี้ยังไม่มีสกิลใน path จึงต้องหาวิธีเอง ส่วนในขั้นที่ 3 จะพบสกิลแล้วอ่านมาใช้
+มาดูกันว่าถ้ายังไม่มีสกิล Claude Code app จะสั่งทีมได้แค่ไหน พรอมต์นี้เตรียม image และ container ให้เองด้วย ถ้าเครื่องยังไม่มี image จะดึงจาก Docker Hub ให้
 
 ![พรอมต์ทีมเอเจนต์ทำงานอย่างไร: 1 เข้า container จาก Claude Code app ด้วย docker exec multi-account 2 หาสกิลตาม path /root/ai-accounts/.Claude/shared/skills ถ้ามีสกิลก็อ่านแล้วใช้ 3 สร้างโฟลเดอร์ทำงาน /workspace/team-demo 4 ทดลองให้แต่ละบัญชีทำงานจริง Claude และ Codex เขียน a_claude.py กับ a_codex.py Codex อีกบัญชีตรวจเลือก Claude แก้เป็น final.py และทดสอบ 5 กรณี แล้วได้ตารางผลจริง เวลา tokens และโควตา](img/concept-15-team-prompt-pipeline.png)
 
-บรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" ใส่ไว้ทั้งรอบก่อนและหลังมีสกิล เพื่อให้เทียบกันได้ยุติธรรม และเป็นวิธีที่ทำให้ Claude Code app รู้จักสกิลใน container
+งานของทีมมี 4 ขั้น
+
+![ก่อนมีสกิล งานทีม 4 ขั้น: Claude Code app บน host สั่งผ่าน docker exec เข้า container multi-account ขั้นที่ 1 บัญชี Claude และ Codex เขียน parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py ขั้นที่ 2 บัญชี Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ ขั้นที่ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี ขั้นที่ 4 Claude Code app สรุปตารางบัญชี เวลา tokens และโควตาจากผลจริง](img/concept-12-team-task.png)
+
+เปิด Claude Code app เลือก **Code** → **New session** → โฟลเดอร์ `04_MultiAccount_Skill` แล้ววางพรอมต์
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
 > ```text
-> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ ทำงานใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ งานของทีมทำใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> เตรียมก่อนเริ่ม (ถ้า container multi-account กำลังรันอยู่แล้ว ข้ามไปได้ ห้ามลบ container / image / volume ที่มีอยู่)
+> - ถ้าเครื่องนี้ไม่มีทั้ง image multi-account:1.0 และ tuchsanai/multi-account:1 ให้ docker pull tuchsanai/multi-account:1
+> - ถ้ายังไม่มีชื่อ multi-account:1.0 ให้ docker tag tuchsanai/multi-account:1 multi-account:1.0
+> - ถ้า container หยุดอยู่ให้ docker start ถ้ายังไม่มีให้ docker run -dit --name multi-account --privileged -p <PORT>:8888 -v ai-accounts:/root/ai-accounts -v <path เต็มของ ../03_MultiAccount_Container/workspace>:/workspace multi-account:1.0 (PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป)
+> - ถ้าไม่มีบัญชี Claude หรือ Codex ที่ล็อกอินเลย ให้หยุดและบอกวิธีล็อกอินใน JupyterLab Terminal ห้ามล็อกอินแทนผม
 > ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 > โฟลเดอร์งานใน container: /workspace/team-demo
 > 1. ให้บัญชี Claude 1 บัญชี และบัญชี Codex 1 บัญชี เขียนฟังก์ชัน Python parse_duration(text) ที่แปลง "1h30m", "45s", "2h" เป็นจำนวนวินาที คนละแบบพร้อมกัน บันทึกเป็น a_claude.py และ a_codex.py
@@ -52,20 +37,19 @@
 > 5. บอกโควตาที่เหลือของแต่ละบัญชีที่ใช้
 > ```
 
+บรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" ทำให้ Claude Code app รู้จักสกิลใน container และเราจะใช้พรอมต์เดียวกันนี้อีกครั้งในขั้นที่ 3 เพื่อเทียบผล
+
+**Output ที่ได้** (ผลจริง 8 พ.ย. 2026 วัดก่อนเพิ่มส่วน "เตรียมก่อนเริ่ม"): งานเสร็จและ `final.py` ผ่าน 5/5 แต่ใช้เวลา **810.2 วินาที** และ 30 คำสั่ง (ล้ม 9 คำสั่ง)
+
 ![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude สำรวจ container ไม่พบสกิลที่ช่วยได้ ไล่ตรวจไฟล์ credential อ่านโค้ด wrapper เขียน run_agent.py เอง แล้วสั่งงานทีละขั้น](img/desktop-team-before.gif)
-
-**ผลจริง** (8 พ.ย. 2026): งานเสร็จและ `final.py` ผ่าน 5/5 แต่ใช้เวลารวม **810.2 วินาที** และ Claude Code app ใช้ไป 30 คำสั่ง (ล้ม 9 คำสั่ง)
-
-| สิ่งที่สังเกตได้ | รายละเอียด |
-|---|---|
-| สำรวจระบบเอง | ไล่เปิด container อื่น โฟลเดอร์บัญชี และ `/usr/local/lib/multi-account` · หลายคำสั่งล้มเพราะ Git Bash แปลง path |
-| **ยุ่งกับไฟล์ credential** | ไล่ตรวจ `.credentials.json` ทุกบัญชี และ**เปิดอ่าน `auth.json` ของ Codex** เพื่อเทียบตัวตนของบัญชี ซึ่งไม่ควรเกิดขึ้น |
-| อ่านโค้ดเบื้องหลังเอง | เปิดอ่านโค้ด wrapper ของ `yoloN` / `cyoloN` เพื่อเดาวิธีเรียก |
-| เขียนเครื่องมือช่วยเอง | เขียน `run_agent.py` สำหรับเรียกบัญชีและจับเวลาขึ้นมาใหม่ แล้วคัดลอกเข้า container |
 
 ![ผลจริงจาก Claude Code app รอบก่อนมีสกิล: ไม่พบสกิลที่ช่วยได้ จึงเขียน run_agent.py เอง ตารางสรุปเวลาและโทเค็นของ 4 บัญชี และตารางโควตา](img/desktop-team-before-result.png)
 
-*คำตอบจริง ตัดส่วนที่ระบุบัญชีที่ล็อกอินและข้อมูลแพ็กเกจของเครื่องผู้สอนออก · ในการทดลองก่อนหน้าที่สั่ง `yolo1` ใน container โดยตรง หัวหน้าทีมเรียก `codex exec` โดยไม่ปิด stdin จนค้างนานกว่า 600 วินาที*
+เมื่อไม่มีสกิล Claude Code app ต้องทำสิ่งเหล่านี้เอง
+
+- สำรวจ container และเปิดอ่านโค้ด wrapper เพื่อเดาวิธีเรียกบัญชี
+- เขียน `run_agent.py` ขึ้นมาใหม่เพื่อเรียกบัญชีและจับเวลา
+- **ไปเปิดไฟล์ credential** อย่าง `auth.json` ซึ่งไม่ควรเกิดขึ้น
 
 ## 2. ทำไมสกิลแก้ปัญหานี้ได้
 
@@ -403,7 +387,12 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
 > ```text
-> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ ทำงานใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ งานของทีมทำใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> เตรียมก่อนเริ่ม (ถ้า container multi-account กำลังรันอยู่แล้ว ข้ามไปได้ ห้ามลบ container / image / volume ที่มีอยู่)
+> - ถ้าเครื่องนี้ไม่มีทั้ง image multi-account:1.0 และ tuchsanai/multi-account:1 ให้ docker pull tuchsanai/multi-account:1
+> - ถ้ายังไม่มีชื่อ multi-account:1.0 ให้ docker tag tuchsanai/multi-account:1 multi-account:1.0
+> - ถ้า container หยุดอยู่ให้ docker start ถ้ายังไม่มีให้ docker run -dit --name multi-account --privileged -p <PORT>:8888 -v ai-accounts:/root/ai-accounts -v <path เต็มของ ../03_MultiAccount_Container/workspace>:/workspace multi-account:1.0 (PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป)
+> - ถ้าไม่มีบัญชี Claude หรือ Codex ที่ล็อกอินเลย ให้หยุดและบอกวิธีล็อกอินใน JupyterLab Terminal ห้ามล็อกอินแทนผม
 > ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 > โฟลเดอร์งานใน container: /workspace/team-demo
 > 1. ให้บัญชี Claude 1 บัญชี และบัญชี Codex 1 บัญชี เขียนฟังก์ชัน Python parse_duration(text) ที่แปลง "1h30m", "45s", "2h" เป็นจำนวนวินาที คนละแบบพร้อมกัน บันทึกเป็น a_claude.py และ a_codex.py
