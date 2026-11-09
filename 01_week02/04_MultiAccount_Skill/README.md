@@ -139,7 +139,11 @@ Claude 2 บัญชีกับ Codex 1 บัญชีแข่งกัน�
 
 ### 3.2 รูปแบบขั้นสูง
 
-![รูปแบบขั้นสูงในการแข่ง ticket: debate ถกกันว่า ticket นี้ด่วนจริงไหม best-of-N แข่งหลายไฟล์เลือกที่ดีที่สุด router ส่งงานให้บัญชีที่ถนัด failover บัญชีล้มย้ายงานไปบัญชีอื่น human gate รอคนอนุมัติก่อนใช้ triage.py จริง](img/skill-02-patterns-advanced.png)
+![รูปแบบขั้นสูงเรื่องตัดสินให้ถูก: debate Claude กับ Codex ถกกันว่า T0283 เห็นยอดตัดสองรอบแต่ไม่รีบ ด่วนหรือไม่ ผู้ตัดสินสรุปว่าด่วนพร้อมเหตุผล best-of-N แข่ง triage_A.py triage_B.py triage_C.py แล้วให้คะแนนตามเกณฑ์เลือกไฟล์ที่ดีที่สุด](img/skill-02a-advanced-decide.png)
+
+![รูปแบบขั้นสูงเรื่องงานไม่สะดุด: router ส่งงานเขียนกฎให้ Claude และงานตรวจโค้ดให้ Codex failover Claude 2 โควตาหมดให้ Claude 1 ทำต่อ human gate รอคนอนุมัติก่อนใช้ triage.py จริง](img/skill-02b-advanced-resilience.png)
+
+*(ภาพจำลอง)*
 
 | รูปแบบ | ตัวอย่างในการแข่ง ticket |
 |---|---|
