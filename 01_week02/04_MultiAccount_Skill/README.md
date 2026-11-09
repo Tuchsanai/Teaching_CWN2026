@@ -178,16 +178,12 @@ skills/
 
 | ขั้น | ทำที่ไหน | เวลารันจริง |
 |---|---|---|
-| **0 · ตรวจว่ามี image แล้วเปิด container** | Claude Code app | – |
 | **1 · ให้ Claude สร้างสกิลจากสเปก (จากศูนย์)** | Claude Code app | ~43 นาที |
 | **2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์** | Claude Code app (หรือลากวางใน JupyterLab) | 67.9 วินาที |
 | **3 · ทดสอบงานทีมชุดเดิมอีกครั้ง** | Claude Code app | 170.5 วินาที |
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | 138.6 วินาที (run 69 วินาที) |
 
-> [!CAUTION]
-> **ไม่มี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี พรอมต์ใน[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-แล้วเปิด-container) จะดึงจาก Docker Hub ให้
-
-**ต้องมีก่อน:** image `multi-account:1.0` หรือ `tuchsanai/multi-account:1`
+**ต้องมีก่อน:** ทำหัวข้อ 1.1 แล้ว พรอมต์ในหัวข้อนั้นเตรียม image และเปิด container `multi-account` ให้
 
 บทนี้ใช้ค่าต่อไปนี้จากบท 03 โดยตรง
 
@@ -199,7 +195,7 @@ skills/
 | โฟลเดอร์งาน | `03_MultiAccount_Container/workspace` → `/workspace` | ผลงานและข้อมูลของทุก run |
 | JupyterLab | `http://localhost:8886/lab` | ลากวางสกิลในขั้นที่ 2 (ถ้าบท 03 ใช้ port อื่น ให้เปลี่ยน `8886`) |
 
-สกิลและพรอมต์ระบุชื่อ `multi-account` ไว้ตายตัว ขั้นที่ 0 จึงเปิด container ด้วยชื่อนี้ ส่วน `/maccount` สร้าง container ชื่อ `multi-account-devtool` จึงใช้กับบทนี้ไม่ได้
+สกิลและพรอมต์ระบุชื่อ `multi-account` ไว้ตายตัว พรอมต์ในหัวข้อ 1.1 จึงเปิด container ด้วยชื่อนี้ ส่วน `/maccount` สร้าง container ชื่อ `multi-account-devtool` จึงใช้กับบทนี้ไม่ได้
 
 **เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `04_MultiAccount_Skill` ของรีโปนี้
 
@@ -212,41 +208,6 @@ skills/
     ├── TEST-REPORT.md     ← รายงานทดสอบของขั้นที่ 1
     └── BENCHMARK.md       ← ผลวัด: สกิลจากศูนย์เทียบกับสกิลชุดเดิม
 ```
-
-## ขั้นที่ 0 · ตรวจว่ามี image แล้วเปิด container
-
-บทนี้เริ่มจากคำถามเดียว: **มี image หรือไม่** พรอมต์นี้ทำงานได้ 2 โหมด
-
-| โหมด | เงื่อนไข | สิ่งที่พรอมต์ทำ |
-|---|---|---|
-| **มี image** | มี `multi-account:1.0` หรือ `tuchsanai/multi-account:1` ในเครื่อง | ใช้ตัวที่มี แล้วเปิด container |
-| **ไม่มี image** | ไม่มีทั้งสองตัว | `docker pull tuchsanai/multi-account:1` (image สำเร็จรูปของผู้สอน) แล้วเปิด container |
-
-![ขั้นที่ 0 วางพรอมต์แล้วกด Enter: นักศึกษากด Enter ใน Claude Code app แล้ว 1 ตรวจว่ามี image multi-account:1.0 หรือ tuchsanai/multi-account:1 2 เปิด container ด้วย docker run 3 สรุปผลเป็นตาราง JupyterLab และสถานะล็อกอิน ถ้าไม่มี image Claude จะ docker pull tuchsanai/multi-account:1 ให้](img/concept-13-image-prerequisite.png)
-
-> [!IMPORTANT]
-> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
->
-> ```text
-> เตรียม image แล้วเปิด container สำหรับบท 04 ห้ามลบ container / image / volume ที่มีอยู่ และห้ามล็อกอินแทนผม
-> 1. ตรวจว่ามี image multi-account:1.0 หรือ tuchsanai/multi-account:1 ในเครื่องหรือไม่ (docker image inspect)
->    - โหมดมี image: ใช้ตัวที่มี
->    - โหมดไม่มี image (ไม่มีทั้งสองตัว): docker pull tuchsanai/multi-account:1
->    จากนั้นถ้ายังไม่มีชื่อ multi-account:1.0 ให้สั่ง docker tag tuchsanai/multi-account:1 multi-account:1.0
-> 2. ถ้า container multi-account กำลังรันอยู่แล้ว ใช้ตัวเดิม ถ้าหยุดอยู่ให้ docker start ถ้ายังไม่มีให้สร้างด้วย
->    docker run -dit --name multi-account --privileged -p <PORT>:8888 -v ai-accounts:/root/ai-accounts -v <path เต็มของ ../03_MultiAccount_Container/workspace>:/workspace multi-account:1.0
->    PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป และสร้างโฟลเดอร์ workspace ถ้ายังไม่มี
-> 3. รอจน http://localhost:<PORT>/lab ตอบ 200 แล้วดูสถานะล็อกอิน yolo1..5 (yoloN auth status ดูแค่ loggedIn) และ cyolo1..5 (cyoloN login status) ห้ามแสดงอีเมล องค์กร หรือ token
-> สรุปเป็นตาราง โหมดที่ใช้ (มี image / pull) | image | container | URL ของ JupyterLab | บัญชี | ล็อกอินแล้ว/ยัง แล้วหยุด
-> ```
-
-จบขั้นนี้แล้ว ทุกส่วนจะเชื่อมกันตามภาพนี้
-
-![ภาพรวมขั้นที่ 0: มี image ใช้ตัวที่มี หรือไม่มี image ให้ docker pull ได้ image multi-account:1.0 แล้ว docker run เป็น container multi-account Claude Code app สั่งงานเข้า container เปิด JupyterLab ที่ port 8886 เชื่อม volume ai-accounts ที่เก็บล็อกอินและสกิล และ /workspace ที่เก็บไฟล์งาน](img/concept-14-step0-overview.png)
-
-ขั้นถัดไปใช้บัญชีจริง ถ้ายังไม่ได้ล็อกอิน ให้ล็อกอินอย่างน้อย 1 บัญชี Claude กับ 1 บัญชี Codex ตาม[ขั้นที่ 3 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-3--ล็อกอินและให้-claude-ตรวจสถานะ-15-นาที)
-
-ถ้าต้องการ build image เอง ให้ทำ[ขั้นที่ 1 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-1--ให้-claude-สร้าง-image-30-นาที) ก่อนเริ่มขั้นนี้
 
 ## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก (~43 นาที)
 
