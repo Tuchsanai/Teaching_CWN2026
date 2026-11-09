@@ -1,8 +1,5 @@
 # การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile
 
-> [!IMPORTANT]
-> **📋 กล่องสีม่วงที่ขึ้นต้นด้วย 📋 คือส่วนที่ต้องคัดลอกไปวาง** กดปุ่ม copy มุมขวาบนของกรอบโค้ด
-
 **สไลด์ประกอบการสอน:** [Multi_Account_Container_Slides.html](Multi_Account_Container_Slides.html) (เปิดในเบราว์เซอร์ กด ← → เปลี่ยนหน้า) · [ฉบับ PDF](Multi_Account_Container_Slides.pdf)
 
 ## 1. เปรียบเทียบ 3 แบบของการเตรียมสภาพแวดล้อม
