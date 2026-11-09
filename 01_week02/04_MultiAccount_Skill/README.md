@@ -1,8 +1,11 @@
-# การสร้างสกิลสำหรับระบบหลายบัญชี (yolo · cyolo · agent-team)
+# 04_MultiAccount_Skill
 
-**สไลด์ประกอบการสอน:** [MultiAccount_Skill_Slides.html](MultiAccount_Skill_Slides.html) (เปิดในเบราว์เซอร์ กด ← → เปลี่ยนหน้า) · [ฉบับ PDF](MultiAccount_Skill_Slides.pdf)
+**สไลด์:** [HTML](MultiAccount_Skill_Slides.html) · [PDF](MultiAccount_Skill_Slides.pdf)
 
-บทนี้ต่อจาก [การสร้าง Docker image สำหรับระบบหลายบัญชีจาก Dockerfile](../03_MultiAccount_Container/README.md) container `multi-account` มีคำสั่ง `yolo1–5` (Claude Code) และ `cyolo1–5` (Codex CLI) ครบแล้ว บทนี้สร้าง **สกิล** ที่ทำให้ AI ใช้คำสั่งเหล่านี้ได้ถูกวิธี ทำงานร่วมกันเป็นทีม และรู้สถิติการใช้งานของทุกบัญชี
+ใช้ container `multi-account` จาก [03_MultiAccount_Container](../03_MultiAccount_Container/README.md) สร้างสกิลให้ AI สั่ง `yolo1–5` และ `cyolo1–5` เป็นทีม พร้อมสถิติของทุกบัญชี
+
+> [!CAUTION]
+> **ต้องมี image `multi-account:1.0` ที่ build จาก[บท 03](../03_MultiAccount_Container/README.md) ก่อน** ถ้าไม่มี image นี้ จะทำบทนี้ไม่ได้เลย
 
 ## 1. ปัญหา: มีคำสั่งครบ แต่ AI ยังใช้ไม่เป็น
 
@@ -27,27 +30,23 @@
 
 ทุกการทดลองในบทนี้เริ่มจาก**วางพรอมต์ใน Claude Code app** แล้ว Claude Code app เข้าไปทำงานใน container ผ่าน `docker exec` การทดลองนี้ให้ Claude Code app เป็นหัวหน้าทีม สั่งบัญชี Claude และ Codex ใน container ทำงาน 4 ขั้น โดย**ใน container ยังไม่มีสกิล**
 
-![การทดลอง: Claude Code app สั่งทีมใน container ผ่าน docker exec งาน 4 ขั้น 1 บัญชี Claude และ Codex เขียนโค้ด parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py 2 บัญชี Codex ตรวจเลือกและบอกจุดที่ต้องแก้ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี 4 สรุปตารางบัญชี เวลา tokens และโควตา ตัวเลขทุกค่าต้องมาจากผลจริงของแต่ละบัญชี](img/concept-12-team-task.png)
-
-| ขั้น | ใครทำ | ผลลัพธ์ |
-|---|---|---|
-| 1 · เขียนโค้ดพร้อมกัน | บัญชี Claude 1 + บัญชี Codex 1 | `a_claude.py`, `a_codex.py` (ฟังก์ชัน `parse_duration("1h30m")` → 5400) |
-| 2 · ตรวจเลือก | บัญชี Codex อีกบัญชี | แบบที่ดีกว่า + จุดที่ต้องแก้ |
-| 3 · แก้ + ทดสอบ | บัญชี Claude | `final.py` ผ่านการทดสอบ 5 กรณี |
-| 4 · สรุปผล | Claude Code app | ตารางเวลา โทเค็น และโควตาของทุกบัญชีจากผลจริง |
+![ก่อนมีสกิล งานทีม 4 ขั้น: Claude Code app บน host สั่งผ่าน docker exec เข้า container multi-account ขั้นที่ 1 บัญชี Claude และ Codex เขียน parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py ขั้นที่ 2 บัญชี Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ ขั้นที่ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี ขั้นที่ 4 Claude Code app สรุปตารางบัญชี เวลา tokens และโควตาจากผลจริง](img/concept-12-team-task.png)
 
 บรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" ใส่ไว้ทั้งรอบก่อนและหลังมีสกิล เพื่อให้เทียบกันได้ยุติธรรม และเป็นวิธีที่ทำให้ Claude Code app รู้จักสกิลใน container
 
-```text
-ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ ทำงานใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
-โฟลเดอร์งานใน container: /workspace/team-demo
-1. ให้บัญชี Claude 1 บัญชี และบัญชี Codex 1 บัญชี เขียนฟังก์ชัน Python parse_duration(text) ที่แปลง "1h30m", "45s", "2h" เป็นจำนวนวินาที คนละแบบพร้อมกัน บันทึกเป็น a_claude.py และ a_codex.py
-2. ส่งทั้งสองไฟล์ให้บัญชี Codex อีกบัญชีหนึ่งเลือกแบบที่ดีกว่าและบอกจุดที่ต้องแก้
-3. ส่งคำแนะนำนั้นให้บัญชี Claude แก้เป็น final.py แล้วรันทดสอบ 5 กรณี
-4. สรุปตาราง บัญชี | งาน | เวลา (วินาที) | input tokens | output tokens | สำเร็จ/ล้ม ตัวเลขต้องมาจากผลจริงของแต่ละบัญชี ห้ามประมาณ
-5. บอกโควตาที่เหลือของแต่ละบัญชีที่ใช้
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ ทำงานใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
+> โฟลเดอร์งานใน container: /workspace/team-demo
+> 1. ให้บัญชี Claude 1 บัญชี และบัญชี Codex 1 บัญชี เขียนฟังก์ชัน Python parse_duration(text) ที่แปลง "1h30m", "45s", "2h" เป็นจำนวนวินาที คนละแบบพร้อมกัน บันทึกเป็น a_claude.py และ a_codex.py
+> 2. ส่งทั้งสองไฟล์ให้บัญชี Codex อีกบัญชีหนึ่งเลือกแบบที่ดีกว่าและบอกจุดที่ต้องแก้
+> 3. ส่งคำแนะนำนั้นให้บัญชี Claude แก้เป็น final.py แล้วรันทดสอบ 5 กรณี
+> 4. สรุปตาราง บัญชี | งาน | เวลา (วินาที) | input tokens | output tokens | สำเร็จ/ล้ม ตัวเลขต้องมาจากผลจริงของแต่ละบัญชี ห้ามประมาณ
+> 5. บอกโควตาที่เหลือของแต่ละบัญชีที่ใช้
+> ```
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude สำรวจ container ไม่พบสกิลที่ช่วยได้ ไล่ตรวจไฟล์ credential อ่านโค้ด wrapper เขียน run_agent.py เอง แล้วสั่งงานทีละขั้น](img/desktop-team-before.gif)
 
@@ -106,7 +105,7 @@ skills/
 | review loop | ต้องการคุณภาพ ให้อีกบัญชีตรวจจนผ่าน | วนจนผู้ตรวจตอบ `APPROVED` หรือครบ `max_rounds` |
 | board | agent ที่มาทีหลังควรรู้สิ่งที่ทีมค้นพบแล้ว | ทุก agent อ่าน `board.md` ก่อนเริ่ม และเพิ่มข้อค้นพบต่อท้าย |
 
-ข้อมูลยาวส่งเป็น **path ของไฟล์** ไม่ยัดลง prompt ผลของทุกงานอยู่ในโฟลเดอร์ของ run (`/workspace/.agent-team/<run_id>/`) ซึ่ง map ออกมาบนเครื่องเรา
+ข้อมูลยาวส่งเป็น **path ของไฟล์** ไม่ยัดลง prompt ผลของทุกงานอยู่ในโฟลเดอร์ของ run (`/workspace/.agent-team/<run_id>/`) ซึ่งบนเครื่องเราคือ `03_MultiAccount_Container/workspace/.agent-team/<run_id>/`
 
 ### 3.2 รูปแบบขั้นสูง
 
@@ -191,12 +190,28 @@ skills/
 
 | ขั้น | ทำที่ไหน | เวลารันจริง |
 |---|---|---|
+| **0 · ตรวจว่ามี image และ container จากบท 03** | Claude Code app | – |
 | **1 · ให้ Claude สร้างสกิลจากสเปก (จากศูนย์)** | Claude Code app | ~43 นาที |
 | **2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์** | Claude Code app (หรือลากวางใน JupyterLab) | 67.9 วินาที |
 | **3 · ทดสอบงานทีมชุดเดิมอีกครั้ง** | Claude Code app | 170.5 วินาที |
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | 138.6 วินาที (run 69 วินาที) |
 
-**ต้องมีก่อน:** container `multi-account` จาก[บทก่อนหน้า](../03_MultiAccount_Container/README.md) กำลังรัน และล็อกอินอย่างน้อย 1 บัญชี Claude และ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
+> [!CAUTION]
+> **ไม่มี image `multi-account:1.0` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี ให้กลับไป[ทำบท 03](../03_MultiAccount_Container/README.md) ก่อน
+
+**ต้องมีก่อน:** image `multi-account:1.0` · container `multi-account` กำลังรัน · ล็อกอินอย่างน้อย 1 บัญชี Claude กับ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
+
+บทนี้ใช้ค่าต่อไปนี้จากบท 03 โดยตรง
+
+| ค่า | ชื่อ | ใช้ในบทนี้ |
+|---|---|---|
+| image | `multi-account:1.0` | ต้นแบบของ container |
+| container | `multi-account` | ทุกคำสั่ง `docker exec` และ `docker cp` |
+| volume | `ai-accounts` → `/root/ai-accounts` | ล็อกอินทุกบัญชี และ `shared/skills` |
+| โฟลเดอร์งาน | `03_MultiAccount_Container/workspace` → `/workspace` | ผลงานและข้อมูลของทุก run |
+| JupyterLab | `http://localhost:8886/lab` | ลากวางสกิลในขั้นที่ 2 (ถ้าบท 03 ใช้ port อื่น ให้เปลี่ยน `8886`) |
+
+สกิลและพรอมต์ระบุชื่อ `multi-account` ไว้ตายตัว จึงต้องใช้ container ที่ build ในบท 03 ส่วน `/maccount` สร้าง container ชื่อ `multi-account-devtool` ซึ่งชื่อไม่ตรง
 
 **เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `04_MultiAccount_Skill` ของรีโปนี้
 
@@ -209,6 +224,31 @@ skills/
     ├── TEST-REPORT.md     ← รายงานทดสอบของขั้นที่ 1
     └── BENCHMARK.md       ← ผลวัด: สกิลจากศูนย์เทียบกับสกิลชุดเดิม
 ```
+
+## ขั้นที่ 0 · ตรวจว่ามี image และ container จากบท 03
+
+ทำขั้นนี้ก่อนทุกครั้ง ผ่านครบแล้วจึงไปขั้นที่ 1
+
+![ด่านตรวจก่อนเริ่มบท 04: บท 03 docker build ได้ image multi-account:1.0 ด่านที่ 1 มี image หรือไม่ ถ้าไม่มีหยุด เริ่มบท 04 ไม่ได้ กลับไปขั้นที่ 1 ของบท 03 ด่านที่ 2 container รันอยู่หรือไม่ ถ้าไม่ กลับไปขั้นที่ 2 ด่านที่ 3 ล็อกอินแล้วหรือไม่ ถ้าไม่ กลับไปขั้นที่ 3 ผ่านครบจึงเริ่มบท 04](img/concept-13-image-prerequisite.png)
+
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ตรวจความพร้อมก่อนเริ่มบท 04 ตรวจอย่างเดียว ห้าม build สร้าง ลบ หยุด หรือแก้ container / image / volume และห้ามล็อกอินแทนผม
+> 1. มี image multi-account:1.0 หรือไม่ (docker image inspect) ถ้าไม่มี ให้หยุดทันทีและบอกว่าต้องกลับไปทำบท 03 ก่อน
+> 2. container multi-account กำลังรันและสร้างจาก image multi-account:1.0 หรือไม่
+> 3. volume ai-accounts ต่ออยู่ที่ /root/ai-accounts และ /workspace ต่อกับโฟลเดอร์ใดบนเครื่องผม
+> 4. สถานะล็อกอิน yolo1..5 (yoloN auth status ดูแค่ loggedIn) และ cyolo1..5 (cyoloN login status) ห้ามแสดงอีเมล องค์กร หรือ token
+> สรุปเป็นตาราง รายการ | ผล | สิ่งที่ต้องทำต่อ แล้วหยุด
+> ```
+
+| ผลที่ได้ | ทำต่อ |
+|---|---|
+| **ไม่มี image `multi-account:1.0`** | **หยุด** กลับไปทำ[ขั้นที่ 1 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-1--ให้-claude-สร้าง-image-30-นาที) แล้วทำขั้นถัดไปของบท 03 ต่อ |
+| มี image แต่ไม่มี container หรือ container ไม่ได้รัน | ทำ[ขั้นที่ 2 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-2--สร้าง-container-จาก-image-1-นาที) |
+| ยังไม่มีบัญชี Claude หรือ Codex ที่ล็อกอิน | ทำ[ขั้นที่ 3 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-3--ล็อกอินและให้-claude-ตรวจสถานะ-15-นาที) |
+| ผ่านครบ | ไปขั้นที่ 1 |
 
 ## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก (~43 นาที)
 
@@ -241,20 +281,23 @@ Claude สร้างสกิล**จากศูนย์** ไม่มี�
 
 ![ภาพเคลื่อนไหว: วางพรอมต์สร้างสกิลใน Claude Code app, Claude อ่านสเปกและ hint เขียน skills/yolo cyolo agent-team จากศูนย์ คัดลอกเข้า container ทดสอบทุกรูปแบบ รวมถึงทดสอบแบบผู้ใช้จริง แล้วเขียน TEST-REPORT.md](img/desktop-step1-build.gif)
 
-```text
-ช่วยสร้างสกิลชุดใหม่ที่ทำให้ AI ใช้ระบบหลายบัญชีใน container multi-account ได้เต็มประสิทธิภาพ
-ทำในโฟลเดอร์นี้ ใช้คำสั่ง docker ได้ แต่ห้ามลบ หยุด หรือสร้าง container / volume ใหม่ ห้ามแตะ credential และห้ามล็อกอินแทนผม
-
-วัตถุดิบ
-- ./prompt_skill_spec.md = สเปกของสกิล 3 ตัว (yolo, cyolo, agent-team) ทุกข้อต้องเป็นจริง
-- ./prompt_skill_hints.md = ข้อเท็จจริงที่วัดมาแล้วและกับดักที่พบจากการใช้งานจริง ใช้แทนการลองผิดลองถูก
-- container multi-account ที่กำลังรัน = ที่ทดสอบจริง (บัญชีที่พร้อมอาจมีไม่ครบ ให้ตรวจเอง)
-
-สร้างจากศูนย์ไว้ใน ./skills (นอก container นี่คือต้นฉบับที่เก็บสำรอง)
-ทดสอบ: คัดลอกโฟลเดอร์สกิลใน ./skills ไปวางที่ shared ของทั้งสองฝั่งใน container แล้วทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
-ใช้บัญชีอย่างประหยัด (haiku/low กับงานทดสอบ) ข้อที่ต้องใช้บัญชีที่ไม่พร้อม = SKIP
-เขียน ./TEST-REPORT.md (นอกโฟลเดอร์ skills) แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และเวลาที่ใช้ แล้วหยุด
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ช่วยสร้างสกิลชุดใหม่ที่ทำให้ AI ใช้ระบบหลายบัญชีใน container multi-account ได้เต็มประสิทธิภาพ
+> ทำในโฟลเดอร์นี้ ใช้คำสั่ง docker ได้ แต่ห้ามลบ หยุด หรือสร้าง container / volume ใหม่ ห้ามแตะ credential และห้ามล็อกอินแทนผม
+>
+> วัตถุดิบ
+> - ./prompt_skill_spec.md = สเปกของสกิล 3 ตัว (yolo, cyolo, agent-team) ทุกข้อต้องเป็นจริง
+> - ./prompt_skill_hints.md = ข้อเท็จจริงที่วัดมาแล้วและกับดักที่พบจากการใช้งานจริง ใช้แทนการลองผิดลองถูก
+> - container multi-account ที่กำลังรัน = ที่ทดสอบจริง (บัญชีที่พร้อมอาจมีไม่ครบ ให้ตรวจเอง)
+>
+> สร้างจากศูนย์ไว้ใน ./skills (นอก container นี่คือต้นฉบับที่เก็บสำรอง)
+> ทดสอบ: คัดลอกโฟลเดอร์สกิลใน ./skills ไปวางที่ shared ของทั้งสองฝั่งใน container แล้วทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
+> ใช้บัญชีอย่างประหยัด (haiku/low กับงานทดสอบ) ข้อที่ต้องใช้บัญชีที่ไม่พร้อม = SKIP
+> เขียน ./TEST-REPORT.md (นอกโฟลเดอร์ skills) แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และเวลาที่ใช้ แล้วหยุด
+> ```
 
 **หลักการออกแบบพรอมต์**
 
@@ -299,13 +342,16 @@ Claude สร้างสกิล**จากศูนย์** ไม่มี�
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude ใช้ docker cp คัดลอก 3 โฟลเดอร์ลงทั้งสองฝั่ง เปิดแต่ละบัญชีด้วย --version ตรวจทุกบัญชีและ team.py check](img/desktop-step2-install.gif)
 
-```text
-ติดตั้งสกิลจาก ./skills ลง container multi-account ด้วยการคัดลอกโฟลเดอร์อย่างเดียว
-- คัดลอกโฟลเดอร์ yolo, cyolo และ agent-team ใน ./skills ไปวางที่ /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ใน container
-- เปิดแต่ละบัญชีหนึ่งครั้งด้วย yoloN --version และ cyoloN --version (wrapper จะเชื่อมสกิลให้แต่ละบัญชีเอง)
-- ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็น SKILL.md ของทั้ง 3 สกิล และตรวจความพร้อมด้วยคำสั่ง check ของสกิล agent-team
-สรุปเป็นตาราง สกิล | ฝั่ง Claude | ฝั่ง Codex แล้วหยุด
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ติดตั้งสกิลจาก ./skills ลง container multi-account ด้วยการคัดลอกโฟลเดอร์อย่างเดียว
+> - คัดลอกโฟลเดอร์ yolo, cyolo และ agent-team ใน ./skills ไปวางที่ /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ใน container
+> - เปิดแต่ละบัญชีหนึ่งครั้งด้วย yoloN --version และ cyoloN --version (wrapper จะเชื่อมสกิลให้แต่ละบัญชีเอง)
+> - ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็น SKILL.md ของทั้ง 3 สกิล และตรวจความพร้อมด้วยคำสั่ง check ของสกิล agent-team
+> สรุปเป็นตาราง สกิล | ฝั่ง Claude | ฝั่ง Codex แล้วหยุด
+> ```
 
 ![ผลจริงจาก Claude Code app: คัดลอกด้วย docker cp 6 ครั้ง ทั้ง 10 บัญชีตอบ --version ปกติ wrapper สร้างลิงก์รายสกิลให้ฝั่ง Codex ทุกบัญชีเห็น SKILL.md ของทั้ง 3 สกิล และ team.py check แยกสถานะบัญชี](img/desktop-step2-result.png)
 
@@ -339,6 +385,20 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 เปิด Claude Code app (โฟลเดอร์ `04_MultiAccount_Skill`) แล้ววางพรอมต์งานทีม**ชุดเดียวกับหัวข้อ 1.1 ทุกตัวอักษร** ต่างกันแค่ตอนนี้ใน container มีสกิลแล้ว
 
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ใช้ทีมเอเจนต์ใน container multi-account ทำงานต่อไปนี้ ทำงานใน container ผ่าน docker exec เท่านั้น (บัญชี yolo1–5 และ cyolo1–5 ใช้เฉพาะบัญชีที่พร้อม)
+> ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
+> โฟลเดอร์งานใน container: /workspace/team-demo
+> 1. ให้บัญชี Claude 1 บัญชี และบัญชี Codex 1 บัญชี เขียนฟังก์ชัน Python parse_duration(text) ที่แปลง "1h30m", "45s", "2h" เป็นจำนวนวินาที คนละแบบพร้อมกัน บันทึกเป็น a_claude.py และ a_codex.py
+> 2. ส่งทั้งสองไฟล์ให้บัญชี Codex อีกบัญชีหนึ่งเลือกแบบที่ดีกว่าและบอกจุดที่ต้องแก้
+> 3. ส่งคำแนะนำนั้นให้บัญชี Claude แก้เป็น final.py แล้วรันทดสอบ 5 กรณี
+> 4. สรุปตาราง บัญชี | งาน | เวลา (วินาที) | input tokens | output tokens | สำเร็จ/ล้ม ตัวเลขต้องมาจากผลจริงของแต่ละบัญชี ห้ามประมาณ
+> 5. บอกโควตาที่เหลือของแต่ละบัญชีที่ใช้
+> ```
+
 ![ภาพเคลื่อนไหว: วางพรอมต์ชุดเดิมใน Claude Code app, Claude ตรวจโฟลเดอร์สกิลใน container เจอ agent-team อ่าน SKILL.md ใช้ team.py check เขียน graph.json แล้วสั่ง team.py run ได้ตารางสรุปและโควตาในคำสั่งเดียว](img/desktop-team-after.gif)
 
 **ผลจริง:** Claude Code app ตรวจโฟลเดอร์สกิลตามบรรทัด "ก่อนเริ่ม…" แล้ว**เจอ `agent-team`** อ่านแค่ `SKILL.md` (ไม่ต้องเปิด `references/`) ใช้ `team.py check` ตรวจบัญชี เขียน `graph.json` ของงาน 4 ขั้น แล้วสั่ง `team.py run` ผ่าน `docker exec` ครั้งเดียวได้ทั้งผลงาน ตารางสถิติจาก ledger และโควตา ก่อนตอบยังรันชุดทดสอบซ้ำเองและดึงโควตา Codex ใหม่ด้วย `quota --refresh`
@@ -366,15 +426,18 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 ![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude อ่านสกิล agent-team แล้วสั่ง team.py lead คำสั่งเดียวพร้อม --simulate-crash yolo2, งบหัวหน้า yolo1=1 และงบลูกทีม cyolo2=1 ได้ yolo2 ล้ม สลับเชิงรับไป yolo1 แล้ว yolo1 เกินงบ สลับเชิงรุกไป cyolo1 และงาน t8 ย้ายจาก cyolo2 ไป cyolo1](img/desktop-step4-lead.gif)
 
-```text
-ใช้ทีมเอเจนต์ใน container multi-account ทดลองการสลับหัวหน้าทีมและการบริหารโทเค็นของลูกทีม
-งานของทีม: สร้างตารางสูตรคูณแม่ 2 ถึงแม่ 9 แบ่งให้ลูกทีมทำคนละแม่ แล้วรวมเป็นไฟล์เดียว /workspace/demo/table.md
-- ใช้คำสั่ง lead ของสกิล agent-team งานทุกชิ้นใช้ความยาก 1
-- ตั้งงบโทเค็นของหัวหน้าให้ต่ำ เพื่อให้เกิดการสลับหัวหน้าแบบเชิงรุกอย่างน้อย 1 ครั้ง
-- จำลองให้หัวหน้าคนหนึ่งล้มกลางคัน เพื่อดูการสลับแบบเชิงรับ
-- ตั้งงบโทเค็นของลูกทีมคนหนึ่งให้ต่ำ เพื่อดูการย้ายงานไปลูกทีมคนอื่น
-สรุปเป็นตาราง: ประวัติการสลับหัวหน้า (จากใคร ไปใคร เพราะอะไร) การย้ายงานของลูกทีม ผลงานครบหรือไม่ และสถิติแยกตามบัญชี
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
+>
+> ```text
+> ใช้ทีมเอเจนต์ใน container multi-account ทดลองการสลับหัวหน้าทีมและการบริหารโทเค็นของลูกทีม
+> งานของทีม: สร้างตารางสูตรคูณแม่ 2 ถึงแม่ 9 แบ่งให้ลูกทีมทำคนละแม่ แล้วรวมเป็นไฟล์เดียว /workspace/demo/table.md
+> - ใช้คำสั่ง lead ของสกิล agent-team งานทุกชิ้นใช้ความยาก 1
+> - ตั้งงบโทเค็นของหัวหน้าให้ต่ำ เพื่อให้เกิดการสลับหัวหน้าแบบเชิงรุกอย่างน้อย 1 ครั้ง
+> - จำลองให้หัวหน้าคนหนึ่งล้มกลางคัน เพื่อดูการสลับแบบเชิงรับ
+> - ตั้งงบโทเค็นของลูกทีมคนหนึ่งให้ต่ำ เพื่อดูการย้ายงานไปลูกทีมคนอื่น
+> สรุปเป็นตาราง: ประวัติการสลับหัวหน้า (จากใคร ไปใคร เพราะอะไร) การย้ายงานของลูกทีม ผลงานครบหรือไม่ และสถิติแยกตามบัญชี
+> ```
 
 **ผลจริง** (app 138.6 วินาที · 10 คำสั่ง · run 69 วินาที · 11 การเรียก): ตารางสูตรคูณครบ 8 แม่ 96 แถว ถูกทุกแถว app ใช้ `lead` คำสั่งเดียวโดยไม่ต้องเปิดโค้ดของสกิล
 
@@ -388,7 +451,7 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 *ผลจริง ตัดรายชื่อบัญชีที่ล็อกอินบนเครื่องผู้สอนออก · งบที่ตั้งต่ำเพียง 1 โทเค็นทำหน้าที่เป็นสวิตช์จำลอง การใช้งานจริงให้ตั้งงบตามโควตาของบัญชี หรือใช้เกณฑ์โควตา 80% ที่เป็นค่าเริ่มต้น · ตัวเลขถูกครบ แต่รูปแบบหัวข้อของแต่ละแม่ไม่เหมือนกัน เพราะพรอมต์ไม่ได้กำหนดรูปแบบ*
 
-ไฟล์ของ run นี้ (`state.json`, `handoff.md`, `board.md`, `ledger.jsonl`) อยู่ใน `workspace/.agent-team/<run_id>/` บนเครื่องเรา เปิด `handoff.md` เพื่อดูใบส่งเวรที่หัวหน้าแต่ละคนเขียนให้คนถัดไป
+ไฟล์ของ run นี้ (`state.json`, `handoff.md`, `board.md`, `ledger.jsonl`) อยู่ใน `03_MultiAccount_Container/workspace/.agent-team/<run_id>/` บนเครื่องเรา เปิด `handoff.md` เพื่อดูใบส่งเวรที่หัวหน้าแต่ละคนเขียนให้คนถัดไป
 
 ## สรุป
 
