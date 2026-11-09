@@ -32,6 +32,10 @@
 
 ![ก่อนมีสกิล งานทีม 4 ขั้น: Claude Code app บน host สั่งผ่าน docker exec เข้า container multi-account ขั้นที่ 1 บัญชี Claude และ Codex เขียน parse_duration พร้อมกันเป็น a_claude.py และ a_codex.py ขั้นที่ 2 บัญชี Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ ขั้นที่ 3 บัญชี Claude แก้เป็น final.py และทดสอบ 5 กรณี ขั้นที่ 4 Claude Code app สรุปตารางบัญชี เวลา tokens และโควตาจากผลจริง](img/concept-12-team-task.png)
 
+หลังกด Enter พรอมต์จะทำงานตามลำดับนี้: เข้า container ด้วย `docker exec` → หาสกิลตาม path ที่กำหนด → สร้างโฟลเดอร์ทำงาน `/workspace/team-demo` → ให้แต่ละบัญชีทำงานจริง รอบนี้ยังไม่มีสกิลใน path จึงต้องหาวิธีเอง ส่วนในขั้นที่ 3 จะพบสกิลแล้วอ่านมาใช้
+
+![พรอมต์ทีมเอเจนต์ทำงานอย่างไร: 1 เข้า container จาก Claude Code app ด้วย docker exec multi-account 2 หาสกิลตาม path /root/ai-accounts/.Claude/shared/skills ถ้ามีสกิลก็อ่านแล้วใช้ 3 สร้างโฟลเดอร์ทำงาน /workspace/team-demo 4 ทดลองให้แต่ละบัญชีทำงานจริง Claude และ Codex เขียน a_claude.py กับ a_codex.py Codex อีกบัญชีตรวจเลือก Claude แก้เป็น final.py และทดสอบ 5 กรณี แล้วได้ตารางผลจริง เวลา tokens และโควตา](img/concept-15-team-prompt-pipeline.png)
+
 บรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" ใส่ไว้ทั้งรอบก่อนและหลังมีสกิล เพื่อให้เทียบกันได้ยุติธรรม และเป็นวิธีที่ทำให้ Claude Code app รู้จักสกิลใน container
 
 > [!IMPORTANT]
@@ -197,7 +201,7 @@ skills/
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | 138.6 วินาที (run 69 วินาที) |
 
 > [!CAUTION]
-> **ไม่มี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี ให้เลือก 1 ใน 2 วิธีใน[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-แล้วเปิด-container)
+> **ไม่มี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี พรอมต์ใน[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-แล้วเปิด-container) จะดึงจาก Docker Hub ให้
 
 **ต้องมีก่อน:** image `multi-account:1.0` หรือ `tuchsanai/multi-account:1`
 
@@ -227,46 +231,38 @@ skills/
 
 ## ขั้นที่ 0 · ตรวจว่ามี image แล้วเปิด container
 
-บทนี้เริ่มจากคำถามเดียว: **มี image หรือไม่**
+บทนี้เริ่มจากคำถามเดียว: **มี image หรือไม่** พรอมต์นี้ทำงานได้ 2 โหมด
 
-![ก่อนเริ่มบท 04: มี image multi-account:1.0 หรือ tuchsanai/multi-account:1 หรือไม่ ถ้ามี เปิด container จาก image ด้วย docker run แล้วเริ่มบท 04 ถ้าไม่มี เลือก 1 วิธี วิธีที่ 1 build เองตามขั้นที่ 1 ของบท 03 วิธีที่ 2 docker pull tuchsanai/multi-account:1 จาก Docker Hub](img/concept-13-image-prerequisite.png)
+| โหมด | เงื่อนไข | สิ่งที่พรอมต์ทำ |
+|---|---|---|
+| **มี image** | มี `multi-account:1.0` หรือ `tuchsanai/multi-account:1` ในเครื่อง | ใช้ตัวที่มี แล้วเปิด container |
+| **ไม่มี image** | ไม่มีทั้งสองตัว | `docker pull tuchsanai/multi-account:1` (image สำเร็จรูปของผู้สอน) แล้วเปิด container |
 
-### มี image: เปิด container
+![ขั้นที่ 0 วางพรอมต์แล้วกด Enter: นักศึกษากด Enter ใน Claude Code app แล้ว 1 ตรวจว่ามี image multi-account:1.0 หรือ tuchsanai/multi-account:1 2 เปิด container ด้วย docker run 3 สรุปผลเป็นตาราง JupyterLab และสถานะล็อกอิน ถ้าไม่มี image Claude จะ docker pull tuchsanai/multi-account:1 ให้](img/concept-13-image-prerequisite.png)
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
 > ```text
-> ตรวจ image แล้วเปิด container สำหรับบท 04 ห้ามลบ container / image / volume ที่มีอยู่ และห้ามล็อกอินแทนผม
-> 1. มี image multi-account:1.0 หรือ tuchsanai/multi-account:1 อย่างน้อย 1 ตัวหรือไม่ (docker image inspect)
->    ถ้าไม่มีทั้งสองตัว ให้หยุดทันทีและบอกว่าต้อง build จากบท 03 หรือ docker pull tuchsanai/multi-account:1 ก่อน
->    ถ้ามีเฉพาะ tuchsanai/multi-account:1 ให้สั่ง docker tag tuchsanai/multi-account:1 multi-account:1.0
+> เตรียม image แล้วเปิด container สำหรับบท 04 ห้ามลบ container / image / volume ที่มีอยู่ และห้ามล็อกอินแทนผม
+> 1. ตรวจว่ามี image multi-account:1.0 หรือ tuchsanai/multi-account:1 ในเครื่องหรือไม่ (docker image inspect)
+>    - โหมดมี image: ใช้ตัวที่มี
+>    - โหมดไม่มี image (ไม่มีทั้งสองตัว): docker pull tuchsanai/multi-account:1
+>    จากนั้นถ้ายังไม่มีชื่อ multi-account:1.0 ให้สั่ง docker tag tuchsanai/multi-account:1 multi-account:1.0
 > 2. ถ้า container multi-account กำลังรันอยู่แล้ว ใช้ตัวเดิม ถ้าหยุดอยู่ให้ docker start ถ้ายังไม่มีให้สร้างด้วย
 >    docker run -dit --name multi-account --privileged -p <PORT>:8888 -v ai-accounts:/root/ai-accounts -v <path เต็มของ ../03_MultiAccount_Container/workspace>:/workspace multi-account:1.0
 >    PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป และสร้างโฟลเดอร์ workspace ถ้ายังไม่มี
 > 3. รอจน http://localhost:<PORT>/lab ตอบ 200 แล้วดูสถานะล็อกอิน yolo1..5 (yoloN auth status ดูแค่ loggedIn) และ cyolo1..5 (cyoloN login status) ห้ามแสดงอีเมล องค์กร หรือ token
-> สรุปเป็นตาราง image | container | URL ของ JupyterLab | บัญชี | ล็อกอินแล้ว/ยัง แล้วหยุด
+> สรุปเป็นตาราง โหมดที่ใช้ (มี image / pull) | image | container | URL ของ JupyterLab | บัญชี | ล็อกอินแล้ว/ยัง แล้วหยุด
 > ```
+
+จบขั้นนี้แล้ว ทุกส่วนจะเชื่อมกันตามภาพนี้
+
+![ภาพรวมขั้นที่ 0: มี image ใช้ตัวที่มี หรือไม่มี image ให้ docker pull ได้ image multi-account:1.0 แล้ว docker run เป็น container multi-account Claude Code app สั่งงานเข้า container เปิด JupyterLab ที่ port 8886 เชื่อม volume ai-accounts ที่เก็บล็อกอินและสกิล และ /workspace ที่เก็บไฟล์งาน](img/concept-14-step0-overview.png)
 
 ขั้นถัดไปใช้บัญชีจริง ถ้ายังไม่ได้ล็อกอิน ให้ล็อกอินอย่างน้อย 1 บัญชี Claude กับ 1 บัญชี Codex ตาม[ขั้นที่ 3 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-3--ล็อกอินและให้-claude-ตรวจสถานะ-15-นาที)
 
-### ไม่มี image: เลือก 1 ใน 2 วิธี
-
-| วิธี | ทำอย่างไร | เหมาะกับ |
-|---|---|---|
-| **1 · build เอง** | ทำ[ขั้นที่ 1 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-1--ให้-claude-สร้าง-image-30-นาที) (~30 นาที) | อยากเข้าใจและควบคุมสิ่งที่อยู่ใน image |
-| **2 · ดึงจาก Docker Hub** | วางพรอมต์ในกล่องด้านล่าง | ต้องการเริ่มบทนี้เร็ว ไม่ต้อง build |
-
-> [!IMPORTANT]
-> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
->
-> ```text
-> ดึง image สำเร็จรูปจาก Docker Hub ห้ามลบ หยุด หรือแก้ container / image / volume ที่มีอยู่
-> 1. docker pull tuchsanai/multi-account:1
-> 2. ยืนยันด้วย docker image inspect tuchsanai/multi-account:1 แล้วสรุปขนาด image และเวลาที่ใช้ แล้วหยุด
-> ```
-
-ได้ image แล้ว กลับไปวางพรอมต์ในหัวข้อ "มี image: เปิด container"
+ถ้าต้องการ build image เอง ให้ทำ[ขั้นที่ 1 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-1--ให้-claude-สร้าง-image-30-นาที) ก่อนเริ่มขั้นนี้
 
 ## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก (~43 นาที)
 
