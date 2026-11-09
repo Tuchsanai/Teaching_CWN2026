@@ -230,6 +230,10 @@ MultiAccountDevtool/
 
 ![ภาพเคลื่อนไหว: วางพรอมต์เปิด container ใน Claude Code app แล้ว Claude docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน](img/desktop-step2-run.gif)
 
+เปิด Docker Desktop หน้า **Containers** แล้วค้นหา `multi-account` จะเห็น container ที่เพิ่งสร้าง
+
+![ภาพจริงจาก Docker Desktop: ค้นหา multi-account เหลือ 1 รายการ จุดสีเขียวกำลังทำงาน สร้างจาก image multi-account:1.0 port 8886:8888](img/docker-desktop-multi-account.png)
+
 **ผลจริง** (~1 นาที): JupyterLab ตอบ 200 ใน **1.96 วินาที** หลังสั่ง `docker run` คำสั่งครบ 10 ตัว และ `cyolo1 mcp list` แสดง `playwright` ทันที เนื่องจากโปรแกรมทั้งหมดอยู่ใน image แล้ว
 
 ![ผลจริงจาก Claude: container multi-account พร้อมใน 1.96 วินาที ตารางเวอร์ชันและสถานะล็อกอิน 10 บัญชี และ cyolo1 mcp list](img/desktop-step2-result.png)
