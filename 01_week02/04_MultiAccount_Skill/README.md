@@ -5,7 +5,7 @@
 ใช้ container `multi-account` จาก [03_MultiAccount_Container](../03_MultiAccount_Container/README.md) สร้างสกิลให้ AI สั่ง `yolo1–5` และ `cyolo1–5` เป็นทีม พร้อมสถิติของทุกบัญชี
 
 > [!CAUTION]
-> **ต้องมี image `multi-account:1.0` ก่อน** ถ้าไม่มี image นี้ จะทำบทนี้ไม่ได้เลย ให้ build จาก[บท 03](../03_MultiAccount_Container/README.md) หรือดึงจาก Docker Hub ตาม[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-และ-container-จากบท-03)
+> **ต้องมี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` ก่อน** ถ้าไม่มีทั้งสองตัว จะทำบทนี้ไม่ได้เลย ให้ build จาก[บท 03](../03_MultiAccount_Container/README.md) หรือดึงจาก Docker Hub ตาม[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-และ-container-จากบท-03)
 
 ## 1. ปัญหา: มีคำสั่งครบ แต่ AI ยังใช้ไม่เป็น
 
@@ -197,15 +197,15 @@ skills/
 | **4 · สลับหัวหน้าทีมและบริหารโทเค็น** | Claude Code app | 138.6 วินาที (run 69 วินาที) |
 
 > [!CAUTION]
-> **ไม่มี image `multi-account:1.0` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี ให้เลือก 1 ใน 2 วิธีใน[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-และ-container-จากบท-03)
+> **ไม่มี image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` = เริ่มบทนี้ไม่ได้** ทุกขั้นทำงานใน container ที่สร้างจาก image นี้ ถ้ายังไม่มี ให้เลือก 1 ใน 2 วิธีใน[ขั้นที่ 0](#ขั้นที่-0--ตรวจว่ามี-image-และ-container-จากบท-03)
 
-**ต้องมีก่อน:** image `multi-account:1.0` · container `multi-account` กำลังรัน · ล็อกอินอย่างน้อย 1 บัญชี Claude กับ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
+**ต้องมีก่อน:** image `multi-account:1.0` หรือ `tuchsanai/multi-account:1` · container `multi-account` กำลังรัน · ล็อกอินอย่างน้อย 1 บัญชี Claude กับ 1 บัญชี Codex (ล็อกอินมากขึ้น ทีมก็ทำงานขนานได้มากขึ้น)
 
 บทนี้ใช้ค่าต่อไปนี้จากบท 03 โดยตรง
 
 | ค่า | ชื่อ | ใช้ในบทนี้ |
 |---|---|---|
-| image | `multi-account:1.0` | ต้นแบบของ container |
+| image | `multi-account:1.0` (ของ Docker Hub คือ `tuchsanai/multi-account:1`) | ต้นแบบของ container |
 | container | `multi-account` | ทุกคำสั่ง `docker exec` และ `docker cp` |
 | volume | `ai-accounts` → `/root/ai-accounts` | ล็อกอินทุกบัญชี และ `shared/skills` |
 | โฟลเดอร์งาน | `03_MultiAccount_Container/workspace` → `/workspace` | ผลงานและข้อมูลของทุก run |
@@ -229,14 +229,16 @@ skills/
 
 ทำขั้นนี้ก่อนทุกครั้ง ผ่านครบแล้วจึงไปขั้นที่ 1
 
-![ด่านตรวจก่อนเริ่มบท 04: ด่านที่ 1 มี image multi-account:1.0 หรือไม่ ถ้าไม่มีจะเริ่มบท 04 ไม่ได้ ให้เลือกวิธีที่ 1 build เองตามขั้นที่ 1 ของบท 03 หรือวิธีที่ 2 docker pull tuchsanai/multi-account:1 จาก Docker Hub แล้ว docker tag เป็น multi-account:1.0 ด่านที่ 2 container รันอยู่หรือไม่ ด่านที่ 3 ล็อกอินแล้วหรือไม่ ผ่านครบจึงเริ่มบท 04](img/concept-13-image-prerequisite.png)
+![ด่านตรวจก่อนเริ่มบท 04: ด่านที่ 1 มี image multi-account:1.0 หรือ tuchsanai/multi-account:1 หรือไม่ ถ้าไม่มีทั้งสองตัวจะเริ่มบท 04 ไม่ได้ ให้เลือกวิธีที่ 1 build เองตามขั้นที่ 1 ของบท 03 หรือวิธีที่ 2 docker pull tuchsanai/multi-account:1 จาก Docker Hub ด่านที่ 2 container รันอยู่หรือไม่ ด่านที่ 3 ล็อกอินแล้วหรือไม่ ผ่านครบจึงเริ่มบท 04](img/concept-13-image-prerequisite.png)
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
 > ```text
-> ตรวจความพร้อมก่อนเริ่มบท 04 ตรวจอย่างเดียว ห้าม build สร้าง ลบ หยุด หรือแก้ container / image / volume และห้ามล็อกอินแทนผม
-> 1. มี image multi-account:1.0 หรือไม่ (docker image inspect) ถ้าไม่มี ให้หยุดทันทีและบอกว่าต้อง build จากบท 03 หรือดึง image สำเร็จรูปจาก Docker Hub ก่อน
+> ตรวจความพร้อมก่อนเริ่มบท 04 ตรวจอย่างเดียว ห้าม build สร้าง ลบ หยุด หรือแก้ container / image / volume และห้ามล็อกอินแทนผม (ยกเว้น docker tag ในข้อ 1)
+> 1. มี image multi-account:1.0 หรือ tuchsanai/multi-account:1 อย่างน้อย 1 ตัวหรือไม่ (docker image inspect)
+>    ถ้ามีเฉพาะ tuchsanai/multi-account:1 ให้สั่ง docker tag tuchsanai/multi-account:1 multi-account:1.0
+>    ถ้าไม่มีทั้งสองตัว ให้หยุดทันทีและบอกว่าต้อง build จากบท 03 หรือ docker pull tuchsanai/multi-account:1 ก่อน
 > 2. container multi-account กำลังรันและสร้างจาก image multi-account:1.0 หรือไม่
 > 3. volume ai-accounts ต่ออยู่ที่ /root/ai-accounts และ /workspace ต่อกับโฟลเดอร์ใดบนเครื่องผม
 > 4. สถานะล็อกอิน yolo1..5 (yoloN auth status ดูแค่ loggedIn) และ cyolo1..5 (cyoloN login status) ห้ามแสดงอีเมล องค์กร หรือ token
@@ -245,7 +247,7 @@ skills/
 
 | ผลที่ได้ | ทำต่อ |
 |---|---|
-| **ไม่มี image `multi-account:1.0`** | **หยุด** เลือก 1 ใน 2 วิธีด้านล่าง |
+| **ไม่มีทั้ง `multi-account:1.0` และ `tuchsanai/multi-account:1`** | **หยุด** เลือก 1 ใน 2 วิธีด้านล่าง |
 | มี image แต่ไม่มี container หรือ container ไม่ได้รัน | ทำ[ขั้นที่ 2 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-2--สร้าง-container-จาก-image-1-นาที) |
 | ยังไม่มีบัญชี Claude หรือ Codex ที่ล็อกอิน | ทำ[ขั้นที่ 3 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-3--ล็อกอินและให้-claude-ตรวจสถานะ-15-นาที) |
 | ผ่านครบ | ไปขั้นที่ 1 |
@@ -257,19 +259,18 @@ skills/
 | **1 · build เอง** | ทำ[ขั้นที่ 1 ของบท 03](../03_MultiAccount_Container/README.md#ขั้นที่-1--ให้-claude-สร้าง-image-30-นาที) (~30 นาที) | อยากเข้าใจและควบคุมสิ่งที่อยู่ใน image |
 | **2 · ดึงจาก Docker Hub** | วางพรอมต์ในกล่องด้านล่าง | ต้องการเริ่มบทนี้เร็ว ไม่ต้อง build |
 
-image สำเร็จรูปบน Docker Hub ชื่อ `tuchsanai/multi-account:1` จึงต้อง `docker tag` เป็น `multi-account:1.0` เพื่อให้ตรงกับบทเรียน
+image สำเร็จรูปของผู้สอนอยู่บน Docker Hub ชื่อ `tuchsanai/multi-account:1` เป็นโปรแกรมชุดเดียวกับที่ build ในบท 03
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
 > ```text
-> ดึง image สำเร็จรูปแล้วตั้งชื่อให้ตรงบทเรียน ห้ามลบ หยุด หรือแก้ container / image / volume ที่มีอยู่
+> ดึง image สำเร็จรูปจาก Docker Hub ห้ามลบ หยุด หรือแก้ container / image / volume ที่มีอยู่
 > 1. docker pull tuchsanai/multi-account:1
-> 2. docker tag tuchsanai/multi-account:1 multi-account:1.0
-> 3. ยืนยันด้วย docker image inspect multi-account:1.0 แล้วสรุปขนาด image และเวลาที่ใช้ แล้วหยุด
+> 2. ยืนยันด้วย docker image inspect tuchsanai/multi-account:1 แล้วสรุปขนาด image และเวลาที่ใช้ แล้วหยุด
 > ```
 
-ได้ image แล้วทำ[ขั้นที่ 2](../03_MultiAccount_Container/README.md#ขั้นที่-2--สร้าง-container-จาก-image-1-นาที) และขั้นที่ 3 ของบท 03 ต่อ แล้วกลับมารันพรอมต์ตรวจความพร้อมด้านบนอีกครั้ง
+ได้ image แล้ว รันพรอมต์ตรวจความพร้อมด้านบนอีกครั้ง พรอมต์จะตั้งชื่อ image ให้ตรงบทเรียน แล้วทำต่อตามตารางผล
 
 ## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก (~43 นาที)
 
