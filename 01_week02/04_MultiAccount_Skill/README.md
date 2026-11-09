@@ -10,7 +10,7 @@
 
 มาดูกันว่าถ้ายังไม่มีสกิล Claude Code app จะสั่งทีมได้แค่ไหน พรอมต์นี้เตรียม image และ container ให้เองด้วย ถ้าเครื่องยังไม่มี image จะดึงจาก Docker Hub ให้
 
-![พรอมต์ทีมเอเจนต์ทำงานอย่างไร: 1 เข้า container จาก Claude Code app ด้วย docker exec multi-account 2 หาสกิลตาม path /root/ai-accounts/.Claude/shared/skills ถ้ามีสกิลก็อ่านแล้วใช้ 3 สร้างโฟลเดอร์ทำงาน /workspace/team-demo 4 ทดลองให้แต่ละบัญชีทำงานจริง Claude และ Codex เขียน a_claude.py กับ a_codex.py Codex อีกบัญชีตรวจเลือก Claude แก้เป็น final.py และทดสอบ 5 กรณี แล้วได้ตารางผลจริง เวลา tokens และโควตา](img/concept-15-team-prompt-pipeline.png)
+![พรอมต์ทีมเอเจนต์ทำงานอย่างไร: 1 เข้า container จาก Claude Code app ด้วย docker exec multi-account 2 หาสกิลตาม path /root/ai-accounts/.Claude/shared/skills ถ้ามีสกิลก็อ่านแล้วใช้ 3 สร้างโฟลเดอร์ทำงาน /workspace/team-demo 4 ทดลองให้แต่ละบัญชีทำงานจริงแบบ fan-out และ fan-in โจทย์ parse_duration แตกให้ Claude เขียน a_claude.py และ Codex เขียน a_codex.py พร้อมกัน แล้วรวมผลให้ Codex อีกบัญชีตรวจเลือกและบอกจุดที่ต้องแก้ จากนั้น Claude แก้เป็น final.py ทดสอบ 5 กรณี และได้ตารางผลจริง เวลา tokens โควตา](img/concept-15-team-prompt-pipeline.png)
 
 งานของทีมมี 4 ขั้น
 
