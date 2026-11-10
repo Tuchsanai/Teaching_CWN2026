@@ -242,23 +242,20 @@ pre.prompt{max-height:720px}
 <tr><td><b>Dockerfile</b><br><span class="muted small">ขั้นตอนการสร้าง image</span></td><td><code>MultiAccountDevtool/Dockerfile</code></td></tr>
 <tr><td><b>image</b><br><span class="muted small">ต้นแบบ อ่านอย่างเดียว</span></td><td><code>multi-account:1.0</code></td></tr>
 <tr><td><b>container</b><br><span class="muted small">ตัวที่ทำงานจริง</span></td><td><code>multi-account</code></td></tr>
-<tr><td><b>volume</b><br><span class="muted small">ข้อมูลคงอยู่แม้ลบ container</span></td><td><code>ai-accounts</code></td></tr>
-<tr><td><b>bind mount</b><br><span class="muted small">โฟลเดอร์บนเครื่อง</span></td><td><code>./workspace</code></td></tr></table></div></div></section>
+<tr><td><b>volume</b><br><span class="muted small">ข้อมูลคงอยู่แม้ลบ container</span></td><td><code>ai-accounts</code></td></tr></table></div></div></section>
 <section class="slide " data-title="2. สร้างครั้งเดียว ใช้ซ้ำได้ (GIF)"><div class="kicker">2 · องค์ประกอบของ Docker</div><h2>build ครั้งเดียว · run ได้ทุกเครื่อง</h2><div class="fig "><img src="img/gif-build-once.gif" alt=""></div><div class="cap">โปรแกรมชุดเดียวกันทุก container ส่วนข้อมูลล็อกอินเป็นของแต่ละเครื่อง เก็บใน volume</div></section>
 <section class="slide " data-title="2.1 โครงสร้างของ image"><div class="kicker">2.1 · โครงสร้างของ image</div><div class="row"><div class="col c3"><div class="fig "><img src="img/concept-03-image-layers.png" alt=""></div></div><div class="col c2 vc"><table style="font-size:20px">
 <tr><th>ส่วน</th><th>เมื่อลบ container</th></tr>
 <tr><td><b>ชั้นของ image</b> (4 ชั้น)<br><span class="muted small">โปรแกรมทั้งหมด</span></td><td><span class="pill gr">ยังอยู่</span></td></tr>
-<tr><td><b>container layer</b><br><span class="muted small">ไฟล์ระหว่างทำงาน</span></td><td><span class="pill rd">หายไป</span></td></tr>
-<tr><td><b>volume ai-accounts</b><br><span class="muted small">ล็อกอิน · skill · MCP</span></td><td><span class="pill gr">ยังอยู่</span></td></tr>
-<tr><td><b>./workspace</b><br><span class="muted small">ไฟล์งาน · หลักฐาน</span></td><td><span class="pill gr">ยังอยู่</span></td></tr></table>
+<tr><td><b>container layer</b><br><span class="muted small">ไฟล์งานใน /workspace · docker cp ออกก่อนลบ</span></td><td><span class="pill rd">หายไป</span></td></tr>
+<tr><td><b>volume ai-accounts</b><br><span class="muted small">ล็อกอิน · skill · MCP</span></td><td><span class="pill gr">ยังอยู่</span></td></tr></table>
 <div class="note info" style="margin-top:18px">image <b>ไม่มีข้อมูลล็อกอินอยู่ภายใน</b> จึงแชร์ให้ผู้อื่นได้โดยไม่เปิดเผยบัญชี</div></div></div></section>
 <section class="slide " data-title="3. ภาพรวมขั้นตอน"><div class="kicker">3 · ภาพรวมขั้นตอนการทดลอง</div><div class="row"><div class="col c3"><div class="fig "><img src="img/concept-04-lab-flow.png" alt=""></div></div><div class="col c2 vc"><table style="font-size:20px">
 <tr><th>ขั้น</th><th>ผู้ดำเนินการ</th><th>เวลา</th></tr>
 <tr><td><b>1</b> build image</td><td>Claude</td><td>~28 นาที</td></tr>
-<tr><td><b>2</b> สร้าง container</td><td>Claude</td><td>~1 นาที</td></tr>
-<tr><td><b>3</b> ล็อกอิน + ตรวจ</td><td>ผู้เรียน + Claude</td><td>~15 นาที</td></tr>
-<tr><td><b>4</b> ทดสอบแบบขนาน</td><td>Claude</td><td>~5 นาที</td></tr>
-<tr><td><b>5</b> ลบแล้วสร้างใหม่</td><td>Claude</td><td>~3 นาที</td></tr></table></div></div></section>
+<tr><td><b>2</b> สร้าง container + ล็อกอิน</td><td>Claude + ผู้เรียน</td><td>~1 + 15 นาที</td></tr>
+<tr><td><b>3</b> ทดสอบ Playwright MCP</td><td>Claude</td><td>~5 นาที</td></tr>
+</table></div></div></section>
 <section class="slide " data-title="3. ก่อนเริ่ม"><div class="kicker">3 · ก่อนเริ่ม</div><h2>ตรวจความพร้อมและเปิดโฟลเดอร์งาน</h2><div class="row"><div class="col vc"><div class="steps"><div class="step"><span class="num">1</span><p>Docker Desktop แสดง <b>Engine running</b></p></div><div class="step"><span class="num">2</span><p>Claude Code app ล็อกอินแล้ว</p></div><div class="step"><span class="num">3</span><p>พื้นที่ดิสก์ว่างอย่างน้อย ~10 GB<br><span class="small muted">image ~4.5 GB + build cache</span></p></div><div class="step"><span class="num">4</span><p><b>Code</b> → <b>New session</b> → เลือกโฟลเดอร์ <code>03_MultiAccount_Container</code></p></div></div></div><div class="col vc"><pre class="">03_MultiAccount_Container/
 ├── 00_Devtool_Container/     ← Dockerfile มาตรฐานของ devtools (input ที่ 1)
 ├── prompt_multi_account.md   ← สเปกระบบหลายบัญชี (input ที่ 2)
@@ -345,104 +342,95 @@ build ด้วย: docker build -t multi-account:1.0 ./MultiAccountDevtool
 ├── multi-account/           ← installer, wrapper ของ yoloN/cyoloN, ตัวแปลง MCP ให้ Codex
 ├── docker-compose.yml       ← ทางเลือก: build + run ด้วยคำสั่งเดียว
 └── setup-report.md · login-guide.md · checklist.md   ← รายงาน 3 ไฟล์ตามสเปก</pre><p class="cap" style="margin-top:14px">เก็บเป็นเฉลยไว้ที่ _solution/MultiAccountDevtool/</p></section>
-<section class="slide divider" data-title="ขั้นที่ 2"><div class="big">2</div><h1>สร้าง container จาก image</h1><p>image เป็นแม่แบบอ่านอย่างเดียว ต้อง <b>docker run</b> เป็น container ก่อนจึงใช้งานได้ (~1 นาที)</p></section>
+<section class="slide divider" data-title="ขั้นที่ 2"><div class="big">2</div><h1>สร้าง container จาก image แล้วล็อกอิน</h1><p>image เป็นแม่แบบอ่านอย่างเดียว ต้อง <b>docker run</b> เป็น container ก่อนจึงใช้งานได้ (~1 นาที + ล็อกอิน ~15 นาที)</p></section>
 <section class="slide " data-title="2 docker run"><div class="kicker">ขั้นที่ 2 · แนวคิด</div><h2>แต่ละ option กำหนดว่า container เชื่อมกับเครื่องเราอย่างไร</h2><div class="fig "><img src="img/concept-07-step2-run.png" alt=""></div></section>
-<section class="slide " data-title="2 พรอมต์ + GIF"><div class="kicker">ขั้นที่ 2 · 💻 Claude Code app</div><div class="row"><div class="col"><pre class="prompt"><button class="copy">คัดลอก</button>เปิด container multi-account จาก image multi-account:1.0 ที่เพิ่ง build
-- ถ้ามี container ชื่อนี้อยู่แล้ว ให้ลบแล้วสร้างใหม่ ห้ามลบ volume ai-accounts (เก็บล็อกอินทุกบัญชี)
-- โฟลเดอร์ ./workspace บนเครื่องผม (สร้างถ้ายังไม่มี) map เป็น /workspace งานจะได้ไม่หายเมื่อลบ container
-- docker run -dit --name multi-account --privileged -p &lt;PORT&gt;:8888 -v ai-accounts:/root/ai-accounts -v &lt;path เต็มของ ./workspace&gt;:/workspace multi-account:1.0
-  PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป
-- จับเวลาตั้งแต่สั่ง run จน http://localhost:&lt;PORT&gt;/lab ตอบ 200
-- ตรวจผ่าน docker exec: yolo1..5 และ cyolo1..5 --version, cyolo1 mcp list,
-  สถานะล็อกอิน (yoloN auth status ดูแค่ loggedIn / cyoloN login status) ห้ามแสดงอีเมลหรือ token
-สรุปเป็นตาราง พร้อม URL ของ JupyterLab และเวลาที่ใช้</pre></div><div class="col"><div class="fig "><img src="img/desktop-step2-run.gif" alt=""></div></div></div></section>
+<section class="slide " data-title="2 พรอมต์"><div class="kicker">ขั้นที่ 2 · พรอมต์ (คัดลอกทั้งกรอบ) · ไม่ได้ทำขั้นที่ 1 ก็ใช้ได้ เพราะจะ pull image ของผู้สอนมาแทน</div><pre class="prompt"><button class="copy">คัดลอก</button># รัน container ชื่อ `multi-account` จาก image `multi-account:1.0`
+## 1. เตรียม image และ container
+ถ้ายังไม่มี image `multi-account:1.0` ให้ดึงจาก Docker Hub แล้วตั้งชื่อใหม่
+```bash
+docker pull tuchsanai/multi-account:1
+docker tag  tuchsanai/multi-account:1 multi-account:1.0
+```
+ถ้ามี container ชื่อ `multi-account` อยู่แล้ว ให้ลบออก (ห้ามลบ volume `ai-accounts`)
+```bash
+docker rm -f multi-account
+```
+## 2. สร้าง container
+`PORT` เริ่มที่ `8886` ถ้าชนใช้เลขว่างถัดไป
+```bash
+docker run -dit \
+  --name multi-account \
+  --privileged \
+  -p &lt;PORT&gt;:8888 \
+  -v ai-accounts:/root/ai-accounts \
+  multi-account:1.0
+```
+จับเวลาตั้งแต่ `docker run` จน `http://localhost:&lt;PORT&gt;/lab` ตอบ `200`
+## 3. ตรวจผ่าน `docker exec` แล้วสรุปเป็นตาราง
+- `yolo1..5 --version` และ `cyolo1..5 --version`
+- `cyolo1 mcp list` ต้องเห็น `playwright`
+- สถานะล็อกอินทุกบัญชี (ห้ามล็อกอินแทนผม ห้ามแก้ไฟล์ใด ๆ)
+  - Claude: `yolo1` ถึง `yolo5` ใช้คำสั่ง `yoloN auth status` แล้วดูเฉพาะค่า `loggedIn`
+  - Codex: `cyolo1` ถึง `cyolo5` ใช้คำสั่ง `cyoloN login status`
+- ตารางสรุป: image มาจากไหน (build เอง / pull) · URL ของ JupyterLab · เวลาที่ใช้
+  และตาราง บัญชี | เวอร์ชัน | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
+- ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
+  (พิมพ์ `yoloN` แล้วเลือก Claude account with subscription / พิมพ์ `cyoloN login --device-auth`)</pre></section>
+<section class="slide " data-title="2 option ของ docker run"><div class="kicker">ขั้นที่ 2 · ความหมายของแต่ละ option</div><h2>docker run</h2><table>
+<tr><th>option</th><th>ความหมาย</th></tr>
+<tr><td><code>-dit</code></td><td>รันเบื้องหลัง (<code>-d</code>) พร้อม terminal (<code>-it</code>)</td></tr>
+<tr><td><code>--name multi-account</code></td><td>ตั้งชื่อ container</td></tr>
+<tr><td><code>--privileged</code></td><td>เปิดให้ใช้ Docker-in-Docker ภายใน container</td></tr>
+<tr><td><code>-p &lt;PORT&gt;:8888</code></td><td>เปิด JupyterLab ที่ <code>http://localhost:&lt;PORT&gt;/lab</code></td></tr>
+<tr><td><code>-v ai-accounts:/root/ai-accounts</code></td><td>volume เก็บล็อกอิน skill และ MCP ไม่หายเมื่อลบ container</td></tr>
+<tr><td><code>multi-account:1.0</code></td><td>image ที่ใช้สร้าง container</td></tr></table></section>
+<section class="slide " data-title="2 วางพรอมต์ (GIF)"><div class="kicker">ขั้นที่ 2 · 💻 Claude Code app</div><h2>ตรวจ image → ลบ container เดิม → docker run → ตรวจ</h2><div class="fig "><img src="img/desktop-step2-run.gif" alt=""></div></section>
 <section class="slide " data-title="2 ดูใน Docker Desktop"><div class="kicker">ขั้นที่ 2 · Docker Desktop หน้า Containers</div><h2>วางพรอมต์แล้ว container ขึ้นมาจริง</h2><div class="fig "><img src="img/docker-desktop-multi-account.png" alt="ภาพจริงจาก Docker Desktop เห็น container multi-account กำลังทำงาน"></div></section>
-<section class="slide " data-title="2 ผลจริง"><div class="kicker">ขั้นที่ 2 · ผลจริง</div><h2>JupyterLab พร้อมใน 1.96 วินาที</h2><div class="row"><div class="col c3"><div class="fig "><img src="img/desktop-step2-result.png" alt=""></div></div><div class="col c2 vc"><div class="note ok">คำสั่งครบ 10 ตัว และ <code>cyolo1 mcp list</code> แสดง <code>playwright</code> ทันที เพราะโปรแกรมทั้งหมดอยู่ใน image แล้ว</div><p class="cap" style="margin-top:16px">เครื่องตัวอย่างใช้ volume ที่เคยล็อกอินไว้แล้ว 5 บัญชี ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3</p></div></div></section>
-<section class="slide divider" data-title="ขั้นที่ 3"><div class="big">3</div><h1>ล็อกอินและให้ Claude ตรวจสถานะ</h1><p>ล็อกอินเองใน JupyterLab ครั้งเดียว ข้อมูลเก็บใน <b>volume ai-accounts</b> (~15 นาที)</p></section>
-<section class="slide " data-title="3.1 ล็อกอินใน JupyterLab"><div class="kicker">ขั้นที่ 3.1 · 🖥️ JupyterLab · 1 บัญชีต่อ 1 แท็บ Terminal</div><h2>อย่างน้อย yolo1, yolo2, cyolo1, cyolo2</h2><table><tr><th>พิมพ์</th><th>เลือก</th></tr>
+<section class="slide " data-title="2 ผลจริง"><div class="kicker">ขั้นที่ 2 · ผลจริง</div><h2>JupyterLab พร้อมใน 2.7 วินาที</h2><div class="row"><div class="col c3"><div class="fig "><img src="img/desktop-step2-result.png" alt=""></div></div><div class="col c2 vc"><div class="note ok">คำสั่งครบ 10 ตัว และ <code>cyolo1 mcp list</code> แสดง <code>playwright</code> ทันที เพราะโปรแกรมทั้งหมดอยู่ใน image แล้ว</div><p class="cap" style="margin-top:16px">เครื่องตัวอย่างใช้ volume ที่เคยล็อกอินไว้แล้ว 5 บัญชี ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะล็อกอินตามหน้าถัดไป · MCP <code>rea</code> มาจากแลปอื่นที่ใช้ volume เดียวกัน</p></div></div></section>
+<section class="slide " data-title="2 ล็อกอินใน JupyterLab"><div class="kicker">ขั้นที่ 2 · 🖥️ JupyterLab · 1 บัญชีต่อ 1 แท็บ Terminal (~15 นาที)</div><h2>ล็อกอินอย่างน้อย CLI ละ 1 บัญชี</h2><table><tr><th>พิมพ์</th><th>เลือก</th></tr>
 <tr><td><code>yolo1</code> … <code>yolo5</code></td><td><b>Claude account with subscription</b> → ยืนยันในเบราว์เซอร์ → <b>Yes, I trust this folder</b> → <code>/exit</code></td></tr>
-<tr><td><code>cyolo1</code> … <code>cyolo5</code></td><td><b>Sign in with ChatGPT</b> หรือ <code>cyolo1 login --device-auth</code></td></tr></table>
-<div class="note info" style="margin-top:22px"><b>ต่างจากแบบที่ 2:</b> ล็อกอินเก็บใน volume จึงล็อกอินครั้งเดียว และยังใช้ได้แม้ลบ container หรือ build image ใหม่</div>
+<tr><td><code>cyolo1</code> … <code>cyolo5</code></td><td><b>Sign in with ChatGPT</b> หรือ <code>cyolo1 login --device-auth</code> หากเบราว์เซอร์ส่งผลกลับไม่ได้</td></tr></table>
+<div class="note info" style="margin-top:22px"><b>ต่างจากแบบที่ 2:</b> ล็อกอินเก็บใน volume <code>ai-accounts</code> จึงล็อกอินครั้งเดียว และยังใช้ได้แม้ลบ container หรือ build image ใหม่</div>
 <div class="note bad" style="margin-top:14px">ผู้เรียนต้องล็อกอินด้วยตนเองเสมอ ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือผู้อื่น</div></section>
-<section class="slide " data-title="3.2 ให้ Claude ตรวจล็อกอิน"><div class="kicker">ขั้นที่ 3.2 · 💻 Claude Code app</div><div class="row"><div class="col"><pre class=""><button class="copy">คัดลอก</button>ช่วยตรวจสถานะล็อกอินทุกบัญชีใน container multi-account ทำผ่าน docker exec เท่านั้น ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ใด ๆ
-- Claude: yolo1 ถึง yolo5 ใช้คำสั่ง yoloN auth status แล้วดูเฉพาะค่า &quot;loggedIn&quot;
-- Codex: cyolo1 ถึง cyolo5 ใช้คำสั่ง cyoloN login status
-สรุปเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
-ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
-(พิมพ์ yoloN แล้วเลือก Claude account with subscription / พิมพ์ cyoloN login --device-auth)</pre><div style="height:16px"></div><div class="fig "><img src="img/desktop-step3-login-check.gif" alt=""></div></div><div class="col"><div class="fig "><img src="img/desktop-step3-result.png" alt=""></div><div class="cap">ผลจริง ~20 วินาที · ขั้นที่ 4 ต้องมีอย่างน้อย 1 บัญชีต่อ CLI</div></div></div></section>
-<section class="slide divider" data-title="ขั้นที่ 4"><div class="big">4</div><h1>ทดสอบ skill และ MCP ข้ามบัญชีแบบขนาน</h1><p>ทุกบัญชีเรียก <b>shared-check</b> และใช้ <b>Playwright MCP</b> ค้นหาเที่ยวบิน BKK → Tokyo พร้อมกัน (~5 นาที)</p></section>
-<section class="slide " data-title="4 พรอมต์"><div class="kicker">ขั้นที่ 4 · พรอมต์ (เหนือ ==== งานของ Claude · ใต้ ==== งานของแต่ละบัญชี)</div><pre class="prompt"><button class="copy">คัดลอก</button>ช่วยทดสอบ skill/MCP ส่วนกลางข้ามบัญชีใน container multi-account
-ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-0. ตรวจสถานะล็อกอิน yolo1..5 (yoloN auth status) และ cyolo1..5 (cyoloN login status)
-   แสดงตาราง บัญชี | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมล องค์กร หรือ token
-   เลือกบัญชีที่ล็อกอินแล้วฝั่งละไม่เกิน 2 บัญชี ถ้าไม่มีบัญชีไหนล็อกอินเลย ให้หยุดและบอกวิธีล็อกอินใน JupyterLab Terminal
-1. บันทึกข้อความใต้เส้น ==== ตามตัวอักษรลง /workspace/multi-account/verify-prompt.txt ใน container
-2. รันทุกบัญชีที่เลือกพร้อมกันจากโฟลเดอร์ /workspace/multi-account แล้วรอจนครบทุกบัญชี (timeout บัญชีละ 15 นาที):
-   yoloN -p &quot;$(cat verify-prompt.txt)&quot; / cyoloN exec --skip-git-repo-check &quot;$(cat verify-prompt.txt)&quot;
-3. คัดลอกภาพที่แต่ละบัญชีรายงานไปเป็น /workspace/multi-account/evidence/&lt;บัญชี&gt;/1-open.png, 2-search.png, 3-results.png
-   พร้อม log คำตอบเป็น run.log ในโฟลเดอร์เดียวกัน
-4. สรุปตาราง บัญชี | รหัส shared-check | tool ที่เรียก | เที่ยวบินอันดับ 1 | เวลาที่ใช้ | PASS/FAIL
-   บัญชีต่างกันแต่ CLI เดียวกันต้องได้รหัสเดียวกัน ถ้าบัญชีใดล้มเหลวให้รายงานตามจริง ห้ามแก้แทนหรือเดาผล
-====
-ตรวจว่า skill และ MCP ส่วนกลางใช้ได้จริงในบัญชีนี้ ทำตามลำดับ ห้ามแก้ไฟล์ตั้งค่าใด ๆ
-
-1. แจ้ง config root ที่ใช้อยู่ (ค่า CLAUDE_CONFIG_DIR หรือ CODEX_HOME) ห้ามแสดง token อีเมล หรือข้อมูลบัญชี
-2. ใช้ skill shared-check ตามกลไก skill ของ CLI นี้ แล้วรายงานรหัสที่ได้ พร้อม path ของ skill ตามที่ CLI แสดง
-   ห้ามค้นหาไฟล์เอง (find, grep, ls) และห้ามเปิดไฟล์จาก path ที่ไม่ได้มาจากรายการ skill ของ CLI
-3. ใช้เครื่องมือของ MCP ชื่อ playwright เท่านั้น ห้ามใช้ curl, python, web search หรือ browser อื่น
-   เปิด https://www.google.com/travel/flights?hl=en
-   ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ญี่ปุ่น ชั้นประหยัด ผู้ใหญ่ 1 คน วันเดินทางคือวันที่ 15 ของเดือนถัดไป
-   ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
-   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริงว่าติดตรงไหน ห้ามเดาราคา
-4. บันทึกภาพหน้าจอด้วย tool screenshot ของ playwright เฉพาะส่วนที่มองเห็น 3 ภาพ
-   ตั้งชื่อ &lt;บัญชี&gt;-1-open.png (หน้าเว็บเปิดได้), &lt;บัญชี&gt;-2-search.png (กรอกเงื่อนไขครบก่อนกดค้นหา),
-   &lt;บัญชี&gt;-3-results.png (รายการผลเที่ยวบิน) แล้วรายงาน path เต็มของแต่ละภาพ
-5. สรุปเป็นตาราง รายการ | PASS/FAIL | หลักฐาน โดยมีแถว: config root, รหัสจาก skill shared-check,
-   ชื่อ MCP server และชื่อ tool ที่เรียกจริง, ภาพหน้าจอ 3 ภาพ (path),
-   เที่ยวบิน 3 อันดับแรก: สายการบิน เวลาออก-ถึง ระยะเวลา จำนวนแวะ ราคา (ตามที่เห็นบนหน้าเว็บ)</pre></section>
-<section class="slide " data-title="4 วางพรอมต์ (GIF)"><div class="kicker">ขั้นที่ 4 · 💻 Claude Code app</div><h2>4 บัญชีทำงานพร้อมกัน</h2><div class="fig "><img src="img/desktop-step4-test.gif" alt=""></div><div class="cap">ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน</div></section>
-<section class="slide " data-title="4 ผลจริง"><div class="kicker">ขั้นที่ 4 · ผลจริง 7 พ.ย. 2026</div><h2>5 นาที 20 วินาที สำหรับ 4 บัญชีพร้อมกัน</h2><div class="row"><div class="col"><div class="fig "><img src="img/desktop-step4-result.png" alt=""></div></div><div class="col vc"><table style="font-size:20px">
-<tr><th>บัญชี</th><th>รหัส shared-check</th><th>MCP</th><th>เวลา</th></tr>
-<tr><td>yolo1</td><td><code>…claude-84dd0687</code></td><td>PASS</td><td>175 วินาที</td></tr>
-<tr><td>yolo2</td><td>เหมือน yolo1</td><td>PASS</td><td>160 วินาที</td></tr>
-<tr><td>cyolo1</td><td><code>…codex-4e38203a</code></td><td>PASS</td><td>108 วินาที</td></tr>
-<tr><td>cyolo2</td><td>เหมือน cyolo1</td><td>PASS</td><td>98 วินาที</td></tr></table>
-<p class="cap" style="margin-top:12px">เที่ยวบินอันดับ 1 ทุกบัญชี: Vietjet · 9 ชม. · แวะ 1 · THB 5,956 · แบบที่ 2 รันทีละบัญชีใช้ ~10 นาที</p></div></div></section>
-<section class="slide " data-title="4 การตีความผล"><div class="kicker">ขั้นที่ 4</div><h2>การตีความผล</h2><div class="grid g3"><div class="card need"><h3>skill กลางใช้ได้</h3><p>บัญชีต่างกันแต่ CLI เดียวกันได้รหัสเดียวกัน แสดงว่าอ่านไฟล์เดียวกันใน shared</p></div><div class="card need"><h3>MCP กลางใช้ได้</h3><p>ทุกบัญชีเรียก tool ของ playwright ได้เอง เช่น browser_navigate, browser_take_screenshot</p></div><div class="card need"><h3>ทำงานพร้อมกันได้</h3><p>4 บัญชีใช้ Chromium แยกกันใน container เดียวโดยไม่ชนกัน</p></div></div><p class="cap" style="margin-top:22px">หลักฐานอยู่บนเครื่องที่ ./workspace/multi-account/evidence/&lt;บัญชี&gt;/ เพราะ map ./workspace ไว้ในขั้นที่ 2</p></section>
-<section class="slide " data-title="4 หลักฐาน (GIF)"><div class="kicker">ขั้นที่ 4 · ภาพจริงจาก Playwright MCP ของ yolo1</div><div class="fig "><img src="img/evidence-yolo1.gif" alt=""></div></section>
-<section class="slide " data-title="4 ผลเดียวกัน 4 บัญชี"><div class="kicker">ขั้นที่ 4 · ภาพจริงที่แต่ละบัญชีบันทึกเอง</div><h2>4 บัญชีได้ผลชุดเดียวกัน</h2><div class="fig "><img src="img/evidence-results-4accounts.png" alt=""></div><div class="cap">ราคาของผู้เรียนจะต่างตามวันที่ค้นหา</div></section>
-<section class="slide divider" data-title="ขั้นที่ 5"><div class="big">5</div><h1>ทดสอบความคงทน: ลบ container แล้วสร้างใหม่</h1><p>ในแบบที่ 2 ต้องติดตั้งและล็อกอินใหม่ทั้งหมด แบบที่ 3 คืนสภาพได้อย่างไร (~3 นาที)</p></section>
-<section class="slide " data-title="5 แนวคิด + พรอมต์"><div class="kicker">ขั้นที่ 5 · 💻 Claude Code app</div><div class="row"><div class="col"><div class="fig "><img src="img/concept-05-volume-persistence.png" alt=""></div></div><div class="col"><pre class="prompt"><button class="copy">คัดลอก</button>พิสูจน์ว่าทุกอย่างถูกอบไว้ใน image แล้ว ด้วยการลบ container multi-account แล้วสร้างใหม่
-- ก่อนลบ: บันทึกสถานะล็อกอินทุกบัญชี (ห้ามแสดงอีเมลหรือ token)
-- ลบด้วย docker rm -f แล้วรัน docker run คำสั่งเดิม (port เดิม volume ai-accounts เดิม ./workspace เดิม)
-  ห้ามลบ volume ห้ามติดตั้งอะไรเพิ่ม จับเวลาตั้งแต่ลบจน JupyterLab ตอบ 200
-- หลังสร้างใหม่ ตรวจผ่าน docker exec: yolo1..5 และ cyolo1..5 --version, cyolo1 mcp list เห็น playwright,
-  skill shared-check ยังอยู่, สถานะล็อกอินเทียบกับก่อนลบ, ไฟล์ใน /workspace/multi-account/evidence ยังอยู่
-- ให้บัญชีแรกที่ล็อกอินแล้วของแต่ละฝั่งตอบสั้น ๆ ว่า &quot;พร้อม&quot; (yoloN -p / cyoloN exec --skip-git-repo-check) เพื่อยืนยันว่าใช้งานได้จริงทันที
-สรุปเป็นตาราง ก่อนลบ | หลังสร้างใหม่ และเวลาที่ใช้</pre></div></div></section>
-<section class="slide " data-title="5 ผลจริง"><div class="kicker">ขั้นที่ 5 · ผลจริง 7 พ.ย. 2026</div><h2>3.27 วินาที ตั้งแต่ลบจนพร้อมใช้</h2><div class="row"><div class="col"><div class="fig "><img src="img/desktop-step5-recreate.gif" alt=""></div></div><div class="col"><div class="fig "><img src="img/desktop-step5-result.png" alt=""></div></div></div><p class="cap">ลบ 0.84 + สร้าง 0.71 + รอ 1.73 วินาที · ทุกรายการเหมือนก่อนลบ · yolo1 / cyolo1 ตอบ "พร้อม" ได้ทันทีโดยไม่ต้องล็อกอินใหม่</p></section>
-<section class="slide " data-title="5 เทียบเวลาคืนสภาพ (GIF)"><div class="kicker">ขั้นที่ 5 · แบบที่ 2 เทียบกับแบบที่ 3</div><h2>~20 นาที เทียบกับ 3.27 วินาที</h2><div class="fig "><img src="img/gif-recreate-compare.gif" alt=""></div><div class="cap">ตัวเลขของแบบที่ 3 วัดจริงในขั้นนี้ · แบบที่ 2 มาจากบท 02_Setup_Multi_Account และเวลาโดยประมาณของการล็อกอิน</div></section>
-<section class="slide photo-slide" data-title="5 ทุกเครื่องเหมือนกัน" style="background-image:url('img/photo-03-reproducible-team.jpg')"><div class="capbox good"><div class="badge">✓</div><div><b>image เดียวกัน · สภาพแวดล้อมเหมือนกันทุกเครื่อง</b><br><span class="sm">โปรแกรมอยู่ใน image · ล็อกอินอยู่ใน volume · ไฟล์งานอยู่ใน ./workspace</span></div></div><div class="imgnote">ภาพจำลอง</div></section>
+<section class="slide divider" data-title="ขั้นที่ 3"><div class="big">3</div><h1>ทดสอบ Playwright MCP ในทุกบัญชีที่ล็อกอินแล้ว</h1><p>ทุกบัญชีค้นหาเที่ยวบิน BKK → Tokyo บน Google Flights · screenshot ทุกขั้น · รวมเป็น GIF (~5 นาที)<br><b>ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน</b></p></section>
+<section class="slide " data-title="3 พรอมต์"><div class="kicker">ขั้นที่ 3 · พรอมต์ (คัดลอกทั้งกรอบ)</div><pre class="prompt"><button class="copy">คัดลอก</button># ทดสอบ Playwright MCP ในบัญชีที่ล็อกอินแล้วของ container `multi-account`
+ให้แต่ละบัญชีที่ล็อกอินแล้วใน container `multi-account` ทำงานต่อไปนี้ ห้ามล็อกอินแทนผม ห้ามแก้ไฟล์ตั้งค่า
+- ใช้ MCP ชื่อ `playwright` เท่านั้น ห้ามใช้ curl, python หรือ web search
+- เปิด https://www.google.com/travel/flights?hl=en
+- ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ชั้นประหยัด ผู้ใหญ่ 1 คน วันที่ 15 ของเดือนถัดไป
+- ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
+- screenshot ทุกขั้นตอนด้วย tool ของ playwright: เปิดหน้าเว็บ, กรอกต้นทาง-ปลายทาง, เลือกวันที่, ผลค้นหา
+- รายงานเที่ยวบิน 3 อันดับแรก (สายการบิน เวลาออก-ถึง ราคา) ตามที่เห็นบนหน้าเว็บ
+  ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริง ห้ามเดาราคา
+เมื่อทุกบัญชีเสร็จ ให้รวม screenshot ของแต่ละบัญชีตามลำดับขั้นตอนเป็นไฟล์ `./evidence/&lt;บัญชี&gt;.gif` บนเครื่องผม</pre></section>
+<section class="slide " data-title="3 วางพรอมต์ (GIF)"><div class="kicker">ขั้นที่ 3 · 💻 Claude Code app</div><h2>5 บัญชีทำงานพร้อมกัน</h2><div class="fig "><img src="img/desktop-step3-playwright.gif" alt=""></div><div class="cap">Claude ตรวจสถานะล็อกอิน รัน yolo1–3 และ cyolo1–2 พร้อมกัน รอจนเสร็จ แล้วรวม screenshot เป็น GIF</div></section>
+<section class="slide " data-title="3 ผลจริง"><div class="kicker">ขั้นที่ 3 · ผลจริง 10 พ.ย. 2026</div><h2>~4.5 นาที สำหรับ 5 บัญชีพร้อมกัน</h2><div class="row"><div class="col c3"><div class="fig "><img src="img/desktop-step3-playwright-result.png" alt=""></div></div><div class="col c2 vc"><table style="font-size:20px">
+<tr><th>บัญชี</th><th>ผล</th></tr>
+<tr><td>yolo1–3</td><td><span class="pill gr">ได้ผล</span> อันดับ 1 Vietjet THB 5,956</td></tr>
+<tr><td>cyolo1–2</td><td><span class="pill rd">หน้าเว็บ error</span> "Oops, something went wrong."</td></tr></table>
+<div class="note info" style="margin-top:18px">บัญชีที่หน้าเว็บไม่แสดงผล Claude รายงานตามจริง <b>ไม่เดาราคา</b></div></div></div></section>
+<section class="slide " data-title="3 หลักฐาน (GIF)"><div class="kicker">ขั้นที่ 3 · ภาพจริงที่แต่ละบัญชีบันทึกผ่าน Playwright MCP · ./evidence/&lt;บัญชี&gt;.gif</div><div class="row"><div class="col"><div class="fig "><img src="img/step3-evidence-yolo1.gif" alt=""></div><div class="cap">yolo1.gif · ค้นหาได้ผล</div></div><div class="col"><div class="fig "><img src="img/step3-evidence-cyolo1.gif" alt=""></div><div class="cap">cyolo1.gif · หน้าเว็บขึ้น error</div></div></div><p class="cap" style="margin-top:14px">แต่ละไฟล์มี 4 ภาพ: เปิดหน้าเว็บ · กรอกต้นทาง-ปลายทาง · เลือกวันที่ · ผลค้นหา · ราคาของผู้เรียนจะต่างตามวันที่ค้นหา</p></section>
 <section class="slide " data-title="สรุป: แบบที่ 2 เทียบกับแบบที่ 3"><div class="kicker">สรุป</div><h2>แบบที่ 2 เทียบกับแบบที่ 3</h2><table class="ba">
 <tr><th></th><th>แบบที่ 2 · ติดตั้งใน container ที่กำลังทำงาน</th><th>แบบที่ 3 · build จาก Dockerfile</th></tr>
 <tr><td>ระบบหลายบัญชีอยู่ที่</td><td>ใน container <code>devtools</code></td><td>ใน image <code>multi-account:1.0</code></td></tr>
 <tr><td>ข้อมูลล็อกอินอยู่ที่</td><td>ใน container (หายเมื่อลบ)</td><td>ใน volume <code>ai-accounts</code> (คงอยู่)</td></tr>
-<tr><td>เมื่อลบ container</td><td>ติดตั้งใหม่ + ล็อกอินใหม่</td><td><code>docker run</code> ใหม่ พร้อมใช้ใน 3.27 วินาที</td></tr>
+<tr><td>เมื่อลบ container</td><td>ติดตั้งใหม่ + ล็อกอินใหม่</td><td><code>docker run</code> ใหม่ พร้อมใช้ทันที ไม่ต้องล็อกอินใหม่</td></tr>
 <tr><td>เครื่องใหม่ / แชร์ให้ทีม</td><td>ทำซ้ำทุกเครื่อง ผลอาจต่างกัน</td><td>build จาก Dockerfile เดียวกัน หรือ push image ให้ทีม pull</td></tr></table></section>
-<section class="slide " data-title="ข้อควรรู้"><div class="kicker red">ข้อควรรู้</div><h2>ข้อควรรู้</h2><div class="grid g3"><div class="card"><h3>ล็อกอินอยู่ใน volume</h3><p class="small"><code>docker rm -f</code> ปลอดภัย แต่ <code>docker volume rm ai-accounts</code> หรือ <code>prune --volumes</code> ลบล็อกอินทุกบัญชี</p></div><div class="card"><h3>JupyterLab ไม่มีรหัสผ่าน</h3><p class="small">ใช้ <code>-p 127.0.0.1:8886:8888</code> หรือตั้ง <code>JUPYTER_PASSWORD</code></p></div><div class="card"><h3>image ต้องไม่มีล็อกอิน</h3><p class="small">ตรวจทุกครั้งก่อน push ขึ้น Docker Hub</p></div><div class="card"><h3>แยกบัญชีระดับโฟลเดอร์</h3><p class="small">ทุกบัญชีทำงานเป็น root คนเดียวกัน ไม่ใช่การแยกสิทธิ์ระดับ OS</p></div><div class="card"><h3>volume ของ Docker-in-Docker</h3><p class="small">ใช้ <code>docker rm -f -v multi-account</code> หากต้องการลบ volume ของ /var/lib/docker ด้วย</p></div><div class="card"><h3>image สำเร็จรูป</h3><p class="small"><code>tuchsanai/multi-account-devtool:2569_1</code> ผ่านสกิล <code>/maccount</code></p></div></div></section>
+<section class="slide " data-title="ข้อควรรู้"><div class="kicker red">ข้อควรรู้</div><h2>ข้อควรรู้</h2><div class="grid g3"><div class="card"><h3>ล็อกอินอยู่ใน volume</h3><p class="small"><code>docker rm -f</code> ปลอดภัย แต่ <code>docker volume rm ai-accounts</code> หรือ <code>prune --volumes</code> ลบล็อกอินทุกบัญชี</p></div><div class="card"><h3>JupyterLab ไม่มีรหัสผ่าน</h3><p class="small">ใช้ <code>-p 127.0.0.1:8886:8888</code> หรือตั้ง <code>JUPYTER_PASSWORD</code></p></div><div class="card"><h3>image ต้องไม่มีล็อกอิน</h3><p class="small">ตรวจทุกครั้งก่อน push ขึ้น Docker Hub</p></div><div class="card"><h3>แยกบัญชีระดับโฟลเดอร์</h3><p class="small">ทุกบัญชีทำงานเป็น root คนเดียวกัน ไม่ใช่การแยกสิทธิ์ระดับ OS</p></div><div class="card"><h3>volume ของ Docker-in-Docker</h3><p class="small">ใช้ <code>docker rm -f -v multi-account</code> หากต้องการลบ volume ของ /var/lib/docker ด้วย</p></div><div class="card"><h3>image สำเร็จรูป</h3><p class="small"><code>tuchsanai/multi-account:1</code> พรอมต์ขั้นที่ 2 pull แล้ว tag เป็น <code>multi-account:1.0</code> ให้เอง</p></div></div></section>
 <section class="slide " data-title="คำสั่งที่ใช้บ่อย"><div class="kicker">คำสั่งที่ใช้บ่อย</div><div class="row"><div class="col"><h3>บนเครื่อง</h3><pre class=""><button class="copy">คัดลอก</button>docker logs -f multi-account          # ดู log ตอน start
 docker exec -it multi-account bash    # เข้า shell ใน container
 docker stop multi-account             # หยุด
 docker start multi-account            # เริ่มใหม่
+docker cp multi-account:/workspace ./backup   # คัดลอกไฟล์งานออกก่อนลบ
 docker rm -f multi-account            # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
 docker build -t multi-account:1.0 _solution/MultiAccountDevtool   # build จากเฉลย</pre></div><div class="col"><h3>ใน container (JupyterLab Terminal)</h3><pre class=""><button class="copy">คัดลอก</button>yolo1 auth status         # สถานะล็อกอิน Claude
 cyolo1 login status       # สถานะล็อกอิน Codex
 cyolo1 mcp list           # ตรวจ MCP ของ Codex
 multi-account-install     # รัน installer ซ้ำ (ไม่ทับของเดิม)</pre></div></div></section>
-<section class="slide " data-title="เช็กลิสต์"><div class="kicker">เช็กลิสต์</div><h2>ทำครบหรือยัง?</h2><div id="check" class="steps"><label><input type="checkbox"> มี image <code>multi-account:1.0</code> (ขั้นที่ 1)</label><label><input type="checkbox"> container <code>multi-account</code> เปิด JupyterLab ได้ (ขั้นที่ 2)</label><label><input type="checkbox"> ล็อกอินอย่างน้อย yolo 1 + cyolo 1 บัญชี และ Claude ตรวจผ่าน (ขั้นที่ 3)</label><label><input type="checkbox"> ทดสอบพร้อมกันได้ PASS และมีภาพใน <code>./workspace/multi-account/evidence/</code> (ขั้นที่ 4)</label><label><input type="checkbox"> ลบแล้วสร้างใหม่ ล็อกอินยังอยู่ (ขั้นที่ 5)</label></div></section>
+<section class="slide " data-title="เช็กลิสต์"><div class="kicker">เช็กลิสต์</div><h2>ทำครบหรือยัง?</h2><div id="check" class="steps"><label><input type="checkbox"> มี image <code>multi-account:1.0</code> (build เองในขั้นที่ 1 หรือ pull ในขั้นที่ 2)</label><label><input type="checkbox"> container <code>multi-account</code> เปิด JupyterLab ได้ และล็อกอินอย่างน้อย CLI ละ 1 บัญชี (ขั้นที่ 2)</label><label><input type="checkbox"> ทุกบัญชีที่ล็อกอินแล้วใช้ Playwright MCP ได้ และมีไฟล์ <code>./evidence/&lt;บัญชี&gt;.gif</code> (ขั้นที่ 3)</label></div></section>
 <section class="slide cover" data-title="ปิดท้าย" style="background-image:url('img/slide-cover.jpg')"><div class="shade"></div><div class="inner" style="justify-content:center">
 <div class="kicker" style="color:#7fd3ff">สรุป</div><h1>build ครั้งเดียว<br>ใช้ได้ทุกเครื่อง</h1>
-<div class="sub">โปรแกรมอยู่ใน <b>image</b> · ล็อกอินอยู่ใน <b>volume</b> · ไฟล์งานอยู่ใน <b>./workspace</b><br>container จึงลบและสร้างใหม่ได้โดยไม่สูญเสียข้อมูล<br><span style="font-size:22px;color:#9fb6dd">รายละเอียดทุกขั้นตอนและพรอมต์เต็มอยู่ใน README.md</span></div></div></section>
+<div class="sub">โปรแกรมอยู่ใน <b>image</b> · ล็อกอินอยู่ใน <b>volume</b><br>container จึงลบและสร้างใหม่ได้โดยไม่ต้องติดตั้งหรือล็อกอินใหม่<br><span style="font-size:22px;color:#9fb6dd">รายละเอียดทุกขั้นตอนและพรอมต์เต็มอยู่ใน README.md</span></div></div></section>
 </div></div>
 
 <div class="zone" id="zl" title="หน้าก่อน"></div><div class="zone" id="zr" title="หน้าถัดไป"></div>

@@ -44,7 +44,7 @@
 
 image ประกอบด้วยชั้น (layer) ซ้อนกัน แต่ละชั้นเกิดจากคำสั่งใน Dockerfile ส่วนข้อมูลที่ต้องเก็บถาวรอยู่นอก image
 
-![container multi-account เชื่อมกับ 3 ส่วน: image multi-account:1.0 เก็บโปรแกรมทั้งหมด, volume ai-accounts เก็บล็อกอิน skill และ MCP, ./workspace เก็บไฟล์งาน ลบ container ได้โดยทั้งสามส่วนยังอยู่](img/concept-03-image-layers.png)
+![container multi-account มี container layer ที่หายเมื่อลบ และเชื่อมกับ 2 ส่วน: image multi-account:1.0 เก็บโปรแกรมทั้งหมด, volume ai-accounts เก็บล็อกอิน skill และ MCP ลบ container ได้โดย image และ volume ยังอยู่](img/concept-03-image-layers.png)
 
 | ส่วน | เก็บอะไร | เมื่อลบ container |
 |---|---|---|
@@ -56,7 +56,7 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 
 ## 3. ภาพรวมขั้นตอนการทดลอง
 
-![ขั้นตอนการทดลอง 5 ขั้นที่สั่งจาก Claude Code app: build image, run container, ล็อกอิน, ทดสอบ skill + MCP, ลบและสร้างใหม่](img/concept-04-lab-flow.png)
+![ขั้นตอนการทดลอง 3 ขั้นที่สั่งจาก Claude Code app: build image, run container + ล็อกอิน, ทดสอบ Playwright MCP](img/concept-04-lab-flow.png)
 
 | ขั้น | ทำที่ไหน | ผู้ดำเนินการ | เวลารันจริง |
 |---|---|---|---|
@@ -213,7 +213,7 @@ MultiAccountDevtool/
 
 ขั้นที่ 1 ได้ image `multi-account:1.0` ซึ่งเป็นแม่แบบแบบอ่านอย่างเดียว ยังใช้งานโดยตรงไม่ได้ ขั้นนี้ใช้ `docker run` สร้าง container จาก image นั้นเพื่อนำมาใช้งานจริง แต่ละ option ของคำสั่งกำหนดว่า container จะเชื่อมกับเครื่องของเราอย่างไร หากไม่ได้ทำขั้นที่ 1 พรอมต์นี้จะดึง image สำเร็จรูปของผู้สอน `tuchsanai/multi-account:1` จาก Docker Hub มาใช้แทน
 
-![image multi-account:1.0 จากขั้นที่ 1 ผ่านคำสั่ง docker run ได้ container multi-account สถานะ running ที่มี yolo1–5 · cyolo1–5, Playwright MCP และ JupyterLab ตัวเลือก --name ตั้งชื่อ container, --privileged เปิด Docker-in-Docker, -p 8886:8888 เปิด JupyterLab ที่ localhost:8886/lab ซึ่งพร้อมใน 1.96 วินาที, -v ai-accounts เชื่อม volume เก็บล็อกอิน skills และ MCP, -v ./workspace เชื่อมโฟลเดอร์ไฟล์งาน](img/concept-07-step2-run.png)
+![image multi-account:1.0 จากขั้นที่ 1 ผ่านคำสั่ง docker run ได้ container multi-account สถานะ running ที่มี yolo1–5 · cyolo1–5, Playwright MCP และ JupyterLab ตัวเลือก --name ตั้งชื่อ container, --privileged เปิด Docker-in-Docker, -p 8886:8888 เปิด JupyterLab ที่ localhost:8886/lab ซึ่งพร้อมใน 2.7 วินาที, -v ai-accounts เชื่อม volume เก็บล็อกอิน skills และ MCP](img/concept-07-step2-run.png)
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
