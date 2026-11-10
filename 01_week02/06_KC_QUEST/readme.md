@@ -59,7 +59,7 @@ python tools/kclab.py doctor
 
 ### ที่มาของชื่อ KC-QUEST
 
-![KC-QUEST ย่อมาจาก KMITL–Chanwanich Quota-Urgency Expiry-aware Scheduling Technique: K = KMITL · C = Chanwanich · Q = Quota โควตา · U = Urgency ความเร่งด่วน · E = Expiry วันหมดอายุ · S = Scheduling จัดตารางงาน · T = Technique](image/kcquest-name.png)
+![KC-QUEST ย่อมาจากอะไร: K = KMITL สถาบัน · C = Chanwanich บริษัท · Q = Quota โควตา · U = Urgency ความเร่งด่วน · E = Expiry วันหมดอายุ · S = Scheduling จัดตารางงาน · T = Technique เทคนิค · จัดตารางงานโดยดูโควตา ความเร่งด่วน และวันหมดอายุ](image/kc-00-name.png)
 
 **KC-QUEST** = **K**MITL–**C**hanwanich **Q**uota-**U**rgency **E**xpiry-aware **S**cheduling **T**echnique (เทคนิคจัดตารางงานที่คำนึงถึงโควตา ความเร่งด่วน และวันหมดอายุ)
 
