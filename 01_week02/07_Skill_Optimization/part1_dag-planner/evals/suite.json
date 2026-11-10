@@ -1,0 +1,82 @@
+{
+ "name": "dag-planner",
+ "skill_name": "dag-planner",
+ "timeout": 900,
+ "grader": "grade.py",
+ "extra_skills": [
+  "../../../05_DAG_Planner/base_skills/agent-team",
+  "../../../05_DAG_Planner/base_skills/yolo",
+  "../../../05_DAG_Planner/base_skills/cyolo"
+ ],
+ "env": {
+  "DAGPLAN_DIR": "{sandbox}/plans",
+  "DAGPLAN_BASE_SKILLS": "{sandbox}/skills"
+ },
+ "prompt": "โจทย์: {goal}\nชื่อแผน: {id}\nจำนวน agent สูงสุด: {max_agents}\n\nวางแผนงานนี้ให้ทีมเอเจนต์ ทำงานในโฟลเดอร์ปัจจุบันเท่านั้น ห้ามแก้ไฟล์ใน ./skills ห้ามล็อกอินแทนฉัน\nก่อนเริ่ม ดูว่าในโฟลเดอร์ ./skills มีสกิลที่ช่วยงานนี้ได้หรือไม่ ถ้ามีให้อ่านและใช้ (เครื่องนี้วางสกิลไว้ที่ ./skills/<ชื่อสกิล>/ แทนตำแหน่งใน container และตั้ง DAGPLAN_DIR ให้แผนไปอยู่ที่ ./plans แล้ว)\n1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ\n2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)\nวางแผนเท่านั้น ห้ามสั่ง export run หรือ report\nบัญชีที่ใช้ได้มีเท่านี้ (โควตาสมมติ): --accounts {accounts}\nตอบภาษาไทยสั้น ๆ: ตาราง บล็อก | ชื่อ | สกิล | ความยาก | ต้องรอ | rank · สายวิกฤต · ตาราง บล็อก | บัญชี | เริ่ม–จบ (นาที)",
+ "tasks": [
+  {
+   "id": "t1-library-booking",
+   "split": "train",
+   "goal": "ระบบจองห้องประชุมของห้องสมุดมหาวิทยาลัย มีปฏิทิน ระบบล็อกอิน อีเมลยืนยัน และหน้า admin",
+   "max_agents": 4,
+   "accounts": "yolo1:80,yolo2:60,cyolo1:90,cyolo2:70",
+   "content_images": false
+  },
+  {
+   "id": "t2-school-notice",
+   "split": "train",
+   "goal": "เว็บประกาศข่าวของโรงเรียน มีหน้าแรก หน้ารายการข่าว ระบบค้นหา หน้า admin เพิ่มข่าว และรูปประกอบข่าว",
+   "max_agents": 2,
+   "accounts": "yolo1:80,yolo2:70",
+   "content_images": false
+  },
+  {
+   "id": "t3-gym-membership",
+   "split": "train",
+   "goal": "ระบบสมาชิกฟิตเนส สมัครสมาชิก ต่ออายุ เช็กอินด้วย QR code รายงานรายเดือน และโลโก้ของยิม",
+   "max_agents": 3,
+   "accounts": "yolo1:80,yolo2:50,cyolo1:90",
+   "content_images": false
+  },
+  {
+   "id": "t4-food-truck",
+   "split": "train",
+   "goal": "เว็บสั่งอาหารล่วงหน้าของ food truck มีเมนูพร้อมรูปอาหาร ตะกร้า เลือกเวลารับ สรุปออเดอร์ และชื่อร้านกับสโลแกน",
+   "max_agents": 4,
+   "accounts": "yolo1:70,yolo2:40,cyolo1:90",
+   "content_images": true
+  },
+  {
+   "id": "v1-pet-clinic",
+   "split": "val",
+   "goal": "ระบบนัดหมายคลินิกสัตว์เลี้ยง มีประวัติสัตว์เลี้ยง ปฏิทินนัด แจ้งเตือนวัคซีน และ dashboard ของสัตวแพทย์",
+   "max_agents": 4,
+   "accounts": "yolo1:80,yolo2:60,cyolo1:90,cyolo2:70",
+   "content_images": false
+  },
+  {
+   "id": "v2-dorm-repair",
+   "split": "val",
+   "goal": "ระบบแจ้งซ่อมของหอพัก ผู้พักแจ้งปัญหาพร้อมรูป ช่างรับงาน ติดตามสถานะ และรายงานสรุปรายสัปดาห์ มีไอคอนของแต่ละประเภทงานซ่อม",
+   "max_agents": 2,
+   "accounts": "cyolo1:90,cyolo2:60",
+   "content_images": false
+  },
+  {
+   "id": "v3-coop-shop",
+   "split": "val",
+   "goal": "เว็บร้านสหกรณ์ชุมชน ขายผักและของแปรรูป มีรูปสินค้า ตะกร้า คูปองส่วนลด และหน้าเล่าเรื่องเกษตรกร พร้อมชื่อแคมเปญเปิดตัว",
+   "max_agents": 3,
+   "accounts": "yolo1:60,cyolo1:90,cyolo2:80",
+   "content_images": true
+  },
+  {
+   "id": "v4-quiz-platform",
+   "split": "val",
+   "goal": "แพลตฟอร์มทำแบบทดสอบออนไลน์ของครู สร้างข้อสอบ สุ่มข้อ จับเวลา ตรวจอัตโนมัติ และกราฟผลคะแนนของห้อง",
+   "max_agents": 4,
+   "accounts": "yolo1:15,yolo2:60,cyolo1:90,cyolo2:70",
+   "content_images": false
+  }
+ ]
+}

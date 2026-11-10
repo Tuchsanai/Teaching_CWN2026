@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จอง</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;color:#1b1b1b;background:#fff;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:12px}
+h1{font-size:1.5rem;margin:8px 0}
+h2{font-size:1.2rem}
+form p{margin:8px 0}
+label{display:block;font-weight:600}
+input,select{width:100%;min-height:36px;font:inherit;padding:4px 8px;border:1px solid #1b1b1b;border-radius:6px;background:#fff;color:#1b1b1b}
+button{min-height:36px;padding:4px 12px;font:inherit;border:1px solid #1b1b1b;border-radius:6px;background:#0b5a4a;color:#fff;cursor:pointer}
+:focus-visible{outline:3px solid #b3261e;outline-offset:2px}
+.err{color:#8c1d18;margin:2px 0 0;min-height:0}
+#ok{color:#0b5a4a;min-height:1.5em;font-weight:600}
+ul{list-style:none;padding:0}
+li{border:1px solid #767676;border-radius:8px;padding:8px;margin-bottom:6px;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1 id="place"></h1>
+<p id="info"></p>
+<form id="f" novalidate>
+<p><label for="name">ชื่อผู้จอง</label><input id="name" autocomplete="off" aria-describedby="e-name"><span class="err" id="e-name"></span></p>
+<p><label for="room" id="roomLabel"></label><select id="room"></select></p>
+<p><label for="people">จำนวนคน</label><input id="people" type="number" inputmode="numeric" aria-describedby="e-people"><span class="err" id="e-people"></span></p>
+<p><label for="date">วันที่</label><input id="date" type="date" aria-describedby="e-date"><span class="err" id="e-date"></span></p>
+<p><label for="start">เวลาเริ่ม</label><select id="start" aria-describedby="e-start"></select><span class="err" id="e-start"></span></p>
+<p><label for="hours">จำนวนชั่วโมง</label><select id="hours"><option>1</option><option>2</option><option>3</option><option>4</option></select></p>
+<p><button id="go" type="submit"></button></p>
+</form>
+<p id="ok" role="status" aria-live="polite"></p>
+<h2 id="count">การจอง 0 รายการ</h2>
+<ul id="list"></ul>
+<p id="total"></p>
+</main>
+<script>
+const CFG = __CFG__;
+const KEY = 'booking-state-v1';
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const money = s => '฿' + Math.floor(s / 100).toLocaleString('en-US') + '.' + String(s % 100).padStart(2, '0');
+let L = [];
+function valid(b) { return b && typeof b === 'object' && typeof b.name === 'string' && CFG.rooms.some(r => r.name === b.room) && /^\d{4}-\d{2}-\d{2}$/.test(b.date) && Number.isInteger(b.start) && Number.isInteger(b.hours) && Number.isInteger(b.people) && Number.isInteger(b.id); }
+function load() { try { const d = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(d)) L = d.filter(valid); } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) {} }
+function price(b) { const r = CFG.rooms.find(x => x.name === b.room); const [y, m, d] = b.date.split('-').map(Number); const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const num = r.rate * b.hours * (100 + (dow === 0 || dow === 6 ? CFG.weekendPct : 0)) * (100 - (b.hours >= CFG.longHours ? CFG.longPct : 0));
+  return Math.floor((2 * num + 10000) / 20000); }
+function today() { const t = new Date(); return t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate()); }
+function render() {
+  L.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.start - b.start || (a.room < b.room ? -1 : 1));
+  $('count').textContent = 'การจอง ' + L.length + ' รายการ';
+  const ul = $('list'); ul.textContent = '';
+  for (const b of L) { const li = document.createElement('li');
+    const s = document.createElement('span'); s.textContent = b.name + ' · ' + b.room + ' · ' + b.people + ' คน · ' + b.date + ' · ' + pad(b.start) + ':00-' + pad(b.start + b.hours) + ':00 · ราคา ' + money(price(b)) + ' ';
+    const x = document.createElement('button'); x.type = 'button'; x.textContent = 'ยกเลิก'; x.setAttribute('aria-label', 'ยกเลิก การจองของ ' + b.name);
+    x.onclick = () => { L = L.filter(y => y.id !== b.id); $('ok').textContent = ''; render(); };
+    li.append(s, x); ul.append(li); }
+  $('total').textContent = 'รวมทั้งหมด ' + money(L.reduce((s, b) => s + price(b), 0));
+  save();
+}
+function setErr(field, msg) { $('e-' + field).textContent = msg; if (msg) $(field).setAttribute('aria-invalid', 'true'); else $(field).removeAttribute('aria-invalid'); }
+function init() {
+  document.title = CFG.place; $('place').textContent = CFG.place; $('roomLabel').textContent = CFG.roomLabel; $('go').textContent = CFG.submit;
+  $('info').textContent = CFG.rooms.map(r => r.name + ' ไม่เกิน ' + r.cap + ' คน ชั่วโมงละ ' + money(r.rate)).join(' · ') + ' · เปิด ' + pad(CFG.open) + ':00 ถึง ' + pad(CFG.close) + ':00';
+  for (const r of CFG.rooms) { const o = document.createElement('option'); o.textContent = r.name; $('room').append(o); }
+  for (let h = CFG.open; h < CFG.close; h++) { const o = document.createElement('option'); o.value = h; o.textContent = pad(h) + ':00'; $('start').append(o); }
+  $('f').onsubmit = e => { e.preventDefault();
+    for (const k of ['name', 'people', 'date', 'start']) setErr(k, ''); $('ok').textContent = '';
+    const b = { id: Date.now() + Math.floor(Math.random() * 1000), name: $('name').value.trim(), room: $('room').value, people: Number($('people').value), date: $('date').value, start: Number($('start').value), hours: Number($('hours').value) };
+    const r = CFG.rooms.find(x => x.name === b.room); let bad = null;
+    const fail = (k, m) => { setErr(k, m); bad = bad || k; };
+    if (!b.name) fail('name', 'กรุณากรอกชื่อผู้จอง');
+    if ($('people').value.trim() === '' || !Number.isInteger(b.people) || b.people < 1 || b.people > r.cap) fail('people', 'จำนวนคนต้องอยู่ระหว่าง 1 ถึง ' + r.cap);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(b.date) || b.date < today()) fail('date', 'วันที่ต้องไม่ใช่วันที่ผ่านมาแล้ว');
+    if (b.start + b.hours > CFG.close) fail('start', 'ต้องสิ้นสุดไม่เกิน ' + pad(CFG.close) + ':00');
+    else if (!bad && L.some(x => x.room === b.room && x.date === b.date && b.start < x.start + x.hours && x.start < b.start + b.hours)) fail('start', 'ช่วงเวลานี้ถูกจองแล้ว');
+    if (bad) { $(bad).focus(); return; }
+    L.push(b); render(); $('ok').textContent = 'จองสำเร็จ'; $('name').value = ''; $('people').value = ''; };
+  load(); render();
+}
+init();
+</script>
+</body>
+</html>
