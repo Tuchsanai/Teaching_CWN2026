@@ -421,7 +421,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -459,7 +459,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -497,7 +497,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -535,7 +535,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -573,7 +573,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -611,7 +611,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -649,7 +649,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -687,7 +687,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -725,7 +725,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -763,7 +763,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 8–12 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt)
 วางแผนเท่านั้น ห้ามสั่ง export run หรือ report
@@ -836,7 +836,7 @@ skills/dag-planner/
 จำนวน agent สูงสุด: 4
 
 ใช้ทีมเอเจนต์ใน container multi-account วางแผนงานนี้ ทำงานใน container ผ่าน docker exec เท่านั้น ห้ามแก้ไฟล์ตั้งค่า ห้ามล็อกอินแทนฉัน
-ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (Claude: /root/ai-accounts/.Claude/shared/skills · Codex: /root/ai-accounts/.Codex/shared/skills) ถ้ามีให้อ่านและใช้
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ (/root/ai-accounts/.Claude/shared/skills) ถ้ามีให้อ่านและใช้
 1. แตกโจทย์เป็นบล็อกงาน 6–10 บล็อก แต่ละบล็อกบอกสกิลที่ใช้ทำ ความยาก ไฟล์ผล และเกณฑ์เสร็จ
 2. วาด DAG แล้ววางแผนว่าบล็อกไหนให้บัญชีไหน เมื่อไร (Gantt) จากโควตาจริง ยังไม่ต้องรันงานจริง
 ตอบภาษาไทยสั้น ๆ: ตาราง บล็อก | ชื่อ | สกิล | ความยาก | ต้องรอ | rank · สายวิกฤตพร้อมเหตุผล 1 บรรทัด · ตาราง บล็อก | บัญชี | เริ่ม–จบ (นาที) · path ของ dag.png และ gantt-plan.png
