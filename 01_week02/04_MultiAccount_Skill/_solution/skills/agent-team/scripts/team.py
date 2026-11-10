@@ -1,2155 +1,1824 @@
 #!/usr/bin/env python3
-"""team.py - ให้หลายบัญชี (yoloN = Claude Code, cyoloN = Codex) ทำงานร่วมกันแบบ multi-agent
+"""team.py - multi-account agent team (Claude yoloN + Codex cyoloN).
 
-คำสั่งหลัก (ดู --help ของแต่ละคำสั่ง):
-  check            ตรวจความพร้อมทุกบัญชีด้วยการเรียกจริง
-  quota            โควตาล่าสุดทุกบัญชี (พร้อมเวลาของข้อมูล)
-  run <graph|->    รันกราฟงาน (relay / fan-out / DAG / review / debate / best_of / image / gate)
-  status [--run]   ภาพรวม run: บัญชี | บทบาท | งานที่รัน | คิว | tokens | โควตา | สถานะ
-  stats            สถิติจาก ledger แยกตามบัญชี / รุ่น / run
-  approve          อนุมัติงานที่มี "approve": true
-  lead             หัวหน้าทีมเป็นรอบสั้น + สลับหัวหน้าอัตโนมัติ (--demo สาธิตครบในคำสั่งเดียว)
-  dispatch/wait/combine/checkpoint/finish   คำสั่งที่หัวหน้าทีมใช้ระหว่างรอบ
-  board            อ่าน/เพิ่มข้อค้นพบบน board.md
+Main commands (see SKILL.md):
+  run GRAPH|-          run a task graph, end with summary table + quota
+  run --resume RID     rerun only failed/blocked nodes (optionally with edits)
+  lead --goal "..."    leader episodes supervised by this script (leader handoff)
+  status / stats / check / quota / approve / board / msg
+Leader-only commands (used inside a lead episode):
+  dispatch / wait / checkpoint / finish
 """
 import argparse
-import collections
 import datetime as _dt
 import fcntl
 import json
 import os
 import random
 import re
-import shutil
-import signal
+import string
+import subprocess
 import sys
 import threading
 import time
 
-sys.dont_write_bytecode = True  # ไม่ทิ้ง __pycache__ ในโฟลเดอร์สกิล
 HERE = os.path.dirname(os.path.realpath(__file__))
-SKILLS = os.path.dirname(os.path.dirname(HERE))
-for _s in ("yolo", "cyolo"):
-    _p = os.path.join(SKILLS, _s, "scripts")
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
-try:
-    import yolo as Y
-    import cyolo as C
-except ImportError as _e:  # pragma: no cover
-    sys.stderr.write("team.py: ต้องมีสกิล yolo และ cyolo อยู่ในโฟลเดอร์ skills เดียวกัน (%s)\n" % _e)
-    sys.exit(2)
+sys.path.insert(0, HERE)
+import ma_common as mc  # noqa: E402
 
 TEAM_PY = os.path.realpath(__file__)
-ROOT = Y.LEDGER_DIR
-FAIL = {"failed", "bad_format", "blocked", "timeout", "not_approved"}
-TERMINAL = FAIL | {"ok"}
-STATUS_TH = {"ok": "สำเร็จ", "failed": "ล้ม", "bad_format": "รูปแบบไม่ผ่าน", "blocked": "ถูกบล็อก",
-             "timeout": "หมดเวลา", "not_approved": "ไม่ผ่านการตรวจ", "waiting_approval": "รออนุมัติ",
-             "pending": "รอคิว", "running": "กำลังรัน"}
-DEMO_GOAL = ("สร้างตารางสูตรคูณแม่ 2 ถึง 9 (แต่ละแม่คูณ 1 ถึง 12 บรรทัดละ 'a x b = c') "
-             "แบ่งให้ลูกทีมทำคนละแม่ แล้วรวมเป็นไฟล์เดียวเรียงแม่ 2 ถึง 9")
+TERMINAL = ("ok", "failed", "bad_output", "blocked")
+DEFAULTS = dict(per_account=3, max_total=8, timeout=900, threshold=80, gate_timeout=1800)
+KIND_PREF = {"image": "cyolo", "review": "cyolo", "code": "cyolo", "doc": "yolo", "long": "yolo"}
+
+
+def P(*a):
+    print(*a, flush=True)
+
+
+# ================================================================= state
+def run_dir_of(rid):
+    return os.path.join(mc.TEAM_ROOT, rid)
+
+
+def new_run_id():
+    return _dt.datetime.now().strftime("%Y%m%d-%H%M%S-") + "".join(random.choice(string.ascii_lowercase)
+                                                                    for _ in range(4))
+
+
+def latest_run():
+    if not os.path.isdir(mc.TEAM_ROOT):
+        return None
+    runs = [d for d in os.listdir(mc.TEAM_ROOT)
+            if os.path.isfile(os.path.join(mc.TEAM_ROOT, d, "state.json"))]
+    runs.sort(key=lambda d: os.path.getmtime(os.path.join(mc.TEAM_ROOT, d, "state.json")))
+    return runs[-1] if runs else None
+
+
+class Locked:
+    def __init__(self, rd):
+        self.path = os.path.join(rd, ".state.lock")
+
+    def __enter__(self):
+        self.f = open(self.path, "a")
+        fcntl.flock(self.f, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, *a):
+        fcntl.flock(self.f, fcntl.LOCK_UN)
+        self.f.close()
+
+
 _tlock = threading.RLock()
-_qlock = threading.Lock()
-QUIET = {"on": False}
 
 
-# ================================================================ utils
-def now_iso():
-    return _dt.datetime.now().astimezone().isoformat(timespec="seconds")
+def load_state(rd):
+    with open(os.path.join(rd, "state.json"), encoding="utf-8") as f:
+        return json.load(f)
 
 
-def hhmmss():
-    return _dt.datetime.now().strftime("%H:%M:%S")
-
-
-def log(msg):
-    stream = sys.stderr if QUIET["on"] else sys.stdout
-    stream.write("[%s] %s\n" % (hhmmss(), msg))
-    stream.flush()
-
-
-def load_json(path, default):
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return default
-
-
-def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    tmp = "%s.tmp.%d.%d" % (path, os.getpid(), threading.get_ident())
+def save_state(rd, st):
+    path = os.path.join(rd, "state.json")
+    tmp = path + ".tmp%d.%d" % (os.getpid(), threading.get_ident())
     with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
+        json.dump(st, f, ensure_ascii=False, indent=1)
     os.replace(tmp, path)
 
 
-def write_text(path, text):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
+def update(rd, fn):
+    """Atomically read-modify-write state.json (safe across threads and processes)."""
+    with _tlock, Locked(rd):
+        st = load_state(rd)
+        r = fn(st)
+        save_state(rd, st)
+        return r
 
 
-def read_text(path, default=""):
-    try:
-        with open(path, encoding="utf-8", errors="replace") as f:
-            return f.read()
-    except OSError:
-        return default
-
-
-def par(fn, items):
-    from concurrent.futures import ThreadPoolExecutor
-    items = list(items)
-    if not items:
-        return []
-    with ThreadPoolExecutor(max_workers=min(16, len(items))) as ex:
-        return list(ex.map(fn, items))
-
-
-def side(acct):
-    return "claude" if acct.startswith("yolo") else "codex"
-
-
-def mod(acct):
-    return Y if side(acct) == "claude" else C
-
-
-def all_accounts():
-    return Y.list_accounts() + C.list_accounts()
-
-
-def parse_budget(values):
-    """['30000', 'yolo2=1'] -> {'*': 30000, 'yolo2': 1}"""
-    out = {}
-    for v in values or []:
-        for part in str(v).split(","):
-            part = part.strip()
-            if not part:
-                continue
-            if "=" in part:
-                k, n = part.split("=", 1)
-                out[k.strip()] = int(n)
-            else:
-                out["*"] = int(part)
-    return out
-
-
-def budget_of(budgets, acct):
-    if not budgets:
-        return None
-    if acct in budgets:
-        return budgets[acct]
-    return budgets.get("*")
-
-
-# ================================================================ run dir / state
-def run_path(run_id):
-    return os.path.join(ROOT, run_id)
-
-
-def list_runs():
-    if not os.path.isdir(ROOT):
-        return []
-    out = []
-    for n in os.listdir(ROOT):
-        p = os.path.join(ROOT, n)
-        if n.startswith(".") or not os.path.isdir(p) or not os.path.isfile(os.path.join(p, "state.json")):
-            continue
-        out.append((os.path.getmtime(os.path.join(p, "state.json")), n))
-    return [n for _, n in sorted(out)]
-
-
-def resolve_run(run_id):
-    if run_id:
-        p = run_path(run_id)
-        return p if os.path.isfile(os.path.join(p, "state.json")) else None
-    runs = list_runs()
-    return run_path(runs[-1]) if runs else None
-
-
-class locked(object):
-    """อ่าน-แก้-เขียน state.json แบบ atomic ข้าม process (flock) - ห้ามซ้อนกัน"""
-
-    def __init__(self, run_dir):
-        self.run_dir = run_dir
-
-    def __enter__(self):
-        _tlock.acquire()
-        self.f = open(os.path.join(self.run_dir, "state.lock"), "a+")
-        fcntl.flock(self.f, fcntl.LOCK_EX)
-        self.st = load_json(os.path.join(self.run_dir, "state.json"), {})
-        self.orig = json.dumps(self.st, sort_keys=True, ensure_ascii=False)
-        return self.st
-
-    def __exit__(self, et, ev, tb):
-        try:
-            if et is None:
-                s = json.dumps(self.st, sort_keys=True, ensure_ascii=False)
-                if s != self.orig:
-                    self.st["updated"] = now_iso()
-                    save_json(os.path.join(self.run_dir, "state.json"), self.st)
-        finally:
-            fcntl.flock(self.f, fcntl.LOCK_UN)
-            self.f.close()
-            _tlock.release()
-        return False
-
-
-def read_state(run_dir):
-    return load_json(os.path.join(run_dir, "state.json"), {})
-
-
-def board_path(run_dir):
-    return os.path.join(run_dir, "board.md")
-
-
-def board_append(run_dir, author, text, node=None):
-    line = "- [%s] **%s**%s: %s\n" % (now_iso(), author, (" (%s)" % node) if node else "",
-                                       text.strip().replace("\n", " "))
-    with open(board_path(run_dir), "a", encoding="utf-8") as f:
+def board_append(rd, author, text):
+    with open(os.path.join(rd, "board.md"), "a", encoding="utf-8") as f:
         fcntl.flock(f, fcntl.LOCK_EX)
-        f.write(line)
+        f.write("\n- [%s · %s] %s\n" % (mc.now_iso()[:19].replace("T", " "), author, text.strip()))
+        fcntl.flock(f, fcntl.LOCK_UN)
 
 
-def board_body(run_dir):
-    txt = read_text(board_path(run_dir))
-    return "\n".join(l for l in txt.splitlines() if l.startswith("- ["))
+def msg_append(rd, frm, to, text):
+    path = os.path.join(rd, "msgs", "%s__%s.md" % (frm, to))
+    with open(path, "a", encoding="utf-8") as f:
+        f.write("\n## %s\n%s\n" % (mc.now_iso()[:19].replace("T", " "), text.strip()))
+    return path
 
 
-def ledger_event(run_dir, st, event, **kw):
-    row = Y.ledger_row(ts_start=now_iso(), ts_end=now_iso(), run_id=st.get("run_id"),
-                       event=event, status="ok", **kw)
-    Y.ledger_append(row, run_dir)
+def event(rd, st, kind, **kw):
+    kw.update(ts=mc.now_iso(), event=kind)
+    st.setdefault("events", []).append(kw)
+    mc.ledger_append(dict(ts_start=kw["ts"], ts_end=kw["ts"], run_id=st["run_id"], node=kw.get("node"),
+                          account=kw.get("to") or kw.get("account"), cli=mc.cli_of(kw.get("to") or kw.get("account") or ""),
+                          status=kind, error=kw.get("reason"), event=kind,
+                          **{k: v for k, v in kw.items() if k in ("from", "to", "type")}), rd)
 
 
-def new_run_dir(mode, goal, run_id=None):
-    rid = run_id or "%s-%04x" % (_dt.datetime.now().strftime("%Y%m%d-%H%M%S"), random.randint(0, 0xffff))
-    rd = run_path(rid)
-    for d in ("msgs", "out", "approvals", "tmp"):
-        os.makedirs(os.path.join(rd, d), exist_ok=True)
-    if not os.path.exists(board_path(rd)):
-        write_text(board_path(rd), "# board ของ run %s\nกระดานความรู้กลาง: ทุก agent อ่านก่อนเริ่ม · "
-                                   "เพิ่มแบบต่อท้าย (ผู้เขียน + เวลา)\n\n" % rid)
-    return rid, rd
+def init_run(rd, rid, graph, options, mode="run", goal=None):
+    for sub in ("msgs", "out", "approve", "logs", "work", "final"):
+        mc.ensure_dir(os.path.join(rd, sub))
+    with open(os.path.join(rd, "graph.json"), "w", encoding="utf-8") as f:
+        json.dump(graph, f, ensure_ascii=False, indent=1)
+    if not os.path.exists(os.path.join(rd, "board.md")):
+        with open(os.path.join(rd, "board.md"), "w", encoding="utf-8") as f:
+            f.write("# board.md · run %s\nกระดานความรู้กลาง: อ่านก่อนเริ่มงาน เพิ่มข้อค้นพบแบบต่อท้ายเท่านั้น "
+                    "(ระบุผู้เขียนและเวลา)\n" % rid)
+    if not os.path.exists(os.path.join(rd, "handoff.md")):
+        with open(os.path.join(rd, "handoff.md"), "w", encoding="utf-8") as f:
+            f.write("# handoff.md · run %s\nยังไม่มี checkpoint\n" % rid)
+    st = dict(run_id=rid, mode=mode, goal=goal or graph.get("goal"), created=mc.now_iso(), done=False,
+              options=options, nodes={}, accounts={}, running=[], switches=[], lead_history=[], events=[],
+              leader={}, final=None)
+    save_state(rd, st)
+    return st
 
 
-# ================================================================ accounts: readiness + quota
-def check_accounts(accs, fresh=False, max_age=900):
-    cache_f = os.path.join(ROOT, "accounts.json")
-    cache = load_json(cache_f, {})
-    t = time.time()
-    need = [a for a in accs if fresh or not cache.get(a) or t - cache[a].get("epoch", 0) > max_age]
-    if need:
-        for r in par(lambda a: mod(a).check_account(a), need):
-            r["epoch"] = time.time()
-            cache[r["account"]] = r
-        with _qlock:
-            cur = load_json(cache_f, {})
-            cur.update({a: cache[a] for a in need})
-            save_json(cache_f, cur)
-    return {a: cache[a] for a in accs if a in cache}
+def norm_node(n, defaults):
+    n = dict(n)
+    for k, v in (defaults or {}).items():
+        n.setdefault(k, v)
+    n.setdefault("type", "task")
+    n.setdefault("account", "any")
+    n.setdefault("difficulty", 2)
+    n.setdefault("depends_on", [])
+    if isinstance(n["depends_on"], str):
+        n["depends_on"] = [x for x in n["depends_on"].split(",") if x]
+    n.setdefault("board", True)
+    return n
 
 
-def get_quota(acct, refresh=False):
-    info = Y.quota(acct) if side(acct) == "claude" else C.quota(acct, refresh=refresh)
-    info["pct"] = Y.quota_pct(info)
-    with _qlock:
-        f = os.path.join(ROOT, "quota.json")
-        cur = load_json(f, {})
-        cur[acct] = info
-        try:
-            save_json(f, cur)
-        except OSError:
-            pass
-    return info
+def graph_nodes(graph):
+    d = graph.get("defaults") or {}
+    return [norm_node(n, d) for n in graph.get("nodes", [])]
 
 
-def cached_quota(acct):
-    return load_json(os.path.join(ROOT, "quota.json"), {}).get(acct)
-
-
-def quota_text(q):
-    if not q or not q.get("available"):
-        return "ไม่มีข้อมูล"
-    if q.get("cli") == "claude":
-        parts = []
-        if q.get("session_pct") is not None:
-            parts.append("session %g%%" % q["session_pct"])
-        if q.get("week_pct") is not None:
-            parts.append("week %g%%" % q["week_pct"])
-        return "%s (ณ %s)" % (" · ".join(parts) or "-", (q.get("ts") or "")[11:19])
-    parts = []
-    if q.get("primary_pct") is not None:
-        parts.append("primary %g%%" % q["primary_pct"])
-    if q.get("secondary_pct") is not None:
-        parts.append("secondary %g%%" % q["secondary_pct"])
-    return "%s (ณ %s)" % (" · ".join(parts) or "-", (q.get("ts") or "")[:16].replace("T", " "))
-
-
-# ================================================================ graph
-PH = re.compile(r"\{\{\s*(file:|account:)?([A-Za-z0-9_.\-]+)\s*\}\}")
-SPECIAL = {"run_dir", "board"}
-
-
-def placeholders(text):
-    return [m.group(2) for m in PH.finditer(text or "") if m.group(2) not in SPECIAL]
-
-
-def expand(nodes):
-    """debate / best_of -> งานย่อย + ผู้ตัดสิน"""
-    out = []
+def validate_graph(nodes):
+    ids = [n.get("id") for n in nodes]
+    errs = []
+    if not nodes:
+        errs.append("กราฟไม่มี nodes")
     for n in nodes:
-        t = n.get("type", "task")
-        if t not in ("debate", "best_of"):
-            out.append(n)
-            continue
-        nid = n["id"]
-        if t == "debate":
-            accs = n.get("accounts") or ["yolo", "cyolo"]
-        else:
-            k = int(n.get("n") or len(n.get("accounts") or []) or 3)
-            base = n.get("accounts") or ["any"]
-            accs = [base[i % len(base)] for i in range(k)]
-        subs = []
-        for i, a in enumerate(accs, 1):
-            s = {kk: vv for kk, vv in n.items() if kk in ("prompt", "difficulty", "cwd", "kind",
-                                                       "timeout", "depends_on", "effort", "model")}
-            s.update(id="%s.%d" % (nid, i), account=a, type="task", expect=n.get("candidate_expect", "text"))
-            out.append(s)
-            subs.append(s["id"])
-        letters = "ABCDEFGHIJKLMNOP"
-        answers = "\n\n".join("คำตอบ %s (จาก {{account:%s}}):\n{{%s}}" % (letters[i], sid, sid)
-                              for i, sid in enumerate(subs))
-        if t == "debate":
-            jp = ("คุณเป็นผู้ตัดสินที่เป็นกลาง โจทย์:\n" + n["prompt"] + "\n\n" + answers +
-                  "\n\nตรวจแต่ละคำตอบอย่างอิสระ (คำนวณหรือทดสอบเองถ้าทำได้) แล้วตอบ JSON บรรทัดเดียวเท่านั้น: "
-                  '{"final": "<คำตอบที่ถูกที่สุด>", "winner": "<ตัวอักษรของคำตอบที่ดีที่สุด หรือ tie หรือ none>", '
-                  '"reason": "<เหตุผลสั้น ๆ>"}')
-        else:
-            crit = n.get("criteria") or "ความถูกต้อง ความครบถ้วน ความชัดเจน"
-            jp = ("คุณเป็นผู้ตัดสิน ให้คะแนนผลงานแต่ละชิ้นของโจทย์นี้:\n" + n["prompt"] + "\n\nเกณฑ์: " + crit +
-                  "\n\n" + answers.replace("คำตอบ ", "ผลงาน ") +
-                  "\n\nให้คะแนน 0-10 ตามเกณฑ์ แล้วตอบ JSON บรรทัดเดียวเท่านั้น: "
-                  '{"best": "<ตัวอักษรของผลงานที่ดีที่สุด>", "scores": {"A": <คะแนน>, ...}, "reason": "<เหตุผลสั้น ๆ>"}')
-        j = {"id": nid, "type": "task", "prompt": jp, "account": n.get("judge") or "any",
-             "expect": "json", "depends_on": subs, "post": t, "candidates": subs,
-             "difficulty": n.get("judge_difficulty") or n.get("difficulty"),
-             "approve": n.get("approve", False)}
-        out.append(j)
-    return out
-
-
-def normalize_nodes(raw, defaults):
-    if isinstance(raw, dict):
-        nodes = raw.get("nodes") or raw.get("tasks") or []
-    else:
-        nodes = raw
-    out = []
-    for n in nodes:
-        n = dict(n)
-        for k, v in (defaults or {}).items():
-            n.setdefault(k, v)
-        coerce(n)
-        if "id" not in n:
-            raise ValueError("ทุกงานต้องมี id")
-        n["id"] = str(n["id"])
-        if not n.get("prompt") and n.get("type") != "review":
-            raise ValueError("งาน %s ไม่มี prompt" % n["id"])
-        out.append(n)
-    out = expand(out)
-    ids = [n["id"] for n in out]
-    dup = [i for i, c in collections.Counter(ids).items() if c > 1]
-    if dup:
-        raise ValueError("id ซ้ำ: %s" % ", ".join(dup))
-    for n in out:
-        deps = list(n.get("depends_on") or [])
-        for p in placeholders(n.get("prompt", "")) + placeholders(n.get("review_prompt", "")):
-            if p not in deps:
-                deps.append(p)
-        n["depends_on"] = deps
-        bad = [d for d in deps if d not in ids]
-        if bad:
-            raise ValueError("งาน %s อ้างงานที่ไม่มี: %s" % (n["id"], ", ".join(bad)))
-        if n.get("kind") == "image" or n.get("type") == "image":
-            n["kind"] = "image"
-            n.setdefault("expect", "png")
-    # ตรวจวงจร
-    g = {n["id"]: n["depends_on"] for n in out}
+        if not n.get("id") or not re.fullmatch(r"[A-Za-z0-9_.-]+", str(n.get("id"))):
+            errs.append("node id ไม่ถูกต้อง: %r (ใช้ A-Z a-z 0-9 _ . -)" % n.get("id"))
+        for d in n["depends_on"]:
+            if d not in ids:
+                errs.append("%s: depends_on ไม่พบ %s" % (n.get("id"), d))
+        if n["type"] not in ("task", "review", "debate", "best_of", "image"):
+            errs.append("%s: type ไม่รู้จัก %s" % (n["id"], n["type"]))
+        if n["type"] in ("task", "image", "review", "debate", "best_of") and not n.get("prompt"):
+            errs.append("%s: ไม่มี prompt" % n.get("id"))
+    if len(set(ids)) != len(ids):
+        errs.append("node id ซ้ำ")
+    # cycle check
+    deps = {n["id"]: n["depends_on"] for n in nodes if n.get("id")}
     seen, stack = set(), set()
 
     def visit(x):
         if x in stack:
-            raise ValueError("กราฟมีวงจรที่ %s" % x)
+            errs.append("กราฟมีวงวน ที่ %s" % x)
+            return
         if x in seen:
             return
         stack.add(x)
-        for d in g[x]:
+        for d in deps.get(x, []):
             visit(d)
         stack.discard(x)
         seen.add(x)
-    for x in g:
+    for x in deps:
         visit(x)
+    return errs
+
+
+# ======================================================= accounts / pool
+def is_account(spec):
+    return bool(mc.cli_of(spec or ""))
+
+
+def node_accounts(n):
+    """Account specs a node may use."""
+    t = n["type"]
+    if t == "review":
+        return [n.get("worker") or n.get("account") or "any", n.get("reviewer") or "any"]
+    if t in ("debate", "best_of"):
+        return list(n.get("accounts") or (["yolo", "cyolo"] if t == "debate" else ["any", "any", "any"])) + \
+            [n.get("judge") or "any"]
+    return [n.get("account") or "any"]
+
+
+def compute_pool(nodes, workers):
+    all_acc = mc.list_accounts()
+    if workers:
+        return [a for a in workers if a in all_acc]
+    specs = [s for n in nodes for s in node_accounts(n)]
+    if specs and all(is_account(s) for s in specs):
+        return sorted(set(specs), key=lambda a: (mc.side_of(a), mc._num_key(a)))
+    sides = set()
+    for s in specs:
+        if s in ("yolo", "cyolo"):
+            sides.add(s)
+        elif s == "any":
+            sides |= {"yolo", "cyolo"}
+        elif is_account(s):
+            sides.add(None)
+    out = [a for a in all_acc if mc.side_of(a) in sides]
+    for s in specs:
+        if is_account(s) and s not in out:
+            out.append(s)
     return out
 
 
-# ================================================================ planning / router
-def route(n):
-    kind = (n.get("kind") or "").lower()
-    p = n.get("prompt") or ""
-    if kind == "image" or (not kind and re.search(r"สร้างภาพ|image generation", p, re.I)):
-        return "codex", "งานภาพ → cyolo (สร้างภาพได้ฝั่ง Codex เท่านั้น)", True
-    if kind in ("code_review", "review_code") or (not kind and re.search(r"ตรวจโค้ด|code review|review (the )?code", p, re.I)):
-        return "codex", "ตรวจโค้ด → Codex", False
-    if kind in ("doc", "long", "summary", "writing") or len(p) > 4000 or \
-            (not kind and re.search(r"เอกสารยาว|long document", p, re.I)):
-        return "claude", "เอกสาร/ข้อความยาว → Claude", False
-    return None, "เลือกบัญชีที่โควตาเหลือมากสุด/งานน้อยสุด", False
+def readiness(pool, recheck=False, quiet=False):
+    cached = {} if recheck else mc.cached_check(600)
+    todo = [a for a in pool if a not in cached]
+    hit = [a for a in pool if a in cached]
+    if hit and not quiet:
+        P("· ใช้ผลตรวจความพร้อม (เรียกจริง) จาก cache ≤10 นาที: " + ", ".join(
+            "%s=%s@%s" % (a, mc.STATUS_TH.get(cached[a]["status"], cached[a]["status"]), cached[a]["as_of"][11:19])
+            for a in hit))
+    if todo:
+        if not quiet:
+            P("· ตรวจความพร้อมด้วยการเรียกจริง: " + ", ".join(todo))
+        for r in mc.check_accounts(todo):
+            cached[r["account"]] = r
+    return {a: cached[a] for a in pool if a in cached}
 
 
-def model_side(n):
-    m = n.get("model")
-    if not m:
+def setup_accounts(rd, pool, ready, roles=None):
+    quotas = {}
+    for a in pool:
+        if ready.get(a, {}).get("status") == "ready":
+            try:
+                quotas[a] = mc.quota(a)
+            except Exception as e:  # noqa
+                quotas[a] = {"note": str(e)}
+
+    def fn(st):
+        thr = st["options"].get("threshold", DEFAULTS["threshold"])
+        for a in pool:
+            r = ready.get(a) or {"status": "error", "detail": "ไม่ได้ตรวจ"}
+            acc = st["accounts"].setdefault(a, {})
+            acc.update(check=r["status"], check_detail=r.get("detail"), role=(roles or {}).get(a, acc.get("role", "ลูกทีม")))
+            acc.setdefault("stopped", False)
+            if r["status"] != "ready":
+                acc["unusable"] = mc.STATUS_TH.get(r["status"], r["status"])
+            q = quotas.get(a)
+            if q is not None:
+                acc["quota"] = q
+                used = mc.quota_used_pct(q)
+                if used is not None and used >= thr and not acc["stopped"]:
+                    acc["stopped"] = True
+                    acc["stop_reason"] = "โควตา %s%% ≥ เกณฑ์ %s%%" % (used, thr)
+        st["pool"] = pool
+    update(rd, fn)
+
+
+def usable(st, a):
+    acc = st["accounts"].get(a)
+    return bool(acc) and not acc.get("unusable") and not acc.get("stopped")
+
+
+def score(st, a):
+    acc = st["accounts"][a]
+    q = mc.quota_cache_load().get(a) or acc.get("quota")
+    used = mc.quota_used_pct(q)
+    used = 50 if used is None else used
+    load = sum(1 for n in st["nodes"].values() if n.get("planned") == a and n["status"] not in TERMINAL)
+    load += sum(1 for r in st["running"] if r["account"] == a)
+    return used + 15 * load + run_tokens(st, a) / 20000.0
+
+
+def choose(st, spec, kind=None, exclude=()):
+    """Router + quota balancing. Returns account or None."""
+    if is_account(spec):
+        return spec
+    pool = [a for a in st.get("pool", []) if usable(st, a) and a not in exclude]
+    pref = None
+    if spec in ("yolo", "cyolo"):
+        pool = [a for a in pool if mc.side_of(a) == spec]
+    elif kind == "image":
+        pool = [a for a in pool if mc.side_of(a) == "cyolo"]
+    else:
+        pref = KIND_PREF.get(kind or "")
+    if not pool:
         return None
-    return "claude" if m in Y.MODELS else "codex"
+    pool.sort(key=lambda a: (0 if (pref is None or mc.side_of(a) == pref) else 1, score(st, a), a))
+    return pool[0]
 
 
-def usable(st, want=None, exclude=()):
-    out = []
-    for a, info in sorted(st.get("accounts", {}).items()):
-        if not info.get("ready") or info.get("stopped") or info.get("unavailable"):
-            continue
-        if a in exclude or a in (st.get("settings", {}).get("exclude") or []):
-            continue
-        if want and side(a) != want:
-            continue
-        out.append(a)
-    return out
+_ledger_cache = {}
 
 
-def load_of(st, a):
-    return sum(1 for n in st["nodes"].values()
-               if n.get("planned") == a and n.get("status") in ("pending", "running", "waiting_approval"))
-
-
-def tokens_of(st, a):
-    tot = 0
-    for n in st["nodes"].values():
-        for at in n.get("attempts") or []:
-            if at.get("account") == a:
-                tot += int(at.get("in") or 0) + int(at.get("out") or 0)
-    return tot
-
-
-def plan(st, n, exclude=(), prefer=None, spec_override=None):
-    """คืน (account, เหตุผล, pinned)"""
-    spec = spec_override or n.get("account") or "any"
-    if re.fullmatch(r"c?yolo\d+", spec):
-        return spec, "ผู้ใช้ระบุบัญชี", True
-    bound = model_side(n)
-    if spec in ("yolo", "claude"):
-        want, reason, cli_bound = "claude", "ระบุฝั่ง yolo", True
-    elif spec in ("cyolo", "codex"):
-        want, reason, cli_bound = "codex", "ระบุฝั่ง cyolo", True
-    else:
-        want, reason, cli_bound = route(n)
-        if bound:
-            want, cli_bound = bound, True
-            reason = "รุ่น %s → ฝั่ง %s" % (n.get("model"), bound)
-    cands = usable(st, want, exclude)
-    if not cands and want and not cli_bound:
-        cands = usable(st, None, exclude)
-        reason += " (ฝั่งที่ต้องการไม่ว่าง → ข้ามฝั่ง)"
-    if not cands:
-        return None, reason + ": ไม่มีบัญชีที่พร้อม", False
-    q = st.get("quota", {})
-    prefer = prefer if prefer else None
-    dw = st.get("settings", {}).get("demo_worker")  # --demo: ลูกทีมงบต่ำรับ 2 งานแรก จึงมีงานในคิวให้ย้ายแน่นอน
-
-    def key(a):
-        return (0 if (a == dw and load_of(st, a) < 2) else 1,
-                0 if (prefer is None or side(a) == prefer) else 1, load_of(st, a),
-                q.get(a) if q.get(a) is not None else 50.0, tokens_of(st, a), a)
-    return min(cands, key=key), reason, False
-
-
-def worker_switch(st, run_dir, nid, frm, to, reason):
-    ev = {"ts": now_iso(), "node": nid, "from": frm, "to": to, "reason": reason}
-    st.setdefault("worker_switches", []).append(ev)
-    board_append(run_dir, "team.py", "ย้ายงาน %s จาก %s ไป %s: %s" % (nid, frm, to or "-", reason))
-    ledger_event(run_dir, st, "worker_switch", node=nid, account=to, error=reason[:160],
-                 **{"from": frm})
-    log("⇄ ย้ายงาน %s: %s → %s (%s)" % (nid, frm, to or "-", reason))
-
-
-def stop_account(st, run_dir, a, reason):
-    info = st["accounts"].setdefault(a, {})
-    if info.get("stopped"):
-        return
-    info["stopped"] = True
-    info["stop_reason"] = reason
-    board_append(run_dir, "team.py", "%s หยุดรับงานใหม่: %s" % (a, reason))
-    log("⏸ %s หยุดรับงานใหม่: %s (งานที่กำลังรันปล่อยให้จบ)" % (a, reason))
-    replan_queued(st, run_dir, a, reason)
-
-
-def replan_queued(st, run_dir, a, reason):
-    for nid in st["order"]:
-        n = st["nodes"][nid]
-        if n.get("planned") != a or n.get("status") not in ("pending", "waiting_approval"):
-            continue
-        if n.get("pinned"):
-            continue  # ผู้ใช้ระบุบัญชีเอง: ไม่ย้ายเงียบ - จะหยุดและรายงานตอนถึงคิว
-        new, why, _ = plan(st, n, exclude=(a,), prefer=side(a))
-        n["planned"] = new
-        worker_switch(st, run_dir, nid, a, new, reason)
-
-
-WORD_DIFF = {"easy": 1, "low": 1, "ง่าย": 1, "medium": 2, "normal": 2, "กลาง": 2, "hard": 3, "high": 3,
-             "ยาก": 3, "xhigh": 4, "max": 5}
-
-
-def coerce(n):
-    """แก้ค่าที่ชนิดผิดให้ใช้ได้ (เช่น difficulty "easy" หรือ "2") แทนการล้มกลางทาง"""
-    d = n.get("difficulty")
-    if d not in (None, ""):
-        try:
-            n["difficulty"] = min(max(int(float(d)), 1), 6)
-        except (TypeError, ValueError):
-            n["difficulty"] = WORD_DIFF.get(str(d).strip().lower(), 2)
-    for k, dv in (("timeout", 600), ("max_rounds", 3), ("n", 3)):
-        if n.get(k) not in (None, ""):
-            try:
-                n[k] = int(float(n[k]))
-            except (TypeError, ValueError):
-                n[k] = dv
-    if isinstance(n.get("depends_on"), str):
-        n["depends_on"] = [x.strip() for x in n["depends_on"].split(",") if x.strip()]
-    return n
-
-
-def add_nodes(st, nodes):
-    for n in nodes:
-        n = coerce(dict(n))
-        n.setdefault("type", "task")
-        n.update(status="pending", attempts=[], error=None, value=None)
-        acct, reason, pinned = plan(st, n)
-        n["planned"], n["route"], n["pinned"] = acct, reason, pinned
-        if n.get("type") == "review":
-            r_spec = n.get("reviewer") or "any"
-            racct, rreason, rpinned = plan(st, n, spec_override=r_spec,
-                                           prefer=("codex" if acct and side(acct) == "claude" else "claude"))
-            n["reviewer_planned"] = racct
-        st["nodes"][n["id"]] = n
-        if n["id"] not in st["order"]:
-            st["order"].append(n["id"])
-    write_graph(st)
-
-
-def write_graph(st):
-    keys = ("id", "type", "kind", "account", "planned", "depends_on", "expect", "difficulty", "approve",
-            "reviewer", "max_rounds", "cwd", "post", "candidates")
-    g = {"run_id": st["run_id"], "goal": st.get("goal"),
-         "nodes": [{k: st["nodes"][i].get(k) for k in keys if st["nodes"][i].get(k) not in (None, [], False)}
-                   for i in st["order"]],
-         "edges": [[d, i] for i in st["order"] for d in st["nodes"][i].get("depends_on") or []]}
-    save_json(os.path.join(st["run_dir"], "graph.json"), g)
-
-
-def init_state(rid, rd, mode, goal, settings, accounts_info, quotas):
-    st = {"run_id": rid, "run_dir": rd, "mode": mode, "goal": goal, "created": now_iso(),
-          "status": "running", "settings": settings, "nodes": {}, "order": [],
-          "accounts": {}, "quota": {}, "worker_switches": [], "lead_history": [], "leader": None}
-    for a, info in accounts_info.items():
-        st["accounts"][a] = {"ready": info.get("state") == "ready", "check": info.get("state"),
-                             "checked": info.get("ts")}
-    for a, q in quotas.items():
-        st["quota"][a] = q.get("pct")
-    return st
-
-
-def apply_quota_threshold(st, run_dir, quotas):
-    thr = st["settings"].get("quota_threshold", 80)
-    for a, q in quotas.items():
-        pct = q.get("pct")
-        st["quota"][a] = pct
-        if pct is not None and pct >= thr and st["accounts"].get(a, {}).get("ready"):
-            stop_account(st, run_dir, a, "โควตา %g%% ≥ เกณฑ์ %g%%" % (pct, thr))
-
-
-# ================================================================ prompts / validation
-FORMAT_HINT = {"int": "\n\n(รูปแบบคำตอบ: จำนวนเต็มอย่างเดียว)",
-               "number": "\n\n(รูปแบบคำตอบ: ตัวเลขอย่างเดียว)",
-               "json": "\n\n(รูปแบบคำตอบ: JSON อย่างเดียว ไม่มีข้อความอื่น)"}
-
-
-def value_of(st, run_dir, nid, limit=1500):
-    n = st["nodes"].get(nid) or {}
-    path = os.path.join(run_dir, "out", nid + ".md")
-    v = n.get("value")
-    if v is None:
-        v = read_text(path).strip()
-    if len(v) > limit:
-        return "(ข้อมูลยาว %d ตัวอักษร อ่านจากไฟล์ %s)" % (len(v), path)
-    return v
-
-
-def render(st, run_dir, text):
-    def rep(m):
-        kind, key = m.group(1), m.group(2)
-        if key == "run_dir":
-            return run_dir
-        if key == "board":
-            return board_path(run_dir)
-        if kind == "file:":
-            return os.path.join(run_dir, "out", key + ".md")
-        if kind == "account:":
-            return (st["nodes"].get(key) or {}).get("assigned") or "?"
-        return value_of(st, run_dir, key)
-    return PH.sub(rep, text or "")
-
-
-def build_prompt(st, run_dir, n, acct, body=None):
-    parts = ["[ทีม %s · งาน %s · บัญชี %s]" % (st["run_id"], n["id"], acct)]
-    if n.get("cwd"):
-        parts.append("โฟลเดอร์ทำงาน (absolute path): %s" % n["cwd"])
-    if st["settings"].get("board", True):
-        b = board_body(run_dir)
-        if b and len(b) <= 1500:
-            parts.append("กระดานความรู้กลาง (%s):\n%s" % (board_path(run_dir), b))
-        elif b:
-            parts.append("อ่านกระดานความรู้กลางก่อนเริ่ม: %s" % board_path(run_dir))
-        parts.append("(ถ้าพบข้อเท็จจริงที่งานอื่นควรรู้ เพิ่มบรรทัด BOARD: <ข้อเท็จจริง> ต่อท้ายคำตอบได้ ไม่ใช่แทนคำตอบ)")
-    prev = [at["account"] for at in n.get("attempts") or [] if at.get("account") != acct]
-    for pa in prev[-1:]:
-        pf = os.path.join(run_dir, "msgs", "%s__%s.progress.md" % (pa, n["id"]))
-        if os.path.isfile(pf):
-            parts.append("งานนี้ย้ายมาจาก %s ความคืบหน้าเดิมอยู่ที่ %s อ่านก่อนแล้วทำต่อ" % (pa, pf))
-    if int(n.get("difficulty") or 0) >= 3 or n.get("kind") == "code":
-        parts.append("งานยาว: เขียนความคืบหน้าสั้น ๆ ลง %s เป็นระยะ" %
-                     os.path.join(run_dir, "msgs", "%s__%s.progress.md" % (acct, n["id"])))
-    parts.append("---")
-    parts.append(render(st, run_dir, body if body is not None else n.get("prompt", "")))
-    hint = FORMAT_HINT.get((n.get("expect") or "text").split(":")[0])
-    return "\n".join(parts) + (hint or "")
-
-
-BOARD_LINE = re.compile(r"^\s*\**BOARD:\**\s*(.+)$", re.M)
-
-
-def split_board(text):
-    facts = [m.group(1).strip() for m in BOARD_LINE.finditer(text or "")]
-    clean = BOARD_LINE.sub("", text or "").strip()
-    if not clean and facts:
-        clean = "\n".join(facts)  # ตอบมาเป็นบรรทัด BOARD: อย่างเดียว: ใช้เป็นคำตอบด้วย ไม่ทิ้ง
-    return clean, facts
-
-
-def _strip_fences(t):
-    t = t.strip()
-    m = re.match(r"^```[a-zA-Z0-9]*\s*\n(.*?)\n?```\s*$", t, re.S)
-    return m.group(1).strip() if m else t
-
-
-def validate(expect, text, n=None):
-    """คืน (ok, value, เหตุผลเมื่อไม่ผ่าน)"""
-    e = expect or "text"
-    t = (text or "").strip()
-    if e == "text":
-        return (bool(t), t, None if t else "คำตอบว่าง")
-    if e in ("int", "number"):
-        pat = r"[-−]?\d[\d,]*" if e == "int" else r"[-−]?\d[\d,]*(?:\.\d+)?"
-        lines = [l.strip().strip("`*_ ").strip() for l in _strip_fences(t).splitlines() if l.strip()]
-        for cand in lines[-1:]:
-            m = re.fullmatch(pat, cand) or re.search(r"=\s*(" + pat + r")\s*\.?$", cand)
-            if m:
-                v = (m.group(1) if m.groups() else m.group(0)).replace(",", "").replace("−", "-")
-                return True, v, None
-        return False, None, ("expect %s: ต้องเป็นค่าล้วนหรือสมการบรรทัดเดียวที่ลงท้าย '= N' (ได้: %r)"
-                             % (e, t[:80]))
-    if e == "json":
-        s = _strip_fences(t)
-        try:
-            obj = json.loads(s)
-        except ValueError:
-            m = re.search(r"(\{.*\}|\[.*\])", s, re.S)
-            try:
-                obj = json.loads(m.group(1)) if m else None
-            except ValueError:
-                obj = None
-            if obj is None:
-                return False, None, "expect json: แปลงเป็น JSON ไม่ได้"
-        return True, json.dumps(obj, ensure_ascii=False), None
-    if e.startswith("regex:"):
-        m = re.search(e[6:], t, re.S | re.M)
-        if not m:
-            return False, None, "expect %s: ไม่ตรงรูปแบบ" % e
-        return True, (m.group(1) if m.groups() else t), None
-    if e.startswith("contains:"):
-        ok = e[9:] in t
-        return ok, t, None if ok else "expect %s: ไม่พบข้อความ" % e
-    if e == "approved":
-        ok = t.lstrip("*# ").upper().startswith("APPROVED")
-        return ok, t, None if ok else "ผู้ตรวจไม่ตอบ APPROVED"
-    if e == "png":
-        p = (n or {}).get("output")
-        if p and C.is_png(p):
-            return True, p, None
-        return False, None, "expect png: ไม่พบไฟล์ PNG ที่ %s" % p
-    return bool(t), t, None
-
-
-# ================================================================ execution
-def exec_on(st, run_dir, n, acct, prompt, role="worker", popen_cb=None):
-    s = side(acct)
-    model = n.get("model") if model_side(n) == s else None
-    eff = n.get("effort")
-    diff = n.get("difficulty") or st["settings"].get("difficulty") or 2
-    timeout = int(n.get("timeout") or st["settings"].get("timeout") or 600)
-    common = dict(timeout=timeout, run_id=st["run_id"], node=n["id"] if role == "worker" else n["id"] + "." + role,
-                  run_dir=run_dir, cwd=n.get("cwd"), popen_cb=popen_cb)
-    if s == "claude":
-        if eff == "ultra":
-            eff = "max"
-        if eff and eff not in Y.EFFORTS:
-            eff = None
-        schema = json.dumps(n["schema"]) if n.get("schema") else None
-        return Y.call(acct, prompt, model, eff, diff, json_schema=schema, **common)
-    if eff and eff not in C.LEVELS:
-        eff = None
-    if n.get("kind") == "image" and role == "worker":
-        common["cwd"] = common["cwd"] or os.path.dirname(n["output"])
-        return C.image(acct, render(st, run_dir, n.get("prompt", "")), n["output"], **common)
-    schema = None
-    if n.get("schema"):
-        schema = os.path.join(run_dir, "tmp", n["id"] + ".schema.json")
-        save_json(schema, n["schema"])
-    return C.call(acct, prompt, model, eff, diff, output_schema=schema, **common)
-
-
-def attempt_of(r, role):
-    return {"account": r["account"], "role": role, "model": r["model"], "effort": r["effort"],
-            "in": r["input_tokens"], "out": r["output_tokens"], "duration_s": r["duration_s"],
-            "ok": r["ok"], "error": (r["error"] or "")[:160] or None, "ts": now_iso(),
-            "effort_note": r.get("effort_note")}
-
-
-class Engine(object):
-    def __init__(self, run_dir, keep_alive=False, wait_approval=0):
-        self.run_dir = run_dir
-        self.keep_alive = keep_alive
-        self.wait_approval = wait_approval
-        self.threads = {}
-        self.stop = threading.Event()
-        self.announced = set()
-        self.last_q = {}
-
-    # ---------------------------------------------------------- scheduling
-    def schedule(self, st, launches):
-        s = st["settings"]
-        per, mx = int(s.get("per_account", 3)), int(s.get("max_parallel", 8))
-        running = collections.Counter(n.get("assigned") for n in st["nodes"].values() if n["status"] == "running")
-        total = sum(running.values())
-        order = sorted(st["order"], key=lambda i: 0 if st["nodes"][i].get("kind") == "image" else 1)
-        for nid in order:
-            n = st["nodes"][nid]
-            if n["status"] not in ("pending", "waiting_approval"):
-                continue
-            deps = [st["nodes"][d]["status"] for d in n.get("depends_on") or [] if d in st["nodes"]]
-            bad = [d for d in n.get("depends_on") or [] if st["nodes"].get(d, {}).get("status") in FAIL]
-            if bad:
-                n["status"] = "blocked"
-                n["error"] = "งานที่ขึ้นกับล้ม: %s" % ", ".join(bad)
-                log("⊘ %s ถูกบล็อก (%s)" % (nid, n["error"]))
-                continue
-            if any(x != "ok" for x in deps):
-                continue
-            if n.get("approve") and not os.path.exists(os.path.join(self.run_dir, "approvals", nid)):
-                if n["status"] != "waiting_approval":
-                    n["status"] = "waiting_approval"
-                    log("✋ %s รออนุมัติ: python3 %s approve --run %s %s" % (nid, TEAM_PY, st["run_id"], nid))
-                continue
-            if n["status"] == "waiting_approval":
-                n["status"] = "pending"
-                log("✔ %s ได้รับอนุมัติแล้ว" % nid)
-            acct = n.get("planned")
-            info = st["accounts"].get(acct or "", {})
-            blocked = (not acct) or (not info.get("ready")) or info.get("stopped") or info.get("unavailable")
-            if blocked:
-                why = (info.get("stop_reason") or info.get("unavailable") or
-                       ("ไม่พร้อม (%s)" % info.get("check")) if acct else "ยังไม่มีบัญชี")
-                if n.get("pinned"):
-                    n["status"] = "failed"
-                    n["error"] = "บัญชีที่ผู้ใช้ระบุ %s ใช้ไม่ได้/หยุดรับงาน: %s (ไม่ย้ายอัตโนมัติ)" % (acct, why)
-                    log("✗ %s: %s" % (nid, n["error"]))
-                    continue
-                new, reason, _ = plan(st, n, exclude=(acct,) if acct else ())
-                if not new:
-                    n["status"] = "failed"
-                    n["error"] = "ไม่มีบัญชีที่พร้อม (%s)" % reason
-                    log("✗ %s: %s" % (nid, n["error"]))
-                    continue
-                if acct:
-                    worker_switch(st, self.run_dir, nid, acct, new, why)
-                n["planned"] = acct = new
-            if total >= mx:
-                break
-            if running[acct] >= per:
-                continue
-            n["status"] = "running"
-            n["assigned"] = acct
-            n["started"] = now_iso()
-            launches.append(nid)
-            running[acct] += 1
-            total += 1
-
-    def loop(self):
-        wait_start = None
-        stuck = 0
-        while True:
-            launches = []
-            with locked(self.run_dir) as st:
-                self.schedule(st, launches)
-                pend = [i for i in st["order"] if st["nodes"][i]["status"] == "pending"]
-                waiting = [i for i in st["order"] if st["nodes"][i]["status"] == "waiting_approval"]
-            for nid in launches:
-                th = threading.Thread(target=self.run_node, args=(nid,), daemon=True)
-                self.threads[nid] = th
-                th.start()
-            alive = [i for i, th in self.threads.items() if th.is_alive()]
-            if not alive and not launches:
-                if self.keep_alive and not self.stop.is_set():
-                    stuck = 0
-                elif waiting:
-                    wait_start = wait_start or time.time()
-                    if time.time() - wait_start >= self.wait_approval:
-                        return "waiting_approval"
-                elif not pend:
-                    return "done"
-                else:
-                    stuck += 1
-                    if stuck > 15:  # ไม่มีงานรันและจัดคิวไม่ได้: รายงานแทนการวนไม่จบ
-                        with locked(self.run_dir) as st:
-                            for i in st["order"]:
-                                if st["nodes"][i]["status"] == "pending":
-                                    st["nodes"][i]["status"] = "failed"
-                                    st["nodes"][i]["error"] = "จัดคิวไม่ได้ (ไม่มีบัญชีว่าง/ค้าง)"
-                        return "done"
-            else:
-                stuck = 0
-            time.sleep(0.4)
-
-    # ---------------------------------------------------------- node
-    def run_node(self, nid):
-        try:
-            self._run_node(nid)
-        except Exception as e:  # ไม่ให้ thread ตายเงียบ
-            with locked(self.run_dir) as st:
-                n = st["nodes"][nid]
-                n["status"] = "failed"
-                n["error"] = "ข้อผิดพลาดในสคริปต์: %s" % e
-            log("✗ %s ข้อผิดพลาดในสคริปต์: %s" % (nid, e))
-
-    def _run_node(self, nid):
-        rd = self.run_dir
-        with locked(rd) as st:
-            n = json.loads(json.dumps(st["nodes"][nid]))
-            acct = n["assigned"]
-            if n.get("kind") == "image" and not n.get("output"):
-                n["output"] = st["nodes"][nid]["output"] = os.path.join(rd, "out", nid + ".png")
-            if n.get("cwd"):
-                os.makedirs(n["cwd"], exist_ok=True)
-            for d in n.get("depends_on") or []:
-                dn = st["nodes"].get(d) or {}
-                write_text(os.path.join(rd, "msgs", "%s__%s.md" % (d, nid)),
-                           "จาก %s (งาน %s) ถึง %s (งาน %s) · %s\nผลอยู่ที่ %s\nค่า: %s\n" % (
-                               dn.get("assigned"), d, acct, nid, now_iso(),
-                               os.path.join(rd, "out", d + ".md"), value_of(st, rd, d, 300)))
-            snap = json.loads(json.dumps(st))
-        mdl = "%s/%s" % (n.get("model") or "auto", n.get("effort") or "auto")
-        log("▶ %s → %s%s" % (nid, acct, " (review loop)" if n.get("type") == "review" else ""))
-        if n.get("type") == "review":
-            out = self.review_loop(snap, n, acct)
-        else:
-            prompt = build_prompt(snap, rd, n, acct)
-            r = exec_on(snap, rd, n, acct, prompt)
-            out = {"results": [(r, "worker")], "final": r}
-        self.finish_node(nid, n, acct, out)
-
-    def review_loop(self, st, n, acct):
-        rd = self.run_dir
-        racct = n.get("reviewer_planned") or acct
-        rounds = int(n.get("max_rounds") or 3)
-        feedback, results, log_lines = None, [], []
-        draft_path = os.path.join(rd, "out", n["id"] + ".md")
-        for rnd in range(1, rounds + 1):
-            body = n.get("prompt", "")
-            if feedback:
-                body += ("\n\nรอบที่ %d: แก้งานตามความเห็นผู้ตรวจด้านล่าง แล้วส่งงานฉบับเต็มใหม่ทั้งหมด\n"
-                         "งานเดิม: %s\nความเห็นผู้ตรวจ:\n%s" % (rnd, draft_path, feedback))
-            r = exec_on(st, rd, n, acct, build_prompt(st, rd, n, acct, body))
-            results.append((r, "worker"))
-            if not r["ok"]:
-                return {"results": results, "final": r}
-            draft, facts = split_board(r["result"])
-            for f in facts:
-                board_append(rd, acct, f, n["id"])
-            write_text(os.path.join(rd, "out", "%s.r%d.md" % (n["id"], rnd)), draft)
-            write_text(draft_path, draft)
-            shown = draft if len(draft) <= 2500 else "(อ่านจากไฟล์ %s)" % draft_path
-            rp = ((n.get("review_prompt") or "ตรวจงานนี้ว่าถูกต้องและครบตามโจทย์") +
-                  "\n\nโจทย์ของผู้ทำ:\n" + render(st, rd, n.get("prompt", "")) +
-                  "\n\nงานที่ต้องตรวจ (%s):\n%s\n\nบรรทัดแรกตอบ APPROVED ถ้าผ่านทุกเกณฑ์ หรือ CHANGES ถ้าไม่ผ่าน "
-                  "แล้วบรรทัดถัดไปบอกสิ่งที่ต้องแก้ให้ชัด" % (draft_path, shown))
-            rv = exec_on(st, rd, n, racct, "[ทีม %s · ผู้ตรวจงาน %s · บัญชี %s]\n%s" % (
-                st["run_id"], n["id"], racct, render(st, rd, rp)), role="review%d" % rnd)
-            results.append((rv, "review%d" % rnd))
-            text = (rv["result"] or "").strip()
-            log_lines.append("## รอบ %d (%s ตรวจงานของ %s)\n%s\n" % (rnd, racct, acct, text or rv["error"]))
-            write_text(os.path.join(rd, "out", n["id"] + ".review.md"), "\n".join(log_lines))
-            if not rv["ok"]:
-                return {"results": results, "final": rv}
-            if text.lstrip("*# ").upper().startswith("APPROVED"):
-                log("  %s รอบ %d: ผู้ตรวจ %s ตอบ APPROVED" % (n["id"], rnd, racct))
-                return {"results": results, "final": r, "approved": True, "rounds": rnd, "draft": draft}
-            log("  %s รอบ %d: ผู้ตรวจ %s ขอแก้" % (n["id"], rnd, racct))
-            feedback = text
-        return {"results": results, "final": r, "approved": False, "rounds": rounds, "draft": draft}
-
-    def finish_node(self, nid, n, acct, out):
-        rd = self.run_dir
-        final = out["final"]
-        quota_after = None
-        if final.get("ok") and side(acct) == "claude":
-            quota_after = get_quota(acct)  # /usage ไม่เสียโทเค็น
-        with locked(rd) as st:
-            sn = st["nodes"][nid]
-            if "output" in n:
-                sn["output"] = n["output"]
-            for r, role in out["results"]:
-                sn.setdefault("attempts", []).append(attempt_of(r, role))
-            sn["model"], sn["effort"] = final.get("model"), final.get("effort")
-            sn["ended"] = now_iso()
-            ok = all(r["ok"] for r, _ in out["results"])
-            if not ok:
-                bad = [r for r, _ in out["results"] if not r["ok"]][-1]
-                kind = bad.get("error_kind")
-                tok = bad["input_tokens"] + bad["output_tokens"]
-                if kind in ("quota", "auth") and tok == 0:
-                    st["accounts"].setdefault(bad["account"], {})["unavailable"] = \
-                        "%s: %s" % ("โควตาหมด/rate limit" if kind == "quota" else "ล็อกอินหมดอายุ", bad["error"][:80])
-                    if sn.get("pinned"):
-                        sn["status"] = "failed"
-                        sn["error"] = "บัญชีที่ผู้ใช้ระบุ %s ล้ม (%s) - ไม่ย้ายอัตโนมัติ" % (bad["account"], bad["error"][:100])
-                        log("✗ %s %s" % (nid, sn["error"]))
-                    else:
-                        new, why, _ = plan(st, sn, exclude=(bad["account"],), prefer=side(bad["account"]))
-                        reason = "ล้มเพราะ%s (%s)" % ("โควตาหมด/rate limit" if kind == "quota" else "ล็อกอินหมดอายุ",
-                                                      bad["error"][:60])
-                        worker_switch(st, rd, nid, bad["account"], new, reason)
-                        if new:
-                            sn["status"], sn["planned"], sn["assigned"] = "pending", new, None
-                        else:
-                            sn["status"], sn["error"] = "failed", reason + " และไม่มีบัญชีอื่นที่พร้อม"
-                    replan_queued(st, rd, bad["account"], "บัญชีใช้ไม่ได้: " + reason_short(kind))
-                else:
-                    sn["status"] = "timeout" if kind == "timeout" else "failed"
-                    sn["error"] = (bad["error"] or "")[:300]
-                    log("✗ %s %s (%s) %s" % (nid, STATUS_TH[sn["status"]], bad["account"], sn["error"][:120]))
-            else:
-                text = final.get("result") or ""
-                clean, facts = split_board(text)
-                for f in facts:
-                    board_append(rd, acct, f, nid)
-                if n.get("type") == "review":
-                    clean = out.get("draft", clean)
-                    sn["rounds"] = out.get("rounds")
-                write_text(os.path.join(rd, "out", nid + ".md"), clean)
-                if n.get("type") == "review" and not out.get("approved"):
-                    vok, val, why = False, None, "ครบ max_rounds=%s แล้วผู้ตรวจยังไม่ตอบ APPROVED" % out.get("rounds")
-                    sn["status"] = "not_approved"
-                else:
-                    vok, val, why = validate(n.get("expect"), clean, sn)
-                    if vok and n.get("post") in ("best_of", "debate"):
-                        vok, why = self.post_judge(st, sn, val)
-                    sn["status"] = "ok" if vok else "bad_format"
-                sn["value"], sn["error"] = val, why
-                tin = sum(a["in"] for a in sn["attempts"])
-                tout = sum(a["out"] for a in sn["attempts"])
-                dur = sum(a["duration_s"] for a in sn["attempts"])
-                log("%s %s %s (%s %s/%s) %.1fs in=%d out=%d%s" % (
-                    "✓" if vok else "✗", nid, STATUS_TH[sn["status"]], acct, sn["model"], sn["effort"], dur,
-                    tin, tout, (" ค่า=%s" % val[:60]) if (vok and val and len(val) < 60) else
-                    ((" · " + why) if why else "")))
-            # งบโทเค็นลูกทีม: ตรวจทันทีที่งานจบ (งานที่รันอยู่ปล่อยให้จบ)
-            for a in {r["account"] for r, _ in out["results"]}:
-                b = budget_of(st["settings"].get("worker_budget"), a)
-                used = tokens_of(st, a)
-                if b is not None and used > b:
-                    stop_account(st, rd, a, "เกินงบโทเค็นลูกทีม %d > %d" % (used, b))
-            if quota_after is not None:
-                apply_quota_threshold(st, rd, {acct: quota_after})
-
-    def post_judge(self, st, sn, val):
-        try:
-            obj = json.loads(val)
-        except ValueError:
-            return False, "ผู้ตัดสินไม่ได้ตอบ JSON"
-        cands = sn.get("candidates") or []
-        key = obj.get("best") if sn.get("post") == "best_of" else obj.get("winner")
-        letters = "ABCDEFGHIJKLMNOP"
-        idx = None
-        if isinstance(key, int) or (isinstance(key, str) and key.strip().isdigit()):
-            idx = int(key) - 1
-        elif isinstance(key, str) and key.strip()[:1].upper() in letters:
-            idx = letters.index(key.strip()[:1].upper())
-        if not obj.get("reason"):
-            return False, "ผู้ตัดสินไม่ได้ให้เหตุผล (reason)"
-        if sn.get("post") == "best_of":
-            if idx is None or not (0 <= idx < len(cands)):
-                return False, "ผู้ตัดสินเลือกผลงานไม่ถูกต้อง: %r" % key
-        if idx is not None and 0 <= idx < len(cands):
-            src = os.path.join(self.run_dir, "out", cands[idx] + ".md")
-            if os.path.isfile(src):
-                shutil.copyfile(src, os.path.join(self.run_dir, "out", sn["id"] + ".best.md"))
-                sn["best"] = cands[idx]
-        return True, None
-
-
-def reason_short(kind):
-    return "โควตาหมด/rate limit" if kind == "quota" else "ล็อกอินหมดอายุ"
-
-
-# ================================================================ summaries
-def node_row(st, nid):
-    n = st["nodes"][nid]
-    ats = n.get("attempts") or []
-    accts = []
-    for a in ats:
-        lab = a["account"] + ("" if a["role"] == "worker" else "(ตรวจ)")
-        if lab not in accts:
-            accts.append(lab)
-    me = "%s/%s" % (n.get("model") or "-", n.get("effort") or "-")
-    return {"node": nid, "accounts": ",".join(accts) or (n.get("planned") or "-"), "model_effort": me,
-            "duration_s": round(sum(a["duration_s"] for a in ats), 1),
-            "input_tokens": sum(a["in"] for a in ats), "output_tokens": sum(a["out"] for a in ats),
-            "status": n["status"], "note": n.get("error") or "", "value": n.get("value")}
-
-
-def summary_data(st, quotas):
-    rows = [node_row(st, i) for i in st["order"]]
-    tot = {"duration_s": round(sum(r["duration_s"] for r in rows), 1),
-           "input_tokens": sum(r["input_tokens"] for r in rows),
-           "output_tokens": sum(r["output_tokens"] for r in rows),
-           "ok": sum(1 for r in rows if r["status"] == "ok"), "count": len(rows)}
-    return {"run_id": st["run_id"], "run_dir": st["run_dir"], "status": st.get("status"),
-            "nodes": rows, "totals": tot, "worker_switches": st.get("worker_switches", []),
-            "lead_history": st.get("lead_history", []),
-            "quota": [{"account": a, "text": quota_text(q), "ts": q.get("ts"), "lines": q.get("lines")}
-                      for a, q in sorted(quotas.items())]}
-
-
-def print_summary(st, quotas, title="สรุป run"):
-    d = summary_data(st, quotas)
-    print("\n## %s %s (%s)" % (title, d["run_id"], STATUS_TH.get(d["status"], d["status"])))
-    print("| งาน | บัญชี | รุ่น/effort | เวลา (s) | input tokens | output tokens | สถานะ |")
-    print("|---|---|---|---|---|---|---|")
-    for r in d["nodes"]:
-        note = (" · " + r["note"][:70].replace("|", "/").replace("\n", " ")) if r["note"] and r["status"] != "ok" else ""
-        print("| %s | %s | %s | %.1f | %d | %d | %s%s |" % (
-            r["node"], r["accounts"], r["model_effort"], r["duration_s"], r["input_tokens"],
-            r["output_tokens"], STATUS_TH.get(r["status"], r["status"]), note))
-    t = d["totals"]
-    print("| **รวม** | | | %.1f | %d | %d | สำเร็จ %d/%d |" % (t["duration_s"], t["input_tokens"],
-                                                            t["output_tokens"], t["ok"], t["count"]))
-    if d["worker_switches"]:
-        print("\nการย้ายงานลูกทีม:\n| งาน | จาก | ไป | เหตุผล |\n|---|---|---|---|")
-        for w in d["worker_switches"]:
-            print("| %s | %s | %s | %s |" % (w["node"], w["from"], w["to"] or "-", w["reason"]))
-    if quotas:
-        print("\nโควตาบัญชีที่ใช้ (ข้อมูลจริง ณ เวลาที่ระบุ):")
-        for q in d["quota"]:
-            print("- %s: %s" % (q["account"], q["text"]))
-    print("\nผลแต่ละงาน: %s/out/<งาน>.md · ledger: %s/ledger.jsonl" % (d["run_dir"], d["run_dir"]))
-
-
-def used_accounts(st):
-    s = set()
-    for n in st["nodes"].values():
-        for a in n.get("attempts") or []:
-            s.add(a["account"])
-    if st.get("leader"):
-        for h in st.get("lead_history", []):
-            for k in ("from", "to"):
-                if h.get(k):
-                    s.add(h[k])
-    return sorted(s)
-
-
-def final_quotas(st):
-    accs = used_accounts(st)
-    return dict(zip(accs, par(get_quota, accs)))
-
-
-# ================================================================ setup helper
-def prepare(args, mode, goal):
-    accs = all_accounts()
-    log("ตรวจความพร้อม %d บัญชี (เรียกจริง, ใช้ผลที่ตรวจภายใน 15 นาทีซ้ำได้) ..." % len(accs))
-    info = check_accounts(accs, fresh=getattr(args, "recheck", False))
-    ready = [a for a in accs if info.get(a, {}).get("state") == "ready"]
-    notready = ["%s=%s" % (a, Y.STATE_TH.get(info.get(a, {}).get("state"), "?")) for a in accs if a not in ready]
-    log("พร้อม: %s%s" % (", ".join(ready) or "-", (" · ข้าม: " + ", ".join(notready)) if notready else ""))
-    quotas = dict(zip(ready, par(get_quota, ready)))
-    return info, ready, quotas
-
-
-def settings_from(args):
-    return {"per_account": args.per_account, "max_parallel": args.max_parallel,
-            "timeout": args.timeout, "worker_budget": parse_budget(args.worker_token_budget),
-            "quota_threshold": args.quota_threshold,
-            "exclude": [x for x in (args.exclude or "").split(",") if x], "board": True,
-            "difficulty": getattr(args, "difficulty", None) or 2}
-
-
-# ================================================================ commands
-def cmd_check(args):
-    accs = args.accounts or all_accounts()
-    info = check_accounts(accs, fresh=not args.cached)
-    rows = [info[a] for a in accs if a in info]
-    if args.json:
-        print(json.dumps(rows, ensure_ascii=False, indent=1))
-        return 0
-    print("| บัญชี | CLI | สถานะ | เวลา (s) | ตรวจเมื่อ | หมายเหตุ |\n|---|---|---|---|---|---|")
-    for r in rows:
-        print("| %s | %s | %s | %.1f | %s | %s |" % (r["account"], r["cli"], Y.STATE_TH.get(r["state"], r["state"]),
-              r.get("duration_s") or 0, (r.get("ts") or "")[11:19], (r.get("error") or "")[:60]))
-    print("\nพร้อม %d/%d บัญชี" % (sum(1 for r in rows if r["state"] == "ready"), len(rows)))
-    return 0
-
-
-def cmd_quota(args):
-    accs = args.accounts or all_accounts()
-    rows = par(lambda a: (C.quota(a, refresh=args.refresh) if side(a) == "codex" else Y.quota(a)), accs)
-    for r in rows:
-        r["pct"] = Y.quota_pct(r)
-    with _qlock:
-        f = os.path.join(ROOT, "quota.json")
-        cur = load_json(f, {})
-        cur.update({r["account"]: r for r in rows})
-        save_json(f, cur)
-    if args.json:
-        print(json.dumps(rows, ensure_ascii=False, indent=1))
-        return 0
-    print("| บัญชี | โควตาที่ใช้ไปแล้ว | เวลาของข้อมูล |\n|---|---|---|")
-    for r in rows:
-        print("| %s | %s | %s |" % (r["account"], " · ".join(r["lines"]) if r["lines"] else "ไม่มีข้อมูล: %s" % r["error"],
-                                     r.get("ts") or "-"))
-    return 0
-
-
-def read_graph_arg(path):
-    if path == "-":
-        data = sys.stdin.buffer.read().decode("utf-8-sig")
-    else:
-        with open(path, encoding="utf-8-sig") as f:
-            data = f.read()
-    return json.loads(data)
-
-
-def cmd_run(args):
-    QUIET["on"] = args.json
-    if args.resume:
-        return resume_run(args)
-    if not args.graph:
-        print("ต้องระบุไฟล์กราฟ (หรือ - เพื่ออ่านจาก stdin) หรือ --resume <run_id>", file=sys.stderr)
-        return 2
+def run_tokens(st, a, workers_only=True):
+    rd = run_dir_of(st["run_id"])
+    path = os.path.join(rd, "ledger.jsonl")
     try:
-        g = read_graph_arg(args.graph)
-        defaults = g.get("defaults", {}) if isinstance(g, dict) else {}
-        nodes = normalize_nodes(g, defaults)
-    except (ValueError, OSError) as e:
-        print("กราฟไม่ถูกต้อง: %s" % e, file=sys.stderr)
-        return 2
-    goal = g.get("goal") if isinstance(g, dict) else None
-    info, ready, quotas = prepare(args, "graph", goal)
-    probs = pinned_problems(nodes, info)
-    if probs:
-        print("ไม่เริ่ม run (ยังไม่เสียโทเค็น): งานที่ระบุบัญชีเองแต่บัญชีนั้นใช้ไม่ได้ — %s\n"
-              "แก้ account เป็นบัญชีที่พร้อม (%s) หรือใช้ฝั่ง yolo / cyolo / any ให้ระบบเลือก" % (
-                  "; ".join(probs), ", ".join(ready) or "-"), file=sys.stderr)
-        return 2
-    rid, rd = new_run_dir("graph", goal, args.run_id)
-    st = init_state(rid, rd, "graph", goal, settings_from(args), info, quotas)
-    if isinstance(g, dict) and g.get("board") is False:
-        st["settings"]["board"] = False
-    with locked(rd) as s2:
-        s2.update(st)
-        apply_quota_threshold(s2, rd, quotas)
-        add_nodes(s2, nodes)
-        for nid in s2["order"]:
-            n = s2["nodes"][nid]
-            log("  %s → %s (%s)" % (nid, n["planned"] or "ไม่มีบัญชี", n["route"]))
-    log("run %s เริ่ม · %d งาน · โฟลเดอร์ %s" % (rid, len(nodes), rd))
-    return finish_run(args, rd)
-
-
-def pinned_problems(nodes, info):
-    """งานที่ผู้ใช้ระบุบัญชีเอง (account / reviewer / judge) แต่บัญชีนั้นไม่พร้อม"""
-    out = []
-    for n in nodes:
-        for f in ("account", "reviewer"):
-            a = n.get(f)
-            if a and re.fullmatch(r"c?yolo\d+", a):
-                stt = (info.get(a) or {}).get("state")
-                if stt != "ready":
-                    out.append("%s.%s=%s (%s)" % (n["id"], f, a, Y.STATE_TH.get(stt, "ไม่มีบัญชีนี้")))
-    return out
-
-
-def finish_run(args, rd):
-    eng = Engine(rd, wait_approval=args.wait_approval)
-    res = eng.loop()
-    with locked(rd) as st:
-        sts = [st["nodes"][i]["status"] for i in st["order"]]
-        if res == "waiting_approval":
-            st["status"] = "waiting_approval"
-        else:
-            st["status"] = "done" if all(s == "ok" for s in sts) else "failed"
-        bad = [i for i in st["order"] if st["nodes"][i]["status"] != "ok"]
-        write_handoff(rd, st, "team.py run", "สำเร็จ %d/%d งาน" % (len(sts) - len(bad), len(sts)),
-                      ("รันต่อ: team.py run --resume %s (งานที่ยังไม่สำเร็จ: %s)" % (st["run_id"], ", ".join(bad)))
-                      if bad else "ไม่มี (จบแล้ว)", "-")
-        final = json.loads(json.dumps(st))
-    quotas = final_quotas(final)
-    if args.json:
-        print(json.dumps(summary_data(final, quotas), ensure_ascii=False, indent=1))
-    else:
-        print_summary(final, quotas)
-        if res == "waiting_approval":
-            w = [i for i in final["order"] if final["nodes"][i]["status"] == "waiting_approval"]
-            print("\n✋ รออนุมัติ: %s\n   อนุมัติ: python3 %s approve --run %s <งาน>\n   แล้วรันต่อ: python3 %s run --resume %s"
-                  % (", ".join(w), TEAM_PY, final["run_id"], TEAM_PY, final["run_id"]))
-        elif final["status"] != "done":
-            print("\nแก้แล้วรันต่อเฉพาะงานที่ล้ม: python3 %s run --resume %s [graph.json] [--set <งาน>.expect=text]"
-                  % (TEAM_PY, final["run_id"]))
-    return 0 if final["status"] in ("done", "waiting_approval") else 1
-
-
-def resume_run(args):
-    rd = resolve_run(args.resume)
-    if not rd:
-        print("ไม่พบ run %s" % args.resume, file=sys.stderr)
-        return 2
-    overrides = {}
-    if args.graph:
-        try:
-            g = read_graph_arg(args.graph)
-            for n in normalize_nodes(g, g.get("defaults", {}) if isinstance(g, dict) else {}):
-                overrides[n["id"]] = n
-        except (ValueError, OSError) as e:
-            print("กราฟไม่ถูกต้อง: %s" % e, file=sys.stderr)
-            return 2
-    for s in args.set or []:
-        m = re.match(r"^([^=]+)\.(prompt|expect|account|model|effort|difficulty|timeout|cwd)=(.*)$", s, re.S)
-        if not m:
-            print("--set ต้องเป็นรูป <งาน>.<field>=<ค่า>: %s" % s, file=sys.stderr)
-            return 2
-        overrides.setdefault(m.group(1), {})[m.group(2)] = m.group(3)
-    info, ready, quotas = prepare(args, "graph", None)
-    with locked(rd) as st:
-        for a, i in info.items():
-            st["accounts"][a] = {"ready": i.get("state") == "ready", "check": i.get("state"), "checked": i.get("ts")}
-        if args.worker_token_budget:
-            st["settings"]["worker_budget"] = parse_budget(args.worker_token_budget)
-        st["quota"] = {}
-        apply_quota_threshold(st, rd, quotas)
-        new_nodes = [o for k, o in overrides.items() if k not in st["nodes"] and o.get("prompt")]
-        rerun, revalid = [], []
-        for nid in st["order"]:
-            n = st["nodes"][nid]
-            if n["status"] == "ok":
-                continue
-            ov = overrides.get(nid, {})
-            prompt_changed = "prompt" in ov and ov["prompt"] != n.get("prompt")
-            for k in ("prompt", "expect", "account", "model", "effort", "difficulty", "timeout", "cwd",
-                      "review_prompt", "max_rounds", "reviewer"):
-                if k in ov:
-                    n[k] = int(ov[k]) if k in ("difficulty", "timeout", "max_rounds") else ov[k]
-            outf = os.path.join(rd, "out", nid + ".md")
-            if n["status"] == "bad_format" and not prompt_changed and os.path.isfile(outf):
-                vok, val, why = validate(n.get("expect"), read_text(outf), n)
-                if vok:
-                    n.update(status="ok", value=val, error=None, revalidated=now_iso())
-                    revalid.append(nid)
-                    continue
-            n.update(status="pending", error=None, assigned=None)
-            acct, reason, pinned = plan(st, n)
-            n["planned"], n["route"], n["pinned"] = acct, reason, pinned
-            rerun.append(nid)
-        if new_nodes:
-            add_nodes(st, new_nodes)
-        st["status"] = "running"
-    log("resume %s · ตรวจรูปแบบใหม่ผ่านโดยไม่เรียกซ้ำ: %s · รันใหม่: %s" % (
-        os.path.basename(rd), ", ".join(revalid) or "-", ", ".join(rerun) or "-"))
-    return finish_run(args, rd)
-
-
-def cmd_approve(args):
-    rd = resolve_run(args.run)
-    if not rd:
-        print("ไม่พบ run", file=sys.stderr)
-        return 2
-    st = read_state(rd)
-    if args.node not in st.get("nodes", {}):
-        print("ไม่มีงาน %s ใน run %s" % (args.node, st.get("run_id")), file=sys.stderr)
-        return 2
-    write_text(os.path.join(rd, "approvals", args.node), "approved %s by %s\n" % (now_iso(), args.by))
-    board_append(rd, args.by, "อนุมัติงาน %s" % args.node)
-    print("อนุมัติ %s แล้ว (%s) · ถ้า run หยุดอยู่ให้รัน: python3 %s run --resume %s" % (
-        args.node, os.path.join(rd, "approvals", args.node), TEAM_PY, st["run_id"]))
-    return 0
-
-
-def account_status_rows(st, refresh=False):
-    accs = sorted(st.get("accounts", {}).keys(), key=lambda a: (side(a), int(re.sub(r"\D", "", a) or 0)))
-    leader = (st.get("leader") or {}).get("account")
-    past = {h.get("from") for h in st.get("lead_history", [])}
-    thr = st.get("settings", {}).get("quota_threshold", 80)
-    rows = []
-    for a in accs:
-        info = st["accounts"][a]
-        running = [i for i in st["order"] if st["nodes"][i]["status"] == "running" and st["nodes"][i].get("assigned") == a]
-        queued = [i for i in st["order"] if st["nodes"][i]["status"] in ("pending", "waiting_approval")
-                  and st["nodes"][i].get("planned") == a]
-        q = get_quota(a) if (refresh and info.get("ready")) else cached_quota(a)
-        pct = Y.quota_pct(q) if q else None
-        b = budget_of(st.get("settings", {}).get("worker_budget"), a)
-        used = tokens_of(st, a)
-        if not info.get("ready") or info.get("unavailable"):
-            stt = "ใช้ไม่ได้ (%s)" % (info.get("unavailable") or Y.STATE_TH.get(info.get("check"), info.get("check")))
-        elif info.get("stopped"):
-            stt = "หยุดรับงาน (%s)" % info.get("stop_reason")
-        elif (pct is not None and pct >= thr - 20) or (b and used >= 0.8 * b):
-            stt = "ใกล้หมด"
-        else:
-            stt = "พร้อม"
-        role = "หัวหน้า" if a == leader and st.get("status") == "running" else \
-            ("อดีตหัวหน้า" if a in past else "ลูกทีม")
-        rows.append({"account": a, "role": role, "running": running, "queued": queued, "tokens": used,
-                     "budget": b, "quota": quota_text(q), "status": stt})
-    return rows
-
-
-def cmd_status(args):
-    rd = resolve_run(args.run)
-    if not rd:
-        print("ยังไม่มี run%s (เริ่มด้วย team.py run <graph.json> หรือ team.py lead --demo)" %
-              ((" ชื่อ " + args.run) if args.run else ""))
-        return 0
-    st = read_state(rd)
-    rows = account_status_rows(st, refresh=args.refresh)
-    if args.json:
-        print(json.dumps({"run_id": st["run_id"], "status": st.get("status"), "accounts": rows,
-                          "nodes": [node_row(st, i) for i in st["order"]],
-                          "leader": st.get("leader"), "lead_history": st.get("lead_history")},
-                         ensure_ascii=False, indent=1))
-        return 0
-    print("run %s · โหมด %s · สถานะ %s · %s" % (st["run_id"], st.get("mode"), STATUS_TH.get(st.get("status"), st.get("status")), rd))
-    if st.get("goal"):
-        print("เป้าหมาย: %s" % st["goal"])
-    print("\n| บัญชี | บทบาท | งานที่รัน | งานในคิว | tokens ที่ใช้ใน run | โควตาล่าสุด (เวลาของข้อมูล) | สถานะ |")
-    print("|---|---|---|---|---|---|---|")
-    for r in rows:
-        print("| %s | %s | %s | %s | %d%s | %s | %s |" % (
-            r["account"], r["role"], ",".join(r["running"]) or "-", ",".join(r["queued"]) or "-", r["tokens"],
-            (" / งบ %d" % r["budget"]) if r["budget"] is not None else "", r["quota"], r["status"]))
-    if not args.brief:
-        print("\n| งาน | บัญชี | สถานะ | ค่า/หมายเหตุ |\n|---|---|---|---|")
-        for i in st["order"]:
-            r = node_row(st, i)
-            v = r["value"] if r["status"] == "ok" else r["note"]
-            print("| %s | %s | %s | %s |" % (i, r["accounts"], STATUS_TH.get(r["status"], r["status"]), (v or "")[:70]))
-    else:
-        for i in st["order"]:
-            r = node_row(st, i)
-            print("- %s: %s (%s)%s" % (i, STATUS_TH.get(r["status"]), r["accounts"],
-                                       (" ค่า=" + r["value"][:50]) if r["status"] == "ok" and r["value"] and len(r["value"]) < 50 else ""))
-    return 0
-
-
-def read_ledger(path):
-    rows = []
-    try:
-        with open(path, encoding="utf-8") as f:
-            for ln in f:
-                try:
-                    rows.append(json.loads(ln))
-                except ValueError:
-                    pass
+        mt = os.path.getmtime(path)
     except OSError:
-        pass
-    return rows
+        return 0
+    key = path
+    if _ledger_cache.get(key, (None,))[0] != mt:
+        _ledger_cache[key] = (mt, mc.read_ledger(path))
+    rows = _ledger_cache[key][1]
+    return sum(mc.row_tokens(r) for r in rows if r.get("account") == a and not r.get("event")
+               and not (workers_only and str(r.get("node") or "").startswith("lead#")))
 
 
-def agg(rows, key):
-    out = collections.OrderedDict()
-    for r in rows:
-        k = key(r)
-        a = out.setdefault(k, collections.Counter())
-        a["calls"] += 1
-        a["ok"] += 1 if r.get("status") == "ok" else 0
-        a["fail"] += 0 if r.get("status") == "ok" else 1
-        for f in ("input_tokens", "cached_input_tokens", "cache_write_tokens", "output_tokens", "reasoning_tokens"):
-            a[f] += int(r.get(f) or 0)
-        a["cost_usd"] += float(r.get("cost_usd") or 0)
-        a["duration_s"] += float(r.get("duration_s") or 0)
-    return out
+# ============================================================ prompts
+def strip_board(text):
+    keep, board = [], []
+    for line in (text or "").splitlines():
+        m = re.match(r"\s*\**BOARD:\**\s*(.+)", line)
+        if m:
+            board.append(m.group(1).strip())
+        else:
+            keep.append(line)
+    return "\n".join(keep).strip(), board
 
 
-def cmd_stats(args):
-    if args.run:
-        rd = resolve_run(args.run)
-        if not rd:
-            print("ไม่พบ run %s" % args.run)
-            return 0
-        path = os.path.join(rd, "ledger.jsonl")
+def substitute(rd, st, text, nid):
+    def rep(m):
+        key = m.group(1)
+        if key.startswith("file:"):
+            return os.path.join(rd, "out", key[5:] + ".md")
+        if key == "run_dir":
+            return rd
+        if key == "board":
+            return os.path.join(rd, "board.md")
+        n = st["nodes"].get(key)
+        if not n:
+            return m.group(0)
+        val = n.get("value")
+        if val is None:
+            return m.group(0)
+        if len(val) > 2000:
+            return "(ข้อมูลยาว อ่านจากไฟล์ %s)" % os.path.join(rd, "out", key + ".md")
+        return val
+    return re.sub(r"\{\{\s*([A-Za-z0-9_.:-]+)\s*\}\}", rep, text or "")
+
+
+EXPECT_HINT = {
+    "number": "รูปแบบคำตอบ: ตอบเฉพาะตัวเลขผลลัพธ์ตัวเดียว ไม่มีข้อความอื่น",
+    "int": "รูปแบบคำตอบ: ตอบเฉพาะจำนวนเต็มตัวเดียว ไม่มีข้อความอื่น",
+    "json": "รูปแบบคำตอบ: ตอบเป็น JSON ล้วน (ไม่มี ``` และไม่มีข้อความอื่น)",
+}
+
+
+def build_prompt(rd, st, n, acc, body, moved_from=None, extra=None):
+    cwd = node_cwd(rd, n)
+    parts = ["[งานทีม run %s · งาน %s · บัญชี %s]" % (st["run_id"], n["id"], acc)]
+    if n.get("board", True):
+        parts.append("กระดานความรู้กลาง: %s — อ่านก่อนเริ่ม ถ้าพบข้อเท็จจริงที่ agent อื่นควรรู้ ให้ใส่ในคำตอบเป็นบรรทัด "
+                     "ขึ้นต้นด้วย \"BOARD: \" (ระบบต่อท้ายลงกระดานให้พร้อมชื่อและเวลา)" % os.path.join(rd, "board.md"))
+    parts.append("โฟลเดอร์ทำงาน (absolute): %s · ถ้างานยาว ให้เขียนความคืบหน้าเป็นระยะลง %s" %
+                 (cwd, os.path.join(rd, "msgs", "%s__progress.md" % n["id"])))
+    if moved_from:
+        parts.append("งานนี้ย้ายมาจากบัญชี %s ความคืบหน้าเดิม (ถ้ามี) อยู่ที่ %s อ่านก่อนแล้วทำต่อ ไม่ต้องเริ่มจากศูนย์" %
+                     (moved_from, os.path.join(rd, "msgs", "%s__progress.md" % n["id"])))
+    parts.append("")
+    parts.append(substitute(rd, st, body, n["id"]))
+    exp = n.get("expect")
+    if extra is not None:
+        if extra:
+            parts.append(extra)
+    elif exp in EXPECT_HINT:
+        parts.append(EXPECT_HINT[exp])
+    return "\n".join(parts)
+
+
+def node_cwd(rd, n):
+    cwd = n.get("cwd") or rd
+    if not os.path.isabs(cwd):
+        cwd = os.path.join(rd, cwd)
+    mc.ensure_dir(cwd)
+    return cwd
+
+
+def check_expect(exp, text):
+    """Return (ok, value, reason)."""
+    t = (text or "").strip()
+    if not exp:
+        return True, t, ""
+    if exp in ("number", "int"):
+        c = t.replace(",", "").strip().strip("`*").strip()
+        pat = r"-?\d+" if exp == "int" else r"-?\d+(?:\.\d+)?"
+        if re.fullmatch(pat, c):
+            return True, c, ""
+        return False, t, "expect=%s แต่คำตอบไม่ใช่ตัวเลขล้วน: %s" % (exp, mc.short(t, 60))
+    if exp == "json":
+        c = re.sub(r"^```(?:json)?\s*|\s*```$", "", t)
+        try:
+            json.loads(c)
+            return True, c, ""
+        except ValueError as e:
+            return False, t, "expect=json แต่ parse ไม่ได้: %s" % e
+    if exp.startswith("regex:"):
+        if re.search(exp[6:], t, re.S):
+            return True, t, ""
+        return False, t, "ไม่ตรง %s" % exp
+    if exp.startswith("contains:"):
+        if exp[9:] in t:
+            return True, t, ""
+        return False, t, "ไม่มีข้อความ %r" % exp[9:]
+    if exp == "approved":
+        return ("APPROVED" in t), t, "" if "APPROVED" in t else "ไม่มี APPROVED"
+    if exp == "png":
+        return True, t, ""
+    return False, t, "expect ไม่รู้จัก: %s" % exp
+
+
+# ===================================================== slots & calls
+def acquire_slot(rd, nid, acc, token):
+    def fn(st):
+        o = st["options"]
+        st["running"] = [r for r in st["running"] if _alive(r)]
+        if not usable(st, acc):
+            return "pinned_stopped" if is_pinned_node(st, nid) else "stopped"
+        if sum(1 for r in st["running"] if r["account"] == acc) >= o.get("per_account", 3):
+            return False
+        if len(st["running"]) >= o.get("max_total", 8):
+            return False
+        st["running"].append(dict(account=acc, node=nid, pid=os.getpid(), token=token, since=mc.now_iso()))
+        return True
+    return update(rd, fn)
+
+
+def release_slot(rd, token):
+    def fn(st):
+        st["running"] = [r for r in st["running"] if r.get("token") != token]
+    update(rd, fn)
+
+
+def _alive(r):
+    if r.get("pid") == os.getpid():
+        return True
+    try:
+        os.kill(r["pid"], 0)
+        return True
+    except (OSError, KeyError):
+        return False
+
+
+def is_pinned_node(st, nid):
+    base = nid.split("#")[0]
+    n = st["nodes"].get(base) or {}
+    return bool(n.get("pinned"))
+
+
+def record_switch(rd, st, nid, frm, to, reason):
+    sw = dict(node=nid, **{"from": frm}, to=to, reason=reason, ts=mc.now_iso())
+    st["switches"].append(sw)
+    event(rd, st, "worker_switch", node=nid, to=to, reason=reason, **{"from": frm})
+    board_append(rd, "team.py", "ย้ายงาน %s จาก %s ไป %s: %s" % (nid, frm, to or "-", reason))
+    msg_append(rd, frm or "none", to or "none",
+               "ย้ายงาน %s มาให้ %s เพราะ %s\nความคืบหน้าเดิม (ถ้ามี): %s" %
+               (nid, to, reason, os.path.join(rd, "msgs", "%s__progress.md" % nid.split("#")[0])))
+    P("↪ ย้ายงาน %s: %s → %s (%s)" % (nid, frm, to, reason))
+
+
+def stop_account(rd, st, a, reason):
+    acc = st["accounts"].setdefault(a, {})
+    if acc.get("stopped"):
+        return
+    acc["stopped"] = True
+    acc["stop_reason"] = reason
+    event(rd, st, "worker_stop", account=a, reason=reason)
+    board_append(rd, "team.py", "บัญชี %s หยุดรับงานใหม่: %s (งานที่รันอยู่ปล่อยให้จบ)" % (a, reason))
+    P("⏸ %s หยุดรับงานใหม่: %s" % (a, reason))
+    for nid, n in st["nodes"].items():
+        if n.get("planned") == a and n["status"] in ("pending", "waiting_approval", "queued"):
+            if n.get("pinned"):
+                continue
+            new = choose(st, n.get("spec", "any"), n.get("kind"), exclude=(a,))
+            n["planned"] = new
+            record_switch(rd, st, nid, a, new, "บัญชี %s หยุดรับงาน: %s" % (a, reason))
+
+
+def after_call(rd, acc, res, nid):
+    def fn(st):
+        o = st["options"]
+        if res.get("status") in mc.SWITCHABLE:
+            st["accounts"].setdefault(acc, {})["unusable"] = "ล้ม: %s" % mc.short(res.get("error"), 60)
+            return
+        if str(nid).startswith("lead#"):
+            return
+        wb = o.get("worker_budget") or {}
+        if o.get("demo_budget_first_worker") and res.get("ok") and not st.get("demo_budget_used"):
+            st["demo_budget_used"] = acc
+            wb[acc] = 1
+            o["worker_budget"] = wb
+        budget = wb.get(acc) or wb.get("*")
+        if budget:
+            used = run_tokens(st, acc)
+            if used > budget:
+                stop_account(rd, st, acc, "เกินงบโทเค็นลูกทีม (%d > %d)" % (used, budget))
+        q = mc.quota_cache_load().get(acc)
+        u = mc.quota_used_pct(q)
+        if u is not None and u >= o.get("threshold", 80):
+            stop_account(rd, st, acc, "โควตา %s%% ≥ เกณฑ์ %s%%" % (u, o.get("threshold", 80)))
+    update(rd, fn)
+
+
+def model_for(n, acc, difficulty=None):
+    d = int(difficulty or n.get("difficulty") or 2)
+    cm, ce, xe = mc.DIFFICULTY[max(1, min(6, d))]
+    if n.get("type") == "image" or n.get("kind") == "image":
+        cm, ce, xe = mc.DIFFICULTY[1]
+    m, e = n.get("model"), n.get("effort")
+    if mc.cli_of(acc) == "claude":
+        model = m if m in mc.CLAUDE_MODELS else cm
+        effort = e if e in mc.CLAUDE_EFFORTS else ("max" if e == "ultra" else ce)
+        return model, effort
+    model = m if (m and m not in mc.CLAUDE_MODELS) else None
+    return model, (e if e in mc.CODEX_EFFORT_ORDER else xe)
+
+
+def call_on(rd, nid, spec, kind, n, body_fn, difficulty=None, extra=None, first_account=None, image_out=None):
+    """Call one agent for (sub)node nid with failover. body_fn(acc) -> prompt body."""
+    pinned = is_account(spec)
+    tried = []
+    moved_from = None
+    acc = first_account
+    if not acc:
+        acc = update(rd, lambda st: choose(st, spec, kind))
+    while True:
+        if not acc:
+            return dict(ok=False, status="failed", error="ไม่มีบัญชีที่พร้อมสำหรับ %s (kind=%s)" % (spec, kind),
+                        account=None, model=None, effort=None, result="", duration_s=0)
+        token = "%s-%s-%s" % (os.getpid(), threading.get_ident(), time.time())
+        while True:
+            got = acquire_slot(rd, nid, acc, token)
+            if got is True:
+                break
+            if got == "pinned_stopped":
+                info = load_state(rd)["accounts"].get(acc, {})
+                err = "บัญชี %s ที่ผู้ใช้ระบุ %s จึงไม่รันและไม่ย้ายอัตโนมัติ" % (
+                    acc, "หยุดรับงาน: %s" % info.get("stop_reason") if info.get("stopped") else
+                    "ใช้ไม่ได้: %s" % info.get("unusable"))
+                P("⛔ %s: %s" % (nid, err))
+                return dict(ok=False, status="failed", error=err, account=acc, model=None, effort=None,
+                            result="", duration_s=0)
+            if got == "stopped":
+                old = acc
+
+                def re_choose(st):
+                    new = choose(st, spec, kind, exclude=tuple(tried) + (old,))
+                    record_switch(rd, st, nid, old, new, "บัญชี %s หยุดรับงาน: %s" %
+                                  (old, st["accounts"].get(old, {}).get("stop_reason") or
+                                   st["accounts"].get(old, {}).get("unusable")))
+                    return new
+                acc = update(rd, re_choose)
+                moved_from = old
+                if not acc:
+                    return dict(ok=False, status="failed", error="ไม่มีบัญชีอื่นรับงานต่อ", account=old,
+                                model=None, effort=None, result="", duration_s=0)
+                continue
+            time.sleep(1.0)
+        st = load_state(rd)
+        model, effort = model_for(n, acc, difficulty)
+        if mc.cli_of(acc) == "codex" and not model:
+            model = mc.codex_default_model(acc)
+        o = st["options"]
+        sim = acc in (o.get("simulate_limit") or [])
+        if o.get("demo_limit_first_worker") and not st.get("demo_limit_used") and not pinned:
+            def mark(s):
+                if s.get("demo_limit_used"):
+                    return False
+                s["demo_limit_used"] = acc
+                s["options"].setdefault("simulate_limit", []).append(acc)
+                return True
+            sim = update(rd, mark) or sim
+        prompt = build_prompt(rd, st, n, acc, body_fn(acc), moved_from=moved_from, extra=extra)
+        _set_node(rd, nid.split("#")[0], account=acc, model=model, effort=effort)
+        P("▶ %s → %s (%s/%s)%s" % (nid, acc, model or "default", effort, " [จำลองโควตาหมด]" if sim else ""))
+        timeout = int(n.get("timeout") or o.get("timeout", 900))
+        cwd = node_cwd(rd, n)
+        try:
+            if mc.cli_of(acc) == "claude":
+                res = mc.call_claude(acc, prompt, model, effort, cwd=cwd, timeout=timeout, run_dir=rd,
+                                     run_id=st["run_id"], node=nid, simulate_limit=sim)
+            else:
+                res = mc.call_codex(acc, prompt, model, effort, cwd=cwd, timeout=timeout, run_dir=rd,
+                                    run_id=st["run_id"], node=nid, simulate_limit=sim)
+        finally:
+            release_slot(rd, token)
+        if image_out and res.get("ok") and not mc.is_png(image_out):
+            res.update(ok=False, status="bad_output", error="ไม่พบไฟล์ PNG ที่ %s" % image_out)
+        after_call(rd, acc, res, nid)
+        P("%s %s ← %s %.1fs in=%s out=%s %s" % ("✔" if res["ok"] else "✘", nid, acc, res["duration_s"],
+                                               res.get("input_tokens"), res.get("output_tokens"),
+                                               "" if res["ok"] else "(%s: %s)" % (res["status"], mc.short(res["error"], 80))))
+        if res["ok"] or res["status"] not in mc.SWITCHABLE:
+            return res
+        tried.append(acc)
+        if pinned:
+            res["error"] = "บัญชี %s ที่ผู้ใช้ระบุล้ม (%s) ไม่ย้ายอัตโนมัติ: %s" % (acc, res["status"], res["error"])
+            update(rd, lambda st: board_append(rd, "team.py", "งาน %s: %s" % (nid, res["error"])))
+            return res
+        old = acc
+
+        def fail_over(st):
+            new = choose(st, spec, kind, exclude=tuple(tried))
+            if not new and spec == "any" and kind != "image":
+                new = choose(st, "any", None, exclude=tuple(tried))
+            record_switch(rd, st, nid, old, new, "%s ล้มเพราะ %s" % (old, res["status"]))
+            return new
+        acc = update(rd, fail_over)
+        moved_from = old
+        if not acc:
+            return res
+
+
+def _set_node(rd, nid, **kw):
+    def fn(st):
+        st["nodes"].setdefault(nid, {}).update(kw)
+    update(rd, fn)
+
+
+# ========================================================= node runners
+def write_out(rd, name, text):
+    path = os.path.join(rd, "out", name + ".md")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text or "")
+    return path
+
+
+def push_board(rd, author, lines):
+    for b in lines:
+        board_append(rd, author, b)
+
+
+def run_task(rd, n, st0):
+    nid = n["id"]
+    image_out = None
+    kind = n.get("kind")
+    if n["type"] == "image":
+        kind = "image"
+        image_out = n.get("path") or os.path.join(rd, "out", nid + ".png")
+        if not os.path.isabs(image_out):
+            image_out = os.path.join(rd, image_out)
+        mc.ensure_dir(os.path.dirname(image_out))
+        body = lambda acc: ("สร้างภาพ (image generation): %s\nบันทึกเป็นไฟล์ PNG ที่ %s (absolute path) แล้วตอบเฉพาะ path" %
+                            (n["prompt"], image_out))
     else:
-        path = os.path.join(ROOT, "ledger.jsonl")
-    rows = [r for r in read_ledger(path) if r.get("cli") and r.get("event") not in ("worker_switch", "lead_switch")]
-    if args.event:
-        rows = [r for r in rows if r.get("event") in args.event.split(",")]
-    if args.since:
-        rows = [r for r in rows if (r.get("ts_start") or "") >= args.since]
-    if not rows:
-        print("ยังไม่มีสถิติใน %s" % path)
-        return 0
-    groups = [("บัญชี", agg(rows, lambda r: r.get("account"))),
-              ("รุ่น", agg(rows, lambda r: "%s/%s" % (r.get("cli"), r.get("model")))),
-              ("run", agg(rows, lambda r: r.get("run_id") or "(ไม่มี run)")),
-              ("ชนิดการเรียก", agg(rows, lambda r: r.get("event") or "call"))]
-    tot = agg(rows, lambda r: "รวม")["รวม"]
-    if args.json:
-        print(json.dumps({"ledger": path, "rows": len(rows),
-                          "by": {g: {k: dict(v) for k, v in d.items()} for g, d in groups},
-                          "total": dict(tot)}, ensure_ascii=False, indent=1))
-        return 0
-    print("สถิติจาก %s (%d แถว)" % (path, len(rows)))
-    for title, d in groups:
-        print("\n### ตาม%s\n| %s | ครั้ง | สำเร็จ | ล้ม | input | cached | cache write | output | reasoning | ค่าใช้จ่ายตามรายการ ($) | เวลารวม (s) | เฉลี่ย (s) |" % (title, title))
-        print("|---|---|---|---|---|---|---|---|---|---|---|---|")
-        for k, a in list(d.items()) + [("**รวม**", tot)]:
-            print("| %s | %d | %d | %d | %d | %d | %d | %d | %d | %.4f | %.1f | %.1f |" % (
-                k, a["calls"], a["ok"], a["fail"], a["input_tokens"], a["cached_input_tokens"],
-                a["cache_write_tokens"], a["output_tokens"], a["reasoning_tokens"], a["cost_usd"],
-                a["duration_s"], a["duration_s"] / max(1, a["calls"])))
-    print("\n(ค่าใช้จ่ายเป็นราคาตามรายการของ Claude ไม่ใช่ยอดจ่ายจริง · Codex ไม่มีข้อมูลราคา)")
-    return 0
+        body = lambda acc: n["prompt"]
+    first = st0["nodes"][nid].get("planned")
+    res = call_on(rd, nid, n.get("account", "any"), kind, n, body, first_account=first, image_out=image_out)
+    return res, res.get("result", ""), image_out
 
 
-def cmd_board(args):
-    rd = resolve_run(args.run)
-    if not rd:
-        print("ยังไม่มี run")
-        return 0
-    if args.add:
-        board_append(rd, args.author, args.add)
-    print(read_text(board_path(rd)))
-    return 0
+def run_review(rd, n, st0):
+    nid = n["id"]
+    worker = n.get("worker") or n.get("account") or "any"
+    reviewer = n.get("reviewer") or "any"
+    rounds = int(n.get("max_rounds") or 3)
+    work_path = review_path = None
+    last = None
+    total = []
+    for r in range(1, rounds + 1):
+        def wbody(acc, r=r, wp=work_path, rp=review_path):
+            if r == 1:
+                return n["prompt"]
+            return ("%s\n\nนี่คือรอบแก้ไขที่ %d: งานรอบก่อนอยู่ที่ %s และข้อแก้ไขจากผู้ตรวจอยู่ที่ %s "
+                    "อ่านทั้งสองไฟล์แล้วส่งงานฉบับแก้ไขที่สมบูรณ์" % (n["prompt"], r, wp, rp))
+        res = call_on(rd, "%s#w%d" % (nid, r), worker, n.get("kind"), n, wbody)
+        total.append(res)
+        if not res["ok"]:
+            return res, res.get("result", ""), None
+        work, b = strip_board(res["result"])
+        push_board(rd, "%s#w%d@%s" % (nid, r, res["account"]), b)
+        work_path = write_out(rd, "%s.r%d.work" % (nid, r), work)
+        criteria = n.get("criteria") or "ถูกต้อง ครบตามโจทย์"
+
+        def rbody(acc, wp=work_path):
+            return ("คุณคือผู้ตรวจ โจทย์ต้นฉบับ:\n%s\n\nงานที่ต้องตรวจอยู่ในไฟล์ %s (อ่านไฟล์นี้) เกณฑ์: %s\n"
+                    "ถ้างานผ่านเกณฑ์ ให้ตอบบรรทัดแรกว่า APPROVED แล้วตามด้วยเหตุผลสั้น ๆ\n"
+                    "ถ้าไม่ผ่าน ห้ามเขียนคำว่า APPROVED ให้ตอบบรรทัดแรกว่า CHANGES แล้วระบุข้อแก้ไขเป็นข้อ ๆ" %
+                    (n["prompt"], wp, criteria))
+        rv = call_on(rd, "%s#r%d" % (nid, r), reviewer, "review", n, rbody, difficulty=n.get("review_difficulty"),
+                     extra="")
+        total.append(rv)
+        if not rv["ok"]:
+            return rv, rv.get("result", ""), None
+        review, b = strip_board(rv["result"])
+        push_board(rd, "%s#r%d@%s" % (nid, r, rv["account"]), b)
+        review_path = write_out(rd, "%s.r%d.review" % (nid, r), review)
+        _set_node(rd, nid, rounds=r)
+        first = (review.strip().splitlines() or [""])[0]
+        if "APPROVED" in first.upper() and "CHANGES" not in first.upper():
+            res = dict(res)
+            res["review"] = "APPROVED รอบ %d โดย %s" % (r, rv["account"])
+            last = res
+            P("✔ %s APPROVED ในรอบ %d" % (nid, r))
+            return res, work, None
+        last = res
+    last = dict(last)
+    last.update(ok=False, status="bad_output", error="ไม่ได้ APPROVED ภายใน max_rounds=%d" % rounds)
+    return last, work, None
 
 
-# ================================================================ leader mode
-def lead_env():
-    return os.environ.get("MA_RUN_DIR"), os.environ.get("MA_LEAD_ACCOUNT")
-
-
-def lead_over_budget(st):
-    ld = st.get("leader") or {}
-    b = budget_of(st["settings"].get("lead_budget"), ld.get("account"))
-    if b is not None and int(ld.get("tokens") or 0) > b:
-        return "งบโทเค็นหัวหน้า %s ใช้ %d > งบ %d" % (ld.get("account"), ld.get("tokens"), b)
-    mx = st["settings"].get("max_dispatch_per_episode")
-    if mx and int(ld.get("dispatches") or 0) >= mx:
-        return "ครบจำนวนการแจกงานต่อรอบ (%d)" % mx
+def _parse_json_loose(text):
+    t = re.sub(r"^```(?:json)?\s*|\s*```$", "", (text or "").strip())
+    try:
+        return json.loads(t)
+    except ValueError:
+        m = re.search(r"\{.*\}", t, re.S)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except ValueError:
+                return None
     return None
 
 
-OVER_MSG = ("⚠ งบหัวหน้าหมด (%s): ส่งไม้ต่อเดี๋ยวนี้ - รัน checkpoint (บอกสิ่งที่ทำแล้วและขั้นต่อไป) "
-            "แล้วจบรอบทันที ห้ามสั่งงานเพิ่ม")
+def run_multi(rd, n, st0):
+    """debate (default Claude vs Codex) and best_of: parallel answers, then a judge."""
+    nid = n["id"]
+    is_debate = n["type"] == "debate"
+    specs = list(n.get("accounts") or (["yolo", "cyolo"] if is_debate else ["any", "any", "any"]))
+    labels = [chr(ord("A") + i) for i in range(len(specs))]
+    results = [None] * len(specs)
+    used = []
+    lock = threading.Lock()
 
-
-def _leader_run(args):
-    rd = resolve_run(args.run) if args.run else (lead_env()[0] or resolve_run(None))
-    if not rd:
-        print("ไม่พบ run (ใส่ --run <run_id>)")
-        return None
-    return rd
-
-
-def heartbeat(st):
-    if st.get("leader"):
-        st["leader"]["heartbeat"] = time.time()
-
-
-def cmd_dispatch(args):
-    rd = _leader_run(args)
-    if not rd:
-        return 2
-    tasks = []
-    if args.tasks_file:
-        try:
-            with open(args.tasks_file, encoding="utf-8-sig") as f:
-                tasks = json.load(f)
-            if isinstance(tasks, dict):
-                tasks = tasks.get("tasks") or tasks.get("nodes") or []
-        except (OSError, ValueError) as e:
-            print("อ่าน --tasks-file ไม่ได้: %s" % e)
-            return 2
-    if args.id:
-        if not args.prompt:
-            print("ต้องมี --prompt คู่กับ --id")
-            return 2
-        tasks.append({"id": args.id, "prompt": args.prompt, "expect": args.expect, "account": args.account,
-                      "difficulty": args.difficulty, "kind": args.kind, "depends_on": args.depends_on.split(",") if args.depends_on else []})
-    if not tasks:
-        print("ไม่มีงานให้แจก (ใช้ --id/--prompt หรือ --tasks-file)")
-        return 2
-    crash = False
-    with locked(rd) as st:
-        heartbeat(st)
-        over = lead_over_budget(st)
-        if over:
-            print(OVER_MSG % over)
-            return 0
-        known = set(st["nodes"])
-        fresh, dup = [], []
-        for t in tasks:
-            t = {k: v for k, v in t.items() if v not in (None, "", [])}
-            t["id"] = str(t["id"])
-            if t["id"] in known:
-                dup.append(t["id"])
-                continue
-            t.setdefault("difficulty", st["settings"].get("difficulty") or 2)
-            t.setdefault("account", "any")
-            fresh.append(t)
-            known.add(t["id"])
-        try:
-            for t in fresh:
-                for d in t.get("depends_on") or []:
-                    if d not in known:
-                        raise ValueError("งาน %s อ้างงานที่ไม่มี: %s" % (t["id"], d))
-            fresh = normalize_nodes_partial(fresh, known)
-        except ValueError as e:
-            print("แจกงานไม่ได้: %s" % e)
-            return 2
-        add_nodes(st, fresh)
-        ld = st.get("leader") or {}
-        acct = ld.get("account") or "?"
-        ld["dispatches"] = int(ld.get("dispatches") or 0) + len(fresh)
-        for t in fresh:
-            write_text(os.path.join(rd, "msgs", "%s__%s.md" % (acct, t["id"])),
-                       "จาก หัวหน้า %s ถึง ลูกทีม (%s) · %s\n\n%s\n" % (acct, st["nodes"][t["id"]]["planned"], now_iso(), t["prompt"]))
-        sim = st["settings"].get("simulate_crash")
-        if sim and sim == acct and not st.get("sim_crash_done") and fresh:
-            st["sim_crash_done"] = True
-            crash = True
-        pg = ld.get("pgid")
-        lines = ["แจกแล้ว %d งาน: %s" % (len(fresh), ", ".join("%s→%s" % (t["id"], st["nodes"][t["id"]]["planned"]) for t in fresh))]
-        if dup:
-            lines.append("มีอยู่แล้ว (ไม่แจกซ้ำ): %s" % ", ".join(dup))
-        over = lead_over_budget(st)
-    print("\n".join(lines))
-    if crash and pg:
-        log("💥 จำลองหัวหน้า %s ล้มกะทันหันหลังแจกงาน (--simulate-crash)" % acct)
-        sys.stdout.flush()
-        try:
-            os.killpg(int(pg), signal.SIGKILL)
-        except Exception:
-            pass
-    if over:
-        print(OVER_MSG % over)
+    def one(i):
+        spec = specs[i]
+        with lock:
+            # different accounts for each contestant when possible
+            acc = update(rd, lambda st: choose(st, spec, n.get("kind"), exclude=tuple(used)) or choose(st, spec, n.get("kind")))
+            used.append(acc)
+        results[i] = call_on(rd, "%s#%s" % (nid, labels[i]), spec, n.get("kind"), n, lambda acc: n["prompt"],
+                             first_account=acc, extra=("รูปแบบคำตอบ: " + n["format"]) if n.get("format") else None)
+    ths = [threading.Thread(target=one, args=(i,)) for i in range(len(specs))]
+    for t in ths:
+        t.start()
+    for t in ths:
+        t.join()
+    paths = {}
+    for i, r in enumerate(results):
+        txt, b = strip_board(r.get("result", ""))
+        push_board(rd, "%s#%s@%s" % (nid, labels[i], r.get("account")), b)
+        paths[labels[i]] = write_out(rd, "%s.%s" % (nid, labels[i]), txt if r["ok"] else "(ล้ม: %s)" % r.get("error"))
+    okl = [labels[i] for i, r in enumerate(results) if r["ok"]]
+    if not okl:
+        r = dict(results[0])
+        r.update(ok=False, status="failed", error="ทุกผู้ตอบล้ม")
+        return r, "", None
+    listing = "\n".join("- คำตอบ %s (บัญชี %s): %s" % (l, results[i].get("account"), paths[l])
+                        for i, l in enumerate(labels) if l in okl)
+    if is_debate:
+        jprompt = ("คุณคือผู้ตัดสิน โจทย์:\n%s\n\nคำตอบจากผู้ตอบที่ทำงานแยกกัน (อ่านทุกไฟล์):\n%s\n\n"
+                   "ตรวจความถูกต้องของแต่ละคำตอบด้วยตัวเอง เทียบกัน แล้วสรุปคำตอบที่ถูก\n"
+                   "ตอบเป็น JSON ล้วน: {\"winner\": \"A|B|...|both|none\", \"answer\": \"คำตอบที่ถูก\", "
+                   "\"reason\": \"เหตุผล\"}" % (n["prompt"], listing))
+        if n.get("expect") in EXPECT_HINT:
+            jprompt += "\nค่า answer ต้องเป็นไปตาม%s (ค่าล้วนในสตริง)" % EXPECT_HINT[n["expect"]].replace("รูปแบบคำตอบ: ", " ")
     else:
-        print("รอผลด้วย: python3 %s wait --run %s" % (TEAM_PY, os.path.basename(rd)))
-    return 0
+        jprompt = ("คุณคือผู้ตัดสิน โจทย์:\n%s\n\nผลงานจากหลายบัญชี (อ่านทุกไฟล์):\n%s\n\nเกณฑ์ให้คะแนน (0-10 ต่อข้อ): %s\n"
+                   "ตอบเป็น JSON ล้วน: {\"scores\": {\"A\": 0, ...}, \"best\": \"A\", \"reason\": \"เหตุผล\"}" %
+                   (n["prompt"], listing, n.get("criteria") or "ถูกต้อง ครบถ้วน ชัดเจน"))
+    judge_spec = n.get("judge") or "any"
+    contestants = tuple(r.get("account") for r in results if r.get("account"))
+    # an independent judge: avoid the contestants' accounts when another account is available
+    judge_acc = update(rd, lambda st: choose(st, judge_spec, n.get("kind"), exclude=contestants)
+                       or choose(st, judge_spec, n.get("kind")))
+    jr = call_on(rd, "%s#judge" % nid, judge_spec, n.get("kind"), n, lambda acc: jprompt, first_account=judge_acc,
+                 difficulty=n.get("judge_difficulty") or max(2, int(n.get("difficulty") or 2)), extra="")
+    if not jr["ok"]:
+        return jr, "", None
+    jtxt, b = strip_board(jr["result"])
+    push_board(rd, "%s#judge@%s" % (nid, jr["account"]), b)
+    write_out(rd, "%s.judge" % nid, jtxt)
+    j = _parse_json_loose(jtxt)
+    if not isinstance(j, dict):
+        jr = dict(jr)
+        jr.update(ok=False, status="bad_output", error="ผู้ตัดสินไม่ได้ตอบ JSON")
+        return jr, jtxt, None
+    if is_debate:
+        value = str(j.get("answer", "")).strip()
+        summary = "คำตอบ: %s\nผู้ชนะ: %s\nเหตุผลของผู้ตัดสิน (%s): %s\n\n%s" % (
+            value, j.get("winner"), jr["account"], j.get("reason"), listing)
+    else:
+        best = str(j.get("best", "")).strip()
+        try:
+            with open(paths.get(best, ""), encoding="utf-8") as f:
+                value = f.read().strip()
+        except OSError:
+            value = ""
+        summary = value
+        write_out(rd, "%s.judge" % nid, "%s\n\nคะแนน: %s\nเลือก: %s\nเหตุผล: %s" % (
+            listing, json.dumps(j.get("scores"), ensure_ascii=False), best, j.get("reason")))
+    _set_node(rd, nid, judge=dict(account=jr["account"], verdict=j))
+    jr = dict(jr)
+    jr["value_override"] = value
+    return jr, summary, None
 
 
-def normalize_nodes_partial(nodes, known):
-    out = []
-    for n in expand([coerce(dict(x)) for x in nodes]):
-        deps = list(n.get("depends_on") or [])
-        for p in placeholders(n.get("prompt", "")):
-            if p not in deps:
-                deps.append(p)
-        n["depends_on"] = deps
-        if n.get("kind") == "image":
-            n.setdefault("expect", "png")
-        out.append(n)
-    ids = known | {n["id"] for n in out}
-    for n in out:
-        bad = [d for d in n["depends_on"] if d not in ids]
+def execute_node(rd, nid):
+    """Wait for deps / approval, run, write out/<nid>.md, update state. Process- and thread-safe."""
+    st = load_state(rd)
+    n = st["nodes"][nid]["spec_node"]
+    gate_deadline = None
+    while True:
+        st = load_state(rd)
+        bad = [d for d in n["depends_on"] if st["nodes"][d]["status"] in ("failed", "bad_output", "blocked")]
         if bad:
-            raise ValueError("งาน %s อ้างงานที่ไม่มี: %s" % (n["id"], ", ".join(bad)))
+            _set_node(rd, nid, status="blocked", error="งานที่ต้องรอ %s ล้ม/ไม่ผ่าน จึงไม่รัน" % ",".join(bad),
+                      ended=mc.now_iso())
+            P("⛔ %s ถูกบล็อกเพราะ %s" % (nid, ",".join(bad)))
+            return
+        if all(st["nodes"][d]["status"] == "ok" for d in n["depends_on"]):
+            break
+        time.sleep(1.0)
+    if n.get("approve"):
+        flag = os.path.join(rd, "approve", nid)
+        if not os.path.exists(flag):
+            _set_node(rd, nid, status="waiting_approval")
+            P("✋ %s รออนุมัติ: python3 %s approve %s %s  (หรือสร้างไฟล์ %s)" % (nid, TEAM_PY, st["run_id"], nid, flag))
+            gt = st["options"].get("gate_timeout", DEFAULTS["gate_timeout"])
+            gate_deadline = time.time() + gt if gt else None
+            while not os.path.exists(flag):
+                if gate_deadline and time.time() > gate_deadline:
+                    _set_node(rd, nid, error="ยังไม่ได้รับอนุมัติภายใน %ss (resume ได้)" % gt)
+                    P("✋ %s ยังไม่ได้รับอนุมัติ หยุดรอ (ใช้ run --resume %s หลังอนุมัติ)" % (nid, st["run_id"]))
+                    return
+                time.sleep(1.0)
+            P("✔ %s ได้รับอนุมัติแล้ว" % nid)
+    # moved before start because planned account stopped?
+    def pre(st):
+        node = st["nodes"][nid]
+        node.update(status="running", started=mc.now_iso())
+        p = node.get("planned")
+        if p and not node.get("pinned") and not usable(st, p):
+            new = choose(st, node.get("spec", "any"), node.get("kind"), exclude=(p,))
+            record_switch(rd, st, nid, p, new, "บัญชี %s หยุดรับงาน/ใช้ไม่ได้: %s" % (
+                p, st["accounts"].get(p, {}).get("stop_reason") or st["accounts"].get(p, {}).get("unusable")))
+            node["planned"] = new
+    update(rd, pre)
+    # msgs for each incoming edge (relay handoff note)
+    st = load_state(rd)
+    for d in n["depends_on"]:
+        msg_append(rd, d, nid, "ผลของ %s อยู่ที่ %s (ค่า: %s)" % (
+            d, os.path.join(rd, "out", d + ".md"), mc.short(st["nodes"][d].get("value"), 120)))
+    t0 = time.time()
+    try:
+        if n["type"] in ("task", "image"):
+            res, text, image_out = run_task(rd, n, st)
+        elif n["type"] == "review":
+            res, text, image_out = run_review(rd, n, st)
+        else:
+            res, text, image_out = run_multi(rd, n, st)
+    except Exception as e:  # never lose the run state
+        res, text, image_out = dict(ok=False, status="failed", error="ข้อผิดพลาดภายใน: %r" % e), "", None
+    clean, board_lines = strip_board(text)
+    push_board(rd, "%s@%s" % (nid, res.get("account")), board_lines)
+    out_path = write_out(rd, nid, clean if n["type"] != "debate" else text)
+    value = res.get("value_override", clean)
+    if image_out:
+        value = image_out
+    status = "ok" if res.get("ok") else ("bad_output" if res.get("status") == "bad_output" else "failed")
+    err = "" if res.get("ok") else res.get("error")
+    if res.get("ok"):
+        ok, v, why = check_expect(n.get("expect"), value)
+        if ok:
+            value = v
+        else:
+            status, err = "bad_output", why + " (คำตอบเก็บไว้ที่ %s)" % out_path
+    if image_out and status == "ok":
+        res["review"] = "PNG ตรวจ signature แล้ว: %s" % image_out
+    _set_node(rd, nid, status=status, value=value, error=err, out=out_path, ended=mc.now_iso(),
+              duration_s=round(time.time() - t0, 1), review=res.get("review"))
+    if status != "ok":
+        P("✘ %s: %s" % (nid, err))
+
+
+def add_nodes(rd, nodes):
+    """Register nodes in state with a planned account (quota balanced)."""
+    def fn(st):
+        added = []
+        for n in nodes:
+            if n["id"] in st["nodes"]:
+                continue
+            spec = n.get("account", "any")
+            kind = "image" if n["type"] == "image" else n.get("kind")
+            entry = dict(status="pending", spec=spec, kind=kind, type=n["type"], pinned=is_account(spec),
+                         difficulty=n.get("difficulty"), spec_node=n, depends_on=n["depends_on"])
+            st["nodes"][n["id"]] = entry
+            if n["type"] in ("task", "image"):
+                entry["planned"] = choose(st, spec, kind)
+            added.append(n["id"])
+        return added
+    return update(rd, fn)
+
+
+# ============================================================== summary
+def summary_rows(st, rd):
+    rows = []
+    led = mc.read_ledger(os.path.join(rd, "ledger.jsonl"))
+    for nid, n in st["nodes"].items():
+        mine = [r for r in led if not r.get("event") and str(r.get("node") or "").split("#")[0] == nid]
+        tin = sum(r.get("input_tokens") or 0 for r in mine)
+        tout = sum(r.get("output_tokens") or 0 for r in mine)
+        accs = sorted({r["account"] for r in mine if r.get("account")})
+        mods = sorted({"%s/%s" % (r.get("model") or "default", r.get("effort")) for r in mine})
+        dur = n.get("duration_s") or round(sum(r.get("duration_s") or 0 for r in mine), 1)
+        stat = n["status"]
+        if n.get("error"):
+            stat += ": " + mc.short(n["error"], 70)
+        if n.get("review"):
+            stat += " (%s)" % n["review"]
+        rows.append([nid, ",".join(accs) or n.get("planned") or "-", ",".join(mods) or "-", dur, tin, tout, stat])
+    return rows
+
+
+def print_summary(rd, as_json=False):
+    st = load_state(rd)
+    rows = summary_rows(st, rd)
+    used = sorted({a for r in mc.read_ledger(os.path.join(rd, "ledger.jsonl")) if not r.get("event")
+                   for a in [r.get("account")] if a}, key=lambda a: (mc.side_of(a), mc._num_key(a)))
+    quotas = {}
+    for a in used:
+        q = mc.quota_cache_load().get(a)
+        if mc.cli_of(a) == "codex" or not q:
+            q = mc.quota(a)
+        quotas[a] = q
+    if as_json:
+        out = dict(run_id=st["run_id"], run_dir=rd, nodes={k: {x: v.get(x) for x in
+                   ("status", "planned", "account", "model", "effort", "value", "error", "out", "duration_s", "review")}
+                   for k, v in st["nodes"].items()},
+                   switches=st["switches"], lead_history=st["lead_history"], quota=quotas,
+                   table=[dict(zip(["node", "account", "model_effort", "seconds", "input_tokens", "output_tokens",
+                                    "status"], r)) for r in rows])
+        print(json.dumps(out, ensure_ascii=False, indent=1))
+        return
+    P("\n## สรุป run %s\nrun directory: %s\n" % (st["run_id"], rd))
+    P(mc.table(["งาน", "บัญชี", "รุ่น/effort", "เวลา s", "input tokens", "output tokens", "สถานะ"], rows))
+    if st["switches"]:
+        P("\nการย้ายงานลูกทีม:\n" + mc.table(["งาน", "จาก", "ไป", "เหตุผล", "เวลา"],
+                                               [[s["node"], s["from"], s["to"], s["reason"], s["ts"][11:19]]
+                                                for s in st["switches"]]))
+    P("\nโควตาของบัญชีที่ใช้:\n" + mc.table(["บัญชี", "โควตาล่าสุด"], [[a, mc.quota_text(quotas[a])] for a in used]))
+
+
+def account_status_label(st, a):
+    acc = st["accounts"].get(a, {})
+    if acc.get("unusable"):
+        return "ใช้ไม่ได้ (%s)" % acc["unusable"]
+    if acc.get("stopped"):
+        return "หยุดรับงาน (%s)" % acc.get("stop_reason")
+    q = mc.quota_cache_load().get(a) or acc.get("quota")
+    u = mc.quota_used_pct(q)
+    if u is not None and u >= st["options"].get("threshold", 80) - 20:
+        return "ใกล้หมด"
+    return "พร้อม"
+
+
+def status_table(st, rd):
+    rows = []
+    led = mc.read_ledger(os.path.join(rd, "ledger.jsonl"))
+    for a in sorted(st["accounts"], key=lambda a: (mc.side_of(a) or "", mc._num_key(a))):
+        acc = st["accounts"][a]
+        running = [r["node"] for r in st["running"] if r["account"] == a]
+        queued = [k for k, n in st["nodes"].items() if n.get("planned") == a and n["status"] in
+                  ("pending", "waiting_approval")]
+        toks = sum(mc.row_tokens(r) for r in led if r.get("account") == a and not r.get("event"))
+        role = acc.get("role", "ลูกทีม")
+        if st.get("leader", {}).get("current") == a:
+            role = "หัวหน้า (ปัจจุบัน)"
+        q = mc.quota_cache_load().get(a) or acc.get("quota")
+        rows.append([a, role, ",".join(running) or "-", ",".join(queued) or "-", toks, mc.quota_text(q),
+                     account_status_label(st, a)])
+    return mc.table(["บัญชี", "บทบาท", "งานที่รัน", "งานในคิว", "tokens ใน run", "โควตาล่าสุด (เวลาของข้อมูล)",
+                     "สถานะ"], rows)
+
+
+# ============================================================ commands
+def read_graph(arg):
+    if arg == "-":
+        data = sys.stdin.buffer.read().decode("utf-8-sig")
+    else:
+        path = arg if os.path.isabs(arg) or os.path.exists(arg) else os.path.join("/workspace", arg)
+        with open(path, encoding="utf-8-sig") as f:
+            data = f.read()
+    try:
+        return json.loads(data)
+    except ValueError as e:
+        raise SystemExit("กราฟไม่ใช่ JSON ที่ถูกต้อง: %s" % e)
+
+
+def parse_budget(s):
+    if not s:
+        return {}
+    out = {}
+    for part in str(s).split(","):
+        part = part.strip()
+        if "=" in part:
+            k, v = part.split("=", 1)
+            out[k.strip()] = int(v)
+        elif part:
+            out["*"] = int(part)
     return out
 
 
-def cmd_wait(args):
-    rd = _leader_run(args)
+def options_from(a, graph=None):
+    g = (graph or {}).get("options") or {}
+    o = dict(DEFAULTS)
+    o.update({k: v for k, v in g.items()})
+    for k in ("per_account", "max_total", "timeout", "threshold", "gate_timeout"):
+        v = getattr(a, k, None)
+        if v is not None:
+            o[k] = v
+    wb = parse_budget(getattr(a, "worker_token_budget", None)) or o.get("worker_budget") or {}
+    o["worker_budget"] = wb
+    sl = [x for x in (getattr(a, "simulate_limit", None) or "").split(",") if x] + mc._env_list("MA_SIMULATE_LIMIT")
+    o["simulate_limit"] = sl
+    return o
+
+
+def run_threads(rd, ids):
+    ths = [threading.Thread(target=execute_node, args=(rd, i), daemon=True) for i in ids]
+    for t in ths:
+        t.start()
+    for t in ths:
+        t.join()
+
+
+def cmd_run(a):
+    if a.resume:
+        rid = a.resume
+        rd = run_dir_of(rid)
+        if not os.path.exists(os.path.join(rd, "state.json")):
+            raise SystemExit("ไม่พบ run %s" % rid)
+        st = load_state(rd)
+        with open(os.path.join(rd, "graph.json"), encoding="utf-8") as f:
+            graph = json.load(f)
+        nodes = {n["id"]: n for n in graph_nodes(graph)}
+        if a.graph:
+            newg = read_graph(a.graph)
+            for n in graph_nodes(newg):
+                if n["id"] in nodes and st["nodes"].get(n["id"], {}).get("status") != "ok":
+                    nodes[n["id"]] = n
+        for s in a.set or []:
+            m = re.match(r"([^.=]+)\.([A-Za-z_]+)=(.*)$", s, re.S)
+            if not m or m.group(1) not in nodes:
+                raise SystemExit("--set ต้องเป็น <node>.<field>=<value> ของ node ที่มีอยู่: %s" % s)
+            v = m.group(3)
+            nodes[m.group(1)][m.group(2)] = int(v) if v.isdigit() and m.group(2) in ("difficulty", "max_rounds", "timeout") else v
+        graph["nodes"] = list(nodes.values())
+        with open(os.path.join(rd, "graph.json"), "w", encoding="utf-8") as f:
+            json.dump(graph, f, ensure_ascii=False, indent=1)
+        redo = []
+
+        def reset(st):
+            for nid, n in nodes.items():
+                e = st["nodes"].get(nid)
+                if e and e["status"] != "ok":
+                    e.update(status="pending", error="", spec_node=n, value=None)
+                    redo.append(nid)
+            st["accounts"] = {k: dict(v, unusable=None, stopped=False, stop_reason=None) for k, v in st["accounts"].items()}
+            st["running"] = []
+        update(rd, reset)
+        P("▶ resume %s: รันใหม่เฉพาะ %s (งานที่สำเร็จแล้วไม่รันซ้ำ)" % (rid, ", ".join(redo) or "-"))
+        pool = st.get("pool") or compute_pool(list(nodes.values()), None)
+        setup_accounts(rd, pool, readiness(pool, a.recheck))
+        def replan(st):
+            for nid in redo:
+                e = st["nodes"][nid]
+                if e["type"] in ("task", "image"):
+                    e["planned"] = choose(st, e["spec"], e.get("kind"))
+        update(rd, replan)
+        run_threads(rd, redo)
+    else:
+        if not a.graph:
+            raise SystemExit("ต้องระบุกราฟ: run graph.json หรือ run - (stdin)")
+        graph = read_graph(a.graph)
+        nodes = graph_nodes(graph)
+        errs = validate_graph(nodes)
+        if errs:
+            raise SystemExit("กราฟไม่ถูกต้อง:\n- " + "\n- ".join(errs))
+        rid = a.run_id or new_run_id()
+        rd = run_dir_of(rid)
+        workers = [w.strip() for w in (a.workers or "").split(",") if w.strip()] or graph.get("workers")
+        o = options_from(a, graph)
+        init_run(rd, rid, graph, o)
+        pool = compute_pool(nodes, workers)
+        P("▶ run %s · run directory %s\n· บัญชีที่อนุญาต: %s" % (rid, rd, ", ".join(pool)))
+        ready = readiness(pool, a.recheck)
+        bad = ["%s=%s" % (k, mc.STATUS_TH.get(v["status"], v["status"])) for k, v in ready.items() if v["status"] != "ready"]
+        if bad:
+            P("· ข้ามบัญชีที่ใช้ไม่ได้: " + ", ".join(bad))
+        setup_accounts(rd, pool, ready)
+        add_nodes(rd, nodes)
+        st = load_state(rd)
+        P("· แผน: " + ", ".join("%s→%s" % (k, v.get("planned") or "/".join(node_accounts(v["spec_node"])))
+                                 for k, v in st["nodes"].items()))
+        if a.dry_run:
+            P(status_table(st, rd))
+            return 0
+        run_threads(rd, [n["id"] for n in nodes])
+    update(rd, lambda st: st.update(done=all(n["status"] in TERMINAL for n in st["nodes"].values())))
+    print_summary(rd, a.json)
+    st = load_state(rd)
+    return 0 if all(n["status"] == "ok" for n in st["nodes"].values()) else 1
+
+
+def resolve_rd(a):
+    rid = getattr(a, "run", None) or os.environ.get("MA_TEAM_RUN") or latest_run()
+    if not rid:
+        return None
+    rd = run_dir_of(rid)
+    return rd if os.path.exists(os.path.join(rd, "state.json")) else None
+
+
+def cmd_status(a):
+    rd = resolve_rd(a)
     if not rd:
-        return 2
-    t0 = time.time()
+        P("ยังไม่มี run ใน %s (เริ่มด้วย team.py run หรือ team.py lead)" % mc.TEAM_ROOT)
+        return 0
+    st = load_state(rd)
+    if a.refresh:
+        for acc in st["accounts"]:
+            if not st["accounts"][acc].get("unusable"):
+                mc.quota(acc)
+    P("run %s (%s) · เป้าหมาย: %s · เสร็จแล้ว: %s" % (st["run_id"], st["mode"], mc.short(st.get("goal") or "-", 100),
+                                                     "ใช่" if st.get("done") else "ยัง"))
+    if st.get("leader"):
+        P("หัวหน้าปัจจุบัน: %s (episode %s)" % (st["leader"].get("current"), st["leader"].get("episode")))
+    P(status_table(st, rd))
+    P("\nงาน:\n" + mc.table(["งาน", "สถานะ", "บัญชี", "ค่า/ผล"], [
+        [k, v["status"], v.get("account") or v.get("planned") or "-",
+         mc.short(v.get("error") or v.get("value") or "", 70)] for k, v in st["nodes"].items()]))
+    if st.get("leader"):
+        _leader_check(rd, evaluate=False)
+    return 0
+
+
+def cmd_stats(a):
+    rows = mc.read_ledger()
+    if a.run:
+        rows = [r for r in rows if r.get("run_id") == a.run]
+    elif not a.all:
+        rid = latest_run()
+        if rid:
+            rows = [r for r in rows if r.get("run_id") == rid]
+            P("(run ล่าสุด %s · ใช้ --all เพื่อดูทั้งหมด)" % rid)
+    if a.account:
+        rows = [r for r in rows if r.get("account") == a.account]
+    calls = [r for r in rows if not r.get("event")]
+    if not calls:
+        P("ยังไม่มีสถิติใน %s" % mc.GLOBAL_LEDGER)
+        return 0
+    if a.json:
+        print(json.dumps(calls, ensure_ascii=False))
+        return 0
+    P(mc.stats_tables(calls))
+    ev = [r for r in rows if r.get("event")]
+    if ev:
+        P("\nเหตุการณ์: " + ", ".join("%s×%d" % (k, sum(1 for r in ev if r["event"] == k))
+                                      for k in sorted({r["event"] for r in ev})))
+    return 0
+
+
+def cmd_check(a):
+    accs = [w for w in (a.workers or "").split(",") if w] or a.accounts or mc.list_accounts()
+    res = mc.check_accounts(accs)
+    print(json.dumps(res, ensure_ascii=False, indent=1) if a.json else mc.check_table(res))
+    return 0
+
+
+def cmd_quota(a):
+    accs = [w for w in (a.workers or "").split(",") if w] or a.accounts or mc.list_accounts()
+    txt, data = mc.quota_table(accs, refresh=a.refresh)
+    print(json.dumps(data, ensure_ascii=False, indent=1) if a.json else txt)
+    return 0
+
+
+def cmd_approve(a):
+    rd = run_dir_of(a.run_id)
+    if not os.path.isdir(rd):
+        raise SystemExit("ไม่พบ run %s" % a.run_id)
+    path = os.path.join(rd, "approve", a.node)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("approved %s by %s\n" % (mc.now_iso(), a.by))
+    board_append(rd, a.by, "อนุมัติงาน %s" % a.node)
+    P("อนุมัติ %s แล้ว (%s)" % (a.node, path))
+    return 0
+
+
+def cmd_board(a):
+    rd = resolve_rd(a)
+    if not rd:
+        P("ยังไม่มี run")
+        return 0
+    if a.text:
+        board_append(rd, a.author, " ".join(a.text))
+    with open(os.path.join(rd, "board.md"), encoding="utf-8") as f:
+        P(f.read())
+    return 0
+
+
+def cmd_msg(a):
+    rd = resolve_rd(a)
+    if not rd:
+        raise SystemExit("ยังไม่มี run")
+    P(msg_append(rd, a.frm, a.to, " ".join(a.text)))
+    return 0
+
+
+# ======================================================== leader tools
+def _leader_touch(rd, **kw):
+    def fn(st):
+        st["leader"]["heartbeat"] = mc.now_iso()
+        st["leader"]["hb_epoch"] = time.time()
+        st["leader"].update(kw)
+        return st["leader"]
+    return update(rd, fn)
+
+
+def _leader_check(rd, evaluate=True):
+    """Called after dispatch/checkpoint/wait: budget check during the episode."""
+    st = load_state(rd)
+    L = st.get("leader") or {}
+    budget = L.get("budget")
+    if evaluate and budget and (L.get("tokens") or 0) > budget and not L.get("stop_requested"):
+        def fn(st):
+            st["leader"]["stop_requested"] = mc.now_iso()
+            st["leader"]["stop_reason"] = "หัวหน้าใช้ tokens %d เกินงบ %d" % (L.get("tokens") or 0, budget)
+        update(rd, fn)
+        L = load_state(rd)["leader"]
+    if L.get("stop_requested") and os.environ.get("MA_TEAM_ROLE") == "leader":
+        P("\nSTOP: %s — รัน checkpoint ทันที (ระบุสิ่งที่ทำแล้วและขั้นต่อไป) แล้วจบรอบนี้ หัวหน้าคนถัดไปจะทำต่อจาก handoff.md" %
+          (L.get("stop_reason") or "ผู้ควบคุมขอให้ส่งไม้ต่อ"))
+        return True
+    return False
+
+
+def cmd_dispatch(a):
+    rd = resolve_rd(a)
+    if not rd:
+        raise SystemExit("ไม่พบ run (ใส่ --run)")
+    st = load_state(rd)
+    if a.id in st["nodes"]:
+        P("งาน %s มีอยู่แล้ว สถานะ %s (ไม่สั่งซ้ำ) ผล: %s" % (a.id, st["nodes"][a.id]["status"],
+                                                            os.path.join(rd, "out", a.id + ".md")))
+        _leader_check(rd)
+        return 0
+    prompt = sys.stdin.read() if a.prompt == "-" else a.prompt
+    n = dict(id=a.id, prompt=prompt, account=a.account, difficulty=a.difficulty,
+             depends_on=[x for x in (a.depends or "").split(",") if x], type=a.type)
+    for k in ("expect", "kind", "cwd", "model", "effort", "path"):
+        if getattr(a, k, None):
+            n[k] = getattr(a, k)
+    n = norm_node(n, {})
+    errs = [e for e in validate_graph([n]) if "depends_on" not in e]
+    for d in n["depends_on"]:
+        if d not in st["nodes"]:
+            errs.append("depends_on ไม่พบ %s" % d)
+    if errs:
+        raise SystemExit("; ".join(errs))
+    if a.account not in ("any", "yolo", "cyolo") and a.account not in st.get("pool", []):
+        pool = st.get("pool", [])
+        raise SystemExit("บัญชี %s ไม่อยู่ในรายชื่อที่อนุญาต (%s)" % (a.account, ",".join(pool)))
+    add_nodes(rd, [n])
+    with open(os.path.join(rd, "graph.json"), encoding="utf-8") as f:
+        g = json.load(f)
+    g.setdefault("nodes", []).append(n)
+    with open(os.path.join(rd, "graph.json"), "w", encoding="utf-8") as f:
+        json.dump(g, f, ensure_ascii=False, indent=1)
+    spawn_exec(rd, load_state(rd)["run_id"], a.id)
+    st = load_state(rd)
+    P("สั่งงาน %s แล้ว → บัญชีที่วางแผน %s · ผลจะอยู่ที่ %s" % (a.id, st["nodes"][a.id].get("planned") or a.account,
+                                                            os.path.join(rd, "out", a.id + ".md")))
+    if os.environ.get("MA_TEAM_ROLE") == "leader":
+        _leader_touch(rd, dispatch_count=(st["leader"].get("dispatch_count") or 0) + 1)
+    _leader_check(rd)
+    return 0
+
+
+def spawn_exec(rd, rid, nid):
+    """Start a worker fully detached (double fork): it is no longer a descendant of the
+    leader's CLI process, so killing/stopping the leader cannot kill the worker."""
+    logp = os.path.join(rd, "logs", nid + ".log")
+    pid = os.fork()
+    if pid == 0:
+        try:
+            os.setsid()
+            if os.fork() != 0:
+                os._exit(0)
+            fd = os.open(logp, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+            nul = os.open(os.devnull, os.O_RDONLY)
+            os.dup2(nul, 0)
+            os.dup2(fd, 1)
+            os.dup2(fd, 2)
+            os.execv(sys.executable, [sys.executable, TEAM_PY, "_exec", "--run", rid, "--node", nid])
+        finally:
+            os._exit(1)
+    os.waitpid(pid, 0)
+    _set_node(rd, nid, spawned=time.time())
+
+
+def revive_workers(rd):
+    """Supervisor safety net: a dispatched worker whose process vanished is restarted when it
+    has not spent tokens yet; otherwise it is marked failed (no automatic paid retry)."""
+    st = load_state(rd)
+    led = None
+    for nid, n in st["nodes"].items():
+        if n["status"] not in ("pending", "running", "waiting_approval") or not n.get("spawned"):
+            continue
+        pid = n.get("exec_pid")
+        if pid:
+            try:
+                os.kill(pid, 0)
+                if open("/proc/%d/stat" % pid).read().split()[2] != "Z":
+                    continue
+            except (OSError, IndexError):
+                pass
+        elif time.time() - n["spawned"] < 15:
+            continue
+        if led is None:
+            led = mc.read_ledger(os.path.join(rd, "ledger.jsonl"))
+        spent = [r for r in led if not r.get("event") and str(r.get("node") or "").split("#")[0] == nid]
+        if spent:
+            _set_node(rd, nid, status="failed", error="process ของลูกทีมหายกลางคันหลังใช้ tokens แล้ว (ไม่ retry อัตโนมัติ)")
+            board_append(rd, "ผู้ควบคุม", "งาน %s: process ลูกทีมหายกลางคัน ทำเครื่องหมายล้ม" % nid)
+        else:
+            board_append(rd, "ผู้ควบคุม", "งาน %s: process ลูกทีมหายก่อนเริ่มเรียกโมเดล เริ่มใหม่ให้" % nid)
+            P("♻ เริ่ม process ลูกทีม %s ใหม่ (process เดิมหายก่อนใช้ tokens)" % nid)
+            _set_node(rd, nid, status="pending", exec_pid=None)
+            spawn_exec(rd, st["run_id"], nid)
+
+
+def cmd_exec(a):
+    rd = run_dir_of(a.run)
+    _set_node(rd, a.node, exec_pid=os.getpid())
+    execute_node(rd, a.node)
+    return 0
+
+
+def cmd_wait(a):
+    rd = resolve_rd(a)
+    if not rd:
+        raise SystemExit("ไม่พบ run")
+    ids = [x for x in (a.ids or "").split(",") if x]
+    deadline = time.time() + a.timeout
     while True:
-        with locked(rd) as st:
-            heartbeat(st)
-            over = lead_over_budget(st) if st.get("mode") == "lead" else None
-            ids = args.ids.split(",") if args.ids else list(st["order"])
-            missing = [i for i in ids if i not in st["nodes"]]
-            sts = {i: st["nodes"][i]["status"] for i in ids if i in st["nodes"]}
-            snap = {i: node_row(st, i) for i in sts}
-        if missing:
-            print("ไม่มีงาน: %s" % ", ".join(missing))
-            return 2
-        done = all(s in TERMINAL for s in sts.values())
-        if done or over or time.time() - t0 > args.timeout:
+        st = load_state(rd)
+        target = ids or list(st["nodes"].keys())
+        pending = [i for i in target if st["nodes"].get(i, {}).get("status") not in TERMINAL]
+        if os.environ.get("MA_TEAM_ROLE") == "leader":
+            _leader_touch(rd)
+        if not pending or time.time() > deadline:
             break
         time.sleep(2)
-    for i, r in snap.items():
-        v = r["value"] if r["status"] == "ok" else r["note"]
-        print("- %s: %s (%s) %s · ผล: %s" % (i, STATUS_TH.get(r["status"], r["status"]), r["accounts"],
-                                             (v or "")[:80].replace("\n", " "), os.path.join(rd, "out", i + ".md")))
-    if over:
-        print(OVER_MSG % over)
-    elif not done:
-        print("ยังไม่ครบ (หมดเวลารอ %ss) เรียก wait อีกครั้ง" % args.timeout)
+    P(mc.table(["งาน", "สถานะ", "บัญชี", "ค่า (สั้น)", "ไฟล์ผล"], [
+        [i, st["nodes"].get(i, {}).get("status", "ไม่พบ"), st["nodes"].get(i, {}).get("account") or "-",
+         mc.short(st["nodes"].get(i, {}).get("error") or st["nodes"].get(i, {}).get("value") or "", 60),
+         os.path.join(rd, "out", i + ".md")] for i in target]))
+    if pending:
+        P("ยังไม่เสร็จ: %s (เรียก wait อีกครั้ง)" % ", ".join(pending))
+    if os.environ.get("MA_TEAM_ROLE") == "leader":
+        _leader_check(rd)
     return 0
 
 
-def cmd_combine(args):
-    rd = _leader_run(args)
+def cmd_checkpoint(a):
+    rd = resolve_rd(a)
     if not rd:
-        return 2
-    st = read_state(rd)
-    ids = args.ids.split(",")
-    notok = [i for i in ids if st["nodes"].get(i, {}).get("status") != "ok"]
-    if notok:
-        print("รวมไม่ได้: งานยังไม่สำเร็จ %s (ใช้ wait ก่อน)" % ", ".join(notok))
-        return 2
-    parts = []
-    if args.title:
-        parts.append("# %s\n" % args.title)
-    for i in ids:
-        txt = read_text(os.path.join(rd, "out", i + ".md")).strip()
-        parts.append(("## %s\n\n%s\n" % (i, txt)) if args.headings else txt + "\n")
-    out = os.path.abspath(args.output or os.path.join(rd, "final.md"))
-    write_text(out, "\n".join(parts))
-    with locked(rd) as s2:
-        heartbeat(s2)
-        s2["combined"] = {"output": out, "ids": ids, "ts": now_iso()}
-        over = lead_over_budget(s2) if s2.get("mode") == "lead" else None
-    print("รวม %d งานเป็น %s (%d ตัวอักษร)" % (len(ids), out, sum(len(p) for p in parts)))
-    if over:
-        print(OVER_MSG % over)
+        raise SystemExit("ไม่พบ run")
+    st = load_state(rd)
+    who = st.get("leader", {}).get("current") or "?"
+    ep = st.get("leader", {}).get("episode")
+    with open(os.path.join(rd, "handoff.md"), "a", encoding="utf-8") as f:
+        f.write("\n## checkpoint %s · หัวหน้า %s (episode %s)\n- ทำแล้ว: %s\n- กำลังรัน/รอ: %s\n- ขั้นต่อไป: %s\n%s" % (
+            mc.now_iso()[:19].replace("T", " "), who, ep, a.done, a.running or "-", a.next,
+            "- การตัดสินใจสำคัญ: %s\n" % a.decision if a.decision else ""))
+    _leader_touch(rd, checkpoint_at=mc.now_iso(), checkpoints=(st["leader"].get("checkpoints") or 0) + 1)
+    P("บันทึก checkpoint แล้ว (%s)" % os.path.join(rd, "handoff.md"))
+    _leader_check(rd)
     return 0
 
 
-def write_handoff(rd, st, who, done, nxt, decisions):
-    rows = ["- %s: %s%s" % (i, STATUS_TH.get(st["nodes"][i]["status"]), (" ค่า=" + (st["nodes"][i].get("value") or "")[:40])
-            if st["nodes"][i]["status"] == "ok" else "") for i in st["order"]]
-    txt = ("# handoff · run %s\nเขียนโดย %s · %s\n\n## เป้าหมาย\n%s\n\n## ทำไปแล้ว\n%s\n\n## งานทั้งหมดตอนนี้\n%s\n\n"
-           "## ขั้นต่อไป\n%s\n\n## การตัดสินใจสำคัญ\n%s\n" % (
-               st["run_id"], who, now_iso(), st.get("goal"), done or "-", "\n".join(rows) or "- (ยังไม่มีงาน)",
-               nxt or "-", decisions or "-"))
-    write_text(os.path.join(rd, "handoff.md"), txt)
-
-
-def cmd_checkpoint(args):
-    rd = _leader_run(args)
+def cmd_finish(a):
+    rd = resolve_rd(a)
     if not rd:
-        return 2
-    with locked(rd) as st:
-        heartbeat(st)
-        who = (st.get("leader") or {}).get("account") or args.by
-        write_handoff(rd, st, who, args.done, args.next, args.decisions)
-        st.setdefault("checkpoints", []).append({"ts": now_iso(), "by": who})
-        if st.get("leader"):
-            st["leader"]["checkpointed"] = True
-        over = lead_over_budget(st) if st.get("mode") == "lead" else None
-    board_append(rd, who, "checkpoint: %s | ต่อไป: %s" % ((args.done or "-")[:120], (args.next or "-")[:120]))
-    print("บันทึก checkpoint แล้ว: %s" % os.path.join(rd, "handoff.md"))
-    if over:
-        print("งบหัวหน้าหมด (%s): จบรอบได้เลย หัวหน้าคนถัดไปจะทำต่อจาก handoff.md" % over)
+        raise SystemExit("ไม่พบ run")
+    if a.output and not os.path.exists(a.output):
+        raise SystemExit("ไม่พบไฟล์ผลลัพธ์ %s (เขียนไฟล์ก่อนแล้วค่อย finish)" % a.output)
+
+    def fn(st):
+        st["done"] = True
+        st["final"] = dict(output=a.output, summary=a.summary, by=st.get("leader", {}).get("current"), ts=mc.now_iso())
+    update(rd, fn)
+    board_append(rd, "หัวหน้า", "จบงาน: %s" % a.summary)
+    P("บันทึกว่างานเสร็จแล้ว ผู้ควบคุมจะสรุปผล")
     return 0
 
 
-def cmd_finish(args):
-    rd = _leader_run(args)
-    if not rd:
-        return 2
-    res = os.path.abspath(args.result) if args.result else None
-    if res and not os.path.isfile(res):
-        print("ไม่พบไฟล์ผลลัพธ์ %s" % res)
-        return 2
-    with locked(rd) as st:
-        heartbeat(st)
-        st["goal_done"] = {"ts": now_iso(), "by": (st.get("leader") or {}).get("account"), "result": res,
-                           "summary": args.summary}
-        write_handoff(rd, st, (st.get("leader") or {}).get("account") or "?", "งานเสร็จ: %s" % (args.summary or res),
-                      "ไม่มี (จบแล้ว)", "-")
-    print("บันทึกว่าเป้าหมายเสร็จแล้ว (ผล: %s) จบรอบได้เลย" % res)
-    return 0
+# ============================================================ supervisor
+LEADER_PROMPT = """คุณคือหัวหน้าทีม (บัญชี {acc} · episode {ep}) ของงานทีม run {rid}
+เป้าหมาย: {goal}
+
+สถานะทั้งหมดอยู่ในไฟล์ ไม่ได้อยู่ในความจำของคุณ เริ่มด้วยการอ่าน {rd}/handoff.md และรัน `{T} status`
+คำสั่งของคุณ (T = {T} · ทุกคำสั่งรู้ run เองจาก env):
+- สั่งงานลูกทีม: T dispatch --id <id> --difficulty <1-6> [--account any|yolo|cyolo] [--depends a,b] [--expect number|json] --prompt "<โจทย์ที่ครบในตัว ระบุ path แบบ absolute>"
+  ลูกทีมรันเป็น process แยก (ผลอยู่ที่ {rd}/out/<id>.md) · id ซ้ำ = ไม่สั่งซ้ำ · ใช้ {{{{file:<id>}}}} ในโจทย์เพื่ออ้างผลของงานก่อนหน้าเป็น path
+- รอผล: T wait --ids a,b (รอได้สูงสุด 300 วินาทีต่อครั้ง เรียกซ้ำได้)
+- บันทึกจุดพัก (หลังทุกขั้นสำคัญ และก่อนจบรอบ): T checkpoint --done "..." --next "..." [--decision "..."]
+- จบงานเมื่อเป้าหมายเสร็จและเขียนไฟล์ผลรวมแล้ว: T finish --output <absolute path> --summary "..."
+กติกา:
+1. แบ่งงานเป็นชิ้นเล็กให้ลูกทีมทำ ห้ามทำงานย่อยเอง ยกเว้นการรวมผลเป็นไฟล์เดียว (อ่าน out/*.md แล้วเขียนไฟล์ผลรวมที่ {rd}/final/)
+2. อย่าสั่งงานที่มีอยู่แล้วซ้ำ ดูจาก `T status` · งานใดล้มให้ตัดสินใจเองว่าจะสั่งงานใหม่ (id ใหม่) หรือไม่
+3. ถ้าคำสั่งใดพิมพ์ STOP ให้รัน checkpoint ทันทีแล้วจบรอบ ไม่ต้องทำอย่างอื่น
+4. ตอบสั้น ๆ ไม่ต้องอธิบายยาว"""
 
 
-def leader_prompt(st, rd, acct, episode, out_path):
-    t = "python3 " + TEAM_PY
-    r = st["run_id"]
-    handoff = read_text(os.path.join(rd, "handoff.md")).strip()
-    tasks = "\n".join("- %s: %s (%s)" % (i, STATUS_TH.get(st["nodes"][i]["status"]), st["nodes"][i].get("planned") or "-")
-                      for i in st["order"]) or "- (ยังไม่มีงาน)"
-    ready = ", ".join(usable(st)) or "-"
-    return ("คุณคือหัวหน้าทีม บัญชี %s รอบที่ %d ของ run %s\nเป้าหมาย: %s\n\n"
-            "สถานะอยู่ในไฟล์ ไม่อยู่ในความจำ หัวหน้าคนก่อนอาจถูกสลับออก ทำต่อจาก handoff ด้านล่าง ห้ามแจกงานที่มี id อยู่แล้วซ้ำ\n"
-            "งานในระบบตอนนี้:\n%s\nลูกทีมที่พร้อม: %s (ระบบเลือกบัญชีให้เองเมื่อใช้ account any)\n\n"
-            "=== handoff.md ===\n%s\n=== จบ handoff ===\n\n"
-            "คำสั่ง (รันด้วยเชลล์ แต่ละคำสั่งตอบเร็ว):\n"
-            "1. แจกงานหลายชิ้นในคำสั่งเดียว: เขียนไฟล์ JSON รายการงาน [{\"id\":\"t1\",\"prompt\":\"<คำสั่งงานครบในตัว>\",\"expect\":\"text\",\"difficulty\":1}, ...] (difficulty เป็นตัวเลข 1-6) "
-            "ลง %s/tmp/tasks.json แล้วรัน: %s dispatch --run %s --tasks-file %s/tmp/tasks.json\n"
-            "   (หรือทีละงาน: %s dispatch --run %s --id t1 --prompt \"...\" [--expect int|number|text|json])\n"
-            "2. รอผล: %s wait --run %s\n"
-            "3. รวมผลเป็นไฟล์เดียว (สคริปต์ต่อไฟล์ให้ ไม่เสียโทเค็น): %s combine --run %s --ids t1,t2,... --output %s\n"
-            "4. บันทึก checkpoint (ทำก่อนจบรอบทุกครั้ง): %s checkpoint --run %s --done \"...\" --next \"...\" --decisions \"...\"\n"
-            "5. เมื่อไฟล์ผลรวมเสร็จ: %s finish --run %s --result %s --summary \"...\"\n\n"
-            "กฎ: แบ่งเป้าหมายเป็นงานย่อยอิสระให้ลูกทีม (คุณไม่ทำงานเอง) · prompt ของงานย่อยต้องครบในตัวและสั่งรูปแบบคำตอบให้ชัด "
-            "(งานคำนวณให้สั่งลูกทีมใช้เชลล์คำนวณ) · ถ้าคำสั่งใดตอบว่า \"งบหัวหน้าหมด\" ให้รัน checkpoint แล้วจบรอบทันที · "
-            "ถ้างานใดล้ม ให้แจกงานใหม่ด้วย id ใหม่ · จบด้วยข้อความสั้น ๆ" % (
-                acct, episode, r, st.get("goal"), tasks, ready, handoff or "(ยังไม่มี)",
-                rd, t, r, rd, t, r, t, r, t, r, out_path, t, r, t, r, out_path))
+def pick_leader(st, succession, exclude):
+    cands = [a for a in succession if a not in exclude]
+    ready = [a for a in cands if st["accounts"].get(a, {}).get("check") == "ready"
+             and not st["accounts"][a].get("lead_failed")]
+    if not ready:
+        return None
+    prev = st.get("leader", {}).get("current")
+    side = mc.side_of(prev) if prev else mc.side_of(ready[0])
+    # explicit succession order first; same side before the other side when automatic
+    if st["options"].get("succession_explicit"):
+        return ready[0]
+    same = [a for a in ready if mc.side_of(a) == side]
+    other = [a for a in ready if mc.side_of(a) != side]
+    key = lambda a: (mc.quota_used_pct(mc.quota_cache_load().get(a) or st["accounts"][a].get("quota")) or 50)
+    return (sorted(same, key=key) + sorted(other, key=key))[0]
 
 
-def choose_successor(st, current, banned, succession, prefer_side):
-    pool = [a for a in (succession or []) if a not in banned]
-    ready = usable(st, exclude=banned)
-    if pool:
-        for a in pool:
-            if a in ready:
-                return a, "ตามรายชื่อสืบทอด"
-    q = st.get("quota", {})
-    cands = [a for a in ready if a != current]
-    if not cands:
-        return None, "ไม่มีบัญชีที่พร้อม"
-    cands.sort(key=lambda a: (0 if side(a) == prefer_side else 1, q.get(a) if q.get(a) is not None else 50.0, a))
-    return cands[0], "อัตโนมัติ: พร้อม โควตาเหลือมากสุด ฝั่งเดียวกันก่อน"
+def write_auto_handoff(rd, st, note):
+    lines = ["\n## สถานะอัตโนมัติจากผู้ควบคุม %s (%s)" % (mc.now_iso()[:19].replace("T", " "), note)]
+    for k, n in st["nodes"].items():
+        lines.append("- %s: %s · บัญชี %s · %s" % (k, n["status"], n.get("account") or n.get("planned") or "-",
+                                                  mc.short(n.get("error") or n.get("value") or "", 80)))
+    if not st["nodes"]:
+        lines.append("- ยังไม่มีงานที่สั่ง")
+    with open(os.path.join(rd, "handoff.md"), "a", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
-def verify_demo(path):
-    txt = read_text(path)
-    got = {}
-    for a, b, c in re.findall(r"(\d+)\s*[x×*]\s*(\d+)\s*=\s*(\d+)", txt):
-        got[(int(a), int(b))] = int(c)
-    need = [(a, b) for a in range(2, 10) for b in range(1, 13)]
-    ok = sum(1 for k in need if got.get(k) == k[0] * k[1])
-    wrong = [k for k in need if k in got and got[k] != k[0] * k[1]]
-    return ok, len(need), wrong
+def lead_switch(rd, frm, to, typ, reason):
+    def fn(st):
+        h = dict(**{"from": frm}, to=to, type=typ, reason=reason, ts=mc.now_iso())
+        st["lead_history"].append(h)
+        event(rd, st, "lead_switch", account=to, to=to, reason=reason, type=typ, **{"from": frm})
+        if frm in st["accounts"]:
+            st["accounts"][frm]["role"] = "หัวหน้าเดิม"
+        if to in st["accounts"]:
+            st["accounts"][to]["role"] = "หัวหน้า"
+        write_auto_handoff(rd, st, "สลับหัวหน้า %s → %s" % (frm, to))
+    update(rd, fn)
+    board_append(rd, "ผู้ควบคุม", "สลับหัวหน้า%s %s → %s: %s" % (typ, frm, to or "-", reason))
+    P("⇄ สลับหัวหน้า%s: %s → %s (%s)" % (typ, frm, to or "-", reason))
 
 
-def cmd_lead(args):
-    goal = args.goal or (DEMO_GOAL if args.demo else None)
-    if not goal:
-        print("ต้องมี --goal \"...\" หรือ --demo", file=sys.stderr)
-        return 2
-    info, ready, quotas = prepare(args, "lead", goal)
-    excl = [x for x in (args.exclude or "").split(",") if x]
-    leaders_pool = [a for a in ready if a not in excl]
-    if not leaders_pool:
-        print("ไม่มีบัญชีที่พร้อมเป็นหัวหน้า", file=sys.stderr)
-        return 1
-    succession = [x for x in (args.succession or "").split(",") if x]
-    claude_first = sorted(leaders_pool, key=lambda a: (0 if side(a) == "claude" else 1,
-                                                       quotas.get(a, {}).get("pct") or 0, a))
-    first = (succession[0] if succession and succession[0] in leaders_pool else claude_first[0])
-    lead_budget = parse_budget(args.lead_token_budget)
-    worker_budget = parse_budget(args.worker_token_budget)
-    sim_crash, sim_limit = args.simulate_crash, args.simulate_limit
-    per_account = args.per_account
-    difficulty = args.worker_difficulty
-    demo_worker = None
-    if args.demo:
-        order = [first] + [a for a in claude_first if a != first]
-        if not sim_crash:
-            sim_crash = first
-        second = order[1] if len(order) > 1 else None
-        if second and not lead_budget:
-            lead_budget = {second: 1}
-        if not worker_budget:
-            workers = [a for a in ready if a not in excl]
-            wb = workers[-1] if workers else None
-            if wb:
-                worker_budget = {wb: 1}
-                demo_worker = wb
-        if per_account == 3:
-            per_account = 1
-        difficulty = difficulty or 1
-        log("โหมดสาธิต: หัวหน้า %s ล้มกะทันหันหลังแจกงานครั้งแรก (เชิงรับ) · งบหัวหน้า %s · งบลูกทีม %s · "
-            "per-account %d (งานเข้าคิวจึงย้ายได้)" % (sim_crash, json.dumps(lead_budget), json.dumps(worker_budget), per_account))
-    rid, rd = new_run_dir("lead", goal, args.run_id)
-    out_path = os.path.abspath(args.output or os.path.join(rd, "final.md"))
-    settings = {"per_account": per_account, "max_parallel": args.max_parallel, "timeout": args.timeout,
-                "worker_budget": worker_budget, "lead_budget": lead_budget, "quota_threshold": args.quota_threshold,
-                "exclude": excl, "board": True, "difficulty": difficulty or 2, "simulate_crash": sim_crash,
-                "max_dispatch_per_episode": args.max_dispatch_per_episode,
-                "demo_worker": demo_worker}
-    st0 = init_state(rid, rd, "lead", goal, settings, info, quotas)
-    with locked(rd) as st:
-        st.update(st0)
-        apply_quota_threshold(st, rd, quotas)
-        write_handoff(rd, st, "team.py (เริ่มต้น)", "-", "แบ่งเป้าหมายเป็นงานย่อยแล้วแจกให้ลูกทีม แล้วรวมผลเป็น %s" % out_path, "-")
-    log("run %s (หัวหน้าทีม) · เป้าหมาย: %s" % (rid, goal))
-    log("โฟลเดอร์ %s · ผลรวมจะอยู่ที่ %s" % (rd, out_path))
-    env_sim = {}
-    if sim_limit:
-        os.environ["MA_SIMULATE_LIMIT"] = ",".join(x for x in [os.environ.get("MA_SIMULATE_LIMIT"), sim_limit] if x)
-        log("จำลอง: บัญชี %s ล้มเหมือนโควตาหมดทุกครั้งที่เรียก (MA_SIMULATE_LIMIT)" % sim_limit)
-    eng = Engine(rd, keep_alive=True)
-    eth = threading.Thread(target=eng.loop, daemon=True)
-    eth.start()
-    leader, banned, episode = first, set(), 0
-    t_start = time.time()
-    while leader and episode < args.max_episodes:
-        episode += 1
-        with locked(rd) as st:
-            st["leader"] = {"account": leader, "episode": episode, "started": now_iso(), "tokens": 0,
-                            "dispatches": 0, "heartbeat": time.time(), "pgid": None, "checkpointed": False}
-            prompt = leader_prompt(st, rd, leader, episode, out_path)
-        log("👑 หัวหน้า %s เริ่มรอบที่ %d" % (leader, episode))
-        outcome = run_leader_episode(args, rd, leader, episode, prompt, env_sim)
-        with locked(rd) as st:
-            ld = st.get("leader") or {}
-            tokens = int(ld.get("tokens") or 0)
-            done = bool(st.get("goal_done"))
-            over = lead_over_budget(st)
-            checkpointed = ld.get("checkpointed")
-        r = outcome["result"]
-        log("   รอบ %d ของ %s จบ: %s · tokens %d%s" % (episode, leader, outcome["how"], tokens,
-                                                  (" · " + over) if over else ""))
-        if done:
-            break
-        kind = reason = None
-        if outcome["how"] in ("crash", "timeout", "stale") or not r["ok"]:
-            kind = "เชิงรับ"
-            reason = {"crash": "หัวหน้าหยุดกะทันหัน (process ถูก kill%s)" % (" · จำลอง --simulate-crash" if leader == sim_crash else ""),
-                      "timeout": "รอบเกินเวลา %ss" % args.episode_timeout,
-                      "stale": "heartbeat ไม่อัปเดตเกิน %ss" % args.heartbeat_timeout}.get(
-                outcome["how"], "รอบล้ม: %s" % (r.get("error") or "")[:100])
-            banned.add(leader)
-        elif over:
-            kind, reason = "เชิงรุก", over
-            banned.add(leader)
+def run_episode(rd, acc, ep, opts):
+    st = load_state(rd)
+    T = "python3 " + TEAM_PY
+    prompt = LEADER_PROMPT.format(acc=acc, ep=ep, rid=st["run_id"], goal=st["goal"], rd=rd, T=T)
+    budget = None
+    lb = opts.get("lead_budget") or {}
+    budget = lb.get(acc) or lb.get("*")
+    if opts.get("demo") and ep_index(st, acc) == 2:
+        budget = 1
+
+    def fn(s):
+        s["leader"].update(current=acc, episode=ep, tokens=0, budget=budget, stop_requested=None, stop_reason=None,
+                           dispatch_count=0, hb_epoch=time.time(), heartbeat=mc.now_iso(), checkpoints=0,
+                           started=mc.now_iso())
+    update(rd, fn)
+    env = dict(os.environ, MA_TEAM_RUN=st["run_id"], MA_TEAM_ROLE="leader")
+    holder = []
+    out = {}
+    last_flush = [0.0]
+
+    def on_event(kind, data):
+        if kind == "tokens":
+            tok = (data.get("input") or 0) + (data.get("cache_write") or 0) + (data.get("output") or 0)
+            if time.time() - last_flush[0] > 1.0 or True:
+                last_flush[0] = time.time()
+                update(rd, lambda s: s["leader"].update(tokens=tok, hb_epoch=time.time()))
+
+    model, effort = model_for({"difficulty": opts.get("leader_difficulty", 2)}, acc)
+    sim = acc in (opts.get("simulate_limit") or [])
+
+    def target():
+        if mc.cli_of(acc) == "claude":
+            out["res"] = mc.call_claude(acc, prompt, model, effort, cwd=rd, timeout=opts.get("episode_timeout", 1800),
+                                        run_dir=rd, run_id=st["run_id"], node="lead#%d" % ep, on_event=on_event,
+                                        proc_holder=holder, env=env, simulate_limit=sim)
         else:
-            q = get_quota(leader)
-            pct = q.get("pct")
-            if pct is not None and pct >= args.quota_threshold:
-                kind, reason = "เชิงรุก", "โควตา %s %g%% ≥ %g%%" % (leader, pct, args.quota_threshold)
-                banned.add(leader)
-        if not kind:
-            continue  # หัวหน้าคนเดิมทำรอบต่อไป
-        nxt, why = choose_successor(read_state(rd), leader, banned | set(excl), succession, side(leader))
-        ev = {"ts": now_iso(), "from": leader, "to": nxt, "type": kind, "reason": reason, "episode": episode,
-              "tokens": tokens, "checkpoint": bool(checkpointed), "choice": why}
-        with locked(rd) as st:
-            st["lead_history"].append(ev)
-            if kind == "เชิงรับ" and not checkpointed:
-                hf = os.path.join(rd, "handoff.md")
-                with open(hf, "a", encoding="utf-8") as f:
-                    f.write("\n## หมายเหตุจาก team.py (%s)\nหัวหน้า %s ล้มก่อนเขียน checkpoint: ย้อนไป checkpoint ล่าสุดด้านบน "
-                            "และใช้รายการงานใน state.json เป็นหลัก (งานที่แจกไปแล้วยังรันอยู่ ไม่ต้องแจกซ้ำ)\n" % (now_iso(), leader))
-        board_append(rd, "team.py", "สลับหัวหน้า%s %s → %s: %s" % (kind, leader, nxt or "-", reason))
-        ledger_event(rd, read_state(rd), "lead_switch", account=nxt, error=reason[:160],
-                     **{"from": leader, "switch_type": kind})
-        log("🔁 สลับหัวหน้า%s: %s → %s (%s)" % (kind, leader, nxt or "-", reason))
-        leader = nxt
-    # รอให้งานลูกทีมที่ค้างจบ
-    log("รองานลูกทีมที่ค้างให้จบ ...")
-    t1 = time.time()
-    while time.time() - t1 < args.timeout:
-        st = read_state(rd)
-        if all(st["nodes"][i]["status"] in TERMINAL or st["nodes"][i]["status"] == "waiting_approval" for i in st["order"]):
-            break
-        time.sleep(1)
-    eng.stop.set()
-    with locked(rd) as st:
-        st["status"] = "done" if st.get("goal_done") and all(
-            st["nodes"][i]["status"] == "ok" for i in st["order"]) else "failed"
-        if st.get("leader"):
-            st["leader"]["ended"] = now_iso()
-        final = json.loads(json.dumps(st))
-    quotas = final_quotas(final)
-    print_lead_summary(final, rd, quotas, out_path, goal == DEMO_GOAL, time.time() - t_start, args.json)
-    return 0 if final["status"] == "done" else 1
+            out["res"] = mc.call_codex(acc, prompt, model, effort, cwd=rd, timeout=opts.get("episode_timeout", 1800),
+                                       run_dir=rd, run_id=st["run_id"], node="lead#%d" % ep, proc_holder=holder,
+                                       env=env, simulate_limit=sim)
+    P("👑 episode %d: หัวหน้า %s (%s/%s)%s" % (ep, acc, model or "default", effort,
+                                              " งบ %s tokens" % budget if budget else ""))
+    th = threading.Thread(target=target, daemon=True)
+    th.start()
+    crash_on = opts.get("simulate_crash") or []
+    if opts.get("demo") and ep_index(load_state(rd), acc) == 1:
+        crash_on = list(crash_on) + [acc]
+    killed = None
+    seen_dispatch = 0
+    while th.is_alive():
+        th.join(1.0)
+        revive_workers(rd)
+        s = load_state(rd)
+        L = s["leader"]
+        if L.get("dispatch_count", 0) != seen_dispatch:
+            seen_dispatch = L.get("dispatch_count", 0)
+        if acc in crash_on and seen_dispatch >= 1 and not killed:
+            killed = "crash"
+            P("💥 จำลองหัวหน้า %s ล้มกลางคัน (หลังสั่งงาน %d ชิ้น)" % (acc, seen_dispatch))
+            for p in holder:
+                mc._kill(p)
+        if L.get("stop_requested") and not killed:
+            cp = L.get("checkpoint_at") or ""
+            if cp > L["stop_requested"]:
+                time.sleep(3)
+                killed = "budget"
+                for p in holder:
+                    mc._kill(p)
+        if not killed and time.time() - (L.get("hb_epoch") or time.time()) > opts.get("heartbeat_timeout", 900):
+            killed = "heartbeat"
+            for p in holder:
+                mc._kill(p)
+    res = out.get("res") or {}
+    s = load_state(rd)
+    if s.get("done"):
+        return "done", None
+    if killed == "crash":
+        return "reactive", "หัวหน้าหยุดกะทันหัน (จำลอง --simulate-crash)"
+    if killed == "budget" or s["leader"].get("stop_requested"):
+        return "proactive", s["leader"].get("stop_reason") or "เกินงบหัวหน้า"
+    if killed == "heartbeat":
+        return "reactive", "heartbeat ไม่อัปเดตเกิน %ss" % opts.get("heartbeat_timeout", 900)
+    if not res.get("ok"):
+        return "reactive", "รอบของหัวหน้าล้ม (%s): %s" % (res.get("status"), mc.short(res.get("error"), 80))
+    lb_total = sum(mc.row_tokens(r) for r in mc.read_ledger(os.path.join(rd, "ledger.jsonl"))
+                   if r.get("account") == acc and str(r.get("node") or "").startswith("lead#"))
+    if budget and lb_total > budget:
+        return "proactive", "หัวหน้าใช้ tokens %d เกินงบ %d" % (lb_total, budget)
+    q = mc.quota_cache_load().get(acc)
+    u = mc.quota_used_pct(q)
+    if u is not None and u >= opts.get("threshold", 80):
+        return "proactive", "โควตาหัวหน้า %s%% ≥ เกณฑ์" % u
+    return "continue", None
 
 
-def run_leader_episode(args, rd, leader, episode, prompt, env_sim):
-    holder = {"p": None}
-    seen_msgs = set()
-    state_box = {"tokens": 0, "last": time.time()}
+def ep_index(st, acc):
+    """1-based index of acc among distinct leaders so far (demo uses it)."""
+    order = []
+    for h in st.get("lead_history", []):
+        for x in (h["from"], h["to"]):
+            if x and x not in order:
+                order.append(x)
+    first = st.get("leader", {}).get("first")
+    if first and first not in order:
+        order.insert(0, first)
+    return order.index(acc) + 1 if acc in order else len(order) + 1
 
-    def popen_cb(p):
-        holder["p"] = p
-        with locked(rd) as st:
-            st["leader"]["pgid"] = p.pid
 
-    def on_event(ev):
-        state_box["last"] = time.time()
-        if ev.get("type") == "assistant":
-            msg = ev.get("message") or {}
-            mid = msg.get("id")
-            u = msg.get("usage") or {}
-            if mid and mid not in seen_msgs:
-                seen_msgs.add(mid)
-                state_box["tokens"] += int(u.get("input_tokens") or 0) + int(u.get("cache_read_input_tokens") or 0) + \
-                    int(u.get("cache_creation_input_tokens") or 0) + int(u.get("output_tokens") or 0)
-                with locked(rd) as st:
-                    st["leader"]["tokens"] = state_box["tokens"]
-                    st["leader"]["heartbeat"] = time.time()
-
-    env = {"MA_RUN_DIR": rd, "MA_LEAD_ACCOUNT": leader}
-    env.update(env_sim)
-    how = {"v": "normal"}
-    stop = threading.Event()
-
-    def watchdog():
-        t0 = time.time()
-        over_since = None
-        while not stop.wait(1.0):
-            p = holder["p"]
-            if not p:
-                continue
-            st = read_state(rd)
-            hb = max(state_box["last"], float((st.get("leader") or {}).get("heartbeat") or 0))
-            if time.time() - t0 > args.episode_timeout:
-                how["v"] = "timeout"
-                Y._kill(p)
-                return
-            if time.time() - hb > args.heartbeat_timeout:
-                how["v"] = "stale"
-                Y._kill(p)
-                return
-            if lead_over_budget(st):
-                over_since = over_since or time.time()
-                if time.time() - over_since > args.over_budget_grace:
-                    how["v"] = "forced"
-                    Y._kill(p)
-                    return
-    wd = threading.Thread(target=watchdog, daemon=True)
-    wd.start()
-    node = "_lead.e%d" % episode
-    st = read_state(rd)
-    if side(leader) == "claude":
-        r = Y.call(leader, prompt, model=args.lead_model, effort=args.lead_effort, cwd=rd,
-                   timeout=args.episode_timeout + 30, run_id=st["run_id"], node=node, run_dir=rd, event="lead",
-                   stream_cb=on_event, popen_cb=popen_cb, env_extra=env)
+def cmd_lead(a):
+    workers = [w.strip() for w in (a.workers or "").split(",") if w.strip()]
+    if a.resume:
+        rid = a.resume
+        rd = run_dir_of(rid)
+        st = load_state(rd)
+        opts = st["options"]
     else:
-        r = C.call(leader, prompt, effort=args.lead_effort_codex, cwd=rd, timeout=args.episode_timeout + 30,
-                   run_id=st["run_id"], node=node, run_dir=rd, event="lead", popen_cb=popen_cb, env_extra=env,
-                   stream_cb=lambda ev: state_box.__setitem__("last", time.time()))
-    stop.set()
-    p = holder["p"]
-    if how["v"] == "normal" and p is not None and p.returncode is not None and p.returncode < 0:
-        how["v"] = "crash"
-    with locked(rd) as st2:
-        tok = r["input_tokens"] + r["output_tokens"]
-        if tok > int(st2["leader"].get("tokens") or 0):
-            st2["leader"]["tokens"] = tok
-        st2["leader"]["ended"] = now_iso()
-        st2["leader"]["outcome"] = how["v"]
-        if how["v"] == "forced":
-            how["v"] = "normal"
-    return {"how": how["v"], "result": r}
+        goal = a.goal
+        if a.demo and not goal:
+            goal = DEMO_GOAL
+        if not goal:
+            raise SystemExit("ต้องระบุ --goal (หรือใช้ --demo เพื่อใช้งานตัวอย่าง)")
+        rid = a.run_id or new_run_id()
+        rd = run_dir_of(rid)
+        opts = options_from(a)
+        opts.update(lead_budget=parse_budget(a.lead_token_budget), simulate_crash=[x for x in (a.simulate_crash or "").split(",") if x],
+                    demo=a.demo, leader_difficulty=a.leader_difficulty, episode_timeout=a.episode_timeout,
+                    heartbeat_timeout=a.heartbeat_timeout, succession_explicit=bool(a.succession))
+        if a.demo:
+            opts.update(demo_limit_first_worker=True, demo_budget_first_worker=True, per_account=1)
+        init_run(rd, rid, {"goal": goal, "nodes": []}, opts, mode="lead", goal=goal.replace("{run_dir}", rd))
+        goal = goal.replace("{run_dir}", rd)
+        update(rd, lambda st: st.update(goal=goal))
+        pool = workers or mc.list_accounts()
+        succession = [x for x in (a.succession or "").split(",") if x]
+        allp = list(dict.fromkeys(pool + succession))
+        P("▶ lead run %s · run directory %s" % (rid, rd))
+        P("· เป้าหมาย: %s" % goal)
+        ready = readiness(allp, a.recheck)
+        bad = ["%s=%s" % (k, mc.STATUS_TH.get(v["status"], v["status"])) for k, v in ready.items() if v["status"] != "ready"]
+        if bad:
+            P("· ข้ามบัญชีที่ใช้ไม่ได้: " + ", ".join(bad))
+        setup_accounts(rd, allp, ready)
+        if not succession:
+            rl = [x for x in allp if ready.get(x, {}).get("status") == "ready"]
+            claude = [x for x in rl if mc.side_of(x) == "yolo"]
+            codex = [x for x in rl if mc.side_of(x) == "cyolo"]
+            first = a.leader or (claude or codex or [None])[0]
+            rest = [x for x in claude + codex if x != first]
+            succession = [first] + rest
+        elif a.leader:
+            succession = [a.leader] + [x for x in succession if x != a.leader]
+        update(rd, lambda st: st.update(succession=succession, pool=[x for x in pool]))
+        update(rd, lambda st: st["leader"].update(first=succession[0]))
+        if a.demo:
+            P("· โหมดสาธิต: หัวหน้าคนที่ 1 ล้มกลางคัน (เชิงรับ) · หัวหน้าคนที่ 2 งบ 1 token (เชิงรุก) · "
+              "ลูกทีมคนแรกจำลองโควตาหมด (ย้ายงาน) · ลูกทีมที่ทำงานแรกเสร็จเกินงบ (หยุดรับงาน)")
+        P("· ลำดับผู้สืบทอด: %s" % " → ".join(x for x in succession if x))
+    st = load_state(rd)
+    succession = st.get("succession") or []
+    leader = st.get("leader", {}).get("current") or succession[0]
+    if not leader:
+        raise SystemExit("ไม่มีบัญชีที่พร้อมเป็นหัวหน้า")
+    tried_fail = set()
+    ep = st.get("leader", {}).get("episode") or 0
+    t0 = time.time()
+    while ep < a.max_episodes:
+        ep += 1
+        outcome, reason = run_episode(rd, leader, ep, load_state(rd)["options"])
+        if outcome == "done":
+            P("✔ หัวหน้า %s ประกาศจบงาน" % leader)
+            break
+        if outcome == "continue":
+            P("· episode %d จบโดยยังไม่ finish หัวหน้า %s ทำต่อรอบถัดไป" % (ep, leader))
+            continue
+        typ = "เชิงรับ" if outcome == "reactive" else "เชิงรุก"
+        tried_fail.add(leader)
+        if outcome == "reactive":
+            update(rd, lambda st: st["accounts"].setdefault(leader, {}).update(lead_failed=reason))
+        nxt = pick_leader(load_state(rd), succession, tried_fail)
+        lead_switch(rd, leader, nxt, typ, reason)
+        if not nxt:
+            P("✘ ไม่มีผู้สืบทอดที่พร้อม หยุดงาน (resume ได้ด้วย lead --resume %s)" % st["run_id"])
+            break
+        leader = nxt
+    # wait for workers that are still running
+    deadline = time.time() + a.episode_timeout
+    while time.time() < deadline:
+        st = load_state(rd)
+        if all(n["status"] in TERMINAL or n["status"] == "waiting_approval" for n in st["nodes"].values()):
+            break
+        revive_workers(rd)
+        time.sleep(2)
+    lead_summary(rd, time.time() - t0)
+    st = load_state(rd)
+    ok = st.get("done") and all(n["status"] == "ok" for n in st["nodes"].values())
+    return 0 if ok else 1
 
 
-def print_lead_summary(st, rd, quotas, out_path, is_demo_goal, elapsed, as_json):
-    stats = agg([r for r in read_ledger(os.path.join(rd, "ledger.jsonl"))
-                 if r.get("cli") and r.get("event") not in ("worker_switch", "lead_switch")],
-                lambda r: r.get("account"))
-    roles = {}
-    for r in read_ledger(os.path.join(rd, "ledger.jsonl")):
-        if r.get("cli"):
-            roles.setdefault(r["account"], set()).add({"lead": "หัวหน้า", "check": "ตรวจความพร้อม"}.get(r.get("event"), "ลูกทีม"))
-    verify = verify_demo(out_path) if (is_demo_goal and os.path.isfile(out_path)) else None
-    if as_json:
-        d = summary_data(st, quotas)
-        d.update(stats_by_account={k: dict(v) for k, v in stats.items()}, output=out_path,
-                 elapsed_s=round(elapsed, 1), verify=verify and {"ok": verify[0], "total": verify[1]})
-        print(json.dumps(d, ensure_ascii=False, indent=1))
-        return
-    print("\n## สรุปงานหัวหน้าทีม run %s (%s · %.0f วินาที)" % (st["run_id"], STATUS_TH.get(st["status"], st["status"]), elapsed))
-    print("เป้าหมาย: %s" % st.get("goal"))
-    print("\n### ประวัติการสลับหัวหน้า\n| # | จาก | ไป | ชนิด | เหตุผล | checkpoint ก่อนสลับ |\n|---|---|---|---|---|---|")
-    for i, h in enumerate(st.get("lead_history", []), 1):
-        print("| %d | %s | %s | %s | %s | %s |" % (i, h["from"], h["to"] or "-", h["type"], h["reason"],
-                                                 "มี" if h.get("checkpoint") else "ไม่มี (ใช้ state.json)"))
-    if not st.get("lead_history"):
-        print("| - | - | - | - | ไม่มีการสลับ | - |")
-    gd = st.get("goal_done") or {}
-    print("หัวหน้าที่ปิดงาน: %s" % (gd.get("by") or "-"))
-    print("\n### การย้ายงานลูกทีม\n| งาน | จาก | ไป | เหตุผล |\n|---|---|---|---|")
-    for w in st.get("worker_switches", []):
-        print("| %s | %s | %s | %s |" % (w["node"], w["from"], w["to"] or "-", w["reason"]))
-    if not st.get("worker_switches"):
-        print("| - | - | - | ไม่มีการย้าย |")
-    d = summary_data(st, quotas)
-    print("\n### ผลของแต่ละงาน\n| งาน | บัญชี | รุ่น/effort | เวลา (s) | input tokens | output tokens | สถานะ | ค่า/หมายเหตุ |")
-    print("|---|---|---|---|---|---|---|---|")
-    for r in d["nodes"]:
-        v = r["value"] if r["status"] == "ok" else r["note"]
-        print("| %s | %s | %s | %.1f | %d | %d | %s | %s |" % (r["node"], r["accounts"], r["model_effort"], r["duration_s"],
-              r["input_tokens"], r["output_tokens"], STATUS_TH.get(r["status"], r["status"]),
-              (v or "").replace("\n", " ").replace("|", "/")[:50]))
-    print("\n### สถิติแยกตามบัญชี (จาก ledger ของ run)\n| บัญชี | บทบาท | ครั้ง | สำเร็จ/ล้ม | input | output | ค่าใช้จ่ายตามรายการ ($) | เวลารวม (s) | โควตาล่าสุด |")
-    print("|---|---|---|---|---|---|---|---|---|")
-    for a, s in stats.items():
-        print("| %s | %s | %d | %d/%d | %d | %d | %.4f | %.1f | %s |" % (
-            a, ",".join(sorted(roles.get(a, []))), s["calls"], s["ok"], s["fail"], s["input_tokens"], s["output_tokens"],
-            s["cost_usd"], s["duration_s"], quota_text(quotas.get(a))))
-    print("\nไฟล์ผลรวม: %s%s" % (out_path, "" if os.path.isfile(out_path) else " (ยังไม่มี)"))
-    if verify:
-        print("ตรวจผลอิสระ (คำนวณ a×b เอง): ถูก %d/%d บรรทัด%s" % (verify[0], verify[1],
-              (" · ผิด: %s" % verify[2][:5]) if verify[2] else ""))
-    print("state: %s/state.json · handoff: %s/handoff.md · board: %s/board.md" % (rd, rd, rd))
+DEMO_GOAL = ("ทำเอกสารสรุปตัวเลข 4 ข้อ: (1) 17*23 (2) 2**12 (3) ผลรวม 1..50 (4) จำนวนเฉพาะที่น้อยกว่า 30 มีกี่ตัว "
+             "ให้ลูกทีมคนละข้อ (difficulty 1, --expect number) แล้วรวมเป็นไฟล์ Markdown เดียวที่ {run_dir}/final/result.md "
+             "เป็นตาราง ข้อ | โจทย์ | คำตอบ | บัญชีที่ทำ")
 
 
-# ================================================================ main
-def add_run_opts(p):
-    p.add_argument("--per-account", type=int, default=3, help="งานพร้อมกันต่อบัญชี (ค่าเริ่มต้น 3)")
-    p.add_argument("--max-parallel", type=int, default=8, help="งานพร้อมกันรวม (ค่าเริ่มต้น 8)")
-    p.add_argument("--timeout", type=int, default=600, help="timeout ต่องาน วินาที (ค่าเริ่มต้น 600)")
-    p.add_argument("--worker-token-budget", action="append",
-                   help="งบโทเค็นลูกทีมใน run: N (ทุกบัญชี) หรือ บัญชี=N เช่น yolo2=30000 · เกินแล้วหยุดรับงานใหม่")
-    p.add_argument("--quota-threshold", type=float, default=80, help="โควตา ≥ ค่านี้ (%%) หยุดรับงานใหม่ (ค่าเริ่มต้น 80)")
-    p.add_argument("--exclude", help="บัญชีที่ห้ามใช้ คั่นด้วย ,")
-    p.add_argument("--recheck", action="store_true", help="ตรวจความพร้อมใหม่ทุกบัญชี (ไม่ใช้ผลภายใน 15 นาที)")
-    p.add_argument("--run-id", help="ตั้งชื่อ run เอง")
-    p.add_argument("--json", action="store_true", help="พิมพ์สรุปเป็น JSON (ความคืบหน้าไป stderr)")
+def lead_summary(rd, elapsed):
+    st = load_state(rd)
+    P("\n## สรุป lead run %s (%.0f วินาที)\nrun directory: %s" % (st["run_id"], elapsed, rd))
+    fin = st.get("final") or {}
+    P("ผลลัพธ์รวม: %s · สรุปจากหัวหน้า: %s" % (fin.get("output") or "-", fin.get("summary") or "-"))
+    P("\nประวัติการสลับหัวหน้า:\n" + (mc.table(["จาก", "ไป", "ชนิด", "เหตุผล", "เวลา"], [
+        [h["from"], h["to"] or "-", h["type"], h["reason"], h["ts"][11:19]] for h in st["lead_history"]])
+        if st["lead_history"] else "(ไม่มี)"))
+    P("\nการย้ายงานลูกทีม:\n" + (mc.table(["งาน", "จาก", "ไป", "เหตุผล", "เวลา"], [
+        [s["node"], s["from"], s["to"] or "-", s["reason"], s["ts"][11:19]] for s in st["switches"]])
+        if st["switches"] else "(ไม่มี)"))
+    stops = [e for e in st.get("events", []) if e.get("event") == "worker_stop"]
+    if stops:
+        P("\nบัญชีที่หยุดรับงาน:\n" + mc.table(["บัญชี", "เหตุผล"], [[e.get("account"), e.get("reason")] for e in stops]))
+    P("\nผลของแต่ละงาน:\n" + mc.table(["งาน", "บัญชี", "รุ่น/effort", "เวลา s", "input tokens", "output tokens", "สถานะ"],
+                                      summary_rows(st, rd)))
+    P("\nสถิติแยกตามบัญชี (รวมหัวหน้า):")
+    P(mc.stats_tables([r for r in mc.read_ledger(os.path.join(rd, "ledger.jsonl")) if not r.get("event")],
+                      by=("account",)))
+    P("\nสถานะบัญชี:\n" + status_table(st, rd))
 
 
+# ================================================================= main
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="team.py", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    sub = ap.add_subparsers(dest="cmd")
+    ap = argparse.ArgumentParser(description="multi-account agent team")
+    sp = ap.add_subparsers(dest="cmd")
 
-    p = sub.add_parser("check", help="ตรวจความพร้อมทุกบัญชีด้วยการเรียกจริง")
-    p.add_argument("accounts", nargs="*")
-    p.add_argument("--cached", action="store_true", help="ใช้ผลที่ตรวจภายใน 15 นาที")
-    p.add_argument("--json", action="store_true")
-    p.set_defaults(fn=cmd_check)
+    r = sp.add_parser("run", help="run a task graph")
+    r.add_argument("graph", nargs="?", help="graph.json path (relative paths resolve to /workspace) or - for stdin")
+    r.add_argument("--resume", metavar="RUN_ID")
+    r.add_argument("--set", action="append", help="on resume: <node>.<field>=<value> (prompt, expect, account...)")
+    r.add_argument("--workers", help="only these accounts, e.g. yolo1,yolo2,cyolo1")
+    r.add_argument("--per-account", type=int, dest="per_account")
+    r.add_argument("--max-total", type=int, dest="max_total")
+    r.add_argument("--timeout", type=int)
+    r.add_argument("--threshold", type=int, help="stop giving work at quota %% (default 80)")
+    r.add_argument("--gate-timeout", type=int, dest="gate_timeout")
+    r.add_argument("--worker-token-budget", help="N (every worker) or acc=N,acc2=M")
+    r.add_argument("--simulate-limit", help="accounts that fail like quota exhausted (test)")
+    r.add_argument("--run-id")
+    r.add_argument("--recheck", action="store_true", help="ignore readiness cache (10 min)")
+    r.add_argument("--dry-run", action="store_true", help="plan only, no model calls besides readiness")
+    r.add_argument("--json", action="store_true")
 
-    p = sub.add_parser("quota", help="โควตาล่าสุด (Claude: /usage · Codex: rate_limits) พร้อมเวลาของข้อมูล")
-    p.add_argument("accounts", nargs="*")
-    p.add_argument("--refresh", action="store_true", help="Codex: เรียกสั้น 1 ครั้งแบบไม่ ephemeral เพื่ออัปเดต")
-    p.add_argument("--json", action="store_true")
-    p.set_defaults(fn=cmd_quota)
+    ld = sp.add_parser("lead", help="supervised leader episodes with handoff")
+    ld.add_argument("--goal")
+    ld.add_argument("--demo", action="store_true", help="turn on all simulators (works with your own --goal)")
+    ld.add_argument("--leader")
+    ld.add_argument("--succession", help="e.g. yolo1,yolo2,cyolo1")
+    ld.add_argument("--workers")
+    ld.add_argument("--lead-token-budget", help="N or acc=N")
+    ld.add_argument("--worker-token-budget")
+    ld.add_argument("--simulate-crash", help="leader account(s) that crash after their first dispatch")
+    ld.add_argument("--simulate-limit", help="account(s) failing like quota exhausted")
+    ld.add_argument("--leader-difficulty", type=int, default=2)
+    ld.add_argument("--max-episodes", type=int, default=8)
+    ld.add_argument("--episode-timeout", type=int, default=1800)
+    ld.add_argument("--heartbeat-timeout", type=int, default=900)
+    ld.add_argument("--per-account", type=int, dest="per_account")
+    ld.add_argument("--max-total", type=int, dest="max_total")
+    ld.add_argument("--timeout", type=int)
+    ld.add_argument("--threshold", type=int)
+    ld.add_argument("--resume", metavar="RUN_ID")
+    ld.add_argument("--run-id")
+    ld.add_argument("--recheck", action="store_true")
 
-    p = sub.add_parser("run", help="รันกราฟงานจากไฟล์ JSON (หรือ - = stdin)")
-    p.add_argument("graph", nargs="?")
-    p.add_argument("--resume", metavar="RUN_ID", help="รันต่อ: งานที่สำเร็จไม่รันซ้ำ รันเฉพาะงานที่ล้ม/ถูกบล็อก")
-    p.add_argument("--set", action="append", metavar="งาน.field=ค่า", help="แก้ prompt/expect/... ของงานก่อน resume")
-    p.add_argument("--wait-approval", type=int, default=0, metavar="S",
-                   help="รอไฟล์อนุมัตินานสุด S วินาที (0 = หยุดแล้วให้ resume ภายหลัง)")
-    p.add_argument("--difficulty", type=int, help="ความยากเริ่มต้นของงานที่ไม่ระบุ (ค่าเริ่มต้น 2)")
-    add_run_opts(p)
-    p.set_defaults(fn=cmd_run)
+    s = sp.add_parser("status")
+    s.add_argument("--run")
+    s.add_argument("--refresh", action="store_true")
+    s = sp.add_parser("stats")
+    s.add_argument("--run")
+    s.add_argument("--all", action="store_true")
+    s.add_argument("--account")
+    s.add_argument("--json", action="store_true")
+    for name in ("check", "quota"):
+        c = sp.add_parser(name)
+        c.add_argument("accounts", nargs="*")
+        c.add_argument("--workers")
+        c.add_argument("--json", action="store_true")
+        if name == "quota":
+            c.add_argument("--refresh", action="store_true")
+    ap_ = sp.add_parser("approve")
+    ap_.add_argument("run_id")
+    ap_.add_argument("node")
+    ap_.add_argument("--by", default="human")
+    b = sp.add_parser("board")
+    b.add_argument("text", nargs="*")
+    b.add_argument("--run")
+    b.add_argument("--author", default="agent")
+    m = sp.add_parser("msg")
+    m.add_argument("frm")
+    m.add_argument("to")
+    m.add_argument("text", nargs="+")
+    m.add_argument("--run")
 
-    p = sub.add_parser("status", help="ภาพรวม run สำหรับหัวหน้าทีม")
-    p.add_argument("--run")
-    p.add_argument("--refresh", action="store_true", help="อ่านโควตาใหม่")
-    p.add_argument("--brief", action="store_true")
-    p.add_argument("--json", action="store_true")
-    p.set_defaults(fn=cmd_status)
+    d = sp.add_parser("dispatch", help="(leader) start a worker task in the background")
+    d.add_argument("--run")
+    d.add_argument("--id", required=True)
+    d.add_argument("--prompt", required=True)
+    d.add_argument("--account", default="any")
+    d.add_argument("--difficulty", type=int, default=2)
+    d.add_argument("--depends")
+    d.add_argument("--expect")
+    d.add_argument("--kind")
+    d.add_argument("--type", default="task", choices=["task", "image"])
+    d.add_argument("--path")
+    d.add_argument("--cwd")
+    d.add_argument("--model")
+    d.add_argument("--effort")
+    w = sp.add_parser("wait")
+    w.add_argument("--run")
+    w.add_argument("--ids")
+    w.add_argument("--timeout", type=int, default=300)
+    c = sp.add_parser("checkpoint")
+    c.add_argument("--run")
+    c.add_argument("--done", required=True)
+    c.add_argument("--next", required=True)
+    c.add_argument("--running")
+    c.add_argument("--decision")
+    f = sp.add_parser("finish")
+    f.add_argument("--run")
+    f.add_argument("--output")
+    f.add_argument("--summary", required=True)
+    x = sp.add_parser("_exec")
+    x.add_argument("--run", required=True)
+    x.add_argument("--node", required=True)
 
-    p = sub.add_parser("stats", help="สถิติจาก ledger ตามบัญชี/รุ่น/run")
-    p.add_argument("--run", help="เฉพาะ run นี้")
-    p.add_argument("--event", help="กรองชนิด เช่น call หรือ call,lead")
-    p.add_argument("--since", help="ตั้งแต่เวลา ISO เช่น 2026-11-08T10:00")
-    p.add_argument("--json", action="store_true")
-    p.set_defaults(fn=cmd_stats)
-
-    p = sub.add_parser("approve", help="อนุมัติงานที่มี approve: true")
-    p.add_argument("node")
-    p.add_argument("--run")
-    p.add_argument("--by", default="human")
-    p.set_defaults(fn=cmd_approve)
-
-    p = sub.add_parser("board", help="อ่าน/เพิ่มข้อค้นพบบน board.md")
-    p.add_argument("--run")
-    p.add_argument("--add")
-    p.add_argument("--author", default="human")
-    p.set_defaults(fn=cmd_board)
-
-    p = sub.add_parser("lead", help="หัวหน้าทีมเป็นรอบสั้น + สลับหัวหน้า/ย้ายงานลูกทีมอัตโนมัติ",
-                       description="รัน foreground พิมพ์ความคืบหน้าทีละบรรทัด จบด้วยตารางสรุป · "
-                                   "--demo = เปิดตัวจำลองครบชุด (หัวหน้าคนแรกล้มหลังแจกงาน, งบหัวหน้าคนที่สอง=1, "
-                                   "งบลูกทีมหนึ่งคน=1, per-account 1) ใช้กับ --goal ของตัวเองได้")
-    p.add_argument("--goal", help="เป้าหมาย (ไม่ใส่ + --demo = ตารางสูตรคูณแม่ 2-9)")
-    p.add_argument("--demo", action="store_true", help="สาธิต: เกิดสลับหัวหน้าเชิงรับ + เชิงรุก + ย้ายงานลูกทีม ในรันเดียว")
-    p.add_argument("--output", help="ไฟล์ผลรวม (ค่าเริ่มต้น <run>/final.md)")
-    p.add_argument("--lead-model", default="sonnet", choices=Y.MODELS, help="รุ่นของหัวหน้าฝั่ง Claude (ค่าเริ่มต้น sonnet)")
-    p.add_argument("--lead-effort", default="low", choices=Y.EFFORTS)
-    p.add_argument("--lead-effort-codex", default="low", choices=C.LEVELS)
-    p.add_argument("--succession", help="รายชื่อหัวหน้าตามลำดับ เช่น yolo1,yolo2,cyolo1")
-    p.add_argument("--lead-token-budget", action="append", help="งบโทเค็นต่อหัวหน้า: N หรือ บัญชี=N (ตรวจระหว่างรอบ)")
-    p.add_argument("--max-dispatch-per-episode", type=int, default=0, help="จำกัดจำนวนงานที่แจกต่อรอบ (0 = ไม่จำกัด)")
-    p.add_argument("--simulate-crash", metavar="บัญชี", help="จำลองหัวหน้าบัญชีนี้ล้มกะทันหันหลังแจกงานครั้งแรก")
-    p.add_argument("--simulate-limit", metavar="บัญชี", help="จำลองบัญชีนี้โควตาหมด (= MA_SIMULATE_LIMIT) ทั้งหัวหน้าและลูกทีม")
-    p.add_argument("--worker-difficulty", type=int, help="ความยากเริ่มต้นของงานลูกทีม (ค่าเริ่มต้น 2, demo 1)")
-    p.add_argument("--episode-timeout", type=int, default=900)
-    p.add_argument("--heartbeat-timeout", type=int, default=420)
-    p.add_argument("--over-budget-grace", type=int, default=120, help="วินาทีที่ให้หัวหน้าเขียน checkpoint หลังงบหมด")
-    p.add_argument("--max-episodes", type=int, default=8)
-    add_run_opts(p)
-    p.set_defaults(fn=cmd_lead)
-
-    p = sub.add_parser("dispatch", help="(หัวหน้า) แจกงานให้ลูกทีม")
-    p.add_argument("--run")
-    p.add_argument("--id")
-    p.add_argument("--prompt")
-    p.add_argument("--expect")
-    p.add_argument("--account")
-    p.add_argument("--difficulty", type=int)
-    p.add_argument("--kind")
-    p.add_argument("--depends-on")
-    p.add_argument("--tasks-file", help="ไฟล์ JSON รายการงาน [{id, prompt, expect?, account?, difficulty?, depends_on?}]")
-    p.set_defaults(fn=cmd_dispatch)
-
-    p = sub.add_parser("wait", help="(หัวหน้า) รอผลงาน")
-    p.add_argument("--run")
-    p.add_argument("--ids")
-    p.add_argument("--timeout", type=int, default=300)
-    p.set_defaults(fn=cmd_wait)
-
-    p = sub.add_parser("combine", help="(หัวหน้า) รวม out/<id>.md เป็นไฟล์เดียว (ไม่เสียโทเค็น)")
-    p.add_argument("--run")
-    p.add_argument("--ids", required=True)
-    p.add_argument("--output")
-    p.add_argument("--title")
-    p.add_argument("--headings", action="store_true", help="ใส่หัวข้อ ## <id> ก่อนแต่ละส่วน")
-    p.set_defaults(fn=cmd_combine)
-
-    p = sub.add_parser("checkpoint", help="(หัวหน้า) เขียน handoff.md สำหรับหัวหน้าคนถัดไป")
-    p.add_argument("--run")
-    p.add_argument("--done")
-    p.add_argument("--next")
-    p.add_argument("--decisions")
-    p.add_argument("--by", default="leader")
-    p.set_defaults(fn=cmd_checkpoint)
-
-    p = sub.add_parser("finish", help="(หัวหน้า) บันทึกว่าเป้าหมายเสร็จ")
-    p.add_argument("--run")
-    p.add_argument("--result")
-    p.add_argument("--summary")
-    p.set_defaults(fn=cmd_finish)
-
-    args = ap.parse_args(argv)
-    if not getattr(args, "fn", None):
+    a = ap.parse_args(argv)
+    if not a.cmd:
         ap.print_help()
         return 0
-    return args.fn(args)
+    fn = {"run": cmd_run, "lead": cmd_lead, "status": cmd_status, "stats": cmd_stats, "check": cmd_check,
+          "quota": cmd_quota, "approve": cmd_approve, "board": cmd_board, "msg": cmd_msg,
+          "dispatch": cmd_dispatch, "wait": cmd_wait, "checkpoint": cmd_checkpoint, "finish": cmd_finish,
+          "_exec": cmd_exec}[a.cmd]
+    return fn(a)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(130)
