@@ -19,7 +19,7 @@ SKILL_STYLE = {
     "debate": ("#475569", "⚖️", "debate · Claude vs Codex + ผู้ตัดสิน"),
     "best_of": ("#0891b2", "🏆", "best_of · N ตัวเลือก + ผู้ตัดสิน"),
 }
-# difficulty → (รุ่น Claude, effort Claude, effort Codex) ตามตารางบท 04 (macore.DIFFICULTY)
+# difficulty → (รุ่น Claude, effort Claude, effort Codex) ตามตาราง DIFFICULTY ของ base skill agent-team
 DIFF = {1: ("haiku", "low", "low"), 2: ("sonnet", "medium", "medium"), 3: ("opus", "high", "high"),
         4: ("opus", "xhigh", "xhigh"), 5: ("opus", "max", "max"), 6: ("opus", "max", "ultra")}
 ACC_PALETTE = ["#1f6feb", "#2da44e", "#8250df", "#cf222e", "#bf8700", "#1b7c83", "#d1242f", "#57606a", "#bc4c00", "#6639ba"]
@@ -258,7 +258,7 @@ def render_compare(rows, title, sub):
             x, w = xa + r["a0"] * PW / as_, max(3, (r["a1"] - r["a0"]) * PW / as_)
             S.append(f'<rect x="{x}" y="{y + 9}" width="{w}" height="{RH - 18}" rx="4" fill="{col}"/>')
             S.append(f'<text x="{x + w + 6}" y="{y + 28}" font-size="12" fill="#555">{r["a1"] - r["a0"]:.1f}'
-                     f'{"" if r.get("status") == "done" else " " + esc(r.get("status"))}</text>')
+                     f'{"" if r.get("status") in ("ok", "done") else " " + esc(r.get("status"))}</text>')
         else:
             S.append(f'<text x="{xa + 6}" y="{y + 28}" font-size="13" fill="#cf222e">{esc(r.get("status") or "ไม่ได้รัน")}</text>')
     S.append(f'<text x="{X0}" y="{H - 30}" font-size="15" fill="#555">แท่งจาง = เวลาตามแผน · แท่งทึบ = เวลาจริง · '

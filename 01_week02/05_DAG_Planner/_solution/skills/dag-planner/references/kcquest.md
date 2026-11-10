@@ -15,9 +15,9 @@ crit_j  = rank(j) ÷ max rank   (0..1 ใช้ในตัวแปร V)
 
 | แหล่ง | ค่า |
 |---|---|
-| `team.py check` → `/workspace/.agent-team/readiness.json` | ใช้เฉพาะบัญชี `state = ready` |
-| `team.py quota` → `/workspace/.agent-team/quota.json` | Claude: `Current session` / `Current week (all models)` / week ของรุ่น · Codex: `primary/secondary (N นาที)` (N ≤ 600 = หน้าต่าง 5 ชม.) · ช่วงที่รีเซ็ตแล้ว = 0% |
-| `--accounts a:N` | สมมติเหลือ N% ในหน้าต่าง 5 ชม. (week 0%) |
+| `team.py check --json` (base skill agent-team) | ใช้เฉพาะบัญชี `status = ready` |
+| `team.py quota --json` | `session_pct` / `week_pct` + เวลารีเซ็ต (`session_resets` `week_resets`) · `week_other` = เพดานเฉพาะรุ่น (นับเป็นเพดานสัปดาห์อีกตัว) · Codex: `primary/secondary` (หน้าต่าง < 7 วัน = session) · รอบที่รีเซ็ตไปแล้ว = 0% |
+| `--accounts a:N` | สมมติเหลือ N% ในหน้าต่าง 5 ชม. (week 0%) · ถ้าทุกบัญชีมี `:N` จะไม่เรียก `team.py` เลย (วางแผนได้โดยไม่มีบัญชีล็อกอิน) |
 
 ```
 headroom_s = 100 − ใช้ไป 5 ชม. · headroom_w = 100 − max(ใช้ไปสัปดาห์, ใช้ไปสัปดาห์ของรุ่น)
@@ -56,4 +56,4 @@ q_s = σ·r_s·c, q_w = σ·r_w·c (โควตาที่งานจะใ�
 
 ## ⑥ เรียนรู้ (`report`)
 
-k[skill] = Σ นาทีจริง ÷ Σ นาทีแผนก่อนคูณ k (เฉพาะบล็อกที่ done) · k["*"] = รวมทุกสกิล · บันทึก `calib.json` (`k`, `history`) · `plan` ใช้ k ของสกิลนั้น ไม่มีใช้ `*` ไม่มีใช้ 1
+k[skill] = Σ นาทีจริง ÷ Σ นาทีแผนก่อนคูณ k (เฉพาะบล็อกที่สถานะ `ok`) · k["*"] = รวมทุกสกิล · บันทึก `calib.json` (`k`, `history`) · `plan` ใช้ k ของสกิลนั้น ไม่มีใช้ `*` ไม่มีใช้ 1

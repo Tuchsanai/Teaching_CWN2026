@@ -1,11 +1,13 @@
 ---
 name: dag-planner
-description: วางแผนงานใหญ่ให้ทีม agent หลายบัญชี — แตกโจทย์เป็นบล็อกงาน 6–14 บล็อกที่แต่ละบล็อกระบุสกิลบท 04 (yolo · cyolo · image · review · debate · best_of) และความยาก วาด DAG (rank + สายวิกฤต + ป้ายสกิล) วางแผนเวลา Gantt ว่าบล็อกไหนให้บัญชีไหนเมื่อไรด้วย KC-QUEST จากโควตาจริง แล้วส่งแผนให้ agent-team รันจริง และวาด Gantt ของจริงเทียบกับแผน (เรียนรู้ตัวปรับเวลา k) ใช้เมื่อผู้ใช้ขอ "วางแผนงาน", "แตกงานเป็น DAG", "แบ่งงานให้ทีม agent", "Gantt", "ใครทำงานไหนเมื่อไร", "รันแผนจริง" · Plan a project as a DAG of skill-tagged blocks (yolo/cyolo/image/review/debate/best_of), schedule it onto Claude/Codex accounts with KC-QUEST from real quota (DAG + Gantt), run the plan for real with agent-team and report actual-vs-plan Gantt with time calibration. Use for "plan this work", "break into a DAG", "split work across agent team", "Gantt", "who does what when", "run the plan".
+description: วางแผนงานใหญ่ให้ทีม agent หลายบัญชี — แตกโจทย์เป็นบล็อกงาน 6–14 บล็อกที่แต่ละบล็อกระบุ base skill (yolo · cyolo · image · review · debate · best_of) และความยาก วาด DAG (rank + สายวิกฤต + ป้ายสกิล) วางแผนเวลา Gantt ว่าบล็อกไหนให้บัญชีไหนเมื่อไรด้วย KC-QUEST จากโควตาจริง แล้วส่งแผนให้ agent-team รันจริง และวาด Gantt ของจริงเทียบกับแผน (เรียนรู้ตัวปรับเวลา k) ใช้เมื่อผู้ใช้ขอ "วางแผนงาน", "แตกงานเป็น DAG", "แบ่งงานให้ทีม agent", "Gantt", "ใครทำงานไหนเมื่อไร", "รันแผนจริง" · Plan a project as a DAG of skill-tagged blocks (yolo/cyolo/image/review/debate/best_of), schedule it onto Claude/Codex accounts with KC-QUEST from real quota (DAG + Gantt), run the plan for real with agent-team and report actual-vs-plan Gantt with time calibration. Use for "plan this work", "break into a DAG", "split work across agent team", "Gantt", "who does what when", "run the plan".
 ---
 
 # dag-planner — แตกงานเป็นบล็อก · DAG · Gantt (KC-QUEST) · รันจริงด้วย agent-team
 
-`D=/root/ai-accounts/.Claude/shared/skills/dag-planner/scripts/dagplan.py` (สำเนาเดียวกันอยู่ใต้ `.Codex/shared/skills/`) · Python 3.8+ stdlib · ต้องมีสกิล agent-team · yolo · cyolo ใน shared เดียวกัน
+`D=/root/ai-accounts/.Claude/shared/skills/dag-planner/scripts/dagplan.py` (สำเนาเดียวกันอยู่ใต้ `.Codex/shared/skills/`) · Python 3.8+ stdlib
+
+**base skills:** สกิลนี้ต่อยอดจาก `agent-team` · `yolo` · `cyolo` (ชุดในโฟลเดอร์ `base_skills/`) ต้องวางอยู่ข้างกันใน `shared/skills` เดียวกัน · ลำดับที่สคริปต์หา: `$DAGPLAN_BASE_SKILLS` → โฟลเดอร์ข้างเคียง → `./base_skills` ของโฟลเดอร์ที่สั่งงาน · ข้อเท็จจริงของ base skill (ฟิลด์ของ node · คำสั่ง `team.py`) ให้อ่าน `SKILL.md` ของสกิลนั้น ห้ามเดา
 
 | ต้องการ | คำสั่ง |
 |---|---|
@@ -13,6 +15,7 @@ description: วางแผนงานใหญ่ให้ทีม agent ห
 | ตรวจไฟล์บล็อก + rank + สายวิกฤต → `dag.png` | `python3 $D dag <แผน> --blocks blocks.json` (ครั้งต่อไปไม่ต้องใส่ `--blocks`) |
 | แจกบล็อกให้บัญชีจากโควตาจริง → `gantt-plan.png` `PLAN.md` | `python3 $D plan <แผน> [--max-agents 6]` |
 | ทดลอง what-if (สมมติโควตา) | `python3 $D plan <แผน> --accounts yolo1:10,yolo2,cyolo1,cyolo2` |
+| วางแผนโดยไม่แตะบัญชีเลย (ทุกบัญชีมี % = สมมติทั้งหมด) | `python3 $D plan <แผน> --accounts yolo1:80,yolo2:80,cyolo1:80,cyolo2:80` |
 | แปลงเป็น `graph.json` ของ agent-team | `python3 $D export <แผน>` |
 | รันจริง (รอจนจบ / เบื้องหลัง) | `python3 $D run <แผน>` · `python3 $D run <แผน> --detach` |
 | Gantt จริง + แผน vs จริง + `REPORT.md` + `calib.json` | `python3 $D report <แผน>` |
@@ -21,7 +24,8 @@ description: วางแผนงานใหญ่ให้ทีม agent ห
 
 ## ขั้นตอน
 
-1. `doctor` → 2. เขียน `blocks.json` ตามกติกาด้านล่าง → 3. `dag` (แก้จนไม่มี ERROR) → 4. `plan` (อ่าน `PLAN.md` ให้ผู้ใช้ดู) → 5. **ถามผู้ใช้ก่อนรันจริง (ใช้โทเค็น)** → `export` → `run` → 6. `report` แล้วสรุปจาก `REPORT.md`
+1. `doctor` → 2. เขียน `blocks.json` ตามกติกาด้านล่าง → 3. `dag` (แก้จนไม่มี ERROR) → 4. `plan` (อ่าน `PLAN.md` ให้ผู้ใช้ดู) → **หยุดตรงนี้ถ้าผู้ใช้ขอแค่แผน (DAG + Gantt)**
+5. รันจริงเฉพาะเมื่อผู้ใช้สั่ง: **ถามผู้ใช้ก่อน (ใช้โทเค็น)** → `export` → `run` → 6. `report` แล้วสรุปจาก `REPORT.md`
 
 ## กติกาแตกบล็อก (AI ต้องทำตาม)
 
@@ -40,7 +44,7 @@ description: วางแผนงานใหญ่ให้ทีม agent ห
 | `debate` ⚖️ | การตัดสินใจที่มีคำตอบถูก/ผิด | `type: debate` Claude vs Codex + ผู้ตัดสิน | 3 |
 | `best_of` 🏆 | งานสร้างสรรค์ อยากได้ตัวเลือกดีสุด (`n` 2–4) | `type: best_of` + ผู้ตัดสิน | n+1 |
 
-ความยาก → รุ่น/effort (ตารางบท 04): 1 haiku/low · 2 sonnet/medium · 3 opus/high · 4 opus/xhigh · 5 opus/max · 6 opus/max (Codex ultra) — Codex effort ตามเลขเดียวกัน · ภาพ = low เสมอ
+ความยาก → รุ่น/effort (ตารางของ agent-team): 1 haiku/low · 2 sonnet/medium · 3 opus/high · 4 opus/xhigh · 5 opus/max · 6 opus/max (Codex ultra) — Codex effort ตามเลขเดียวกัน · ภาพ = low เสมอ
 
 ```json
 {"goal": "เว็บร้านกาแฟหน้าเดียว", "name": "cafe",
@@ -59,7 +63,7 @@ rank = ขนาด + rank สูงสุดของบล็อกที่�
 
 ## รันจริง (`export` · `run` · `report`)
 
-`export` สร้าง prompt ของแต่ละ node (เป้าหมายรวม · งานของบล็อก · ไฟล์ผลใน `app/` · เกณฑ์ done · path ไฟล์ของบล็อกก่อนหน้า · ห้ามแก้ไฟล์บล็อกอื่น · ตอบสั้น) ใช้ `cwd` = `app/` ร่วมกัน ตรวจกับ `graph.md` และ `add_node()` ของ agent-team จริง · ส่งเป็น**ฝั่ง** `yolo`/`cyolo` (ไม่ผูกบัญชี) เพื่อให้ failover ของ agent-team ทำงาน · agent-team ไม่ retry งานที่เสียโทเค็น · `report` คำนวณ k = เวลาจริง ÷ แผน แยกตามสกิล → `calib.json` ให้ `plan` ครั้งถัดไปใช้ · รายละเอียด: [references/run.md](references/run.md)
+`export` สร้าง prompt ของแต่ละ node (เป้าหมายรวม · งานของบล็อก · ไฟล์ผลใน `app/` · เกณฑ์ done · path ไฟล์ของบล็อกก่อนหน้า · ห้ามแก้ไฟล์บล็อกอื่น · ตอบสั้น) ใช้ `cwd` = `app/` ร่วมกัน ตรวจด้วย `validate_graph()` ของ `team.py` ใน base skill จริง (ไม่เรียกโมเดล) · ส่งเป็น**ฝั่ง** `yolo`/`cyolo` (ไม่ผูกบัญชี) เพื่อให้ failover ของ agent-team ทำงาน · agent-team ไม่ retry งานที่เสียโทเค็น · `report` คำนวณ k = เวลาจริง ÷ แผน แยกตามสกิล → `calib.json` ให้ `plan` ครั้งถัดไปใช้ · รายละเอียด: [references/run.md](references/run.md)
 
 ## ข้อห้าม
 

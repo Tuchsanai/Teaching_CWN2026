@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""dagplan.py — แตกโจทย์เป็นบล็อกงาน (แต่ละบล็อกใช้สกิลบท 04) → DAG → แผน KC-QUEST + Gantt → รันจริงด้วย agent-team → รายงานแผน vs จริง
+"""dagplan.py — แตกโจทย์เป็นบล็อกงาน (แต่ละบล็อกใช้ base skill: yolo · cyolo · agent-team) → DAG → แผน KC-QUEST + Gantt → รันจริงด้วย agent-team → รายงานแผน vs จริง
 
   dagplan.py doctor                                   ตรวจ python · สกิล agent-team/yolo/cyolo · ตัววาด PNG · บัญชีพร้อม
   dagplan.py dag    NAME [--blocks FILE|-]            ตรวจไฟล์บล็อก → rank · สายวิกฤต → dag.svg/png
   dagplan.py plan   NAME [--max-agents 6] [--accounts yolo1,cyolo1:40]
                                                       โควตาจริง (team.py check/quota) หรือค่าสมมติ → KC-QUEST
                                                       → gantt-plan.svg/png · dag.svg/png (มีป้ายบัญชี) · PLAN.md · plan.json
-  dagplan.py export NAME                              → graph.json ของ agent-team (ตรวจกับ graph.md + add_node จริง)
-  dagplan.py run    NAME [--detach]                   team.py run graph.json · เก็บ run_id ใน run.json
+  dagplan.py export NAME                              → graph.json ของ agent-team (ตรวจด้วย validate_graph ของ team.py จริง)
+  dagplan.py run    NAME [--detach]                   team.py run graph.json --run-id ... --workers ... · เก็บ run_id ใน run.json
   dagplan.py report NAME [--run RUN_ID]               state.json + ledger → gantt-actual · compare · REPORT.md · calib.json
 
 แผนอยู่ที่ /workspace/plans/<NAME>/ (blocks.json · ภาพ · รายงาน) · ไฟล์งานของทีมอยู่ที่ /workspace/plans/<NAME>/app/
@@ -29,11 +29,22 @@ import kcquest as K  # noqa: E402
 import render as R  # noqa: E402
 
 SKILLS_DIR = os.path.dirname(os.path.dirname(HERE))
-TEAM = next((p for p in (os.path.join(SKILLS_DIR, "agent-team", "scripts", "team.py"),
-                         "/root/ai-accounts/.Claude/shared/skills/agent-team/scripts/team.py") if os.path.isfile(p)),
-            os.path.join(SKILLS_DIR, "agent-team", "scripts", "team.py"))
-GRAPH_MD = os.path.join(os.path.dirname(os.path.dirname(TEAM)), "references", "graph.md")
-PLANS = os.environ.get("DAGPLAN_DIR") or "/workspace/plans"
+
+
+def find_base():
+    """โฟลเดอร์ base skills (agent-team · yolo · cyolo): $DAGPLAN_BASE_SKILLS → ข้างเคียงสกิลนี้ (shared/skills)
+    → ./base_skills ของโฟลเดอร์ที่สั่งงาน → shared ของ container"""
+    for c in (os.environ.get("DAGPLAN_BASE_SKILLS"), SKILLS_DIR, os.path.join(os.getcwd(), "base_skills"),
+              "/root/ai-accounts/.Claude/shared/skills"):
+        if c and os.path.isfile(os.path.join(c, "agent-team", "scripts", "team.py")):
+            return os.path.abspath(c)
+    return SKILLS_DIR
+
+
+BASE = find_base()
+TEAM = os.path.join(BASE, "agent-team", "scripts", "team.py")
+PLANS = os.environ.get("DAGPLAN_DIR") or ("/workspace/plans" if os.path.isdir("/workspace") else
+                                          os.path.join(os.getcwd(), "workspace", "plans"))
 TEAM_DIR = os.environ.get("MA_TEAM_DIR") or "/workspace/.agent-team"
 ID_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 ROLE_TH = {"worker": "ทำ", "reviewer": "ตรวจ", "candidate": "ตอบ", "judge": "ตัดสิน"}
@@ -68,8 +79,33 @@ def pdir(name, *a):
 
 def team(*args, timeout=600, capture=True):
     if not os.path.isfile(TEAM):
-        sys.exit(f"ERROR ไม่พบ team.py ของสกิล agent-team ({TEAM}) — ติดตั้ง agent-team ใน shared/skills เดียวกัน")
-    return subprocess.run([sys.executable, TEAM, *args], capture_output=capture, text=True, timeout=timeout)
+        sys.exit(f"ERROR ไม่พบ team.py ของ base skill agent-team ({TEAM}) — คัดลอก base_skills/agent-team ไปไว้ข้างสกิลนี้ "
+                 "หรือตั้ง DAGPLAN_BASE_SKILLS")
+    return subprocess.run([sys.executable, TEAM, *args], capture_output=capture, text=True, timeout=timeout,
+                          encoding="utf-8", errors="replace")
+
+
+def team_json(*args, timeout=300):
+    """เรียก team.py ... --json แล้วคืน (ข้อมูล, CompletedProcess) · ข้อมูล = None ถ้าอ่าน JSON ไม่ได้"""
+    r = team(*args, "--json", timeout=timeout)
+    out = r.stdout or ""
+    for k, ch in sorted((out.find(c), c) for c in "[{" if out.find(c) >= 0):
+        try:
+            return json.loads(out[k:]), r
+        except ValueError:
+            continue
+    return None, r
+
+
+def ready_accounts(only=()):
+    """→ ({บัญชี: ผล check}, [บัญชีที่พร้อม]) จาก team.py check --json (ตรวจด้วยการเรียกจริง ไม่อ่าน credential)"""
+    res, r = team_json("check", *only)
+    if res is None:
+        print("WARN team.py check ล้ม: " + ((r.stderr or r.stdout) or "").strip()[-300:])
+        res = []
+    rd = {x.get("account"): x for x in res if isinstance(x, dict)}
+    ready = [x for x, v in rd.items() if v.get("status") == "ready" and (not only or x in only)]
+    return rd, sorted(ready, key=lambda x: (K.kind_of(x), int(re.sub(r"\D", "", x) or 0)))
 
 
 def save_img(svg_text, path_svg):
@@ -215,10 +251,10 @@ def cmd_doctor(a):
         ok &= good is not False
         rows.append(("✅" if good else ("⚠️" if good is None else "❌")) + f" {what}" + (f"\n     → {fix}" if fix and not good else ""))
     row(sys.version_info >= (3, 8), f"Python {sys.version.split()[0]}", "ต้องใช้ Python 3.8+")
-    for sk, f in (("agent-team", TEAM), ("yolo", os.path.join(SKILLS_DIR, "yolo", "scripts", "yolo.py")),
-                  ("cyolo", os.path.join(SKILLS_DIR, "cyolo", "scripts", "cyolo.py"))):
-        row(os.path.isfile(f), f"สกิล {sk}: {f}", f"ติดตั้งสกิล {sk} ใน {SKILLS_DIR}")
-    row(os.path.isfile(GRAPH_MD), f"agent-team references/graph.md (ใช้ตรวจ export)")
+    rows.append(f"📦 base skills: {BASE}")
+    for sk, f in (("agent-team", TEAM), ("yolo", os.path.join(BASE, "yolo", "scripts", "yolo.py")),
+                  ("cyolo", os.path.join(BASE, "cyolo", "scripts", "cyolo.py"))):
+        row(os.path.isfile(f), f"base skill {sk}: {f}", f"คัดลอก base_skills/{sk} ไปไว้ที่ {SKILLS_DIR}")
     try:
         os.makedirs(PLANS, exist_ok=True)
         wtext(os.path.join(PLANS, ".doctor"), "ok")
@@ -239,13 +275,9 @@ def cmd_doctor(a):
         "ติดตั้ง Playwright Chromium หรือตั้ง DAGPLAN_CHROME")
     ready = []
     if os.path.isfile(TEAM):
-        r = team("check", timeout=300)
-        rd = jload(os.path.join(TEAM_DIR, "readiness.json"), {}) or {}
-        ready = sorted([k for k, v in rd.items() if v.get("state") == "ready"], key=lambda x: (K.kind_of(x), x))
-        row(r.returncode == 0 and bool(ready) or (None if r.returncode == 0 else False),
-            "บัญชีพร้อม (team.py check): " + (", ".join(ready) or "ไม่มี"),
+        _, ready = ready_accounts()
+        row(bool(ready) or None, "บัญชีพร้อม (team.py check): " + (", ".join(ready) or "ไม่มี → ใช้ได้เฉพาะแผนสมมติ --accounts yolo1:80,..."),
             "ให้ผู้ใช้ล็อกอินเอง (! yoloN auth login / ! cyoloN login) — สกิลนี้ไม่ล็อกอินแทน")
-        print(r.stdout.strip())
         kinds = {K.kind_of(x) for x in ready}
         if ready and kinds != {"yolo", "cyolo"}:
             rows.append("⚠️ มีบัญชีพร้อมแค่ฝั่งเดียว → บล็อก review/debate/image (หรือ yolo) จะไม่มีใครรับ")
@@ -287,28 +319,28 @@ def parse_accounts(s):
 
 
 def real_snaps(only, left):
-    """บัญชีที่ team.py check บอกว่าพร้อม + โควตาจาก team.py quota (แคชของ agent-team)"""
-    r = team("check", *only, timeout=300)
-    if r.returncode != 0:
-        print("WARN team.py check ล้ม: " + (r.stderr or r.stdout).strip()[-300:])
-    rd = jload(os.path.join(TEAM_DIR, "readiness.json"), {}) or {}
-    ready = [x for x, v in rd.items() if v.get("state") == "ready" and (not only or x in only)]
-    if ready:
-        team("quota", *ready, timeout=300)
-    qc = jload(os.path.join(TEAM_DIR, "quota.json"), {}) or {}
+    """บัญชีที่ team.py check บอกว่าพร้อม + โควตาจาก team.py quota --json
+    ถ้าทุกบัญชีใน --accounts ระบุ % (สมมติทั้งหมด) จะไม่เรียก team.py เลย → วางแผนได้แม้ไม่มีบัญชีล็อกอิน"""
+    offline = bool(only) and all(x in left for x in only)
+    rd, ready, qc = {}, [], {}
+    if not offline:
+        rd, ready = ready_accounts(only)
+        if ready:
+            qc, _ = team_json("quota", *ready)
+            qc = qc if isinstance(qc, dict) else {}
     snaps, notes = [], []
     for acc in sorted(set(ready) | set(left), key=lambda x: (K.kind_of(x), int(re.sub(r"\D", "", x)))):
-        hint = str((rd.get(acc) or {}).get("detail") or "").split(" ")[0] if K.kind_of(acc) == "yolo" else None
         if acc in left:
-            plan = (qc.get(acc) or {}).get("plan") or (hint if hint in ("max", "team", "pro") else "default")
-            snaps.append(K.assumed(acc, left[acc], plan))
-            if acc not in ready:
+            snaps.append(K.assumed(acc, left[acc], (qc.get(acc) or {}).get("plan") or "default"))
+            if not offline and acc not in ready:
                 notes.append(f"{acc} ไม่พร้อมตาม team.py check → ใช้ได้แค่ในแผนสมมติ (รันจริงไม่ได้)")
         else:
-            snaps.append(K.snap_from_team(acc, qc.get(acc), hint if hint in ("max", "team", "pro") else None))
+            snaps.append(K.snap_from_team(acc, qc.get(acc)))
+    if offline:
+        notes.append("ทุกบัญชีเป็นค่าสมมติ (--accounts มี % ครบ) → ไม่ได้เรียก team.py check/quota")
     skipped = [x for x in only if x not in ready and x not in left]
     if skipped:
-        notes.append("ข้ามบัญชีที่ไม่พร้อม: " + ", ".join(f"{x} ({(rd.get(x) or {}).get('state', 'ไม่รู้จัก')})" for x in skipped))
+        notes.append("ข้ามบัญชีที่ไม่พร้อม: " + ", ".join(f"{x} ({(rd.get(x) or {}).get('status', 'ไม่รู้จัก')})" for x in skipped))
     return K.score_accounts(snaps), notes
 
 
@@ -407,23 +439,6 @@ def cmd_plan(a):
 
 
 # ---------------------------------------------------------------- export
-def graph_fields():
-    """ชื่อฟิลด์ของ node ที่ agent-team รองรับ อ่านจาก references/graph.md จริง (ตาราง 'ฟิลด์ของ node')"""
-    try:
-        txt = open(GRAPH_MD, encoding="utf-8").read()
-    except OSError:
-        return None
-    sec = txt.split("## ฟิลด์ของ node", 1)[-1].split("\n## ", 1)[0]
-    names = set()
-    for line in sec.splitlines():
-        if line.startswith("|") and not line.startswith("|---"):
-            names |= set(re.findall(r"`([a-z_]+)`", line.split("|")[1]))
-            first = line.split("|")[1].strip()
-            if first in ("review", "debate", "best_of"):         # แถวชนิด: ฟิลด์อยู่คอลัมน์ที่ 2 (ค่าในวงเล็บไม่ใช่ฟิลด์)
-                names |= set(re.findall(r"`([a-z_]+)`", re.sub(r"\([^)]*\)", "", line.split("|")[2])))
-    return names
-
-
 def topo(blocks, assign):
     by, done, out = {b["id"]: b for b in blocks}, set(), []
     while len(out) < len(blocks):
@@ -466,6 +481,7 @@ def node_prompt(doc, b, by, app, n_total):
 
 
 def build_graph(name, doc, plan):
+    """blocks → graph.json ตามหัวข้อ "กราฟงาน (JSON)" ใน SKILL.md ของ base skill agent-team"""
     blocks, cost, rank, succ, calc, crit = analyse(doc)
     by = {b["id"]: b for b in blocks}
     assign = (plan or {}).get("assign") or {}
@@ -476,63 +492,51 @@ def build_graph(name, doc, plan):
         picks = (assign.get(b["id"]) or {}).get("accounts") or []
         role = lambda r: [p["account"] for p in picks if p["role"] == r]   # noqa: E731
         n = {"id": b["id"], "depends_on": list(b["depends_on"]), "difficulty": int(b.get("difficulty", 2)),
-             "cwd": app, "timeout": int(b.get("timeout") or 600), "expect": "text"}
+             "cwd": app, "timeout": int(b.get("timeout") or 600)}
         sk = b["skill"]
         if sk == "image":
-            n.update(account="cyolo", image=os.path.join(app, b["output"]), kind="image",
+            n.update(type="image", account="cyolo", path=os.path.join(app, b["output"]),
                      prompt=f"{b['title']}. {b.get('detail') or ''} (ภาพสำหรับโปรเจกต์: {doc['goal']}) "
                             f"เงื่อนไขที่ต้องครบ: {b['done']}".replace("  ", " "))
-            n.pop("expect")
         else:
             n["prompt"] = node_prompt(doc, b, by, app, len(blocks))
             if sk in ("yolo", "cyolo"):
                 n["account"] = sk
             elif sk == "review":
-                w = (role("worker") or [None])[0]
-                n.update(type="review", account=side(w, b.get("worker") or "yolo"),
+                w = side((role("worker") or [None])[0], b.get("worker") or "yolo")
+                n.update(type="review", worker=w, reviewer="cyolo" if w == "yolo" else "yolo",
                          criteria=f"{b['done']} · ไฟล์ {os.path.join(app, b['output'])} มีอยู่จริงและตรงโจทย์ (เปิดไฟล์ตรวจเอง)",
                          max_rounds=int(b.get("max_rounds") or 2), review_difficulty=n["difficulty"])
-                n["reviewer"] = "cyolo" if n["account"] == "yolo" else "yolo"
             elif sk == "debate":
-                j = (role("judge") or [None])[0]
-                n.update(type="debate", candidates=["yolo", "cyolo"], judge=side(j, "any"), judge_difficulty=n["difficulty"])
-                n.pop("expect")
+                n.update(type="debate", accounts=["yolo", "cyolo"], judge=side((role("judge") or [None])[0], "any"),
+                         judge_difficulty=n["difficulty"])
             elif sk == "best_of":
                 c = role("candidate") or []
                 k = int(b.get("n") or 2)
-                n.update(type="best_of", candidates=[K.kind_of(x) for x in c] if len(c) == k else ["yolo", "cyolo"][:k] + ["any"] * max(0, k - 2),
+                n.update(type="best_of", accounts=[K.kind_of(x) for x in c] if len(c) == k else (["yolo", "cyolo"] + ["any"] * k)[:k],
                          judge=side((role("judge") or [None])[0], "any"), criteria=b["done"], judge_difficulty=n["difficulty"])
-                n.pop("expect")
         nodes.append(n)
     return {"goal": doc["goal"], "defaults": {"difficulty": 1, "timeout": 600}, "nodes": nodes}
 
 
 def verify_graph(g):
-    """ตรวจ 2 ชั้น: ① ฟิลด์ตาม references/graph.md ② ให้ add_node() ของ team.py จริงรับทุก node (ไม่สร้าง run)"""
+    """ให้ validate_graph() ของ team.py ใน base skill ตรวจกราฟจริง (ไม่สร้าง run ไม่เรียกโมเดล) + ตรวจ path"""
     errs = []
-    fields = graph_fields()
-    if fields is None:
-        errs.append(f"อ่าน {GRAPH_MD} ไม่ได้")
-    else:
-        for n in g["nodes"]:
-            extra = sorted(set(n) - fields)
-            if extra:
-                errs.append(f"{n['id']}: ฟิลด์ที่ graph.md ไม่รู้จัก {extra}")
     for n in g["nodes"]:
-        if n.get("image") and not (n["image"].startswith("/") and n["image"].endswith(".png")):
-            errs.append(f"{n['id']}: image ต้องเป็น absolute path .png")
+        if n.get("type") == "image" and not (str(n.get("path", "")).startswith("/") and n["path"].endswith(".png")):
+            errs.append(f"{n['id']}: path ของภาพต้องเป็น absolute path .png")
         if n.get("cwd") and not n["cwd"].startswith("/"):
             errs.append(f"{n['id']}: cwd ต้องเป็น absolute path")
-    code = ("import json,sys; sys.dont_write_bytecode=True; sys.path.insert(0, sys.argv[1]); import team; "
-            "g=json.load(sys.stdin); st={'nodes':{},'order':[]}\n"
-            "for n in g['nodes']:\n"
-            "    n=dict(n); [n.setdefault(k,v) for k,v in g.get('defaults',{}).items()]; team.add_node(st,n)\n"
-            "print('accepted', len(st['order']))")
+    code = ("import json,sys; sys.dont_write_bytecode=True; sys.path.insert(0, sys.argv[1]); import team\n"
+            "g=json.load(sys.stdin); nodes=team.graph_nodes(g); errs=team.validate_graph(nodes)\n"
+            "print(json.dumps({'errors': errs, 'nodes': len(nodes)}, ensure_ascii=True))")
     r = subprocess.run([sys.executable, "-c", code, os.path.dirname(TEAM)], input=json.dumps(g), capture_output=True,
                        text=True, timeout=60)
-    if r.returncode != 0:
-        errs.append("team.py add_node ไม่ยอมรับ: " + (r.stderr.strip().splitlines() or ["?"])[-1])
-    return errs, r.stdout.strip()
+    try:
+        res = json.loads(r.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        return errs + ["team.validate_graph รันไม่ได้: " + ((r.stderr or "").strip().splitlines() or ["?"])[-1]], ""
+    return errs + [f"agent-team: {e}" for e in res["errors"]], f"รับ {res['nodes']} node"
 
 
 def cmd_export(a):
@@ -549,11 +553,12 @@ def cmd_export(a):
         return 1
     os.makedirs(pdir(a.name, "app"), exist_ok=True)
     jsave(pdir(a.name, "graph.json"), g)
-    print(f"OK {pdir(a.name, 'graph.json')} · {len(g['nodes'])} node · ตรวจกับ graph.md + team.add_node: {ok}")
+    print(f"OK {pdir(a.name, 'graph.json')} · {len(g['nodes'])} node · team.validate_graph ของ base skill: {ok}")
     for n in g["nodes"]:
-        extra = n.get("reviewer") or n.get("candidates") or ""
-        print(f"  {n['id']:<6} {n.get('type', 'task'):<8} account={n['account'] if 'account' in n else '-'} {extra or ''}"
-              + (f" judge={n['judge']}" if n.get("judge") else "") + (f" image={n['image']}" if n.get("image") else ""))
+        who = n.get("account") or (f"{n.get('worker')}→{n.get('reviewer')}" if n.get("type") == "review" else
+                                   "+".join(n.get("accounts") or []))
+        print(f"  {n['id']:<6} {n.get('type', 'task'):<8} {who}"
+              + (f" judge={n['judge']}" if n.get("judge") else "") + (f" path={n['path']}" if n.get("path") else ""))
     return 0
 
 
@@ -569,14 +574,21 @@ def cmd_run(a):
     accs = [q["account"] for q in plan.get("accounts", []) if not q.get("assumed")]
     rid = f"{a.name}-{dt.datetime.now().strftime('%Y%m%d-%H%M%S')}"
     os.makedirs(pdir(a.name, "app"), exist_ok=True)
-    args = ["run", gpath, "--run", rid] + (["--accounts", ",".join(accs)] if accs else []) + (["--detach"] if a.detach else [])
+    args = ["run", gpath, "--run-id", rid] + (["--workers", ",".join(accs)] if accs else [])
     info = jload(pdir(a.name, "run.json"), {}) or {}
     info.setdefault("history", []).append({"run_id": rid, "started": K.iso(K.now()), "detach": a.detach, "accounts": accs})
     info["run_id"] = rid
     jsave(pdir(a.name, "run.json"), info)
-    print(f"run_id {rid} (บันทึกใน {pdir(a.name, 'run.json')}) · บัญชี {', '.join(accs) or 'ทุกบัญชี'}", flush=True)
+    print(f"run_id {rid} (บันทึกใน {pdir(a.name, 'run.json')}) · บัญชี {', '.join(accs) or 'ทุกบัญชีของฝั่งที่แผนใช้'}", flush=True)
+    if a.detach:                                   # team.py ไม่มีโหมดเบื้องหลัง → สกิลนี้แยก process เอง
+        log = pdir(a.name, "run.log")
+        with open(log, "ab") as f:
+            subprocess.Popen([sys.executable, TEAM, *args], stdout=f, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                             start_new_session=True)
+        print(f"รันเบื้องหลัง · log {log}\nดูสถานะ: python3 {TEAM} status --run {rid}\nจบแล้ว: dagplan.py report {a.name}")
+        return 0
     r = team(*args, timeout=None, capture=False)
-    print(f"\nต่อไป: dagplan.py report {a.name}" + ("  (รอให้ run จบก่อน: team.py status --run " + rid + ")" if a.detach else ""))
+    print(f"\nต่อไป: dagplan.py report {a.name}")
     return r.returncode
 
 
@@ -596,14 +608,28 @@ def ledger_rows(path):
 
 
 def tokens_used(r):
-    return int(r.get("input_tokens") or 0) + int(r.get("output_tokens") or 0)
+    """นับแบบเดียวกับ row_tokens ของ base skill: ไม่รวม cache read (Codex: input − cached_input)"""
+    i = int(r.get("input_tokens") or 0)
+    if r.get("cli") == "codex":
+        i -= int(r.get("cached_input_tokens") or 0)
+    return max(i, 0) + int(r.get("cache_write_tokens") or 0) + int(r.get("output_tokens") or 0)
 
 
 def block_of(node_tag, ids):
-    if node_tag in ids:
-        return node_tag
-    head = str(node_tag or "").rsplit(".", 1)[0]
+    """node ใน ledger: <id> · <id>#w1 · <id>#r1 (review) · <id>#A · <id>#judge (debate/best_of)"""
+    head = str(node_tag or "").split("#", 1)[0]
     return head if head in ids else None
+
+
+def role_of(node_tag):
+    tail = str(node_tag or "").partition("#")[2]
+    if tail == "judge":
+        return "judge"
+    if re.fullmatch(r"r\d+", tail):
+        return "reviewer"
+    if re.fullmatch(r"[A-Z]", tail):
+        return "candidate"
+    return "worker"
 
 
 def cmd_report(a):
@@ -621,7 +647,7 @@ def cmd_report(a):
     if not st:
         sys.exit(f"ERROR ไม่พบ {rdir}/state.json")
     nodes = st.get("nodes", {})
-    rows = [r for r in ledger_rows(os.path.join(rdir, "ledger.jsonl")) if r.get("event") == "call"]
+    rows = [r for r in ledger_rows(os.path.join(rdir, "ledger.jsonl")) if not r.get("event")]
     calls = [r for r in rows if block_of(r.get("node"), ids)]
     probes = [r for r in rows if not block_of(r.get("node"), ids)]
     running = [i for i, n in nodes.items() if n.get("status") in ("running", "pending", "waiting_approval")]
@@ -632,7 +658,7 @@ def cmd_report(a):
     # แท่งจริง: (บล็อก, บัญชี, บทบาท) → ช่วง ts_start..ts_end ใน ledger
     seg = {}
     for r in calls:
-        k = (block_of(r["node"], ids), r["account"], r.get("role") or "worker")
+        k = (block_of(r["node"], ids), r["account"], role_of(r["node"]))
         s, e = mins(r.get("ts_start")), mins(r.get("ts_end") or r.get("ts_start"))
         cur = seg.get(k)
         seg[k] = (min(cur[0], s), max(cur[1], e)) if cur else (s, e)
@@ -654,29 +680,29 @@ def cmd_report(a):
         a0, a1 = mins(n.get("started")), mins(n.get("ended"))
         if a0 is None and rs:
             a0 = min(mins(r["ts_start"]) for r in rs)
-        if a1 is None and rs and n.get("status") in ("done", "failed"):
+        if a1 is None and rs and n.get("status") in ("ok", "failed", "bad_output"):
             a1 = max(mins(r.get("ts_end") or r["ts_start"]) for r in rs)
         p0 = p.get("start") * 60 if p.get("status") == "planned" else None
         p1 = p.get("end") * 60 if p.get("status") == "planned" else None
         acc_real = []
         for r in rs:
-            lab = f"{r['account']}({ROLE_TH.get(r.get('role'), r.get('role'))})"
+            lab = f"{r['account']}({ROLE_TH[role_of(r['node'])]})"
             if lab not in acc_real:
                 acc_real.append(lab)
         out_file = os.path.join(pdir(a.name, "app"), b["output"])
-        if n.get("status") == "done" and b["skill"] in ("debate", "best_of") and not os.path.exists(out_file):
+        if n.get("status") == "ok" and b["skill"] in ("debate", "best_of") and not os.path.exists(out_file):
             os.makedirs(os.path.dirname(out_file), exist_ok=True)          # คำตอบที่ชนะ/ที่ถูก → ไฟล์ผลของบล็อก (คัดลอกข้อความ ไม่รัน)
             wtext(out_file, str(n.get("value") or "") + "\n")
         exists = os.path.exists(out_file)
         table.append({"id": i, "skill": b["skill"], "plan_acc": ", ".join(f"{x['account']}({ROLE_TH[x['role']]})" for x in p.get("accounts", [])) or "-",
-                      "real_acc": ", ".join(acc_real) or (n.get("assigned") or "-"), "p_min": (p1 - p0) if p0 is not None else None,
+                      "real_acc": ", ".join(acc_real) or (n.get("account") or n.get("planned") or "-"), "p_min": (p1 - p0) if p0 is not None else None,
                       "a_min": (a1 - a0) if (a0 is not None and a1 is not None) else None, "tokens": tok, "calls": len(rs),
                       "in": sum(int(r.get("input_tokens") or 0) for r in rs), "out": sum(int(r.get("output_tokens") or 0) for r in rs),
                       "status": n.get("status", "ไม่อยู่ใน run"), "file": exists, "error": (n.get("error") or "")[:120],
                       "base_min": (p.get("dur_base_h") or 0) * 60})
-        comp.append({"block": i, "skill": b["skill"], "p0": p0, "p1": p1, "a0": a0 if a1 is not None else None, "a1": a1,
+        comp.append({"block": i, "skill": b["skill"], "p0": p0, "p1": p1, "a0": a0 if a1 is not None else None, "a1": a1 if a0 is not None else None,
                      "status": n.get("status")})
-        if n.get("status") == "done" and table[-1]["a_min"] is not None and table[-1]["base_min"]:
+        if n.get("status") == "ok" and table[-1]["a_min"] is not None and table[-1]["base_min"]:
             s = by_skill.setdefault(b["skill"], [0.0, 0.0])
             s[0] += table[-1]["a_min"]
             s[1] += table[-1]["base_min"]
@@ -703,18 +729,18 @@ def cmd_report(a):
     if running:
         L += [f"> ⚠ run ยังไม่จบ ({', '.join(running)} ยังรัน/รอ) — รายงานนี้เป็นภาพชั่วคราว ยังไม่เขียน calib.json", ""]
     L += ["## ตารางบล็อก (แผน vs จริง)", "",
-          "| บล็อก | สกิล | บัญชีแผน | บัญชีจริง | นาทีแผน | นาทีจริง | tokens (in+out) | ครั้ง | สถานะ | ไฟล์ผล |",
+          "| บล็อก | สกิล | บัญชีแผน | บัญชีจริง | นาทีแผน | นาทีจริง | tokens (ไม่รวม cache read) | ครั้ง | สถานะ | ไฟล์ผล |",
           "|---|---|---|---|---|---|---|---|---|---|"]
     for t in table:
         f = lambda v: "-" if v is None else f"{v:.2f}"   # noqa: E731
         L.append(f"| {'**' + t['id'] + '**' if t['id'] in crit else t['id']} | {R.SKILL_STYLE[t['skill']][1]} {t['skill']} | {t['plan_acc']} | "
-                 f"{t['real_acc']} | {f(t['p_min'])} | {f(t['a_min'])} | {t['tokens']:,} ({t['in']:,}+{t['out']:,}) | {t['calls']} | "
-                 f"{t['status']}{(' — ' + t['error']) if t['error'] and t['status'] != 'done' else ''} | {'✅' if t['file'] else '❌'} {by[t['id']]['output']} |")
+                 f"{t['real_acc']} | {f(t['p_min'])} | {f(t['a_min'])} | {t['tokens']:,} | {t['calls']} | "
+                 f"{t['status']}{(' — ' + t['error']) if t['error'] and t['status'] != 'ok' else ''} | {'✅' if t['file'] else '❌'} {by[t['id']]['output']} |")
     L += ["", f"- tokens รวมของบล็อก **{tot_tok:,}** = ผลรวมจาก ledger ของ run ({len(calls)} การเรียก) **{led_tok:,}**"
           + (" ✅ ตรงกัน" if tot_tok == led_tok else " ❌ ไม่ตรง"),
           f"- การเรียกที่ไม่ใช่บล็อก (ตรวจความพร้อม ฯลฯ): {len(probes)} ครั้ง · {sum(tokens_used(r) for r in probes):,} tokens (ไม่นับในตาราง)",
           f"- เวลารวม: แผน {plan_span:.1f} นาที · จริง {real_span:.1f} นาที",
-          f"- บล็อกเสร็จ {sum(t['status'] == 'done' for t in table)}/{len(table)}", "",
+          f"- บล็อกเสร็จ {sum(t['status'] == 'ok' for t in table)}/{len(table)}", "",
           "## ภาพ", "", f"![Gantt จริง]({os.path.basename(ga)})", "", f"![แผน vs จริง]({os.path.basename(cp)})", "",
           "## ความต่างระหว่างแผนกับของจริง", ""]
     diff = [t for t in table if t["plan_acc"] != "-" and
@@ -722,13 +748,13 @@ def cmd_report(a):
     L += [f"- {t['id']}: แผน {t['plan_acc']} → จริง {t['real_acc']}" for t in diff] or ["- บัญชีจริงตรงกับแผนทุกบล็อก"]
     L.append("- (export ส่งเป็นฝั่ง yolo/cyolo ไม่ผูกบัญชี เพื่อให้ failover ของ agent-team ทำงาน → agent-team เลือกบัญชีในฝั่งเองตามโหลด/โควตา ดู references/run.md)")
     for e in st.get("events") or []:
-        L.append(f"- event {e.get('event')}: {e.get('text')}")
+        L.append(f"- event {e.get('event')}: {e.get('node') or ''} {e.get('from') or ''}→{e.get('to') or ''} {e.get('reason') or ''}".rstrip())
     L += ["", "## ตัวปรับเวลา k (calib.json)", "",
           f"`{cal_path}`: " + (json.dumps(new, ensure_ascii=False) if new and not running else "ไม่อัปเดต (ไม่มีบล็อกที่เสร็จ หรือ run ยังไม่จบ)"),
           "", "k = นาทีจริง ÷ นาทีแผน (ก่อนคูณ k) แยกตามสกิล · `plan` ครั้งถัดไปคูณเวลาแต่ละบล็อกด้วย k ของสกิลนั้น"]
     wtext(pdir(a.name, "REPORT.md"), "\n".join(L) + "\n")
     print(f"OK REPORT {pdir(a.name, 'REPORT.md')} · {ga} · {cp}" + ("" if png1 and png2 else "  (ไม่มี Chromium → SVG)"))
-    print(f"  tokens บล็อก {tot_tok:,} · ledger {led_tok:,} · เสร็จ {sum(t['status'] == 'done' for t in table)}/{len(table)}"
+    print(f"  tokens บล็อก {tot_tok:,} · ledger {led_tok:,} · เสร็จ {sum(t['status'] == 'ok' for t in table)}/{len(table)}"
           + (f" · k ใหม่ {new}" if new and not running else ""))
     return 0 if not running else 3
 

@@ -88,27 +88,38 @@ def parse_reset(txt):
 
 
 def snap_from_team(acc, q, plan_hint=None):
-    """แปลง 1 รายการของ /workspace/.agent-team/quota.json → snapshot แบบ orch.py"""
-    s = {"account": acc, "kind": kind_of(acc), "logged_in": True, "plan": (q or {}).get("plan") or plan_hint or "default",
-         "session_used": 0, "session_reset": None, "week_used": 0, "week_reset": None, "at": (q or {}).get("ts")}
-    for w in (q or {}).get("windows") or []:
-        name, pct, rst = w.get("name", ""), float(w.get("used_percent") or 0), parse_reset(w.get("resets"))
-        mins = re.search(r"\((\d+)\s*นาที\)", name)
-        if name.startswith("Current session") or (mins and int(mins.group(1)) <= 600):
-            slot = "session"
-        elif name.startswith("Current week (all") or mins:
-            slot = "week"
-        else:                                   # เพดานเฉพาะรุ่น (week (Fable)) นับเป็นเพดานสัปดาห์อีกตัว
-            s["week_model_used"] = max(s.get("week_model_used", 0), pct)
+    """แปลง 1 รายการของ `team.py quota --json` (สกิล agent-team ใน base_skills) → snapshot แบบ orch.py
+
+    ฟิลด์ที่ใช้: session_pct · session_resets · week_pct · week_resets · week_other{รุ่น: %} · plan
+    Codex มี primary/secondary {used_percent, window_minutes, resets} → หน้าต่าง < 7 วัน = session, ยาวสุด = week
+    """
+    q = q or {}
+    s = {"account": acc, "kind": kind_of(acc), "logged_in": True, "plan": q.get("plan") or plan_hint or "default",
+         "session_used": 0, "session_reset": None, "week_used": 0, "week_reset": None, "at": q.get("as_of")}
+    wins = {}
+    if q.get("session_pct") is not None:
+        wins["session"] = (float(q["session_pct"]), q.get("session_resets"))
+    if q.get("week_pct") is not None:
+        wins["week"] = (float(q["week_pct"]), q.get("week_resets"))
+    for w in (q.get("primary"), q.get("secondary")):          # Codex: เวลารีเซ็ตอยู่ในหน้าต่างดิบ
+        if not w:
             continue
+        slot = "session" if (w.get("window_minutes") or 0) < 10080 else "week"
+        if slot in wins and not wins[slot][1]:
+            wins[slot] = (wins[slot][0], w.get("resets"))
+    for slot, (pct, rst_txt) in wins.items():
+        rst = parse_reset(rst_txt)
         if rst and rst <= now():                # ข้อมูลเก่า: รอบนั้นรีเซ็ตแล้ว → 0%
             step = dt.timedelta(hours=5 if slot == "session" else 168)
             while rst <= now():
                 rst += step
             pct = 0.0
         s[slot + "_used"], s[slot + "_reset"] = pct, iso(rst)
-    if not (q or {}).get("windows"):
-        s["usage_error"] = "ไม่มีข้อมูลโควตา → ถือว่า 0%"
+    other = [float(v) for v in (q.get("week_other") or {}).values() if v is not None]
+    if other:                                   # เพดานเฉพาะรุ่น นับเป็นเพดานสัปดาห์อีกตัว
+        s["week_model_used"] = max(other)
+    if not wins:
+        s["usage_error"] = (q.get("note") or "ไม่มีข้อมูลโควตา") + " → ถือว่า 0%"
     return s
 
 

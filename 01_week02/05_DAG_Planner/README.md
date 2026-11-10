@@ -1,4 +1,4 @@
-# DAG Planner Skill: แตกงานเป็นบล็อก · แต่ละบล็อกใช้สกิล · วาด DAG + Gantt · ให้ทีมรันจริง
+# DAG Planner Skill: แตกงานเป็นบล็อก · แต่ละบล็อกใช้สกิล · วาด DAG + Gantt (ต่อยอดจาก base skills)
 
 ## 1. ปัญหา: มีทีมแล้ว แต่ยังไม่มีแผน
 
@@ -15,7 +15,7 @@
 
 ![งานใหญ่ สั่งทีเดียวไม่ไหว: โจทย์ใหญ่ 1 ข้อทำให้ไม่รู้จะเริ่มตรงไหน AI ตัวเดียวทำไม่จบ และพลาดจุดเดียวต้องเริ่มใหม่ จึงแตกเป็นบล็อกงาน B01–B06 แต่ละบล็อกบอกสกิล ไฟล์ผล และวิธีตรวจ](img/concept-01a-split-blocks.png)
 
-จากนั้นจัดบล็อกทั้งหมดให้เป็นระเบียบด้วย DAG จัดเวลาด้วย Gantt แล้วให้ทีมรันจริง
+จากนั้นจัดบล็อกทั้งหมดให้เป็นระเบียบด้วย DAG จัดเวลาด้วย Gantt แล้วจึงให้ทีมรันจริง คาบนี้ทำถึง **Gantt แผน** ส่วนการรันจริงเป็นภาคต่อ
 
 ![จากบล็อกงานสู่แผนที่รันได้จริง: DAG คือแผนผังว่างานไหนต้องรองานไหน ลูกศรคือต้องรอและห้ามวนกลับ · Gantt คือตารางเวลาว่าใครทำงานไหนเมื่อไร แถวคือบัญชี แท่งคืองาน · รันจริงคือทีมเอเจนต์ทำตามแผนแล้วเทียบแผนกับเวลาจริง](img/concept-01b-dag-gantt-run.png)
 
@@ -159,7 +159,7 @@ $c_j$ คือขนาดของงาน $j$ และ $\mathrm{succ}(j)$ �
 | `size` | ขนาดงาน S / M / L = 0.6 / 1.5 / 3 ล้านโทเคน ใหญ่กว่า L ต้องแบ่ง | AI |
 | `depends_on` | บล็อกที่ต้องเสร็จก่อน คือลูกศรใน DAG | AI |
 | `skill` | สกิลที่ใช้ทำ (หัวข้อ 3.2) | AI |
-| `difficulty` | ความยาก 1–6 ตารางเดียวกับบท 04 ใช้เลือกรุ่นและ effort | AI |
+| `difficulty` | ความยาก 1–6 ตามตารางของ base skill `agent-team` ใช้เลือกรุ่นและ effort | AI |
 | `output` | ไฟล์ผล บล็อกถัดไปอ่านไฟล์นี้ต่อ | AI |
 | `done` | เกณฑ์เสร็จที่ตรวจได้ | AI |
 | `exclusive` | บล็อกรวมระบบและทดสอบสุดท้าย รันคนเดียว | AI |
@@ -172,7 +172,7 @@ $c_j$ คือขนาดของงาน $j$ และ $\mathrm{succ}(j)$ �
 
 ![แต่ละบล็อกเลือกสกิลที่ใช้ทำ: yolo งานที่ต้องคิดยาว 1 บัญชี · cyolo งานตรงไปตรงมา 1 บัญชี · image สร้างภาพ 1 บัญชี · review ทำแล้วให้อีกฝั่งตรวจ 2 บัญชี · debate สองฝั่งเถียงมีผู้ตัดสิน 3 บัญชี · best_of หลายคนทำเลือกดีที่สุด N+1 บัญชี](img/concept-03-six-skills.png)
 
-| `skill` | ใช้เมื่อ | ตัวอย่างจากระบบในหัวข้อ 2 | ทีมทำจริงด้วย (agent-team บท 04) | บัญชี |
+| `skill` | ใช้เมื่อ | ตัวอย่างจากระบบในหัวข้อ 2 | ทีมทำจริงด้วย (base skill `agent-team`) | บัญชี |
 |---|---|---|---|---|
 | `yolo` | งานที่ต้องคิดยาว | I ตะกร้า | งานเดี่ยวฝั่ง Claude | 1 |
 | `cyolo` | งานตรงไปตรงมา | F API สินค้า | งานเดี่ยวฝั่ง Codex | 1 |
@@ -195,7 +195,21 @@ $c_j$ คือขนาดของงาน $j$ และ $\mathrm{succ}(j)$ �
 
 ## 4. สกิล `dag-planner` ทำงานอย่างไร
 
-### 4.1 ขั้นตอนและผู้รับผิดชอบ
+### 4.1 ต่อยอดจาก base skills
+
+`dag-planner` ไม่ได้เรียก Claude หรือ Codex เอง แต่ใช้สกิล 3 ตัวที่มีอยู่แล้วเป็นฐาน เรียกว่า **base skills** เก็บไว้ในโฟลเดอร์ `./base_skills` ของบทนี้ (ชุดเดียวกับสกิลที่ได้จาก[บท 04](../04_MultiAccount_Skill/README.md))
+
+![dag-planner ต่อยอดจาก base skills: กล่อง dag-planner แตกบล็อก DAG Gantt เรียกผ่าน team.py ลงไปที่โฟลเดอร์ ./base_skills ซึ่งมี agent-team รันทีมหลายบัญชี · yolo เรียก Claude · cyolo เรียก Codex และสร้างภาพ · ไม่คัดลอกโค้ด ไม่แก้ base skills](img/concept-15-base-skills.png)
+
+| base skill | ทำอะไร | `dag-planner` ใช้ตรงไหน |
+|---|---|---|
+| `agent-team` | รันทีมหลายบัญชีตาม `graph.json` · ตรวจความพร้อมและโควตา | `team.py check` · `quota` (ตอน `plan`) · `team.py run` (ตอนรันจริง) |
+| `yolo` | เรียก Claude 1 บัญชี | บล็อกที่ `skill` เป็น `yolo` และฝั่ง Claude ของ review · debate · best_of |
+| `cyolo` | เรียก Codex 1 บัญชี · สร้างภาพ | บล็อกที่ `skill` เป็น `cyolo` · `image` และฝั่ง Codex ของ review · debate · best_of |
+
+กติกา 2 ข้อ: `dag-planner` **ไม่คัดลอกโค้ด**ของ base skill (เรียกผ่าน `team.py` เท่านั้น) และ**ไม่แก้ไฟล์**ใน `./base_skills` ถ้า base skill เปลี่ยนรุ่น ให้สร้าง `dag-planner` ใหม่จากสเปกเดิม
+
+### 4.2 ขั้นตอนและผู้รับผิดชอบ
 
 ![สกิล dag-planner ทำงานอย่างไร: แผง AI คิด ใช้โทเคน 1 โจทย์ เล่าสิ่งที่อยากได้ 2 แตกบล็อก ได้ blocks.json · แผงสคริปต์คำนวณ ไม่ใช้โทเคน 3 DAG คำสั่ง dag ได้ dag.png 4 Gantt แผน คำสั่ง plan ได้ gantt-plan.png · แผงทีมเอเจนต์ทำ ใช้โทเคน 5 รันจริง คำสั่ง export และ run ได้ไฟล์งานใน app/ 6 Gantt จริง คำสั่ง report ได้ REPORT.md · ลูกศรย้อนจาก Gantt จริงกลับไป Gantt แผน โดย calib.json เก็บตัวปรับเวลาของแต่ละสกิลให้แผนรอบหน้าแม่นขึ้น](img/concept-04-pipeline.png)
 
@@ -203,23 +217,27 @@ $c_j$ คือขนาดของงาน $j$ และ $\mathrm{succ}(j)$ �
 |---|---|---|
 | **AI** (Claude Code app) | อ่านโจทย์ แตกเป็นบล็อก เลือกสกิลและความยาก | ใช้ |
 | **`dagplan.py`** (สคริปต์ในสกิล) | ตรวจกราฟ คิด rank วาด DAG แจกบล็อกให้บัญชี วาด Gantt และสรุปผลจริง | ไม่ใช้ |
-| **`agent-team`** (บท 04) | รันแต่ละบล็อกด้วยสกิลที่ระบุ บนบัญชีจริง | ใช้ |
+| **`agent-team`** (base skill) | รันแต่ละบล็อกด้วยสกิลที่ระบุ บนบัญชีจริง | ใช้ |
 
-### 4.2 คำสั่งของสกิล
+คาบนี้และการบ้านทำขั้น 1–4 ส่วนขั้น 5–6 เป็นภาคต่อ
+
+![คาบนี้วางแผนอย่างเดียว ยังไม่รัน: คาบนี้และการบ้านทำ 1 โจทย์ 2 แตกบล็อก ได้ blocks.json 3 DAG ได้ dag.png 4 Gantt แผน ได้ gantt-plan.png และ PLAN.md · ภาคต่อคือ 5 รันจริง 6 Gantt จริง · วางแผนไม่ใช้โทเคนของทีม](img/concept-17-lab-scope.png)
+
+### 4.3 คำสั่งของสกิล
 
 | ขั้น | คำสั่ง | ผลที่ได้ |
 |---|---|---|
-| ตรวจเครื่อง | `doctor` | python สกิลบท 04 ตัววาด PNG และบัญชีที่พร้อม |
+| ตรวจเครื่อง | `doctor` | python · base skills ที่พบ · ตัววาด PNG และบัญชีที่พร้อม |
 | 3 · DAG | `dag <แผน>` | ตรวจวงวน id ซ้ำ id ที่ไม่มีจริง และ skill ที่ไม่รู้จัก แล้วได้ rank สายวิกฤต และ `dag.png` |
 | 4 · Gantt แผน | `plan <แผน>` | แจกบล็อกให้บัญชีจากโควตาจริง ได้ `gantt-plan.png` และ `PLAN.md` ที่บอกเหตุผลทุกบล็อก |
-| 5 · รันจริง | `export` แล้ว `run <แผน>` | แปลงเป็น `graph.json` ของ agent-team แล้วรันจริง |
-| 6 · Gantt จริง | `report <แผน>` | `gantt-actual.png`, `compare.png`, `REPORT.md` และ `calib.json` |
+| 5 · รันจริง (ภาคต่อ) | `export` แล้ว `run <แผน>` | แปลงเป็น `graph.json` ของ agent-team แล้วรันจริง |
+| 6 · Gantt จริง (ภาคต่อ) | `report <แผน>` | `gantt-actual.png`, `compare.png`, `REPORT.md` และ `calib.json` |
 
-### 4.3 ใครอยู่ตรงไหน
+### 4.4 ใครอยู่ตรงไหน
 
-![ใครอยู่ตรงไหน: เครื่องเรามี Claude Code app และโฟลเดอร์ ./workspace สั่งผ่าน docker exec เข้า container multi-account ที่มีสกิล dag-planner agent-team yolo cyolo บัญชี yolo1–5 cyolo1–5 และ /workspace/plans ซึ่งเป็นไฟล์ชุดเดียวกับ ./workspace](img/concept-05-host-container.png)
+![ใครอยู่ตรงไหน: เครื่องเรามี Claude Code app โฟลเดอร์ ./base_skills ./skills/dag-planner และ ./workspace · docker exec สั่งงานเข้า container · docker cp คัดลอก base_skills และ dag-planner ไปที่ shared/skills ซึ่งมี dag-planner agent-team yolo cyolo · บัญชี yolo1–5 cyolo1–5 · /workspace/plans มี blocks.json dag.png gantt-plan.png PLAN.md เป็นไฟล์ชุดเดียวกับ ./workspace · สั่งจากเครื่องเรา งานทั้งหมดรันใน container](img/concept-16-host-base-skills.png)
 
-### 4.4 แผนกับของจริงต่างกันได้
+### 4.5 แผนกับของจริงต่างกันได้
 
 Gantt แผนคำนวณจากขนาดงานที่**ประเมิน** เมื่อรันจริง คำสั่ง `report` อ่านเวลาเริ่มและจบของทุกบล็อกจาก ledger ของ agent-team แล้ววาด **Gantt จริง** เทียบกับแผน พร้อมคำนวณตัวปรับเวลา $k$ แยกตามสกิล
 
@@ -229,118 +247,126 @@ $$k_{\text{skill}} = \frac{\text{เวลาจริง}}{\text{เวลา�
 
 ค่า $k$ ถูกเก็บใน `calib.json` และ `plan` ครั้งถัดไปจะคูณเวลาของแต่ละบล็อกด้วย $k$ ของสกิลนั้น
 
-อีกเรื่องที่ต่างได้คือ**บัญชี** `export` ส่งงานให้ agent-team เป็น**ฝั่ง** (`yolo` หรือ `cyolo`) ไม่ผูกบัญชีเจาะจง เพราะถ้าผูก ระบบย้ายงานเมื่อบัญชีล้มของบท 04 จะปิดไป agent-team จึงเลือกบัญชีในฝั่งเองตามโหลด และ `report` แสดงส่วนต่างนี้ให้เห็น
+อีกเรื่องที่ต่างได้คือ**บัญชี** `export` ส่งงานให้ agent-team เป็น**ฝั่ง** (`yolo` หรือ `cyolo`) ไม่ผูกบัญชีเจาะจง เพราะถ้าผูก ระบบย้ายงานเมื่อบัญชีล้มของ agent-team จะปิดไป agent-team จึงเลือกบัญชีในฝั่งเองตามโหลด และ `report` แสดงส่วนต่างนี้ให้เห็น
 
 ## 5. ภาพรวมขั้นตอนการทดลอง
 
-| ขั้น | ทำอะไร | เวลารันจริง |
+| ขั้น | ทำอะไร | ใช้โทเคนของทีมไหม |
 |---|---|---|
-| **1 · ให้ Claude สร้างสกิลจากสเปก** | สร้าง `skills/dag-planner` แล้วทดสอบ 8 ข้อ | ~16.6 นาที |
-| **2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์** | `docker cp` ลง shared ทั้งสองฝั่ง | 117 วินาที |
-| **3 · วางแผนโจทย์ "เหมียวช็อป"** | บล็อกงาน + DAG + Gantt แผน (ยังไม่ใช้โทเคนของทีม) | 82 วินาที |
-| **4 · รันแผนจริงด้วยทีมเอเจนต์** | agent-team ทำทุกบล็อก แล้ว `report` เทียบแผนกับของจริง | 230 วินาที (ทีมรัน 2.8 นาที) |
-| **5 · what-if ด้วย k ที่เรียนรู้แล้ว** | วางแผนใหม่ 2 แบบโดยไม่รันจริง | 83 วินาที |
+| **1 · ให้ Claude สร้างสกิลจากสเปก + `./base_skills`** | สร้าง `skills/dag-planner` แล้วทดสอบ 8 ข้อ | ไม่ใช้ (ทดสอบการรันด้วยตัวจำลอง) |
+| **2 · ติดตั้งด้วยการคัดลอกโฟลเดอร์** | `docker cp` base skills 3 ตัวและ `dag-planner` ลง shared ทั้งสองฝั่ง | ไม่ใช้ |
+| **3 · วางแผนโจทย์ "เหมียวช็อป" (ยังไม่รัน)** | บล็อกงาน + DAG + Gantt แผน | ไม่ใช้ |
+| **การบ้าน** | วางแผน 10 โจทย์ ได้ DAG + Gantt โจทย์ละชุด | ไม่ใช้ |
+| ภาคต่อ · รันแผนจริงและ what-if | agent-team ทำทุกบล็อก แล้วเทียบแผนกับของจริง | ใช้ |
 
-ทุกขั้น **วางพรอมต์ใน Claude Code app** แล้ว Claude Code app ทำงานใน container ผ่าน `docker exec` เหมือนบท 04
+ทุกขั้น **วางพรอมต์ใน Claude Code app** แล้ว Claude Code app ทำงานใน container ผ่าน `docker exec`
 
-**ต้องมีก่อน:** container `multi-account` จาก[บท 03](../03_MultiAccount_Container/README.md) กำลังรัน · ติดตั้งสกิล `yolo` · `cyolo` · `agent-team` จาก[บท 04](../04_MultiAccount_Skill/README.md) แล้ว · ล็อกอินอย่างน้อย 2 บัญชี Claude และ 2 บัญชี Codex (บล็อก review และ best_of ต้องใช้หลายบัญชีพร้อมกัน)
+**ต้องมีก่อน:** container `multi-account` จาก[บท 03](../03_MultiAccount_Container/README.md) กำลังรัน · ล็อกอินอย่างน้อย 2 บัญชี Claude และ 2 บัญชี Codex (บล็อก review และ best_of ต้องใช้หลายบัญชีพร้อมกัน) · ไม่จำเป็นต้องทำบท 04 มาก่อน เพราะ base skills อยู่ใน `./base_skills` แล้ว
 
 **เปิดโฟลเดอร์งาน:** ใน Claude Code app เลือก **Code** → **New session** → เลือกโฟลเดอร์ `05_DAG_Planner` ของรีโปนี้
 
 ```text
 05_DAG_Planner/
-├── prompt_dag_skill_spec.md   ← สเปกของสกิล dag-planner (input ที่ 1)
-├── tools/                     ← planner.py + orch.py ตัววางแผนชุดเดิม (DAG · Gantt · KC-QUEST) ใช้เป็นแหล่งความรู้ (input ที่ 2)
-└── _solution/                 ← skills/dag-planner (สกิลจากการรันจริง) · TEST-REPORT.md · plans/meow-shop (แผน รายงาน และหน้าเว็บที่ทีมสร้าง)
+├── base_skills/               ← base skills 3 ตัว: agent-team · yolo · cyolo (input ที่ 1 · ห้ามแก้)
+├── prompt_dag_skill_spec.md   ← สเปกของสกิล dag-planner (input ที่ 2)
+├── tools/                     ← planner.py + orch.py ตัววางแผนชุดเดิม (DAG · Gantt · KC-QUEST) ใช้เป็นแหล่งความรู้ (input ที่ 3)
+├── homework/                  ← โจทย์การบ้าน 10 ข้อ + ตัวอย่างข้อ 1
+└── _solution/                 ← skills/dag-planner (เฉลย) · TEST-REPORT.md · plans/meow-shop (แผนและผลรันจริงของภาคต่อ)
 ```
 
-## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก (~16.6 นาที)
+## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก + `./base_skills`
 
 ### 1.1 · input
 
 | input | บทบาท |
 |---|---|
+| [`base_skills/`](base_skills/) | base skills 3 ตัว Claude อ่าน `SKILL.md` · `references/` · `scripts/team.py` ของ `agent-team` เพื่อรู้รูปแบบ `graph.json` และผลของ `check` · `quota` จริง |
 | [`prompt_dag_skill_spec.md`](prompt_dag_skill_spec.md) | สเปกของสกิล: ฟิลด์ของบล็อก · ตารางสกิล → node ของ agent-team · คำสั่ง 6 คำสั่ง · ภาพ DAG/Gantt · การรันจริง · ตัวปรับ k · การติดตั้ง · เกณฑ์ทดสอบ 8 ข้อ |
 | [`tools/`](tools/) | `planner.py` + `orch.py` ตัววางแผนชุดเดิม ใช้เป็นแหล่งความรู้ (ห้ามคัดลอกทั้งไฟล์ ดึงเฉพาะส่วน KC-QUEST) |
-| สกิลบท 04 ใน container | Claude อ่าน `SKILL.md` และ `team.py` ของ agent-team ใน container เพื่อรู้รูปแบบ `graph.json` จริง |
 
 ### 1.2 · วางพรอมต์
 
-![ภาพเคลื่อนไหว: วางพรอมต์สร้างสกิลใน Claude Code app, Claude อ่านสเปกและสกิลบท 04 ใน container เขียน skills/dag-planner คัดลอกเข้า container แล้วทดสอบ 8 ข้อ จนได้ตารางผล](img/desktop-step1-build.gif)
-
 ```text
-ช่วยสร้างสกิล dag-planner ที่ทำให้ AI วางแผนงานเป็น DAG + Gantt โดยแต่ละบล็อกงานใช้สกิลของบท 04 แล้วส่งแผนให้ทีมเอเจนต์รันจริงได้
+ช่วยสร้างสกิล dag-planner ที่ทำให้ AI วางแผนงานเป็น DAG + Gantt โดยแต่ละบล็อกงานใช้ base skill ใน ./base_skills แล้วส่งแผนให้ทีมเอเจนต์รันจริงได้
 ทำในโฟลเดอร์นี้ ใช้คำสั่ง docker ได้ แต่ห้ามลบ หยุด หรือสร้าง container / volume ใหม่ ห้ามแตะ credential และห้ามล็อกอินแทนผม
 
 วัตถุดิบ
+- ./base_skills = base skills 3 ตัว (agent-team · yolo · cyolo) อ่าน SKILL.md references และ scripts ของแต่ละตัวก่อนใช้ ห้ามเดา ห้ามแก้ไฟล์ในโฟลเดอร์นี้
 - ./prompt_dag_skill_spec.md = สเปกของสกิล ทุกข้อต้องเป็นจริง
 - ./tools/planner.py และ ./tools/orch.py = ตัววางแผนชุดเดิม (DAG · Gantt · KC-QUEST) ใช้เป็นแหล่งความรู้ ห้ามคัดลอกทั้งไฟล์
-- container multi-account ที่กำลังรัน = ที่ทดสอบจริง มีสกิล yolo · cyolo · agent-team ของบท 04 อยู่แล้ว (อ่าน SKILL.md ของสกิลเหล่านั้นใน container ก่อนใช้)
+- container multi-account ที่กำลังรัน = ที่ทดสอบจริง
 
 สร้างไว้ใน ./skills/dag-planner (นอก container = ต้นฉบับที่เก็บสำรอง)
-ทดสอบ: คัดลอกโฟลเดอร์ไปวางที่ shared ของทั้งสองฝั่งใน container แล้วทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
-ใช้บัญชีอย่างประหยัด (difficulty 1 กับงานทดสอบ) ข้อที่ต้องใช้บัญชีที่ไม่พร้อม = SKIP
-เขียน ./TEST-REPORT.md (นอกโฟลเดอร์ skills) แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และเวลาที่ใช้ แล้วหยุด
+ทดสอบ: คัดลอก base skills (ถ้าใน container ยังไม่มีหรือไม่ตรงกับ ./base_skills) และ dag-planner ไปวางที่ shared ของทั้งสองฝั่งใน container แล้วทดสอบทุกข้อในหัวข้อ "ทดสอบ" ของสเปก
+ห้ามรันทีมจริงด้วยโทเคน ทดสอบการรันด้วยตัวจำลองของ agent-team เท่านั้น ข้อที่ต้องใช้บัญชีที่ไม่พร้อม = SKIP
+เขียน ./TEST-REPORT.md (นอกโฟลเดอร์ skills) แล้วสรุปเป็นตารางสั้น ๆ: ผลทดสอบ ไฟล์ที่สร้าง และสิ่งที่ยังไม่ได้ทดสอบ แล้วหยุด
 ```
 
 **หลักการออกแบบพรอมต์**
 
+- **ให้ base skills เป็นไฟล์ในโฟลเดอร์งาน:** Claude อ่าน `./base_skills` ได้ตรง ๆ ไม่ต้องเข้าไปค้นใน container และผู้เรียนเห็นว่าสกิลใหม่ต่อยอดจากอะไร
 - **ให้สเปกที่ชัด:** ฟิลด์ของบล็อก ตารางสกิล คำสั่ง และเกณฑ์ทดสอบอยู่ในสเปก Claude ไม่ต้องเดา
 - **ความรู้เดิมเป็นแค่แหล่งอ้างอิง:** `tools/` มีโค้ดที่ไม่เกี่ยว (worker · postgres) ห้ามคัดลอกทั้งไฟล์ สกิลใหม่ต้องแยกชั้นตามหลักการเปิดทีละชั้น
-- **รู้จักสกิลบท 04 จากของจริง:** ให้อ่าน `SKILL.md` ใน container ก่อนใช้ จึงได้ `graph.json` ที่ agent-team ยอมรับ
-- **ทดสอบแบบประหยัด:** รันจริงแค่แผนเล็ก 4 บล็อก ความยาก 1
+- **ทดสอบโดยไม่ใช้โทเคน:** เส้นทาง `run` → `report` ทดสอบด้วยตัวจำลอง `MA_SIMULATE_LIMIT` ของ agent-team ซึ่งทำให้ทุกการเรียกล้มทันทีเหมือนโควตาหมด
 
 ### 1.3 · ผลจริง
 
-**ผลจริง** (8 พ.ย. 2026 · ~16.6 นาที): **PASS 8 / 8**
+**ผลจริง** (10 พ.ย. 2026): **PASS 8 / 8** โดยไม่ได้รันทีมจริงด้วยโทเคน
 
-![ผลจริงจาก Claude: ตารางทดสอบ 8 ข้อ PASS ทั้งหมด doctor · dag จับข้อผิดพลาด · แผน 8 บล็อกครบ 6 สกิล · plan จากโควตาจริง · what-if · export · รันจริง 4 บล็อก 40.5 วินาที · เรียกจาก host](img/desktop-step1-build-result.png)
+![ผลทดสอบจริง 8 ข้อ PASS ทั้งหมด: 1 ติดตั้งและ doctor · 2 dag จับข้อผิดพลาด 4 แบบ · 3 แผน 8 บล็อกครบ 6 สกิล สายวิกฤตยาว 7.2M tok · 4 plan จากโควตาจริง · 5 what-if yolo1 ไม่ได้บล็อก · 6 export ผ่าน validate_graph ของ base skill · 7 run และ report ด้วยตัวจำลอง ใช้ 0 โทเคน · 8 เรียกจาก host · ยังไม่ได้รันทีมจริงด้วยโทเคน](img/desktop-step1-build-result.png)
 
-*คำตอบจริงเป็นภาษาอังกฤษ แปลและจัดหน้าใหม่ · รายงานฉบับเต็มอยู่ที่ [`_solution/TEST-REPORT.md`](_solution/TEST-REPORT.md) · ตอนรันจริงใช้ชื่อ container `my-multi-account` ภาพผลจริงทุกขั้นปรับชื่อเป็น `multi-account` ให้ตรงกับบทเรียน*
+*จัดหน้าใหม่จากผลทดสอบจริง · รายงานฉบับเต็มอยู่ที่ [`_solution/TEST-REPORT.md`](_solution/TEST-REPORT.md) · การทดสอบข้อ 7 เจอข้อบกพร่อง 1 จุด (`report` ล้มเมื่อมีบล็อกที่ถูกบล็อก) และแก้แล้วก่อนสรุปผล*
 
 ภาพจากการทดสอบข้อ 3–4: แผนตัวอย่าง 8 บล็อกที่ใช้สกิลครบทั้ง 6 แบบ ทุกกล่องมี **ป้ายสีของสกิล** (พร้อมรุ่น/effort จากความยาก) และป้ายล่างบอกบัญชีที่ KC-QUEST แจก บล็อกที่ใช้หลายบัญชี (debate · review · best_of) จึงมีหลายป้าย
 
-![DAG จริงจากการทดสอบ: แผน cafe8 8 บล็อก B01 cyolo · B02 debate (yolo2 cyolo1 yolo1) · B03 image · B04 yolo · B05 review (yolo2 cyolo2) · B06 best_of (yolo2 yolo1 cyolo1) · B07 yolo · B08 cyolo exclusive · สายวิกฤต B01 → B02 → B05 → B07 → B08 ยาว 7.2M tok](img/real-test-cafe8-dag.png)
+![DAG จริงจากการทดสอบ: แผน cafe8 8 บล็อก B01 cyolo · B02 debate (yolo3 cyolo1 yolo1) · B03 image · B04 yolo · B05 review (yolo3 cyolo2) · B06 best_of (yolo3 yolo1 cyolo2) · B07 yolo · B08 cyolo exclusive · สายวิกฤต B01 → B02 → B05 → B07 → B08 ยาว 7.2M tok](img/real-test-cafe8-dag.png)
 
 ไฟล์ที่ Claude สร้าง (เก็บเป็นเฉลยไว้ที่ [`_solution/skills/dag-planner/`](_solution/skills/dag-planner/))
 
 ```text
 skills/dag-planner/
-├── SKILL.md            ← ตาราง "ต้องการ → คำสั่ง" · ขั้นตอน · กติกาแตกบล็อก · ตารางเลือกสกิล · เรียกจาก host
+├── SKILL.md            ← base skills ที่ใช้ · ตาราง "ต้องการ → คำสั่ง" · ขั้นตอน · กติกาแตกบล็อก · ตารางเลือกสกิล · เรียกจาก host
 ├── scripts/            ← dagplan.py (คำสั่งหลัก) · kcquest.py (KC-QUEST ที่ดึงจาก orch.py) · render.py (วาด DAG · Gantt · compare)
 └── references/         ← blocks.md (ฟิลด์ + ตัวอย่าง 8 บล็อก) · kcquest.md (สูตรย่อ) · run.md (รันจริงและรายงาน)
 ```
 
-## ขั้นที่ 2 · ติดตั้งสกิลด้วยการคัดลอกโฟลเดอร์ (117 วินาที)
+สคริปต์หา base skills ตามลำดับ: ตัวแปร `DAGPLAN_BASE_SKILLS` → โฟลเดอร์ข้างเคียงใน `shared/skills` → `./base_skills` ของโฟลเดอร์ที่สั่งงาน
 
-ติดตั้ง = คัดลอกโฟลเดอร์ `dag-planner` ไปวางใน `shared/skills` ทั้งฝั่ง Claude และ Codex **ไม่ต้องรันสคริปต์ติดตั้ง** (วิธีเดียวกับบท 04)
+## ขั้นที่ 2 · ติดตั้งด้วยการคัดลอกโฟลเดอร์
 
-![ภาพเคลื่อนไหว: วางพรอมต์ใน Claude Code app, Claude ใช้ docker cp คัดลอก dag-planner ลงทั้งสองฝั่ง เปิดแต่ละบัญชีด้วย --version แล้วรัน doctor](img/desktop-step2-install.gif)
+ติดตั้ง = คัดลอก 4 โฟลเดอร์ (`agent-team` · `yolo` · `cyolo` จาก `./base_skills` และ `dag-planner`) ไปวางใน `shared/skills` ทั้งฝั่ง Claude และ Codex **ไม่ต้องรันสคริปต์ติดตั้ง** base skills ต้องอยู่ข้าง `dag-planner` เสมอ
 
 ```text
-ติดตั้งสกิลจาก ./skills/dag-planner ลง container multi-account ด้วยการคัดลอกโฟลเดอร์อย่างเดียว
-- คัดลอกโฟลเดอร์ dag-planner ไปวางที่ /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ใน container
+ติดตั้งสกิลลง container multi-account ด้วยการคัดลอกโฟลเดอร์อย่างเดียว
+- คัดลอก ./base_skills/agent-team ./base_skills/yolo ./base_skills/cyolo และ ./skills/dag-planner ไปวางที่ /root/ai-accounts/.Claude/shared/skills และ /root/ai-accounts/.Codex/shared/skills ใน container (base skill ตัวใดที่มีอยู่แล้วและตรงกันทุกไฟล์ ไม่ต้องคัดลอกซ้ำ)
 - เปิดแต่ละบัญชีหนึ่งครั้งด้วย yoloN --version และ cyoloN --version (wrapper จะเชื่อมสกิลให้แต่ละบัญชีเอง)
 - ตรวจว่าทุกบัญชี yolo1–5 และ cyolo1–5 มองเห็น dag-planner/SKILL.md แล้วรันคำสั่ง doctor ของสกิล
-สรุปเป็นตาราง ฝั่ง | มองเห็นสกิล · ผล doctor แล้วหยุด
+สรุปเป็นตาราง สกิล | มาจาก | ตรงกับไฟล์บนเครื่องไหม และตาราง ฝั่ง | มองเห็นสกิล | ผล doctor แล้วหยุด
 ```
 
-![ผลจริงจาก Claude Code app: ฝั่ง Claude yolo1–5 เห็นครบ 5/5 doctor ผ่าน ฝั่ง Codex cyolo1–5 เห็นครบ 5/5 doctor ผ่าน คัดลอกด้วย docker cp ตรงกับไฟล์ local ทุกไฟล์](img/desktop-step2-install-result.png)
+![ผลจริง: agent-team yolo cyolo จาก ./base_skills และ dag-planner จาก ./skills ตรงกับไฟล์บนเครื่องทั้งฝั่ง Claude และ Codex · yolo1–5 เห็นครบ 5/5 doctor พร้อมใช้ · cyolo1–5 เห็นครบ 5/5 doctor พร้อมใช้ · บัญชีพร้อม yolo1 yolo2 yolo3 cyolo1 cyolo2](img/desktop-step2-install-result.png)
 
-*ผลจริง · ใช้สกิลที่เตรียมไว้: เปลี่ยน `./skills/dag-planner` ในพรอมต์เป็น `./_solution/skills/dag-planner`*
+*ผลจริง 10 พ.ย. 2026 จัดหน้าใหม่ · ใช้สกิลที่เตรียมไว้: เปลี่ยน `./skills/dag-planner` ในพรอมต์เป็น `./_solution/skills/dag-planner`*
 
-คัดลอกเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `05_DAG_Planner`) หรือลากโฟลเดอร์ `dag-planner` ไปวางใน JupyterLab ที่ `.Claude/shared/skills` และ `.Codex/shared/skills` แบบเดียวกับ[ขั้นที่ 2 ของบท 04](../04_MultiAccount_Skill/README.md#วิธีที่-2--ลากวางใน-jupyterlab):
+คัดลอกเองโดยไม่ใช้ Claude (รันจากโฟลเดอร์ `05_DAG_Planner`) หรือลากโฟลเดอร์ทั้ง 4 ไปวางใน JupyterLab ที่ `.Claude/shared/skills` และ `.Codex/shared/skills`:
 
 ```bash
-for d in .Claude .Codex; do docker cp ./_solution/skills/dag-planner multi-account:/root/ai-accounts/$d/shared/skills/; done
+for d in .Claude .Codex; do
+  for s in base_skills/agent-team base_skills/yolo base_skills/cyolo _solution/skills/dag-planner; do
+    docker cp ./$s multi-account:/root/ai-accounts/$d/shared/skills/
+  done
+done
 docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyolo$n --version; done'
+docker exec multi-account python3 /root/ai-accounts/.Claude/shared/skills/dag-planner/scripts/dagplan.py doctor
 ```
 
-## ขั้นที่ 3 · วางแผนโจทย์ "เหมียวช็อป" (82 วินาที)
+## ขั้นที่ 3 · วางแผนโจทย์ "เหมียวช็อป" (ยังไม่รัน · 82 วินาที)
 
-![โจทย์ของขั้นที่ 3–5: เว็บร้านอาหารแมว เหมียวช็อป ข้อมูลและโค้ดหน้าเว็บใช้ yolo และ cyolo · รูปสินค้าใช้ image · สโลแกนหัวเว็บใช้ best_of · หน้าตาเว็บที่ต้องมีคนตรวจใช้ review](img/concept-13-meow-shop.png)
+ขั้นนี้จบที่แผน คือได้บล็อกงาน DAG และ Gantt ยังไม่ให้ทีมลงมือทำ
 
-โจทย์เล็กพอที่จะรันจริงได้ในไม่กี่นาที แต่มีงานที่ต้องใช้สกิลต่างกันครบ: โค้ด (Claude/Codex) · ภาพสินค้า · สโลแกนที่อยากได้ตัวเลือกดีสุด · CSS ที่ควรมีคนตรวจ · และการทดสอบรวม พรอมต์มีบรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" แบบเดียวกับบท 04 เพื่อให้ Claude Code app เจอสกิล `dag-planner` เอง
+![โจทย์ของขั้นที่ 3 และภาคต่อ: เว็บร้านอาหารแมว เหมียวช็อป ข้อมูลและโค้ดหน้าเว็บใช้ yolo และ cyolo · รูปสินค้าใช้ image · สโลแกนหัวเว็บใช้ best_of · หน้าตาเว็บที่ต้องมีคนตรวจใช้ review](img/concept-13-meow-shop.png)
+
+โจทย์เล็กพอที่จะรันจริงได้ในไม่กี่นาที แต่มีงานที่ต้องใช้สกิลต่างกันครบ: โค้ด (Claude/Codex) · ภาพสินค้า · สโลแกนที่อยากได้ตัวเลือกดีสุด · CSS ที่ควรมีคนตรวจ · และการทดสอบรวม พรอมต์มีบรรทัด "ก่อนเริ่ม ดูว่าใน container มีสกิล…" เพื่อให้ Claude Code app เจอสกิล `dag-planner` เอง
 
 ![ภาพเคลื่อนไหว: วางพรอมต์วางแผนใน Claude Code app, Claude ตรวจโฟลเดอร์สกิลเจอ dag-planner อ่าน SKILL.md และ blocks.md เขียน blocks.json 8 บล็อก แล้ว dag และ plan --max-agents 4](img/desktop-step3-plan.gif)
 
@@ -356,7 +382,7 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 ตอบภาษาไทยสั้น ๆ: ตาราง บล็อก | ชื่อ | สกิล | ความยาก | ต้องรอ | rank · สายวิกฤตพร้อมเหตุผล 1 บรรทัด · ตาราง บล็อก | บัญชี | เริ่ม–จบ (นาที) · path ของ dag.png และ gantt-plan.png
 ```
 
-**ผลจริง** (82 วินาที): Claude Code app **เจอสกิล `dag-planner`** แตกโจทย์เป็น **8 บล็อก** ใช้สกิล 5 แบบ (ไม่มีบล็อกที่ต้องตัดสินถูก/ผิดจึงไม่ใช้ debate) และวางแผนว่าใช้เวลารวมประมาณ **1.7 นาที**
+**ผลจริง** (8 พ.ย. 2026 · 82 วินาที): Claude Code app **เจอสกิล `dag-planner`** แตกโจทย์เป็น **8 บล็อก** ใช้สกิล 5 แบบ (ไม่มีบล็อกที่ต้องตัดสินถูก/ผิดจึงไม่ใช้ debate) และวางแผนว่าใช้เวลารวมประมาณ **1.7 นาที**
 
 ![ผลจริงจาก Claude: ตารางบล็อก 8 บล็อกพร้อมสกิล ความยาก ต้องรอ rank · สายวิกฤต B01 → B05 → B08 · ตารางบล็อก บัญชี เริ่ม–จบ รวมประมาณ 1.7 นาที](img/desktop-step3-plan-result.png)
 
@@ -379,7 +405,36 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 - **บล็อกหลายบัญชีมีแท่งหลายแถว** เชื่อมด้วยเส้นประ: B05 (review) อยู่ทั้ง yolo2 #2 (ทำ) และ cyolo1 (ตรวจ) · B04 (best_of) อยู่ 3 แถว
 - **yolo2 ได้งานมากที่สุด** เพราะโควตาจะรีเซ็ตเร็วที่สุด (26.6 ชม.) ใช้ให้คุ้มก่อนหายไปฟรี ๆ (ตัวแปร U ของ KC-QUEST) `yolo2 #2` = งานที่ 2 ที่ yolo2 ทำพร้อมกัน
-- เวลาในแผนเป็นนาทีที่**ประเมิน** (โทเคน ÷ ความเร็ว × k) ไม่ใช่เวลาจริง · k ตอนนี้มาจากแผนทดสอบเล็ก 4 บล็อกในขั้นที่ 1 เหตุผลของทุกบล็อกอยู่ใน [`PLAN.md`](_solution/plans/meow-shop/PLAN.md)
+- เวลาในแผนเป็นนาทีที่**ประเมิน** (โทเคน ÷ ความเร็ว × k) ไม่ใช่เวลาจริง เหตุผลของทุกบล็อกอยู่ใน [`PLAN.md`](_solution/plans/meow-shop/PLAN.md)
+- **ตัวเลขนาทีขึ้นกับ k:** ผลในภาพใช้ k จาก `calib.json` ที่ได้จากการรันทดสอบเล็กก่อนหน้า จึงได้ 1.7 นาที เครื่องที่ยังไม่เคยรันจริงจะไม่มี `calib.json` (k = 1) แผนเดียวกันจะได้เวลารวมราว 45 นาที ลำดับงาน สายวิกฤต และวิธีแจกบัญชีเหมือนเดิม ต่างกันแค่สเกลเวลา
+- บัญชีที่ได้งานขึ้นกับโควตา ณ เวลาที่สั่ง `plan` ผลบนเครื่องของแต่ละคนจึงไม่จำเป็นต้องตรงกับภาพ
+
+## การบ้าน · วางแผน 10 โจทย์ (DAG + Gantt · ยังไม่รันจริง)
+
+ทำแบบเดียวกับขั้นที่ 3 กับโจทย์ 10 ข้อ ข้อละ 1 แผน ส่ง `blocks.json` · `dag.png` · `gantt-plan.png` · `PLAN.md` และ `ANSWER.md` ต่อโจทย์ ห้ามสั่ง `export` · `run` · `report` รายละเอียด พรอมต์ สิ่งที่ต้องส่ง และเกณฑ์ให้คะแนนอยู่ใน [`homework/README.md`](homework/README.md)
+
+![การบ้าน 10 โจทย์ วางแผนด้วย dag-planner: โจทย์ 1 เว็บอาหารแมว 2 RAG เอกสารรัฐ 3 จองคิวคลินิก 4 IoT ฟาร์ม 5 OCR ใบเสร็จ 6 ML ทำนายลูกค้า 7 แอปรายจ่าย 8 CI/CD 9 สื่อการสอน 10 ตรวจการบ้าน ผ่าน dag-planner แล้วส่งต่อโจทย์ 4 ไฟล์ blocks.json dag.png gantt-plan.png PLAN.md · วางแผนเท่านั้น ห้ามรันจริง](img/concept-18-homework.png)
+
+| ข้อ | ชื่อแผน | โจทย์ (ย่อ) |
+|---|---|---|
+| 1 | `hw01-catfood-next` | เว็บขายอาหารแมว ใช้ Next.js กับ Docker มีแชทบอทช่วยแนะนำอาหาร |
+| 2 | `hw02-gov-rag-k8s` | RAG ถามตอบเอกสารภาครัฐ deployment ด้วย Kubernetes |
+| 3 | `hw03-clinic-line-queue` | จองคิวคลินิกผ่าน LINE chatbot มีแจ้งเตือนและ dashboard |
+| 4 | `hw04-iot-farm-dashboard` | IoT ฟาร์มผัก MQTT → ฐานข้อมูล time series → Grafana + แจ้งเตือน |
+| 5 | `hw05-receipt-ocr-api` | API อ่านใบเสร็จภาษาไทย (OCR) ด้วย FastAPI + คิวงาน + Docker |
+| 6 | `hw06-churn-ml-pipeline` | pipeline ทำนายลูกค้าเลิกใช้บริการ ถึง API และ dashboard |
+| 7 | `hw07-expense-mobile` | แอปมือถือบันทึกรายจ่าย สแกนสลิป มี backend และกราฟสรุป |
+| 8 | `hw08-cicd-microservices` | แยก monolith เป็น 3 microservices + CI/CD + Helm บน Kubernetes |
+| 9 | `hw09-course-media` | สื่อการสอนออนไลน์ 1 บท: สไลด์ ภาพ สคริปต์ แบบทดสอบ หน้าเว็บ |
+| 10 | `hw10-ai-autograder` | ระบบส่งการบ้านเขียนโปรแกรม ตรวจใน sandbox และให้ AI เขียนคำแนะนำ |
+
+ตัวอย่างข้อ 1 ที่ทำให้ดู (ผลจริงจาก `dag` และ `plan` เมื่อ 10 พ.ย. 2026 ยังไม่ได้รันทีม): 11 บล็อก ใช้สกิลครบ 6 แบบ สายวิกฤต B01 → B08 → B11
+
+![DAG ของตัวอย่างการบ้านข้อ 1 hw01-catfood-next 11 บล็อก: B01 โครงโปรเจกต์ Next.js · B02 เลือกวิธีทำแชทบอท debate · B03 ข้อมูลสินค้า 12 รายการ · B04 ชื่อร้านและคำทักทายของบอท best_of · B05 ภาพสินค้า image รอ B03 · B06 หน้ารายการสินค้า · B07 ตะกร้าและสรุปยอด · B08 API แชทบอทแนะนำอาหาร review · B09 หน้าต่างแชท · B10 Dockerfile และ docker-compose · B11 รวมระบบและทดสอบใน Docker exclusive · สายวิกฤต B01 → B08 → B11 ยาว 6.6M tok](homework/example-hw01/dag.png)
+
+## ภาคต่อ · รันแผนจริงและ what-if (ยังไม่ทำในคาบนี้)
+
+ขั้นที่ 4–5 ด้านล่างเป็นภาคต่อ **ใช้โทเคนของทีม** จึงไม่อยู่ในคาบนี้และไม่อยู่ในการบ้าน เก็บไว้ให้เห็นว่าแผนจากขั้นที่ 3 ถูกนำไปรันอย่างไร · ผลทั้งหมดในภาคต่อมาจากการรันจริงเมื่อ 8 พ.ย. 2026 ด้วย agent-team รุ่นก่อน (สถานะที่เสร็จแสดงเป็น `done` ส่วน base skills ชุดปัจจุบันใช้ `ok`) ยังไม่ได้รันซ้ำกับ base skills ชุดปัจจุบัน
 
 ## ขั้นที่ 4 · รันแผนจริงด้วยทีมเอเจนต์ (230 วินาที)
 
@@ -474,6 +529,7 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 | | บท 04 (ไม่มีแผน) | บท 05 (มี `dag-planner`) |
 |---|---|---|
+| ต่อยอดจากอะไร | – | base skills ใน `./base_skills` (agent-team · yolo · cyolo) |
 | ใครเขียน `graph.json` | คน / AI เขียนเอง | สกิลแปลงจาก `blocks.json` ให้ (`export`) |
 | แต่ละงานใช้สกิลอะไร | ระบุเองทีละ node | ทุกบล็อกมี `skill` + `difficulty` ตามตาราง |
 | ใครทำบล็อกไหน เมื่อไร | ไม่รู้จนกว่าจะรัน | Gantt แผนจาก KC-QUEST + โควตาจริง |
@@ -482,6 +538,7 @@ docker exec multi-account bash -lc 'for n in 1 2 3 4 5; do yolo$n --version; cyo
 
 ## ข้อควรรู้
 
+- **base skills ต้องอยู่ข้าง `dag-planner`:** ใน `shared/skills` เดียวกัน และห้ามแก้ไฟล์ใน `./base_skills` ถ้า base skill เปลี่ยนรุ่น ให้สร้าง `dag-planner` ใหม่จากสเปก
 - **แผนเป็นค่าประมาณ:** ขนาด S/M/L เป็นการประเมิน แผนแรกอาจต่างจากจริงมาก หลังรันจริงครั้งแรก `calib.json` ช่วยให้แม่นขึ้น
 - **รันจริงใช้โทเคน:** `run` ให้ทีมทำงานจริง สกิลจึงให้ถามผู้ใช้ก่อน และเริ่มจากความยากต่ำ
 - **บัญชีจริงอาจไม่ตรงแผน:** export ส่งเป็นฝั่งเพื่อให้ failover ทำงาน ถ้าอยากห้ามบัญชีไหนให้ตัดออกจาก `--accounts`
@@ -501,7 +558,9 @@ python3 $D doctor                                  # เครื่องพร
 python3 $D dag meow-shop --blocks blocks.json      # ตรวจบล็อก + rank + dag.png
 python3 $D plan meow-shop --max-agents 4           # Gantt แผนจากโควตาจริง
 python3 $D plan meow-shop --accounts yolo1:5,yolo2,cyolo1,cyolo2   # what-if (สมมติโควตา)
-python3 $D export meow-shop && python3 $D run meow-shop --detach   # รันจริง (ใช้โทเคน)
+python3 $D plan meow-shop --accounts yolo1:80,yolo2:80,cyolo1:80,cyolo2:80   # สมมติทั้งหมด ไม่เรียกบัญชีใดเลย
+# ภาคต่อ (ใช้โทเคน)
+python3 $D export meow-shop && python3 $D run meow-shop --detach   # รันจริง
 python3 $D report meow-shop                        # Gantt จริง + แผน vs จริง + calib.json
 ```
 
