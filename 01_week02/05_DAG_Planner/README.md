@@ -256,7 +256,7 @@ $$k_{\text{skill}} = \frac{\text{เวลาจริง}}{\text{เวลา�
 | **1 · ให้ Claude สร้างสกิลจากสเปก + `./base_skills`** | สร้าง `skills/dag-planner` แล้วทดสอบ 8 ข้อ | ไม่ใช้ (ทดสอบการรันด้วยตัวจำลอง) |
 | **2 · ติดตั้งด้วยการคัดลอกโฟลเดอร์** | `docker cp` base skills 3 ตัวและ `dag-planner` ลง shared ทั้งสองฝั่ง | ไม่ใช้ |
 | **3 · วางแผนโจทย์ "เหมียวช็อป" (ยังไม่รัน)** | บล็อกงาน + DAG + Gantt แผน | ไม่ใช้ |
-| **การบ้าน** | วางแผน 10 โจทย์ ได้ DAG + Gantt โจทย์ละชุด | ไม่ใช้ |
+| **การบ้าน** | วางแผน 10 โจทย์ ได้ DAG + Gantt โจทย์ละชุด (มีเฉลยครบ 10 ข้อ) | ไม่ใช้ |
 | ภาคต่อ · รันแผนจริงและ what-if | agent-team ทำทุกบล็อก แล้วเทียบแผนกับของจริง | ใช้ |
 
 ทุกขั้น **วางพรอมต์ใน Claude Code app** แล้ว Claude Code app ทำงานใน container ผ่าน `docker exec`
@@ -411,7 +411,7 @@ docker exec multi-account python3 /root/ai-accounts/.Claude/shared/skills/dag-pl
 
 ## การบ้าน · วางแผน 10 โจทย์ (DAG + Gantt · ยังไม่รันจริง)
 
-ทำแบบเดียวกับขั้นที่ 3 กับโจทย์ 10 ข้อ ข้อละ 1 แผน ส่ง `blocks.json` · `dag.png` · `gantt-plan.png` · `PLAN.md` และ `ANSWER.md` ต่อโจทย์ ห้ามสั่ง `export` · `run` · `report` รายละเอียด พรอมต์ สิ่งที่ต้องส่ง และเกณฑ์ให้คะแนนอยู่ใน [`homework/README.md`](homework/README.md) · เฉลยครบ 10 ข้อ (พรอมต์ที่คัดลอกไปวาง → DAG → Gantt) อยู่ใน [`_solution/homework/README.md`](_solution/homework/README.md)
+ทำแบบเดียวกับขั้นที่ 3 กับโจทย์ 10 ข้อ ข้อละ 1 แผน ส่ง `blocks.json` · `dag.png` · `gantt-plan.png` · `PLAN.md` และ `ANSWER.md` ต่อโจทย์ ห้ามสั่ง `export` · `run` · `report` รายละเอียด พรอมต์ สิ่งที่ต้องส่ง และเกณฑ์ให้คะแนนอยู่ใน [`homework/README.md`](homework/README.md)
 
 ![การบ้าน 10 โจทย์ วางแผนด้วย dag-planner: โจทย์ 1 เว็บอาหารแมว 2 RAG เอกสารรัฐ 3 จองคิวคลินิก 4 IoT ฟาร์ม 5 OCR ใบเสร็จ 6 ML ทำนายลูกค้า 7 แอปรายจ่าย 8 CI/CD 9 สื่อการสอน 10 ตรวจการบ้าน ผ่าน dag-planner แล้วส่งต่อโจทย์ 4 ไฟล์ blocks.json dag.png gantt-plan.png PLAN.md · วางแผนเท่านั้น ห้ามรันจริง](img/concept-18-homework.png)
 
@@ -431,6 +431,36 @@ docker exec multi-account python3 /root/ai-accounts/.Claude/shared/skills/dag-pl
 ตัวอย่างข้อ 1 ที่ทำให้ดู (ผลจริงจาก `dag` และ `plan` เมื่อ 10 พ.ย. 2026 ยังไม่ได้รันทีม): 11 บล็อก ใช้สกิลครบ 6 แบบ สายวิกฤต B01 → B08 → B11
 
 ![DAG ของตัวอย่างการบ้านข้อ 1 hw01-catfood-next 11 บล็อก: B01 โครงโปรเจกต์ Next.js · B02 เลือกวิธีทำแชทบอท debate · B03 ข้อมูลสินค้า 12 รายการ · B04 ชื่อร้านและคำทักทายของบอท best_of · B05 ภาพสินค้า image รอ B03 · B06 หน้ารายการสินค้า · B07 ตะกร้าและสรุปยอด · B08 API แชทบอทแนะนำอาหาร review · B09 หน้าต่างแชท · B10 Dockerfile และ docker-compose · B11 รวมระบบและทดสอบใน Docker exclusive · สายวิกฤต B01 → B08 → B11 ยาว 6.6M tok](homework/example-hw01/dag.png)
+
+### เฉลยการบ้าน (ผลจริงจากสกิล · 10 พ.ย. 2026)
+
+เฉลยครบ 10 ข้ออยู่ใน [`_solution/homework/README.md`](_solution/homework/README.md) แต่ละข้อเรียงเป็น พรอมต์ที่คัดลอกไปวาง (โจทย์ + ให้ใช้สกิล) → ตารางบล็อกงาน → DAG → Gantt แผน → `ANSWER.md`
+
+| ข้อ | ชื่อแผน | บล็อก | สกิลที่ใช้ | สายวิกฤต | ยาว (M tok) | เวลารวม agent 4 | agent 2 |
+|---|---|---|---|---|---|---|---|
+| 1 | [`hw01-catfood-next`](_solution/homework/hw01-catfood-next/) | 11 | yolo · cyolo · image · review · debate · best_of | B01 → B08 → B11 | 6.6 | 110.5 นาที | ได้ 6/11 บล็อก |
+| 2 | [`hw02-gov-rag-k8s`](_solution/homework/hw02-gov-rag-k8s/) | 12 | yolo · cyolo · review · debate | B01 → B04 → B05 → B06 → B07 → B12 | 11.1 | 127.5 นาที | ได้ 5/12 บล็อก |
+| 3 | [`hw03-clinic-line-queue`](_solution/homework/hw03-clinic-line-queue/) | 10 | yolo · cyolo · image · review · best_of | B02 → B05 → B10 | 7.5 | 83.4 นาที | ได้ 7/10 บล็อก |
+| 4 | [`hw04-iot-farm-dashboard`](_solution/homework/hw04-iot-farm-dashboard/) | 10 | yolo · cyolo · image · review · debate | B02 → B05 → B07 → B10 | 5.7 | 70.9 นาที | ได้ 3/10 บล็อก |
+| 5 | [`hw05-receipt-ocr-api`](_solution/homework/hw05-receipt-ocr-api/) | 11 | yolo · cyolo · image · review · debate | B02 → B05 → B06 → B08 → B11 | 9.6 | 101.5 นาที | ได้ 5/11 บล็อก |
+| 6 | [`hw06-churn-ml-pipeline`](_solution/homework/hw06-churn-ml-pipeline/) | 10 | yolo · cyolo · review · debate · best_of | B02 → B04 → B05 → B06 → B10 | 9.6 | 100.0 นาที | ได้ 4/10 บล็อก |
+| 7 | [`hw07-expense-mobile`](_solution/homework/hw07-expense-mobile/) | 10 | yolo · cyolo · image · review · debate · best_of | B01 → B04 → B06 → B10 | 8.1 | 101.5 นาที | ได้ 1/10 บล็อก |
+| 8 | [`hw08-cicd-microservices`](_solution/homework/hw08-cicd-microservices/) | 11 | yolo · cyolo · review · debate | B01 → B02 → B03 → B11 | 7.5 | 96.9 นาที | ได้ 0/11 บล็อก |
+| 9 | [`hw09-course-media`](_solution/homework/hw09-course-media/) | 10 | yolo · cyolo · image · review · best_of | B01 → B03 → B08 → B10 | 6.6 | 89.8 นาที | ได้ 7/10 บล็อก |
+| 10 | [`hw10-ai-autograder`](_solution/homework/hw10-ai-autograder/) | 11 | yolo · cyolo · review · debate | B02 → B05 → B11 | 6.6 | 89.0 นาที | ได้ 7/11 บล็อก |
+
+| อ่านตาราง | ความหมาย |
+|---|---|
+| โควตาที่ใช้ | **สมมติ** `--accounts yolo1:80,yolo2:60,cyolo1:90,cyolo2:70` สกิลจึงไม่เรียกบัญชีใดเลย และสั่งซ้ำแล้วได้แผนเดียวกัน ถ้าใช้โควตาจริง บัญชีที่ได้งานจะต่างจากเฉลย |
+| เวลารวม | ค่าประเมินก่อนรันจริง (ยังไม่มี `calib.json` ตัวปรับเวลา k = 1) ใช้ดูลำดับและการแจกบัญชี ไม่ใช่เวลาจริง |
+| คอลัมน์ agent 2 | ทุกโจทย์มีบล็อก `debate` หรือ `best_of` ที่ต้องใช้ 3 บัญชีพร้อมกัน เมื่อจำกัด agent สูงสุด 2 บล็อกนั้นจึงไม่มีบัญชีรับ และบล็อกที่รออยู่ถูกบล็อกตาม (ข้อ 8 ได้ 0/11 เพราะบล็อกแรกเป็น `debate`) |
+| ที่รัน | สั่ง `dag` และ `plan` บนเครื่องโดยตรงด้วย `./base_skills` ไม่ได้รันทีมจริง ไม่มีการสั่ง `export` · `run` · `report` |
+
+ตัวอย่างเฉลยข้อ 2 (RAG ถามตอบเอกสารภาครัฐบน Kubernetes): 12 บล็อก สายวิกฤตยาว 6 บล็อก เพราะงาน ingest → ทำดัชนี → ตอบ → API ต้องทำต่อกัน ส่วนชุดคำถามทดสอบ (B03) หน้าเว็บ (B08) และ Dockerfile (B09) ทำขนานได้
+
+![DAG ของ hw02-gov-rag-k8s 12 บล็อก: B01 โครงโปรเจกต์และสัญญา API cyolo · B02 เลือก vector DB และโมเดล embedding debate · B03 ชุดคำถามทดสอบ 20 ข้อ yolo · B04 อ่าน PDF เป็นข้อความรายหน้า cyolo · B05 ตัดข้อความ ทำ embedding และสร้างดัชนี yolo · B06 ค้นคืนและตอบพร้อมอ้างอิงหน้า review · B07 API ถามตอบ cyolo · B08 หน้าเว็บถามตอบ cyolo · B09 Dockerfile ของระบบ cyolo · B10 Kubernetes manifests review · B11 ประเมินความแม่นด้วยชุดคำถาม yolo · B12 รวมระบบและทดสอบบน kind yolo exclusive · สายวิกฤต B01 → B04 → B05 → B06 → B07 → B12 ยาว 11.1M tok](_solution/homework/hw02-gov-rag-k8s/dag.png)
+
+![Gantt แผนของ hw02-gov-rag-k8s: แถวคือบัญชี cyolo1 cyolo2 yolo1 yolo2 · B01 cyolo1 0–8 · B02 yolo1+cyolo2+yolo2 0–9 · B04 cyolo1 8–26 · B03 yolo1 9–21 · B09 cyolo2 9–16 · B08 cyolo1 9–28 · B10 yolo1+cyolo2 21–40 · B05 yolo2 26–39 · B06 cyolo1+yolo2 39–84 · B07 cyolo1 84–102 · B11 yolo1 84–96 · B12 yolo1 102–128 · รวมประมาณ 127.5 นาที ขอบส้มคือสายวิกฤต](_solution/homework/hw02-gov-rag-k8s/gantt-plan.png)
 
 ## ภาคต่อ · รันแผนจริงและ what-if (ยังไม่ทำในคาบนี้)
 
@@ -535,12 +565,14 @@ docker exec multi-account python3 /root/ai-accounts/.Claude/shared/skills/dag-pl
 | ใครทำบล็อกไหน เมื่อไร | ไม่รู้จนกว่าจะรัน | Gantt แผนจาก KC-QUEST + โควตาจริง |
 | เสร็จเมื่อไร | ไม่รู้ | แผน 1.7 นาที → จริง 2.8 นาที → แผนใหม่ 2.8 นาที (เรียนรู้ k) |
 | what-if | ต้องรันจริง | `plan` ใหม่ ไม่ใช้โทเคนของทีม |
+| การบ้าน | – | 10 โจทย์ วางแผนเป็น DAG + Gantt โดยไม่รัน พร้อมเฉลย |
 
 ## ข้อควรรู้
 
 - **base skills ต้องอยู่ข้าง `dag-planner`:** ใน `shared/skills` เดียวกัน และห้ามแก้ไฟล์ใน `./base_skills` ถ้า base skill เปลี่ยนรุ่น ให้สร้าง `dag-planner` ใหม่จากสเปก
 - **แผนเป็นค่าประมาณ:** ขนาด S/M/L เป็นการประเมิน แผนแรกอาจต่างจากจริงมาก หลังรันจริงครั้งแรก `calib.json` ช่วยให้แม่นขึ้น
 - **รันจริงใช้โทเคน:** `run` ให้ทีมทำงานจริง สกิลจึงให้ถามผู้ใช้ก่อน และเริ่มจากความยากต่ำ
+- **วางแผนได้โดยไม่มี container:** ถ้าทุกบัญชีใน `--accounts` ระบุ % สกิลไม่เรียกบัญชีใดเลย จึงสั่ง `dag` และ `plan` บนเครื่องด้วย `./base_skills` ได้ (เฉลยการบ้านทำแบบนี้) ต้องมี Python 3.8+ และถ้าไม่มี headless Chromium จะได้ภาพเป็น SVG
 - **บัญชีจริงอาจไม่ตรงแผน:** export ส่งเป็นฝั่งเพื่อให้ failover ทำงาน ถ้าอยากห้ามบัญชีไหนให้ตัดออกจาก `--accounts`
 - **dependency ที่ขาดทำให้งานไม่ตรงกัน:** ตัดลูกศรได้เฉพาะงานที่ไม่ใช้ข้อมูลของกันจริง (บทเรียนรูปสินค้าในขั้นที่ 4)
 - **บล็อกหลายบัญชีต้องมีบัญชีพอ:** best_of n=2 ใช้ 3 บัญชีพร้อมกัน จำนวน agent สูงสุดต้องไม่ต่ำกว่านั้น (ขั้นที่ 5 แบบ ก.)
@@ -562,6 +594,15 @@ python3 $D plan meow-shop --accounts yolo1:80,yolo2:80,cyolo1:80,cyolo2:80   # �
 # ภาคต่อ (ใช้โทเคน)
 python3 $D export meow-shop && python3 $D run meow-shop --detach   # รันจริง
 python3 $D report meow-shop                        # Gantt จริง + แผน vs จริง + calib.json
+```
+
+บนเครื่องโดยตรง ไม่ผ่าน container (รันจากโฟลเดอร์ `05_DAG_Planner` ใช้ `./base_skills` และโควตาสมมติ)
+
+```bash
+export DAGPLAN_DIR=./workspace/plans
+D=_solution/skills/dag-planner/scripts/dagplan.py
+python3 $D dag hw02-gov-rag-k8s --blocks _solution/homework/hw02-gov-rag-k8s/blocks.json
+python3 $D plan hw02-gov-rag-k8s --max-agents 4 --accounts yolo1:80,yolo2:60,cyolo1:90,cyolo2:70
 ```
 
 จาก host
