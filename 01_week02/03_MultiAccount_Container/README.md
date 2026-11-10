@@ -244,9 +244,11 @@ MultiAccountDevtool/
 > docker run -dit \
 >   --name multi-account \
 >   --privileged \
+>   --platform linux/amd64 \
 >   -p <PORT>:8888 \
 >   -v ai-accounts:/root/ai-accounts \
->   multi-account:1.0
+>   multi-account:1.0 \
+>   bash -c 'F=/etc/jupyter/jupyter_server_config.py; grep -q delete_to_trash $F || printf "c.FileContentsManager.delete_to_trash = False\nc.FileContentsManager.always_delete_dir = True\n" >> $F; exec /usr/local/bin/start.sh'
 > ```
 >
 > จับเวลาตั้งแต่ `docker run` จน `http://localhost:<PORT>/lab` ตอบ `200`
@@ -271,9 +273,11 @@ MultiAccountDevtool/
 | `-dit` | รันเบื้องหลัง (`-d`) พร้อม terminal (`-it`) |
 | `--name multi-account` | ตั้งชื่อ container |
 | `--privileged` | เปิดให้ใช้ Docker-in-Docker ภายใน container |
+| `--platform linux/amd64` | ใช้ image สถาปัตยกรรม amd64 (เครื่อง Apple Silicon จะรันผ่าน emulation) |
 | `-p <PORT>:8888` | เปิด JupyterLab ที่ `http://localhost:<PORT>/lab` |
 | `-v ai-accounts:/root/ai-accounts` | volume เก็บล็อกอิน skill และ MCP ไม่หายเมื่อลบ container |
 | `multi-account:1.0` | image ที่ใช้สร้าง container |
+| `bash -c '...'` | ตั้งค่า JupyterLab ให้ลบไฟล์/โฟลเดอร์ได้จริง (ไม่ย้ายไปถังขยะ และลบโฟลเดอร์ที่มีไฟล์ได้) แล้วเริ่ม `start.sh` ตามปกติ |
 
 ![ภาพเคลื่อนไหว: วางพรอมต์รัน container ใน Claude Code app แล้ว Claude ตรวจ image ลบ container เดิม docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน MCP และสถานะล็อกอิน](img/desktop-step2-run.gif)
 
