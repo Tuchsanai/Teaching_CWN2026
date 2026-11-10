@@ -27,9 +27,11 @@ docker rm -f multi-account
 docker run -dit \
   --name multi-account \
   --privileged \
+  --platform linux/amd64 \
   -p <PORT>:8888 \
   -v ai-accounts:/root/ai-accounts \
-  multi-account:1.0
+  multi-account:1.0 \
+  bash -c 'F=/etc/jupyter/jupyter_server_config.py; grep -q delete_to_trash $F || printf "c.FileContentsManager.delete_to_trash = False\nc.FileContentsManager.always_delete_dir = True\n" >> $F; exec /usr/local/bin/start.sh'
 ```
 
 จับเวลาตั้งแต่ `docker run` จน `http://localhost:<PORT>/lab` ตอบ `200`
