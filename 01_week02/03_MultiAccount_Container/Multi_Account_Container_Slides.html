@@ -229,13 +229,6 @@ pre.prompt{max-height:720px}
 <div class="sub" style="font-size:22px"><b>multi-account:1.0</b> · yolo1–5 · cyolo1–5 · Playwright MCP · volume ai-accounts</div>
 <div class="hint">กด <span class="kbd">→</span> เพื่อเริ่ม · <span class="kbd">F</span> เต็มจอ · <span class="kbd">O</span> ดูทุกหน้า</div></div></section>
 <section class="slide " data-title="1. เปรียบเทียบ 3 แบบ"><div class="kicker">1 · เปรียบเทียบ</div><h2>การเตรียมสภาพแวดล้อม 3 แบบใน 01_week02</h2><div class="fig "><img src="img/concept-01-three-approaches.png" alt=""></div></section>
-<section class="slide " data-title="1. ตารางเปรียบเทียบ"><div class="kicker">1 · เปรียบเทียบ</div><h2>แต่ละแบบต่อยอดจากแบบก่อนหน้า</h2><table>
-<tr><th></th><th>แบบที่ 1 · devtools</th><th>แบบที่ 2 · ติดตั้งภายหลัง</th><th>แบบที่ 3 · build จาก Dockerfile</th></tr>
-<tr><td><b>บทเรียน</b></td><td>01_Docker_VSCode_Setup</td><td>02_Setup_Multi_Account</td><td><b>บทนี้</b></td></tr>
-<tr><td><b>จุดเริ่มต้น</b></td><td>image <code>tuchsanai/devtools:2569_1</code></td><td>container <code>devtools</code></td><td>Dockerfile</td></tr>
-<tr><td><b>ระบบหลายบัญชี</b></td><td>ไม่มี</td><td>ติดตั้งผ่าน <code>docker exec</code></td><td>ติดตั้งตั้งแต่ขั้น build</td></tr>
-<tr><td><b>ล็อกอินเก็บที่</b></td><td>–</td><td>ภายใน container</td><td>volume <code>ai-accounts</code></td></tr>
-<tr><td><b>เมื่อลบ container</b></td><td>ได้เครื่องมือพื้นฐานชุดเดิม</td><td>ติดตั้งและล็อกอินใหม่</td><td><code>docker run</code> ใหม่ พร้อมใช้ทันที</td></tr></table></section>
 <section class="slide " data-title="1. ขั้นตอนของแต่ละแบบ (GIF)"><div class="kicker">1 · เปรียบเทียบ</div><h2>ผลเมื่อ container ถูกลบ</h2><div class="fig "><img src="img/gif-three-approaches.gif" alt=""></div><div class="cap">ภาพเคลื่อนไหวประกอบแนวคิด เวลาของแบบที่ 2 มาจากบท 02_Setup_Multi_Account ตัวเลขของแบบที่ 3 มาจากการรันจริงในบทนี้</div></section>
 <section class="slide " data-title="2. องค์ประกอบของ Docker"><div class="kicker">2 · องค์ประกอบของ Docker</div><div class="row"><div class="col c3"><div class="fig "><img src="img/concept-02-docker-terms.png" alt=""></div></div><div class="col c2 vc"><table style="font-size:20px">
 <tr><th>องค์ประกอบ</th><th>ในบทนี้</th></tr>
