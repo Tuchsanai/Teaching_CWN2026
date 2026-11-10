@@ -1,48 +1,48 @@
 
-💬 วางใน **Claude Code ใน VS Code บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
+💬 วางใน **Claude Code app บนเครื่องตัวเอง** (Docker Desktop ต้อง Engine running) → กดส่ง → อนุญาตคำสั่ง `docker` เมื่อถูกถาม
 
-```text
+````markdown
+# รัน container ชื่อ `multi-account` จาก image `multi-account:1.0`
 
-เตรียม container `multi-account-devtool`:
+## 1. เตรียม image และ container
 
-1. ถ้ามี container `multi-account-devtool` อยู่แล้ว ให้ลบด้วย `docker rm -f multi-account-devtool`
-   (ห้ามลบ volume `ai-accounts` เพราะเก็บการล็อกอินของทุกบัญชีไว้)
+ถ้ายังไม่มี image `multi-account:1.0` ให้ดึงจาก Docker Hub แล้วตั้งชื่อใหม่
 
-2. ตรวจ port <SSH_PORT>=2223 และ <JUPYTER_PORT>=8886 ถ้าชน ให้ใช้ port ว่างถัดไป
-
-3. หาไฟล์ env ในโฟลเดอร์ปัจจุบัน: ใช้ `.env` ก่อน ถ้าไม่มีใช้ `.env_example` (หรือ `.env.example`)
-   แล้วเติม `--env-file <path เต็ม>` ในข้อ 4 (ห้ามแสดงค่าในไฟล์ แสดงได้เฉพาะชื่อตัวแปร)
-   - ถ้าใช้ไฟล์ example ให้เตือนว่า "⚠️ ไม่พบ .env — ใช้ <ชื่อไฟล์> แทน ค่าอาจเป็นค่าตัวอย่าง
-     กรุณา copy เป็น .env แล้วใส่ค่าจริง" พร้อมบอกชื่อตัวแปรที่ค่าว่างหรือดูเป็นค่าตัวอย่าง
-   - ถ้าไม่พบทั้งสองไฟล์ ให้ตัด `--env-file` ออกแล้วรันต่อ และเตือนว่า
-     "⚠️ ไม่พบ .env หรือ .env_example — container จะไม่มี environment variable กรุณาสร้าง .env แล้วรันใหม่"
-
-4. รัน:
-
-docker run -dit --name multi-account-devtool --hostname multi-account-devtool --privileged \
-  -p <SSH_PORT>:22 -p <JUPYTER_PORT>:8888 \
-  --env-file <ENV_FILE> \
-  -v ai-accounts:/root/ai-accounts \
-  tuchsanai/multi-account-devtool:2569_1
-
-5. รอจน `docker logs multi-account-devtool` มีบรรทัดที่มีข้อความ `jupyter lab :8888`
-
-6. ตรวจ skill `vastai` `yolo` `cyolo` (สำคัญ ห้ามข้าม):
-
-docker exec multi-account-devtool bash -lc \
-'B=$HOME/ai-accounts; for t in .Claude .Codex; do for s in vastai yolo cyolo; do [ -d $B/$t/shared/skills/$s ] && echo "$t/$s OK" || echo "$t/$s MISSING"; done; done'
-
-   ถ้ามี MISSING แม้แต่ตัวเดียว ให้แจ้งเตือนฉันเป็นภาษาไทยอย่างชัดเจนว่า
-   "⚠️ ยังไม่ได้ติดตั้ง skill — กรุณาติดตั้ง skill ต่อไปนี้ก่อนใช้งาน: <รายชื่อที่ขาด>"
-   ห้ามแสดงรหัสหรือเนื้อหาใน SKILL.md
-   และห้ามติดตั้ง skill เอง ให้แจ้งเตือนอย่างเดียว
-
-7. ไม่ต้องติดตั้ง Claude Code / Codex เพิ่ม (มีใน image แล้ว) ห้ามล็อกอินแทนฉัน
-   สรุปผลเป็นภาษาไทย โดยเรียงดังนี้:
-   - ถ้ามีคำเตือน (ใช้ไฟล์ example / ไม่พบไฟล์ env / skill ขาด) ให้แสดงคำเตือนไว้บนสุดของสรุป ก่อนข้อมูลอื่น
-   - port ที่ใช้ (SSH / Jupyter)
-   - URL ของ JupyterLab
-   - สถานะไฟล์ env (ใช้ .env / ใช้ .env_example แทน / ไม่พบ) พร้อมรายชื่อตัวแปรที่โหลด (เฉพาะชื่อ)
-   - ผลตรวจ skill (มีครบ / ขาดอะไร)
-
+```bash
+docker pull tuchsanai/multi-account:1
+docker tag  tuchsanai/multi-account:1 multi-account:1.0
 ```
+
+ถ้ามี container ชื่อ `multi-account` อยู่แล้ว ให้ลบออก (ห้ามลบ volume `ai-accounts`)
+
+```bash
+docker rm -f multi-account
+```
+
+## 2. สร้าง container
+
+`PORT` เริ่มที่ `8886` ถ้าชนใช้เลขว่างถัดไป
+
+```bash
+docker run -dit \
+  --name multi-account \
+  --privileged \
+  -p <PORT>:8888 \
+  -v ai-accounts:/root/ai-accounts \
+  multi-account:1.0
+```
+
+จับเวลาตั้งแต่ `docker run` จน `http://localhost:<PORT>/lab` ตอบ `200`
+
+## 3. ตรวจผ่าน `docker exec` แล้วสรุปเป็นตาราง
+
+- `yolo1..5 --version` และ `cyolo1..5 --version`
+- `cyolo1 mcp list` ต้องเห็น `playwright`
+- สถานะล็อกอินทุกบัญชี (ห้ามล็อกอินแทนผม ห้ามแก้ไฟล์ใด ๆ)
+  - Claude: `yolo1` ถึง `yolo5` ใช้คำสั่ง `yoloN auth status` แล้วดูเฉพาะค่า `loggedIn`
+  - Codex: `cyolo1` ถึง `cyolo5` ใช้คำสั่ง `cyoloN login status`
+- ตารางสรุป: image มาจากไหน (build เอง / pull) · URL ของ JupyterLab · เวลาที่ใช้
+  และตาราง บัญชี | เวอร์ชัน | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
+- ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
+  (พิมพ์ `yoloN` แล้วเลือก Claude account with subscription / พิมพ์ `cyoloN login --device-auth`)
+````
