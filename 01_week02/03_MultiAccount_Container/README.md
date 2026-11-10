@@ -62,7 +62,7 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 |---|---|---|---|
 | **1 · build image** | Claude Code app | Claude | ~28 นาที (build ครั้งสุดท้าย 5 นาที) |
 | **2 · สร้าง container จาก image** | Claude Code app | Claude | ~1 นาที |
-| **3 · ล็อกอินและตรวจสถานะ** | JupyterLab → Claude Code app | ผู้เรียน + Claude | ~15 นาที |
+| **3 · ล็อกอิน** | JupyterLab | ผู้เรียน | ~15 นาที |
 | **4 · ทดสอบ skill/MCP ข้ามบัญชีแบบขนาน** | Claude Code app | Claude | ~5 นาที |
 | **5 · ลบ container แล้วสร้างใหม่** | Claude Code app | Claude | ~3 นาที |
 
@@ -255,9 +255,15 @@ MultiAccountDevtool/
 >
 > ## 3. ตรวจผ่าน `docker exec` แล้วสรุปเป็นตาราง
 >
-> - `yolo1..5` และ `cyolo1..5 --version`, `cyolo1 mcp list` ต้องเห็น `playwright`
-> - สถานะล็อกอิน: `yoloN auth status` (ดูแค่ `loggedIn`) / `cyoloN login status` ห้ามแสดงอีเมลหรือ token
-> - ตารางสรุป: image มาจากไหน (build เอง / pull) · URL ของ JupyterLab · เวลาที่ใช้ · ผลของแต่ละบัญชี
+> - `yolo1..5 --version` และ `cyolo1..5 --version`
+> - `cyolo1 mcp list` ต้องเห็น `playwright`
+> - สถานะล็อกอินทุกบัญชี (ห้ามล็อกอินแทนผม ห้ามแก้ไฟล์ใด ๆ)
+>   - Claude: `yolo1` ถึง `yolo5` ใช้คำสั่ง `yoloN auth status` แล้วดูเฉพาะค่า `loggedIn`
+>   - Codex: `cyolo1` ถึง `cyolo5` ใช้คำสั่ง `cyoloN login status`
+> - ตารางสรุป: image มาจากไหน (build เอง / pull) · URL ของ JupyterLab · เวลาที่ใช้
+>   และตาราง บัญชี | เวอร์ชัน | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
+> - ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
+>   (พิมพ์ `yoloN` แล้วเลือก Claude account with subscription / พิมพ์ `cyoloN login --device-auth`)
 > ````
 
 **ความหมายของแต่ละ option ใน `docker run`**
@@ -277,15 +283,13 @@ MultiAccountDevtool/
 
 ![ภาพจริงจาก Docker Desktop: ค้นหา multi-account เหลือ 1 รายการ จุดสีเขียวกำลังทำงาน สร้างจาก image multi-account:1.0 port 8886:8888](img/docker-desktop-multi-account.png)
 
-![ผลจริงจาก Claude: container multi-account พร้อมใน 2.1 วินาที ที่มาของ image URL ของ JupyterLab cyolo1 mcp list เห็น playwright และตารางเวอร์ชันกับสถานะล็อกอิน 10 บัญชี](img/desktop-step2-result.png)
+![ผลจริงจาก Claude: container multi-account พร้อมใน 2.7 วินาที ที่มาของ image URL ของ JupyterLab cyolo1 mcp list เห็น playwright ตารางเวอร์ชันกับสถานะล็อกอิน 10 บัญชี และวิธีล็อกอินบัญชีที่เหลือ](img/desktop-step2-result.png)
 
 *เครื่องตัวอย่างใช้ volume `ai-accounts` ที่เคยล็อกอินไว้แล้ว 5 บัญชี จึงแสดง ✅ ตั้งแต่ยังไม่ได้ล็อกอินในแลปนี้ (ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3) MCP `rea` มาจากแลปอื่นที่เคยติดตั้งไว้ใน volume เดียวกัน*
 
-## ขั้นที่ 3 · ล็อกอินและให้ Claude ตรวจสถานะ (~15 นาที)
+## ขั้นที่ 3 · ล็อกอินใน JupyterLab (~15 นาที)
 
-### 3.1 · ล็อกอินใน JupyterLab: 1 บัญชีต่อ 1 แท็บ Terminal
-
-วิธีเดียวกับบท `02_Setup_Multi_Account` (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ขั้นที่ 3.1 ของบทดังกล่าว](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
+เปิด JupyterLab ตาม URL ที่ได้จากขั้นที่ 2 แล้วล็อกอิน 1 บัญชีต่อ 1 แท็บ Terminal วิธีเดียวกับบท `02_Setup_Multi_Account` (ดูภาพเคลื่อนไหวครบทุกขั้นที่ [ขั้นที่ 3.1 ของบทดังกล่าว](../02_Setup_Multi_Account/README.md#31--ล็อกอิน-1-บัญชี--1-แท็บ-terminal)) อย่างน้อย `yolo1`, `yolo2`, `cyolo1`, `cyolo2`
 
 | พิมพ์ | หน้าจอล็อกอิน | เลือก |
 |---|---|---|
@@ -296,25 +300,7 @@ MultiAccountDevtool/
 
 > **ผู้เรียนต้องล็อกอินด้วยตนเองเสมอ** ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือผู้อื่น
 
-### 3.2 · ให้ Claude ตรวจสถานะล็อกอิน
-
-> [!IMPORTANT]
-> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
->
-> ```text
-> ช่วยตรวจสถานะล็อกอินทุกบัญชีใน container multi-account ทำผ่าน docker exec เท่านั้น ห้ามล็อกอินแทนฉัน ห้ามแก้ไฟล์ใด ๆ
-> - Claude: yolo1 ถึง yolo5 ใช้คำสั่ง yoloN auth status แล้วดูเฉพาะค่า "loggedIn"
-> - Codex: cyolo1 ถึง cyolo5 ใช้คำสั่ง cyoloN login status
-> สรุปเป็นตาราง บัญชี | ล็อกอินแล้ว/ยัง เท่านั้น ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
-> ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
-> (พิมพ์ yoloN แล้วเลือก Claude account with subscription / พิมพ์ cyoloN login --device-auth)
-> ```
-
-![ภาพเคลื่อนไหว: วางพรอมต์ตรวจล็อกอินใน Claude Code app แล้วได้ตาราง 10 บัญชี](img/desktop-step3-login-check.gif)
-
-![ผลจริงจาก Claude: ล็อกอินแล้ว 5 บัญชี ยังไม่ล็อกอิน 5 บัญชี พร้อมวิธีล็อกอินบัญชีที่เหลือ](img/desktop-step3-result.png)
-
-*ผลจริง (~20 วินาที) เครื่องตัวอย่างล็อกอินไว้ 5 บัญชี ขั้นที่ 4 ต้องมีอย่างน้อย 1 บัญชีต่อ CLI (แนะนำ CLI ละ 2 บัญชีเพื่อเทียบรหัส)*
+ไม่ต้องสั่ง Claude ตรวจสถานะแยกอีกครั้ง พรอมต์ของขั้นที่ 4 ตรวจสถานะล็อกอินทุกบัญชีก่อนเริ่มทดสอบ ขั้นที่ 4 ต้องมีอย่างน้อย 1 บัญชีต่อ CLI (แนะนำ CLI ละ 2 บัญชีเพื่อเทียบรหัส)
 
 ## ขั้นที่ 4 · ทดสอบ skill และ MCP ข้ามบัญชีแบบขนาน (~5 นาที)
 
