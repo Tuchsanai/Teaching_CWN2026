@@ -718,6 +718,7 @@ B01, B03 และ B02 ใช้ไป 3 agent เหลือที่ว่า
 
 | ไฟล์ | คืออะไร |
 |---|---|
+| `KC_QUEST_Slides.html` · `KC_QUEST_Slides.pdf` | สไลด์ของบทนี้ 70 หน้า (เปิดไฟล์ `.html` ในเบราว์เซอร์ กด → เพื่อเปลี่ยนหน้า) |
 | `base_skills/` | สกิล 4 ตัวชุดเดียวกับบท 05: `agent-team` · `yolo` · `cyolo` · `dag-planner` (KC-QUEST อยู่ที่ `dag-planner/scripts/kcquest.py`) |
 | `tools/kclab.py` | โหมดสอน: `doctor` · `rank` · `rounds` · `explain --round N` · ตัวเลือก `--weights` `--set` `--scenario` `--max-agents` `--png` |
 | `tools/sim.py` · `tools/sim_result.md` | ตัวจำลองเทียบ 4 วิธี และผลที่รันไว้ |
