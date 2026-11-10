@@ -38,6 +38,13 @@ docker run -dit \
 
 ## 3. ตรวจผ่าน `docker exec` แล้วสรุปเป็นตาราง
 
+ก่อนเริ่ม ดูว่าใน container มีสกิลที่ช่วยงานนี้ได้หรือไม่ ถ้ามีให้อ่านและใช้
+
+- Claude: `/root/ai-accounts/.Claude/shared/skills`
+- Codex: `/root/ai-accounts/.Codex/shared/skills`
+
+รายการที่ต้องตรวจ
+
 - `yolo1..5 --version` และ `cyolo1..5 --version`
 - `cyolo1 mcp list` ต้องเห็น `playwright`
 - สถานะล็อกอินทุกบัญชี (ห้ามล็อกอินแทนผม ห้ามแก้ไฟล์ใด ๆ)
@@ -47,4 +54,5 @@ docker run -dit \
   และตาราง บัญชี | เวอร์ชัน | ล็อกอินแล้ว/ยัง ห้ามแสดงอีเมล ชื่อองค์กร หรือ token
 - ถ้ามีบัญชีที่ยังไม่ล็อกอิน ให้บอกวิธีล็อกอินใน JupyterLab Terminal
   (พิมพ์ `yoloN` แล้วเลือก Claude account with subscription / พิมพ์ `cyoloN login --device-auth`)
+- ถ้าไม่มีบัญชี Claude หรือ Codex ที่ล็อกอินเลย ให้หยุดและบอกวิธีล็อกอินใน JupyterLab Terminal ห้ามล็อกอินแทนผม
 ````
