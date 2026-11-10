@@ -6,9 +6,9 @@
                      [--reps 2] [--accounts yolo2,yolo3] [--par 4] [--model sonnet] [--effort medium]
   skillopt.py grade  <suite_dir> --label v0                         ตรวจซ้ำโดยไม่เรียกโมเดล
   skillopt.py report <suite_dir> [--labels v0,v1]                   ตารางเทียบรุ่น + results.json
-  skillopt.py failures <suite_dir> --label v0 [--split train]       ข้อที่ไม่ผ่าน + path ของ transcript
+  skillopt.py failures <suite_dir> --label v0 [--split train|val|test|all]  ข้อที่ไม่ผ่าน + path ของ transcript (ค่าเริ่มต้น train)
   skillopt.py null   <suite_dir> --label v0                         ความแกว่งของรุ่นเดียวกันระหว่างรอบ (A/A)
-  skillopt.py gate   <suite_dir> --base v0 --cand v1                รับ/ไม่รับรุ่นใหม่ (ชุด val ไม่ลด + ดีขึ้นเกินความแกว่ง)
+  skillopt.py gate   <suite_dir> --base v0 --cand v1 [--z 1.5]      รับ/ไม่รับรุ่นใหม่ (ชุด val ไม่ลด + ดีขึ้นเกินความแกว่ง)
 
 suite_dir/suite.json:
   {"name": "...", "skill_name": "dag-planner", "prompt": "... {goal} ...", "timeout": 900,
@@ -102,8 +102,12 @@ def run_trial(suite_dir, suite, task, rep, a, account):
         for e in suite.get("extra_skills", []):
             src = os.path.normpath(os.path.join(suite_dir, e))
             shutil.copytree(src, os.path.join(sb, "skills", os.path.basename(src)), ignore=ign)
-    for f in task.get("files", []):                     # ไฟล์ตั้งต้นของโจทย์ (ถ้ามี)
-        shutil.copy(os.path.join(suite_dir, f), sb)
+    for f in suite.get("files", []) + task.get("files", []):   # ไฟล์/โฟลเดอร์ตั้งต้น (ของทุกโจทย์ + ของโจทย์นี้)
+        src = os.path.normpath(os.path.join(suite_dir, fill(f, task)))
+        if os.path.isdir(src):                          # โฟลเดอร์ → วางเป็น sandbox/<ชื่อโฟลเดอร์> (เช่น เว็บที่ต้องแก้)
+            shutil.copytree(src, os.path.join(sb, os.path.basename(src)), ignore=ign, symlinks=True)
+        else:
+            shutil.copy(src, sb)
     v = dict(task, sandbox=sb)
     prompt = fill(suite["prompt"], v)
     env = os.environ.copy()
@@ -212,6 +216,9 @@ def summarize(rows):
     out = {"n": len(rows), "score": mean("score"),
            "score_sd": round(statistics.pstdev([r["score"] for r in rows]), 3) if rows else None,
            "perfect": sum(1 for r in rows if r["score"] >= 0.999),
+           # รอบที่เอเจนต์เปิด SKILL.md จริง (รอบที่ไม่เปิด ไม่ได้วัดสกิล) และรอบที่จบไม่ปกติ (หมดเวลา / CLI ล้ม)
+           "skill_read": sum(1 for r in rows if r.get("skill_read")),
+           "abnormal": sum(1 for r in rows if r.get("timed_out") or not r.get("ok", True)),
            "wall_s": mean("wall_s"), "tool_calls": mean("tool_calls"), "tool_errors": mean("tool_errors"),
            "cost_usd": mean("cost_usd"), "output_tokens": mean("output_tokens"),
            # โทเคนขาเข้าทั้งหมดที่โมเดลต้องอ่าน (รวมที่อ่านจาก cache) = ตัวแทนของ "งานที่ทำต่อรอบ"
@@ -233,21 +240,23 @@ def cmd_report(a):
     for lb in labels:
         rows = collect(a.suite, lb)
         res[lb] = {"all": summarize(rows)}
-        for sp in ("train", "val"):
+        for sp in ("train", "val", "test"):
             res[lb][sp] = summarize([r for r in rows if r["split"] == sp])
         res[lb]["trials"] = [dict({k: r[k] for k in ("task", "split", "rep", "account", "score", "wall_s", "tool_calls",
                                                  "tool_errors", "cost_usd", "output_tokens", "timed_out")},
                                   failed=[c["id"] for c in r["checks"] if not c["pass"]]) for r in rows]
     json.dump(res, open(os.path.join(a.suite, "results.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    H = ["รุ่น", "ชุด", "รอบ", "คะแนน", "sd", "เต็มทุกข้อ", "เวลา (s)", "คำสั่ง", "คำสั่งล้ม", "ค่าใช้จ่าย", "output tok", "โทเคนขาเข้า"]
+    H = ["รุ่น", "ชุด", "รอบ", "คะแนน", "sd", "เต็มทุกข้อ", "เวลา (s)", "คำสั่ง", "คำสั่งล้ม", "ค่าใช้จ่าย", "output tok", "โทเคนขาเข้า",
+         "อ่านสกิล", "จบไม่ปกติ"]
     L = ["| " + " | ".join(H) + " |", "|" + "---|" * len(H)]
     for lb in labels:
-        for sp in ("train", "val", "all"):
+        for sp in ("train", "val", "test", "all"):
             s = res[lb][sp]
             if s["n"]:
-                L.append("| %s | %s | %d | **%.1f%%** | %.1f | %d/%d | %.0f | %.1f | %.1f | $%.3f | %.0f | %.0f |" % (
+                L.append("| %s | %s | %d | **%.1f%%** | %.1f | %d/%d | %.0f | %.1f | %.1f | $%.3f | %.0f | %.0f | %d/%d | %d |" % (
                     lb, sp, s["n"], s["score"] * 100, s["score_sd"] * 100, s["perfect"], s["n"], s["wall_s"],
-                    s["tool_calls"], s["tool_errors"], s["cost_usd"], s["output_tokens"], s["context_tokens"]))
+                    s["tool_calls"], s["tool_errors"], s["cost_usd"], s["output_tokens"], s["context_tokens"],
+                    s["skill_read"], s["n"], s["abnormal"]))
     ids = []
     for lb in labels:
         for k in res[lb]["all"]["checks"]:
@@ -274,73 +283,111 @@ def cmd_failures(a):
 
 
 def noise_of(rows):
-    """ความแกว่งของรุ่นเดียวกัน (A/A) -> (ต่อโจทย์, ของค่าเฉลี่ย) หรือ None
-    ต่อโจทย์ = ค่าเฉลี่ยของ |คะแนนสูงสุด - ต่ำสุด| ระหว่างรอบของโจทย์เดียวกัน (สกิลไม่ได้แก้อะไรเลย)
-    ของค่าเฉลี่ย = ต่อโจทย์ / sqrt(จำนวนโจทย์) เพราะคะแนนที่รายงานเป็นค่าเฉลี่ยของหลายโจทย์"""
+    """ความแกว่งของรุ่นเดียวกัน (A/A) -> dict หรือ None (ถ้าไม่มีโจทย์ที่รันอย่างน้อย 2 รอบ)
+    sd      = ส่วนเบี่ยงเบนของคะแนนระหว่างรอบของโจทย์เดียวกัน (รวมทุกโจทย์แบบ pooled · สกิลไม่ได้แก้อะไรเลย)
+    se_mean = sd / sqrt(จำนวนรอบทั้งหมด) = ความแกว่งของค่าเฉลี่ยของรุ่นนี้
+    สูตรนี้ใช้ได้กับ --reps เท่าใดก็ได้ (ไม่ใช้ max-min ซึ่งโตตามจำนวนรอบ)"""
     by = {}
     for r in rows:
         by.setdefault(r["task"], []).append(r["score"])
-    d = [max(v) - min(v) for v in by.values() if len(v) > 1]
-    if not d:
+    vs = [(statistics.variance(v), len(v)) for v in by.values() if len(v) > 1]
+    if not vs:
         return None
-    per = statistics.mean(d)
-    return per, per / (len(d) ** 0.5)
+    var = sum(x * (n - 1) for x, n in vs) / sum(n - 1 for _, n in vs)
+    trials = sum(n for _, n in vs)
+    return {"tasks": len(vs), "trials": trials, "var": var, "sd": var ** 0.5, "se_mean": (var / trials) ** 0.5,
+            "moved": sum(1 for v in by.values() if len(v) > 1 and max(v) - min(v) > 1e-9)}
+
+
+def se_diff(b, c):
+    """ความแกว่งของ "ส่วนต่างค่าเฉลี่ย" ระหว่างสองรุ่น = sqrt(se_mean_b^2 + se_mean_c^2) · None ถ้ารุ่นใดรันโจทย์ละรอบเดียว"""
+    nb, nc = noise_of(b), noise_of(c)
+    if nb is None or nc is None:
+        return None
+    return (nb["se_mean"] ** 2 + nc["se_mean"] ** 2) ** 0.5
 
 
 def cmd_null(a):
     rows = collect(a.suite, a.label)
-    for sp in ("train", "val", "all"):
+    for sp in ("train", "val", "test", "all"):
         rs = [r for r in rows if sp == "all" or r["split"] == sp]
+        if not rs:
+            continue
         n = noise_of(rs)
         if n is None:
             print("%s: ไม่มีข้อมูล (ต้องรันโจทย์ละอย่างน้อย 2 รอบ)" % sp)
             continue
-        by = {}
-        for r in rs:
-            by.setdefault(r["task"], []).append(r["score"])
-        moved = sum(1 for v in by.values() if max(v) - min(v) > 1e-9)
-        print("%s: %d โจทย์ · คะแนนต่างกันระหว่างรอบ %d โจทย์ · ความแกว่งต่อโจทย์ %.1f จุด · ความแกว่งของค่าเฉลี่ย %.1f จุด" % (
-            sp, len(by), moved, n[0] * 100, n[1] * 100))
-    print("สกิลรุ่นเดียวกัน โจทย์เดียวกัน ยังได้คะแนนต่างกันเท่านี้ → รุ่นใหม่ต้องดีขึ้นมากกว่าความแกว่งของค่าเฉลี่ย จึงนับว่าดีขึ้นจริง")
+        print("%s: %d โจทย์ %d รอบ · คะแนนต่างกันระหว่างรอบ %d โจทย์ · sd ระหว่างรอบ %.1f จุด · ความแกว่งของค่าเฉลี่ย %.1f จุด"
+              " · ความแกว่งของส่วนต่างสองรุ่น %.1f จุด" % (sp, n["tasks"], n["trials"], n["moved"], n["sd"] * 100,
+                                                   n["se_mean"] * 100, n["se_mean"] * 2 ** 0.5 * 100))
+    print("สกิลรุ่นเดียวกัน โจทย์เดียวกัน ยังได้คะแนนต่างกันเท่านี้ → ประตูรับใช้เกณฑ์ = ค่าที่มากกว่าระหว่าง --eps กับ"
+          " --z (1.5) × ความแกว่งของส่วนต่างสองรุ่น · ถ้าเป็น 0 ทุกโจทย์ ชุดโจทย์อาจง่ายไปหรือจำนวนรอบน้อยไป")
     return 0
+
+
+def keyset(rows):
+    return sorted((r["task"], r["rep"]) for r in rows)
 
 
 def cmd_gate(a):
     b, c = collect(a.suite, a.base), collect(a.suite, a.cand)
     out, ok = [], True
-    nz = noise_of(b)
-    if nz is not None:
-        out.append("ความแกว่งของ %s เอง (A/A): ต่อโจทย์ %.1f จุด · ของค่าเฉลี่ย %.1f จุด → เกณฑ์ = ค่าที่มากกว่าระหว่างค่านี้กับ eps %.1f" % (
-            a.base, nz[0] * 100, nz[1] * 100, a.eps * 100))
-        a.eps = max(a.eps, nz[1])
+    if keyset(b) != keyset(c):                      # ค่าเฉลี่ยของโจทย์คนละชุดเทียบกันไม่ได้
+        only_b = sorted(set(keyset(b)) - set(keyset(c)))
+        only_c = sorted(set(keyset(c)) - set(keyset(b)))
+        print("ERROR สองรุ่นรันโจทย์ × รอบ ไม่ตรงกัน → เทียบไม่ได้ (รันให้ครบชุดเดียวกันก่อน)\n  มีเฉพาะ %s: %s\n  มีเฉพาะ %s: %s" % (
+            a.base, only_b[:8], a.cand, only_c[:8]))
+        return 2
+    for lb, rows in ((a.base, b), (a.cand, c)):
+        bad = [r for r in rows if r.get("timed_out") or not r.get("ok", True)]
+        if bad:
+            out.append("⚠ %s มี %d รอบจบไม่ปกติ (หมดเวลา/CLI ล้ม): %s → เปิด stderr.txt ดูว่าเป็นความผิดของสกิลหรือของระบบ"
+                       " (โควตาหมด เครือข่าย) ถ้าเป็นของระบบให้รันรอบนั้นซ้ำก่อนตัดสิน" % (
+                           lb, len(bad), ", ".join("%s-r%d" % (r["task"], r["rep"]) for r in bad[:6])))
+        nr = [r for r in rows if "skill_read" in r and not r["skill_read"]]
+        if nr and len(nr) < len(rows):              # ไม่เปิดทุกรอบ = แขนที่ไม่มีสกิล ไม่ต้องเตือน
+            out.append("⚠ %s มี %d รอบที่เอเจนต์ไม่ได้เปิด SKILL.md → รอบนั้นไม่ได้วัดสกิล" % (lb, len(nr)))
+
+    def thr(sp):
+        rb = [r for r in b if sp == "all" or r["split"] == sp]
+        rc = [r for r in c if sp == "all" or r["split"] == sp]
+        sd = se_diff(rb, rc)
+        return (max(a.eps, a.z * sd), sd) if sd is not None else (a.eps, None)
+
     for sp in ("train", "val"):
         sb, sc = summarize([r for r in b if r["split"] == sp]), summarize([r for r in c if r["split"] == sp])
         if not sb["n"] or not sc["n"]:
             out.append("%s: ไม่มีข้อมูลครบทั้งสองรุ่น" % sp)
             ok = False
             continue
+        t, sd = thr(sp)
         d = sc["score"] - sb["score"]
-        out.append("%s: %.1f%% → %.1f%% (%+.1f) · ค่าใช้จ่าย $%.2f → $%.2f · คำสั่ง %.1f → %.1f" % (
-            sp, sb["score"] * 100, sc["score"] * 100, d * 100, sb["cost_usd"], sc["cost_usd"],
+        out.append("%s: %.1f%% → %.1f%% (%+.1f) · เกณฑ์ %.1f จุด%s · ค่าใช้จ่าย $%.2f → $%.2f · คำสั่ง %.1f → %.1f" % (
+            sp, sb["score"] * 100, sc["score"] * 100, d * 100, t * 100,
+            "" if sd is not None else " (ไม่รู้ความแกว่ง: โจทย์ละรอบเดียว ใช้ --eps)", sb["cost_usd"], sc["cost_usd"],
             sb["tool_calls"], sc["tool_calls"]))
-        if sp == "val" and d < -a.eps:
+        if sp == "val" and d < -t:
             ok = False
-            out.append("  ✗ คะแนนชุด val ลดลงเกิน %.1f จุด → รุ่นใหม่จำโจทย์ชุด train (overfit) หรือทำของเดิมพัง" % (a.eps * 100))
-        if sp == "train" and d < -a.eps:
+            out.append("  ✗ คะแนนชุด val ลดลงเกิน %.1f จุด → รุ่นใหม่จำโจทย์ชุด train (overfit) หรือทำของเดิมพัง" % (t * 100))
+        if sp == "train" and d < -t:
             ok = False
-            out.append("  ✗ คะแนนชุด train ลดลง → การแก้ไม่ได้ผล")
+            out.append("  ✗ คะแนนชุด train ลดลงเกิน %.1f จุด → การแก้ไม่ได้ผล" % (t * 100))
     if ok:
         sb, sc = summarize(b), summarize(c)
+        t, sd = thr("all")
         k = a.cost_metric
         name = {"cost_usd": "ค่าใช้จ่าย", "tool_calls": "จำนวนคำสั่ง", "context_tokens": "โทเคนขาเข้า"}[k]
         gain, cheaper = sc["score"] - sb["score"], sc[k] < sb[k] * 0.9
         delta = "%s %.4g → %.4g (%+.0f%%)" % (name, sb[k], sc[k], (sc[k] / sb[k] - 1) * 100 if sb[k] else 0)
-        if gain <= a.eps and not cheaper:
+        out.append("รวม: %.1f%% → %.1f%% (%+.1f) · เกณฑ์ %.1f จุด = ค่าที่มากกว่าระหว่าง eps %.1f กับ z %.1f × ความแกว่งของส่วนต่าง %s" % (
+            sb["score"] * 100, sc["score"] * 100, gain * 100, t * 100, a.eps * 100, a.z,
+            "%.1f จุด" % (sd * 100) if sd is not None else "(ไม่รู้)"))
+        if gain <= t and not cheaper:
             ok = False
-            out.append("  ✗ คะแนนรวมดีขึ้น %+.1f จุด ไม่เกินความแกว่ง %.1f จุด และ%sไม่ลดลงอย่างน้อย 10%% [%s] → ยังไม่มีหลักฐานพอให้รับ" % (
-                gain * 100, a.eps * 100, name, delta))
+            out.append("  ✗ คะแนนรวมดีขึ้น %+.1f จุด ไม่เกินเกณฑ์ %.1f จุด และ%sไม่ลดลงอย่างน้อย 10%% [%s] → ยังไม่มีหลักฐานพอให้รับ" % (
+                gain * 100, t * 100, name, delta))
         else:
-            out.append("  ✓ %s" % ("คะแนนรวมดีขึ้น %+.1f จุด มากกว่าความแกว่ง %.1f จุด" % (gain * 100, a.eps * 100) if gain > a.eps
+            out.append("  ✓ %s" % ("คะแนนรวมดีขึ้น %+.1f จุด มากกว่าเกณฑ์ %.1f จุด" % (gain * 100, t * 100) if gain > t
                                  else "คะแนนเท่าเดิม (อยู่ในช่วงความแกว่ง) และ%sลดลงอย่างน้อย 10%% [%s]" % (name, delta)))
     print("\n".join(out))
     print("ผล: %s %s แทน %s" % ("ACCEPT ✅ รับ" if ok else "REJECT ❌ ไม่รับ", a.cand, a.base))
@@ -353,20 +400,26 @@ def main():
     sp.add_parser("lint").add_argument("skill")
     r = sp.add_parser("run")
     r.add_argument("suite"); r.add_argument("--skill", required=True); r.add_argument("--label", required=True)
-    r.add_argument("--split", default="all", choices=["train", "val", "all"]); r.add_argument("--tasks")
+    r.add_argument("--split", default="all", choices=["train", "val", "test", "all"]); r.add_argument("--tasks")
     r.add_argument("--reps", type=int, default=2); r.add_argument("--accounts", default="yolo2,yolo3")
     r.add_argument("--par", type=int, default=4); r.add_argument("--model", default="sonnet")
     r.add_argument("--effort", default="medium")
-    for n in ("grade", "failures"):
-        p = sp.add_parser(n); p.add_argument("suite"); p.add_argument("--label", required=True)
-        p.add_argument("--split", default="all")
+    p = sp.add_parser("grade"); p.add_argument("suite"); p.add_argument("--label", required=True)
+    p = sp.add_parser("failures"); p.add_argument("suite"); p.add_argument("--label", required=True)
+    p.add_argument("--split", default="train", choices=["train", "val", "test", "all"],
+                   help="ค่าเริ่มต้น train: ระหว่างแก้สกิลห้ามเปิดผลรายข้อของชุด val/test")
     p = sp.add_parser("null"); p.add_argument("suite"); p.add_argument("--label", required=True)
     p = sp.add_parser("report"); p.add_argument("suite"); p.add_argument("--labels")
     p = sp.add_parser("gate"); p.add_argument("suite"); p.add_argument("--base", required=True)
     p.add_argument("--cand", required=True); p.add_argument("--eps", type=float, default=0.02)
+    p.add_argument("--z", type=float, default=1.5,
+                   help="ต้องดีขึ้นกี่เท่าของความแกว่งของส่วนต่าง (1.5 = รุ่นที่ไม่ต่างจริงหลุดผ่านราว 7%% · 2 = ราว 2%%)")
     p.add_argument("--cost-metric", default="cost_usd", choices=["cost_usd", "tool_calls", "context_tokens"],
                    help="ตัวชี้วัดต้นทุนที่ใช้ตัดสินเมื่อคะแนนเท่าเดิม (ต้องเลือกก่อนวัดรุ่นใหม่)")
     a = ap.parse_args()
+    for st in (sys.stdout, sys.stderr):              # console ของ Windows (cp874/cp1252) พิมพ์ไทยและสัญลักษณ์ไม่ได้
+        if hasattr(st, "reconfigure"):
+            st.reconfigure(encoding="utf-8", errors="replace")
     if a.cmd == "lint":
         print(json.dumps(lint(a.skill), ensure_ascii=False, indent=1))
         return 0
