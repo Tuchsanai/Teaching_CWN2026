@@ -271,7 +271,7 @@ $$k_{\text{skill}} = \frac{\text{เวลาจริง}}{\text{เวลา�
 ├── prompt_dag_skill_spec.md   ← สเปกของสกิล dag-planner (input ที่ 2)
 ├── tools/                     ← planner.py + orch.py ตัววางแผนชุดเดิม (DAG · Gantt · KC-QUEST) ใช้เป็นแหล่งความรู้ (input ที่ 3)
 ├── homework/                  ← โจทย์การบ้าน 10 ข้อ + ตัวอย่างข้อ 1
-└── _solution/                 ← skills/dag-planner (เฉลย) · TEST-REPORT.md · plans/meow-shop (แผนและผลรันจริงของภาคต่อ)
+└── _solution/                 ← skills/dag-planner (เฉลย) · TEST-REPORT.md · homework (เฉลยการบ้าน 10 ข้อ) · plans/meow-shop (แผนและผลรันจริงของภาคต่อ)
 ```
 
 ## ขั้นที่ 1 · ให้ Claude สร้างสกิลจากสเปก + `./base_skills`
@@ -411,7 +411,7 @@ docker exec multi-account python3 /root/ai-accounts/.Claude/shared/skills/dag-pl
 
 ## การบ้าน · วางแผน 10 โจทย์ (DAG + Gantt · ยังไม่รันจริง)
 
-ทำแบบเดียวกับขั้นที่ 3 กับโจทย์ 10 ข้อ ข้อละ 1 แผน ส่ง `blocks.json` · `dag.png` · `gantt-plan.png` · `PLAN.md` และ `ANSWER.md` ต่อโจทย์ ห้ามสั่ง `export` · `run` · `report` รายละเอียด พรอมต์ สิ่งที่ต้องส่ง และเกณฑ์ให้คะแนนอยู่ใน [`homework/README.md`](homework/README.md)
+ทำแบบเดียวกับขั้นที่ 3 กับโจทย์ 10 ข้อ ข้อละ 1 แผน ส่ง `blocks.json` · `dag.png` · `gantt-plan.png` · `PLAN.md` และ `ANSWER.md` ต่อโจทย์ ห้ามสั่ง `export` · `run` · `report` รายละเอียด พรอมต์ สิ่งที่ต้องส่ง และเกณฑ์ให้คะแนนอยู่ใน [`homework/README.md`](homework/README.md) · เฉลยครบ 10 ข้อ (พรอมต์ที่คัดลอกไปวาง → DAG → Gantt) อยู่ใน [`_solution/homework/README.md`](_solution/homework/README.md)
 
 ![การบ้าน 10 โจทย์ วางแผนด้วย dag-planner: โจทย์ 1 เว็บอาหารแมว 2 RAG เอกสารรัฐ 3 จองคิวคลินิก 4 IoT ฟาร์ม 5 OCR ใบเสร็จ 6 ML ทำนายลูกค้า 7 แอปรายจ่าย 8 CI/CD 9 สื่อการสอน 10 ตรวจการบ้าน ผ่าน dag-planner แล้วส่งต่อโจทย์ 4 ไฟล์ blocks.json dag.png gantt-plan.png PLAN.md · วางแผนเท่านั้น ห้ามรันจริง](img/concept-18-homework.png)
 
