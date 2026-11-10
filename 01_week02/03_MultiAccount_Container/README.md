@@ -215,24 +215,63 @@ MultiAccountDevtool/
 
 ## ขั้นที่ 2 · สร้าง container จาก image (~1 นาที)
 
-ขั้นที่ 1 ได้ image `multi-account:1.0` ซึ่งเป็นแม่แบบแบบอ่านอย่างเดียว ยังใช้งานโดยตรงไม่ได้ ขั้นนี้ใช้ `docker run` สร้าง container จาก image นั้นเพื่อนำมาใช้งานจริง แต่ละ option ของคำสั่งกำหนดว่า container จะเชื่อมกับเครื่องของเราอย่างไร
+ขั้นที่ 1 ได้ image `multi-account:1.0` ซึ่งเป็นแม่แบบแบบอ่านอย่างเดียว ยังใช้งานโดยตรงไม่ได้ ขั้นนี้ใช้ `docker run` สร้าง container จาก image นั้นเพื่อนำมาใช้งานจริง แต่ละ option ของคำสั่งกำหนดว่า container จะเชื่อมกับเครื่องของเราอย่างไร หากไม่ได้ทำขั้นที่ 1 พรอมต์นี้จะดึง image สำเร็จรูปของผู้สอน `tuchsanai/multi-account:1` จาก Docker Hub มาใช้แทน
 
 ![image multi-account:1.0 จากขั้นที่ 1 ผ่านคำสั่ง docker run ได้ container multi-account สถานะ running ที่มี yolo1–5 · cyolo1–5, Playwright MCP และ JupyterLab ตัวเลือก --name ตั้งชื่อ container, --privileged เปิด Docker-in-Docker, -p 8886:8888 เปิด JupyterLab ที่ localhost:8886/lab ซึ่งพร้อมใน 1.96 วินาที, -v ai-accounts เชื่อม volume เก็บล็อกอิน skills และ MCP, -v ./workspace เชื่อมโฟลเดอร์ไฟล์งาน](img/concept-07-step2-run.png)
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
-> ```text
-> เปิด container multi-account จาก image multi-account:1.0 ที่เพิ่ง build
-> - ถ้ามี container ชื่อนี้อยู่แล้ว ให้ลบแล้วสร้างใหม่ ห้ามลบ volume ai-accounts (เก็บล็อกอินทุกบัญชี)
-> - โฟลเดอร์ ./workspace บนเครื่องผม (สร้างถ้ายังไม่มี) map เป็น /workspace งานจะได้ไม่หายเมื่อลบ container
-> - docker run -dit --name multi-account --privileged -p <PORT>:8888 -v ai-accounts:/root/ai-accounts -v <path เต็มของ ./workspace>:/workspace multi-account:1.0
->   PORT เริ่มที่ 8886 ถ้าชนใช้เลขว่างถัดไป
-> - จับเวลาตั้งแต่สั่ง run จน http://localhost:<PORT>/lab ตอบ 200
-> - ตรวจผ่าน docker exec: yolo1..5 และ cyolo1..5 --version, cyolo1 mcp list,
->   สถานะล็อกอิน (yoloN auth status ดูแค่ loggedIn / cyoloN login status) ห้ามแสดงอีเมลหรือ token
-> สรุปเป็นตาราง พร้อม URL ของ JupyterLab และเวลาที่ใช้
+> ````markdown
+> # รัน container ชื่อ `multi-account` จาก image `multi-account:1.0`
+>
+> ## 1. เตรียม image และ container
+>
+> ถ้ายังไม่มี image `multi-account:1.0` ให้ดึงจาก Docker Hub แล้วตั้งชื่อใหม่
+>
+> ```bash
+> docker pull tuchsanai/multi-account:1
+> docker tag  tuchsanai/multi-account:1 multi-account:1.0
 > ```
+>
+> ถ้ามี container ชื่อ `multi-account` อยู่แล้ว ให้ลบออก (ห้ามลบ volume `ai-accounts`)
+>
+> ```bash
+> docker rm -f multi-account
+> ```
+>
+> ## 2. สร้าง container
+>
+> `PORT` เริ่มที่ `8886` ถ้าชนใช้เลขว่างถัดไป
+>
+> ```bash
+> docker run -dit \
+>   --name multi-account \
+>   --privileged \
+>   -p <PORT>:8888 \
+>   -v ai-accounts:/root/ai-accounts \
+>   multi-account:1.0
+> ```
+>
+> จับเวลาตั้งแต่ `docker run` จน `http://localhost:<PORT>/lab` ตอบ `200`
+>
+> ## 3. ตรวจผ่าน `docker exec` แล้วสรุปเป็นตาราง
+>
+> - `yolo1..5` และ `cyolo1..5 --version`, `cyolo1 mcp list` ต้องเห็น `playwright`
+> - สถานะล็อกอิน: `yoloN auth status` (ดูแค่ `loggedIn`) / `cyoloN login status` ห้ามแสดงอีเมลหรือ token
+> - ตารางสรุป: image มาจากไหน (build เอง / pull) · URL ของ JupyterLab · เวลาที่ใช้ · ผลของแต่ละบัญชี
+> ````
+
+**ความหมายของแต่ละ option ใน `docker run`**
+
+| option | ความหมาย |
+|---|---|
+| `-dit` | รันเบื้องหลัง (`-d`) พร้อม terminal (`-it`) |
+| `--name multi-account` | ตั้งชื่อ container |
+| `--privileged` | เปิดให้ใช้ Docker-in-Docker ภายใน container |
+| `-p <PORT>:8888` | เปิด JupyterLab ที่ `http://localhost:<PORT>/lab` |
+| `-v ai-accounts:/root/ai-accounts` | volume เก็บล็อกอิน skill และ MCP ไม่หายเมื่อลบ container |
+| `multi-account:1.0` | image ที่ใช้สร้าง container |
 
 ![ภาพเคลื่อนไหว: วางพรอมต์เปิด container ใน Claude Code app แล้ว Claude docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน](img/desktop-step2-run.gif)
 
