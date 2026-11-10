@@ -57,7 +57,23 @@ python tools/kclab.py doctor
 | 5 · รันจริง | `export` · `run` | `agent-team` รันตามแผน | หัวข้อ 5 |
 | 6 · Gantt จริง | `report` | เทียบแผนกับของจริง แล้วเก็บตัวปรับเวลา k | หัวข้อ 5 |
 
-ชื่อ KC-QUEST ย่อมาจาก **K**MITL–**C**hanwanich **Q**uota-**U**rgency **E**xpiry-aware **S**cheduling **T**echnique แปลว่าเทคนิคจัดตารางงานที่ดูโควตา (Quota) ความเร่งด่วน (Urgency) และวันหมดอายุของโควตา (Expiry)
+### ที่มาของชื่อ KC-QUEST
+
+![KC-QUEST ย่อมาจาก KMITL–Chanwanich Quota-Urgency Expiry-aware Scheduling Technique: K = KMITL · C = Chanwanich · Q = Quota โควตา · U = Urgency ความเร่งด่วน · E = Expiry วันหมดอายุ · S = Scheduling จัดตารางงาน · T = Technique](image/kcquest-name.png)
+
+**KC-QUEST** = **K**MITL–**C**hanwanich **Q**uota-**U**rgency **E**xpiry-aware **S**cheduling **T**echnique (เทคนิคจัดตารางงานที่คำนึงถึงโควตา ความเร่งด่วน และวันหมดอายุ)
+
+| ตัวอักษร | ย่อมาจาก | ความหมาย |
+|---|---|---|
+| **K** | KMITL | สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง |
+| **C** | Chanwanich | บริษัท จันวณิช (CWN) |
+| **Q** | Quota | โควตา |
+| **U** | Urgency | ความเร่งด่วน |
+| **E** | Expiry | วันหมดอายุ |
+| **S** | Scheduling | จัดตารางงาน |
+| **T** | Technique | เทคนิค |
+
+K และ C มาจากสองหน่วยงานที่พัฒนาอัลกอริทึมนี้ร่วมกันเป็นสื่อการสอน ส่วน QUEST บอกสิ่งที่อัลกอริทึมดูตอนแจกงาน
 
 ## 2. ข้อมูลที่ KC-QUEST ใช้
 
