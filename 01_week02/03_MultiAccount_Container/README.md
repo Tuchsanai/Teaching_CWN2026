@@ -271,15 +271,13 @@ MultiAccountDevtool/
 | `-v ai-accounts:/root/ai-accounts` | volume เก็บล็อกอิน skill และ MCP ไม่หายเมื่อลบ container |
 | `multi-account:1.0` | image ที่ใช้สร้าง container |
 
-![ภาพเคลื่อนไหว: วางพรอมต์เปิด container ใน Claude Code app แล้ว Claude docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน](img/desktop-step2-run.gif)
+![ภาพเคลื่อนไหว: วางพรอมต์รัน container ใน Claude Code app แล้ว Claude ตรวจ image ลบ container เดิม docker run รอ JupyterLab ตอบ 200 และตรวจเวอร์ชัน MCP และสถานะล็อกอิน](img/desktop-step2-run.gif)
 
 เปิด Docker Desktop หน้า **Containers** แล้วค้นหา `multi-account` จะเห็น container ที่เพิ่งสร้าง
 
 ![ภาพจริงจาก Docker Desktop: ค้นหา multi-account เหลือ 1 รายการ จุดสีเขียวกำลังทำงาน สร้างจาก image multi-account:1.0 port 8886:8888](img/docker-desktop-multi-account.png)
 
-**ผลจริง** (~1 นาที): JupyterLab ตอบ 200 ใน **1.96 วินาที** หลังสั่ง `docker run` คำสั่งครบ 10 ตัว และ `cyolo1 mcp list` แสดง `playwright` ทันที เนื่องจากโปรแกรมทั้งหมดอยู่ใน image แล้ว
-
-![ผลจริงจาก Claude: container multi-account พร้อมใน 1.96 วินาที ตารางเวอร์ชันและสถานะล็อกอิน 10 บัญชี และ cyolo1 mcp list](img/desktop-step2-result.png)
+![ผลจริงจาก Claude: container multi-account พร้อมใน 2.1 วินาที ที่มาของ image URL ของ JupyterLab cyolo1 mcp list เห็น playwright และตารางเวอร์ชันกับสถานะล็อกอิน 10 บัญชี](img/desktop-step2-result.png)
 
 *เครื่องตัวอย่างใช้ volume `ai-accounts` ที่เคยล็อกอินไว้แล้ว 5 บัญชี จึงแสดง ✅ ตั้งแต่ยังไม่ได้ล็อกอินในแลปนี้ (ของผู้เรียนจะเป็น ❌ ทั้งหมดจนกว่าจะทำขั้นที่ 3) MCP `rea` มาจากแลปอื่นที่เคยติดตั้งไว้ใน volume เดียวกัน*
 
