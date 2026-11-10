@@ -63,7 +63,6 @@ image ประกอบด้วยชั้น (layer) ซ้อนกัน �
 | **1 · build image** | Claude Code app | Claude | ~28 นาที (build ครั้งสุดท้าย 5 นาที) |
 | **2 · สร้าง container + ล็อกอิน** | Claude Code app → JupyterLab | Claude + ผู้เรียน | ~1 นาที + ล็อกอิน ~15 นาที |
 | **3 · ทดสอบ Playwright MCP ทุกบัญชี** | Claude Code app | Claude | ~5 นาที |
-| **4 · ลบ container แล้วสร้างใหม่** | Claude Code app | Claude | ~3 นาที |
 
 **ตรวจก่อนเริ่ม:** Docker Desktop แสดง **Engine running** · Claude Code app ล็อกอินแล้ว · มีพื้นที่ดิสก์ว่างอย่างน้อย ~10 GB (image ~4.5 GB + build cache)
 
@@ -295,13 +294,13 @@ MultiAccountDevtool/
 | `yolo1` … `yolo5` | Select login method | **Claude account with subscription** → ยืนยันในเบราว์เซอร์ → **Yes, I trust this folder** → `/exit` |
 | `cyolo1` … `cyolo5` | Choose how you want to use Codex | **Sign in with ChatGPT** หรือ `cyolo1 login --device-auth` หากเบราว์เซอร์ส่งผลกลับไม่ได้ |
 
-**ความต่างจากแบบที่ 2:** ข้อมูลล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ใน container จึงล็อกอินเพียง**ครั้งเดียว** และยังใช้ได้แม้ลบ container หรือ build image ใหม่ (ทดสอบในขั้นที่ 4)
+**ความต่างจากแบบที่ 2:** ข้อมูลล็อกอินถูกเก็บใน **volume `ai-accounts`** ไม่ใช่ใน container จึงล็อกอินเพียง**ครั้งเดียว** และยังใช้ได้แม้ลบ container หรือ build image ใหม่
 
 > **ผู้เรียนต้องล็อกอินด้วยตนเองเสมอ** ห้ามส่งรหัสผ่าน code หรือ URL ที่มี token ให้ AI หรือผู้อื่น
 
 ## ขั้นที่ 3 · ทดสอบ Playwright MCP ในทุกบัญชีที่ล็อกอินแล้ว (~5 นาที)
 
-แต่ละบัญชีที่ล็อกอินแล้วใช้ **Playwright MCP** ที่ติดตั้งไว้ใน image เปิด Google Flights แล้วค้นหาเที่ยวบิน BKK → Tokyo **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน**
+แต่ละบัญชีที่ล็อกอินแล้วใช้ **Playwright MCP** ที่ติดตั้งไว้ใน image เปิด Google Flights ค้นหาเที่ยวบิน BKK → Tokyo แล้ว screenshot ทุกขั้นตอน **ค้นหาอย่างเดียว ไม่จองและไม่ชำระเงิน** จากนั้น Claude รวมภาพของแต่ละบัญชีเป็น GIF
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
@@ -315,84 +314,23 @@ MultiAccountDevtool/
 > - เปิด https://www.google.com/travel/flights?hl=en
 > - ค้นหาเที่ยวบินเที่ยวเดียว Bangkok (BKK) ไป Tokyo ชั้นประหยัด ผู้ใหญ่ 1 คน วันที่ 15 ของเดือนถัดไป
 > - ค้นหาอย่างเดียว ห้ามกดจอง ห้ามกรอกข้อมูลส่วนตัว ห้ามชำระเงิน ห้ามล็อกอินเว็บไซต์ใด
+> - screenshot ทุกขั้นตอนด้วย tool ของ playwright: เปิดหน้าเว็บ, กรอกต้นทาง-ปลายทาง, เลือกวันที่, ผลค้นหา
 > - รายงานเที่ยวบิน 3 อันดับแรก (สายการบิน เวลาออก-ถึง ราคา) ตามที่เห็นบนหน้าเว็บ
 >   ถ้าหน้าเว็บไม่แสดงผล ให้รายงานตามจริง ห้ามเดาราคา
-> ```
-
-## ขั้นที่ 4 · ทดสอบความคงทน: ลบ container แล้วสร้างใหม่ (~3 นาที)
-
-ขั้นนี้ทดสอบความคงทนของสภาพแวดล้อม ในแบบที่ 2 การลบ `devtools` ทำให้ต้องติดตั้งระบบหลายบัญชีใหม่และล็อกอินใหม่ทุกบัญชี ขั้นนี้ตรวจว่าแบบที่ 3 คืนสภาพได้อย่างไร
-
-![ลบ container multi-account ด้วย docker rm -f แล้ว volume ai-accounts ยังเก็บล็อกอินของ yolo1–5 และ cyolo1–5 ไว้ครบ container ใหม่จาก image multi-account:1.0 ต่อเข้ากับ volume เดิม](img/concept-05-volume-persistence.png)
-
-> [!IMPORTANT]
-> **📋 คัดลอกกล่องนี้ → Claude Code app แล้วกด Enter**
 >
-> ```text
-> พิสูจน์ว่าทุกอย่างถูกอบไว้ใน image แล้ว ด้วยการลบ container multi-account แล้วสร้างใหม่
-> - ก่อนลบ: บันทึกสถานะล็อกอินทุกบัญชี (ห้ามแสดงอีเมลหรือ token)
-> - ลบด้วย docker rm -f แล้วรัน docker run คำสั่งเดิม (port เดิม volume ai-accounts เดิม)
->   ห้ามลบ volume ห้ามติดตั้งอะไรเพิ่ม จับเวลาตั้งแต่ลบจน JupyterLab ตอบ 200
-> - หลังสร้างใหม่ ตรวจผ่าน docker exec: yolo1..5 และ cyolo1..5 --version, cyolo1 mcp list เห็น playwright,
->   skill shared-check ยังอยู่, สถานะล็อกอินเทียบกับก่อนลบ
-> - ให้บัญชีแรกที่ล็อกอินแล้วของแต่ละฝั่งตอบสั้น ๆ ว่า "พร้อม" (yoloN -p / cyoloN exec --skip-git-repo-check) เพื่อยืนยันว่าใช้งานได้จริงทันที
-> สรุปเป็นตาราง ก่อนลบ | หลังสร้างใหม่ และเวลาที่ใช้
+> เมื่อทุกบัญชีเสร็จ ให้รวม screenshot ของแต่ละบัญชีตามลำดับขั้นตอนเป็นไฟล์ `./evidence/<บัญชี>.gif` บนเครื่องผม
 > ```
 
-![ภาพเคลื่อนไหว: วางพรอมต์ลบแล้วสร้างใหม่ใน Claude Code app แล้วได้ตารางก่อนลบและหลังสร้างใหม่](img/desktop-step5-recreate.gif)
+![ภาพเคลื่อนไหว: วางพรอมต์ทดสอบ Playwright MCP ใน Claude Code app แล้ว Claude ตรวจสถานะล็อกอิน รัน yolo1–3 และ cyolo1–2 พร้อมกัน รอจนเสร็จ รวม screenshot เป็น GIF แล้วสรุปผล](img/desktop-step3-playwright.gif)
 
-**ผลจริง** (7 พ.ย. 2026 · ~3 นาที): ตั้งแต่ลบจน JupyterLab ตอบ 200 ใช้ **3.27 วินาที** (ลบ 0.84 + สร้าง 0.71 + รอ 1.73) เวอร์ชัน CLI, `playwright`, skill `shared-check`, และสถานะล็อกอินทั้ง 10 บัญชี **เหมือนก่อนลบทุกรายการ** และ `yolo1` / `cyolo1` ตอบ "พร้อม" ได้ทันที (13.5 / 5.6 วินาที) โดยไม่ต้องล็อกอินใหม่
+**ผลจริง** (10 พ.ย. 2026 · ~4.5 นาที สำหรับ 5 บัญชีพร้อมกัน): Claude เลือกบัญชีที่ล็อกอินแล้ว 5 บัญชี (`yolo1–3`, `cyolo1–2`) ค้นหาได้ผล 3 บัญชี และอันดับแรกเป็น Vietjet THB 5,956 ส่วน `cyolo1` กับ `cyolo2` กรอกเงื่อนไขครบแต่ Google Flights ตอบว่า "Oops, something went wrong." Claude จึงรายงานตามจริงโดยไม่เดาราคา
 
-![ผลจริงจาก Claude: ตารางก่อนลบและหลังสร้างใหม่ ทุกรายการเหมือนเดิม เวลา 3.27 วินาที และคอลัมน์บอกว่าแต่ละอย่างเก็บอยู่ใน image, volume หรือ ./workspace](img/desktop-step5-result.png)
+![ผลจริงจาก Claude: yolo1–3 ได้ 3 อันดับแรกตรงกัน Vietjet THB 5,956, Hong Kong Express THB 7,956, China Southern THB 8,585 ส่วน cyolo1–2 หน้าเว็บขึ้น Oops something went wrong พร้อมรายการไฟล์ GIF ของแต่ละบัญชี](img/desktop-step3-playwright-result.png)
 
-*คอลัมน์ "เก็บอยู่ที่" ในคำตอบสรุปหลักการของบทนี้: **โปรแกรมอยู่ใน image · ล็อกอินและ skill อยู่ใน volume** ไม่มีข้อมูลสำคัญอยู่ใน container จึงลบได้โดยไม่สูญเสียข้อมูล ส่วนไฟล์งานใน `/workspace` ต้องคัดลอกออกมาด้วย `docker cp` ก่อนลบ (ตอนรันจริงยัง map `./workspace` ไว้ จึงมีคอลัมน์ `./workspace` ในภาพ) ประโยคแรกของคำตอบที่ระบุว่า "พิสูจน์ไม่ได้ว่าทุกอย่างอบไว้ใน image" มาจาก MCP `rea` ที่เครื่องตัวอย่างเคยเพิ่มไว้ใน volume จากแลปอื่น ซึ่งดาวน์โหลดผ่าน `npx` ขณะใช้งาน ผู้เรียนที่เริ่มจาก volume ใหม่จะไม่มี MCP ตัวนี้ (ข้อสังเกต: MCP ที่ใช้เป็นประจำควรติดตั้งไว้ใน image ด้วย)*
+ไฟล์ `./evidence/<บัญชี>.gif` ที่ Claude สร้าง แต่ละไฟล์มี 4 ภาพตามลำดับขั้นตอน ได้แก่ เปิดหน้าเว็บ, กรอกต้นทาง-ปลายทาง, เลือกวันที่ และผลค้นหา
 
-ภาพเคลื่อนไหวด้านล่างเปรียบเทียบเวลาในการคืนสภาพของแบบที่ 2 และแบบที่ 3
+| `yolo1.gif` (ค้นหาได้ผล) | `cyolo1.gif` (หน้าเว็บขึ้น error) |
+|---|---|
+| ![GIF จริงจาก yolo1: เปิด Google Flights, กรอก Bangkok BKK ไป Tokyo, เลือก Tue Dec 15, ผลค้นหาอันดับ 1 Vietjet THB 5,956](img/step3-evidence-yolo1.gif) | ![GIF จริงจาก cyolo1: เปิด Google Flights, กรอก Bangkok BKK ไป Tokyo, เลือก Tue Dec 15, หลังค้นหาหน้าเว็บขึ้น Oops, something went wrong.](img/step3-evidence-cyolo1.gif) |
 
-![ภาพเคลื่อนไหว: เมื่อ container ถูกลบ แบบที่ 2 ต้องติดตั้งและล็อกอินใหม่รวมประมาณ 20 นาที แบบที่ 3 docker run ใหม่พร้อมใช้ใน 3.27 วินาที](img/gif-recreate-compare.gif)
-
-*ตัวเลขของแบบที่ 3 วัดจริงในขั้นนี้ ตัวเลขของแบบที่ 2 มาจากผลรันจริงในบท `02_Setup_Multi_Account` (ติดตั้ง ~5 นาที) และเวลาโดยประมาณของการล็อกอิน (~15 นาที)*
-
-![ภาพจำลอง: นักศึกษา 3 คนในห้องปฏิบัติการ หน้าจอทั้งสามแสดง multi-account:1.0 yolo1-5 OK cyolo1-5 OK playwright OK และ ready in 3.27 s เหมือนกัน](img/photo-03-reproducible-team.jpg)
-
-*(ภาพจำลอง) ทุกเครื่องที่สร้าง container จาก image เดียวกันได้สภาพแวดล้อมเหมือนกัน*
-
-## สรุป: แบบที่ 2 เทียบกับแบบที่ 3
-
-| | แบบที่ 2 · ติดตั้งใน container ที่กำลังทำงาน | แบบที่ 3 · build จาก Dockerfile |
-|---|---|---|
-| ระบบหลายบัญชีอยู่ที่ | ใน container `devtools` | ใน image `multi-account:1.0` |
-| ข้อมูลล็อกอินอยู่ที่ | ใน container (หายเมื่อลบ) | ใน volume `ai-accounts` (คงอยู่) |
-| เมื่อลบ container | ติดตั้งใหม่ + ล็อกอินใหม่ | `docker run` ใหม่ พร้อมใช้ใน 3.27 วินาที |
-| เครื่องใหม่ / แชร์ให้ทีม | ทำซ้ำทุกเครื่อง ผลอาจต่างกัน | build จาก Dockerfile เดียวกัน หรือ push image ให้ทีม pull ได้ชุดเดียวกัน |
-
-## ข้อควรรู้
-
-- **ข้อมูลล็อกอินอยู่ใน volume:** `docker rm -f multi-account` ปลอดภัย แต่ `docker volume rm ai-accounts` หรือ `docker system prune --volumes` จะลบข้อมูลล็อกอินทุกบัญชี
-- **JupyterLab ไม่มีรหัสผ่าน:** Terminal ใน JupyterLab เข้าถึง credential ทุกบัญชีได้ หากไม่ต้องการให้เครื่องอื่นในเครือข่ายเข้าถึง ให้ใช้ `-p 127.0.0.1:8886:8888` หรือตั้ง `-e JUPYTER_PASSWORD=...` (Claude แจ้งเตือนทั้งสองเรื่องไว้ในผลขั้นที่ 1–2)
-- **image ต้องไม่มีข้อมูลล็อกอิน:** ก่อน push image ขึ้น Docker Hub ให้ตรวจทุกครั้งว่าไม่มี credential ติดไป (Claude ตรวจไว้แล้วในขั้นที่ 1 ข้อ "ไม่มีข้อมูลล็อกอินใน image")
-- **การแยกบัญชีเป็นระดับโฟลเดอร์:** ทุกบัญชีทำงานในฐานะ `root` คนเดียวกัน ไม่ใช่การแยกสิทธิ์ระดับระบบปฏิบัติการ
-- **anonymous volume ของ Docker-in-Docker:** `docker rm -f` จะเหลือ volume ของ `/var/lib/docker` ไว้ ใช้ `docker rm -f -v multi-account` หากต้องการลบด้วย (ไม่กระทบ `ai-accounts` เพราะเป็น named volume)
-- **image สำเร็จรูป:** หากไม่ต้องการ build เอง ใช้ image ของผู้สอน `tuchsanai/multi-account-devtool:2569_1` ผ่านสกิล `/maccount` ได้ (ใช้ volume `ai-accounts` เดียวกัน)
-
-## คำสั่งที่ใช้บ่อย
-
-บนเครื่อง (หรือสั่ง Claude Code app เป็นภาษาธรรมชาติ)
-
-```bash
-docker logs -f multi-account          # ดู log ตอน start
-docker exec -it multi-account bash    # เข้า shell ใน container
-docker stop multi-account             # หยุด
-docker start multi-account            # เริ่มใหม่
-docker rm -f multi-account            # ลบ container (ล็อกอินยังอยู่ใน volume ai-accounts)
-docker build -t multi-account:1.0 _solution/MultiAccountDevtool   # build จากเฉลย
-```
-
-ใน container (JupyterLab Terminal)
-
-```bash
-yolo1 auth status         # สถานะล็อกอิน Claude
-cyolo1 login status       # สถานะล็อกอิน Codex
-cyolo1 mcp list           # ตรวจ MCP ของ Codex
-multi-account-install     # รัน installer ซ้ำ (ไม่ทับของเดิม)
-```
+*ภาพจริงที่แต่ละบัญชีบันทึกผ่าน Playwright MCP ไฟล์ของ `yolo2` เหมือนกับ `yolo1` และไฟล์ของ `cyolo2` เหมือนกับ `cyolo1` ทุก byte เพราะเบราว์เซอร์ headless วาดหน้าเดียวกันออกมาเหมือนกัน ราคาและผลของผู้เรียนจะต่างตามวันที่ค้นหา*
