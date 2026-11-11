@@ -4,33 +4,40 @@ description: เช่า GPU และจัดการ Template บน Vast.a
 allowed-tools: Bash, Read, Write, Edit
 ---
 
+# vastai — เช่า GPU และจัดการ Template บน Vast.ai
+
 ไฟล์เดียวจบ — toolkit อยู่ในนี้ ไม่มีไฟล์ประกอบอื่น
 
-**Verified: Python 3.12.3 · vastai 1.8.2 · 2026-09-30** · log watch + SSH ทุก endpoint ทดสอบจริง 2026-10-02 (deploy vLLM บน RTX 4090) (ทดสอบซ้ำครบทุกเส้นทางบน 1.8.2 ด้วย 3 instance พร้อมกัน ค่าใช้จ่ายจริง ~$0.044 — ดูท้ายไฟล์) · รุ่นก่อน: vastai 1.5.5 · 2026-08-27
+**Verified: Python 3.12.3 · vastai 1.8.3 · 2026-10-17** (1.8.3 = โค้ด Python เหมือน 1.8.2 ทุกไฟล์) · ทดสอบจริง 2026-10-17: `sweep()` v5 (3 รอบแทน 4–5, ยืนยัน 2 เป้า, คุม rate limit ตาม header) · session keep-alive ร่วมกับ SDK · reconcile เร็วเมื่อ offer ถูกแย่ง (95 → 8 s) · deploy vLLM + Qwen 3.6 บน RTX 5090 · 5 เครื่อง จ่ายจริง ~$0.3 — ดู "ผลทดสอบ 2026-10-17" ท้ายไฟล์ · log watch + SSH ทุก endpoint ทดสอบจริง 2026-10-02 (deploy vLLM บน RTX 4090) · SSH 2 ทาง (direct+proxy, `connect`/`--via`) + ค่าดาวน์โหลดต่ำก่อน (`--max-down-cost`) + ค้นหาเครื่องแบบ `sweep()` (เร็วขึ้น ~40% ไม่พลาดราคาต่ำสุด 0/20) ทดสอบจริง 2026-10-03 (ทดสอบซ้ำครบทุกเส้นทางบน 1.8.2 ด้วย 3 instance พร้อมกัน ค่าใช้จ่ายจริง ~$0.044 — ดูท้ายไฟล์) · รุ่นก่อน: vastai 1.5.5 · 2026-08-27
 
-**ขั้นแรกสุดของทุก session — เช็คว่าติดตั้ง `vastai` แล้วหรือยัง แล้วแจ้งผู้ใช้ก่อนทำอย่างอื่น:**
+## ขั้นที่ 0 — ตรวจว่าติดตั้ง `vastai` แล้วหรือยัง (ทำก่อนอย่างอื่นทุก session)
 
 ```bash
 python -c "import importlib.metadata as m; print(m.version('vastai'))" 2>/dev/null || echo NOT_INSTALLED
 ```
 
 - ได้เลขเวอร์ชัน → แจ้งผู้ใช้สั้น ๆ ว่า "vastai ติดตั้งแล้ว (เวอร์ชัน X)" แล้วไปต่อ
-- `NOT_INSTALLED` → **แจ้งผู้ใช้ก่อนเริ่มติดตั้ง** ว่ายังไม่ได้ติดตั้ง vastai และอาจใช้เวลาสักพัก
-- อย่ารวม `pip install` ไว้ในคำสั่งเดียวกับ `env`/`keys`/`sweep` — ผู้ใช้จะไม่รู้ว่าช้าเพราะอะไร
+- `NOT_INSTALLED` → **แจ้งผู้ใช้ก่อนเริ่มติดตั้งเสมอ** ด้วยข้อความประมาณนี้ แล้วค่อยรัน `pip install`:
+
+  > ยังไม่ได้ติดตั้ง `vastai` — **การรันครั้งแรกจะใช้เวลานานกว่าปกติ เพราะต้องติดตั้ง `pip install 'vastai~=1.8'` ก่อน**
+  > (ดาวน์โหลด SDK + CLI และ dependency ใช้เวลาสักครู่ ขึ้นกับความเร็วเน็ต) ครั้งต่อไปจะเร็วตามปกติ
+
+- รัน `pip install` **แยกเป็นคำสั่งของมันเอง** — อย่ารวมไว้ในคำสั่งเดียวกับ `env`/`keys`/`sweep` ผู้ใช้จะไม่รู้ว่าช้าเพราะอะไร
+- ติดตั้งเสร็จแล้วแจ้งผลสั้น ๆ ("ติดตั้ง vastai X เรียบร้อย") แล้วไปต่อ · ติดตั้งไม่ผ่าน → หยุด แจ้ง error ให้ผู้ใช้
 
 ```bash
-pip install 'vastai~=1.8'        # ได้ทั้ง SDK และ CLI ; ลงที่ /opt/venv ซึ่งไม่ถาวร
+pip install 'vastai~=1.8'        # ได้ทั้ง SDK และ CLI ; ลงที่ /opt/venv ซึ่งไม่ถาวร (container ใหม่ = ต้องติดตั้งใหม่ และแจ้งผู้ใช้ใหม่)
 ```
 
-# .env — เก็บ credential เท่านั้น
+## .env — เก็บ credential เท่านั้น
 
 toolkit หาไฟล์เองตามลำดับ (อันแรกที่เจอชนะ) — **ไม่มี path ส่วนตัว hardcode ในสกิล**
 
 1. `$VASTAI_ENV`  2. `~/.config/vastai/vastai.env`  ← แนะนำ  3. `./.env` ใน cwd
 
 ```dotenv
-VAST_API_KEY=<key จาก https://cloud.vast.ai/manage-keys/>
-VAST_SSH_KEY_FILE=~/.ssh/id_vastai      # **private** key เท่านั้น (สัมพัทธ์ = อิงโฟลเดอร์ .env)
+VAST_API_KEY=
+VAST_SSH_KEY_FILE=     # **private** key เท่านั้น (สัมพัทธ์ = อิงโฟลเดอร์ .env)
 VAST_HTTP_TIMEOUT=30                    # timeout ต่อ 1 request (SDK default 120s ซึ่งนานเกิน)
 ```
 
@@ -62,17 +69,29 @@ override เฉพาะครั้งได้ทาง flag หรือ env:
 | `VAST_MAX_DESTROY` | `10` | เพดานเครื่องที่ลบได้ต่อคำสั่งเดียว |
 | `VAST_BLOCK_GEO` | `CN` | รหัสประเทศ (คั่นด้วย `,`) ที่ `plan`/`rent` **ไม่เลือก** เพราะ huggingface.co ถูก block — ตั้งว่าง หรือ `--allow-geo` เพื่อปิด |
 | `VAST_LOADING_GRACE` | `420` | ค้าง `loading` เกินกี่วินาทีถึงลบ+เปลี่ยนเครื่อง — image ใหญ่ (vLLM ~11 GB) ตั้ง `1000` |
+| `VAST_SEARCH_CALLS` | `28` | งบคำค้นต่อการค้นหนึ่งครั้ง (ไม่รวมขั้นยืนยันราคาต่ำสุด) — ปกติใช้จริง 15–20 · server ให้ burst ~30 ต่อ key แล้วเติม ~1/s (รวมทุก process) |
+| `VAST_SEARCH_FOCUS` | `15` | ต้องค้นให้ครบสำหรับ N เครื่องถูกสุดที่ผ่านเกณฑ์ (ช่วงที่ `rent`/`plan` เลือกจริง) |
+| `VAST_MAX_DOWN_COST` | `0.005` | $/GB ค่าดาวน์โหลด — `plan`/`rent` **หา offer ที่ถูกกว่านี้ก่อน** ไม่มีค่อย fallback (เรียงค่าดาวน์โหลดต่ำก่อน) · `0` = ปิด · ต่อคำสั่งใช้ `--max-down-cost` |
 | `VAST_LABEL_PREFIX` | *(ว่าง)* | ตั้งเป็น prefix ของงาน → **ห้ามแตะ/ลบเครื่องที่ label ไม่ตรง** |
 
 **ตรวจ config ก่อนเริ่มงานเสมอ:**
 
 ```bash
-python /tmp/vast.py env      # โชว์ว่าอ่านไฟล์ไหน + ได้ค่าอะไร (ไม่โชว์ค่า secret) ; exit 1 ถ้าไม่ครบ
+python /tmp/vast.py env      # โชว์ว่าอ่านไฟล์ไหน + ได้ค่าอะไร (ไม่โชว์ค่า secret) ; exit 1 ถ้าไม่มี key
 ```
+
+**ตรวจว่า `VAST_API_KEY` โหลดจาก environment หรือไม่ — แล้วแจ้งผู้ใช้ทุกครั้ง** (ดูฟิลด์ `VAST_API_KEY_source`
+ใน output ของ `env` หรือบรรทัด `NOTICE:` ใน stderr ของทุกคำสั่ง):
+
+| `VAST_API_KEY_source` | ความหมาย | ต้องทำ |
+|:--|:--|:--|
+| `environment` | ได้จากตัวแปรที่ export ใน shell/process | ไปต่อได้ ไม่ต้องแจ้ง |
+| `env_file` | **ไม่ได้โหลดจาก environment** — toolkit ใช้ค่าจากไฟล์ `.env` แทน | **แจ้งผู้ใช้** ว่า key ไม่ได้มาจาก environment และใช้จากไฟล์ไหน (ไม่ต้องโชว์ค่า) แล้วไปต่อได้ |
+| `missing` | ไม่มีทั้งใน environment และ `.env` (หรือ export ไว้เป็นค่าว่าง) | **หยุด แจ้งผู้ใช้** พร้อม `VAST_API_KEY_notice` และวิธีตั้งค่า (`export VAST_API_KEY=…` หรือใส่ในไฟล์ `.env` ข้างบน) — ห้ามเดา/ค้นหา key จากไฟล์อื่นเอง |
 
 ---
 
-# ขอยืนยันเมื่อไหร่ / ทำเองได้เลยเมื่อไหร่
+## ขอยืนยันเมื่อไหร่ / ทำเองได้เลยเมื่อไหร่
 
 | ทำเองได้เลย ไม่ต้องถาม | ต้องขอยืนยันจากผู้ใช้ |
 |:--|:--|
@@ -86,11 +105,13 @@ python /tmp/vast.py env      # โชว์ว่าอ่านไฟล์ไ�
 
 **เวลาผู้ใช้ขอเช่า — ห้ามถามว่าจะเอา offer ไหน ให้ตัดสินใจเองแล้วเช่าเลย** ด้วย `rent`
 (offer อายุสั้นระดับวินาที–นาที ถามคนก่อน = offer หายเกือบทุกครั้ง — เจอจริง 2 ครั้งติดใน 2026-09-30)
-เกณฑ์ "ดีที่สุด" ของ `rent`: กรอง `BASE_FILTER` + CUDA + เพดานราคา → ให้ reliability ≥ 0.995 มาก่อน →
+เกณฑ์ "ดีที่สุด" ของ `rent`: กรอง `BASE_FILTER` + CUDA + เพดานราคา + **ค่าดาวน์โหลด `inet_down_cost<0.005` $/GB**
+(ไม่มี offer ผ่านค่อยค้นใหม่ไม่จำกัด แล้วเรียงค่าดาวน์โหลดต่ำก่อนเป็นขั้นละ $0.005) → ให้ reliability ≥ 0.995 มาก่อน →
 ถูกสุด → เน็ตเร็วสุด; offer หายระหว่างยิงก็ลองตัวถัดไปอัตโนมัติ (ไม่เกิน `--tries`, default 5)
 เพดานราคายังบังคับเสมอ: ผู้ใช้ระบุราคา/GPU ที่แพงกว่า `VAST_MAX_DPH` มาแล้ว (เช่น ขอ 4090) = ส่ง `--max-dph`
 ให้พอกับราคาตลาดของ GPU นั้นได้ แต่ถ้าไม่ได้ระบุ GPU ห้ามขยายเพดานเอง
-หลังเช่าแล้ว**รายงาน**: `instance_id` · `gpu` · `$/hr` (แยก gpu+storage) · ที่ตั้ง · เหตุผลที่เลือก · วิธีต่อ SSH
+หลังเช่าแล้ว**รายงาน**: `instance_id` · `gpu` · `$/hr` (แยก gpu+storage) · ที่ตั้ง · เหตุผลที่เลือก ·
+**วิธีต่อ SSH ทั้ง 2 ทาง** (direct และ proxy จาก `connect` ใน output ของ `rent` พร้อมผลทดสอบแต่ละทาง — ดูหัวข้อ "SSH — ต่อได้ 2 ทาง")
 
 🔒 **ห้ามพิมพ์ API key ออกมาไม่ว่ากรณีใด** — `create` คืน `instance_api_key`, instance row ทุกตัวมี
 `jupyter_token` → `print(r)` ตรง ๆ = key หลุด (toolkit เรียก `redact()` ให้แล้ว)
@@ -99,26 +120,27 @@ public key ต้องผูกกับบัญชีก่อน (`vast.py k
 
 ---
 
-# Toolkit — เขียนไฟล์นี้ครั้งเดียวต่อ session แล้วใช้ทุกคำสั่ง
+## Toolkit — เขียนไฟล์นี้ครั้งเดียวต่อ session แล้วใช้ทุกคำสั่ง
 
 ```bash
 cat > /tmp/vast.py <<'VASTPY'
 #!/usr/bin/env python3
-"""vast.py — toolkit เดียวของ skill vastai (verified: Python 3.12.3 · vastai 1.8.2 · 2026-09-30)
+"""vast.py — toolkit เดียวของ skill vastai (verified: Python 3.12.3 · vastai 1.8.3 · 2026-10-17)
 
-  plan|rent|create|status|stop|start|destroy|sweep|bill|run|push|pull|drift|watch
+  plan|rent|create|status|stop|start|destroy|sweep|bill|run|push|pull|connect|drift|watch
   template-search|template-show|template-create|template-update|template-delete
 
-อ่าน key จาก env VAST_API_KEY เท่านั้น · log ไป stderr · ผลลัพธ์ JSON ไป stdout
+อ่าน key จาก env VAST_API_KEY (หรือ .env) · ถ้าไม่ได้มาจาก environment จะพิมพ์ NOTICE · log ไป stderr · ผลลัพธ์ JSON ไป stdout
 """
 import argparse, io, json, os, re, subprocess, sys, time
 
 # ===== SDK CONTRACT — แก้ที่นี่ที่เดียวเมื่อ SDK เปลี่ยน (ดู `drift`) =====================
-VERIFIED = {"python": "3.12.3", "vastai": "1.8.2", "date": "2026-09-30"}
+VERIFIED = {"python": "3.12.3", "vastai": "1.8.3", "date": "2026-10-17"}
 OFFER = {"id":"id","gpu":"gpu_name","num_gpus":"num_gpus","price":"dph_total","price_gpu":"dph_base",
          "reliability":"reliability","perf":"dlperf_per_dphtotal","cuda":"cuda_max_good","disk":"disk_space",
          "storage_cost":"storage_cost","inet":"inet_down","geo":"geolocation","ports":"direct_port_count",
-         "gpu_ram":"gpu_ram","machine":"machine_id","duration":"duration","verification":"verification"}
+         "gpu_ram":"gpu_ram","machine":"machine_id","duration":"duration","verification":"verification",
+         "down_cost":"inet_down_cost","up_cost":"inet_up_cost"}
 TEMPLATE = {"id":"id","hash":"hash_id","name":"name","image":"image","tag":"tag",
             "disk":"recommended_disk_space","recommended":"recommended","creator":"creator_id",
             "count":"count_created","ssh":"use_ssh","ssh_direct":"ssh_direct",
@@ -216,8 +238,25 @@ def load_env(path=None):
         return p, warn
     return None, None
 
+# จำไว้ "ก่อน" อ่าน .env ว่า VAST_API_KEY มาจาก environment (shell export) หรือไม่ — ใช้แจ้งผู้ใช้
+_KEY_IN_ENV = "VAST_API_KEY" in os.environ
 ENV_FILE, ENV_WARN = load_env()
 if ENV_WARN: sys.stderr.write("WARN: %s\n" % ENV_WARN)
+
+def key_source():
+    """คืน (source, ข้อความแจ้งผู้ใช้) · source = environment | env_file | missing"""
+    if not os.environ.get("VAST_API_KEY", "").strip():
+        if _KEY_IN_ENV:
+            return "missing", ("VAST_API_KEY ถูก export ใน environment แต่เป็นค่าว่าง (และบังค่าใน .env) "
+                               "— unset VAST_API_KEY หรือ export ค่าที่ถูกต้อง")
+        return "missing", ("ไม่ได้โหลด VAST_API_KEY จาก environment และไม่พบใน .env "
+                           "(หาไฟล์จาก: %s)" % ", ".join(env_paths()))
+    if _KEY_IN_ENV:
+        return "environment", None
+    return "env_file", "VAST_API_KEY ไม่ได้โหลดจาก environment — ใช้ค่าจากไฟล์ %s แทน" % ENV_FILE
+
+KEY_SOURCE, KEY_NOTICE = key_source()
+if KEY_NOTICE: sys.stderr.write("NOTICE: %s\n" % KEY_NOTICE)
 
 def _num(k, d, cast):
     try:
@@ -241,8 +280,11 @@ MAX_INSTANCES = _num("VAST_MAX_INSTANCES", 10, int)     # เพดานจำ�
 MAX_DPH       = _num("VAST_MAX_DPH", 0.20, float)       # เพดาน $/hr — แพงกว่านี้ต้อง --max-dph เอง
 MAX_DESTROY   = _num("VAST_MAX_DESTROY", 10, int)       # เพดานเครื่องที่ลบได้ต่อคำสั่ง
 HTTP_TIMEOUT  = _num("VAST_HTTP_TIMEOUT", 30, float)    # timeout ต่อ 1 request (SDK default 120)
-SEARCH_PASSES = max(2, _num("VAST_SEARCH_PASSES", 2, int))      # search offers ขนานกันกี่รอบ (ขั้นต่ำ 2)
-SEARCH_GAP    = max(3.0, _num("VAST_SEARCH_GAP", 3.0, float))  # แต่ละรอบเริ่มห่างกันกี่วินาที (ขั้นต่ำ 3)
+SEARCH_CALLS  = max(12, _num("VAST_SEARCH_CALLS", 28, int))   # งบคำค้นต่อ sweep (ไม่รวมยืนยันราคาต่ำสุด) — burst ที่ rate limit รับได้
+SEARCH_FOCUS  = max(5, _num("VAST_SEARCH_FOCUS", 15, int))    # ช่วงราคาถูกสุดกี่เครื่อง (ที่ผ่านเกณฑ์) ที่ต้องค้นให้ครบ
+# ค่าดาวน์โหลดต่อ GB ต่างกันได้ ~40 เท่า ($0.001–0.039/GB) — เคยจ่ายค่าโหลดโมเดล 23 GB แพงกว่าค่า GPU
+# plan/rent ค้นแบบ inet_down_cost<cap ก่อน ถ้าไม่มี offer ผ่านเกณฑ์ค่อยค้นใหม่ไม่จำกัด (เรียงค่าดาวน์โหลดต่ำก่อน) · 0 = ปิด
+MAX_DOWN_COST = _num("VAST_MAX_DOWN_COST", 0.005, float)   # $/GB
 LABEL_PREFIX  = os.environ.get("VAST_LABEL_PREFIX", "") # ตั้งแล้วห้ามแตะเครื่องที่ label ไม่ตรง
 # ประเทศที่ huggingface.co ถูก block (CN: curl ได้ 000) → โหลดโมเดลไม่ได้/ต้องใช้ mirror ที่ช้าและพังกับ Xet
 # ตั้ง VAST_BLOCK_GEO="" เพื่อปิด หรือใส่ --allow-geo ต่อคำสั่ง
@@ -273,12 +315,27 @@ def http_err(e):
     except ValueError: o["msg"] = (r.text or "").strip()[:200]
     return o
 
+_SESSIONS = {}
+def _shared_sessions():
+    """SDK สร้าง VastSession ใหม่ทุก request = DNS+TCP+TLS ใหม่ทุกครั้ง (~0.85 s, ครั้งแรก ~2 s · วัด 2026-10-17)
+    → แทน factory ด้วย session เดียวต่อ server_url (keep-alive) ใช้ร่วมกับ Searcher · show_instance ฯลฯ เหลือ ~0.3 s"""
+    import requests
+    from vastai.api import client as C
+    if getattr(C.VastSession, "_vastpy_shared", False): return
+    orig = C.VastSession
+    def factory(url):
+        s = _SESSIONS.get(url)
+        if s is None:
+            s = _SESSIONS[url] = orig(url); s.mount("https://", requests.adapters.HTTPAdapter(pool_maxsize=16))
+        return s
+    factory._vastpy_shared = True; C.VastSession = factory
+
 def client(retry=3):
-    key = os.environ.get("VAST_API_KEY")
+    key = os.environ.get("VAST_API_KEY", "").strip()
     if not key:
-        die("ไม่พบ VAST_API_KEY — ใส่ใน .env แล้ว chmod 600 (หาไฟล์จาก: %s)"
-            % ", ".join(env_paths()))
+        die("%s — export VAST_API_KEY=… หรือใส่ใน .env แล้ว chmod 600" % KEY_NOTICE)
     from vastai import VastAI
+    _shared_sessions()
     v = VastAI(api_key=key, retry=retry)
     try: v.client.timeout = HTTP_TIMEOUT      # default 120s × retry = รอนานเกิน
     except AttributeError: pass
@@ -299,42 +356,247 @@ def rates(row):
             "billed_now": "gpu+storage" if run else "storage only"}
 
 # ===== offer =============================================================================
-def build_query(a):
+def build_query(a, price=True):
+    """price=False: ไม่ใส่ dph<max (sweep หั่นช่วงราคาเอง — dph ซ้ำสองตัวใน query ตัวหลังทับตัวแรก)"""
     p = [BASE_FILTER, "num_gpus=%d" % a.num_gpus, "disk_space>%d" % (int(a.disk)+10),
          "inet_down>%d" % a.min_inet]
     # อย่าส่ง cuda_vers เข้า Offer API: พบว่า server คืน 0 แถวสำหรับ RTX 5090 แม้
     # raw offer มี cuda_max_good=13.x. ตรวจค่าจาก response ใน cmd_plan แทน.
     if a.gpu:          p.append("gpu_name=%s" % a.gpu.replace(" ","_"))
-    if a.max_dph:      p.append("dph<%s" % a.max_dph)
+    if a.max_dph and price: p.append("dph<%s" % a.max_dph)
     if a.min_gpu_ram:  p.append("gpu_ram>=%s" % a.min_gpu_ram)      # หน่วย GB!
     if a.extra_query:  p.append(a.extra_query)
     return " ".join(p)
 
-def _search_once(v, q, disk):
-    """ต้องส่ง storage=disk ไม่งั้น dph_total คิด storage แค่ 5 GiB (default)"""
-    return [o for o in (v.search_offers(query=q, order="dph_total",
-            limit=BEHAVIOUR["search_hard_cap"], storage=float(disk)) or []) if o.get("dph_total") is not None]
+# ---- search: ทำไมต้อง sweep (วัดจริง 2026-10-03 — ดู "การค้นหาเครื่อง" ท้ายไฟล์) ----------------------------
+# /bundles/ ไม่คืนตลาดทั้งหมด: server ตัด/สุ่ม raw offers ก่อนรวม bundle (เครื่อง 8 GPU = 8 offer) แล้วคืนตัวแทน 1 ตัว/bundle
+#   → เรียก 1 ครั้งเห็น RTX 4090 ~44 จาก ~185 เครื่อง, พลาดราคาต่ำสุด ~1/3 ของครั้ง; limit>64 ไม่ช่วย
+# ตัวกรอง dph เทียบ dph_base (ไม่รวม storage) ทีละ offer → หั่นช่วงราคาให้แคบ = bundle แตก = ผลครบ
+# rate limit: X-RateLimit-Limit 5 ต่อ backend แต่ LB มีหลาย backend → 429 ลองใหม่ 0.3 s มักผ่าน (รอ Retry-After = เสีย 5–10 s)
+# SDK เปิด session ใหม่ทุก request (~2.2 s) → ใช้ session เดียว keep-alive (~0.9 s) ยิง /bundles/ ตรง ด้วย body จาก parse_query ของ SDK
+MID_MAX = 1 << 22                                   # machine_id สูงสุดที่ใช้หั่นเมื่อช่วงราคาแคบจนหั่นต่อไม่ได้
+
+class Searcher:
+    """rate limit (วัดจริง 2026-10-17): X-RateLimit-Limit 30 ต่อ API key รวมทุก process · burst ~25–30 แล้วเติม ~1 ครั้ง/วินาที
+    → bucket ฝั่ง client เติม 1/s และเชื่อ X-RateLimit-Remaining ของ server เสมอ (ยิงจนโดน 429 = เสียครั้งละ ≥1 s)"""
+    def __init__(self, v, rate=1.0, burst=24):
+        import threading
+        from vastai.api.query import parse_query, offers_fields, offers_alias, offers_mult
+        from vastai.api import client as C
+        self.pq = lambda q: parse_query(q, {"verified":{"eq":True},"external":{"eq":False},"rentable":{"eq":True}},
+                                        offers_fields, offers_alias, offers_mult)      # = ค่า default ของ SDK search_offers
+        self.v, self.url = v, v.client.server_url.rstrip("/") + "/api/v0/bundles/"
+        _shared_sessions(); self.s = C.VastSession(v.client.server_url)              # connection เดียวกับ SDK
+        self.h = {"Authorization": "Bearer " + v.client.api_key}
+        self.rate, self.burst, self.tokens, self.t = rate, burst, float(burst), time.time()
+        self.lock = threading.Lock(); self.calls = self.r429 = self.slow = 0; self.fallback = False
+    def _take(self):
+        while True:
+            with self.lock:
+                now = time.time(); self.tokens = min(self.burst, self.tokens + (now-self.t)*self.rate); self.t = now
+                if self.tokens >= 1: self.tokens -= 1; return
+                wait = (1-self.tokens)/self.rate
+            time.sleep(min(wait, 1.0))
+    def _seen(self, r):
+        try: rem = float(r.headers.get("X-RateLimit-Remaining"))
+        except (TypeError, ValueError): return
+        with self.lock: self.tokens = min(self.tokens, rem)      # process อื่นที่ใช้ key เดียวกันกินโควตาไปได้
+    def __call__(self, q, disk):
+        """ต้องส่ง allocated_storage=disk ไม่งั้น dph_total คิด storage แค่ 5 GiB"""
+        if self.fallback:                       # HTTP ตรงใช้ไม่ได้ → กลับไปใช้ SDK (ช้ากว่าแต่ผลเหมือนกัน)
+            return [o for o in (self.v.search_offers(query=q, order="dph_total", limit=BEHAVIOUR["search_hard_cap"],
+                    storage=float(disk)) or []) if o.get("dph_total") is not None]
+        body = self.pq(q); body.update(order=[["dph_total","asc"]], type="on-demand",
+                                       limit=BEHAVIOUR["search_hard_cap"], allocated_storage=float(disk))
+        for k in range(12):
+            self._take()
+            # tail latency: warm p50 0.3 s · บางครั้งค้าง ~9 s (วัดจริง) → timeout สั้นแล้วยิงใหม่ทันที
+            to = (3.0, 6.0)[k] if k < 2 else HTTP_TIMEOUT
+            try: r = self.s.post(self.url, json=body, headers=self.h, timeout=to)
+            except Exception as e:
+                if k == 11: raise
+                self.slow += 1
+                if "Timeout" not in type(e).__name__: time.sleep(0.5*(k+1))
+                continue
+            self.calls += 1; self._seen(r)
+            if r.status_code == 429:            # bucket ของ server หมด → รอเติม (≥1 s) ไม่ยิงรัว
+                self.r429 += 1
+                with self.lock: self.tokens = min(self.tokens, 0.0)
+                try: ra = float(r.headers.get("Retry-After") or 0)
+                except ValueError: ra = 0.0
+                time.sleep(min(max(ra, 1.0/self.rate), 10)); continue
+            if r.status_code in (404, 405):
+                log("search: /bundles/ ตอบ %s → ใช้ SDK search_offers แทน" % r.status_code); self.fallback = True
+                return self(q, disk)
+            r.raise_for_status()
+            return [o for o in (r.json().get("offers") or []) if o.get("dph_total") is not None]
+        raise RuntimeError("search: 429/timeout ติดต่อกัน 12 ครั้ง")
+
+_SEARCHER = None
+def searcher(v):
+    global _SEARCHER
+    if _SEARCHER is None or _SEARCHER.v is not v: _SEARCHER = Searcher(v)
+    return _SEARCHER
+
+def _slice_q(q, s):
+    lo, hi, mlo, mhi = s
+    p = [q, "dph>=%.9f" % lo, "dph<%.9f" % hi]       # 9 ตำแหน่ง: %.6f ปัดขึ้นจน dph<min ยังเจอตัวมันเอง (บั๊กที่เจอจริง)
+    if (mlo, mhi) != (0, MID_MAX): p += ["machine_id>=%d" % mlo, "machine_id<%d" % mhi]
+    return " ".join(p)
+
+def _in_slice(o, s):
+    lo, hi, mlo, mhi = s
+    return lo <= gf(o,OFFER,"price_gpu") < hi and mlo <= int(g(o,OFFER,"machine",0) or 0) < mhi
 
 def search(v, q, disk):
-    """ยิง search_offers ขนานกัน SEARCH_PASSES รอบ (≥2) แต่ละรอบเริ่มห่างกัน SEARCH_GAP วินาที (≥3)
-    แล้วรวมผล ตัด offer id ซ้ำ (เก็บแถวจากรอบหลังสุดเพราะราคาสดกว่า) — ผลแต่ละรอบไม่ตรงกัน 100%
-    และติด cap 64 แถว การรวมหลายรอบจึงได้ offer มากกว่า; รอบที่ error ข้ามได้ ถ้าพังหมดค่อย raise"""
-    from concurrent.futures import ThreadPoolExecutor
-    def one(i):
-        time.sleep(i * SEARCH_GAP)
-        return _search_once(v, q, disk)
-    with ThreadPoolExecutor(SEARCH_PASSES) as ex:
-        futs = [ex.submit(one, i) for i in range(SEARCH_PASSES)]
-    merged, counts, err = {}, [], None
-    for f in futs:
-        try: rows = f.result()
-        except Exception as e: err = e; counts.append("err"); continue
-        counts.append(len(rows))
-        for o in rows: merged[g(o,OFFER,"id")] = o
-    if not any(c != "err" for c in counts): raise err
-    log("search %d รอบ (ห่าง %.0fs): %s แถว → รวมไม่ซ้ำ %d offers"
-        % (SEARCH_PASSES, SEARCH_GAP, "+".join(map(str, counts)), len(merged)))
+    """ค้น query แคบ (machine_id=… ใน create, drift) — ไม่ใช่การเลือกเครื่อง
+    server ตอบ query เดิมเหมือนเดิมทุกครั้ง (วัด 2026-10-17) → ยิงครั้งเดียว ว่างค่อยยิงซ้ำอีกครั้ง"""
+    S = searcher(v); rows = S(q, disk) or S(q, disk)
+    merged = {g(o,OFFER,"id"): o for o in rows}
     return sorted(merged.values(), key=lambda o: gf(o,OFFER,"price",9e9))
+
+PREFER_REL = 0.995           # rent เลือกเครื่อง reliability ≥ ค่านี้ก่อน → ต้องยืนยันราคาต่ำสุดของกลุ่มนี้แยกด้วย
+
+def sweep(v, q, disk, hi_cap, keep=lambda o: True, focus_k=None, max_calls=None, k0=8, per_slice=3, split_n=10):
+    """ค้นตลาดให้ครบในช่วงที่จะถูกเลือกจริง — 3 รอบ ยิงขนานทุกรอบ:
+    R1  k0 ช่วงราคา (dph_base) เท่ากันใน [0, hi_cap) — ไม่ยิง root (ช่วงกว้างคืน 64 แถว ช้ากว่า 0.62 vs 0.32 s)   8 calls
+    R2  focus_hi = dph_total ของเครื่องที่ focus_k ที่ผ่าน keep() (+2%) — offer ใดถูกกว่านี้มี dph_base < focus_hi
+        หั่น [0, focus_hi) ตามราคาที่รู้แล้ว ช่วงละ ~per_slice เครื่อง  **+ ยืนยันราคาต่ำสุดพร้อมกันในรอบเดียว**
+    R3  ช่วงที่น่าสงสัยหั่นต่อ (≥ split_n แถว หรือเครื่องที่รู้ว่าอยู่ในช่วงไม่โผล่ · "แฝด" ราคาเดียวกันหั่นตาม machine_id)
+        + ยืนยันซ้ำเฉพาะเป้าที่ราคาต่ำสุดเปลี่ยน/ยังยืนยันไม่ได้
+    ยืนยัน 2 เป้า (เพราะ rent เรียง reliability ≥ PREFER_REL ก่อนราคา): ① ราคารวมต่ำสุดที่ผ่าน keep
+        ② ราคารวมต่ำสุดที่ผ่าน keep และ reliability ≥ PREFER_REL — ใส่ reliability>=… ใน query ฝั่ง server ให้ช่วงเบาบาง
+        วิธี: offer ใดที่ total < mt ต้องมี base < mt → ค้น [0, mt) **หั่นครึ่งตาม machine_id**
+        (server รวม offer เป็น bundle คืนตัวแทน 1 ตัว/bundle และตอบ query เดิมเหมือนเดิมทุกครั้ง →
+         ยิงซ้ำไม่ได้อะไรใหม่ แต่หั่นต่างแบบ = bundle แตกต่างแบบ = เห็นตัวที่ถูกซ่อน)
+    คืน (offers เรียงราคา, stats)"""
+    from concurrent.futures import ThreadPoolExecutor
+    import math
+    S = searcher(v); focus_k = focus_k or SEARCH_FOCUS; max_calls = max_calls or SEARCH_CALLS
+    c0, r0, s0, t0 = S.calls, S.r429, S.slow, time.time(); found, got = {}, {}; rounds = 0
+    TARGETS = (("min", lambda o: True, ""),
+               ("min_rel", lambda o: gf(o,OFFER,"reliability") >= PREFER_REL, " reliability>=%s" % PREFER_REL))
+
+    def qs(s):
+        if s is None: return q
+        return _slice_q(q + s[4], s[:4]) if len(s) > 4 else _slice_q(q, s)
+    def run(ex, slices):
+        nonlocal rounds
+        if not slices: return []
+        rounds += 1
+        res = list(ex.map(lambda s: S(qs(s), disk), slices))
+        for s, rows in zip(slices, res):
+            for o in rows: found.setdefault(g(o,OFFER,"id"), o)
+            if s is not None and len(s) == 4: got[s] = {g(o,OFFER,"machine") for o in rows}
+        return res
+    def known():
+        k = {}
+        for o in sorted(found.values(), key=lambda o: gf(o,OFFER,"price",9e9)): k.setdefault(g(o,OFFER,"machine"), o)
+        return k
+    def focus_hi():
+        n = 0
+        for o in known().values():
+            if keep(o):
+                n += 1
+                if n >= focus_k: return min(hi_cap, gf(o,OFFER,"price") * 1.02)
+        return hi_cap
+    def left(): return max(0, max_calls - (S.calls - c0))
+    def min_total(pred):
+        return min((gf(o,OFFER,"price") for o in found.values() if keep(o) and pred(o)), default=None)
+    def confirm(mt, extra):
+        """[0, mt) 2 ชิ้น หั่นที่ machine_id มัธยฐานของเครื่องที่รู้จักในช่วงนั้น"""
+        hi = math.floor(mt * 1e9) / 1e9
+        ids = sorted(int(g(o,OFFER,"machine",0) or 0) for o in found.values() if gf(o,OFFER,"price_gpu") < hi)
+        mm = ids[len(ids)//2] if len(ids) >= 2 and 0 < ids[len(ids)//2] < MID_MAX else MID_MAX // 64
+        return [(0.0, hi, 0, mm, extra), (0.0, hi, mm, MID_MAX, extra)]
+    def dense(res, mt, extra):
+        """ช่วงยืนยันแน่นจนอาจถูกตัด (มักเป็นเครื่องที่ไม่ผ่าน keep เช่น CUDA ต่ำ) → หั่นตามราคาที่เห็น"""
+        hi = math.floor(mt * 1e9) / 1e9
+        bs = sorted(gf(o,OFFER,"price_gpu") for r in res for o in r)
+        cs = [0.0] + [bs[i] for i in range(len(bs)//3, len(bs), max(1, len(bs)//3))][:3] + [hi]
+        return [(a_, b_, 0, MID_MAX, extra) for a_, b_ in zip(cs, cs[1:]) if b_ > a_]
+    def split(slices, res, fh, K):
+        C = []
+        for s, rows in zip(slices, res):
+            inside = {m for m, o in K.items() if _in_slice(o, s)}
+            if s[0] < fh and (len(rows) >= split_n or inside - got.get(s, set())):
+                lo, hi, mlo, mhi = s
+                ins = [K[m] for m in inside]
+                if len(ins) >= 2 and len({round(gf(o,OFFER,"price_gpu"), 9) for o in ins}) == 1:
+                    # "แฝด": หลายเครื่องราคาเดียวกัน (มัก host เดียว = bundle เดียว) หั่นราคาไม่แตก → หั่นตาม machine_id
+                    ids = sorted(int(g(o,OFFER,"machine")) for o in ins); mm = ids[len(ids)//2]
+                    if not (mlo < mm < mhi): mm = (mlo+mhi)//2
+                    C += [(lo, hi, mlo, mm), (lo, hi, mm, mhi)]
+                elif hi - lo > 0.002: m = (lo+hi)/2; C += [(lo, m, mlo, mhi), (m, hi, mlo, mhi)]
+                else: mm = (mlo+mhi)//2; C += [(lo, hi, mlo, mm), (lo, hi, mm, mhi)]
+        return sorted(C)
+
+    state = {}                                   # เป้า → (mt ที่ยืนยัน, ok)
+    def plan_confirm(prev_res=None):
+        """คืนช่วงยืนยันของเป้าที่ยังไม่ผ่าน (หรือราคาต่ำสุดเปลี่ยนไปจากที่ยืนยัน)"""
+        D, owner = [], []
+        for name, pred, extra in TARGETS:
+            mt = min_total(pred)
+            if mt is None: continue
+            done = state.get(name)
+            if done and done[1] and abs(done[0] - mt) < 1e-9: continue
+            pr = (prev_res or {}).get(name)
+            sl = dense(pr, mt, extra) if pr and max(len(r) for r in pr) >= split_n else confirm(mt, extra)
+            D += sl; owner += [(name, pred, mt)] * len(sl)
+        return D, owner
+    def judge(owner, res):
+        by = {}
+        for (name, pred, mt), r in zip(owner, res): by.setdefault((name, pred, mt), []).append(r)
+        out = {}
+        for (name, pred, mt), rs in by.items():
+            cheap = [o for r in rs for o in r if gf(o,OFFER,"price") < mt - 1e-9 and keep(o) and pred(o)]
+            state[name] = (mt, not cheap and max(len(r) for r in rs) < split_n); out[name] = rs
+        return out
+
+    B = C = []
+    with ThreadPoolExecutor(12) as ex:
+        w = hi_cap / k0
+        run(ex, [(i*w, (i+1)*w, 0, MID_MAX) for i in range(k0)])                              # R1
+        fh, K = focus_hi(), known()
+        bases = sorted({round(gf(o,OFFER,"price_gpu"), 9) for o in K.values() if gf(o,OFFER,"price_gpu") < fh})
+        cuts = [0.0]
+        for i in range(per_slice, len(bases), per_slice):
+            c = (bases[i-1] + bases[i]) / 2
+            if c - cuts[-1] >= 0.001: cuts.append(c)
+        cuts.append(fh)
+        B = [(a_, b_, 0, MID_MAX) for a_, b_ in zip(cuts, cuts[1:]) if b_ > a_][:left()]
+        D, own = plan_confirm()
+        res = run(ex, B + D); prev = judge(own, res[len(B):])                                   # R2 (+ ยืนยัน)
+        fh, K = focus_hi(), known()
+        C = split(B, res[:len(B)], fh, K)[:left()]
+        D, own = plan_confirm(prev)
+        res = run(ex, C + D); prev = judge(own, res[len(C):]) or prev                          # R3 (+ ยืนยันซ้ำ)
+        for _ in range(3):                       # เป้าที่ยังไม่ผ่าน → ยืนยันต่อจนจบ ไม่ขึ้นกับงบ
+            D, own = plan_confirm(prev)
+            if not D: break
+            prev = judge(own, run(ex, D)) or prev
+    min_checked = all(ok for _, ok in state.values()) and bool(state)
+    st = {"calls": S.calls - c0, "r429": S.r429 - r0, "timeouts": S.slow - s0, "seconds": round(time.time()-t0, 2),
+          "rounds": rounds, "offers": len(found), "machines": len(known()), "slices": k0 + len(B) + len(C),
+          "focus_hi": round(fh, 4), "min_checked": min_checked,
+          "confirmed": {k: ok for k, (_, ok) in state.items()}}
+    log("sweep: %d calls/%d รอบ ใน %.1fs → %d offers / %d เครื่อง · focus ≤ $%.3f/hr · ราคาต่ำสุด%s"
+        % (st["calls"], rounds, st["seconds"], st["offers"], st["machines"], fh,
+           "ยืนยันแล้ว (รวม + rel≥%s)" % PREFER_REL if min_checked else "ยังไม่ยืนยัน (⚠ %s)" % st["confirmed"]))
+    return sorted(found.values(), key=lambda o: gf(o,OFFER,"price",9e9)), st
+
+def tiered_pool(v, a, keep):
+    """ค้นแบบค่าดาวน์โหลดถูกก่อน: sweep ด้วย inet_down_cost<cap ใน query ก่อน (server กรอง)
+    ไม่มี offer ผ่าน keep() ค่อย sweep ใหม่แบบไม่จำกัด · คืน (pool, cap ที่ได้ผล หรือ None ถ้า fallback/ปิด)"""
+    q = build_query(a, price=False); cap = getattr(a, "max_down_cost", 0) or 0
+    if cap > 0:
+        qc = "%s inet_down_cost<%s" % (q, cap); log("query: %s (+ หั่นช่วง dph < %s)" % (qc, a.max_dph))
+        pool = [o for o in sweep(v, qc, a.disk, a.max_dph, keep)[0] if keep(o)]
+        if pool:
+            log("ใช้ offer ค่าดาวน์โหลด < $%s/GB (%d offers)" % (cap, len(pool))); return pool, cap
+        log("⚠ ไม่มี offer ค่าดาวน์โหลด < $%s/GB ที่ผ่านเกณฑ์ → ค้นใหม่ไม่จำกัด (เรียงค่าดาวน์โหลดต่ำก่อน)" % cap)
+    log("query: %s (+ หั่นช่วง dph < %s)" % (q, a.max_dph))
+    return [o for o in sweep(v, q, a.disk, a.max_dph, keep)[0] if keep(o)], None
 
 def rank3(offers, cap):
     pool = [o for o in offers if gf(o,OFFER,"price",9e9) <= cap]
@@ -540,11 +802,11 @@ def cmd_template_delete(a):
 def instances(v): return v.show_instances() or []
 def by_label(v, lb): return [i for i in instances(v) if g(i,INST,"label","") == lb]
 
-def preflight(v, label, max_inst, cap, offer=None):
+def preflight(v, label, max_inst, cap, offer=None, cur=None):
     if not label: die("ต้องมี label เสมอ — label คือ idempotency key ตัวเดียวที่ Vast มี")
     if LABEL_PREFIX and not label.startswith(LABEL_PREFIX):
         die("label %r ต้องขึ้นต้นด้วย %r" % (label, LABEL_PREFIX))
-    cur = instances(v)
+    cur = instances(v) if cur is None else cur
     dup = [g(i,INST,"id") for i in cur if g(i,INST,"label","") == label]
     if dup: die("label %r ถูกใช้แล้วโดย %s — ปฏิเสธการสร้างซ้ำ" % (label, dup))
     if len(cur) >= max_inst: die("มี %d เครื่องแล้ว เพดาน %d" % (len(cur), max_inst))
@@ -597,6 +859,11 @@ def wait_for(v, iid, want, timeout=900, poll=8, grace=None, watch=None):
         st = g(row,INST,"status")
         if st in want: return True, row, "ok"
         if watch and watch.check(): return False, row, "log fatal: %s" % watch.hit["meaning"]
+        if watch and not watch.hit:            # error ของ docker บน host มักโผล่ใน status_msg ไม่ใช่ logs()
+            watch.hit = scan(g(row,INST,"msg",""), watch.pats)
+            if watch.hit:
+                log("  ‼ status_msg fatal [%s]: %s\n      %s" % (watch.hit["scope"], watch.hit["meaning"], watch.hit["line"]))
+                return False, row, "status_msg fatal: %s" % watch.hit["meaning"]
         if st in DEAD: return False, row, "instance %s" % st
         if st in TRANSIENT:
             stuck = stuck or time.time()
@@ -639,26 +906,43 @@ def ssh_probe(host, port, key, cmd="true", timeout=45):
     rc, o_, e_ = sh(["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host, cmd], timeout)
     return rc, o_.strip(), e_.strip()
 
-def ssh_check(row, key, tries=20, poll=10, watch=None):
-    """ทดสอบ SSH ทันทีหลังสร้างเครื่อง — ลองทุก endpoint ทุกรอบ จนกว่าจะมีอย่างน้อย 1 ทางใช้ได้
-    แล้วรันคำสั่งจริง (nvidia-smi) ไม่ใช่แค่ `true` · คืน dict รายงานผลแต่ละ endpoint + ทางที่เลือก"""
-    eps = ssh_endpoints(row); res = {"endpoints": {}, "chosen": None, "after_s": None}
+def ssh_check(row, key, tries=20, poll=10, watch=None, settle=3):
+    """ทดสอบ SSH ทันทีหลังสร้างเครื่อง — ลอง **ทั้ง direct และ proxy** แล้วรันคำสั่งจริง (nvidia-smi) ไม่ใช่แค่ `true`
+    ทางแรกผ่านแล้ว ลองทางที่ยังไม่ผ่านต่ออีก settle รอบ (proxy มักขึ้นช้ากว่า direct ไม่กี่วินาที)
+    คืน dict: ผลแต่ละ endpoint + ทางที่เลือก (direct ก่อน) + all_ok"""
+    eps = ssh_endpoints(row); res = {"endpoints": {}, "chosen": None, "after_s": None, "all_ok": False}
     if not eps: res["error"] = "ไม่มี ssh endpoint ใน instance row"; return res
+    first = None
     for k in range(tries):
         for name, h, p in eps:
+            if res["endpoints"].get(name, {}).get("ok"): continue          # ผ่านแล้วไม่ต้องลองซ้ำ
             rc, o_, e_ = ssh_probe(h, p, key, "nvidia-smi --query-gpu=name,memory.total --format=csv,noheader", 45)
             res["endpoints"][name] = {"host": h, "port": p, "ok": rc == 0,
                                       **({"gpu": o_.splitlines()[0][:80]} if rc == 0 and o_ else {"err": (e_ or o_)[-160:]})}
         ok = [(n, h, p) for n, h, p in eps if res["endpoints"][n]["ok"]]
-        if ok:
-            res["chosen"] = {"name": ok[0][0], "host": ok[0][1], "port": ok[0][2]}; res["after_s"] = k*poll
-            for n, info in res["endpoints"].items():
-                log("  ssh %-6s %s:%s -> %s" % (n, info["host"], info["port"], "OK " + info.get("gpu","") if info["ok"] else "FAIL " + info.get("err","")[-80:]))
-            return res
-        if watch and k >= 1 and watch.check(force=True): break       # ssh พลาด → ดู log ว่าทำไม
+        if ok and first is None: first = k; res["after_s"] = k*poll
+        if len(ok) == len(eps) or (ok and k - first >= settle): break
+        if not ok and watch and k >= 1 and watch.check(force=True): break   # ssh พลาดทุกทาง → ดู log ว่าทำไม
         time.sleep(poll)
-    res["after_s"] = tries*poll
+    ok = [(n, h, p) for n, h, p in eps if res["endpoints"][n]["ok"]]
+    if ok: res["chosen"] = {"name": ok[0][0], "host": ok[0][1], "port": ok[0][2]}
+    else: res["after_s"] = tries*poll
+    res["all_ok"] = len(ok) == len(eps)
+    for n, info in res["endpoints"].items():
+        log("  ssh %-6s %s:%s -> %s" % (n, info["host"], info["port"], "OK " + info.get("gpu","") if info["ok"] else "FAIL " + info.get("err","")[-80:]))
+    if ok and not res["all_ok"]:
+        log("  ⚠ ใช้ได้แค่ %s — อีกทางยังไม่ผ่าน (ลอง `connect --id N` ภายหลัง)" % ", ".join(n for n, _, _ in ok))
     return res
+
+def ssh_cmds(eps, key, iid=None):
+    """คำสั่งพร้อมใช้ของทุก endpoint (ssh/scp + บล็อก ~/.ssh/config) — ให้ผู้ใช้สลับทางได้เองเมื่อทางหนึ่งหลุด"""
+    k = key or "<VAST_SSH_KEY_FILE>"
+    return {n: {"host": h, "port": p,
+                "ssh": "ssh -i %s -p %d root@%s" % (k, p, h),
+                "scp": "scp -i %s -P %d <src> root@%s:<dst>" % (k, p, h),
+                "ssh_config": "Host vast-%s%s\n  HostName %s\n  Port %d\n  User root\n  IdentityFile %s\n"
+                              "  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" % ("%s-" % iid if iid else "", n, h, p, k)}
+            for n, h, p in eps}
 
 def ssh_ready(host, port, key, tries=20, poll=10, watch=None):
     """running != ต่อ SSH ได้ — Vast apt-install sshd เข้า image ที่ไม่มี ต้องรออีก 10-20s"""
@@ -696,12 +980,17 @@ def need_key(a):
     return k
 
 def running_target(v, a):
-    """เลือก endpoint ที่ต่อได้จริงตอนนี้ (direct ก่อน แล้ว proxy) — direct ที่เคยใช้ได้อาจตายทีหลัง (เจอจริง)"""
+    """เลือก endpoint ที่ต่อได้จริงตอนนี้ — --via auto (default: direct ก่อน แล้ว proxy) | direct | proxy
+    direct ที่เคยใช้ได้อาจตายทีหลัง (เจอจริง) → auto สลับไป proxy ให้เอง"""
     row = v.show_instance(id=a.id)
     if row is None: die("ไม่มี instance %s" % a.id)
     if g(row,INST,"status") != "running": die("instance %s = %r ไม่ใช่ running" % (a.id, g(row,INST,"status")))
     eps = ssh_endpoints(row); key = need_key(a)
     if not eps: die("instance %s ยังไม่มี ssh_host/ssh_port" % a.id)
+    via = getattr(a, "via", "auto") or "auto"
+    if via != "auto":
+        eps = [e for e in eps if e[0] == via]
+        if not eps: die("instance %s ไม่มี endpoint แบบ %s (มี: %s)" % (a.id, via, ", ".join(e[0] for e in ssh_endpoints(row))))
     for _ in range(3):
         for name, h, p in eps:
             if ssh_probe(h, p, key, "true", 30)[0] == 0:
@@ -716,33 +1005,29 @@ def cmd_plan(a):
     if template:
         a.disk=max(a.disk,gf(template,TEMPLATE,"disk"))
         tq=" ".join(template_query_parts(template)); a.extra_query=" ".join(x for x in (a.extra_query,tq) if x)
-    q = build_query(a); log("query: %s" % q)
-    offers = search(v, q, a.disk)
-    before_cuda = len(offers)
-    offers = [o for o in offers if cuda_compatible(o, a.min_cuda)]
-    n = len(offers); offers = [o for o in offers if geo_ok(o, a)]
-    if n != len(offers): log("ตัด %d offers ในประเทศ %s (HF ถูก block — --allow-geo เพื่อรวม)" % (n-len(offers), ",".join(sorted(BLOCK_GEO))))
-    log("CUDA >= %s: ผ่าน %d/%d offers หลังตรวจ cuda_max_good ฝั่ง client"
-        % (a.min_cuda, len(offers), before_cuda))
-    if template: offers=[o for o in offers if not template_offer_mismatches(template,o)]
-    log("พบ %d offers หลังตรวจ template compatibility (API cap %d ต่อรอบ × %d รอบ)" % (len(offers), BEHAVIOUR["search_hard_cap"], SEARCH_PASSES))
+    keep = lambda o: (cuda_compatible(o, a.min_cuda) and geo_ok(o, a) and gf(o,OFFER,"price",9e9) <= a.max_dph
+                      and not (template and template_offer_mismatches(template, o)))
+    offers, down_cap = tiered_pool(v, a, keep)
+    log("พบ %d offers ผ่าน CUDA >= %s · ไม่อยู่ใน %s · template"
+        % (len(offers), a.min_cuda, ",".join(sorted(BLOCK_GEO)) or "-"))
     picks = rank3(offers, a.max_dph)
     if not picks: die("ไม่มี offer <= $%.2f/hr ที่ตรงเกณฑ์ — ห้ามขยายเพดานเอง ให้รายงานผู้ใช้" % a.max_dph)
     rows = []
-    print("\n%-3s %-15s %-11s %-10s %-6s %-7s %-6s %-18s %s"
-          % ("#","เกณฑ์","offer_id","$/hr","cuda","rel","net","geo","gpu"), file=sys.stderr)
+    print("\n%-3s %-15s %-11s %-10s %-6s %-7s %-6s %-8s %-18s %s"
+          % ("#","เกณฑ์","offer_id","$/hr","cuda","rel","net","$/GB↓","geo","gpu"), file=sys.stderr)
     for n,(tag,o) in enumerate(picks,1):
         gpu_ph = gf(o,OFFER,"price_gpu")
         st_ph  = gf(o,OFFER,"storage_cost")*a.disk/BEHAVIOUR["hours_per_month"]
         tot    = gf(o,OFFER,"price") or gpu_ph+st_ph
-        print("%-3d %-15s %-11s $%-9.4f %-6s %-7.4f %-6d %-18s %s (gpu $%.4f + stor $%.4f)"
+        print("%-3d %-15s %-11s $%-9.4f %-6s %-7.4f %-6d $%-7.4f %-18s %s (gpu $%.4f + stor $%.4f)"
               % (n,tag,g(o,OFFER,"id"),tot,g(o,OFFER,"cuda","-"),gf(o,OFFER,"reliability"),
-                 gf(o,OFFER,"inet"),str(g(o,OFFER,"geo","-"))[:18],g(o,OFFER,"gpu","-"),gpu_ph,st_ph),
+                 gf(o,OFFER,"inet"),gf(o,OFFER,"down_cost"),str(g(o,OFFER,"geo","-"))[:18],g(o,OFFER,"gpu","-"),gpu_ph,st_ph),
               file=sys.stderr)
         rows.append({"rank":n,"why":tag,"offer_id":g(o,OFFER,"id"),"machine_id":g(o,OFFER,"machine"),
                      "gpu":g(o,OFFER,"gpu"),"gpu_ram_mib":g(o,OFFER,"gpu_ram"),"cuda":g(o,OFFER,"cuda"),
                      "reliability":gf(o,OFFER,"reliability"),"inet_down_mbps":gf(o,OFFER,"inet"),
                      "geo":g(o,OFFER,"geo"),"perf_per_dollar":gf(o,OFFER,"perf"),
+                     "download_per_gb":gf(o,OFFER,"down_cost"),
                      "gpu_per_hr":round(gpu_ph,5),"storage_per_hr":round(st_ph,5),"total_per_hr":round(tot,5)})
     th=g(template,TEMPLATE,"hash") if template else None
     image_name=("%s:%s"%(g(template,TEMPLATE,"image"),g(template,TEMPLATE,"tag"))) if template else a.image
@@ -751,18 +1036,20 @@ def cmd_plan(a):
         print("  #%d  create --label %s --offer-id %s --machine-id %s --expect-dph %.4f%s --yes"
               % (r["rank"],a.label,r["offer_id"],r["machine_id"],r["total_per_hr"],
                  " --template-id %s --template-hash %s"%(g(template,TEMPLATE,"id"),th) if th else ""), file=sys.stderr)
-    out({"mode":"plan","image":image_name,"disk":a.disk,"label":a.label,
+    out({"mode":"plan","image":image_name,"disk":a.disk,"label":a.label,"download_cap_per_gb":down_cap,
          "template":template_safe(template) if template else None,"offers":rows}); return 0
 
 def cmd_create(a):
     v = client()
-    ex = by_label(v, a.label)
+    cur = instances(v); ex = [i for i in cur if g(i,INST,"label","") == a.label]
     if ex:                                              # idempotent
         iid = g(ex[0],INST,"id"); log("label %r มีอยู่แล้ว -> adopt %s (ไม่สร้างใหม่)" % (a.label,iid))
         return _settle(v, iid, a)
     if not a.yes: die("create ต้องมี --yes (ผู้ใช้ยืนยันการเสียเงินแล้ว)")
-    offer = None
-    if a.machine_id:   # ⚠ id=<offer_id> กรองไม่ได้ server เมินเงียบ ๆ → ต้องใช้ machine_id
+    offer = getattr(a, "fresh_offer", None)            # rent ส่ง offer ที่เพิ่งค้นมา (< 10 s) → ไม่ต้องค้นยืนยันซ้ำ
+    if offer is not None:
+        pass
+    elif a.machine_id:   # ⚠ id=<offer_id> กรองไม่ได้ server เมินเงียบ ๆ → ต้องใช้ machine_id
         offer = next((o for o in search(v, "machine_id=%d" % a.machine_id, a.disk)
                       if g(o,OFFER,"id") == a.offer_id), None)
         if offer is None: die("offer %s บน machine %s หายไปแล้ว — search ใหม่" % (a.offer_id,a.machine_id))
@@ -779,7 +1066,7 @@ def cmd_create(a):
         if offer:
             bad=template_offer_mismatches(template,offer)
             if bad: die("offer ไม่ตรง template: %s"%"; ".join(bad))
-    preflight(v, a.label, a.max_instances, a.max_dph, offer)
+    preflight(v, a.label, a.max_instances, a.max_dph, offer, cur=cur)
     if a.template_hash:
         kw = dict(template_hash=a.template_hash,disk=a.disk,label=a.label,cancel_unavail=True)
     else:
@@ -794,7 +1081,12 @@ def cmd_create(a):
     except Exception as e:
         log("create ล้มเหลว: %s" % json.dumps(http_err(e), ensure_ascii=False))
         log("ห้าม retry — ตรวจก่อนว่าเครื่องเกิดขึ้นแล้วหรือยัง (จาก label)")
-        iid = reconcile(v, a.label)
+        he = http_err(e)
+        # 400 no_such_ask = server ปฏิเสธชัดเจน (offer ถูกแย่ง) ไม่มีเครื่องเกิด → เช็ค label สั้น ๆ พอ
+        # (เดิมรอ 90 s ทุกกรณี — rent 2 ตัวขนานแย่ง offer เดียวกัน เสียเวลาเปล่า 95 s · วัดจริง 2026-10-17)
+        # error อื่น (timeout/network) ไม่รู้ว่า request ถึง server ไหม → รอเต็ม window เหมือนเดิม
+        gone = he.get("code") == 400 and "no_such_ask" in str(he.get("msg") or "")
+        iid = reconcile(v, a.label, window=6, poll=3) if gone else reconcile(v, a.label)
         if iid: log("เกิดขึ้นจริงแล้ว: %s -> adopt" % iid); return _settle(v, iid, a, t0)
         out({"mode":"create","ok":False,"instance_id":None,"error":http_err(e),
              "reason":"create failed, no instance created"})
@@ -830,6 +1122,7 @@ def _settle(v, iid, a, t0=None):
         if key and host:                    # ทดสอบ SSH ทันที: ทุก endpoint + รันคำสั่งจริง
             chk = ssh_check(row, key, watch=watch); o["ssh"] = chk
             o["ssh_ready"] = bool(chk["chosen"]); o["ssh_ready_after_s"] = chk["after_s"]
+            o["ssh_all_ok"] = chk["all_ok"]; o["connect"] = ssh_cmds(ssh_endpoints(row), key, iid)
             if chk["chosen"]:
                 o["ssh_host"], o["ssh_port"] = chk["chosen"]["host"], chk["chosen"]["port"]; host, port = o["ssh_host"], o["ssh_port"]
                 seen = (chk["endpoints"][chk["chosen"]["name"]].get("gpu") or "")
@@ -848,21 +1141,25 @@ def _settle(v, iid, a, t0=None):
 
 def cmd_rent(a):
     """เลือก offer ที่ดีที่สุดเองแล้ว create — offer หายก็ลองตัวถัดไป (ไม่ต้องถามผู้ใช้)"""
-    v = client(); a.yes = True; a.template_id = a.template_hash = None
-    if by_label(v, a.label):                           # idempotent → cmd_create จะ adopt ให้
+    v = client(); a.yes = True; a.template_id = a.template_hash = None; a.fresh_offer = None
+    cur = instances(v)
+    if any(g(i,INST,"label","") == a.label for i in cur):   # idempotent → cmd_create จะ adopt ให้
         a.offer_id, a.machine_id, a.expect_dph = 0, None, None; return cmd_create(a)
-    preflight(v, a.label, a.max_instances, a.max_dph)   # guard ที่ไม่ขึ้นกับ offer → fail ทันที ไม่วนลอง offer
-    q = build_query(a); log("query: %s" % q)
-    pool = [o for o in search(v, q, a.disk)
-            if cuda_compatible(o, a.min_cuda) and geo_ok(o, a) and gf(o,OFFER,"price",9e9) <= a.max_dph]
+    preflight(v, a.label, a.max_instances, a.max_dph, cur=cur)   # guard ที่ไม่ขึ้นกับ offer → fail ทันที ไม่วนลอง offer
+    pool, down_cap = tiered_pool(v, a, lambda o: cuda_compatible(o, a.min_cuda) and geo_ok(o, a)
+                                                 and gf(o,OFFER,"price",9e9) <= a.max_dph)
+    t_found = time.time()
     if not pool: die("ไม่มี offer <= $%.2f/hr ที่ตรงเกณฑ์ (ตัดประเทศ %s แล้ว — --allow-geo เพื่อรวม)" % (a.max_dph, ",".join(sorted(BLOCK_GEO)) or "-"))
-    cand = sorted(pool, key=lambda o: (gf(o,OFFER,"reliability") < 0.995,
+    # ผ่าน cap แล้ว = เรียงราคาตามเดิม · fallback = ค่าดาวน์โหลดต่ำก่อน (ปัดเป็นขั้น $0.005 ให้ราคา/ชม. ยังมีผลในขั้นเดียวกัน)
+    dkey = (lambda o: 0) if down_cap or not (a.max_down_cost or 0) > 0 else (lambda o: int(gf(o,OFFER,"down_cost") / 0.005))
+    cand = sorted(pool, key=lambda o: (gf(o,OFFER,"reliability") < PREFER_REL, dkey(o),
                                        gf(o,OFFER,"price",9e9), -gf(o,OFFER,"inet")))[:a.tries]
     failed = []
     for n, o in enumerate(cand, 1):
         a.offer_id, a.machine_id, a.expect_dph = g(o,OFFER,"id"), g(o,OFFER,"machine"), gf(o,OFFER,"price")
-        log("ลอง #%d offer %s %s %s $%.4f/hr rel %.4f net %d" % (n, a.offer_id, g(o,OFFER,"gpu"),
-            g(o,OFFER,"geo","-"), a.expect_dph, gf(o,OFFER,"reliability"), gf(o,OFFER,"inet")))
+        a.fresh_offer = o if time.time() - t_found < 10 else None   # offer สด ไม่ต้องค้นยืนยันซ้ำ (หายจริง create ได้ 400 → reconcile)
+        log("ลอง #%d offer %s %s %s $%.4f/hr rel %.4f net %d down $%.4f/GB" % (n, a.offer_id, g(o,OFFER,"gpu"),
+            g(o,OFFER,"geo","-"), a.expect_dph, gf(o,OFFER,"reliability"), gf(o,OFFER,"inet"), gf(o,OFFER,"down_cost")))
         buf = io.StringIO(); real = sys.stdout; sys.stdout = buf     # จับ JSON ของ create เพื่ออ่าน fatal_log
         try:
             rc = cmd_create(a)
@@ -877,6 +1174,8 @@ def cmd_rent(a):
             try: res = json.loads(line)
             except ValueError: pass
         if rc == 0 or a.no_replace:
+            res.update({"download_per_gb": gf(o,OFFER,"down_cost"), "upload_per_gb": gf(o,OFFER,"up_cost"),
+                        "download_cap_per_gb": down_cap})
             out(res); return rc
         # เครื่องเกิดแล้วแต่ใช้ไม่ได้ (log fatal / ค้าง / ssh ไม่ติด) → ลบเครื่องที่เพิ่งสร้างเอง แล้วลองเครื่องถัดไป
         bad = [g(i,INST,"id") for i in by_label(v, a.label)]
@@ -1066,7 +1365,7 @@ def cmd_bill(a):
     for d in o["instances"]:
         print("%-10d %-22s %7.3f %8.3f %9.3f %8.2f %8.3f %7.3f  %.3f" % (d["instance_id"], d["label"][:22], d["gpu_hours"],
               d["gpu"], d["storage"], d["download_gb"], d["download"], d["upload"], d["total"]))
-        if d["download"] > d["gpu"]: print("   [!] ค่าดาวน์โหลด ($%.3f/GB) แพงกว่าค่า GPU — ครั้งหน้าใส่ inet_down_cost<0.01" % (d["download_rate"] or 0))
+        if d["download"] > d["gpu"]: print("   [!] ค่าดาวน์โหลด ($%.3f/GB) แพงกว่าค่า GPU — rent/plan ค้น inet_down_cost<$%s/GB ก่อนแล้ว (อย่าใส่ --max-down-cost 0)" % (d["download_rate"] or 0, MAX_DOWN_COST))
     print("รวม: GPU $%.3f + storage $%.3f + download $%.3f + upload $%.3f = **$%.3f** | credit เหลือ ~$%.2f"
           % (total["gpu"], total["storage"], total["download"], total["upload"], grand, o["credit_remaining_usd"]))
     print(o["note"]); return 0
@@ -1077,6 +1376,18 @@ def cmd_run(a):
     if not ok: die("ต่อ SSH ไม่ได้ใน %ds" % w)
     rc, o_, e_ = sh(["ssh","-i",key,"-p",str(port)]+SSH_OPTS+["root@%s"%host, a.cmd], a.timeout)
     sys.stderr.write(e_); sys.stdout.write(o_); return rc
+
+def cmd_connect(a):
+    """ทดสอบ SSH ทั้ง direct และ proxy ของเครื่องที่ running แล้วคืนคำสั่ง ssh/scp + ~/.ssh/config ของทุกทาง
+    exit 0 = ใช้ได้ทุกทาง · 1 = ใช้ได้บางทาง · 2 = ใช้ไม่ได้เลย"""
+    v = client(); row = v.show_instance(id=a.id)
+    if row is None: die("ไม่มี instance %s" % a.id)
+    if g(row,INST,"status") != "running": die("instance %s = %r ไม่ใช่ running" % (a.id, g(row,INST,"status")))
+    key = need_key(a); chk = ssh_check(row, key, tries=a.tries, poll=10, settle=a.tries)
+    cmds = ssh_cmds(ssh_endpoints(row), key, a.id)
+    for n, c in cmds.items(): c.update({k: chk["endpoints"].get(n, {}).get(k) for k in ("ok","gpu","err")})
+    out({"mode":"connect","id":a.id,"all_ok":chk["all_ok"],"chosen":chk["chosen"],"endpoints":cmds})
+    return 0 if chk["all_ok"] else (1 if chk["chosen"] else 2)
 
 def cmd_xfer(a):
     v = client(); host, port, key = running_target(v, a)
@@ -1168,24 +1479,28 @@ def cmd_env(a):
     """แสดงว่าโหลด .env จากไหนและได้ค่าอะไร — ไม่โชว์ค่า secret"""
     o = {"env_file": ENV_FILE or "<ไม่พบไฟล์>", "env_file_exists": bool(ENV_FILE),
          "searched": env_paths(), "permission_warning": ENV_WARN,
-         "VAST_API_KEY": "<set len=%d>" % len(os.environ.get("VAST_API_KEY","")) 
-                          if os.environ.get("VAST_API_KEY") else "<MISSING>",
+         "VAST_API_KEY": "<set len=%d>" % len(os.environ.get("VAST_API_KEY","").strip())
+                          if KEY_SOURCE != "missing" else "<MISSING>",
+         "VAST_API_KEY_source": KEY_SOURCE, "VAST_API_KEY_notice": KEY_NOTICE,
          "VAST_SSH_KEY_FILE": SSH_KEY_ENV or "<unset>",
          "ssh_key_readable": bool(SSH_KEY_ENV and os.path.isfile(SSH_KEY_ENV)),
          "ssh_fingerprint": fingerprint() if SSH_KEY_ENV else None,
          "ssh_pubkey_from": pubkey()[1] if SSH_KEY_ENV else None,
          "VAST_LABEL_PREFIX": LABEL_PREFIX or "<unset — ไม่มี guard กันแตะเครื่องอื่น>",
          "VAST_MAX_DPH": MAX_DPH, "VAST_MAX_INSTANCES": MAX_INSTANCES,
-         "VAST_MAX_DESTROY": MAX_DESTROY, "VAST_HTTP_TIMEOUT": HTTP_TIMEOUT}
+         "VAST_MAX_DESTROY": MAX_DESTROY, "VAST_HTTP_TIMEOUT": HTTP_TIMEOUT, "VAST_MAX_DOWN_COST": MAX_DOWN_COST}
     out(o)
-    return 0 if (os.environ.get("VAST_API_KEY") and ENV_FILE) else 1
+    return 0 if KEY_SOURCE != "missing" else 1
 
 # ===== argparse ==========================================================================
 def main():
     p = argparse.ArgumentParser(prog="vast.py"); s = p.add_subparsers(dest="action", required=True)
     def common(q, ssh=False):
         q.add_argument("--timeout", type=int, default=900)
-        if ssh: q.add_argument("--key", default=None)
+        if ssh:
+            q.add_argument("--key", default=None)
+            q.add_argument("--via", default="auto", choices=("auto","direct","proxy"),
+                           help="ทาง SSH: auto = direct ก่อน ต่อไม่ได้สลับ proxy")
     for name in ("plan","create"):
         q = s.add_parser(name); q.add_argument("--label", required=True)
         q.add_argument("--image", default=DEFAULT_IMAGE); q.add_argument("--disk", type=float, default=40)
@@ -1197,6 +1512,8 @@ def main():
             q.add_argument("--allow-geo", action="store_true", help="ไม่ตัดประเทศใน VAST_BLOCK_GEO")
             q.add_argument("--min-gpu-ram", type=int, help="หน่วย GB"); q.add_argument("--extra-query", default="")
             q.add_argument("--template-id",type=int,help="ใช้ disk ขั้นต่ำและ template_hash จาก template นี้")
+            q.add_argument("--max-down-cost", type=float, default=MAX_DOWN_COST,
+                           help="$/GB ค่าดาวน์โหลด: หา offer ต่ำกว่านี้ก่อน ไม่มีค่อย fallback · 0 = ปิด")
         else:
             q.add_argument("--offer-id", type=int, required=True); q.add_argument("--machine-id", type=int)
             q.add_argument("--expect-dph", type=float); q.add_argument("--yes", action="store_true")
@@ -1219,13 +1536,17 @@ def main():
     q.add_argument("--no-watch", action="store_true", help="ไม่ต้องสุ่มอ่าน log ระหว่าง init")
     q.add_argument("--watch-every", type=int, default=20, help="อ่าน log ทุกกี่วินาที")
     q.add_argument("--no-replace", action="store_true", help="เครื่องเสียแล้วไม่ต้องลบ+เปลี่ยนเครื่องให้")
+    q.add_argument("--max-down-cost", type=float, default=MAX_DOWN_COST,
+                   help="$/GB ค่าดาวน์โหลด: หา offer ต่ำกว่านี้ก่อน ไม่มีค่อย fallback · 0 = ปิด")
     q = s.add_parser("watch"); q.add_argument("--id", type=int, required=True)
     q.add_argument("--file", help="log ไฟล์ในเครื่อง เช่น /workspace/server.log"); q.add_argument("--lines", type=int, default=300)
     q.add_argument("--ready", help="regex ใน log = พร้อม"); q.add_argument("--probe", help="คำสั่งในเครื่อง rc 0 = พร้อม")
     q.add_argument("--fatal", action="append", help="regex fatal เพิ่มเติม"); q.add_argument("--every", type=int, default=15)
     q.add_argument("--alive", help="pattern ของ process (pgrep -f) ที่ต้องยังอยู่ เช่น server.py — หายไป = fatal")
     q.add_argument("--timeout", type=int, default=1800); q.add_argument("--destroy-on-fatal", action="store_true")
-    q.add_argument("--key", default=None)
+    q.add_argument("--key", default=None); q.add_argument("--via", default="auto", choices=("auto","direct","proxy"))
+    q = s.add_parser("connect"); q.add_argument("--id", type=int, required=True)
+    q.add_argument("--key", default=None); q.add_argument("--tries", type=int, default=3, help="รอบทดสอบต่อ endpoint (ห่าง 10 s)")
     for name in ("status","stop","start"):
         q = s.add_parser(name); q.add_argument("--id", type=int, required=True)
         q.add_argument("--timeout", type=int, default=420)
@@ -1274,31 +1595,32 @@ def main():
     a = p.parse_args()
     return {"env":cmd_env,"keys":cmd_keys,"plan":cmd_plan,"rent":cmd_rent,"create":cmd_create,"status":cmd_life,"stop":cmd_life,"start":cmd_life,"bill":cmd_bill,
             "destroy":cmd_destroy,"sweep":cmd_sweep,"run":cmd_run,"push":cmd_xfer,"pull":cmd_xfer,
-            "drift":cmd_drift,"watch":cmd_watch,"template-search":cmd_template_search,"template-show":cmd_template_show,
+            "drift":cmd_drift,"watch":cmd_watch,"connect":cmd_connect,"template-search":cmd_template_search,"template-show":cmd_template_show,
             "template-create":cmd_template_create,"template-update":cmd_template_update,
             "template-delete":cmd_template_delete}[a.action](a)
 
 if __name__ == "__main__":
     raise SystemExit(main())
 VASTPY
-python /tmp/vast.py env            # ต้องเห็น env_file_exists:true และ VAST_API_KEY:<set …>
+python /tmp/vast.py env            # ต้องเห็น VAST_API_KEY:<set …> · ดู VAST_API_KEY_source แล้วแจ้งผู้ใช้ (หัวข้อ .env)
 ```
 
 ทุก subcommand อ่าน `.env` เองแล้ว — ไม่ต้อง `source` และไม่ต้อง `export` อะไรก่อนรัน
 
 ---
 
-# RUNBOOK 1 — CREATE
+## RUNBOOK 1 — CREATE
 
 > เป้า: "อยากได้ GPU X" → running + SSH ต่อได้ ใน **คำสั่งเดียว ไม่ต้องถามผู้ใช้** และไม่มีเครื่องซ้ำแม้ error
 
 | # | รัน | ต้องเห็นจึงไปต่อ | ถ้าไม่เห็น |
 |--:|:--|:--|:--|
-| 0 | `python /tmp/vast.py env && python /tmp/vast.py keys` | `env_file_exists:true` · `VAST_API_KEY:<set …>` · `ssh_key_readable:true` · `registered:true` | ตั้งค่าใน `.env` ให้ครบ แล้ว `keys --attach` (ดูหัวไฟล์) |
+| 0 | `python /tmp/vast.py env && python /tmp/vast.py keys` | `VAST_API_KEY:<set …>` (ถ้า `VAST_API_KEY_source` ≠ `environment` → แจ้งผู้ใช้) · `ssh_key_readable:true` · `registered:true` | ตั้งค่าใน `.env` ให้ครบ แล้ว `keys --attach` (ดูหัวไฟล์) |
 | 1 | `python /tmp/vast.py sweep` | จำนวนเครื่อง + เครดิต > ค่าใช้จ่ายที่คาด × 2 | เครดิตไม่พอ → หยุด แจ้งผู้ใช้ |
 | 2 | `python /tmp/vast.py rent --label <unique> [--gpu RTX_4090] [--min-gpu-ram 24] [--max-dph 0.45]` | เลือก offer ดีสุดเอง + create + wait running + SSH (+ เฝ้า log, เครื่องเสีย = ลบ+เปลี่ยนเครื่องเอง — RUNBOOK 1b) → `{"ok":true,"instance_id":N,"ssh_ready":true,"chosen":{…}}` — ของจริง **41–96 s** | `ไม่มี offer <= $X` → ผ่อนเกณฑ์อื่นหรือรายงานผู้ใช้ · ลองครบ `--tries` แล้ว offer หายหมด → `rent` ใหม่อีกรอบ · `"ok":false`+`reason` → ดูตาราง state machine |
 | 3 | (ทางเลือก) `plan` + `create --offer-id …` | ใช้เมื่อผู้ใช้อยากเลือก offer เองเท่านั้น | |
 | 5 | `python /tmp/vast.py run --id N --cmd "nvidia-smi"` | ชื่อ GPU + VRAM **ตรงกับ offer** | ดู error playbook |
+| 6 | `python /tmp/vast.py connect --id N` | `all_ok:true` — ต่อได้ทั้ง direct และ proxy | ได้ทางเดียว (exit 1) → ใช้ทางที่ได้ไปก่อน แล้ว `connect` ซ้ำภายหลัง · ไม่ได้เลย (exit 2) → error playbook #6 #11 #28 |
 
 preflight อัตโนมัติ — ผ่านครบถึงจะยิง create: label ไม่ซ้ำ (ซ้ำ = **adopt ตัวเดิม**) · จำนวนเครื่อง < เพดาน ·
 `machine_id=` ยืนยัน offer ยังอยู่ **และราคา ≤ เพดาน** · kwargs ทุกตัวอยู่ใน `CREATE_KWARGS`
@@ -1306,7 +1628,7 @@ preflight อัตโนมัติ — ผ่านครบถึงจะ�
 **create พัง = ห้าม retry** → `reconcile()` หาเครื่องจาก label ก่อน (เกิดแล้ว→adopt / ไม่เกิด→`plan` ใหม่)
 label คือ **idempotency key ตัวเดียวที่ Vast มี** → ทุก create ต้องมี label unique
 
-## TEMPLATE — Python SDK
+### TEMPLATE — Python SDK
 
 ```bash
 python /tmp/vast.py template-search                         # recommended templates
@@ -1339,7 +1661,30 @@ merge ทุก field ก่อน PUT และอ่านกลับ verify 
 สร้าง instance จาก template ยังต้อง `plan` ราคา offer และถามยืนยันค่าใช้จ่ายเหมือน create ปกติ
 โดย `create` ต้องรับทั้ง `--template-id` และ `--template-hash` เพื่อยืนยันว่า hash ไม่เปลี่ยน, disk พอ และ offer compatible
 
-# RUNBOOK 1b — LOG WATCH (สุ่มอ่าน log ระหว่าง init → เจอ error ลบ+หาเครื่องใหม่เอง)
+## SSH — ต่อได้ 2 ทาง (direct + proxy)
+
+ทุกเครื่องมี SSH 2 ทาง และ toolkit ทดสอบ/ใช้ได้ทั้งคู่:
+
+| ทาง | host:port มาจาก | ข้อดี | ข้อเสีย |
+|:--|:--|:--|:--|
+| `direct` | `public_ipaddr` + `ports["22/tcp"][0].HostPort` | เร็ว ไม่ผ่านตัวกลาง · ใช้ map port อื่น (HTTP) ได้ด้วย | network ของ host หลุดชั่วคราวได้ (playbook #31) · บางเครื่องไม่มี |
+| `proxy` | `ssh_host` (`sshN.vast.ai`) + `ssh_port` | มีทุกเครื่อง · รอดตอน direct หลุด | ผ่านตัวกลางของ Vast (ช้ากว่าเล็กน้อย) · บาง template แบบ direct proxy เสีย (playbook #21) |
+
+```bash
+python /tmp/vast.py connect --id N                    # ทดสอบทั้ง 2 ทาง (nvidia-smi จริง) + คืนคำสั่ง ssh/scp/~/.ssh/config ของแต่ละทาง
+python /tmp/vast.py run  --id N --via proxy --cmd "…"  # บังคับทาง: auto (default) | direct | proxy
+python /tmp/vast.py push --id N --via proxy --src f --dst /workspace/
+```
+
+- `rent`/`create` ทดสอบทั้ง 2 ทางทันทีหลัง running — ทางแรกผ่านแล้วยังลองอีกทางต่ออีก 3 รอบ (proxy มักขึ้นช้ากว่า)
+  แล้วคืน `ssh_all_ok` + `connect.{direct,proxy}.{ssh,scp,ssh_config}` · ผ่านแค่ทางเดียวไม่นับว่าเครื่องเสีย (`ok` ยังเป็น true) แต่ต้องแจ้งผู้ใช้
+- `run`/`push`/`pull`/`watch` แบบ `--via auto` ลอง direct ก่อน ต่อไม่ได้สลับ proxy ให้เอง (log: `direct ต่อไม่ได้ → ใช้ proxy …`)
+  · `--via direct|proxy` ล็อกทางเดียว ไม่ fallback (ใช้ทดสอบ หรือเมื่อรู้ว่าอีกทางเสีย)
+- `connect` exit code: `0` ได้ทุกทาง · `1` ได้บางทาง · `2` ไม่ได้เลย
+- รายงานผู้ใช้ทุกครั้งที่เช่าเครื่อง: คำสั่ง ssh ของ**ทั้งสองทาง** + บอกว่าทางไหนผ่าน/ไม่ผ่าน — ให้ผู้ใช้สลับทางเองได้เมื่อทางหนึ่งหลุด
+- ผล `ssh_config` ใช้ alias `vast-<id>-direct` / `vast-<id>-proxy` → ผู้ใช้วางต่อท้าย `~/.ssh/config` แล้ว `ssh vast-<id>-proxy` ได้เลย
+
+## RUNBOOK 1b — LOG WATCH (สุ่มอ่าน log ระหว่าง init → เจอ error ลบ+หาเครื่องใหม่เอง)
 
 `rent`/`create` **เฝ้า log ให้อัตโนมัติ** ระหว่างรอ `running` และรอ SSH: อ่าน `logs(tail=200)` ทุก `--watch-every` วินาที (default 20)
 แล้วเทียบกับ `FATAL_LOG` (ใน SDK CONTRACT) — เจอเมื่อไหร่เลิกรอทันที ไม่ต้องเสียเงินรอ timeout 420–900 s
@@ -1365,7 +1710,7 @@ python /tmp/vast.py watch --id N --file /workspace/server.log \
 `--destroy-on-fatal` = ผู้ใช้อนุญาตล่วงหน้าให้ลบเครื่องเมื่อ init พัง (ไม่ใส่ = รายงานอย่างเดียว) · scope `host` → `rent` label ใหม่ได้เลย ·
 scope `image` → แก้โค้ด/ค่าก่อน (เช่น VRAM ไม่พอ: ลด `max_model_len`/`gpu_memory_utilization`) ไม่ใช่เปลี่ยนเครื่อง
 
-# บทเรียน deploy model server บน Vast (vLLM, 2026-10-02 · RTX 4090 · 1 เครื่อง ~1 ชม. · จ่ายจริง ~$0.47)
+## บทเรียน deploy model server บน Vast (vLLM, 2026-10-02 · RTX 4090 · 1 เครื่อง ~1 ชม. · จ่ายจริง ~$0.47)
 
 ลำดับที่ได้ผล — แต่ละขั้น **verify ก่อนไปต่อ**:
 
@@ -1389,7 +1734,34 @@ image `vllm/vllm-openai:*` ~11 GB pull 7 นาทีบนเครื่อง
 
 ถ้าต้อง trade-off มากขนาดนี้ ให้เสนอผู้ใช้ GPU ที่ VRAM ใหญ่ขึ้น (เช่น 32/48 GB) เทียบราคาด้วย `plan` ก่อนเสียเวลาจูน
 
-# RUNBOOK 2 — STOP / START (verify จริงทุกครั้ง อย่าเชื่อ return value)
+### Qwen 3.6 บน vLLM (ทดสอบจริง 2026-10-17 · RTX 5090 · ~18 นาที · ~$0.26 รวมค่าโหลด)
+
+Qwen 3.6 บน HF มีแค่ 27B (dense) และ 35B-A3B (MoE) → บน GPU 32 GB ใช้ **`nvidia/Qwen3.6-35B-A3B-NVFP4`** (23.5 GB, Apache-2.0,
+NVFP4 native บน Blackwell) · ทางเลือก VRAM 24 GB: `cyankiwi/Qwen3.6-27B-AWQ-INT4` (20.5 GB — UNVERIFIED บน vLLM ในสกิลนี้)
+
+```bash
+VAST_LOADING_GRACE=1000 python /tmp/vast.py rent --label qwen36-vllm --gpu RTX_5090 --min-cuda 12.9 --disk 80 --max-dph 0.80 \
+    --image vllm/vllm-openai:v0.31.0-cu129 --env "-p 8000:8000"
+# start.sh (push แล้วรันแบบ detach — RUNBOOK บทเรียน deploy ข้อ 2):
+pip uninstall -y torchcodec                              # playbook #49 — ไม่งั้น vllm serve ตายทันที
+python3 -c "from huggingface_hub import snapshot_download as d; d('nvidia/Qwen3.6-35B-A3B-NVFP4', max_workers=16)"
+vllm serve nvidia/Qwen3.6-35B-A3B-NVFP4 --host 0.0.0.0 --port 8000 --quantization modelopt --served-model-name qwen3.6 \
+    --max-model-len 32768 --gpu-memory-utilization 0.90 --max-num-seqs 8 --reasoning-parser qwen3 > /workspace/server.log 2>&1
+python /tmp/vast.py watch --id N --file /workspace/server.log --ready "Application startup complete" \
+    --probe "curl -sf localhost:8000/health" --alive "vllm serve" --every 15 --timeout 1500
+```
+
+| ขั้น | วัดได้จริง |
+|:--|:--|
+| `rent` → running + SSH 2 ทาง (pull image 11.8 GB) | 159 s |
+| โหลดโมเดล 23.5 GB (`snapshot_download`, 16 workers) | 89 s = **265 MB/s** · ค่าดาวน์โหลด $0.0026/GB = $0.06 |
+| `vllm serve` → `Application startup complete` (รวม CUDA graph capture ~100 s) | 265 s |
+| VRAM ใช้ 27.7 / 32.6 GB · KV cache 5.44 GiB = 232k tokens (7 request × 32k พร้อมกัน) | |
+| decode เดี่ยว (soak 5 รอบจากนอกเครื่องผ่าน `public_ip:HostPort ของ 8000/tcp`) | ~170 tok/s (รอบหนึ่งตกเหลือ 69 tok/s) |
+
+ต้องปิด thinking หรือให้ `max_tokens` ยาวพอ (playbook #50) · ทั้งงาน (เช่า→ทดสอบ→destroy) ~18 นาที
+
+## RUNBOOK 2 — STOP / START (verify จริงทุกครั้ง อย่าเชื่อ return value)
 
 | # | รัน | ต้องเห็น | ถ้าไม่เห็น |
 |--:|:--|:--|:--|
@@ -1401,7 +1773,7 @@ image `vllm/vllm-openai:*` ~11 GB pull 7 นาทีบนเครื่อง
 `stop` หยุดค่า GPU แต่ **ยังเสียค่า storage** — `destroy` เท่านั้นที่หยุดทุกอย่าง (toolkit เตือนให้ทุกครั้ง)
 ข้อมูลใน disk รอด stop→start (ทดสอบแล้ว)
 
-# RUNBOOK 3 — DESTROY
+## RUNBOOK 3 — DESTROY
 
 | # | รัน | ต้องเห็น | ถ้าไม่เห็น |
 |--:|:--|:--|:--|
@@ -1413,7 +1785,7 @@ image `vllm/vllm-openai:*` ~11 GB pull 7 นาทีบนเครื่อง
 `--id` ที่ไม่มีแล้ว = นับว่าสำเร็จ · ตั้ง `VAST_LABEL_PREFIX` แล้วจะ**ปฏิเสธการลบเครื่องที่ label ไม่ตรง** ·
 เพดาน 10 เครื่อง/ครั้ง (`VAST_MAX_DESTROY`)
 
-# RUNBOOK 4 — SWEEP & AUDIT (บังคับก่อนจบทุก session)
+## RUNBOOK 4 — SWEEP & AUDIT (บังคับก่อนจบทุก session)
 
 ```bash
 python /tmp/vast.py sweep --older-than 60      # exit 1 ถ้ายังมีเครื่องเหลือ
@@ -1422,7 +1794,7 @@ python /tmp/vast.py sweep --older-than 60      # exit 1 ถ้ายังมี
 แล้ว**รายงานผู้ใช้เสมอ** แม้เป็น 0: กี่เครื่องรันอยู่ / burn rate / ใช้ไปประมาณเท่าไร / เครดิตเหลือ
 คิดถูกต้อง: `running` = `dph_base + storage`, `exited/stopped` = **storage อย่างเดียว**
 
-# RUNBOOK 5 — BILL (บังคับหลัง destroy ทุกครั้ง: สรุปค่าใช้จ่ายและสถิติให้ผู้ใช้)
+## RUNBOOK 5 — BILL (บังคับหลัง destroy ทุกครั้ง: สรุปค่าใช้จ่ายและสถิติให้ผู้ใช้)
 
 ```bash
 python /tmp/vast.py bill --id N [--id M …]      # ระบุ id ตรง ๆ
@@ -1441,13 +1813,17 @@ python /tmp/vast.py bill --days 1 --json         # ย้อนหลัง N �
 ที่ $0.029/GB = $0.34 มากกว่าค่า GPU $0.16 ของเครื่องเดียวกัน) invoice ออกเป็น bucket รายวัน ชั่วโมงล่าสุดอาจยังไม่ครบ
 ให้บอกผู้ใช้ด้วย
 
-**ป้องกันตั้งแต่ตอน plan:** ใส่ `--extra-query "inet_down_cost<0.01"` เมื่องานต้องดาวน์โหลดหลาย GB และหลัง `create`
+**ป้องกันตั้งแต่ตอน plan (อัตโนมัติแล้ว):** `plan`/`rent` ค้น `inet_down_cost<$0.005/GB` ก่อนเสมอ (`VAST_MAX_DOWN_COST`/`--max-down-cost`)
+ไม่มี offer ผ่านค่อย fallback แบบเรียงค่าดาวน์โหลดต่ำก่อน — ดูค่า `download_per_gb` ใน output (`plan` มีคอลัมน์ `$/GB↓`)
+· เคสจริง 30 ก.ย.–3 ต.ค. 2026: ค่าดาวน์โหลดต่อ GB ต่างกัน ~40 เท่า ($0.001–0.039) — 2 เครื่องที่ $0.039/GB โหลด ~23–25 GB
+จ่ายค่าดาวน์โหลด $1.85 (41% ของบิล 3 วัน) ขณะที่เครื่องที่โหลด 23.7 GB เท่ากันที่ $0.001/GB จ่าย $0.03 · ทดสอบ 2026-10-03:
+4090 มี 21–28 offers และ 5090 มี 23–37 offers ที่ < $0.005/GB จึงแทบไม่ต้อง fallback · หลัง `create`
 วัดความเร็วจริงทันที (`curl -o /dev/null -m 10 -w "%{speed_download}" <url ไฟล์ใหญ่>`) ค่า `inet_down` ที่ประกาศเชื่อไม่ได้
 (เคสจริง: ประกาศ 1391 Mbps ได้จริง 1.8 MB/s) ถ้าช้ากว่า ~20 MB/s ให้ destroy แล้วเช่าเครื่องอื่นก่อนเริ่มติดตั้ง
 
 ---
 
-# State machine + timeout (ตัวเลขจากการวัดจริง)
+## State machine + timeout (ตัวเลขจากการวัดจริง)
 
 ```
 create ──► None(provisioning) ──► created/loading ──► running ──► exited/stopped ──► (destroy) หาย
@@ -1466,7 +1842,7 @@ create ──► None(provisioning) ──► created/loading ──► running 
 
 **`running` ≠ ใช้งานได้** — นิยาม "พร้อม" ที่ใช้ได้จริง = `actual_status=="running"` **และ** `ssh … true` rc 0
 
-# เลือก offer ให้ดีกว่า "ถูกสุด"
+## เลือก offer ให้ดีกว่า "ถูกสุด"
 
 `BASE_FILTER` = `rentable=true verified=true reliability>0.99 direct_port_count>=4 duration>2`
 
@@ -1477,17 +1853,74 @@ create ──► None(provisioning) ──► created/loading ──► running 
 ⚠ **ห้ามใช้ `georegion=true` / `chunked=true`** — ตัวแปลงฝั่ง client ตัดส่วนที่เหลือของ query ทิ้งเงียบ ๆ
 (`georegion=true geolocation=EU dph<0.5 num_gpus=2` → `geolocation in [...] dph < 0`, `num_gpus` หาย)
 
-**การค้นทุกครั้งยิงขนานอย่างน้อย 2 รอบ** (`search()` ใน toolkit): รอบถัดไปเริ่มหลังรอบก่อน ≥3 วินาที
-แล้วรวมผลและตัด offer id ที่ซ้ำ ทำให้ได้ offer มากกว่า cap 64 แถวต่อรอบ และจับ offer ที่เพิ่งขึ้นได้
-ปรับได้ด้วย `VAST_SEARCH_PASSES` (≥2) และ `VAST_SEARCH_GAP` (≥3 วินาที ตั้งต่ำกว่านี้จะถูกปัดขึ้นเป็น 3) ·
-ถ้าเรียก `search_offers` เองนอก toolkit ก็ต้องทำแบบเดียวกัน
+### การค้นหาเครื่อง — `sweep()` (v5 · ออกแบบ+วัดจริง 2026-10-17 · รุ่นแรก 2026-10-03)
+
+**ทำไมค้นครั้งเดียวไม่พอ** — `/bundles/` ไม่ได้คืนตลาดทั้งหมด (วัดจริง):
+- server รวม offer เป็น **bundle** (field `bundle_id`) แล้วคืน**ตัวแทน 1 ตัวต่อ bundle** — เครื่องอื่นใน bundle เดียวกัน
+  (มักเป็น GPU รุ่นเดียว ราคาเท่ากัน คนละ host ก็ได้) ถูกซ่อน · คืนสูงสุด 64 แถว (`limit` > 64 ไม่ช่วย · field `truncated` เป็น `false` เสมอ ใช้ไม่ได้)
+- ช่วงกว้าง (root) ไม่ได้คืน 64 ตัวที่ถูกสุด แต่เป็นตัวอย่างกระจายทั้งช่วง — ตลาด ≤ $0.25 มี ~130 เครื่อง root เห็น 64
+- ช่วงที่คืน 4–11 แถวยังซ่อนเครื่อง ~5% · ≥ 12 แถว ซ่อน 10–20% ทุกครั้ง → **ช่วงแคบ + หั่นต่างแบบ = เห็นครบขึ้น**
+- **server ตอบ query เดิมเหมือนเดิมทุกครั้ง** (6 ครั้งติดใน 6 s ได้ชุดเดียวกัน 100%) → ยิง query ซ้ำ = เปลืองโควตาเปล่า ๆ
+  แต่หั่นอีกแบบ (เช่น ตาม `machine_id`) bundle แตกคนละแบบ จึงเห็นตัวที่ถูกซ่อน
+- `dph` ใน query เทียบ **`dph_base`** (ราคา GPU ไม่รวม storage) ทีละ offer · field ซ้ำใน query รวมเป็น AND (`reliability>0.99 reliability>=0.995` ✓)
+- **rate limit** (วัด 2026-10-17 · เปลี่ยนจากเดิม): `X-RateLimit-Limit: 30` ต่อ API key **รวมทุก process** · burst ~30 แล้วเติม ~1 ครั้ง/วินาที ·
+  `X-RateLimit-Remaining` แม่นยำ (0 = ครั้งถัดไป 429 แน่) · `Retry-After: 1` → toolkit คุม bucket ฝั่ง client ตาม header นี้
+- latency: TCP RTT ~0.28 s, TLS ใหม่ ~0.85 s (DNS ครั้งแรก ~1.1 s) · warm request ช่วงแคบ 0.32 s แต่ช่วงกว้างที่คืน 64 แถว 0.62 s
+  → SDK เปิด session ใหม่ทุก request ทั้ง `show_instance`/`show_user`/… · toolkit แทน factory ของ SDK ให้ใช้ session เดียว keep-alive
+  (ใช้ร่วมกับ Searcher) · ยิง `/bundles/` ตรงด้วย body จาก `parse_query` ของ SDK
+  (`/search/asks/` ตัวใหม่ **ไม่กรองตาม query** — RTX 4090 ได้ 5090 ปน — ห้ามใช้)
+
+**algorithm** (`sweep()` · ใช้ใน `plan`/`rent` ผ่าน `tiered_pool`) — **3 รอบ** ยิงขนานทุกรอบ (เดิม 4–5 รอบ):
+
+| รอบ | ทำอะไร | calls |
+|:--|:--|--:|
+| R1 | 8 ช่วง `dph` เท่ากันใน `[0, max_dph)` — **ไม่ยิง root** (ช่วงกว้างช้ากว่า 2 เท่าและไม่ได้ข้อมูลเพิ่ม) | 8 |
+| R2 | focus = ราคาถูกสุด `VAST_SEARCH_FOCUS` เครื่องที่ผ่านเกณฑ์ → หั่น `[0, focus)` ตามราคาที่รู้แล้ว ช่วงละ ~3 เครื่อง **+ ยืนยันราคาต่ำสุดในรอบเดียวกัน** | ~3–8 + 4 |
+| R3 | ช่วงที่น่าสงสัย (≥10 แถว หรือเครื่องที่รู้ว่าอยู่ในช่วงไม่โผล่) หั่นครึ่ง · "แฝด" ราคาเดียวกันหั่นตาม `machine_id` **+ ยืนยันซ้ำเฉพาะเป้าที่ราคาต่ำสุดเปลี่ยน** | เท่างบที่เหลือ |
+| (ต่อ) | เป้าที่ยังยืนยันไม่ได้ → ยืนยันต่อ ≤ 3 รอบ ไม่ขึ้นกับงบ (ปกติไม่ต้อง) | 0–4 |
+
+**ยืนยัน 2 เป้า** (เพราะ `rent` เรียง reliability ≥ 0.995 ก่อนราคา — รุ่นก่อนยืนยันแค่ราคาต่ำสุดรวม ตัวที่ rent เลือกจริงจึงไม่เคยถูกยืนยัน):
+① ราคารวมต่ำสุดที่ผ่านเกณฑ์ ② ราคารวมต่ำสุดที่ผ่านเกณฑ์**และ** reliability ≥ `PREFER_REL` (ใส่ `reliability>=0.995` ใน query ฝั่ง server ให้ช่วงเบาบาง)
+· แต่ละเป้า: ค้น `[0, mt)` **หั่นครึ่งที่ machine_id มัธยฐาน** (แทนการยิง query เดิม 2 ครั้งพร้อมกันซึ่งได้ผลเหมือนกันเป๊ะ) ·
+ไม่มีแถวที่ถูกกว่าและไม่แน่น (< 10 แถว) = ยืนยัน · log: `sweep: N calls/R รอบ ใน X s → … · ราคาต่ำสุดยืนยันแล้ว (รวม + rel≥0.995)`
+
+กันช้า: bucket ฝั่ง client เติม 1/s และ `tokens = min(tokens, X-RateLimit-Remaining)` ทุก response · 429 → รอ ≥ 1 s (ไม่ยิงรัว) ·
+timeout ต่อครั้ง 3 → 6 s แล้วยิงใหม่ (บางครั้งค้าง ~9 s)
+
+**ผลวัดจริง 2026-10-17** — benchmark: แต่ละ algorithm รอ bucket เต็ม (28 s) → ค้นแบบ `plan`/`rent` → **ground truth ทันทีหลังค้น**
+(หั่นซ้อนจนทุก leaf ≤ 2 แถว ในช่วงถูกสุด 15 เครื่อง) · 6 เคส × 2 รอบ · "rent ถูก" = ได้ (tier reliability, ราคารวม) เท่ากับตัวดีสุดใน truth
+
+| กรณี | เวลา v0 → v5 | calls | ราคาต่ำสุดถูก v0 / v5 | ตัวที่ rent เลือกถูก v0 / v5 |
+|:--|:--|:--|:--|:--|
+| RTX 4090 ≤ $0.60 (down < $0.005/GB) | 2.93 → 2.84 s | 16 → 15 | 1/2 · 2/2 | 1/2 · 2/2 |
+| RTX 5090 ≤ $1.00 | 2.86 → 3.34 s | 14.5 → 15.5 | 2/2 · 1/2 | 2/2 · 1/2 |
+| RTX 3090 ≤ $0.30 | 2.81 → **1.58 s** | 19 → 17.5 | 2/2 · 2/2 | 2/2 · 1/2 |
+| ทุก GPU ≤ $0.20 | 3.55 → **2.39 s** | 17.5 → 18.5 | 2/2 · 2/2 | 2/2 · 2/2 |
+| RTX 4090 ≤ $0.80 ไม่กรองค่าดาวน์โหลด | 3.30 → 3.76 s | 18 → 19.5 | 2/2 · 2/2 | 2/2 · 2/2 |
+| ทุก GPU ≤ $0.30 ไม่กรองค่าดาวน์โหลด | 3.48 → **2.51 s** | 17.5 → 19 | 2/2 · 2/2 | 2/2 · 2/2 |
+| **รวม** | **3.15 → 2.74 s (−13%)** | 17.1 → 17.5 | 11/12 · 11/12 | 11/12 · 10/12 |
+
+- เมื่อมีโปรแกรมอื่นใช้ key เดียวกัน (bucket เหลือน้อย): v0 โดน 429 เฉลี่ย 6.2 ครั้ง/การค้น ช้า 6.05 s · รุ่นใหม่ 0.4 ครั้ง 4.89 s
+- end-to-end CLI (session ร่วม): `sweep` 3.0 → 2.2 s · `bill` 4.0 → 3.2 s · `template-search` 4.0 → 3.1 s · `plan` 5090 3.8 → 2.1 s
+- เคสที่พลาด (ทั้ง v0 และ v5 อัตราใกล้กัน) = เครื่องถูกที่ algorithm ไม่เห็นเลย ตรวจซ้ำทันที 4 ครั้งใน 30 s ไม่พบเครื่องใหม่ —
+  ยังพิสูจน์สาเหตุไม่ได้ (**UNVERIFIED**: bundle ซ่อนแม้ช่วงเบาบาง หรือเครื่องเพิ่งลงตลาด)
+
+**วิธีที่ลองแล้วแพ้** (อย่าทำซ้ำ):
+- ค้นซ้ำหลายรอบด้วย query เดิม — server ตอบเหมือนเดิมทุกครั้ง ไม่ได้อะไรเพิ่ม
+- หั่นครึ่งทีละชั้นหลายรอบ (ช้า 8–14 s) · pipeline ยิงต่อเนื่องไม่มีจังหวะ / cache แผนที่ตลาดไว้ค้นซ้ำ (โดน 429 หนัก ช้า 5–21 s)
+- **ลด call เหลือ ~12 (root+4 หรือ 5–6 ช่วง)**: เร็วขึ้นแต่ "ตัวที่ rent เลือก" ถูกแค่ 10/12 — ตัวกำหนดเวลาคือ**จำนวนรอบ** ไม่ใช่จำนวน call
+  (bucket รับ ~25 call ต่อ burst ได้สบาย) → ใช้ความกว้าง 8 ช่วงเท่าเดิม แต่รวมขั้นยืนยันเข้าไปในรอบที่มีอยู่แล้ว
+- เพิ่มการหั่นทั้งช่วง focus ตาม machine_id (2 call ช่วงกว้าง) — query ช่วงกว้างช้า 0.62 s ทำให้ทั้งรอบช้าตาม (3.7 s)
+- ประเมินโดยเทียบกับ truth ที่วัดหลังพักหลายสิบวินาที / union ของหลาย algorithm — noise จากตลาดเปลี่ยนกลบความต่างหมด
+
+ถ้าเรียก `search_offers` เองนอก toolkit ต้องหั่นช่วงราคาแบบเดียวกัน ค้นครั้งเดียวไม่ครบ
 
 ฟิลด์ query ทั้งหมด: `vastai search offers --help` = source of truth ที่แม่นกว่าเอกสารเว็บ
 ชื่อ/หน่วยที่ต่างกันสองฝั่ง อยู่ในบล็อก `SDK CONTRACT` (`OFFER` / `INST`) ต้น toolkit แล้ว
 
 ---
 
-# Error playbook — อาการ → สาเหตุ → ทางแก้
+## Error playbook — อาการ → สาเหตุ → ทางแก้
 
 ✅ = เจอของจริงในการทดสอบ · ⚠️ = รู้จากซอร์ส/เอกสาร ยังไม่ได้ทำให้เกิดจริง (UNVERIFIED)
 
@@ -1502,7 +1935,7 @@ create ──► None(provisioning) ──► created/loading ──► running 
 | 7 ✅ | `scp: dest open "/workspace/x": No such file` | image `nvidia/cuda:*` **ไม่มี `/workspace`** | `mkdir -p` ก่อน (toolkit ทำให้แล้ว) หรือใช้ `/root/` — อย่า copy ลง `/root` หรือ `/` ทั้ง dir จะพัง permission `.ssh` |
 | 8 ✅ | ราคาที่โดนจริง > ที่ประเมิน ($0.0947→$0.1044) | `search_offers(storage=5.0)` เป็น default | ส่ง `storage=<disk จริง>` ทุกครั้ง |
 | 9 ✅ | `search_offers(query="id=…")` คืน 0 แถวทั้งที่ offer ยังอยู่ | server ไม่ honor `id` (ผ่าน `parse_query` แต่ถูกเมิน) | ค้นด้วย `machine_id=` แล้วหา offer id ในผลลัพธ์ — เอา `id=` ไปทำ preflight จะ **บล็อกการสร้างทุกครั้ง** |
-| 10 ✅ | `search_offers(limit=500)` คืน 64 | cap ฝั่ง server | **แคบ query** ไม่ใช่เพิ่ม limit |
+| 10 ✅ | `search_offers(limit=500)` คืน 64 / ค้นซ้ำ query เดิมได้เครื่องไม่เหมือนเดิม / พลาดราคาต่ำสุด | server ตัด raw offers แล้วรวม bundle คืนตัวแทน 1 ตัว | ใช้ `sweep()` (หั่นช่วง `dph` ให้แคบ) — ดู "การค้นหาเครื่อง" |
 | 11 ✅ | `ssh_url()` ปกติ แต่ `Permission denied (publickey)` | public key ยังไม่ผูกกับบัญชี (หรือผูกคนละคีย์กับที่ `VAST_SSH_KEY_FILE` ชี้) | `vast.py keys` ดู `registered` + `fingerprint` → ยังไม่ผูกก็ `keys --attach` แล้วรอ ~10 s · เครื่องที่สร้างไปแล้วใช้ `attach_ssh(instance_id=…, ssh_key=<เนื้อ public>)` · ยืนยันจาก `logs()` ที่จะขึ้น `Accepted key … authorized_keys` |
 | 12 ✅ | `actual_status == "offline"` / ไม่อัปเดต | host หลุด | ถือว่าล้มเหลวทันที อย่ารอ → destroy แล้วเลือก offer ที่ `reliability` สูงกว่า |
 | 13 ✅ | error message ไม่มีรายละเอียด | `str(HTTPError)` มีแค่ code+url | อ่าน `e.response.json()["msg"]` (toolkit มี `http_err()`) |
@@ -1522,7 +1955,7 @@ create ──► None(provisioning) ──► created/loading ──► running 
 | 27 ✅ | `plan --template-id` ของ template ที่มี `cuda_max_good` ส่ง `cuda_vers` ไป server | `template_query_parts` แปลง filter ตรง ๆ (ชน #23) | แก้แล้ว: ข้าม `cuda_max_good` ใน query แล้วตรวจฝั่ง client ใน `template_offer_mismatches` |
 | 28 ✅ | `running` แล้วแต่ SSH ไม่ติด, `logs()` มี `Authentication refused: bad ownership or modes for file /root/.ssh/authorized_keys` | image (เช่น `vllm/vllm-openai`) ทำ `/root` ให้ group/other เขียนได้ → sshd ปฏิเสธ key; เดิม `rent` รอเงียบ ๆ ~10 นาที | onstart default มี `SSH_FIX` (chown/chmod `/root` `.ssh` ซ้ำ 90 s) แล้ว · `LogWatch` จับ pattern นี้ได้ใน ≤20 s (scope `image`) |
 | 30 ✅ | `watch` รอต่อทั้งที่ server ตายแล้วด้วย `OSError: Could not load this library: …libtorchcodec_image.so` | pattern ไม่ครอบคลุม `OSError`/`Application startup failed` และไม่ได้เช็คว่า process ยังอยู่ | เพิ่ม pattern + `--alive <pgrep pattern>` · (ต้นเหตุ: `vllm/vllm-openai:cu129-nightly` มี torchcodec ที่ build กับ CUDA 13 → `pip uninstall -y torchcodec` ถ้าไม่ใช้ audio) |
-| 31 ✅ | direct SSH/port (`public_ip:HostPort`) ใช้ได้ตอนสร้าง แล้ว **timeout กลางทาง ~10 นาที** ก่อนกลับมาเอง ขณะที่ proxy `sshN.vast.ai` ยังใช้ได้ | network ของ host หลุดชั่วคราว (instance ยัง `running`) | หลังสร้างเครื่อง `ssh_check` ทดสอบ **ทุก endpoint** + รัน `nvidia-smi` จริง แล้วรายงานผลแต่ละทาง · `run`/`push`/`pull`/`watch` เลือก endpoint ที่ต่อได้ตอนนั้น (direct → proxy) · บริการ HTTP ให้มีทางสำรอง เช่น `cloudflared tunnel --url http://localhost:PORT` |
+| 31 ✅ | direct SSH/port (`public_ip:HostPort`) ใช้ได้ตอนสร้าง แล้ว **timeout กลางทาง ~10 นาที** ก่อนกลับมาเอง ขณะที่ proxy `sshN.vast.ai` ยังใช้ได้ | network ของ host หลุดชั่วคราว (instance ยัง `running`) | หลังสร้างเครื่อง `ssh_check` ทดสอบ **ทุก endpoint** + รัน `nvidia-smi` จริง แล้วรายงานผลแต่ละทาง · `run`/`push`/`pull`/`watch` เลือก endpoint ที่ต่อได้ตอนนั้น (direct → proxy, หรือล็อกด้วย `--via`) · `connect --id N` ทดสอบ+ให้คำสั่งของทั้งสองทาง · บริการ HTTP ให้มีทางสำรอง เช่น `cloudflared tunnel --url http://localhost:PORT` |
 | 32 ✅ | `watch --alive` รายงาน "process ตาย" ทั้งที่ server ยังรันอยู่ | ssh rc 255 (ต่อไม่ได้) ถูกนับเหมือน `pgrep` rc 1 | แก้แล้ว: rc 255 → หา endpoint ใหม่, นับว่าตายเฉพาะ rc 1 · pattern `[s]erver.py` กัน pgrep เจอ shell ของตัวเอง |
 | 33 ✅ | `watch` รายงาน ready ภายใน 13 s หลัง restart (ยังไม่พร้อมจริง) / เจอ fatal ของรอบก่อน | อ่านเจอ `Application startup complete`/error ที่ค้างใน log เก่า ก่อน process ใหม่ truncate ไฟล์ | แก้แล้ว: นับ log ไฟล์เฉพาะเมื่อ mtime ≥ เวลาเริ่ม watch (เวลาฝั่ง remote) |
 | 34 ✅ | `rent` ลบเครื่องดี ๆ ทิ้งเพราะ log มี `Error response from daemon: No such container: C.<id>` | บรรทัดนี้ขึ้นปกติก่อน container ถูกสร้าง | แก้แล้ว: pattern docker ใช้ `(?!No such container)` — **pattern ใหม่ทุกตัวต้องลองกับ log ของเครื่องที่ปกติก่อน** |
@@ -1532,11 +1965,33 @@ create ──► None(provisioning) ──► created/loading ──► running 
 | 38 ✅ | `curl` ไฟล์เดียวจาก HF ได้ ~7.6 MB/s แต่ `snapshot_download` + `HF_HUB_ENABLE_HF_TRANSFER=1` โหลด 23 GB ใน ~7.5 นาที (~50 MB/s) | single stream ถูกจำกัดต่อ connection | วัดความเร็วด้วยเครื่องมือที่จะใช้จริง (hf_transfer/หลาย connection) ก่อนตัดสินใจเปลี่ยนเครื่อง |
 | 39 ✅ | เครื่องในจีน (`geolocation` ลงท้าย `, CN`) `curl https://huggingface.co/...` ได้ `000` · `hf-mirror.com` ใช้ได้แต่ Xet ตอบ `401 Unauthorized … cas-server.xethub.hf.co` และ HTTP ได้แค่ ~17 MB/s | HF ถูก block ในจีน; `inet_down` ที่ประกาศ (2212 Mbps) ไม่ช่วย | `plan`/`rent` **ตัดประเทศใน `VAST_BLOCK_GEO` (default `CN`) ให้แล้ว** · ถ้าจำเป็นต้องใช้: `--allow-geo` + `HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1` · pull Docker Hub ในจีนก็ช้า (vLLM 11 GB ~13 นาที) |
 | 40 ✅ | `rent` ลบเครื่องที่ยัง pull image vLLM อยู่ เพราะค้าง `loading` เกิน 420 s | image ~11 GB ใช้เวลาเกิน grace | ตั้ง `VAST_LOADING_GRACE=1000` สำหรับ image ใหญ่ · ดู `status_msg` (`Pulling from …`/`Download complete`) แยกจากเครื่องค้างจริง |
+| 41 ✅ | ค้าง `created` นาน ๆ, `status_msg` = `Error response from daemon: failed to create task for container: …` แต่ `rent` รอจนครบ grace | error docker ของ host อยู่ใน `status_msg` ไม่ใช่ `logs()` | แก้แล้ว: `wait_for` scan `status_msg` ด้วย `FATAL_LOG` ทุก poll → ลบ+เปลี่ยนเครื่องทันที |
+| 42 ✅ | `dph<0.330667` ยังคืน offer ที่ `dph_base=0.3306666…` (ยืนยันราคาต่ำสุดไม่จบ) | `%.6f` ปัดขึ้น | ใช้ `%.9f` และปัดขอบบนลง (`math.floor`) |
+| 43 ✅ | "ยืนยันราคาต่ำสุดแล้ว" แต่มีเครื่องราคารวมถูกกว่า | ยืนยันแค่ `dph_base` ต่ำสุด แต่เครื่องที่ base สูงกว่าอาจค่า storage ถูกกว่า | ยืนยันด้วย `dph < total ต่ำสุด` แล้วดูว่ามีแถวไหน total ต่ำกว่า |
+| 44 ✅ | HTTP 429 ตอนค้นถี่ · `Retry-After` 1 s | rate limit (2026-10-17: `X-RateLimit-Limit 30` ต่อ API key รวมทุก process, burst ~30 แล้วเติม ~1/s · ก่อนหน้านี้เคยเป็น 5 ต่อ backend) | toolkit คุม bucket ตาม `X-RateLimit-Remaining` ไม่ยิงจนโดน 429 · หลาย process ใช้ key เดียวกันพร้อมกัน = แบ่ง bucket กัน · การค้นหนึ่งครั้งใช้ ~15–20 call → ค้นติดกันได้ ~2 ครั้งก่อนช้าลงเหลือ 1 call/s |
+| 45 ✅ | `search_offers_new` (`/search/asks/`) 400 `select_cols` หรือคืน GPU ผิดรุ่น | SDK ส่ง `["*"]` ที่ server ไม่รับ และ endpoint ไม่กรองตาม query | อย่าใช้ — ใช้ `/bundles/` |
 | 29 ✅ | รอ `running`/SSH จน timeout ทั้งที่เครื่องพังตั้งแต่นาทีแรก | ไม่ได้ดู log ระหว่างรอ | `rent`/`create` สุ่มอ่าน log ทุก 20 s (`LogWatch`) · `watch` สำหรับ init ของ server เอง · ดู RUNBOOK 1b |
+| 46 ✅ | `rent` หลายตัวพร้อมกันเลือก offer เดียวกัน → ตัวที่แย่งไม่ทันได้ `400 … no_such_ask  Instance type by id N is not available` แล้วค้างเฉย ๆ ~95 s ก่อนลองตัวถัดไป | `reconcile()` รอ label 90 s ทุกกรณี | แก้แล้ว: 400 `no_such_ask` = server ปฏิเสธชัดเจน ไม่มีเครื่องเกิด → เช็ค label สั้น ๆ 6 s แล้วไปต่อ (rent ที่ชนกัน 221 s → 43 s) · error อื่น (timeout/network) ยังรอเต็ม 90 s กันเครื่องซ้ำ |
+| 47 ✅ | ค้นช่วงเดิมซ้ำได้ผลเหมือนเดิมทุกครั้ง แต่ยังขาดเครื่อง / เครื่อง GPU รุ่นเดียวราคาเดียวกันโผล่แค่ตัวเดียว | `/bundles/` คืนตัวแทน 1 ตัวต่อ `bundle_id` (เครื่องอื่นใน bundle ถูกซ่อน) และ deterministic ต่อ query | หั่นช่วงต่างแบบ (ราคา และ `machine_id`) แทนการยิงซ้ำ — `sweep()` ทำให้แล้ว |
+| 48 ✅ | `rent` ได้เครื่องที่ไม่ใช่ตัวถูกสุดในกลุ่ม reliability ≥ 0.995 ทั้งที่ log บอก "ราคาต่ำสุดยืนยันแล้ว" | ยืนยันแค่ราคาต่ำสุดรวม แต่ rent เรียง reliability ≥ 0.995 ก่อน | แก้แล้ว: ยืนยัน 2 เป้า (รวม + `reliability>=0.995` ฝั่ง server) |
+| 49 ✅ | `vllm/vllm-openai:v0.31.0-cu129` (stable ไม่ใช่แค่ nightly) `vllm serve` ตายใน 8 s ด้วย `OSError: Could not load this library: …libtorchcodec_image.so` | torchcodec ใน image build กับ CUDA 13 (เหมือน #36) | `pip uninstall -y torchcodec` ใน start script ก่อน `vllm serve` เสมอ (ถ้าไม่ใช้ audio/video) · `watch --alive "vllm serve"` จับได้ใน 16 s |
+| 50 ✅ | Qwen 3.6 (`--reasoning-parser qwen3`) ตอบ `content` ว่าง, `finish_reason=length` | โมเดลใช้ token ไปกับ thinking (~1.6k ตัวอักษรใน `reasoning_content`) จนหมด `max_tokens` | ตั้ง `max_tokens` ≥ 1500 หรือปิด thinking ต่อ request: `"chat_template_kwargs": {"enable_thinking": false}` |
 
 ---
 
-# ผลทดสอบซ้ำบน vastai 1.8.2 (2026-09-30)
+## ผลทดสอบ 2026-10-17 (vastai 1.8.3 · loop engineer 5 รอบ · เครื่องจริง 5 เครื่อง พร้อมกันสูงสุด 3 · จ่ายจริง ~$0.3)
+
+5 รอบปรับ+วัด search: v1 (3 รอบ, call −42%) → v2 (หั่น focus ตาม machine_id — ช้า ตัด) → v3 (ไม่ยิง root) →
+v4 (ยืนยัน 2 เป้า) → **v5 = v4 + กว้าง 8 ช่วง** (ใช้จริง) — ตารางใน "การค้นหาเครื่อง"
+
+**ผ่าน (ของจริง)**: `env` `keys` `drift --live` (no drift บน 1.8.3) `sweep` `bill` · `plan` (default/GPU/template/`--max-down-cost 0`) ·
+`rent` 5090 + vLLM image (159 s, SSH 2 ทาง) · `rent` 2 ตัวขนาน ×2 รอบ (ชนกันที่ offer เดียว → fix #46: 221 → 43 s) ·
+`create` offer ที่ถูกแย่ง → 9 s ไม่มีเครื่องเกิด · adopt label ซ้ำ · `run` `connect` (exit 0 ทั้ง 2 ทาง) · `push`/`pull` 5 MB byte-match ·
+`stop` 37 s → `exited` (no-op ซ้ำ, storage-only) → `start` 36 s ข้อมูลรอด (md5) · `watch` (จับ fatal #49 ใน 16 s, ready ใน 265 s) ·
+`destroy --label-prefix`/`--id`/`--dry-run`/idempotent · `template-create` (+กันชื่อซ้ำ) `-show` `-update` (verify, hash ใหม่ #25)
+`plan --template-id` `-delete --dry-run` `-delete` (verify หาย) · offline test 43 ข้อ (parser ทุก subcommand, .env, redact, filter, slice, geo/cuda, FATAL_LOG)
+
+## ผลทดสอบซ้ำบน vastai 1.8.2 (2026-09-30)
 
 SDK 1.8.2 เปลี่ยน signature เป็น explicit params (`create_instance`, `create_template`, `update_template`, `show_invoices`)
 และเพิ่ม `ssh`/`jupyter`/`direct`/volume/`bid_price` — raw `runtype` string เดิมยังใช้ได้ (ห้ามส่งคู่กับ flag ใหม่ → ValueError)
@@ -1549,7 +2004,7 @@ SDK 1.8.2 เปลี่ยน signature เป็น explicit params (`create_
 · `destroy --dry-run`/guard prefix/idempotent · `template-create`+กันชื่อซ้ำ · `template-update` verify · `template-delete` verify · `bill` v1
 · offer หายระหว่าง plan→create 1 ครั้ง → preflight `machine_id` ปฏิเสธถูกต้อง ไม่มีเครื่องเกิด · แก้บั๊ก #24 #27
 
-# ผลทดสอบจริง (2026-08-26)
+## ผลทดสอบจริง (2026-08-26)
 
 ทุกเครื่อง: `nvidia/cuda:12.4.1-runtime-ubuntu22.04` (~2.4 GB compressed) · disk 40 GB · on-demand (ไม่ใช้ bid)
 · เพดาน $0.20/hr และ 20 นาที/เครื่อง · **8 instance รวม ~27 นาที ค่าใช้จ่ายจริงจากใบแจ้งหนี้ ~$0.04**
@@ -1572,7 +2027,7 @@ official vLLM offer ราคาถูกหายก่อน create 3 คร�
 
 ---
 
-# 🔐 ก่อนส่งสกิลนี้ให้คนอื่น
+## 🔐 ก่อนส่งสกิลนี้ให้คนอื่น
 
 ไฟล์นี้ออกแบบให้**ส่งต่อได้ทันทีโดยไม่รั่วอะไรเลย** — key อยู่ใน `.env` ที่ไม่ได้อยู่ในสกิล
 และไม่มี path ส่วนตัว / account id / เลข instance / ยอดเครดิต อยู่ในไฟล์
@@ -1604,12 +2059,14 @@ grep -nE '(VAST_API_KEY|ssh-(rsa|ed25519))[= ]|/home/[a-z]|/Users/|[A-Za-z0-9]{4
 
 ---
 
-# ✅ Checklist ก่อนจบงานทุกครั้ง
+## ✅ Checklist ก่อนจบงานทุกครั้ง
 
 - [ ] `python /tmp/vast.py sweep` แล้ว **รายงานผู้ใช้**: กี่เครื่องรันอยู่ / burn rate / ใช้ไปประมาณเท่าไร / เครดิตเหลือ
 - [ ] หลัง destroy รัน `python /tmp/vast.py bill --id …` แล้ว **สรุปค่าใช้จ่ายจริง + สถิติของงาน** (ตาราง GPU/storage/download/upload ต่อเครื่อง, รวม, เครดิตเหลือ, เวลา create→destroy, จำนวนเครื่องที่เช่า, ความเร็วเน็ตที่วัดได้)
 - [ ] เครื่องที่ไม่ตั้งใจให้ค้าง → destroy แล้ว **verify ว่าหายจาก `show_instances()`** จริง
 - [ ] ทุก `stop`/`start`/`destroy` อ่านสถานะซ้ำหลังทำ ไม่ได้เชื่อ return value
+- [ ] รายงานค่าดาวน์โหลด `download_per_gb` ของเครื่องที่เช่า (และบอกถ้าเป็น fallback เพราะไม่มี offer < cap)
+- [ ] รายงานคำสั่ง SSH ของ**ทั้ง direct และ proxy** พร้อมผลทดสอบแต่ละทาง (`connect --id N`)
 - [ ] ไม่มี API key / `instance_api_key` / `jupyter_token` โผล่ใน output หรือไฟล์
 - [ ] ถ้ามี `create` ที่ error → ยืนยันแล้วว่า **ไม่มีเครื่องซ้ำเกิดขึ้น** (เช็คจาก label)
 - [ ] ชื่อ field / signature ที่ใช้ตรงกับบล็อก `SDK CONTRACT` — เดาไม่ได้ให้เขียน **UNVERIFIED**
