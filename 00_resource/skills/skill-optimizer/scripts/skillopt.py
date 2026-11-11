@@ -242,9 +242,13 @@ def cmd_report(a):
         res[lb] = {"all": summarize(rows)}
         for sp in ("train", "val", "test"):
             res[lb][sp] = summarize([r for r in rows if r["split"] == sp])
+        for sp in ("all", "val", "test"):
+            res[lb][sp].pop("checks", None)
         res[lb]["trials"] = [dict({k: r[k] for k in ("task", "split", "rep", "account", "score", "wall_s", "tool_calls",
                                                  "tool_errors", "cost_usd", "output_tokens", "timed_out")},
-                                  failed=[c["id"] for c in r["checks"] if not c["pass"]]) for r in rows]
+                                  # ผลรายข้อเก็บเฉพาะชุด train · ชุด val/test เก็บแค่คะแนน (กันคำตอบรั่วเข้าการแก้สกิล)
+                                  failed=[c["id"] for c in r["checks"] if not c["pass"]] if r["split"] == "train" else None)
+                             for r in rows]
     json.dump(res, open(os.path.join(a.suite, "results.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     H = ["รุ่น", "ชุด", "รอบ", "คะแนน", "sd", "เต็มทุกข้อ", "เวลา (s)", "คำสั่ง", "คำสั่งล้ม", "ค่าใช้จ่าย", "output tok", "โทเคนขาเข้า",
          "อ่านสกิล", "จบไม่ปกติ"]
@@ -259,12 +263,12 @@ def cmd_report(a):
                     s["skill_read"], s["n"], s["abnormal"]))
     ids = []
     for lb in labels:
-        for k in res[lb]["all"]["checks"]:
+        for k in res[lb]["train"]["checks"]:
             if k not in ids:
                 ids.append(k)
-    L += ["", "| ข้อตรวจ | " + " | ".join(labels) + " |", "|---|" + "---|" * len(labels)]
+    L += ["", "| ข้อตรวจ (เฉพาะชุด train) | " + " | ".join(labels) + " |", "|---|" + "---|" * len(labels)]
     for k in ids:
-        L.append("| %s | %s |" % (k, " | ".join(res[lb]["all"]["checks"].get(k, "-") for lb in labels)))
+        L.append("| %s | %s |" % (k, " | ".join(res[lb]["train"]["checks"].get(k, "-") for lb in labels)))
     print("\n".join(L))
     return 0
 
