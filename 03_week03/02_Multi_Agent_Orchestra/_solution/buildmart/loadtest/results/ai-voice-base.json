@@ -1,0 +1,170 @@
+{
+  "label": "ai-voice-base",
+  "config": {
+    "mode": "voice",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "stage_sec": 60,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 30000,
+      "ttft_p95_ms": 8000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [
+      "V01.wav",
+      "V02.wav",
+      "V03.wav",
+      "V04.wav",
+      "V05.wav",
+      "V06.wav",
+      "V07.wav",
+      "V08.wav",
+      "V09.wav",
+      "V10.wav"
+    ]
+  },
+  "summary": {
+    "mode": "voice",
+    "max_users_ok": 0,
+    "thresholds": {
+      "p95_ms": 30000,
+      "ttft_p95_ms": 8000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 2,
+    "stages_total": 6,
+    "best_rps": 0.479,
+    "finished_at": "2026-10-23T10:21:06.319Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 11,
+      "errors": 3,
+      "error_rate": 0.2727,
+      "p50": 6019,
+      "p95": 7977,
+      "ttft_p50": 2953,
+      "ttft_p95": 3447,
+      "rtf": null,
+      "tokens_per_s": 128,
+      "queue_max": 2,
+      "rps": 0.129,
+      "error_samples": [
+        "tts HTTP 502 fetch failed"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "error_rate 0.2727 > 0.02"
+      ]
+    },
+    {
+      "users": 2,
+      "n": 17,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 5558,
+      "p95": 23127,
+      "ttft_p50": 1842,
+      "ttft_p95": 4200,
+      "rtf": null,
+      "tokens_per_s": 125.1,
+      "queue_max": 3,
+      "rps": 0.274,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 33,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 7793,
+      "p95": 16583,
+      "ttft_p50": 2222,
+      "ttft_p95": 4407,
+      "rtf": null,
+      "tokens_per_s": 832.9,
+      "queue_max": 7,
+      "rps": 0.479,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 32,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 19479,
+      "p95": 35164,
+      "ttft_p50": 2451,
+      "ttft_p95": 5878,
+      "rtf": null,
+      "tokens_per_s": 82.2,
+      "queue_max": 13,
+      "rps": 0.374,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 35164 > 30000 ms"
+      ]
+    },
+    {
+      "users": 16,
+      "n": 45,
+      "errors": 7,
+      "error_rate": 0.1556,
+      "p50": 9303,
+      "p95": 66820,
+      "ttft_p50": 3961,
+      "ttft_p95": 12515,
+      "rtf": null,
+      "tokens_per_s": 77.5,
+      "queue_max": 20,
+      "rps": 0.339,
+      "error_samples": [
+        "tts HTTP 502 fetch failed",
+        "tts HTTP 504 timeout"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "p95 66820 > 30000 ms",
+        "ttft_p95 12515 > 8000 ms",
+        "error_rate 0.1556 > 0.02"
+      ]
+    },
+    {
+      "users": 32,
+      "n": 65,
+      "errors": 27,
+      "error_rate": 0.4154,
+      "p50": 13510,
+      "p95": 70099,
+      "ttft_p50": 7388,
+      "ttft_p95": 16764,
+      "rtf": null,
+      "tokens_per_s": 73.3,
+      "queue_max": 39,
+      "rps": 0.327,
+      "error_samples": [
+        "tts HTTP 504 timeout"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "p95 70099 > 30000 ms",
+        "ttft_p95 16764 > 8000 ms",
+        "error_rate 0.4154 > 0.02"
+      ]
+    }
+  ]
+}

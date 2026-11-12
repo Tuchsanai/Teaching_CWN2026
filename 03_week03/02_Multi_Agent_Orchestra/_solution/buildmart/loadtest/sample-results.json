@@ -1,0 +1,109 @@
+{
+ "label": "chat · 5090 + 4090",
+ "config": {
+  "mode": "chat",
+  "stage_sec": 120,
+  "users": [
+   1,
+   2,
+   4,
+   8,
+   16,
+   32
+  ],
+  "llm": "Qwen3.8-27B-nvfp4",
+  "prefetch": {
+   "chat": 4,
+   "stt": 4,
+   "tts": 2
+  }
+ },
+ "summary": {
+  "mode": "chat",
+  "max_users_ok": 16,
+  "thresholds": {
+   "p95_s": 12,
+   "error_rate": 0.01
+  }
+ },
+ "stages": [
+  {
+   "users": 1,
+   "n": 14,
+   "errors": 0,
+   "p50": 2.76,
+   "p95": 3.63,
+   "ttft_p50": 0.97,
+   "ttft_p95": 1.44,
+   "rtf": null,
+   "tokens_per_s": 55.4,
+   "queue_max": 0,
+   "ok": true
+  },
+  {
+   "users": 2,
+   "n": 28,
+   "errors": 0,
+   "p50": 2.91,
+   "p95": 3.87,
+   "ttft_p50": 1.04,
+   "ttft_p95": 1.53,
+   "rtf": null,
+   "tokens_per_s": 100.0,
+   "queue_max": 0,
+   "ok": true
+  },
+  {
+   "users": 4,
+   "n": 56,
+   "errors": 0,
+   "p50": 3.22,
+   "p95": 4.38,
+   "ttft_p50": 1.19,
+   "ttft_p95": 1.71,
+   "rtf": null,
+   "tokens_per_s": 167.6,
+   "queue_max": 0,
+   "ok": true
+  },
+  {
+   "users": 8,
+   "n": 112,
+   "errors": 0,
+   "p50": 3.85,
+   "p95": 5.47,
+   "ttft_p50": 1.48,
+   "ttft_p95": 2.07,
+   "rtf": null,
+   "tokens_per_s": 189.8,
+   "queue_max": 4,
+   "ok": true
+  },
+  {
+   "users": 16,
+   "n": 224,
+   "errors": 0,
+   "p50": 7.59,
+   "p95": 11.69,
+   "ttft_p50": 3.13,
+   "ttft_p95": 4.37,
+   "rtf": null,
+   "tokens_per_s": 127.4,
+   "queue_max": 24,
+   "ok": true
+  },
+  {
+   "users": 32,
+   "n": 448,
+   "errors": 25,
+   "p50": 15.08,
+   "p95": 26.84,
+   "ttft_p50": 6.44,
+   "ttft_p95": 8.98,
+   "rtf": null,
+   "tokens_per_s": 76.9,
+   "queue_max": 56,
+   "ok": false
+  }
+ ]
+}

@@ -1,0 +1,1198 @@
+[
+  {
+    "id": "CV-01",
+    "set": "conv",
+    "title": "ปูน CEM-001 อายุเก็บ → ราคาส่ง 100 ถุง → ตะกร้า → ค่าส่ง → ใบเสนอราคา (เสียงทุกรอบ)",
+    "voice": true,
+    "turns": [
+      {
+        "audio": "V01.wav",
+        "text": "ปูนซีเมนต์ CEM-001 เก็บได้นานแค่ไหน",
+        "lang": "th",
+        "expected": "CEM-001 เก็บได้ 3 เดือนนับจากวันผลิต (วางบนพาเลท ซ้อนไม่เกิน 10 ถุง)",
+        "key_facts": [
+          [
+            "3 เดือน",
+            "สามเดือน"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 12
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 14
+          }
+        ],
+        "needs_products": [
+          "CEM-001"
+        ]
+      },
+      {
+        "audio": "V02.wav",
+        "text": "ถ้าซื้อร้อยถุงราคาส่งเท่าไร",
+        "lang": "th",
+        "refers_to": "CEM-001",
+        "expected": "CEM-001 100 ถุงได้ราคาส่งขั้น 50–199 (ลด 5%) ถุงละ 137.75 บาท รวม 13,775.00 บาท (ก่อน VAT)",
+        "expected_values": [
+          "137.75",
+          "13775"
+        ],
+        "needs_products": [
+          "CEM-001"
+        ]
+      },
+      {
+        "audio": "V03.wav",
+        "text": "ใส่ตะกร้าให้หน่อย",
+        "lang": "th",
+        "refers_to": "CEM-001 × 100 ถุง",
+        "expected": "เพิ่ม CEM-001 จำนวน 100 ถุงลงตะกร้าแล้ว",
+        "key_facts": [
+          "CEM-001",
+          "100"
+        ],
+        "expect_state": {
+          "cartCount": 100
+        },
+        "needs_products": [
+          "CEM-001"
+        ]
+      },
+      {
+        "audio": "V09.wav",
+        "text": "แล้วส่งด้วยรถอะไร ค่าส่งเท่าไร",
+        "lang": "th",
+        "refers_to": "ตะกร้า CEM-001 × 100 ถุง",
+        "expected": "น้ำหนักรวม 5,000 กก. ส่งด้วยรถ 6 ล้อ ค่าส่ง 1,500.00 บาท",
+        "expected_values": [
+          "รถ 6 ล้อ",
+          "1500"
+        ],
+        "key_facts": [
+          [
+            "5000",
+            "5,000.00"
+          ]
+        ]
+      },
+      {
+        "audio": "V10.wav",
+        "text": "ขอใบเสนอราคาด้วย",
+        "lang": "th",
+        "refers_to": "ตะกร้าปัจจุบัน",
+        "expected": "สร้างใบเสนอราคาเลข QT-YYYYMMDD-NNNN จากตะกร้า (CEM-001 100 ถุง ยอดก่อน VAT 13,775.00 + ค่าส่ง 1,500.00 + VAT 1,069.25 = 16,344.25 บาท)",
+        "expected_values": [
+          "QT-"
+        ],
+        "key_facts": [
+          [
+            "16344.25",
+            "16,344.25"
+          ]
+        ],
+        "expect_state": {
+          "quoteNo": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "CV-02",
+    "set": "conv",
+    "title": "ปูกระเบื้อง 60x60: เกรียง → อัตราปูนกาว → พื้น 20 ตร.ม. → กี่ถุง → ตะกร้า → ยอดรวม (2 รอบแรกเป็นเสียง)",
+    "voice": true,
+    "turns": [
+      {
+        "audio": "V04.wav",
+        "text": "ปูกระเบื้องหกสิบคูณหกสิบ ใช้เกรียงฟันกี่มิล",
+        "lang": "th",
+        "expected": "กระเบื้อง 60x60 ซม. ใช้เกรียงฟัน 10 มม.",
+        "key_facts": [
+          [
+            "10 มม.",
+            "10 มิล",
+            "10 mm"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 7
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 14
+          }
+        ]
+      },
+      {
+        "audio": "V05.wav",
+        "text": "แล้วต้องใช้ปูนกาวกี่กิโลต่อตารางเมตร",
+        "lang": "th",
+        "refers_to": "กระเบื้อง 60x60 / เกรียงฟัน 10 มม. (ปูนกาว CEM-004)",
+        "expected": "ปูนกาว CEM-004 อัตราประมาณ 5.5 กก./ตร.ม. สำหรับกระเบื้อง 60x60 ซม.",
+        "key_facts": [
+          [
+            "5.5 กก",
+            "5.5 กิโล"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 7
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 14
+          }
+        ],
+        "needs_products": [
+          "CEM-004"
+        ]
+      },
+      {
+        "text": "ถ้าพื้นห้อง 20 ตร.ม. ต้องใช้ปูนกาวทั้งหมดกี่กิโล",
+        "refers_to": "อัตรา 5.5 กก./ตร.ม.",
+        "expected": "20 × 5.5 = 110 กก.",
+        "expected_values": [
+          "110"
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 7
+          }
+        ]
+      },
+      {
+        "text": "คิดเป็นกี่ถุง",
+        "refers_to": "ปูนกาว 110 กก. / ถุง 20 กก.",
+        "expected": "110 ÷ 20 = 5.5 → 6 ถุง (CEM-004 ถุงละ 20 กก.) · เครื่องคำนวณเว็บใช้ 1 ถุง/4 ตร.ม. ได้ 5 ถุง",
+        "expected_values": [
+          [
+            "6 ถุง",
+            "6ถุง",
+            "6 bags"
+          ]
+        ],
+        "needs_products": [
+          "CEM-004"
+        ]
+      },
+      {
+        "text": "ใส่ตะกร้าให้ 6 ถุงเลย",
+        "refers_to": "CEM-004 × 6",
+        "expected": "เพิ่ม CEM-004 6 ถุงลงตะกร้า",
+        "key_facts": [
+          "CEM-004",
+          "6"
+        ],
+        "expect_state": {
+          "cartCount": 6
+        }
+      },
+      {
+        "text": "รวมค่าส่งกับ VAT แล้วต้องจ่ายเท่าไร",
+        "refers_to": "ตะกร้า CEM-004",
+        "expected": "ยอดสินค้า 1,110.00 + ค่าส่งกระบะ 500.00 + VAT 112.70 = 1,722.70 บาท",
+        "expected_values": [
+          "1110",
+          "500",
+          "1722.7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-03",
+    "set": "conv",
+    "title": "เหล็ก DB12: สต็อกรังสิต → สาขาไหนมากสุด → ระยะทาบ → แล้ว DB16 → ราคาส่ง 200 เส้น (รอบแรกเสียง)",
+    "voice": true,
+    "turns": [
+      {
+        "audio": "V06.wav",
+        "text": "สาขารังสิตมีเหล็กข้ออ้อย DB12 เหลือกี่เส้น",
+        "lang": "th",
+        "expected": "สาขารังสิตมี DB12 (STL-003) 400 เส้น",
+        "expected_values": [
+          "400"
+        ],
+        "needs_products": [
+          "STL-003"
+        ],
+        "volatile": true
+      },
+      {
+        "text": "แล้วสาขาไหนมีเยอะที่สุด",
+        "refers_to": "STL-003 DB12",
+        "expected": "ลาดกระบัง (LKB) มากที่สุด 700 เส้น (บางนา 500 · รังสิต 400)",
+        "expected_values": [
+          "ลาดกระบัง",
+          "700"
+        ],
+        "needs_products": [
+          "STL-003"
+        ],
+        "volatile": true
+      },
+      {
+        "text": "เหล็กตัวนี้ต้องทาบยาวอย่างน้อยกี่เซน",
+        "refers_to": "DB12",
+        "expected": "ระยะทาบอย่างน้อย 40 เท่าของเส้นผ่านศูนย์กลาง → DB12 ทาบอย่างน้อย 48 ซม.",
+        "key_facts": [
+          [
+            "48 ซม",
+            "48 เซน",
+            "48 cm"
+          ],
+          [
+            "40 เท่า",
+            "40d"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 8
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 12
+          }
+        ]
+      },
+      {
+        "text": "แล้วถ้าเป็น DB16 ล่ะ",
+        "refers_to": "ระยะทาบ (เปลี่ยนจาก DB12 เป็น DB16)",
+        "expected": "DB16 ทาบอย่างน้อย 64 ซม. (40 × 16 มม.)",
+        "key_facts": [
+          [
+            "64 ซม",
+            "64 เซน",
+            "64 cm"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 8
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 12
+          }
+        ]
+      },
+      {
+        "text": "โอเค เอา DB12 200 เส้น ราคาส่งเท่าไร",
+        "refers_to": "STL-003",
+        "expected": "DB12 200 เส้นได้ราคาขั้น ≥200 (ลด 10%) เส้นละ 175.50 บาท รวม 35,100.00 บาท (ก่อน VAT)",
+        "expected_values": [
+          "175.5",
+          "35100"
+        ],
+        "needs_products": [
+          "STL-003"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-04",
+    "set": "conv",
+    "title": "สายไฟ THW 2.5 + เบรกเกอร์: จับคู่ → ราคา/ประกัน → ตะกร้า → ยอดรวม → คูปอง BUILD5 (รอบแรกเสียง)",
+    "voice": true,
+    "turns": [
+      {
+        "audio": "V07.wav",
+        "text": "สายไฟ THW สองจุดห้า ใช้คู่กับเบรกเกอร์กี่แอมป์",
+        "lang": "th",
+        "expected": "สาย THW 2.5 ตร.มม. รับกระแสได้ 21 A ใช้คู่กับเบรกเกอร์ 16–20 A",
+        "key_facts": [
+          [
+            "16–20",
+            "16-20",
+            "16 ถึง 20",
+            "16 หรือ 20"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 5
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 6
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 14
+          }
+        ],
+        "needs_products": [
+          "ELC-001"
+        ]
+      },
+      {
+        "text": "เบรกเกอร์ 16A ที่ร้านขายตัวละเท่าไร รับประกันกี่ปี",
+        "refers_to": "เบรกเกอร์ที่ใช้คู่สายเมื่อกี้ → ELC-002",
+        "expected": "ELC-002 เบรกเกอร์ลูกย่อย 16A ตัวละ 145.00 บาท รับประกัน 2 ปี",
+        "expected_values": [
+          "145"
+        ],
+        "key_facts": [
+          [
+            "2 ปี",
+            "สองปี"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 14
+          }
+        ],
+        "needs_products": [
+          "ELC-002"
+        ]
+      },
+      {
+        "text": "เอาสายไฟนั่น 3 ม้วน กับเบรกเกอร์ 4 ตัว ใส่ตะกร้าให้หน่อย",
+        "refers_to": "ELC-001 × 3 + ELC-002 × 4",
+        "expected": "เพิ่ม ELC-001 3 ม้วน และ ELC-002 4 ตัวลงตะกร้า",
+        "key_facts": [
+          "ELC-001",
+          "ELC-002"
+        ],
+        "expect_state": {
+          "cartCount": 7
+        }
+      },
+      {
+        "text": "ทั้งหมดรวม VAT กับค่าส่งเท่าไร",
+        "refers_to": "ตะกร้า ELC-001 × 3 + ELC-002 × 4",
+        "expected": "ยอดสินค้า 5,530.00 + ค่าส่งกระบะ 500.00 + VAT 422.10 = 6,452.10 บาท",
+        "expected_values": [
+          "5530",
+          "6452.1"
+        ]
+      },
+      {
+        "text": "ใช้คูปอง BUILD5 ได้ไหม ถ้าได้เหลือเท่าไร",
+        "refers_to": "ยอดตะกร้าเดิม",
+        "expected": "ได้ (ยอด 5,530.00 ≥ 5,000) ลด 5% = 276.50 → 5,253.50 + ค่าส่ง 500.00 + VAT 402.75 = 6,156.25 บาท",
+        "expected_values": [
+          "276.5",
+          "6156.25"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-05",
+    "set": "conv",
+    "title": "สีภายนอก (ถามอังกฤษด้วยเสียง) → แล้วภายในล่ะ → ราคาสองตัว → ทา 120 ตร.ม. → ทาเที่ยว 2 ห่างกี่ชม.",
+    "voice": true,
+    "turns": [
+      {
+        "audio": "V08.wav",
+        "text": "What is the warranty of the exterior paint?",
+        "lang": "en",
+        "expected": "The exterior paint PNT-001 has an 8-year warranty (when the full paint system is applied). (answer in English)",
+        "key_facts": [
+          [
+            "8 year",
+            "8-year",
+            "eight year",
+            "8 ปี"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 4
+          }
+        ],
+        "needs_products": [
+          "PNT-001"
+        ]
+      },
+      {
+        "text": "แล้วสีภายในล่ะ ประกันกี่ปี",
+        "refers_to": "การรับประกัน (เปลี่ยนเป็นสีภายใน PNT-002)",
+        "expected": "สีภายใน PNT-002 รับประกัน 5 ปี",
+        "key_facts": [
+          [
+            "5 ปี",
+            "ห้าปี"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 4
+          }
+        ],
+        "needs_products": [
+          "PNT-002"
+        ]
+      },
+      {
+        "text": "สองตัวนี้ราคาแกลลอนละเท่าไร",
+        "refers_to": "PNT-001 และ PNT-002",
+        "expected": "PNT-001 ภายนอก 890.00 บาท · PNT-002 ภายใน 590.00 บาท ต่อแกลลอน",
+        "expected_values": [
+          "890",
+          "590"
+        ],
+        "needs_products": [
+          "PNT-001",
+          "PNT-002"
+        ]
+      },
+      {
+        "text": "ถ้าจะทาผนังภายนอก 120 ตร.ม. 2 เที่ยว ต้องใช้สีกี่แกลลอน",
+        "refers_to": "สีภายนอก PNT-001",
+        "expected": "PNT-001 8 แกลลอน (120×2÷30) + รองพื้น PNT-003 3 แกลลอน (120÷40)",
+        "expected_values": [
+          [
+            "8 แกลลอน",
+            "8 gallon"
+          ]
+        ],
+        "key_facts": [
+          [
+            "3 แกลลอน",
+            "3 gallon"
+          ]
+        ],
+        "needs_products": [
+          "PNT-001"
+        ]
+      },
+      {
+        "text": "ทาเที่ยวที่สองต้องรอกี่ชั่วโมง",
+        "refers_to": "สีที่กำลังจะทา (PNT-001)",
+        "expected": "ทาเที่ยวที่ 2 ห่างจากเที่ยวแรก 2 ชั่วโมง (สภาวะปกติ)",
+        "key_facts": [
+          [
+            "2 ชั่วโมง",
+            "2 ชม",
+            "สองชั่วโมง"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-PNT.pdf",
+            "page": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-06",
+    "set": "conv",
+    "title": "กระเบื้องห้องน้ำ: TIL-002 ปูพื้นได้ไหม → งั้นตัว 60x60 → 12 ตร.ม. กี่กล่อง → ยาแนว → ราคารวม",
+    "voice": false,
+    "turns": [
+      {
+        "text": "กระเบื้อง TIL-002 เอาไปปูพื้นห้องน้ำได้ไหมครับ",
+        "expected": "ไม่ได้ TIL-002 เป็นกระเบื้องผนังเคลือบเงา สำหรับผนังเท่านั้น ห้ามปูพื้น (ลื่นเมื่อเปียก)",
+        "key_facts": [
+          [
+            "ผนังเท่านั้น",
+            "ห้ามปูพื้น",
+            "ไม่ได้"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 5
+          },
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 6
+          }
+        ],
+        "needs_products": [
+          "TIL-002"
+        ]
+      },
+      {
+        "text": "งั้นตัว 60x60 ที่ร้านมีล่ะ ดูดซึมน้ำเท่าไร กันลื่นไหม",
+        "refers_to": "กระเบื้องพื้น 60x60 → TIL-001",
+        "expected": "TIL-001 พอร์ซเลนเกรด A ดูดซึมน้ำ < 0.5% กันลื่นระดับ R10 ปูพื้นภายนอกได้",
+        "key_facts": [
+          [
+            "0.5%",
+            "0.5 %"
+          ],
+          "R10"
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 5
+          }
+        ],
+        "needs_products": [
+          "TIL-001"
+        ]
+      },
+      {
+        "text": "ห้องน้ำ 12 ตร.ม. ต้องซื้อกี่กล่อง",
+        "refers_to": "TIL-001 (กล่องละ 1.44 ตร.ม.)",
+        "expected": "12 × 1.1 (เผื่อเศษ 10%) ÷ 1.44 = 9.17 → 10 กล่อง (+ ปูนกาว CEM-004 3 ถุง · ยาแนว TIL-003 3 ถุง)",
+        "expected_values": [
+          [
+            "10 กล่อง",
+            "10 boxes"
+          ]
+        ],
+        "needs_products": [
+          "TIL-001"
+        ]
+      },
+      {
+        "text": "ยาแนวเสร็จแล้วต้องรอนานแค่ไหนถึงจะโดนน้ำได้",
+        "refers_to": "งานปูกระเบื้องห้องน้ำ (ยาแนว TIL-003)",
+        "expected": "ยาแนว TIL-003 ต้องรอ 24 ชม. ก่อนโดนน้ำ",
+        "key_facts": [
+          [
+            "24 ชม",
+            "24 ชั่วโมง"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-TIL.pdf",
+            "page": 10
+          }
+        ]
+      },
+      {
+        "text": "กระเบื้องที่ว่า 10 กล่องรวมเป็นเงินเท่าไร",
+        "refers_to": "TIL-001 × 10",
+        "expected": "TIL-001 กล่องละ 389.00 × 10 = 3,890.00 บาท (ก่อน VAT)",
+        "expected_values": [
+          "3890"
+        ],
+        "needs_products": [
+          "TIL-001"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-07",
+    "set": "conv",
+    "title": "นโยบายร้าน: ปูนเปิดถุงคืนได้ไหม → ถ้ายังไม่เปิด → เหล็กสั่งตัด → แต้ม Pro → แลกได้ไหม",
+    "voice": false,
+    "turns": [
+      {
+        "text": "ซื้อปูนไปแล้วเปิดถุงใช้ไปนิดเดียว เอามาคืนได้ไหม",
+        "expected": "ไม่ได้ ปูนที่เปิดถุงแล้วคืนไม่ได้",
+        "key_facts": [
+          [
+            "คืนไม่ได้",
+            "ไม่สามารถคืน",
+            "ไม่ได้"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 4
+          }
+        ]
+      },
+      {
+        "text": "แล้วถ้ายังไม่ได้เปิดล่ะ คืนได้ภายในกี่วัน",
+        "refers_to": "ปูนถุงที่ยังไม่เปิด",
+        "expected": "คืนได้ภายใน 7 วัน สภาพเดิมพร้อมใบเสร็จ",
+        "key_facts": [
+          [
+            "7 วัน",
+            "เจ็ดวัน"
+          ],
+          "ใบเสร็จ"
+        ],
+        "sources": [
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 4
+          }
+        ]
+      },
+      {
+        "text": "เหล็กที่ให้ร้านตัดตามขนาดล่ะ คืนได้เหมือนกันไหม",
+        "refers_to": "การคืนสินค้า (เหล็กสั่งตัด)",
+        "expected": "ไม่ได้ เหล็กที่สั่งตัดคืนไม่ได้",
+        "key_facts": [
+          [
+            "คืนไม่ได้",
+            "ไม่ได้"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 3
+          }
+        ]
+      },
+      {
+        "text": "ถ้าสมัคร BuildMart Pro แล้วซื้อของ 5,000 บาท จะได้กี่แต้ม",
+        "expected": "1 แต้มต่อทุก 100 บาท → 50 แต้ม",
+        "expected_values": [
+          [
+            "50 แต้ม",
+            "50 points"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 7
+          }
+        ]
+      },
+      {
+        "text": "แต้มเท่านั้นเอาไปแลกส่วนลดได้เลยไหม",
+        "refers_to": "50 แต้ม",
+        "expected": "ยังไม่ได้ แลกได้ทีละ 100 แต้ม (100 แต้ม = ส่วนลด 50 บาท) · 50 แต้มต้องสะสมเพิ่มอีก 50 แต้ม",
+        "key_facts": [
+          [
+            "100 แต้ม"
+          ],
+          [
+            "50 บาท"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-POLICY.pdf",
+            "page": 7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-08",
+    "set": "conv",
+    "title": "เทพื้นคอนกรีต 3 คิว: วัสดุ → บ่มกี่วัน → ปูนตัวนั้นมาตรฐานอะไร → ใส่ตะกร้าทั้งหมด → คูปอง BUILD5",
+    "voice": false,
+    "turns": [
+      {
+        "text": "จะเทพื้นคอนกรีต 3 คิว ต้องใช้อะไรบ้าง",
+        "expected": "คอนกรีต 1:2:4 ปริมาตร 3 ลบ.ม. → ปูน CEM-001 21 ถุง · ทรายหยาบ AGG-001 2 ลบ.ม. · หิน 3/4 AGG-003 3 ลบ.ม.",
+        "expected_values": [
+          "21",
+          [
+            "2 ลบ.ม",
+            "2 คิว",
+            "2 ลูกบาศก์"
+          ],
+          [
+            "3 ลบ.ม",
+            "3 คิว",
+            "3 ลูกบาศก์"
+          ]
+        ],
+        "needs_products": [
+          "CEM-001",
+          "AGG-001",
+          "AGG-003"
+        ]
+      },
+      {
+        "text": "เทเสร็จแล้วต้องบ่มกี่วัน",
+        "refers_to": "พื้นคอนกรีตที่จะเท",
+        "expected": "บ่มชื้นอย่างน้อย 7 วัน",
+        "key_facts": [
+          [
+            "7 วัน",
+            "เจ็ดวัน"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 6
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 7
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 14
+          }
+        ]
+      },
+      {
+        "text": "ปูนตัวที่ใช้ผสมนั่นได้มาตรฐานอะไร",
+        "refers_to": "CEM-001",
+        "expected": "CEM-001 ผ่าน มอก.15 ประเภท 1 กำลังอัดที่ 28 วัน ≥ 325 กก./ตร.ซม.",
+        "key_facts": [
+          [
+            "มอก.15",
+            "มอก. 15",
+            "TIS 15"
+          ],
+          "325"
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 8
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 14
+          }
+        ],
+        "needs_products": [
+          "CEM-001"
+        ]
+      },
+      {
+        "text": "ใส่ตะกร้าตามที่คำนวณไว้ทั้งหมดเลย",
+        "refers_to": "CEM-001 × 21 + AGG-001 × 2 + AGG-003 × 3",
+        "expected": "เพิ่ม CEM-001 21 · AGG-001 2 · AGG-003 3 ลงตะกร้า",
+        "key_facts": [
+          "CEM-001",
+          "AGG-001",
+          "AGG-003"
+        ],
+        "expect_state": {
+          "cartCount": 26
+        }
+      },
+      {
+        "text": "ใช้คูปอง BUILD5 แล้วยอดสุทธิรวมค่าส่งกับ VAT เท่าไร",
+        "refers_to": "ตะกร้าทั้งหมด",
+        "expected": "ยอดสินค้า 5,895.00 ≥ 5,000 ใช้ BUILD5 ได้ ลด 294.75 → 5,600.25 · น้ำหนัก 8,850 กก. ส่งรถ 10 ล้อ 3,500.00 · VAT 637.02 · สุทธิ 9,737.27 บาท",
+        "expected_values": [
+          "294.75",
+          "รถ 10 ล้อ",
+          "9737.27"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-09",
+    "set": "conv",
+    "title": "ท่อ PVC: ชั้น 8.5 ใช้น้ำดีได้ไหม → งั้นท่อน้ำดีครึ่งนิ้ว 60 เส้น → ข้องอคู่กัน → ทากาวรอกี่ชม.",
+    "voice": false,
+    "turns": [
+      {
+        "text": "ท่อ PVC ชั้น 8.5 เอามาเดินน้ำประปาได้ไหม",
+        "expected": "ไม่ควร ชั้น 8.5 ใช้กับน้ำทิ้ง · น้ำดี/น้ำประปาต้องใช้ชั้น 13.5",
+        "key_facts": [
+          "น้ำทิ้ง",
+          "13.5"
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 5
+          }
+        ],
+        "needs_products": [
+          "PIP-002"
+        ]
+      },
+      {
+        "text": "งั้นเอาท่อน้ำดีขนาดครึ่งนิ้ว 60 เส้น ราคาเท่าไร",
+        "refers_to": "ท่อชั้น 13.5 ½ นิ้ว → PIP-001",
+        "expected": "PIP-001 60 เส้น ราคาส่ง (ลด 5%) เส้นละ 58.90 รวม 3,534.00 บาท",
+        "expected_values": [
+          "58.9",
+          "3534"
+        ],
+        "needs_products": [
+          "PIP-001"
+        ]
+      },
+      {
+        "text": "ข้องอที่ใช้กับท่อนี้มีไหม ราคาเท่าไร",
+        "refers_to": "ท่อ PIP-001 ½ นิ้ว → ข้องอ PIP-003",
+        "expected": "มี ข้องอ PVC ½ นิ้ว 90° (PIP-003) ชิ้นละ 6.00 บาท",
+        "expected_values": [
+          [
+            "6 บาท",
+            "6.00"
+          ]
+        ],
+        "needs_products": [
+          "PIP-003"
+        ]
+      },
+      {
+        "text": "ต่อท่อทากาวเสร็จ รอนานแค่ไหนถึงเปิดน้ำได้",
+        "refers_to": "งานต่อท่อ PIP-001 + กาว PIP-004",
+        "expected": "กาวทาท่อ PIP-004 ต้องรอ 1 ชั่วโมงก่อนเปิดน้ำ",
+        "key_facts": [
+          [
+            "1 ชั่วโมง",
+            "1 ชม",
+            "หนึ่งชั่วโมง"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-ELC-PIP.pdf",
+            "page": 12
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-10",
+    "set": "conv",
+    "title": "ก่อผนัง 30 ตร.ม.: อิฐมวลเบา → ปูนก่อที่รังสิต → ถ้าเปลี่ยนเป็นอิฐมอญ → ราคาส่งอิฐ → รถส่ง",
+    "voice": false,
+    "turns": [
+      {
+        "text": "ก่อผนังอิฐมวลเบา 30 ตารางเมตร ต้องใช้อะไรเท่าไร",
+        "expected": "อิฐมวลเบา BRK-002 250 ก้อน (8.33 ก้อน/ตร.ม.) + ปูนก่อ CEM-002 4 ถุง",
+        "expected_values": [
+          "250",
+          [
+            "4 ถุง",
+            "4 bags"
+          ]
+        ],
+        "needs_products": [
+          "BRK-002",
+          "CEM-002"
+        ]
+      },
+      {
+        "text": "สาขารังสิตมีปูนก่อตัวนั้นไหม",
+        "refers_to": "CEM-002",
+        "expected": "รังสิตไม่มี CEM-002 (เหลือ 0) · มีที่ลาดกระบัง 400 ถุง และบางนา 300 ถุง",
+        "expected_values": [
+          "400",
+          "300"
+        ],
+        "key_facts": [
+          [
+            "ไม่มี",
+            "หมด",
+            "0"
+          ]
+        ],
+        "needs_products": [
+          "CEM-002"
+        ],
+        "volatile": true
+      },
+      {
+        "text": "ถ้าเปลี่ยนเป็นอิฐมอญล่ะ ต้องใช้เท่าไร",
+        "refers_to": "ผนัง 30 ตร.ม. เดิม (เปลี่ยนชนิดอิฐ)",
+        "expected": "อิฐมอญ BRK-001 4200 ก้อน (140 ก้อน/ตร.ม.) + ปูนก่อ CEM-002 8 ถุง",
+        "expected_values": [
+          "4200",
+          [
+            "8 ถุง",
+            "8 bags"
+          ]
+        ],
+        "needs_products": [
+          "BRK-001"
+        ]
+      },
+      {
+        "text": "อิฐมอญ 4,200 ก้อนนั้น ราคาส่งเท่าไร",
+        "refers_to": "BRK-001",
+        "expected": "≥200 ก้อนลด 10% → ก้อนละ 1.08 บาท รวม 4,536.00 บาท",
+        "expected_values": [
+          "1.08",
+          "4536"
+        ],
+        "needs_products": [
+          "BRK-001"
+        ]
+      },
+      {
+        "text": "อิฐมอญล็อตนี้หนักเท่าไร ต้องส่งด้วยรถอะไร",
+        "refers_to": "BRK-001 × 4200",
+        "expected": "4200 × 1.1 กก. = 4,620 กก. → รถ 6 ล้อ ค่าส่ง 1,500.00 บาท",
+        "expected_values": [
+          "4620",
+          "รถ 6 ล้อ"
+        ],
+        "key_facts": [
+          "1500"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-11",
+    "set": "conv",
+    "title": "English: DB16 price → standard → 150 bars → CONTRACTOR10 total → Sunday hours",
+    "voice": false,
+    "turns": [
+      {
+        "text": "Do you sell DB16 deformed bars? How much per bar?",
+        "expected": "Yes, STL-004 DB16 10 m bar, 340.00 baht per bar (excl. VAT)",
+        "expected_values": [
+          "340"
+        ],
+        "needs_products": [
+          "STL-004"
+        ]
+      },
+      {
+        "text": "What grade and standard is it?",
+        "refers_to": "DB16 (STL-004)",
+        "expected": "Grade SD40 to TIS 24-2559 (มอก.24-2559), yield strength ≥ 4,000 ksc",
+        "key_facts": [
+          "SD40",
+          [
+            "24-2559",
+            "มอก.24",
+            "TIS 24"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 4
+          },
+          {
+            "filename": "BM-DS-STL.pdf",
+            "page": 8
+          }
+        ]
+      },
+      {
+        "text": "And if I take 150 of them?",
+        "refers_to": "STL-004 × 150",
+        "expected": "150 bars → 5% wholesale discount: 323.00 baht/bar, 48,450.00 baht total (excl. VAT)",
+        "expected_values": [
+          "323",
+          "48450"
+        ],
+        "needs_products": [
+          "STL-004"
+        ]
+      },
+      {
+        "text": "Can I use coupon CONTRACTOR10 on that? What is the final total with delivery and VAT?",
+        "refers_to": "the 150 DB16 bars",
+        "expected": "Yes (subtotal 48,450.00 ≥ 30,000): discount 4,845.00 → 43,605.00, weight 2,367 kg → 6-wheel truck 1,500.00, VAT 3,157.35, total 48,262.35 baht",
+        "expected_values": [
+          "4845",
+          "1500",
+          "48262.35"
+        ]
+      },
+      {
+        "text": "Are you open on Sunday?",
+        "expected": "Yes, Sunday 08:00–12:00 (Mon–Sat 07:00–18:00)",
+        "expected_values": [
+          [
+            "08:00",
+            "8:00",
+            "8 am",
+            "8am",
+            "8.00"
+          ],
+          [
+            "12:00",
+            "12 pm",
+            "12pm",
+            "noon",
+            "12.00"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CV-12",
+    "set": "conv",
+    "title": "ปูน (คลุมเครือ) → ตัวที่ใช้ฉาบ → 50 ถุง → แล้วถ้า 200 ถุงล่ะ → ฉาบหนาเกิน 1.5 ซม.",
+    "voice": false,
+    "turns": [
+      {
+        "text": "ปูนถุงละเท่าไรครับ",
+        "expected": "ถามกลับว่าปูนชนิดไหน หรือแจ้งราคาทั้ง 4 ตัว: CEM-001 145 · CEM-002 120 · CEM-003 125 · CEM-004 185 บาท",
+        "key_facts": [
+          [
+            "ชนิด",
+            "ตัวไหน",
+            "แบบไหน",
+            "CEM-001",
+            "145"
+          ]
+        ],
+        "needs_products": [
+          "CEM-001"
+        ]
+      },
+      {
+        "text": "เอาตัวที่ใช้ฉาบผนัง",
+        "refers_to": "ปูนฉาบ → CEM-003",
+        "expected": "ปูนฉาบสำเร็จรูป CEM-003 ถุงละ 125.00 บาท",
+        "expected_values": [
+          "125"
+        ],
+        "needs_products": [
+          "CEM-003"
+        ]
+      },
+      {
+        "text": "ถ้าซื้อ 50 ถุงล่ะ",
+        "refers_to": "CEM-003 × 50",
+        "expected": "50 ถุงลด 5% → ถุงละ 118.75 รวม 5,937.50 บาท",
+        "expected_values": [
+          "118.75",
+          "5937.5"
+        ],
+        "needs_products": [
+          "CEM-003"
+        ]
+      },
+      {
+        "text": "แล้วถ้า 200 ถุงล่ะ",
+        "refers_to": "CEM-003 × 200",
+        "expected": "200 ถุงลด 10% → ถุงละ 112.50 รวม 22,500.00 บาท",
+        "expected_values": [
+          "112.5",
+          "22500"
+        ],
+        "needs_products": [
+          "CEM-003"
+        ]
+      },
+      {
+        "text": "ถ้าผนังต้องฉาบหนาเกิน 1.5 ซม. ต้องทำยังไง",
+        "refers_to": "งานฉาบด้วย CEM-003",
+        "expected": "ฉาบเกิน 1.5 ซม. ให้แบ่งฉาบ 2 ชั้น (ความหนาแนะนำ 1–1.5 ซม.)",
+        "key_facts": [
+          [
+            "2 ชั้น",
+            "สองชั้น"
+          ]
+        ],
+        "sources": [
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 3
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 9
+          },
+          {
+            "filename": "BM-DS-CEM.pdf",
+            "page": 15
+          }
+        ]
+      }
+    ]
+  }
+]

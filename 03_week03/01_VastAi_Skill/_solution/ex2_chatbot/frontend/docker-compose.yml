@@ -1,0 +1,49 @@
+# สบายใจ นวดแผนไทย — Chatbot (Exercise 2)
+# รันแบบ mock (ไม่ต้องมี GPU):   docker compose --profile mock up -d --build
+# รันกับ Vast.ai จริง:           แก้ LLM_BASE_URL ใน .env แล้ว docker compose up -d --build web
+
+name: sabaijai-chatbot
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-massage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-massage_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-massage_shop}
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # ไม่ expose port ออก host (ใช้ภายใน network ของ compose เท่านั้น)
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-massage}:${POSTGRES_PASSWORD:-massage_pw}@db:5432/${POSTGRES_DB:-massage_shop}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://mock-llm:8000}
+      LLM_MODEL: ${LLM_MODEL:-mock-thai-massage}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-120000}
+      TZ: Asia/Bangkok
+    ports:
+      - "3300:3000"
+
+  mock-llm:
+    build: ./mock-llm
+    profiles: ["mock"]
+    restart: unless-stopped
+    # ไม่ต้อง expose port — web เรียกผ่าน http://mock-llm:8000
+
+volumes:
+  pgdata:

@@ -1,0 +1,50 @@
+{
+  "label": "mock-chat-2workers",
+  "config": {
+    "mode": "chat",
+    "users": [
+      8
+    ],
+    "stage_sec": 20,
+    "url": "http://localhost:3400",
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": []
+  },
+  "summary": {
+    "mode": "chat",
+    "max_users_ok": 8,
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 1,
+    "stages_total": 1,
+    "best_rps": 5.014,
+    "finished_at": "2026-10-23T08:28:14.736Z"
+  },
+  "stages": [
+    {
+      "users": 8,
+      "n": 106,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1529,
+      "p95": 2025,
+      "ttft_p50": 712,
+      "ttft_p95": 808,
+      "rtf": null,
+      "tokens_per_s": 57.2,
+      "queue_max": 8,
+      "rps": 5.014,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

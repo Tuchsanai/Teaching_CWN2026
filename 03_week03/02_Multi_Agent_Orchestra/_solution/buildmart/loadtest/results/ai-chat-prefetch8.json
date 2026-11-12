@@ -1,0 +1,138 @@
+{
+  "label": "ai-chat-prefetch8",
+  "config": {
+    "mode": "chat",
+    "users": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "stage_sec": 45,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [],
+    "prefetch": {
+      "chat": "8",
+      "stt": null,
+      "tts": null
+    },
+    "note": "CHAT_PREFETCH=8 · 1 worker (NInfer max-concurrency 4)"
+  },
+  "summary": {
+    "mode": "chat",
+    "max_users_ok": 4,
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 1,
+    "stages_total": 4,
+    "best_rps": 1.416,
+    "at_max_users_ok": {
+      "users": 4,
+      "p50": 4461,
+      "p95": 6361
+    },
+    "finished_at": "2026-10-23T11:06:13.577Z"
+  },
+  "stages": [
+    {
+      "users": 4,
+      "n": 45,
+      "ok_n": 45,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 4461,
+      "p95": 6361,
+      "queue_max": 4,
+      "rps": 0.916,
+      "wall_s": 49.12,
+      "ttft_p50": 2675,
+      "ttft_p95": 4132,
+      "tok_s_per_user_p50": 27.69,
+      "tok_s_total": 40.53,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 27.69,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 51,
+      "ok_n": 51,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 7497,
+      "p95": 11405,
+      "queue_max": 8,
+      "rps": 0.982,
+      "wall_s": 51.96,
+      "ttft_p50": 5969,
+      "ttft_p95": 9366,
+      "tok_s_per_user_p50": 23.82,
+      "tok_s_total": 41.69,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 23.82,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "ttft_p95 9366 > 6000 ms"
+      ]
+    },
+    {
+      "users": 16,
+      "n": 74,
+      "ok_n": 74,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 12329,
+      "p95": 18188,
+      "queue_max": 16,
+      "rps": 1.213,
+      "wall_s": 61.01,
+      "ttft_p50": 10369,
+      "ttft_p95": 15836,
+      "tok_s_per_user_p50": 22.86,
+      "tok_s_total": 51.32,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 22.86,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "ttft_p95 15836 > 6000 ms"
+      ]
+    },
+    {
+      "users": 32,
+      "n": 104,
+      "ok_n": 104,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 20345,
+      "p95": 28849,
+      "queue_max": 32,
+      "rps": 1.416,
+      "wall_s": 73.45,
+      "ttft_p50": 18832,
+      "ttft_p95": 26457,
+      "tok_s_per_user_p50": 26.65,
+      "tok_s_total": 63.31,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 26.65,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 28849 > 20000 ms",
+        "ttft_p95 26457 > 6000 ms"
+      ]
+    }
+  ]
+}

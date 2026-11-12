@@ -1,0 +1,149 @@
+{
+  "label": "ai-tts-base",
+  "config": {
+    "mode": "tts",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "stage_sec": 60,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 10000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": []
+  },
+  "summary": {
+    "mode": "tts",
+    "max_users_ok": 2,
+    "thresholds": {
+      "p95_ms": 10000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 2,
+    "stages_total": 6,
+    "best_rps": 0.39,
+    "finished_at": "2026-10-23T10:10:25.439Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 16,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 3747,
+      "p95": 4419,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 0.428,
+      "tokens_per_s": null,
+      "queue_max": 1,
+      "rps": 0.26,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 2,
+      "n": 25,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 5067,
+      "p95": 5866,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 0.571,
+      "tokens_per_s": null,
+      "queue_max": 2,
+      "rps": 0.386,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 26,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 9747,
+      "p95": 12453,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 1.138,
+      "tokens_per_s": null,
+      "queue_max": 5,
+      "rps": 0.387,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 12453 > 10000 ms"
+      ]
+    },
+    {
+      "users": 8,
+      "n": 31,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 20229,
+      "p95": 21297,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 2.073,
+      "tokens_per_s": null,
+      "queue_max": 8,
+      "rps": 0.39,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 21297 > 10000 ms"
+      ]
+    },
+    {
+      "users": 16,
+      "n": 36,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 41329,
+      "p95": 48711,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 4.048,
+      "tokens_per_s": null,
+      "queue_max": 16,
+      "rps": 0.358,
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 48711 > 10000 ms"
+      ]
+    },
+    {
+      "users": 32,
+      "n": 55,
+      "errors": 32,
+      "error_rate": 0.5818,
+      "p50": 30974,
+      "p95": 55920,
+      "ttft_p50": null,
+      "ttft_p95": null,
+      "rtf": 3.545,
+      "tokens_per_s": null,
+      "queue_max": 33,
+      "rps": 0.193,
+      "error_samples": [
+        "tts HTTP 504 timeout"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "p95 55920 > 10000 ms",
+        "error_rate 0.5818 > 0.02"
+      ]
+    }
+  ]
+}

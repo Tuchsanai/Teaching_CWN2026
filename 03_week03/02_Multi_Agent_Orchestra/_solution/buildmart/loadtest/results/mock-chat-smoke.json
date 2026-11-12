@@ -1,0 +1,122 @@
+{
+  "label": "mock-chat-smoke",
+  "config": {
+    "mode": "chat",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "stage_sec": 20,
+    "url": "http://localhost:3400",
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": []
+  },
+  "summary": {
+    "mode": "chat",
+    "max_users_ok": 16,
+    "thresholds": {
+      "p95_ms": 20000,
+      "ttft_p95_ms": 6000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 5,
+    "stages_total": 5,
+    "best_rps": 2.668,
+    "finished_at": "2026-10-23T08:24:15.196Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 14,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1440,
+      "p95": 2016,
+      "ttft_p50": 701,
+      "ttft_p95": 741,
+      "rtf": null,
+      "tokens_per_s": 57.7,
+      "queue_max": 1,
+      "rps": 0.679,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 2,
+      "n": 28,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1493,
+      "p95": 2013,
+      "ttft_p50": 697,
+      "ttft_p95": 739,
+      "rtf": null,
+      "tokens_per_s": 57.7,
+      "queue_max": 2,
+      "rps": 1.317,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 54,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 1499,
+      "p95": 2019,
+      "ttft_p50": 699,
+      "ttft_p95": 738,
+      "rtf": null,
+      "tokens_per_s": 57.5,
+      "queue_max": 4,
+      "rps": 2.571,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 8,
+      "n": 60,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 2882,
+      "p95": 3486,
+      "ttft_p50": 2146,
+      "ttft_p95": 2573,
+      "rtf": null,
+      "tokens_per_s": 57.6,
+      "queue_max": 8,
+      "rps": 2.661,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 16,
+      "n": 68,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 5810,
+      "p95": 6406,
+      "ttft_p50": 4997,
+      "ttft_p95": 5571,
+      "rtf": null,
+      "tokens_per_s": 57.6,
+      "queue_max": 16,
+      "rps": 2.668,
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

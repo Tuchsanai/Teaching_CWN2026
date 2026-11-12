@@ -1,0 +1,260 @@
+{
+  "label": "ai-voice-v2",
+  "config": {
+    "mode": "voice",
+    "users": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "stage_sec": 60,
+    "url": "http://localhost:3500",
+    "thresholds": {
+      "p95_ms": 30000,
+      "ttft_p95_ms": 8000,
+      "error_rate": 0.02
+    },
+    "chars_per_token": 2.5,
+    "audio_files": [
+      "V01.wav",
+      "V02.wav",
+      "V03.wav",
+      "V04.wav",
+      "V05.wav",
+      "V06.wav",
+      "V07.wav",
+      "V08.wav",
+      "V09.wav",
+      "V10.wav"
+    ],
+    "prefetch": {
+      "chat": "4",
+      "stt": "4",
+      "tts": "2"
+    },
+    "note": "base prefetch chat4/stt4/tts2 · 1 worker each"
+  },
+  "summary": {
+    "mode": "voice",
+    "max_users_ok": 0,
+    "thresholds": {
+      "p95_ms": 30000,
+      "ttft_p95_ms": 8000,
+      "error_rate": 0.02
+    },
+    "stages_ok": 1,
+    "stages_total": 5,
+    "best_rps": 0.514,
+    "at_max_users_ok": {
+      "users": 2,
+      "p50": 3182,
+      "p95": 10488
+    },
+    "finished_at": "2026-10-23T11:18:36.446Z"
+  },
+  "stages": [
+    {
+      "users": 1,
+      "n": 13,
+      "ok_n": 12,
+      "errors": 1,
+      "error_rate": 0.0769,
+      "p50": 3536,
+      "p95": 9040,
+      "queue_max": 2,
+      "rps": 0.191,
+      "wall_s": 62.7,
+      "ttft_p50": 2390,
+      "ttft_p95": 4469,
+      "tok_s_per_user_p50": 130.16,
+      "tok_s_total": 8.07,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 130.16,
+      "first_audio_p50": 3536,
+      "first_audio_p95": 9040,
+      "breakdown_p50": {
+        "stt": 1236,
+        "chat_ttft": 1157,
+        "chat": 1564,
+        "tts": 8,
+        "audio_fetch": 9
+      },
+      "breakdown_p95": {
+        "stt": 2519,
+        "chat_ttft": 1950,
+        "chat": 2382,
+        "tts": 6303,
+        "audio_fetch": 25
+      },
+      "error_samples": [
+        "tts HTTP 502 fetch failed"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "error_rate 0.0769 > 0.02"
+      ]
+    },
+    {
+      "users": 2,
+      "n": 24,
+      "ok_n": 24,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 3182,
+      "p95": 10488,
+      "queue_max": 2,
+      "rps": 0.39,
+      "wall_s": 61.54,
+      "ttft_p50": 1836,
+      "ttft_p95": 3269,
+      "tok_s_per_user_p50": 105.73,
+      "tok_s_total": 19.48,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 105.73,
+      "first_audio_p50": 3182,
+      "first_audio_p95": 10488,
+      "breakdown_p50": {
+        "stt": 536,
+        "chat_ttft": 1189,
+        "chat": 1674,
+        "tts": 7,
+        "audio_fetch": 11
+      },
+      "breakdown_p95": {
+        "stt": 1362,
+        "chat_ttft": 2126,
+        "chat": 2679,
+        "tts": 6993,
+        "audio_fetch": 18
+      },
+      "error_samples": [],
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "users": 4,
+      "n": 40,
+      "ok_n": 39,
+      "errors": 1,
+      "error_rate": 0.025,
+      "p50": 3828,
+      "p95": 16604,
+      "queue_max": 5,
+      "rps": 0.514,
+      "wall_s": 75.85,
+      "ttft_p50": 2412,
+      "ttft_p95": 4296,
+      "tok_s_per_user_p50": 56.58,
+      "tok_s_total": 25.22,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 56.58,
+      "first_audio_p50": 3828,
+      "first_audio_p95": 16604,
+      "breakdown_p50": {
+        "stt": 569,
+        "chat_ttft": 1676,
+        "chat": 2462,
+        "tts": 7,
+        "audio_fetch": 11
+      },
+      "breakdown_p95": {
+        "stt": 1431,
+        "chat_ttft": 3199,
+        "chat": 4972,
+        "tts": 14299,
+        "audio_fetch": 26
+      },
+      "error_samples": [
+        "tts HTTP 502 fetch failed"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "error_rate 0.025 > 0.02"
+      ]
+    },
+    {
+      "users": 8,
+      "n": 32,
+      "ok_n": 32,
+      "errors": 0,
+      "error_rate": 0,
+      "p50": 22162,
+      "p95": 33931,
+      "queue_max": 9,
+      "rps": 0.338,
+      "wall_s": 94.61,
+      "ttft_p50": 2271,
+      "ttft_p95": 5746,
+      "tok_s_per_user_p50": 90.94,
+      "tok_s_total": 21.67,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 90.94,
+      "first_audio_p50": 22162,
+      "first_audio_p95": 33931,
+      "breakdown_p50": {
+        "stt": 586,
+        "chat_ttft": 1616,
+        "chat": 2448,
+        "tts": 18449,
+        "audio_fetch": 13
+      },
+      "breakdown_p95": {
+        "stt": 1775,
+        "chat_ttft": 5102,
+        "chat": 6512,
+        "tts": 29269,
+        "audio_fetch": 30
+      },
+      "error_samples": [],
+      "ok": false,
+      "fail_reasons": [
+        "p95 33931 > 30000 ms"
+      ]
+    },
+    {
+      "users": 16,
+      "n": 46,
+      "ok_n": 35,
+      "errors": 11,
+      "error_rate": 0.2391,
+      "p50": 10751,
+      "p95": 61974,
+      "queue_max": 20,
+      "rps": 0.293,
+      "wall_s": 119.29,
+      "ttft_p50": 4056,
+      "ttft_p95": 11248,
+      "tok_s_per_user_p50": 54.9,
+      "tok_s_total": 18.79,
+      "token_count_method": "llm_usage",
+      "tokens_per_s": 54.9,
+      "first_audio_p50": 10751,
+      "first_audio_p95": 61974,
+      "breakdown_p50": {
+        "stt": 1115,
+        "chat_ttft": 3351,
+        "chat": 5282,
+        "tts": 9,
+        "audio_fetch": 14
+      },
+      "breakdown_p95": {
+        "stt": 3199,
+        "chat_ttft": 8952,
+        "chat": 10143,
+        "tts": 54981,
+        "audio_fetch": 37
+      },
+      "error_samples": [
+        "tts HTTP 504 timeout"
+      ],
+      "ok": false,
+      "fail_reasons": [
+        "p95 61974 > 30000 ms",
+        "ttft_p95 11248 > 8000 ms",
+        "error_rate 0.2391 > 0.02"
+      ]
+    }
+  ]
+}

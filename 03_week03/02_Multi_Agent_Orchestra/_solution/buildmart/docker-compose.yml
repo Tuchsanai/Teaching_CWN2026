@@ -1,0 +1,198 @@
+# บ้านช่าง BuildMart v3 — ทั้งระบบในไฟล์เดียว (build context = โฟลเดอร์นี้ทุก service)
+#   ฟรี (mock):   docker compose -p buildmart --profile mock up -d --build
+#                 (LLM + STT + rerank + TTS = mock-llm · TTS เล่นเสียง VoxCPM2 ที่อัดไว้แล้ว)
+#   AI จริง:      วาง .env.vast (LLM · GPU-1) + .env.aibox (STT_URL GPU-2 · TTS_URL/RERANK_URL GPU-3 · AIBOX_API_KEY)
+#                 แล้ว docker compose -p buildmart up -d --build
+#   ขยาย worker:  docker compose -p buildmart up -d --scale chat-worker=2 --scale stt-worker=2 (prefetch: CHAT_/STT_/TTS_PREFETCH)
+#   build ใหม่ทีละตัว: docker compose -p buildmart up -d --build --no-deps web
+# เอกสาร PDF ของ RAG อยู่ที่ LAB/documents/ (../../documents) → copy เข้า image ของ workers ตอน build
+name: buildmart
+
+x-worker-env: &worker-env
+  DATABASE_URL: postgres://bm:bm@db:5432/buildmart
+  AMQP_URL: amqp://guest:guest@rabbitmq:5672
+  EMBED_URL: http://embedder:80
+
+# build ของ workers (chat / rag / notify / stt ใช้ image เดียวกัน) · PDF มาจาก LAB/documents
+x-workers-build: &workers-build
+  context: .
+  dockerfile: workers/Dockerfile
+  additional_contexts:
+    documents: ../../documents
+
+# .env.aibox (ไม่บังคับ): STT_URL · TTS_URL · RERANK_URL · AIBOX_API_KEY ของ ai-box (GPU-2/GPU-3)
+#   ไม่มีไฟล์ → worker ใช้ http://mock-llm:8000 ทั้งหมด (โหมดฟรี)
+#   ห้ามใส่ *_URL / AIBOX_* ใน environment: ด้านล่าง (environment ทับค่าจาก env_file)
+x-aibox-env-file: &aibox-env-file
+  - path: .env.aibox
+    required: false
+
+x-worker-health: &worker-health
+  # worker เขียนไฟล์ /tmp/ready เมื่อเชื่อม DB + RabbitMQ สำเร็จ (workers/lib/ready.js)
+  test: ["CMD-SHELL", "test -f /tmp/ready"]
+  interval: 5s
+  timeout: 3s
+  retries: 30
+  start_period: 10s
+
+services:
+  db:
+    build: { context: ., dockerfile: db/Dockerfile }
+    environment:
+      POSTGRES_USER: bm
+      POSTGRES_PASSWORD: bm
+      POSTGRES_DB: buildmart
+    volumes: [bm-db:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bm -d buildmart && psql -U bm -d buildmart -tAc 'select 1 from products limit 1' | grep -q 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:4.4-management
+    hostname: buildmart-mq
+    ports: ["127.0.0.1:15672:15672"]
+    volumes: [bm-mq:/var/lib/rabbitmq]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  embedder:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9
+    command: ["--model-id", "intfloat/multilingual-e5-small", "--port", "80"]
+    volumes: [bm-hf:/data]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 600s   # ครั้งแรกโหลดโมเดล ~470MB
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: web/Dockerfile }
+    ports: ["3400:3000"]
+    environment:
+      DATABASE_URL: postgres://bm:bm@db:5432/buildmart
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234}
+      EVAL_TOKEN: ${EVAL_TOKEN:-bm-eval}
+      TTS_ENABLED: ${TTS_ENABLED:-auto}
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  chat-worker:
+    build: *workers-build
+    command: ["node", "chat-worker.js"]
+    # .env.vast (ถ้ามี) ให้ MODE / LLM_BASE_URL / LLM_MODEL / LLM_API_KEY
+    # ไม่มี → workers/lib/config.js เลือก mock-llm (http://mock-llm:8000) และ MODE=mock อัตโนมัติ
+    # .env.aibox (ถ้ามี) ให้ RERANK_URL / AIBOX_API_KEY → reranker จริง (top 20 → top 4)
+    # (อย่าใส่ LLM_* / AIBOX_* ใน environment: ด้านล่าง เพราะ environment ทับค่าจาก env_file)
+    env_file:
+      - path: .env.vast
+        required: false
+      - path: .env.aibox
+        required: false
+    environment:
+      <<: *worker-env
+      MOCK_LLM_URL: http://mock-llm:8000
+      RERANK: ${RERANK:-on}
+      CHAT_PREFETCH: ${CHAT_PREFETCH:-4}
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      embedder: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  rag-worker:
+    build: *workers-build
+    command: ["node", "rag-worker.js"]
+    environment: *worker-env
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      embedder: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  notify-worker:
+    build: *workers-build
+    command: ["node", "notify-worker.js"]
+    environment: *worker-env
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  # v3: เสียงพูด → ข้อความ · คิว stt.request (prefetch STT_PREFETCH) → ${STT_URL}/v1/audio/transcriptions
+  # ไม่มี .env.aibox → mock-llm (เทียบ sha256 ของไฟล์เสียงทดสอบใน e2e/voice-fixtures/index.json)
+  stt-worker:
+    build: *workers-build
+    command: ["node", "stt-worker.js"]
+    env_file: *aibox-env-file
+    environment:
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      MOCK_LLM_URL: http://mock-llm:8000
+      STT_PREFETCH: ${STT_PREFETCH:-8}
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  # tts-worker (v3): เบา ไม่มีโมเดลในตัว → ${TTS_URL}/v1/audio/speech (VoxCPM2 บน ai-box)
+  #   ไม่มี .env.aibox → mock-llm เล่นเสียง VoxCPM2 ที่อัดไว้แล้ว (e2e/voice-fixtures/tts-cache) · เปิดตลอด (ไม่มี profile)
+  tts-worker:
+    build: *workers-build
+    command: ["node", "tts-worker.js"]
+    env_file: *aibox-env-file
+    environment:
+      <<: *worker-env
+      MOCK_LLM_URL: http://mock-llm:8000
+      TTS_PREFETCH: ${TTS_PREFETCH:-2}
+    depends_on:
+      db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck: *worker-health
+    restart: unless-stopped
+
+  # mock-llm = LLM + ai-box จำลอง (chat · STT · rerank · TTS ที่อัดไว้) — โหมดฟรี
+  #   MOCK_DELAY_MS (ms/delta) · MOCK_TTFT_MS · MOCK_STT_MS · MOCK_TTS_MS · MOCK_RERANK_MS = หน่วงเวลาให้ใกล้ของจริง (load test)
+  mock-llm:
+    profiles: [mock]
+    build: { context: ., dockerfile: mock-llm/Dockerfile }
+    environment:
+      MOCK_DELAY_MS: ${MOCK_DELAY_MS:-15}
+      MOCK_TTFT_MS: ${MOCK_TTFT_MS:-0}
+      MOCK_STT_MS: ${MOCK_STT_MS:-0}
+      MOCK_TTS_MS: ${MOCK_TTS_MS:-0}
+      MOCK_RERANK_MS: ${MOCK_RERANK_MS:-0}
+      MOCK_LLM_SLOTS: ${MOCK_LLM_SLOTS:-0}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  bm-db:
+  bm-hf:
+  bm-mq:
