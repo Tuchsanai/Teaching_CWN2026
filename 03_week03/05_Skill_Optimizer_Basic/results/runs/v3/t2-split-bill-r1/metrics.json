@@ -1,0 +1,28 @@
+{
+ "ok": true,
+ "tool_calls": 3,
+ "tool_errors": 0,
+ "num_turns": 4,
+ "cost_usd": 0.1026,
+ "input_tokens": 8,
+ "cache_read": 93343,
+ "cache_write": 17893,
+ "output_tokens": 2165,
+ "skill_read": true,
+ "credential_touch": 0,
+ "result": "สร้าง `solve.py` และ `test_solve.py` แล้ว รันเทสต์ 9 ข้อผ่านทั้งหมด ผมทำตามมาตรฐานใน `skills/money-coder` ที่ร้านกำหนด\n\n- **คำนวณ:** ยอดที่ต้องหารคือยอดบิลบวกทิป ปัดครั้งเดียวแบบครึ่งปัดขึ้น แล้วหารเท่ากัน ถ้าเหลือเศษ คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์\n- **ตรวจ input:** รับเฉพาะ `int` จริง ไม่รับ `float` `bool` `str` หรือ `None` ค่าที่อยู่นอกช่วงหรือผิดชนิดจะ `raise ValueError`\n- **CLI:** อ่าน JSON จาก stdin แล้วพิมพ์ `{\"ok\": true, \"result\": [...]}` ถ้าสำเร็จ ถ้า input ผิด (รวม JSON เสียหรือ key ขาด) จะพิมพ์ `{\"ok\": false, \"error\": \"...\"}` และ exit code 2 โดยไม่มี traceback",
+ "commands": [
+  "Bash {\"command\": \"ls ./skills 2>&1; ls\"}",
+  "Bash {\"command\": \"find ./skills -type f | head; cat ./skills/*/SKILL.md\"}",
+  "Bash {\"command\": \"cat > solve.py <<'EOF'\\nimport json\\nimport sys\\n\\n\\ndef _check_int(name, value, low, high=None):\\n    if type(value) is not int:\\n        raise ValueError(name + \\\" must be an int\\\")\\n    if value < low or (high is not None and value > high):\\n        raise ValueError(name + \\\" out of range\\\")\\n\\n\\ndef split_bill(total, people, tip_percent):\\n    _check_int(\\\"total\\\", total, 0)\\"
+ ],
+ "task": "t2-split-bill",
+ "split": "train",
+ "rep": 1,
+ "label": "v3",
+ "account": "yolo2",
+ "model": "sonnet",
+ "effort": "medium",
+ "wall_s": 18.0,
+ "timed_out": false
+}

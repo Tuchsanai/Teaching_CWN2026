@@ -1,0 +1,55 @@
+{
+ "score": 0.8,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"total\": 10000, \"people\": 3, \"tip_percent\": 0} ต้องได้ {\"ok\": true, \"result\": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3334, 3333, 3333]"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"total\": 10000, \"people\": 0, \"tip_percent\": 0} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"people must be >= 1\"}"
+  },
+  {
+   "id": "tests",
+   "pass": true,
+   "note": ""
+  }
+ ]
+}

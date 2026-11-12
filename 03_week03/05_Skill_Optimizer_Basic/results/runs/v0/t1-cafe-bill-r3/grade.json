@@ -1,0 +1,55 @@
+{
+ "score": 0.7,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 2}], \"member\": false} ต้องได้ {\"ok\": true, \"result\": 9630} exit 0 แต่ได้ exit 0 stdout {\"total\": 9630}"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"item 0: qty must be an integer >= 1\"}"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "python3 -m unittest -q test_solve ไม่ผ่าน: ----------------------------------------------------------------------\nRan 0 tests in 0.000s\n\nNO TESTS RAN"
+  }
+ ]
+}

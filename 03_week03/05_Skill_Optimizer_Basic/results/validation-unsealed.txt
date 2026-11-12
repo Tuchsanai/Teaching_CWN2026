@@ -1,0 +1,94 @@
+===== noskill (Validation Set)
+## v1-parking-fee r1 (val) score 0.50 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/noskill/v1-parking-fee-r1/transcript.jsonl
+  ✗ reject_value: parking_fee(-1, false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 2 จาก 2 กรณี
+  ✗ reject_type: parking_fee(90.0, false) ต้อง raise ValueError แต่คืนค่า 5350.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+## v1-parking-fee r2 (val) score 0.50 · คำสั่งล้ม 1 · /workspace/sklab/suite/runs/noskill/v1-parking-fee-r2/transcript.jsonl
+  ✗ reject_value: parking_fee(-1, false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 2 จาก 2 กรณี
+  ✗ reject_type: parking_fee(90.0, false) ต้อง raise ValueError แต่คืนค่า 5350.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+## v1-parking-fee r3 (val) score 0.50 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/noskill/v1-parking-fee-r3/transcript.jsonl
+  ✗ reject_value: parking_fee(-1, false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 2 จาก 2 กรณี
+  ✗ reject_type: parking_fee(90.0, false) ต้อง raise ValueError แต่คืนค่า 5350.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+## v2-net-pay r1 (val) score 0.30 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/noskill/v2-net-pay-r1/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ reject_value: net_pay(-1, 10000, false) ต้อง raise ValueError แต่คืนค่า -9700 · พลาด 3 จาก 3 กรณี
+  ✗ reject_type: net_pay(40.0, 10000, false) ต้อง raise ValueError แต่คืนค่า 388000.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+## v2-net-pay r2 (val) score 0.30 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/noskill/v2-net-pay-r2/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ reject_value: net_pay(-1, 10000, false) ต้อง raise ValueError แต่คืนค่า -9700 · พลาด 3 จาก 3 กรณี
+  ✗ reject_type: net_pay(40.0, 10000, false) ต้อง raise ValueError แต่คืนค่า 388000.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+## v2-net-pay r3 (val) score 0.30 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/noskill/v2-net-pay-r3/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ reject_value: net_pay(-1, 10000, false) ต้อง raise ValueError แต่คืนค่า -9700 · พลาด 3 จาก 3 กรณี
+  ✗ reject_type: net_pay(40.0, 10000, false) ต้อง raise ValueError แต่คืนค่า 388000.0 · พลาด 5 จาก 5 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout (ว่าง)
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)
+  ✗ tests: ไม่มีไฟล์ test_solve.py ข้าง solve.py
+===== v0 (Validation Set)
+## v1-parking-fee r1 (val) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v1-parking-fee-r1/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout {"fee_satang": 5350}
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "minutes must be between 0 and 1440"}
+  ✗ tests: unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)
+## v1-parking-fee r2 (val) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v1-parking-fee-r2/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout {"satang": 5350}
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "minutes must be between 0 and 1440"}
+## v1-parking-fee r3 (val) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v1-parking-fee-r3/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 0 stdout {"satang": 5350}
+  ✗ cli_error: stdin {"minutes": -1, "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "minutes must be between 0 and 1440"}
+## v2-net-pay r1 (val) score 0.60 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v2-net-pay-r1/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout {"net_pay": 368000}
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "hours must be an integer 0-80"}
+## v2-net-pay r2 (val) score 0.60 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v2-net-pay-r2/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout {"net_pay": 368000}
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "hours must be between 0 and 80"}
+## v2-net-pay r3 (val) score 0.60 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/v2-net-pay-r3/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 0 stdout {"net_pay": 368000}
+  ✗ cli_error: stdin {"hours": 81, "rate": 10000, "has_sso": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "hours must be between 0 and 80"}
+===== v1 (Validation Set)
+## v2-net-pay r1 (val) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v1/v2-net-pay-r1/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+## v2-net-pay r2 (val) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v1/v2-net-pay-r2/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+## v2-net-pay r3 (val) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v1/v2-net-pay-r3/transcript.jsonl
+  ✗ half_up: net_pay(41, 5100, false) คาด 205301 ได้ 205300 · พลาด 3 จาก 3 กรณี
+  ✗ no_drift: net_pay(38, 5005, true) คาด 174975 ได้ 174974 · พลาด 3 จาก 3 กรณี
+===== v2 (Validation Set)
+===== v3 (Validation Set)
+===== v4 (Validation Set)
+## v1-parking-fee r1 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v1-parking-fee-r1/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py MINUTES true|false"}
+## v1-parking-fee r2 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v1-parking-fee-r2/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py MINUTES true|false"}
+## v1-parking-fee r3 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v1-parking-fee-r3/transcript.jsonl
+  ✗ cli_ok: stdin {"minutes": 120, "member": false} ต้องได้ {"ok": true, "result": 5350} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py MINUTES true|false"}
+## v2-net-pay r1 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v2-net-pay-r1/transcript.jsonl
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py HOURS RATE_SATANG true|false"}
+## v2-net-pay r2 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v2-net-pay-r2/transcript.jsonl
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py HOURS RATE true|false"}
+## v2-net-pay r3 (val) score 0.90 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v4/v2-net-pay-r3/transcript.jsonl
+  ✗ cli_ok: stdin {"hours": 40, "rate": 10000, "has_sso": true} ต้องได้ {"ok": true, "result": 368000} exit 0 แต่ได้ exit 2 stdout {"ok": false, "error": "usage: solve.py HOURS RATE true|false"}

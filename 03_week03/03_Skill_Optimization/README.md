@@ -27,6 +27,7 @@
 
 ## ก่อนเริ่ม
 
+- ยังไม่เคยใช้ `skill-optimizer`: เริ่มที่ [ฉบับเริ่มต้น](../05_Skill_Optimizer_Basic/README.md) (โจทย์เขียนโค้ดคิดเงิน วัด 1 รุ่นใช้ 2 นาที)
 - container `multi-account` รันอยู่ และมีสกิลใน `/root/ai-accounts/.Claude/shared/skills` (บท [03](../03_MultiAccount_Container/) · [04](../04_MultiAccount_Skill/))
 - บัญชี `yolo` ล็อกอินแล้วอย่างน้อย 1 บัญชี
 - ไม่ต้องคัดลอกไฟล์เข้า container: ชุดโจทย์อยู่ในสกิลแล้ว (`examples/web-fixer`)

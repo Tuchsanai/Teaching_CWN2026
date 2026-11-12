@@ -23,6 +23,8 @@ import argparse, json, os, re, shutil, statistics, subprocess, sys, threading, t
 from concurrent.futures import ThreadPoolExecutor
 
 SECRET_RE = re.compile(r"\.credentials\.json|auth\.json|\.claude\.json")
+# อ่านสกิลตรง ๆ (SKILL.md) หรืออ่านทั้งโฟลเดอร์ด้วย glob เช่น cat ./skills/<ชื่อ>/*
+SKILL_RE = re.compile(r"SKILL\.md|\b(?:cat|head|tail|less|more|sed|awk)\b[^\n]*\bskills/[\w.*-]+/")
 
 
 # ------------------------------------------------------------------ lint
@@ -70,7 +72,7 @@ def parse_transcript(path):
                 if c.get("type") == "tool_use":
                     s = c["name"] + " " + json.dumps(c.get("input"), ensure_ascii=False)
                     tools.append(s)
-                    if "SKILL.md" in s:
+                    if SKILL_RE.search(s):
                         skill_read = True
         elif t == "user":
             for c in (m.get("message") or {}).get("content", []):
