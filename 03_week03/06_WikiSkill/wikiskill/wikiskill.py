@@ -635,6 +635,12 @@ def cmd_status(a):
     opt = sum((h.get("maintainer") or {}).get("cost_usd") or 0 for h in st["history"]) + sum((h.get("proposer") or {}).get("cost_usd") or 0 for h in st["history"])
     calls = sum(1 for h in st["history"] if h.get("maintainer")) + sum((h.get("proposer") or {}).get("calls") or 0 for h in st["history"])
     print("\nรวม: Trial ของ Inference Agent %d ครั้ง ($%.2f) · การเรียกโมเดลของ Maintainer + Proposer %d ครั้ง ($%.2f)" % (tr, inf, calls, opt))
+    if st["phase"] == "gate" and st["r_best"] >= 1.0 - 1e-9:      # เหตุผลที่วงรอบหยุด (Algorithm 1 บรรทัด 5 หรือครบ K)
+        print("สถานะ: หยุดแล้ว เพราะ R_best = 100%% ที่รอบ %d (หยุดก่อนครบ %d รอบ)" % (st["k"], cfg["iters"]))
+    elif st["phase"] == "gate" and st["k"] >= cfg["iters"]:
+        print("สถานะ: หยุดแล้ว เพราะครบ %d รอบ" % cfg["iters"])
+    else:
+        print("สถานะ: ยังไม่จบ (รอบ %d · ขั้นล่าสุด %s)" % (st["k"], st["phase"]))
     return 0
 
 

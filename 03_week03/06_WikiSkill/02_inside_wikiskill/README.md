@@ -19,7 +19,7 @@
 
 ```text
 wikiskill/
-├── wikiskill.py                 685 บรรทัด   วงรอบทั้งหมด 9 คำสั่ง (Python มาตรฐาน)
+├── wikiskill.py                 691 บรรทัด   วงรอบทั้งหมด 9 คำสั่ง (Python มาตรฐาน)
 └── prompts/
     ├── maintainer.md            74 บรรทัด    system prompt ของ Wiki Maintainer
     ├── proposer.md              84 บรรทัด    system prompt ของ Skill Proposer
@@ -168,8 +168,8 @@ write(P(ws, "wiki", "skill-impact.md"), … + "\n".join(E) + "\n")
 | คำสั่ง | ทำอะไร |
 |---|---|
 | [`loop`](../wikiskill/wikiskill.py#L589) | เรียก 4 ขั้นซ้ำ · หยุดเมื่อ `r_best = 100%` หรือครบ `--iters` |
-| [`status`](../wikiskill/wikiskill.py#L610) | ตารางสรุปทุกรอบจาก `state.json` (ไม่เรียกโมเดล) |
-| [`eval`](../wikiskill/wikiskill.py#L641) | วัดชุดสกิลใดก็ได้กับชุดโจทย์ใดก็ได้ ใช้เทียบกับสกิลของบท 05 |
+| [`status`](../wikiskill/wikiskill.py#L610) | ตารางสรุปทุกรอบจาก `state.json` และเหตุผลที่วงรอบหยุด (ไม่เรียกโมเดล) |
+| [`eval`](../wikiskill/wikiskill.py#L647) | วัดชุดสกิลใดก็ได้กับชุดโจทย์ใดก็ได้ ใช้เทียบกับสกิลของบท 05 |
 
 ---
 

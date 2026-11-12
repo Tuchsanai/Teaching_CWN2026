@@ -1,0 +1,31 @@
+--- a/skills/cafe_function_checklist/SKILL.md
++++ b/skills/cafe_function_checklist/SKILL.md
+@@ -65,12 +65,25 @@
+ ### 4. สร้าง test_solve.py ข้าง solve.py แล้วรันจริง
+ - ใช้ `unittest` และ `from solve import FUNC`
+ - ครอบคลุม: กรณีปกติ · ค่าขอบพอดี (เช่น พอดีเกณฑ์ขั้นต่ำ/ขั้นบันได) · เศษ .5 พอดีที่ต้องปัดขึ้น · `assertRaises(ValueError)` สำหรับ ค่านอกช่วง, 0, ติดลบ, float, bool, enum ผิด
+-- รัน `python3 -m unittest -q` ต้องผ่านทั้งหมด ถ้าล้มให้แก้ solve.py ไม่ใช่แก้ test
++- **ตัวตรวจนับจำนวนเมธอด `def test_...` ต้องมีอย่างน้อย 6 เมธอด (ตั้งเป้า 8 ขึ้นไป)** ไม่ได้นับจำนวน assertion การรวม assertion หลายอย่างไว้ในเมธอดเดียวจะได้จำนวนไม่พอ
++- เขียน 1 เมธอดต่อ 1 พฤติกรรม แยกเป็นอย่างน้อยดังนี้ (แต่ละข้อคือ 1 เมธอด):
++  1. `test_normal` กรณีปกติ
++  2. `test_boundary_lower` ขอบล่างพอดี (เช่น ค่าต่ำสุดที่อนุญาต หรือพอดีเกณฑ์ขั้นต่ำ)
++  3. `test_boundary_upper` ขอบบน/ขั้นบันได/เพดานพอดี และค่าที่เกินไปนิดเดียว
++  4. `test_half_up` เศษ .5 พอดีที่ต้องปัดขึ้น
++  5. `test_reject_out_of_range` ค่านอกช่วง/0/ติดลบ -> `assertRaises(ValueError)`
++  6. `test_reject_float` float -> `assertRaises(ValueError)`
++  7. `test_reject_bool` bool -> `assertRaises(ValueError)`
++  8. `test_reject_bad_enum_or_key` enum ผิด/key ขาด/ชนิด list-dict ผิด (ถ้าโจทย์ไม่มี ให้แยกกรณีปกติเพิ่มอีกเมธอด เช่น ค่ารวมหลายเงื่อนไขพร้อมกัน)
++- ห้ามลบเทสต์ทิ้งเพื่อให้ผ่าน ถ้าลบต้องเพิ่มทดแทนให้จำนวนเมธอดไม่ลด
++- ค่าที่คาดใน test ให้คำนวณด้วยมือจากโจทย์ ถ้า test ล้มให้ตรวจก่อนว่าผิดที่ solve.py หรือที่ค่าที่คาด แล้วแก้ฝั่งที่ผิดจริง (ห้ามแก้ solve.py ให้ตรงกับ test โดยไม่ดูโจทย์)
++- รัน `python3 -m unittest -q` ต้องผ่านทั้งหมด และบรรทัด `Ran N tests` ต้อง N >= 6
+ 
+ ### 5. ตรวจก่อนตอบ (ต้องรันจริง)
+ ```
+ echo '<JSON กรณีปกติ>' | python3 solve.py; echo "exit=$?"   # ต้อง exit=0 และมี "ok": true
+ echo '<JSON กรณีผิด>'  | python3 solve.py; echo "exit=$?"   # ต้อง exit=2 และมี "ok": false ไม่มี Traceback
+-python3 -m unittest -q
++python3 -m unittest -q 2>&1 | grep -E "^Ran|OK|FAILED"
++grep -c "def test_" test_solve.py   # ต้อง >= 6 (แนะนำ >= 8)
+ ```
+-ห้ามรายงานว่าเสร็จถ้ายังไม่ได้รันทั้งสามคำสั่ง
++ห้ามรายงานว่าเสร็จถ้ายังไม่ได้รันทั้งหมดนี้ ถ้า `Ran N tests` ได้ N < 6 ให้แยกเมธอดเพิ่มก่อนตอบ ห้ามตอบทั้งที่ N < 6
