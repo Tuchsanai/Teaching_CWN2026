@@ -1,0 +1,126 @@
+{
+ "cfg": {
+  "name": "w1",
+  "suite": "/workspace/wklab/suite",
+  "skillopt": "/workspace/wklab/skill-optimizer/scripts/skillopt.py",
+  "accounts": [
+   "yolo1",
+   "yolo2",
+   "yolo3"
+  ],
+  "iters": 8,
+  "reps": 3,
+  "par": 6,
+  "model": "sonnet",
+  "effort": "medium",
+  "opt_model": "sonnet",
+  "opt_effort": "high",
+  "task_desc": "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน 10 ข้อ)",
+  "use_wiki": true
+ },
+ "k": 1,
+ "phase": "gate",
+ "r_best": 1.0,
+ "history": [
+  {
+   "k": 1,
+   "skills_in": [],
+   "train_score": 0.44166666666666665,
+   "train_perfect": 0,
+   "train_n": 12,
+   "train_checks": {
+    "contract": "12/12",
+    "basic": "12/12",
+    "half_up": "8/12",
+    "no_drift": "9/12",
+    "boundary": "12/12",
+    "reject_value": "0/12",
+    "reject_type": "0/12",
+    "cli_ok": "0/12",
+    "cli_error": "0/12",
+    "tests": "0/12"
+   },
+   "train": {
+    "trials": 12,
+    "cost_usd": 0.397,
+    "context_tokens": 82721,
+    "tool_calls": 2.25,
+    "skill_read": 2
+   },
+   "sampled": {
+    "fail": [
+     "t4-cashback-r1",
+     "t2-split-bill-r1",
+     "t3-shipping-fee-r3",
+     "t1-cafe-bill-r1",
+     "t4-cashback-r3"
+    ],
+    "pass": []
+   },
+   "patterns_created": [
+    "missing-cli-entrypoint.md",
+    "missing-input-validation.md",
+    "money-rounding-half-up.md",
+    "missing-test-file.md",
+    "happy-path-only-verification.md"
+   ],
+   "patterns_updated": [],
+   "edits_skipped": [],
+   "patterns_total": 5,
+   "maintainer": {
+    "calls": 1,
+    "tool_calls": 0,
+    "cost_usd": 0.1798,
+    "wall_s": 76.2,
+    "output_tokens": 11169,
+    "context_tokens": 17033
+   },
+   "proposal": {
+    "action": "create",
+    "name": "baankafe_solve_checklist",
+    "rationale": "ทุก Trace ใน iteration 1 ไม่มีสกิล และล้มข้อ cli/validation/tests เหมือนกันหมด และ half_up ในงานที่ใช้ floor จึงสร้างสกิล checklist เดียวพร้อมโค้ดแม่แบบ"
+   },
+   "proposer": {
+    "attempts": 1,
+    "reads": [
+     "wiki/patterns/missing-cli-entrypoint.md",
+     "wiki/patterns/missing-input-validation.md",
+     "wiki/patterns/money-rounding-half-up.md",
+     "traces/t4-cashback-r1.md",
+     "traces/t2-split-bill-r1.md",
+     "traces/t1-cafe-bill-r1.md",
+     "traces/t3-shipping-fee-r1.md"
+    ],
+    "traces_read": 4,
+    "patterns_read": 3,
+    "calls": 8,
+    "cost_usd": 0.145,
+    "wall_s": 24.6,
+    "context_tokens": 39403
+   },
+   "val_score": 1.0,
+   "r_best_before": 0.43333333333333335,
+   "accepted": true,
+   "outcome": "ACCEPTED",
+   "r_best_after": 1.0,
+   "skills_out": [
+    "baankafe_solve_checklist"
+   ],
+   "val": {
+    "trials": 6,
+    "cost_usd": 0.427,
+    "context_tokens": 151604,
+    "tool_calls": 4.0,
+    "skill_read": 6
+   }
+  }
+ ],
+ "baseline": {
+  "trials": 6,
+  "cost_usd": 0.151,
+  "context_tokens": 82954,
+  "tool_calls": 2.17,
+  "skill_read": 2,
+  "val_score": 0.43333333333333335
+ }
+}

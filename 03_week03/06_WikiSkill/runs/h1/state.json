@@ -1,0 +1,128 @@
+{
+ "cfg": {
+  "name": "h1",
+  "suite": "/workspace/wklab/suite",
+  "skillopt": "/workspace/wklab/skill-optimizer/scripts/skillopt.py",
+  "accounts": [
+   "yolo3",
+   "yolo1",
+   "yolo2"
+  ],
+  "iters": 8,
+  "reps": 3,
+  "par": 6,
+  "model": "haiku",
+  "effort": "medium",
+  "opt_model": "sonnet",
+  "opt_effort": "high",
+  "task_desc": "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน 10 ข้อ)",
+  "use_wiki": true
+ },
+ "k": 1,
+ "phase": "gate",
+ "r_best": 1.0,
+ "history": [
+  {
+   "k": 1,
+   "skills_in": [],
+   "train_score": 0.5083333333333333,
+   "train_perfect": 0,
+   "train_n": 12,
+   "train_checks": {
+    "contract": "12/12",
+    "basic": "12/12",
+    "half_up": "7/12",
+    "no_drift": "7/12",
+    "boundary": "12/12",
+    "reject_value": "11/12",
+    "reject_type": "0/12",
+    "cli_ok": "0/12",
+    "cli_error": "0/12",
+    "tests": "0/12"
+   },
+   "train": {
+    "trials": 12,
+    "cost_usd": 0.052,
+    "context_tokens": 121596,
+    "tool_calls": 4.0,
+    "skill_read": 1
+   },
+   "sampled": {
+    "fail": [
+     "t4-cashback-r1",
+     "t1-cafe-bill-r2",
+     "t2-split-bill-r1",
+     "t3-shipping-fee-r3",
+     "t4-cashback-r3"
+    ],
+    "pass": []
+   },
+   "patterns_created": [
+    "floor-instead-of-half-up.md",
+    "intermediate-rounding-drift.md",
+    "reject-non-int-inputs-as-valueerror.md",
+    "validate-spec-ranges-with-valueerror.md",
+    "hidden-cli-contract-stdin-json.md",
+    "missing-test-solve-py.md",
+    "self-check-confirms-own-assumptions.md"
+   ],
+   "patterns_updated": [],
+   "edits_skipped": [],
+   "patterns_total": 7,
+   "maintainer": {
+    "calls": 1,
+    "tool_calls": 0,
+    "cost_usd": 0.2308,
+    "wall_s": 86.0,
+    "output_tokens": 13013,
+    "context_tokens": 25168
+   },
+   "proposal": {
+    "action": "create",
+    "name": "cafe_solve_contract",
+    "rationale": "ทุก Trace พลาด cli_ok/cli_error/tests/reject_type เหมือนกัน และบางตัวพลาด half_up/no_drift/reject_value (pattern ทั้ง 7 ใน wiki) แต่ยังไม่มีสกิลเลย จึงสร้างสกิลเดียวที่ให้โค้ดแม่แบบและเช็กลิสต์ครบทุกข้อตัวตรวจ"
+   },
+   "proposer": {
+    "attempts": 1,
+    "reads": [
+     "wiki/patterns/hidden-cli-contract-stdin-json.md",
+     "wiki/patterns/reject-non-int-inputs-as-valueerror.md",
+     "wiki/patterns/missing-test-solve-py.md",
+     "traces/t4-cashback-r1.md",
+     "traces/t2-split-bill-r1.md",
+     "traces/t1-cafe-bill-r2.md",
+     "traces/t3-shipping-fee-r1.md"
+    ],
+    "traces_read": 4,
+    "patterns_read": 3,
+    "calls": 8,
+    "cost_usd": 0.177,
+    "wall_s": 33.1,
+    "context_tokens": 44418
+   },
+   "val_score": 1.0,
+   "r_best_before": 0.5,
+   "accepted": true,
+   "outcome": "ACCEPTED",
+   "r_best_after": 1.0,
+   "skills_out": [
+    "cafe_solve_contract"
+   ],
+   "val": {
+    "trials": 6,
+    "cost_usd": 0.069,
+    "context_tokens": 195228,
+    "tool_calls": 6.67,
+    "skill_read": 4
+   }
+  }
+ ],
+ "baseline": {
+  "trials": 6,
+  "cost_usd": 0.024,
+  "context_tokens": 124811,
+  "tool_calls": 4.17,
+  "skill_read": 0,
+  "val_score": 0.5
+ }
+}

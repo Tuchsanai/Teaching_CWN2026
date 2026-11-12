@@ -1,0 +1,55 @@
+{
+ "score": 0.4,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": false,
+   "note": "refund(150, 25, false) คาด 113 ได้ 112 · พลาด 3 จาก 3 กรณี"
+  },
+  {
+   "id": "no_drift",
+   "pass": false,
+   "note": "refund(5551, 13, true) คาด 4226 ได้ 4225 · พลาด 4 จาก 4 กรณี"
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "refund(100000, 10, \"yes\") ต้อง raise ValueError แต่คืนค่า 78750 · พลาด 1 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"paid\": 100000, \"used_percent\": 25, \"restock\": false} ต้องได้ {\"ok\": true, \"result\": 75000} exit 0 แต่ได้ exit 0 stdout 100000\n87500\n70000\n61250\n17500\n0"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"paid\": 100000, \"used_percent\": 101, \"restock\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 100000\n87500\n70000\n61250\n17500\n0"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

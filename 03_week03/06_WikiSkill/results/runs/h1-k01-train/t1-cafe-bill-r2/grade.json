@@ -1,0 +1,55 @@
+{
+ "score": 0.4,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": false,
+   "note": "cafe_bill([{\"price\": 4505, \"qty\": 1}], true) คาด 4338 ได้ 4339 · พลาด 3 จาก 3 กรณี"
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": false,
+   "note": "cafe_bill([{\"price\": 4500, \"qty\": 0}], false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 3 จาก 3 กรณี"
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "cafe_bill([{\"price\": 4500.0, \"qty\": 1}], false) ต้อง raise ValueError แต่คืนค่า 4815 · พลาด 5 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 2}], \"member\": false} ต้องได้ {\"ok\": true, \"result\": 9630} exit 0 แต่ได้ exit 0 stdout 47572"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 47572"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

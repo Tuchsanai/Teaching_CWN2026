@@ -1,0 +1,57 @@
+{
+ "create_patterns": [
+  {
+   "name": "test-count-below-minimum.md",
+   "content": "# test-count-below-minimum\n\nมีทั้งแบบที่พลาดและแบบที่สำเร็จ\n\n## อาการ\n- ข้อ `tests` เป็นข้อเดียวที่ล้ม (ได้ 0.90 ผ่าน 9/10): `unittest พบ N เทสต์ (ต้องมีอย่างน้อย 6)`\n- ส่วนอื่นผ่านครบ: contract, basic, half_up, no_drift, boundary, reject_value, reject_type, cli_ok, cli_error\n- ผลของ unittest ที่ Agent เห็นเองคือ `Ran 4 tests` หรือ `Ran 5 tests` และ `OK` แต่ Agent ไม่ได้เทียบกับเกณฑ์ และสรุปว่า \"ผ่านทั้งหมด\"\n\n## สาเหตุ\n- สกิลบอกว่า test_solve.py \"ต้องมีอย่างน้อย\" แล้วไล่หมวดไว้ (ปกติ · ขอบ · ปัดเศษ · ValueError) แต่ไม่ได้ระบุ **จำนวน test method ขั้นต่ำ** ตัวตรวจนับ method `test_*` ไม่ใช่จำนวน assert\n- ตัวอย่างโครงในสกิลมีแค่ `test_basic` กับ `test_reject` Agent จึงจับหมวดมาเป็น method ละหมวด ได้ 4–5 method และเอา assert หลายตัวรวมใน method เดียว\n- `for` หรือ `subTest` ใน method เดียวนับเป็น 1 เทสต์ (t4-cashback-r5 ใช้ subTest ใน test_reject แล้วยังนับเป็น 1)\n- เกณฑ์ 6 มองไม่เห็นจากโจทย์ มีแต่ในตัวตรวจ\n\n## หลักฐาน\n- iter 2 · ล้ม (ได้ 0.90) 5 trace: t4-cashback-r6 (5 เทสต์), t1-cafe-bill-r5 (5), t3-shipping-fee-r2 (4), t2-split-bill-r4 (4), t4-cashback-r4 (5)\n- iter 2 · ผ่าน (ได้ 1.00) 3 trace: t1-cafe-bill-r1, t1-cafe-bill-r3, t4-cashback-r5 ทุกตัว `Ran 6 tests`\n- ใช้โค้ด solve.py แบบเดียวกัน ต่างกันที่จำนวน method: ตัวที่ผ่านแยก `test_member`, `test_empty`, `test_birthday` หรือ `test_cap` ออกเป็น method ของตัวเอง\n- ไม่เกี่ยวกับโจทย์ข้อไหน: t1 และ t4 มีทั้งผ่านและล้ม\n\n## วิธีแก้\n- เขียน test_solve.py ให้มี **อย่างน้อย 8 method `test_*`** (เกณฑ์คือ 6 เผื่อไว้ 2) แยกเป็นคนละ method:\n  `test_basic` · `test_boundary_exact` · `test_boundary_below` · `test_boundary_above` · `test_half_up` · `test_reject_value` · `test_reject_type` · `test_zero_or_empty` (หรือ `test_cap` ถ้ามีเพดาน)\n- ห้ามรวมหลายหมวดไว้ใน method เดียว และห้ามหวังพึ่ง `subTest` ให้นับเพิ่ม\n- ก่อนจบงานดูบรรทัด `Ran N tests` จาก `python3 -m unittest -v test_solve 2>&1 | tail -5` ถ้า N < 8 ให้เพิ่ม method\n- เขียนค่าคาดหวังจากการคำนวณจริงให้ถูก อย่าเขียนนิพจน์แปลก ๆ เช่น `45742.5 and 45743` (t1-cafe-bill-r1) หรือ `20000 if False else 25000 and 20000` (t4-cashback-r4) ซึ่งต้องแก้ทีหลัง\n- ถ้าเทสต์ล้มให้เช็กเลขด้วยมือก่อนว่าผิดที่โค้ดหรือที่ค่าคาดหวัง (t1-cafe-bill-r3 ตรวจแล้วพบว่าผิดที่ค่าคาดหวัง 45733 ควรเป็น 45743 จึงแก้เทสต์ไม่แก้โค้ด)\n"
+  }
+ ],
+ "update_patterns": [
+  {
+   "name": "missing-test-file.md",
+   "edits": [
+    {
+     "op": "append",
+     "content": "\n## อัปเดต iter 2: แก้ได้แล้ว\n- สกิล `cafe_solve_checklist` ทำให้ Agent สร้าง test_solve.py ครบ 8/8 trace และรันผ่านทุกตัว ไม่มี trace ใดล้มเพราะไม่มีไฟล์\n- ปัญหาที่เหลือของข้อ `tests` คือจำนวนเทสต์ไม่ถึง 6 (5 จาก 8 trace) ดู test-count-below-minimum\n"
+    }
+   ]
+  },
+  {
+   "name": "input-validation-missing.md",
+   "edits": [
+    {
+     "op": "append",
+     "content": "\n## อัปเดต iter 2: แก้ได้แล้ว\n- `reject_value` และ `reject_type` ผ่าน 8/8 trace (t1-r1, t1-r3, t1-r5, t2-r4, t3-r2, t4-r4, t4-r5, t4-r6) ทุกตัวใช้ `_int` / `_flag` ตามสกิล และตรวจอินพุตก่อนทางลัด return 0\n- ช่วงที่โจทย์ไม่ได้ระบุ (เช่น `price` ตั้ง `lo=0`, list ว่างคืน 0) ไม่ทำให้ตัวตรวจล้ม\n"
+    }
+   ]
+  },
+  {
+   "name": "cli-json-wrapper-missing.md",
+   "edits": [
+    {
+     "op": "append",
+     "content": "\n## อัปเดต iter 2: แก้ได้แล้ว\n- `cli_ok` และ `cli_error` ผ่าน 8/8 trace หลังสกิลใส่โค้ด `_main()` ให้คัดลอก Agent ทุกตัววางต่อท้าย solve.py และรันทดสอบทั้ง exit 0 และ exit 2 ก่อนจบ\n"
+    }
+   ]
+  },
+  {
+   "name": "rounding-exact-half-up.md",
+   "edits": [
+    {
+     "op": "append",
+     "content": "\n## อัปเดต iter 2: แก้ได้แล้ว\n- cashback เคยพลาดเพราะปัดลง ใน iter 2 t4-cashback-r4, r5, r6 ใช้ `Fraction` หรือ int แล้ว `(num*2+den)//(den*2)` ผ่าน `half_up` และ `no_drift` ครบ\n- ทุกโจทย์ (cafe_bill, split_bill, shipping_fee, cashback) ผ่านสองข้อนี้ 8/8 และ Agent เขียนว่าเลือก half up \"ตามที่สกิลกำหนด\"\n"
+    }
+   ]
+  },
+  {
+   "name": "happy-path-only-self-check.md",
+   "edits": [
+    {
+     "op": "append",
+     "content": "\n## อัปเดต iter 2: ดีขึ้นมาก แต่ยังเหลือช่องว่างเรื่องการเทียบผลกับเกณฑ์\n- Agent ทุกตัวรัน unittest + CLI ทั้งกรณีปกติและกรณีผิด (3–5 คำสั่ง) คะแนนเฉลี่ยขึ้นจาก 0.30–0.50 เป็น 0.90–1.00\n- ที่พลาดคือ checklist ข้อ \"มี test_solve.py\" ไม่ระบุจำนวนขั้นต่ำ Agent เห็น `Ran 4/5 tests` แล้วถือว่าผ่าน ดู test-count-below-minimum\n- สรุป: การรันเช็กยังไม่พอ ต้องเทียบผลกับตัวเลขเกณฑ์ที่เขียนไว้ใน checklist ด้วย\n"
+    }
+   ]
+  }
+ ],
+ "update_index": "# Wiki Index\n\n- [test-count-below-minimum](wiki/patterns/test-count-below-minimum.md): [ยังเกิดอยู่ iter 2: ข้อเดียวที่ล้ม 5/8 trace] ข้อ tests ล้มเพราะ test_solve.py มี method test_* แค่ 4–5 ตัว (ต้อง ≥ 6) เนื่องจากสกิลไม่ระบุจำนวนขั้นต่ำและตัวอย่างโครงมีแค่ 2 method ให้เขียนอย่างน้อย 8 method แยกหมวด (basic, ขอบ 3 แบบ, half_up, reject_value, reject_type, zero/cap) แล้วดู `Ran N tests` ก่อนจบ ตัวที่ผ่านทุกตัวมี 6 method\n- [input-validation-missing](wiki/patterns/input-validation-missing.md): ฟังก์ชันไม่ตรวจอินพุต จึงคืนค่าปกติหรือ raise ZeroDivisionError เมื่อได้ค่านอกช่วง/float/bool (reject_value, reject_type) เพราะโจทย์บอกแค่ช่วงที่ถูก ให้ตรวจทุกพารามิเตอร์เป็นอย่างแรก (ปฏิเสธ bool และ float) แล้ว raise ValueError [แก้ได้แล้ว iter 2 ด้วย _int/_flag ในสกิล]\n- [cli-json-wrapper-missing](wiki/patterns/cli-json-wrapper-missing.md): cli_ok/cli_error ล้มเพราะ solve.py มีแต่ฟังก์ชัน ไม่อ่าน stdin ซึ่งโจทย์ไม่ได้บอก ให้เพิ่ม main ที่อ่าน JSON จาก stdin พิมพ์ {\"ok\":true,\"result\":..} exit 0 และเมื่อผิดพิมพ์ {\"ok\":false,\"error\":..} exit 2 [แก้ได้แล้ว iter 2]\n- [missing-test-file](wiki/patterns/missing-test-file.md): ข้อ tests ล้มเพราะไม่มี test_solve.py ข้าง solve.py (โจทย์ไม่ได้ขอ) ให้สร้างไฟล์ unittest ครอบคลุมกรณีปกติ ค่าขอบ ปัดเศษ และ ValueError แล้วรันให้ผ่าน [เรื่องไฟล์หายแก้ได้แล้ว iter 2 ส่วนจำนวนเทสต์ไม่พอดู test-count-below-minimum]\n- [rounding-exact-half-up](wiki/patterns/rounding-exact-half-up.md): half_up/no_drift ล้มเมื่อเลือกปัดลง (//) เองตอนโจทย์ไม่ระบุ ส่วนข้อที่ผ่านใช้จำนวนเต็ม/Fraction แล้วปัด half up ครั้งเดียวท้ายสุด ใช้ (num*2+den)//(den*2) ห้าม float และ round() [แก้ได้แล้ว iter 2]\n- [happy-path-only-self-check](wiki/patterns/happy-path-only-self-check.md): Agent ทดสอบเองแค่ตัวอย่างปกติ 3–5 ตัวแล้วจบ จึงพลาดทุกข้อนอกเหนือจากกรณีปกติ (ได้ 0.30–0.50) ให้ใช้ checklist 5 ข้อ: ค่าขอบ ปัดเศษ ValueError CLI และ test_solve.py ก่อนส่งงาน [iter 2 ดีขึ้นแล้ว เหลือแค่ต้องเทียบผลกับตัวเลขเกณฑ์ เช่น จำนวนเทสต์]\n",
+ "append_log": "## Iteration 2 · Training 91.3%\n\nรอบนี้ใช้สกิล `cafe_solve_checklist` (เสนอใน iter 1, รับที่ Validation 92.5%) ขึ้นจากรอบฐาน 45.4% Trace 8 ตัว: ล้ม 5 (t4-cashback-r6, r4, t1-cafe-bill-r5, t3-shipping-fee-r2, t2-split-bill-r4) ผ่าน 3 (t1-cafe-bill-r1, r3, t4-cashback-r5)\n\nสถานะของปัญหาเดิมจาก iter 1:\n- input-validation-missing: แก้ได้แล้ว reject_value/reject_type ผ่าน 8/8\n- cli-json-wrapper-missing: แก้ได้แล้ว cli_ok/cli_error ผ่าน 8/8\n- rounding-exact-half-up: แก้ได้แล้ว cashback ทั้ง 3 trace ใช้ Fraction/int ปัด half up ผ่านครบ\n- missing-test-file: เรื่องไฟล์หายแก้ได้แล้ว Agent สร้าง test_solve.py ครบ 8/8\n- happy-path-only-self-check: ดีขึ้น Agent รัน unittest และ CLI ทั้งปกติและผิดทุกตัว\n\nสิ่งที่พบใหม่: ทั้ง 5 trace ที่ล้มพลาดข้อเดียวคือ `tests` ที่ `unittest พบ N เทสต์ (ต้องมีอย่างน้อย 6)` (N = 4, 4, 5, 5, 5) ส่วนทั้ง 3 trace ที่ผ่านมี 6 เทสต์พอดี โค้ด solve.py ไม่ต่างกัน ต่างแค่จำนวน method `test_*`\n- สาเหตุ: สกิลเขียนว่า \"ต้องมีอย่างน้อย\" เป็นหมวด ไม่มีตัวเลขจำนวน method และตัวอย่างโครงมีแค่ test_basic กับ test_reject Agent จึงเขียนหมวดละ method ได้ 4–5 ตัว และเห็น `Ran 5 tests` แล้วไม่ได้เอะใจ\n- เพิ่มหน้า test-count-below-minimum (มีทั้งแบบพลาดและแบบสำเร็จ) และเพิ่มหมายเหตุสถานะ iter 2 ในอีก 5 หน้า รวมทั้งแก้บรรทัดใน index\n\nข้อสังเกตอื่น: ตอนเขียนเทสต์ Agent คำนวณค่าคาดหวังผิดหลายครั้ง (t1-r3 ได้ 45733 แทน 45743, t1-r1 ใช้นิพจน์ `45742.5 and 45743`, t4-r4 ใช้ `20000 if False else ...` แล้วแก้ด้วย sed) ไม่กระทบคะแนนแต่เป็นความเสี่ยง\n\nข้อสังเกตสำหรับ Skill Proposer: แก้สกิลข้อ 4 ให้ระบุ \"อย่างน้อย 8 method `test_*` แยกหมวด (เกณฑ์ 6 + เผื่อ)\" ปรับตัวอย่างโครงให้มีหลาย method และสั่งให้ดู `Ran N tests` ก่อนจบ ไม่ควรแตะส่วนอื่นของสกิลเพราะผ่านครบแล้ว\n"
+}

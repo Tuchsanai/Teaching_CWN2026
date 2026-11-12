@@ -1,0 +1,31 @@
+--- a/skills/cafe_solve_checklist/SKILL.md
++++ b/skills/cafe_solve_checklist/SKILL.md
+@@ -59,13 +59,22 @@
+ แทน `FUNC` ด้วยชื่อฟังก์ชันของโจทย์ ผิดปกติต้อง exit 2 พร้อม JSON ไม่มี traceback
+ 
+ ## 4. สร้าง test_solve.py ข้าง solve.py (unittest) แล้วรันให้ผ่าน
+-ต้องมีอย่างน้อย: กรณีปกติ 2–3 ตัว · ค่าขอบทุกเกณฑ์ (พอดี, ต่ำกว่า 1, สูงกว่า 1) · เคสปัดเศษที่เศษ = .5 พอดี · `assertRaises(ValueError)` สำหรับค่านอกช่วง, float (`1000.0`), bool, ชนิดผิด
++ตัวตรวจนับจำนวน method ที่ชื่อขึ้นต้นด้วย `test_` และต้องได้ **อย่างน้อย 6** แต่ `for` และ `subTest` ใน method เดียวนับเป็น 1 เท่านั้น ให้เขียน **อย่างน้อย 8 method แยกกัน** ดังนี้ (1 หมวด = 1 method):
++`test_basic` · `test_boundary_exact` · `test_boundary_below` · `test_boundary_above` · `test_half_up` (เศษ .5 พอดี) · `test_reject_value` (นอกช่วง, ค่าติดลบ, ค่าที่ผิด enum) · `test_reject_type` (float เช่น `1000.0`, bool, str, None) · `test_zero_or_cap` (ค่า 0, list ว่าง หรือเพดาน แล้วแต่โจทย์)
++ห้ามรวมหลายหมวดไว้ใน method เดียว ห้ามหวังพึ่ง `subTest` ให้นับเพิ่ม คำนวณค่าคาดหวังด้วยมือให้ถูกก่อนเขียน อย่าเขียนนิพจน์แปลก ๆ ถ้าเทสต์ล้มให้เช็กก่อนว่าผิดที่โค้ดหรือที่ค่าคาดหวัง
+ ```python
+ import unittest
+ from solve import FUNC
+ 
+ class T(unittest.TestCase):
+     def test_basic(self): ...
++    def test_boundary_exact(self): ...
++    def test_boundary_below(self): ...
++    def test_boundary_above(self): ...
++    def test_half_up(self): ...
++    def test_reject_value(self): ...
++    def test_reject_type(self): ...
++    def test_zero_or_cap(self): ...
+     def test_reject(self):
+         with self.assertRaises(ValueError):
+             FUNC(...)
+@@ -74,3 +83,4 @@
+     unittest.main()
+ ```
+ รัน `python3 -m unittest -v test_solve` และ `echo '{...}' | python3 solve.py; echo $?` ทั้งกรณีปกติ (exit 0) และกรณีผิด (exit 2) ก่อนจบงาน
++**ก่อนจบงานต้องดู `Ran N tests` จากผล `python3 -m unittest test_solve 2>&1 | tail -5` ถ้า N < 8 ให้เพิ่ม method แล้วรันใหม่ ห้ามสรุปว่าผ่านโดยไม่เทียบตัวเลขนี้**

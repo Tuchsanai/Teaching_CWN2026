@@ -1,0 +1,159 @@
+{
+ "cfg": {
+  "name": "n1",
+  "suite": "/workspace/wklab/suite",
+  "skillopt": "/workspace/wklab/skill-optimizer/scripts/skillopt.py",
+  "accounts": [
+   "yolo2",
+   "yolo3",
+   "yolo1"
+  ],
+  "iters": 8,
+  "reps": 3,
+  "par": 6,
+  "model": "sonnet",
+  "effort": "medium",
+  "opt_model": "sonnet",
+  "opt_effort": "high",
+  "task_desc": "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน 10 ข้อ)",
+  "use_wiki": false
+ },
+ "k": 2,
+ "phase": "gate",
+ "r_best": 1.0,
+ "history": [
+  {
+   "k": 1,
+   "skills_in": [],
+   "train_score": 0.47500000000000003,
+   "train_perfect": 0,
+   "train_n": 12,
+   "train_checks": {
+    "contract": "12/12",
+    "basic": "12/12",
+    "half_up": "10/12",
+    "no_drift": "10/12",
+    "boundary": "12/12",
+    "reject_value": "1/12",
+    "reject_type": "0/12",
+    "cli_ok": "0/12",
+    "cli_error": "0/12",
+    "tests": "0/12"
+   },
+   "train": {
+    "trials": 12,
+    "cost_usd": 0.593,
+    "context_tokens": 82756,
+    "tool_calls": 2.25,
+    "skill_read": 4
+   },
+   "proposal": {
+    "action": "create",
+    "name": "billing_function_contract",
+    "rationale": "ทุก Trace (t1–t4) พลาด reject_value/reject_type/cli_ok/cli_error/tests เหมือนกัน เพราะ Agent ไม่รู้ข้อกำหนดที่โจทย์ไม่ได้เขียน และ t4 ปัดลงแทน half-up"
+   },
+   "proposer": {
+    "attempts": 1,
+    "reads": [
+     "traces/t1-cafe-bill-r1.md",
+     "traces/t4-cashback-r1.md",
+     "traces/t3-shipping-fee-r1.md",
+     "traces/t2-split-bill-r2.md"
+    ],
+    "traces_read": 4,
+    "patterns_read": 0,
+    "calls": 5,
+    "cost_usd": 0.123,
+    "wall_s": 27.4,
+    "context_tokens": 32202
+   },
+   "val_score": 0.9500000000000001,
+   "r_best_before": 0.39999999999999997,
+   "accepted": true,
+   "outcome": "ACCEPTED",
+   "r_best_after": 0.9500000000000001,
+   "skills_out": [
+    "billing_function_contract"
+   ],
+   "val": {
+    "trials": 6,
+    "cost_usd": 0.313,
+    "context_tokens": 106930,
+    "tool_calls": 2.67,
+    "skill_read": 4
+   }
+  },
+  {
+   "k": 2,
+   "skills_in": [
+    "billing_function_contract"
+   ],
+   "train_score": 0.9416666666666668,
+   "train_perfect": 5,
+   "train_n": 12,
+   "train_checks": {
+    "contract": "12/12",
+    "basic": "12/12",
+    "half_up": "12/12",
+    "no_drift": "12/12",
+    "boundary": "12/12",
+    "reject_value": "12/12",
+    "reject_type": "12/12",
+    "cli_ok": "12/12",
+    "cli_error": "12/12",
+    "tests": "5/12"
+   },
+   "train": {
+    "trials": 12,
+    "cost_usd": 0.961,
+    "context_tokens": 130707,
+    "tool_calls": 3.42,
+    "skill_read": 12
+   },
+   "proposal": {
+    "action": "patch",
+    "name": "billing_function_contract",
+    "rationale": "7 จาก 12 Trace ตกเฉพาะข้อ tests เพราะมีเทสต์ 4–5 เมธอด ไม่ถึง 6 ส่วน t4 ที่ผ่านมี 6 เมธอด จึงเพิ่มข้อกำหนดจำนวนเมธอดขั้นต่ำและขั้นตรวจก่อนจบงานในสกิลเดิม"
+   },
+   "proposer": {
+    "attempts": 1,
+    "reads": [
+     "skills/billing_function_contract/SKILL.md",
+     "traces/t1-cafe-bill-r1.md",
+     "traces/t3-shipping-fee-r1.md",
+     "traces/t2-split-bill-r3.md",
+     "traces/t4-cashback-r1.md"
+    ],
+    "traces_read": 4,
+    "patterns_read": 0,
+    "calls": 6,
+    "cost_usd": 0.12,
+    "wall_s": 15.9,
+    "context_tokens": 32898
+   },
+   "val_score": 1.0,
+   "r_best_before": 0.9500000000000001,
+   "accepted": true,
+   "outcome": "ACCEPTED",
+   "r_best_after": 1.0,
+   "skills_out": [
+    "billing_function_contract"
+   ],
+   "val": {
+    "trials": 6,
+    "cost_usd": 0.38,
+    "context_tokens": 125875,
+    "tool_calls": 3.17,
+    "skill_read": 6
+   }
+  }
+ ],
+ "baseline": {
+  "trials": 6,
+  "cost_usd": 0.139,
+  "context_tokens": 82785,
+  "tool_calls": 2.0,
+  "skill_read": 0,
+  "val_score": 0.39999999999999997
+ }
+}

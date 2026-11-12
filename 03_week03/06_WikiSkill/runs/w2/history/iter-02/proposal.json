@@ -1,0 +1,22 @@
+{
+ "action": "patch",
+ "name": "cafe_solve_checklist",
+ "edits": [
+  {
+   "op": "replace",
+   "target": "ต้องมีอย่างน้อย: กรณีปกติ 2–3 ตัว · ค่าขอบทุกเกณฑ์ (พอดี, ต่ำกว่า 1, สูงกว่า 1) · เคสปัดเศษที่เศษ = .5 พอดี · `assertRaises(ValueError)` สำหรับค่านอกช่วง, float (`1000.0`), bool, ชนิดผิด",
+   "content": "ตัวตรวจนับจำนวน method ที่ชื่อขึ้นต้นด้วย `test_` และต้องได้ **อย่างน้อย 6** แต่ `for` และ `subTest` ใน method เดียวนับเป็น 1 เท่านั้น ให้เขียน **อย่างน้อย 8 method แยกกัน** ดังนี้ (1 หมวด = 1 method):\n`test_basic` · `test_boundary_exact` · `test_boundary_below` · `test_boundary_above` · `test_half_up` (เศษ .5 พอดี) · `test_reject_value` (นอกช่วง, ค่าติดลบ, ค่าที่ผิด enum) · `test_reject_type` (float เช่น `1000.0`, bool, str, None) · `test_zero_or_cap` (ค่า 0, list ว่าง หรือเพดาน แล้วแต่โจทย์)\nห้ามรวมหลายหมวดไว้ใน method เดียว ห้ามหวังพึ่ง `subTest` ให้นับเพิ่ม คำนวณค่าคาดหวังด้วยมือให้ถูกก่อนเขียน อย่าเขียนนิพจน์แปลก ๆ ถ้าเทสต์ล้มให้เช็กก่อนว่าผิดที่โค้ดหรือที่ค่าคาดหวัง"
+  },
+  {
+   "op": "replace",
+   "target": "    def test_basic(self): ...\n",
+   "content": "    def test_basic(self): ...\n    def test_boundary_exact(self): ...\n    def test_boundary_below(self): ...\n    def test_boundary_above(self): ...\n    def test_half_up(self): ...\n    def test_reject_value(self): ...\n    def test_reject_type(self): ...\n    def test_zero_or_cap(self): ...\n"
+  },
+  {
+   "op": "append",
+   "content": "\n**ก่อนจบงานต้องดู `Ran N tests` จากผล `python3 -m unittest test_solve 2>&1 | tail -5` ถ้า N < 8 ให้เพิ่ม method แล้วรันใหม่ ห้ามสรุปว่าผ่านโดยไม่เทียบตัวเลขนี้**\n"
+  }
+ ],
+ "purpose_append": "iter 2: แก้ pattern wiki/patterns/test-count-below-minimum.md (ข้อ tests ล้ม 21/24 trace ได้ 0.90 เพราะ test_solve.py มี method test_* เพียง 3–5 ตัว ต้อง ≥ 6) จึงระบุขั้นต่ำ 8 method แยกหมวด ขยายโครงตัวอย่างเป็น 8 method และบังคับดู `Ran N tests` ก่อนจบ ส่วน wiki/patterns/missing-test-file.md และ happy-path-only-self-check.md ยังเกี่ยวข้องในฐานะเรื่องไฟล์เทสต์และการเทียบผลกับเกณฑ์",
+ "rationale": "ใน iter 2 ข้อ tests เป็นข้อเดียวที่ล้ม (t1-r5, t2-r1, t3-r6 มี 3–5 method ส่วน t4-r5 และ t1-r1 ที่ผ่านมี 6 method พอดี) เพราะสกิลไม่ระบุจำนวน method ขั้นต่ำและตัวอย่างโครงมีแค่ 2 method จึงระบุ 8 method และให้เทียบ Ran N tests ก่อนจบ"
+}

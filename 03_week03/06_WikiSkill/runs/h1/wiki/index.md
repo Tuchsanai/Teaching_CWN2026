@@ -1,0 +1,9 @@
+# Wiki Index
+
+- [floor-instead-of-half-up](wiki/patterns/floor-instead-of-half-up.md): ผลลัพธ์สตางค์ต่ำไป 1 (ข้อ half_up) เพราะ Agent ปัดด้วย `//` (floor) ตามที่โจทย์ไม่ได้บอก ให้ใช้ half up `(2*n + d)//(2*d)` เสมอ ห้ามใช้ `round()`
+- [intermediate-rounding-drift](wiki/patterns/intermediate-rounding-drift.md): ผลเพี้ยน 1 สตางค์ (ข้อ no_drift) เพราะปัดเศษทุกขั้นหรือปัดก่อนคูณ 2 ให้ใช้ `Fraction` หรือจำนวนเต็มที่ยังไม่หาร แล้วปัดครั้งเดียวตอนท้าย (ก่อนเทียบเพดาน)
+- [reject-non-int-inputs-as-valueerror](wiki/patterns/reject-non-int-inputs-as-valueerror.md): ข้อ reject_type พลาดเพราะฟังก์ชันรับ float/bool/str แล้วคำนวณต่อ หรือ raise TypeError ให้ validate ทุกพารามิเตอร์ (int จริงที่ไม่ใช่ bool, flag เป็น bool, tier เป็น str ในชุดที่กำหนด) แล้ว raise ValueError อย่างเดียว
+- [validate-spec-ranges-with-valueerror](wiki/patterns/validate-spec-ranges-with-valueerror.md): ข้อ reject_value พลาดเพราะไม่ตรวจช่วงที่โจทย์เขียนไว้ เช่น qty ตั้งแต่ 1 คืน 0 แทน raise ให้ไล่ทุกพารามิเตอร์รวมสมาชิกใน list แล้ว raise ValueError ให้ตรงขอบเขต
+- [hidden-cli-contract-stdin-json](wiki/patterns/hidden-cli-contract-stdin-json.md): ข้อ cli_ok/cli_error พลาดทั้ง 5 trace เพราะโจทย์ไม่พูดถึง CLI แต่ตัวตรวจรัน `python solve.py` ส่ง JSON ทาง stdin ให้เขียน main() พิมพ์ `{"ok":true,"result":...}` exit 0 หรือ `{"ok":false,"error":...}` exit 2 และไม่มี demo print
+- [missing-test-solve-py](wiki/patterns/missing-test-solve-py.md): ข้อ tests พลาดทุก trace เพราะ Agent ทดสอบด้วย `python3 -c` แล้วไม่เหลือไฟล์ ให้สร้าง test_solve.py ข้าง solve.py (unittest/pytest) แล้วรัน `python3 -m unittest` จากโฟลเดอร์งาน ไม่ใช้ `python3 -I`
+- [self-check-confirms-own-assumptions](wiki/patterns/self-check-confirms-own-assumptions.md): Agent ทดสอบเองผ่านหมดแต่ได้ 0.4–0.6 เพราะค่าคาดมาจากสมมติฐานเดียวกับโค้ด ให้ไล่เช็กลิสต์ตามข้อตัวตรวจ (เศษ .5, หลายขั้นตอน, ชนิดผิด, qty=0, CLI, test file) ก่อนจบ
