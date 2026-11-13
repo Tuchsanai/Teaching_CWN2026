@@ -175,38 +175,7 @@ def eq1():
     shot("t06-eq1", body, 600)
 
 
-def eq2():
-    V = [("ไม่มีสกิล", [0.5, 0.5, 0.5, 0.3, 0.3, 0.3]), ("v0", [0.7, 0.8, 0.8, 0.6, 0.6, 0.6]), ("v1", [1.0, 1.0, 1.0, 0.8, 0.8, 0.8]),
-         ("v2", [1.0] * 6), ("v3", [1.0] * 6), ("v4", [0.9] * 6)]
-    best = max(sum(v) / 6 for _, v in V)
-    rows = ""
-    for name, v in V:
-        m = sum(v) / 6
-        top = abs(m - best) < 1e-9
-        cells = "".join("<td style='padding:6px 0;width:74px;text-align:center;%s;font-size:22px'>%.1f</td>" % (MONO, x) for x in v)
-        rows += """<tr style='background:%s'><td style='padding:6px 14px;font-size:24px;font-weight:800;color:%s;border-radius:12px 0 0 12px'>%s</td>%s
-          <td style='padding:6px 12px;font-size:22px;%s;color:%s'>%.1f ÷ 6</td>
-          <td style='padding:6px 14px;font-size:26px;font-weight:800;color:%s;border-radius:0 12px 12px 0'>%.1f%%%s</td></tr>""" % (
-            "#E3F3DE" if top else "#fff", INK, name, cells, MONO, MUTE, sum(v), "#2F6B22" if top else INK, m * 100, " &nbsp;★ สูงสุด" if top else "")
-    part = lambda c, t, d: """<div style='flex:1;border-radius:14px;padding:8px 14px;background:#fff;border-left:12px solid %s'>
-        <div style='font-size:30px;font-family:Cambria,Georgia,serif;color:%s;font-weight:800'>%s</div><div style='font-size:21px'>%s</div></div>""" % (c, c, t, d)
-    parts = "".join([part(RED, "r(s)", "คะแนนของงาน 1 ชิ้น เมื่อใช้สกิล s"),
-                     part(TEAL, "Σ … ÷ |D<sub>sel</sub>|", "บวกคะแนนของทุกงานใน D<sub>sel</sub> แล้วหารด้วยจำนวนงาน = <b>ค่าเฉลี่ย</b>"),
-                     part(GREEN, "s ∈ 𝒞(D<sub>tr</sub>)", "ทำแบบนี้กับสกิล <b>ทุกรุ่น</b> ที่สร้างระหว่างเทรน"),
-                     part(ORANGE, "arg max", "ตอบว่า <b>รุ่นไหน</b> ได้ค่าเฉลี่ยสูงสุด (ไม่ใช่ตอบว่าได้เท่าไร)")])
-    th = "padding:2px 0;font-size:19px;color:%s;font-weight:700;text-align:center" % MUTE
-    body = """<h1>สมการ 2: เลือกสกิลรุ่นที่ดีที่สุด</h1>
-    <div class='sub' style='margin-bottom:10px'>อ่านสมการจากข้างในออกข้างนอก 4 ชั้น · ตารางล่าง = คิดตามสมการด้วยคะแนน Validation จริงของ LAB (2 งาน × 3 รอบ = 6 ค่าต่อรุ่น)</div>
-    <div style='text-align:center;font-size:44px;font-family:Cambria,Georgia,serif;color:%s;background:#fff;border:3px solid %s;border-radius:20px;padding:6px;margin-bottom:10px'>
-      <i>s</i><sup>★</sup><sub>sel</sub> &nbsp;=&nbsp; <span style='color:%s'>arg max</span><sub style='color:%s;font-size:26px'> s ∈ 𝒞(D<sub>tr</sub>)</sub> &nbsp;
-      <span style='color:%s'>( Σ<sub style='font-size:24px'> x ∈ D<sub>sel</sub></sub></span> <span style='color:%s'><i>r</i>(<i>s</i>)</span> <span style='color:%s'>) ÷ |D<sub>sel</sub>|</span></div>
-    <div style='display:flex;gap:10px;margin-bottom:12px'>%s</div>
-    <table style='border-collapse:separate;border-spacing:0 5px;width:100%%'>
-      <tr><th style='%s;text-align:left;padding-left:14px'>สกิลรุ่น s</th><th style='%s' colspan='3'>parking_fee รอบ 1 2 3</th><th style='%s' colspan='3'>net_pay รอบ 1 2 3</th>
-          <th style='%s;text-align:left;padding-left:12px'>Σ ÷ |D<sub>sel</sub>|</th><th style='%s;text-align:left;padding-left:14px'>ค่าเฉลี่ย</th></tr>%s</table>
-    <div class='note' style='margin-top:8px'>arg max ตอบว่า <b>v2 และ v3</b> (เสมอกันที่ 100%%) · LAB เลือก v3 เพราะคะแนนเท่ากันแต่ต้นทุนต่ำกว่า ซึ่งเป็นกติกาเพิ่มของ LAB ไม่ใช่ของเปเปอร์</div>""" % (
-        INK, LINE, ORANGE, GREEN, TEAL, RED, TEAL, parts, th, th, th, th, th, rows)
-    shot("t07-eq2", body, 830)
+# สมการ 2 และ 3 และตารางที่เชื่อมทั้ง 3 สมการ วาดใน diagrams_eq.py (ใช้ MathML)
 
 
 def edits():
@@ -367,6 +336,6 @@ def timeline():
 
 
 if __name__ == "__main__":
-    for w in sys.argv[1:] or ["mapping", "algorithm", "compare", "gd_step", "eq_overview", "eq1", "eq2", "edits", "gate_timeline",
+    for w in sys.argv[1:] or ["mapping", "algorithm", "compare", "gd_step", "eq_overview", "eq1", "edits", "gate_timeline",
                               "reflection_example", "three_way", "skill_anatomy", "timeline"]:
         globals()[w]()
