@@ -637,4 +637,4 @@ def cashback(amount, tier, birthday):
 
 LAB 0 2 3 4 5 รันผ่าน Claude ด้วยพรอมต์ตามตัวอักษร · LAB 1 ผู้สอนรันคำสั่งชุดเดียวกันโดยตรง
 
-**ถัดไป:** [Skill Optimization กับสกิลตรวจและแก้เว็บ](../03_Skill_Optimization/README.md) ใช้วิธีเดียวกันกับงานที่ยากขึ้น
+**ถัดไป:** [WikiSkill · ให้ AI จดสมุดความรู้ แล้วเขียนสกิลจากสมุด](../06_WikiSkill/README.md) ใช้งาน `money-coder` เดิม เทียบกับ Skill Optimizer
