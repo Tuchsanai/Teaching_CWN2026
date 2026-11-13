@@ -99,6 +99,220 @@ def compare():
     shot("t03-vs-lab", body, 860)
 
 
+def box(color, sym, name, ex, w="flex:1"):
+    return """<div style='%s;background:#fff;border:3px solid %s;border-top:14px solid %s;border-radius:18px;padding:12px 16px;text-align:center'>
+      <div style='font-size:46px;font-weight:800;color:%s;font-style:italic;font-family:Cambria,Georgia,serif'>%s</div>
+      <div style='font-size:24px;font-weight:800;color:%s'>%s</div>
+      <div style='font-size:21px;color:%s;margin-top:4px'>%s</div></div>""" % (w, LINE, color, color, sym, INK, name, MUTE, ex)
+
+
+def big_arrow(txt="➜"):
+    return "<div style='font-size:46px;color:%s;align-self:center;font-weight:800'>%s</div>" % (BROWN, txt)
+
+
+def gd_step():
+    """สูตรปรับน้ำหนัก 1 ก้าว พร้อมตัวเลขตัวอย่าง (ตัวเลขสมมติ)"""
+    def term(color, top, mid, bot):
+        return """<div style='text-align:center'><div style='font-size:21px;color:%s;font-weight:700;height:30px'>%s</div>
+          <div style='font-size:64px;font-weight:800;color:%s;font-family:Cambria,Georgia,serif;line-height:1.1'>%s</div>
+          <div style='font-size:22px;color:%s'>%s</div></div>""" % (color, top, color, mid, MUTE, bot)
+    op = lambda t: "<div style='font-size:58px;color:%s;font-family:Cambria,Georgia,serif;align-self:center;padding:0 6px'>%s</div>" % (INK, t)
+    sym = (term(GREEN, "น้ำหนักใหม่", "θ", "ค่าหลังปรับ") + op("←") + term(BROWN, "น้ำหนักเดิม", "θ", "ค่าก่อนปรับ") + op("−") +
+           term(ORANGE, "Learning Rate", "η", "ขนาดของก้าว") + op("×") + term(PURPLE, "Gradient", "∇Loss", "ทิศที่ Loss เพิ่ม"))
+    num = (term(GREEN, "", "4.8", "") + op("←") + term(BROWN, "", "5.0", "") + op("−") + term(ORANGE, "", "0.1", "") + op("×") + term(PURPLE, "", "2.0", ""))
+    rows = "".join("""<div style='display:flex;align-items:center;gap:16px;background:#fff;border-radius:12px;padding:9px 18px;margin-bottom:7px;border-left:12px solid %s'>
+        <div style='width:330px;font-size:25px;font-weight:800;color:%s'>%s</div><div style='flex:1;font-size:23px'>%s</div></div>""" % (c, INK, a, b) for c, a, b in [
+        (PURPLE, "Gradient = +2.0", "เพิ่มน้ำหนัก 1 หน่วย Loss จะเพิ่ม 2 หน่วย → ต้อง <b>ลด</b> น้ำหนัก (เดินทางตรงข้าม)"),
+        (ORANGE, "Learning Rate = 0.1", "เดินแค่ 0.1 ของ Gradient → ขยับ 0.1 × 2.0 = 0.2"),
+        (GREEN, "น้ำหนักใหม่ = 4.8", "5.0 − 0.2 = 4.8 · แล้วทำซ้ำจาก Forward Pass อีกรอบ")])
+    body = """<h1>สูตรปรับน้ำหนัก 1 ก้าว</h1>
+    <div class='sub' style='margin-bottom:10px'>บรรทัดบน = สูตร · บรรทัดล่าง = ตัวเลขตัวอย่าง (สมมติว่าโมเดลมีน้ำหนักตัวเดียว)</div>
+    <div style='display:flex;justify-content:center;gap:10px;background:#fff;border:3px solid %s;border-radius:22px;padding:14px 20px 10px'>%s</div>
+    <div style='display:flex;justify-content:center;gap:34px;margin:6px 0 14px'>%s</div>%s""" % (LINE, sym, num, rows)
+    shot("t04-gd-step", body, 650)
+
+
+def eq_overview():
+    """ภาพรวมของ 3 สมการ: ข้อมูล 3 ชุด ทำหน้าที่อะไร"""
+    def stage(color, eq, title, lines):
+        return """<div style='flex:1;background:#fff;border:3px solid %s;border-top:14px solid %s;border-radius:20px;padding:14px 18px'>
+          <div style='%s;font-size:21px;color:%s'>%s</div>
+          <div style='font-size:28px;font-weight:800;color:%s;margin:2px 0 8px'>%s</div>
+          <div style='font-size:23px;line-height:1.45'>%s</div></div>""" % (LINE, color, MONO, MUTE, eq, INK, title, lines)
+    cards = big_arrow().join([
+        stage(TEAL, "สมการ 1", "ทำงาน 1 ครั้ง", "โมเดล + งาน + สกิล<br>→ <b>Trajectory</b> และ <b>คะแนน</b><br><span style='color:%s'>หน่วยที่เล็กที่สุดของทุกอย่าง</span>" % MUTE),
+        stage(GREEN, "ระหว่างเทรน", "สร้างสกิลหลายรุ่น", "ใช้งานจาก <b>D<sub>tr</sub></b><br>→ สกิล s<sub>0</sub>, s<sub>1</sub>, s<sub>2</sub>, …<br><span style='color:%s'>ชุดนี้เรียกว่า 𝒞(D<sub>tr</sub>)</span>" % MUTE),
+        stage(ORANGE, "สมการ 2", "เลือกรุ่นที่ดีที่สุด", "วัดทุกรุ่นบน <b>D<sub>sel</sub></b><br>→ เลือกรุ่นที่คะแนนเฉลี่ยสูงสุด<br><span style='color:%s'>ได้ s<sup>★</sup><sub>sel</sub></span>" % MUTE),
+        stage(RED, "สมการ 3", "รายงานผล", "วัดรุ่นที่เลือกบน <b>D<sub>test</sub></b><br>→ ตัวเลขที่เขียนลงเปเปอร์<br><span style='color:%s'>ทำครั้งเดียวตอนจบ</span>" % MUTE)])
+    data = "".join("""<div style='flex:1;border-radius:16px;padding:10px 16px;background:%s;color:#fff'>
+        <div style='font-size:27px;font-weight:800'>%s</div><div style='font-size:22px'>%s</div></div>""" % (c, a, b) for c, a, b in [
+        (GREEN, "D<sub>tr</sub> · Train", "ให้โมเดลลองทำ เพื่อหาว่าควรแก้สกิลอย่างไร"),
+        (ORANGE, "D<sub>sel</sub> · Selection", "ตัดสินว่ารุ่นไหนดีกว่า (ไม่ใช้หาวิธีแก้)"),
+        (RED, "D<sub>test</sub> · Test", "ล็อกไว้ ใช้รายงานผลครั้งเดียว")])
+    body = """<h1>ภาพรวมของสมการทั้ง 3</h1>
+    <div class='sub' style='margin-bottom:14px'>สมการ 1 นิยามการทำงาน 1 ครั้ง · สมการ 2 บอกวิธีเลือกสกิล · สมการ 3 บอกวิธีรายงานผล · แต่ละขั้นใช้ข้อมูลคนละชุด</div>
+    <div style='display:flex;gap:8px;align-items:stretch'>%s</div>
+    <div style='font-size:24px;font-weight:800;color:%s;margin:20px 0 8px'>ข้อมูล 3 ชุด ไม่ซ้ำกัน</div>
+    <div style='display:flex;gap:14px'>%s</div>""" % (cards, INK, data)
+    shot("t05-eq-overview", body, 590)
+
+
+def eq1():
+    ins = "".join([box(BROWN, "M", "โมเดลเป้าหมาย", "ถูกล็อก ไม่ถูกแก้<br><span style='%s;color:#2A6F68'>sonnet</span>" % MONO),
+                   box(GREEN, "x", "งาน 1 ชิ้น", "โจทย์ 1 ข้อ<br><span style='%s;color:#2A6F68'>cashback</span>" % MONO),
+                   box(ORANGE, "s", "สกิล", "ข้อความที่ถูกปรับ<br><span style='%s;color:#2A6F68'>v0/SKILL.md</span>" % MONO)])
+    mid = box(TEAL, "h", "Harness", "ระบบที่ให้โมเดลทำงาน<br><span style='%s;color:#2A6F68'>claude -p</span>" % MONO, "width:300px")
+    outs = "".join([box(PURPLE, "τ", "Trajectory", "บันทึกทุกขั้นที่โมเดลทำ<br><span style='%s;color:#2A6F68'>Trace ของ Trial</span>" % MONO),
+                    box(RED, "r", "คะแนน", "ตัวเลข 0 ถึง 1<br><span style='%s;color:#2A6F68'>7 จาก 10 ข้อ = 0.7</span>" % MONO)])
+    body = """<h1>สมการ 1: การทำงาน 1 ครั้ง</h1>
+    <div class='sub' style='margin-bottom:12px'>อ่านจากซ้ายไปขวา: ของ 3 อย่างเข้า Harness แล้วได้ของ 2 อย่างออกมา · ตัวอักษรสีเขียวเข้ม = สิ่งนั้นใน LAB ของบทนี้</div>
+    <div style='text-align:center;font-size:54px;font-family:Cambria,Georgia,serif;color:%s;background:#fff;border:3px solid %s;border-radius:20px;padding:8px;margin-bottom:18px'>
+      ( <span style='color:%s'><i>τ</i></span> , <span style='color:%s'><i>r</i></span> ) &nbsp;=&nbsp; <span style='color:%s'><i>h</i></span> ( <span style='color:%s'><i>M</i></span> , <span style='color:%s'><i>x</i></span> , <span style='color:%s'><i>s</i></span> )</div>
+    <div style='display:flex;gap:12px;align-items:stretch'>
+      <div style='flex:3;display:flex;gap:10px'>%s</div>%s%s%s<div style='flex:2;display:flex;gap:10px'>%s</div></div>
+    <div class='note' style='margin-top:18px'>ถ้าเปลี่ยนแค่ <b>s</b> แล้วคะแนน <b>r</b> เปลี่ยน แปลว่าผลนั้นมาจากสกิล เพราะ M, x และ h เหมือนเดิมทุกอย่าง</div>""" % (
+        INK, LINE, PURPLE, RED, TEAL, BROWN, GREEN, ORANGE, ins, big_arrow(), mid, big_arrow(), outs)
+    shot("t06-eq1", body, 600)
+
+
+def eq2():
+    V = [("ไม่มีสกิล", [0.5, 0.5, 0.5, 0.3, 0.3, 0.3]), ("v0", [0.7, 0.8, 0.8, 0.6, 0.6, 0.6]), ("v1", [1.0, 1.0, 1.0, 0.8, 0.8, 0.8]),
+         ("v2", [1.0] * 6), ("v3", [1.0] * 6), ("v4", [0.9] * 6)]
+    best = max(sum(v) / 6 for _, v in V)
+    rows = ""
+    for name, v in V:
+        m = sum(v) / 6
+        top = abs(m - best) < 1e-9
+        cells = "".join("<td style='padding:6px 0;width:74px;text-align:center;%s;font-size:22px'>%.1f</td>" % (MONO, x) for x in v)
+        rows += """<tr style='background:%s'><td style='padding:6px 14px;font-size:24px;font-weight:800;color:%s;border-radius:12px 0 0 12px'>%s</td>%s
+          <td style='padding:6px 12px;font-size:22px;%s;color:%s'>%.1f ÷ 6</td>
+          <td style='padding:6px 14px;font-size:26px;font-weight:800;color:%s;border-radius:0 12px 12px 0'>%.1f%%%s</td></tr>""" % (
+            "#E3F3DE" if top else "#fff", INK, name, cells, MONO, MUTE, sum(v), "#2F6B22" if top else INK, m * 100, " &nbsp;★ สูงสุด" if top else "")
+    part = lambda c, t, d: """<div style='flex:1;border-radius:14px;padding:8px 14px;background:#fff;border-left:12px solid %s'>
+        <div style='font-size:30px;font-family:Cambria,Georgia,serif;color:%s;font-weight:800'>%s</div><div style='font-size:21px'>%s</div></div>""" % (c, c, t, d)
+    parts = "".join([part(RED, "r(s)", "คะแนนของงาน 1 ชิ้น เมื่อใช้สกิล s"),
+                     part(TEAL, "Σ … ÷ |D<sub>sel</sub>|", "บวกคะแนนของทุกงานใน D<sub>sel</sub> แล้วหารด้วยจำนวนงาน = <b>ค่าเฉลี่ย</b>"),
+                     part(GREEN, "s ∈ 𝒞(D<sub>tr</sub>)", "ทำแบบนี้กับสกิล <b>ทุกรุ่น</b> ที่สร้างระหว่างเทรน"),
+                     part(ORANGE, "arg max", "ตอบว่า <b>รุ่นไหน</b> ได้ค่าเฉลี่ยสูงสุด (ไม่ใช่ตอบว่าได้เท่าไร)")])
+    th = "padding:2px 0;font-size:19px;color:%s;font-weight:700;text-align:center" % MUTE
+    body = """<h1>สมการ 2: เลือกสกิลรุ่นที่ดีที่สุด</h1>
+    <div class='sub' style='margin-bottom:10px'>อ่านสมการจากข้างในออกข้างนอก 4 ชั้น · ตารางล่าง = คิดตามสมการด้วยคะแนน Validation จริงของ LAB (2 งาน × 3 รอบ = 6 ค่าต่อรุ่น)</div>
+    <div style='text-align:center;font-size:44px;font-family:Cambria,Georgia,serif;color:%s;background:#fff;border:3px solid %s;border-radius:20px;padding:6px;margin-bottom:10px'>
+      <i>s</i><sup>★</sup><sub>sel</sub> &nbsp;=&nbsp; <span style='color:%s'>arg max</span><sub style='color:%s;font-size:26px'> s ∈ 𝒞(D<sub>tr</sub>)</sub> &nbsp;
+      <span style='color:%s'>( Σ<sub style='font-size:24px'> x ∈ D<sub>sel</sub></sub></span> <span style='color:%s'><i>r</i>(<i>s</i>)</span> <span style='color:%s'>) ÷ |D<sub>sel</sub>|</span></div>
+    <div style='display:flex;gap:10px;margin-bottom:12px'>%s</div>
+    <table style='border-collapse:separate;border-spacing:0 5px;width:100%%'>
+      <tr><th style='%s;text-align:left;padding-left:14px'>สกิลรุ่น s</th><th style='%s' colspan='3'>parking_fee รอบ 1 2 3</th><th style='%s' colspan='3'>net_pay รอบ 1 2 3</th>
+          <th style='%s;text-align:left;padding-left:12px'>Σ ÷ |D<sub>sel</sub>|</th><th style='%s;text-align:left;padding-left:14px'>ค่าเฉลี่ย</th></tr>%s</table>
+    <div class='note' style='margin-top:8px'>arg max ตอบว่า <b>v2 และ v3</b> (เสมอกันที่ 100%%) · LAB เลือก v3 เพราะคะแนนเท่ากันแต่ต้นทุนต่ำกว่า ซึ่งเป็นกติกาเพิ่มของ LAB ไม่ใช่ของเปเปอร์</div>""" % (
+        INK, LINE, ORANGE, GREEN, TEAL, RED, TEAL, parts, th, th, th, th, th, rows)
+    shot("t07-eq2", body, 830)
+
+
+def edits():
+    """ตัวอย่าง Edit 3 แบบ ด้วยข้อความของสกิล money-coder"""
+    def row(color, op, th, before, after, src):
+        cell = lambda t, bg: "<div style='flex:1;background:%s;border-radius:12px;padding:10px 14px;font-size:21px;line-height:1.4'>%s</div>" % (bg, t)
+        return """<div style='display:flex;gap:12px;align-items:stretch;background:#fff;border-radius:16px;padding:10px 14px;margin-bottom:10px;border-left:14px solid %s'>
+          <div style='width:190px'><div style='%s;font-size:30px;font-weight:800;color:%s'>%s</div><div style='font-size:24px;font-weight:800;color:%s'>%s</div>
+            <div style='font-size:19px;color:%s;margin-top:4px'>%s</div></div>%s%s</div>""" % (
+            color, MONO, color, op, INK, th, MUTE, src, cell(before, "#FBF1EC"), cell(after, "#EAF6E6"))
+    rows = (row(GREEN, "add", "เพิ่มกฎ", "<span style='color:%s'>(ไม่มีกฎเรื่องวิธีทำงาน)</span>" % MUTE,
+                "<b>+</b> เขียนไฟล์โค้ด ไฟล์เทสต์ และรันเทสต์ ในการเรียกเครื่องมือ Bash ครั้งเดียว แล้วตอบทันที", "จริง · v2 → v3") +
+            row(ORANGE, "replace", "แทนกฎเดิม", "ต้องเรียกใช้จาก command line ได้ รับ JSON และตอบเป็น JSON",
+                "สำเร็จตอบ {\"ok\": true, \"result\": …} exit 0 · ข้อมูลผิดตอบ {\"ok\": false, \"error\": \"…\"} exit 2", "จริง · v0 → v1") +
+            row(RED, "delete", "ลบกฎ", "<s>ใส่คำอธิบายยาว ๆ ไว้ท้ายคำตอบทุกครั้ง</s>",
+                "<span style='color:%s'>(กฎถูกลบ เพราะทำให้งานช้าและไม่ช่วยให้ถูกขึ้น)</span>" % MUTE, "ตัวอย่างสมมติ"))
+    head = """<div style='display:flex;gap:12px;padding:0 14px 6px 28px;font-size:21px;color:%s;font-weight:700'>
+      <div style='width:190px'>ชนิดของ Edit</div><div style='flex:1'>สกิลก่อนแก้</div><div style='flex:1'>สกิลหลังแก้</div></div>""" % MUTE
+    body = """<h1>Edit 3 แบบ: add · replace · delete</h1>
+    <div class='sub' style='margin-bottom:12px'>1 Edit = แก้กฎ 1 ข้อในสกิล · ตัวอย่าง add และ replace มาจากสกิล money-coder ของ LAB · delete เป็นตัวอย่างสมมติ (LAB ไม่มีรุ่นที่ลบกฎ)</div>%s%s""" % (head, rows)
+    shot("t08-edits", body, 610)
+
+
+def gate_timeline():
+    """ตัวอย่างการตัดสินของ Gate 6 ก้าว (ตัวเลขสมมติ)"""
+    S = [("เริ่ม", 70, None), ("ก้าว 1", 75, True), ("ก้าว 2", 75, False), ("ก้าว 3", 72, False), ("ก้าว 4", 80, True), ("ก้าว 5", 78, False), ("ก้าว 6", 84, True)]
+    cur, bars = 70, ""
+    for name, sc, ok in S:
+        col = BROWN if ok is None else (GREEN if ok else RED)
+        why = "สกิลเริ่มต้น" if ok is None else ("%d &gt; %d" % (sc, cur) if ok else ("%d = %d เท่ากัน" % (sc, cur) if sc == cur else "%d &lt; %d" % (sc, cur)))
+        verdict = "" if ok is None else ("ACCEPT" if ok else "REJECT")
+        h = int((sc - 60) * 9)
+        bars += """<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end'>
+          <div style='font-size:26px;font-weight:800;color:%s'>%d</div>
+          <div style='width:110px;height:%dpx;background:%s;border-radius:12px 12px 0 0;opacity:%s'></div>
+          <div style='font-size:23px;font-weight:800;color:%s;margin-top:6px'>%s</div>
+          <div style='font-size:20px;color:%s;height:28px'>%s</div>
+          <div style='font-size:22px;font-weight:800;color:%s;height:30px'>%s</div>
+          <div style='font-size:20px;color:%s'>ปัจจุบัน = %d</div></div>""" % (
+            col, sc, h, col, "1" if ok is not False else "0.55", INK, name, MUTE, why, col, verdict, MUTE, sc if ok is not False else cur)
+        if ok:
+            cur = sc
+    body = """<h1>Validation Gate ตัดสินอย่างไร (ตัวอย่างสมมติ 6 ก้าว)</h1>
+    <div class='sub' style='margin-bottom:6px'>แท่ง = คะแนนบน D<sub>sel</sub> ของสกิลรุ่นใหม่ในก้าวนั้น · เทียบกับคะแนนของ <b>สกิลปัจจุบัน</b> · ต้องสูงกว่าจึงรับ เท่ากันก็ไม่รับ</div>
+    <div style='display:flex;gap:6px;align-items:flex-end;height:430px;background:#fff;border:3px solid %s;border-radius:20px;padding:14px 18px'>%s</div>
+    <div class='note' style='margin-top:12px'>สกิลปัจจุบันขยับเฉพาะก้าวที่ถูกรับ: 70 → 75 → 80 → 84 · ก้าว 2 3 5 ถูกปฏิเสธ และ Edit ของก้าวนั้นถูกจดลง Buffer</div>""" % (LINE, bars)
+    shot("t09-gate-timeline", body, 680)
+
+
+def reflection_example():
+    """Backward Pass เดินตามด้วยผลจริงของ LAB (v0 -> v1) จัดให้อยู่ในรูปของ SkillOpt"""
+    def col(color, no, title, sub, inner, w="flex:1"):
+        return """<div style='%s;background:#fff;border:3px solid %s;border-top:14px solid %s;border-radius:18px;padding:10px 12px'>
+          <div style='font-size:24px;font-weight:800;color:%s'><span style='color:%s'>%s</span> %s</div>
+          <div style='font-size:19px;color:%s;margin-bottom:8px;height:50px'>%s</div>%s</div>""" % (w, LINE, color, INK, color, no, title, MUTE, sub, inner)
+    chip = lambda t, bg, fg="#3B2A20", extra="": "<div style='background:%s;color:%s;border-radius:10px;padding:6px 10px;font-size:20px;margin-bottom:6px;line-height:1.3;%s'>%s</div>" % (bg, fg, extra, t)
+    c1 = (chip("<b>12 Trajectory</b><br>4 งาน × 3 รอบ ด้วยสกิล v0", "#F3EDE4") +
+          chip("งานที่ผิด (คะแนน &lt; 1.0)<br><b>12 ใบ</b>", "#FBE3DC") + chip("งานที่ถูก (คะแนน = 1.0)<br><b>0 ใบ</b>", "#E3F3DE"))
+    c2 = (chip("กลุ่มที่ 1 · 8 ใบ", "#EFE6FA") + chip("กลุ่มที่ 2 · 4 ใบ", "#EFE6FA") +
+          chip("อ่านทีละกลุ่ม หาข้อผิดที่<br><b>เกิดซ้ำในกลุ่ม</b>", "#F3EDE4"))
+    P = [("A", "CLI ตอบ JSON คนละรูปแบบ", "12/12", ORANGE), ("B", "เทสต์ไม่ครบ 6 หรือรันไม่ได้", "5/12", ORANGE),
+         ("C", "ข้อมูลผิดชนิด ไม่ได้ ValueError", "4/12", ORANGE), ("D", "ปัดเศษทุกขั้น คลาด 1 สตางค์", "1/12", MUTE)]
+    c3 = "".join(chip("<b style='color:%s'>%s</b> %s<br><span style='%s;color:%s'>พบ %s Trial</span>" % (c, k, t, MONO, MUTE, n), "#FFF6EA") for k, t, n, c in P)
+    c4 = (chip("<b>1</b> &nbsp;A &nbsp;<span style='color:%s'>12/12</span>" % MUTE, "#E3F3DE") + chip("<b>2</b> &nbsp;B &nbsp;<span style='color:%s'>5/12</span>" % MUTE, "#E3F3DE") +
+          chip("<b>3</b> &nbsp;C &nbsp;<span style='color:%s'>4/12</span>" % MUTE, "#E3F3DE") +
+          "<div style='border-top:3px dashed %s;margin:8px 0 8px;font-size:18px;color:%s;text-align:center'>ตัดที่ 3 ข้อ</div>" % (RED, RED) +
+          chip("<s>D &nbsp;1/12</s> &nbsp;ยังไม่แก้", "#FBE3DC", MUTE))
+    c5 = (chip("<b>replace</b> กฎข้อ 4<br>กำหนดรูปแบบ JSON และ exit code", "#E3F3DE") + chip("<b>replace</b> กฎข้อ 5<br>unittest อย่างน้อย 6 เทสต์", "#E3F3DE") +
+          chip("<b>replace</b> กฎข้อ 3<br>ValueError เท่านั้น", "#E3F3DE"))
+    a = "<div style='font-size:34px;color:%s;align-self:center;font-weight:800'>➜</div>" % BROWN
+    body = """<h1>Backward Pass เดินตามด้วยผลจริงของ LAB (v0 → v1)</h1>
+    <div class='sub' style='margin-bottom:12px'>จำนวน Trial ที่พบข้อผิดเป็นผลจริงของ LAB · LAB ไม่ได้แบ่ง Minibatch จริง ภาพนี้จัดผลให้อยู่ในรูปของ SkillOpt โดยใช้ B<sub>m</sub> = 8 และ L = 3</div>
+    <div style='display:flex;gap:6px;align-items:stretch'>%s%s%s%s%s%s%s%s%s</div>
+    <div class='note' style='margin-top:14px'>ผลหลังผ่าน Gate: Training 71.7%% → 100.0%% · Validation 68.3%% → 90.0%% · ข้อ D ที่ถูกตัดออก กลับมาเป็นปัญหาบน Validation และถูกแก้ใน v2</div>""" % (
+        col(TEAL, "1", "หลักฐาน", "Rollout Batch จาก Forward Pass", c1, "width:250px"), a,
+        col(PURPLE, "2", "แบ่งกลุ่ม", "Minibatch ละไม่เกิน 8 ใบ", c2, "width:250px"), a,
+        col(ORANGE, "3", "ข้อเสนอ", "รวมจากทุกกลุ่ม ตัดข้อที่ซ้ำแล้ว", c3), a,
+        col(GREEN, "4", "Rank แล้ว Clip", "เรียงตามจำนวนที่พบ เก็บ L = 3", c4, "width:230px"), a,
+        col(BROWN, "5", "สกิลรุ่นใหม่ v1", "ใช้ Edit ที่เหลือ 3 ข้อ", c5))
+    shot("t10-reflection-example", body, 720)
+
+
+def three_way():
+    L = [("ใช้อะไรเป็นหลักฐาน", "Loss ของข้อมูลใน Minibatch", "Trajectory ของงานใน Minibatch แยกงานที่ผิดกับงานที่ถูก",
+          "ข้อที่ผิดของ Training 12 Trial และ Trace", PURPLE),
+         ("หาทิศของตัวอย่างแต่ละตัว", "Gradient ของตัวอย่างแต่ละตัว", "Reflection: Optimizer Model อ่านทีละกลุ่ม แล้วเสนอ Edit",
+          "Claude Code อ่านข้อที่ผิด แล้วหาสาเหตุ", PURPLE),
+         ("รวมทิศในกลุ่ม", "เฉลี่ย Gradient ทั้ง Minibatch สัญญาณรบกวนหักล้างกัน", "Merge: เก็บข้อที่เกิดซ้ำ ตัดข้อที่ซ้ำ ขัดกัน หรือเฉพาะตัวอย่าง",
+          "เก็บสาเหตุที่พบมากกว่า 1 Trial", PURPLE),
+         ("จำกัดขนาดของก้าว", "คูณด้วย Learning Rate η", "Rank แล้ว Clip เหลือไม่เกิน L<sub>t</sub> ข้อ", "แก้ไม่เกิน 3 จุดต่อรุ่น", ORANGE),
+         ("ผลของก้าว", "น้ำหนักชุดใหม่ θ", "สกิลรุ่นใหม่ s<sub>new</sub>", "โฟลเดอร์รุ่นใหม่ เช่น v1", GREEN),
+         ("ใครเป็นคนทำ", "สูตรคณิตศาสตร์ (Backpropagation)", "Optimizer Model O", "Claude Code ตามพรอมต์ของเรา", BROWN)]
+    rows = ""
+    for name, gd, so, lab, col in L:
+        rows += """<div style='display:flex;align-items:center;gap:16px;background:#fff;border-radius:12px;padding:10px 16px;margin-bottom:7px;border-left:12px solid %s'>
+          <div style='width:270px;font-size:24px;font-weight:800;color:%s'>%s</div>
+          <div style='width:360px;font-size:22px'>%s</div><div style='flex:1;font-size:22px'>%s</div><div style='width:360px;font-size:22px'>%s</div></div>""" % (
+            col, INK, name, gd, so, lab)
+    head = """<div style='display:flex;gap:16px;padding:0 16px 6px 28px;font-size:22px;color:%s;font-weight:700'>
+      <div style='width:270px'>ขั้นของ Backward Pass</div><div style='width:360px'>Gradient Descent</div><div style='flex:1'>SkillOpt (เปเปอร์)</div><div style='width:360px'>LAB ของเรา (money-coder)</div></div>""" % MUTE
+    body = """<h1>Backward Pass เทียบ 3 ทาง</h1>
+    <div class='sub' style='margin-bottom:14px'>ทั้งสามทำสิ่งเดียวกัน: จากหลักฐานของกลุ่มเล็ก หาทิศที่ควรปรับ รวมให้เหลือทิศที่เชื่อได้ แล้วปรับเพียงเล็กน้อย</div>%s%s""" % (head, rows)
+    shot("t11-backward-three-way", body, 660)
+
+
 if __name__ == "__main__":
-    for w in sys.argv[1:] or ["mapping", "algorithm", "compare"]:
+    for w in sys.argv[1:] or ["mapping", "algorithm", "compare", "gd_step", "eq_overview", "eq1", "eq2", "edits", "gate_timeline",
+                              "reflection_example", "three_way"]:
         globals()[w]()
