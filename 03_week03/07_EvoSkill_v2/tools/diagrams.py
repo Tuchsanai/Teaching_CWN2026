@@ -49,21 +49,21 @@ def table(heads, rows, widths=None, size=23):
 
 # ------------------------------------------------------------------ t01 จาก v1 สู่ v2
 def v1v2():
-    left = """<div class='card' style='flex:1;border-top:14px solid %s'>
+    left = """<div class='card' style='flex:1.02;border-top:14px solid %s'>
       <div style='font-size:32px;font-weight:800;color:%s'>EvoSkill v1</div>
       <div class='note' style='margin:4px 0 12px'>ตัวปรับสกิล = Agent 2 ตัว ทำงานต่อกัน</div>
       <div class='row' style='gap:8px;align-items:stretch'>%s%s%s</div>
       <div class='note' style='margin-top:14px'>• benchmark ใหม่ต้อง <b>แปลงด้วยมือ</b> ให้เข้ารูปแบบที่ระบบรองรับ<br>• รองรับตัวตรวจของผู้ใช้ได้จำกัด</div></div>""" % (
         FILE, INK, box(FILE, "Proposer", "อ่านจุดพลาดของ Solver<br>แล้ว <b>เสนอ</b> การแก้", "flex:1"), arrow(),
         box(FILE, "Generator", "นำข้อเสนอไป <b>เขียน</b><br>เป็นไฟล์สกิล", "flex:1"))
-    right = """<div class='card' style='flex:1.25;border-top:14px solid %s'>
+    right = """<div class='card' style='flex:1.5;border-top:14px solid %s'>
       <div style='font-size:32px;font-weight:800;color:%s'>EvoSkill v2</div>
       <div class='note' style='margin:4px 0 12px'>Agent 3 ตัว วางซ้อนบน Agent Harness ที่ใช้อยู่แล้ว (เช่น Claude Code)</div>
       <div class='row' style='gap:8px;align-items:stretch'>%s%s%s</div>
       <div class='note' style='margin-top:14px'>• ผู้ใช้ <b>อธิบาย benchmark เป็นข้อความ</b> และให้ตัวตรวจของตัวเอง<br>• Evolver เป็นเซสชันเดียวที่อยู่ <b>ตลอดการรัน</b></div></div>""" % (
-        EVOLVER, INK, box(ADAPT, "Benchmark Adaptor", "<b>ใหม่</b> · เตรียม benchmark<br>ก่อนเริ่ม (ครั้งเดียว)", "flex:1", 26),
-        box(SOLVER, "Solver", "ทำโจทย์ด้วย<br>ชุดสกิลปัจจุบัน", "flex:0.8", 26),
-        box(EVOLVER, "Evolver", "<b>รวม</b> Proposer + Generator<br>อ่านผล แล้วเขียนสกิลเอง", "flex:1", 26))
+        EVOLVER, INK, box(ADAPT, "Benchmark Adaptor", "<b>ใหม่</b> · เตรียมสนาม<br>ก่อนเริ่ม (ครั้งเดียว)", "flex:1.15", 25, 21),
+        box(SOLVER, "Solver", "ทำโจทย์ด้วย<br>ชุดสกิลปัจจุบัน", "flex:0.85", 25, 21),
+        box(EVOLVER, "Evolver", "<b>รวม</b> Proposer + Generator<br>อ่านผล แล้วเขียนสกิลเอง", "flex:1.35", 25, 21))
     body = """<h1>จาก EvoSkill v1 สู่ EvoSkill v2</h1>
     <div class='sub'>เปลี่ยน 2 อย่าง: รวม Agent 2 ตัวของตัวปรับสกิลเป็น Evolver ตัวเดียว และเพิ่ม Benchmark Adaptor</div>
     <div class='row' style='align-items:stretch'>%s<div class='arrow'>➜</div>%s</div>%s""" % (
@@ -295,7 +295,8 @@ def paper_cost():
         for name, col, h1, c1, p1, h2, c2, p2 in rows:
             tr += "<tr><td style='border-left:14px solid %s;font-weight:800'>%s</td><td>%s</td><td>%s</td><td><b>%s</b></td><td>%s</td><td>%s</td><td><b>%s</b></td></tr>" % (col, name, h1, c1, p1, h2, c2, p2)
         return """<div style='font-size:26px;font-weight:800;color:%s;margin:12px 0 0'>%s (Held-out จาก %d episode)</div>
-        <table class='t'><tr><th></th><th>Held-out</th><th>ต้นทุน</th><th>ต่อ 1 จุดที่เพิ่ม</th><th>Held-out</th><th>ต้นทุน</th><th>ต่อ 1 จุดที่เพิ่ม</th></tr>%s</table>""" % (INK, title, total, tr)
+        <table class='t' style='table-layout:fixed'><tr><th style='width:400px'></th><th colspan='3' style='font-weight:800;color:#4A2F1F'>เห็น Ground Truth ละเอียด</th><th colspan='3' style='font-weight:800;color:#4A2F1F'>เห็นแค่ผ่านหรือไม่ผ่าน</th></tr>
+        <tr><th></th><th>Held-out</th><th>ต้นทุน</th><th>ต่อ 1 จุดที่เพิ่ม</th><th>Held-out</th><th>ต้นทุน</th><th>ต่อ 1 จุดที่เพิ่ม</th></tr>%s</table>""" % (INK, title, total, tr)
     ssb = tb("SpreadsheetBench v2", 312, [
         ("ไม่มีสกิล", "#BCAAA4", "81", "–", "–", "81", "–", "–"),
         ("SkillBoost", FILE, "101", "$13.95", "$2.18", "85", "$13.66", "$10.65"),
@@ -308,7 +309,7 @@ def paper_cost():
         ("EvoSkill v2 · Haiku evolver", "#7FC8BE", "46", "$1.87", "$0.09", "33", "$0.73", "$0.10"),
         ("EvoSkill v2", EVOLVER, "48", "$0.99", "$0.04", "41", "$1.55", "$0.10")])
     body = """<h1>ผลในเปเปอร์: ต้นทุนของผู้ปรับสกิล</h1>
-    <div class='sub'>Table 4 และ 5 ของเปเปอร์ · ต้นทุน = ราคาตามรายการของผู้ปรับสกิลอย่างเดียว (ไม่รวม rollout ของ Solver) · 3 คอลัมน์ซ้าย = เห็น Ground Truth ละเอียด · 3 คอลัมน์ขวา = เห็นแค่ผ่านหรือไม่ผ่าน</div>%s%s%s""" % (
+    <div class='sub'>Table 4 และ 5 ของเปเปอร์ · ต้นทุน = ราคาตามรายการของผู้ปรับสกิลอย่างเดียว (ไม่รวม rollout ของ Solver) · Held-out = จำนวน episode ที่ผ่าน</div>%s%s%s""" % (
         ssb, tau, strip(EVOLVER, "\"ต่อ 1 จุดที่เพิ่ม\" = ต้นทุน ÷ จำนวนจุดของ pass rate บน Held-out ที่เพิ่มจากไม่มีสกิล · EvoSkill v2 ต่ำสุดทั้ง 4 การเทียบ", 24, 10))
     shot(D + "t11-paper-cost.png", body, 960)
 
@@ -359,7 +360,7 @@ def methods():
     ]
     body = """<h1>EvoSkill v2 เทียบกับวิธีปรับสกิลอื่น</h1>
     <div class='sub'>2 แถวบน = วิธีที่เปเปอร์นำมาเทียบ · 2 แถวกลาง = วิธีของบท 05 และ 06 ตามที่ใช้ใน LAB ของเรา</div>%s""" % table(
-        ["วิธี", "ผู้ปรับสกิลคืออะไร", "จำอะไรข้ามรอบ", "ครั้งต่อโจทย์", "กติการับสกิล", "เห็นอะไรจากตัวตรวจ"], rows, [250, 370, 300, 110, 270, None], 21)
+        ["วิธี", "ผู้ปรับสกิลคืออะไร", "จำอะไรข้ามรอบ", "ครั้งต่อ<br>โจทย์", "กติการับสกิล", "เห็นอะไรจากตัวตรวจ"], rows, [215, 330, 280, 95, 255, None], 21)
     shot(D + "t13-methods.png", body, 760)
 
 
