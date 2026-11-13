@@ -110,7 +110,36 @@ def examples():
     shot("d03-examples", body, 940)
 
 
+def algorithm():
+    INK, MUTE, LINE = "#4A2F1F", "#7A6557", "#E5D9CC"
+    TEAL, ORANGE, GREEN, RED, BROWN = "#2A9D8F", "#F4A261", "#6BBF59", "#E76F51", "#6F4E37"
+    L = [("", "รับเข้า", "สกิลรุ่นแรก S<sub>0</sub> · งาน Training 4 งาน · งาน Validation 2 งาน · ตัวตรวจ", "", ""),
+         ("0", "ตรวจตัวตรวจ", "เฉลยต้องได้ 10/10 · เฉลยที่จงใจผิด 1 จุด ต้องตกเฉพาะข้อนั้น", "check_grader.py", TEAL),
+         ("1", "วัดรุ่นฐาน", "คะแนน(S<sub>0</sub>) = ค่าเฉลี่ยของ 6 งาน × 3 รอบ = 18 Trial", "run · report", ORANGE),
+         ("", "ทำซ้ำ k = 1, 2, …", "", "", BROWN),
+         ("2", "　วิเคราะห์ข้อที่ผิด", "ข้อที่ผิดของ S<sub>k−1</sub> เฉพาะ Training → สาเหตุที่พบมากกว่า 1 Trial → ISSUES.md", "failures", GREEN),
+         ("3", "　คัดลอกแล้วแก้", "S′ = สำเนาของ S<sub>k−1</sub> ที่แก้ไม่เกิน 3 จุด (โฟลเดอร์ใหม่)", "lint", ORANGE),
+         ("4", "　วัดรุ่นใหม่", "คะแนน(S′) ด้วยงาน จำนวนรอบ และโมเดล ชุดเดียวกับรุ่นฐาน", "run · report", TEAL),
+         ("5", "　ประตูรับ", "Training ไม่ลด · Validation ไม่ลด · รวมดีขึ้นเกินเกณฑ์ หรือเท่าเดิมแต่ต้นทุนลด ≥ 10%", "gate", GREEN),
+         ("", "　　ถ้าผ่านครบ 3 ข้อ", "<b>ACCEPT</b>: S<sub>k</sub> = S′ (รุ่นใหม่เป็นรุ่นฐาน)", "gate", GREEN),
+         ("", "　　ถ้าไม่", "<b>REJECT</b>: S<sub>k</sub> = S<sub>k−1</sub> (ทิ้ง S′ · จดเหตุผลลง ISSUES.md)", "gate", RED),
+         ("", "　หยุดเมื่อ", "ไม่มีข้อที่ผิดซ้ำ และคะแนนหรือต้นทุนไม่ดีขึ้นแล้ว", "", BROWN),
+         ("", "ส่งออก", "สกิลรุ่นฐานล่าสุด S<sub>k</sub> และ ISSUES.md", "", INK)]
+    rows = ""
+    for no, name, txt, cmd, col in L:
+        rows += """<div style='display:flex;align-items:center;gap:16px;background:#fff;border-radius:12px;padding:8px 16px;margin-bottom:7px;border-left:12px solid %s'>
+          <div style='%s;width:86px;font-size:22px;color:%s'>%s</div>
+          <div style='width:300px;font-size:25px;font-weight:800;color:%s;white-space:pre'>%s</div>
+          <div style='flex:1;font-size:23px'>%s</div>
+          <div style='%s;width:210px;font-size:21px;color:#2A6F68;text-align:right'>%s</div></div>""" % (
+            col or LINE, MONO, MUTE, ("ขั้น " + no) if no else "", INK, name, txt, MONO, cmd)
+    body = """<h1>Algorithm 1: วงรอบของ Skill Optimizer</h1>
+    <div class='sub' style='margin-bottom:18px'>เลขทางซ้าย = ขั้นของอัลกอริทึม · ทางขวา = คำสั่งของ <span style='%s'>skillopt.py</span> ที่ทำขั้นนั้น ·
+      S<sub>k</sub> = สกิลรุ่นฐานหลังรอบที่ k · S′ = สกิลรุ่นใหม่ที่ยังไม่ถูกรับ</div>%s""" % (MONO, rows)
+    shot("d04-algorithm", body, 900)
+
+
 if __name__ == "__main__":
-    pipeline()
-    grader()
-    examples()
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm"]
+    for w in which:
+        globals()[w]()
