@@ -1,0 +1,55 @@
+{
+ "score": 0.6,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": false,
+   "note": "bulk_price(100, 60, false) คาด 5939 ได้ 5938 · พลาด 2 จาก 3 กรณี"
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 10, \"coupon\": false} ต้องได้ {\"ok\": true, \"result\": 258138} exit 0 แต่ได้ exit 0 stdout (ว่าง)"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 0, \"coupon\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

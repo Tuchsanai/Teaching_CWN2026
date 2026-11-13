@@ -1,0 +1,55 @@
+{
+ "score": 0.5,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": false,
+   "note": "late_fee(10, 30) คาด 2 ได้ 1 · พลาด 1 จาก 4 กรณี"
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "late_fee(100000.0, 5) ต้อง raise ValueError แต่ raise TypeError · พลาด 5 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"amount\": 100000, \"days_late\": 10} ต้องได้ {\"ok\": true, \"result\": 7500} exit 0 แต่ได้ exit 0 stdout usage: python solve.py <amount_satang> <days_late>"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"amount\": 100000, \"days_late\": 366} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout usage: python solve.py <amount_satang> <days_late>"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

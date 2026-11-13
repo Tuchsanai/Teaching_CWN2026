@@ -1,0 +1,55 @@
+{
+ "score": 0.6,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "split_bill(10000.0, 2, 0) ต้อง raise ValueError แต่คืนค่า [5000, 5000] · พลาด 1 จาก 4 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"total\": 10000, \"people\": 3, \"tip_percent\": 0} ต้องได้ {\"ok\": true, \"result\": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3667, 3667, 3666]\n[500, 499]\n[0, 0, 0, 0]"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"total\": 10000, \"people\": 0, \"tip_percent\": 0} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout [3667, 3667, 3666]\n[500, 499]\n[0, 0, 0, 0]"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

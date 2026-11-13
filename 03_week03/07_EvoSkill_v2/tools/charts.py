@@ -13,11 +13,18 @@ from draw import ROOT, USER, ADAPT, SOLVER, EVOLVER, FILE, BAD, INK, MUTE, LINE,
 GREY = "#BCAAA4"
 RUNS = [("e1", "e1 · เห็นเฉลยของ Training", "การตั้งค่าหลัก (Fine-grained Ground Truth)"),
         ("e2", "e2 · รันซ้ำของ e1", "การตั้งค่าเดียวกับ e1 ทุกค่า"),
+        ("v1", "v1 · รันซ้ำของ e1", "Agent อิสระทำตามพรอมต์ LAB 0–2"),
         ("n1", "n1 · เฉลย + หมายเหตุ 1 ประโยค", "ผู้ใช้บอกว่างานที่ได้คะแนนเต็มมี 2 ไฟล์"),
+        ("n2", "n2 · รันซ้ำของ n1", "Agent อิสระทำตามพรอมต์ LAB 3"),
         ("p1", "p1 · เห็นแต่คะแนน", "ไม่มีเฉลยใน Reference Folder"),
+        ("p2", "p2 · รันซ้ำของ p1", "Agent อิสระทำตามพรอมต์ LAB 4"),
         ("f1", "f1 · เซสชันใหม่ทุก epoch", "เหมือน e1 แต่ Evolver ไม่ใช้ --resume"),
         ("f2", "f2 · รันซ้ำของ f1", "การตั้งค่าเดียวกับ f1 ทุกค่า"),
-        ("h1", "h1 · haiku ทั้ง Solver และ Evolver", "Self-evolution ของโมเดลเล็ก")]
+        ("f3", "f3 · รันซ้ำของ f1", "Agent อิสระทำตามพรอมต์ LAB 5"),
+        ("h1", "h1 · haiku ทั้ง Solver และ Evolver", "Self-evolution ของโมเดลเล็ก"),
+        ("h2", "h2 · รันซ้ำของ h1", "Agent อิสระทำตามพรอมต์ LAB 6")]
+PATHS = ("e1", "e2", "n1", "p1", "f1", "h1")
+GROUPS = [("เห็นเฉลย", ("e1", "e2", "v1")), ("เฉลย + หมายเหตุ", ("n1", "n2")), ("เห็นแต่คะแนน", ("p1", "p2")), ("เซสชันใหม่ทุก epoch", ("f1", "f2", "f3"))]
 
 
 def state(ws):
@@ -121,7 +128,7 @@ def runs_table():
         rows += "<tr><td style='border-left:14px solid %s;width:390px'><b style='font-size:24px'>%s</b><br><span style='font-size:19px;color:%s'>%s</span></td><td style='font-size:22px;width:430px'>%s</td><td style='width:330px'>%s</td><td style='font-size:22px;text-align:center'>%d/%d</td><td style='font-size:22px;text-align:center'>$%.2f</td></tr>" % (
             EVOLVER, name, MUTE, desc, steps, bar, ft["passes"], ft["n"], sum(t["cost_usd"] for t in T))
     body = """<h1>ทุกการรันของบทนี้</h1>
-    <div class='sub'>ผลจริง · Solver = sonnet / effort medium (ยกเว้น h1) · 3 epochs · โจทย์ละ 3 ครั้ง · แต่ละการตั้งค่ารัน 1 ครั้ง (e1 และ f1 มีรันซ้ำ) · ขีดสีเข้มบนแท่ง = คะแนน Test ตอนไม่มีสกิล</div>
+    <div class='sub'>ผลจริง · Solver = sonnet / effort medium (ยกเว้น h1) · 3 epochs · โจทย์ละ 3 ครั้ง · แต่ละการตั้งค่ารัน 2–3 ครั้ง · ขีดสีเข้มบนแท่ง = คะแนน Test ตอนไม่มีสกิล</div>
     <table class='t'><tr><th>การรัน</th><th>Validation ราย epoch (0 → 3)</th><th>Test Set · ชุดของ epoch สุดท้าย</th><th>ผ่านครบ 10 ข้อ</th><th>ต้นทุนของ Evolver</th></tr>%s</table>""" % rows
     shot("img/r02-runs.png", body)
 
@@ -138,22 +145,24 @@ def compare():
     for k, nm in (("w1-final", "WikiSkill (w1)"), ("w2-final", "WikiSkill (w2)")):
         if k in R:
             items.append((nm, "บท 06 · เริ่มจากว่าง", FILE, R[k]["test"]))
-    for ws, name, desc in RUNS:
-        st = state(ws)
-        if st and ws in ("e1", "n1", "p1", "f1"):
-            s = st["legs"]["v%d_test" % st["epochs"]]
-            items.append(("EvoSkill v2 (%s)" % ws, name.split(" · ", 1)[1], EVOLVER, {"score": s["score"], "perfect": s["passes"], "n": s["n"], "context_tokens": s["context_tokens"]}))
+    for gname, members in GROUPS:
+        ss = [state(w)["legs"]["v3_test"] for w in members if state(w)]
+        if ss:
+            sc = [s["score"] for s in ss]
+            items.append(("EvoSkill v2", "%s<br>%d การรัน<br>%s ถึง %s" % (gname, len(ss), pct(min(sc)), pct(max(sc))), EVOLVER,
+                          {"score": sum(sc) / len(sc), "perfect": sum(s["passes"] for s in ss), "n": sum(s["n"] for s in ss),
+                           "context_tokens": sum(s["context_tokens"] for s in ss) / len(ss)}))
     cols = ""
     for name, desc, col, s in items:
         h = s["score"] * 100
         cols += """<div style='flex:1;text-align:center'><div style='height:330px;display:flex;flex-direction:column;justify-content:flex-end'>
           <div style='font-size:27px;font-weight:800;color:%s'>%s</div><div style='font-size:19px;color:%s;margin-bottom:4px'>ผ่านครบ %d/%d</div>
           <div style='height:%.0fpx;background:%s;border-radius:12px 12px 0 0;margin:0 9px'></div></div>
-          <div style='font-size:21px;font-weight:800;color:%s;line-height:1.2;margin-top:8px;height:52px'>%s</div><div style='font-size:18px;color:%s;line-height:1.25;margin-top:2px;height:46px'>%s</div>
+          <div style='font-size:21px;font-weight:800;color:%s;line-height:1.2;margin-top:8px;height:30px'>%s</div><div style='font-size:18px;color:%s;line-height:1.25;margin-top:2px;height:72px'>%s</div>
           <div style='font-size:18px;color:%s;margin-top:6px'>%s โทเคน/rollout</div></div>""" % (
             INK, pct(s["score"]), MUTE, s["perfect"], s["n"], h * 2.5, col, INK, name, MUTE, desc, MUTE, format(int(s["context_tokens"]), ","))
     body = """<h1>Test Set 3 ข้อ: EvoSkill v2 เทียบกับบท 05 และ 06</h1>
-    <div class='sub'>ผลจริง · โจทย์ ตัวตรวจ Solver (sonnet / effort medium) และพรอมต์ของ Solver ชุดเดียวกันทุกแท่ง · 3 โจทย์ × 3 ครั้ง = 9 rollout ต่อแท่ง · ตัวเลขของบท 05 และ 06 มาจากผลของบท 06</div>
+    <div class='sub'>ผลจริง · โจทย์ ตัวตรวจ Solver (sonnet / effort medium) และพรอมต์ของ Solver ชุดเดียวกันทุกแท่ง · 3 โจทย์ × 3 ครั้ง = 9 rollout ต่อการรัน · แท่งของ EvoSkill v2 = ค่าเฉลี่ยของการรันซ้ำ 2–3 ครั้ง (ช่วงต่ำสุด–สูงสุดอยู่ใต้ชื่อ) · ตัวเลขของบท 05 และ 06 มาจากผลของบท 06 (การรันละ 1 ครั้ง)</div>
     <div class='card'><div style='display:flex;align-items:flex-end'>%s</div></div>
     <div class='note' style='margin-top:10px'>สิ่งที่ผู้ปรับสกิลเห็นไม่เท่ากัน: บท 05 และ 06 อ่าน <b>ข้อความของตัวตรวจ</b> ของชุด Training ได้ · EvoSkill v2 ได้ <b>แต่คะแนน</b> และ (ถ้าผู้ใช้ให้) เฉลยของชุด Training</div>""" % cols
     shot("img/r03-compare.png", body)
@@ -197,7 +206,7 @@ def effort():
 if __name__ == "__main__":
     story()
     for ws, name, desc in RUNS:
-        st = state(ws)
+        st = state(ws) if ws in PATHS else None
         if st:
             c = st["cfg"]
             path(ws, "เส้นทางของการรัน %s" % name, "ผลจริง · Solver %s · Evolver %s%s" % (c["solver_model"], c["evolver_model"], " · เซสชันใหม่ทุก epoch" if c["fresh_session"] else ""))

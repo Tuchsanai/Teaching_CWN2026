@@ -1,0 +1,540 @@
+{
+ "cfg": {
+  "name": "n2",
+  "data": "/workspace/evlab/bench/data/baankafe",
+  "skillopt": "/workspace/evlab/skill-optimizer/scripts/skillopt.py",
+  "accounts": [
+   "yolo1",
+   "yolo2",
+   "yolo3"
+  ],
+  "par": 6,
+  "solver_prompt": "เขียนโค้ด Python ตามโจทย์ด้านล่าง บันทึกไฟล์ในโฟลเดอร์ปัจจุบัน\nถ้าใน ./skills มีสกิล ให้อ่านและทำตามก่อนเริ่ม\n\n{brief}",
+  "solver_model": "sonnet",
+  "solver_effort": "medium",
+  "evolver_model": "sonnet",
+  "evolver_effort": "high",
+  "adaptor_model": "sonnet",
+  "turn_minutes": 30,
+  "fresh_session": false
+ },
+ "epochs": 3,
+ "n": 3,
+ "phase": "test",
+ "k": 3,
+ "session_id": "0d375cd1-20c6-473e-a70a-5530093cbc6f",
+ "legs": {
+  "base_train": {
+   "n": 12,
+   "tasks": 4,
+   "score": 0.4666666666666666,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 4,
+   "mixed": 0,
+   "by_task": {
+    "t1-cafe-bill": [
+     0.5,
+     0.5,
+     0.5
+    ],
+    "t2-split-bill": [
+     0.4,
+     0.6,
+     0.5
+    ],
+    "t3-shipping-fee": [
+     0.6,
+     0.5,
+     0.5
+    ],
+    "t4-cashback": [
+     0.3,
+     0.3,
+     0.4
+    ]
+   },
+   "cost_usd": 1.018,
+   "context_tokens": 85053,
+   "tool_calls": 2.25,
+   "skill_read": 1,
+   "grader_failed": 0,
+   "label": "base_train",
+   "split": "train",
+   "skills": [],
+   "model": "sonnet"
+  },
+  "base_val": {
+   "n": 6,
+   "tasks": 2,
+   "score": 0.5,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 2,
+   "mixed": 0,
+   "by_task": {
+    "v1-parking-fee": [
+     0.5,
+     0.5,
+     0.5
+    ],
+    "v2-net-pay": [
+     0.5,
+     0.5,
+     0.5
+    ]
+   },
+   "cost_usd": 0.508,
+   "context_tokens": 82870,
+   "tool_calls": 2.0,
+   "skill_read": 1,
+   "grader_failed": 0,
+   "label": "base_val",
+   "split": "validation",
+   "skills": [],
+   "model": "sonnet"
+  },
+  "base_test": {
+   "n": 9,
+   "tasks": 3,
+   "score": 0.4555555555555555,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 3,
+   "mixed": 0,
+   "by_task": {
+    "x1-late-fee": [
+     0.5,
+     0.5,
+     0.3
+    ],
+    "x2-refund": [
+     0.5,
+     0.3,
+     0.5
+    ],
+    "x3-bulk-price": [
+     0.5,
+     0.5,
+     0.5
+    ]
+   },
+   "cost_usd": 0.745,
+   "context_tokens": 82505,
+   "tool_calls": 2.0,
+   "skill_read": 0,
+   "grader_failed": 0,
+   "label": "base_test",
+   "split": "test",
+   "skills": [],
+   "model": "sonnet"
+  },
+  "v1_val": {
+   "n": 6,
+   "tasks": 2,
+   "score": 0.9166666666666666,
+   "passes": 1,
+   "pass3": 1,
+   "all3": 0,
+   "none3": 1,
+   "mixed": 1,
+   "by_task": {
+    "v1-parking-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "v2-net-pay": [
+     1.0,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 0.699,
+   "context_tokens": 129296,
+   "tool_calls": 3.33,
+   "skill_read": 6,
+   "grader_failed": 0,
+   "label": "v1_val",
+   "split": "validation",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  },
+  "v1_train": {
+   "n": 12,
+   "tasks": 4,
+   "score": 0.9,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 4,
+   "mixed": 0,
+   "by_task": {
+    "t1-cafe-bill": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t2-split-bill": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t3-shipping-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t4-cashback": [
+     0.9,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 1.387,
+   "context_tokens": 133963,
+   "tool_calls": 3.5,
+   "skill_read": 12,
+   "grader_failed": 0,
+   "label": "v1_train",
+   "split": "train",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  },
+  "v2_val": {
+   "n": 6,
+   "tasks": 2,
+   "score": 0.9,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 2,
+   "mixed": 0,
+   "by_task": {
+    "v1-parking-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "v2-net-pay": [
+     0.9,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 0.724,
+   "context_tokens": 140542,
+   "tool_calls": 3.67,
+   "skill_read": 6,
+   "grader_failed": 0,
+   "label": "v2_val",
+   "split": "validation",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  },
+  "v2_train": {
+   "n": 12,
+   "tasks": 4,
+   "score": 0.9,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 4,
+   "mixed": 0,
+   "by_task": {
+    "t1-cafe-bill": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t2-split-bill": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t3-shipping-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "t4-cashback": [
+     0.9,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 1.468,
+   "context_tokens": 143176,
+   "tool_calls": 3.75,
+   "skill_read": 12,
+   "grader_failed": 0,
+   "label": "v2_train",
+   "split": "train",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  },
+  "v3_val": {
+   "n": 6,
+   "tasks": 2,
+   "score": 0.9,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 2,
+   "mixed": 0,
+   "by_task": {
+    "v1-parking-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "v2-net-pay": [
+     0.9,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 0.73,
+   "context_tokens": 135065,
+   "tool_calls": 3.5,
+   "skill_read": 6,
+   "grader_failed": 0,
+   "label": "v3_val",
+   "split": "validation",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  },
+  "v3_test": {
+   "n": 9,
+   "tasks": 3,
+   "score": 0.8999999999999999,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 3,
+   "mixed": 0,
+   "by_task": {
+    "x1-late-fee": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "x2-refund": [
+     0.9,
+     0.9,
+     0.9
+    ],
+    "x3-bulk-price": [
+     0.9,
+     0.9,
+     0.9
+    ]
+   },
+   "cost_usd": 1.084,
+   "context_tokens": 140601,
+   "tool_calls": 3.67,
+   "skill_read": 9,
+   "grader_failed": 0,
+   "label": "v3_test",
+   "split": "test",
+   "skills": [
+    "money-function-spec"
+   ],
+   "model": "sonnet"
+  }
+ },
+ "turns": [
+  {
+   "ok": true,
+   "tool_calls": 7,
+   "tools": {
+    "Bash": 7
+   },
+   "bash": 7,
+   "bash_python": 3,
+   "rerun_old_scripts": 0,
+   "subagents": 0,
+   "compactions": 0,
+   "touch": {
+    "traces": 2,
+    "solver_workspaces": 0,
+    "reference": 3,
+    "scores": 0,
+    "skills": 0,
+    "staging": 1,
+    "evolver_workspace": 0
+   },
+   "num_turns": 8,
+   "cost_usd": 0.1746,
+   "output_tokens": 6188,
+   "context_tokens": 215702,
+   "session_cost_usd": 0.1746,
+   "k": 1,
+   "wall_s": 48.1,
+   "timed_out": false,
+   "fresh_session": true,
+   "session_id": "0d375cd1-20c6-473e-a70a-5530093cbc6f",
+   "rollouts_given": 12,
+   "old_scripts": 0,
+   "skills": [
+    "money-function-spec"
+   ],
+   "skill_md_bytes": 7182,
+   "skill_other_files": [
+    "money-function-spec/template.py"
+   ],
+   "skill_problems": [],
+   "files_added": [
+    "money-function-spec/SKILL.md",
+    "money-function-spec/template.py"
+   ],
+   "files_removed": [],
+   "files_changed": [],
+   "workspace_files": []
+  },
+  {
+   "ok": true,
+   "tool_calls": 8,
+   "tools": {
+    "Bash": 7,
+    "bash": 1
+   },
+   "bash": 7,
+   "bash_python": 6,
+   "rerun_old_scripts": 0,
+   "subagents": 0,
+   "compactions": 0,
+   "touch": {
+    "traces": 1,
+    "solver_workspaces": 2,
+    "reference": 2,
+    "scores": 0,
+    "skills": 0,
+    "staging": 2,
+    "evolver_workspace": 0
+   },
+   "num_turns": 9,
+   "cost_usd": 0.1508,
+   "output_tokens": 5363,
+   "context_tokens": 454524,
+   "session_cost_usd": 0.3254,
+   "k": 2,
+   "wall_s": 49.4,
+   "timed_out": false,
+   "fresh_session": false,
+   "session_id": "0d375cd1-20c6-473e-a70a-5530093cbc6f",
+   "rollouts_given": 12,
+   "old_scripts": 0,
+   "skills": [
+    "money-function-spec"
+   ],
+   "skill_md_bytes": 8965,
+   "skill_other_files": [
+    "money-function-spec/template.py"
+   ],
+   "skill_problems": [],
+   "files_added": [],
+   "files_removed": [],
+   "files_changed": [
+    "money-function-spec/SKILL.md"
+   ],
+   "workspace_files": []
+  },
+  {
+   "ok": true,
+   "tool_calls": 2,
+   "tools": {
+    "Bash": 2
+   },
+   "bash": 2,
+   "bash_python": 1,
+   "rerun_old_scripts": 0,
+   "subagents": 0,
+   "compactions": 0,
+   "touch": {
+    "traces": 0,
+    "solver_workspaces": 1,
+    "reference": 1,
+    "scores": 0,
+    "skills": 0,
+    "staging": 0,
+    "evolver_workspace": 0
+   },
+   "num_turns": 3,
+   "cost_usd": 0.044,
+   "output_tokens": 1419,
+   "context_tokens": 176114,
+   "session_cost_usd": 0.3694,
+   "k": 3,
+   "wall_s": 16.4,
+   "timed_out": false,
+   "fresh_session": false,
+   "session_id": "0d375cd1-20c6-473e-a70a-5530093cbc6f",
+   "rollouts_given": 12,
+   "old_scripts": 0,
+   "skills": [
+    "money-function-spec"
+   ],
+   "skill_md_bytes": 8965,
+   "skill_other_files": [
+    "money-function-spec/template.py"
+   ],
+   "skill_problems": [],
+   "files_added": [],
+   "files_removed": [],
+   "files_changed": [],
+   "workspace_files": []
+  }
+ ],
+ "adapt": {
+  "ok": true,
+  "tool_calls": 3,
+  "tools": {
+   "Bash": 3
+  },
+  "bash": 3,
+  "bash_python": 2,
+  "rerun_old_scripts": 0,
+  "subagents": 0,
+  "compactions": 0,
+  "touch": {
+   "traces": 0,
+   "solver_workspaces": 0,
+   "reference": 0,
+   "scores": 0,
+   "skills": 0,
+   "staging": 0,
+   "evolver_workspace": 0
+  },
+  "num_turns": 4,
+  "cost_usd": 0.1157,
+  "output_tokens": 2078,
+  "context_tokens": 131624,
+  "wall_s": 18.4,
+  "tasks": {
+   "train": 4,
+   "validation": 2,
+   "test": 3
+  },
+  "reference": {
+   "files": 13,
+   "answers": 8,
+   "leaks": []
+  },
+  "audit_ok": true
+ },
+ "session_cost": 0.3694
+}

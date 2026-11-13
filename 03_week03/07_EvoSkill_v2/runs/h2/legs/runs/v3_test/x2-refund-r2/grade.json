@@ -1,0 +1,55 @@
+{
+ "score": 0.6,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "refund(100000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 90000 · พลาด 4 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"paid\": 100000, \"used_percent\": 25, \"restock\": false} ต้องได้ {\"ok\": true, \"result\": 75000} exit 0 แต่ได้ exit 0 stdout (ว่าง)"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"paid\": 100000, \"used_percent\": 101, \"restock\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

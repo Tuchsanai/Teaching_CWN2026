@@ -34,9 +34,13 @@ def add_tree(ws, name, sub, skip_ext=(".jsonl", ".stderr", ".pyc")):
         dirs[:] = sorted(d for d in dirs if d not in SKIP)
         for f in sorted(files):
             p = os.path.join(root, f)
-            if f.endswith(skip_ext) or os.path.getsize(p) > MAX:
+            try:
+                if f.endswith(skip_ext) or os.path.getsize(p) > MAX:
+                    continue
+                data = open(p, "rb").read()
+            except OSError:                              # ไฟล์ของการรันที่ยังเดินอยู่ อาจหายไประหว่างแพ็ก
                 continue
-            add("runs/%s/%s" % (name, os.path.relpath(p, os.path.join(W, ws)).replace(os.sep, "/")), open(p, "rb").read())
+            add("runs/%s/%s" % (name, os.path.relpath(p, os.path.join(W, ws)).replace(os.sep, "/")), data)
 
 
 for ws in sorted(os.listdir(W)) if os.path.isdir(W) else []:
@@ -72,6 +76,9 @@ for ws in sorted(os.listdir(W)) if os.path.isdir(W) else []:
             add(base + "metrics.json", json.dumps(m, ensure_ascii=False, indent=1).encode("utf-8"))
             for f in ("solve.py", "test_solve.py"):
                 p = os.path.join(t, "sandbox", f)
-                if not sealed and os.path.isfile(p):
-                    add(base + "sandbox/" + f, open(p, "rb").read())
+                try:
+                    if not sealed and os.path.isfile(p):
+                        add(base + "sandbox/" + f, open(p, "rb").read())
+                except OSError:
+                    pass
 tar.close()

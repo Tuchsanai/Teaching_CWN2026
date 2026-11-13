@@ -1,0 +1,32 @@
+from fractions import Fraction
+import math
+
+
+def shipping_fee(weight_g, distance_km, express):
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (คำนวณด้วยเศษส่วนแท้ ปัดครึ่งขึ้นตอนท้ายสุดครั้งเดียว)"""
+    if isinstance(weight_g, bool) or isinstance(distance_km, bool):
+        raise ValueError("invalid input")
+    if not (isinstance(weight_g, (int, float, Fraction)) and isinstance(distance_km, (int, float, Fraction))):
+        raise ValueError("invalid input")
+    if (isinstance(weight_g, float) and not math.isfinite(weight_g)) or \
+       (isinstance(distance_km, float) and not math.isfinite(distance_km)):
+        raise ValueError("invalid input")
+    if not (1 <= weight_g <= 30000):
+        raise ValueError("weight_g must be within 1-30000")
+    if distance_km < 0:
+        raise ValueError("distance_km must be >= 0")
+
+    w = Fraction(weight_g)
+    if w <= 1000:
+        fee = Fraction(4000)
+    elif w <= 5000:
+        fee = Fraction(8000)
+    else:
+        fee = 8000 + (w - 5000) * Fraction(1500, 1000)  # 15 บาท/กก. = 1.5 สตางค์/กรัม
+
+    if distance_km > 100:
+        fee *= Fraction(6, 5)
+    if express:
+        fee *= Fraction(3, 2)
+
+    return int(math.floor(fee + Fraction(1, 2)))

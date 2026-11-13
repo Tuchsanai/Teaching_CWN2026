@@ -1,0 +1,55 @@
+{
+ "score": 0.6,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "bulk_price(25000.0, 5, false) ต้อง raise ValueError แต่ raise TypeError · พลาด 5 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 10, \"coupon\": false} ต้องได้ {\"ok\": true, \"result\": 258138} exit 0 แต่ได้ exit 0 stdout bulk_price(10000, 1, False)  = 10700\nbulk_price(10000, 10, False) = 103255\nbulk_price(10000, 50, True)  = 482503\nAll che"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 0, \"coupon\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout bulk_price(10000, 1, False)  = 10700\nbulk_price(10000, 10, False) = 103255\nbulk_price(10000, 50, Tru"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}
