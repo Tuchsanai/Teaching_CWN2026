@@ -312,7 +312,61 @@ def three_way():
     shot("t11-backward-three-way", body, 660)
 
 
+def skill_anatomy():
+    """ไฟล์สกิล 1 ไฟล์มี 2 ส่วน: ใครแก้ส่วนไหนได้ เมื่อไร"""
+    bar = lambda w, c="#D9CFC3": "<div style='height:14px;width:%d%%;background:%s;border-radius:7px;margin:9px 0'></div>" % (w, c)
+    doc = """<div style='width:520px;background:#fff;border:4px solid %s;border-radius:20px;padding:16px 20px'>
+      <div style='%s;font-size:24px;color:#2A6F68;font-weight:700;margin-bottom:8px'>best_skill.md</div>
+      <div style='border:3px solid %s;border-radius:14px;padding:10px 14px;margin-bottom:12px'>
+        <div style='font-size:23px;font-weight:800;color:%s'>ส่วนกฎทั่วไป</div>%s%s%s%s%s</div>
+      <div style='border:3px dashed %s;border-radius:14px;padding:10px 14px;background:#FDF1EE'>
+        <div style='%s;font-size:18px;color:%s'>SLOW_UPDATE_START</div>
+        <div style='font-size:23px;font-weight:800;color:%s'>🔒 ส่วนที่ถูกป้องกัน</div>%s%s
+        <div style='%s;font-size:18px;color:%s'>SLOW_UPDATE_END</div></div></div>""" % (
+        LINE, MONO, ORANGE, ORANGE, bar(92), bar(80, "#F4A261"), bar(88), bar(70, "#F4A261"), bar(84),
+        RED, MONO, MUTE, RED, bar(86, "#E9A99A"), bar(64, "#E9A99A"), MONO, MUTE)
+    def who(color, title, rows):
+        r = "".join("<div style='display:flex;gap:10px;font-size:22px;margin-top:5px'><div style='width:170px;color:%s'>%s</div><div style='flex:1'>%s</div></div>" % (MUTE, a, b) for a, b in rows)
+        return "<div style='background:#fff;border-radius:16px;padding:12px 18px;margin-bottom:12px;border-left:14px solid %s'><div style='font-size:26px;font-weight:800;color:%s'>%s</div>%s</div>" % (color, INK, title, r)
+    right = (who(ORANGE, "ส่วนกฎทั่วไป ← ก้าวปกติ (Fast Update)", [("แก้เมื่อไร", "ทุกก้าว"), ("แก้ได้เท่าไร", "ไม่เกิน L<sub>t</sub> ข้อต่อก้าว"), ("เรียนจากอะไร", "Rollout Batch ของก้าวนั้น"), ("ผ่าน Gate", "ต้องผ่าน")]) +
+             who(RED, "ส่วนที่ถูกป้องกัน ← Slow Update", [("แก้เมื่อไร", "ท้าย Epoch (ตั้งแต่ Epoch ที่ 2)"), ("ก้าวปกติแก้ได้ไหม", "<b>ไม่ได้</b>"), ("เรียนจากอะไร", "การเทียบสกิลของ Epoch ก่อนกับปัจจุบัน"), ("ผ่าน Gate", "ต้องผ่าน")]) +
+             who(PURPLE, "Meta Skill ← ไม่อยู่ในไฟล์นี้", [("อยู่ที่ไหน", "หน้าพรอมต์ของ Optimizer Model"), ("ส่งออกไหม", "<b>ไม่ส่งออก</b>")]))
+    body = """<h1>ไฟล์สกิล 1 ไฟล์ มี 2 ส่วน</h1>
+    <div class='sub' style='margin-bottom:14px'>แถบสีส้ม = บรรทัดที่ก้าวปกติเพิ่งแก้ · กรอบเส้นประ = ส่วนที่ก้าวปกติแตะไม่ได้ มีเครื่องหมายกำกับหัวท้าย</div>
+    <div style='display:flex;gap:26px;align-items:flex-start'>%s<div style='flex:1'>%s</div></div>""" % (doc, right)
+    shot("t12-skill-anatomy", body, 745)
+
+
+def timeline():
+    """โครง 2 วงซ้อนของ Algorithm 1 ตลอด 4 Epoch (จำนวนก้าวต่อ Epoch ในภาพเป็นตัวอย่าง)"""
+    def step(t): return "<div style='background:#EAF6E6;border:2px solid %s;border-radius:10px;padding:6px 0;text-align:center;font-size:20px;margin-bottom:5px'>%s</div>" % (GREEN, t)
+    def end(t, c, bg): return "<div style='background:%s;border:2px solid %s;border-radius:10px;padding:6px 0;text-align:center;font-size:20px;font-weight:700;margin-bottom:5px;color:%s'>%s</div>" % (bg, c, INK, t)
+    none = "<div style='border:2px dashed %s;border-radius:10px;padding:6px 0;text-align:center;font-size:19px;color:%s;margin-bottom:5px'>ยังไม่มี</div>" % (LINE, MUTE)
+    cols = ""
+    for e in range(1, 5):
+        tail = (none + none) if e == 1 else (end("Slow Update", RED, "#FDF1EE") + end("Meta Skill", PURPLE, "#F1EAFA"))
+        cols += """<div style='flex:1;background:#fff;border:3px solid %s;border-top:14px solid %s;border-radius:18px;padding:10px 12px'>
+          <div style='font-size:26px;font-weight:800;color:%s;margin-bottom:2px'>Epoch %d</div>
+          <div style='font-size:19px;color:%s;margin-bottom:8px'>สลับลำดับงาน · ล้าง Buffer</div>
+          %s%s%s<div style='text-align:center;font-size:20px;color:%s;margin:-2px 0 4px'>⋮</div>
+          <div style='font-size:19px;color:%s;margin:6px 0 4px'>ท้าย Epoch</div>%s</div>""" % (
+            LINE, BROWN, INK, e, MUTE, step("ก้าว: Forward → Backward → Gate"), step("ก้าว: Forward → Backward → Gate"), step("ก้าว: Forward → Backward → Gate"), MUTE, MUTE, tail)
+    lr = """<div style='display:flex;align-items:center;gap:14px;margin:12px 0 10px'>
+      <div style='width:300px;font-size:23px;font-weight:800;color:%s'>Learning Rate L<sub>t</sub></div>
+      <div style='font-size:24px;font-weight:800;color:%s'>4</div>
+      <div style='flex:1;height:22px;border-radius:11px;background:linear-gradient(90deg,#F4A261,#FBE3CC)'></div>
+      <div style='font-size:24px;font-weight:800;color:%s'>2</div>
+      <div style='width:330px;font-size:21px;color:%s'>ลดลงแบบ Cosine ตลอดการเทรน</div></div>""" % (INK, ORANGE, ORANGE, MUTE)
+    foot = """<div style='display:flex;gap:12px'>
+      <div style='flex:1;background:#fff;border-radius:14px;padding:10px 16px;border-left:12px solid %s;font-size:22px'><b>ก่อนเริ่ม</b> · วัดสกิลเริ่มต้น s<sub>0</sub> บน D<sub>sel</sub></div>
+      <div style='flex:1;background:#fff;border-radius:14px;padding:10px 16px;border-left:12px solid %s;font-size:22px'><b>หลังจบ</b> · วัด s<sub>best</sub> บน D<sub>test</sub> ครั้งเดียว แล้วส่งออก</div></div>""" % (BROWN, RED)
+    body = """<h1>โครงของ Algorithm 1: วงซ้อน 2 ชั้น</h1>
+    <div class='sub' style='margin-bottom:10px'>วงนอก = Epoch (ค่าตั้งต้น 4 รอบ) · วงใน = ก้าว (ข้อ 6.1–6.3) · จำนวนก้าวต่อ Epoch ขึ้นกับจำนวนงานฝึก ในภาพแสดง 3 ก้าวเป็นตัวอย่าง</div>
+    <div style='display:flex;gap:10px'>%s</div>%s%s""" % (cols, lr, foot)
+    shot("t13-timeline", body, 705)
+
+
 if __name__ == "__main__":
     for w in sys.argv[1:] or ["mapping", "algorithm", "compare", "gd_step", "eq_overview", "eq1", "eq2", "edits", "gate_timeline",
-                              "reflection_example", "three_way"]:
+                              "reflection_example", "three_way", "skill_anatomy", "timeline"]:
         globals()[w]()
