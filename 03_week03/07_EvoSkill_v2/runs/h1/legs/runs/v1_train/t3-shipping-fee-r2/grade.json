@@ -1,0 +1,55 @@
+{
+ "score": 0.7,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "half_up",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"weight_g\": 3000, \"distance_km\": 150, \"express\": false} ต้องได้ {\"ok\": true, \"result\": 9600} exit 0 แต่ได้ exit 0 stdout ok  shipping_fee(500, 10, False) = 4000 (คาด 4000)\nok  shipping_fee(1000, 0, False) = 4000 (คาด 4000)\nok  shipping_fee(1"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout ok  shipping_fee(500, 10, False) = 4000 (คาด 4000)\nok  shipping_fee(1000, 0, False) = 4000 (คาด 4000"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  }
+ ]
+}

@@ -396,3 +396,5 @@ haiku ปรับสกิลจาก Trace ของตัวเอง: Valid
 | [`AGENT.md`](AGENT.md) | กติกาของ LAB ที่ Claude อ่านก่อนทำทุกพรอมต์ |
 
 **ก่อนหน้า:** [Skill Optimizer ฉบับเริ่มต้น](../05_Skill_Optimizer_Basic/README.md) โจทย์เดียวกัน ปรับสกิลโดยคนสั่งทีละรอบ
+
+**ถัดไป:** [EvoSkill v2 · ให้ Agent 3 ตัวปรับสกิลกันเอง](../07_EvoSkill_v2/README.md) โจทย์เดียวกัน ผู้เขียนสกิลเป็น Agent ตัวเดียวที่อยู่ตลอดการรัน

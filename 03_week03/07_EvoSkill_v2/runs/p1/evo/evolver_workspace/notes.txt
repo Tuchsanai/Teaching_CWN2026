@@ -1,0 +1,3 @@
+epoch1: wrote money-spec-functions skill (validation+half-up+run tests). Hypothesis: validation +0.1, floor tip -0.1. Check epoch1 scores to confirm.
+epoch2: e1 scores avg .64 (t4 .3->.7 from half-up; integral-float accepted costs .1 in t2/t4). t1,t3 stuck .6 all identical code. v2 adds InputError(ValueError,TypeError), strict int.
+epoch3: e2 all 0.7 (dual exception InputError gave t1,t3 +.1). plateau; code identical across rollouts. v3 = EXPERIMENT: r1 half-up / r2 half-even / r3 per-step half-up chosen by pwd -rN. Compare scores per rollout index in epoch3; then KEEP winner and REMOVE experiment section in v4.

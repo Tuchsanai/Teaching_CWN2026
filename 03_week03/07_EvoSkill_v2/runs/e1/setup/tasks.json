@@ -1,0 +1,137 @@
+[
+ {
+  "id": "t1-cafe-bill",
+  "split": "train",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `cafe_bill(items, member)` ในไฟล์ `solve.py` สำหรับคิดเงินหน้าร้าน\n- `items` = list ของ dict `{\"price\": ราคาต่อชิ้น (สตางค์), \"qty\": จำนวนชิ้น (ตั้งแต่ 1)}`\n- ยอดรวมตั้งแต่ 500 บาทขึ้นไป ลด 5%\n- `member` = True ลดอีก 10%\n- บวก VAT 7% เป็นขั้นสุดท้าย\n- คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/t1-cafe-bill/solve.py",
+   "answers/t1-cafe-bill/test_solve.py"
+  ],
+  "grading": {
+   "key": "t1-cafe-bill",
+   "function": "cafe_bill"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "t2-split-bill",
+  "split": "train",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `split_bill(total, people, tip_percent)` ในไฟล์ `solve.py` สำหรับหารบิล\n- `total` = ยอดบิล (สตางค์ ตั้งแต่ 0) · `people` = จำนวนคน (ตั้งแต่ 1) · `tip_percent` = ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0–100)\n- ยอดที่ต้องหาร = ยอดบิลบวกทิป\n- หารเท่ากันทุกคน ถ้าหารไม่ลงตัว ให้คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์จนครบ\n- คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน",
+  "inputs": [],
+  "answer_files": [
+   "answers/t2-split-bill/solve.py",
+   "answers/t2-split-bill/test_solve.py"
+  ],
+  "grading": {
+   "key": "t2-split-bill",
+   "function": "split_bill"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "t3-shipping-fee",
+  "split": "train",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `shipping_fee(weight_g, distance_km, express)` ในไฟล์ `solve.py` สำหรับคิดค่าส่งเมล็ดกาแฟ\n- `weight_g` = น้ำหนัก 1–30,000 กรัม · `distance_km` = ระยะทาง (ตั้งแต่ 0) · `express` = True คือส่งด่วน\n- ไม่เกิน 1,000 กรัม 40 บาท · ไม่เกิน 5,000 กรัม 80 บาท · เกิน 5,000 กรัม 80 บาท บวกส่วนที่เกิน 5,000 กรัม กิโลกรัมละ 15 บาท (คิดตามสัดส่วนของกรัม)\n- ระยะทางเกิน 100 กม. คิดเพิ่ม 20%\n- ส่งด่วน คิดเพิ่ม 50% (คูณต่อจากข้อก่อน)\n- คืนค่าส่ง เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/t3-shipping-fee/solve.py",
+   "answers/t3-shipping-fee/test_solve.py"
+  ],
+  "grading": {
+   "key": "t3-shipping-fee",
+   "function": "shipping_fee"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "t4-cashback",
+  "split": "train",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `cashback(amount, tier, birthday)` ในไฟล์ `solve.py` สำหรับคิดเงินคืนสมาชิก\n- `amount` = ยอดซื้อ (สตางค์ ตั้งแต่ 0) · `tier` = \"silver\" \"gold\" หรือ \"platinum\" · `birthday` = True คือซื้อในเดือนเกิด\n- อัตราเงินคืน: silver 1.5% · gold 2.5% · platinum 4%\n- ยอดซื้อต่ำกว่า 100 บาท ไม่ได้เงินคืน\n- เดือนเกิด ได้เงินคืน 2 เท่า\n- เงินคืนสูงสุด 200 บาทต่อบิล\n- คืนเงินคืน เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/t4-cashback/solve.py",
+   "answers/t4-cashback/test_solve.py"
+  ],
+  "grading": {
+   "key": "t4-cashback",
+   "function": "cashback"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "v1-parking-fee",
+  "split": "validation",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `parking_fee(minutes, member)` ในไฟล์ `solve.py` สำหรับคิดค่าจอดรถ\n- `minutes` = เวลาที่จอด 0–1,440 นาที · `member` = True คือสมาชิก\n- จอดไม่เกิน 30 นาที ไม่คิดเงิน\n- จอดเกิน 30 นาที คิดชั่วโมงละ 25 บาท นับจากเวลาที่จอดทั้งหมด เศษของชั่วโมงนับเป็น 1 ชั่วโมง\n- ค่าจอดก่อนส่วนลดและภาษี สูงสุด 250 บาท\n- สมาชิกลด 15%\n- บวก VAT 7% เป็นขั้นสุดท้าย\n- คืนค่าจอด เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/v1-parking-fee/solve.py",
+   "answers/v1-parking-fee/test_solve.py"
+  ],
+  "grading": {
+   "key": "v1-parking-fee",
+   "function": "parking_fee"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "v2-net-pay",
+  "split": "validation",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `net_pay(hours, rate, has_sso)` ในไฟล์ `solve.py` สำหรับคิดค่าแรงรายสัปดาห์ของพนักงานพาร์ตไทม์\n- `hours` = ชั่วโมงทำงาน (จำนวนเต็ม 0–80) · `rate` = ค่าแรงต่อชั่วโมง (สตางค์ ตั้งแต่ 0) · `has_sso` = True คือหักประกันสังคม\n- 40 ชั่วโมงแรกจ่ายตามค่าแรงปกติ ชั่วโมงที่เกิน 40 จ่าย 1.5 เท่า\n- หักภาษี ณ ที่จ่าย 3% ของค่าแรงรวม\n- หักประกันสังคม 5% ของค่าแรงรวม แต่ไม่เกิน 750 บาท\n- คืนเงินสุทธิที่พนักงานได้รับ เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/v2-net-pay/solve.py",
+   "answers/v2-net-pay/test_solve.py"
+  ],
+  "grading": {
+   "key": "v2-net-pay",
+   "function": "net_pay"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "x1-late-fee",
+  "split": "test",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `late_fee(amount, days_late)` ในไฟล์ `solve.py` สำหรับคิดค่าปรับของลูกค้าขายส่งที่ชำระเงินช้า\n- `amount` = ยอดค้างชำระ (สตางค์ ตั้งแต่ 0) · `days_late` = จำนวนวันที่ช้า (จำนวนเต็ม 0–365)\n- ช้าไม่เกิน 3 วัน ไม่คิดค่าปรับ\n- ช้าเกิน 3 วัน คิดค่าปรับวันละ 0.75% ของยอดค้างชำระ นับทุกวันที่ช้า (รวม 3 วันแรก)\n- ค่าปรับสูงสุด 15% ของยอดค้างชำระ\n- คืนค่าปรับ เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/x1-late-fee/solve.py",
+   "answers/x1-late-fee/test_solve.py"
+  ],
+  "grading": {
+   "key": "x1-late-fee",
+   "function": "late_fee"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "x2-refund",
+  "split": "test",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `refund(paid, used_percent, restock)` ในไฟล์ `solve.py` สำหรับคิดเงินคืนของคอร์สสอนชงกาแฟ\n- `paid` = เงินที่ลูกค้าจ่ายมา (สตางค์ ตั้งแต่ 0) · `used_percent` = เรียนไปแล้วกี่เปอร์เซ็นต์ (จำนวนเต็ม 0–100) · `restock` = True คือหักค่าดำเนินการ\n- คืนเงินตามสัดส่วนที่ยังไม่ได้เรียน\n- เรียนไปแล้วเกิน 80% ไม่คืนเงิน\n- หักค่าดำเนินการ 12.5% ของยอดที่จะคืน\n- คืนเงินที่ต้องคืนลูกค้า เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/x2-refund/solve.py",
+   "answers/x2-refund/test_solve.py"
+  ],
+  "grading": {
+   "key": "x2-refund",
+   "function": "refund"
+  },
+  "category": "coding"
+ },
+ {
+  "id": "x3-bulk-price",
+  "split": "test",
+  "instruction": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `bulk_price(unit_price, qty, coupon)` ในไฟล์ `solve.py` สำหรับคิดราคาขายส่งเมล็ดกาแฟ\n- `unit_price` = ราคาต่อถุง (สตางค์ ตั้งแต่ 0) · `qty` = จำนวนถุง (1–1,000) · `coupon` = True คือมีคูปอง\n- ซื้อ 10 ถุงขึ้นไป ลด 3.5% · ซื้อ 50 ถุงขึ้นไป ลด 7.5% (ใช้อัตราเดียว)\n- มีคูปอง ลดอีก 2.5%\n- บวก VAT 7% เป็นขั้นสุดท้าย\n- คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์",
+  "inputs": [],
+  "answer_files": [
+   "answers/x3-bulk-price/solve.py",
+   "answers/x3-bulk-price/test_solve.py"
+  ],
+  "grading": {
+   "key": "x3-bulk-price",
+   "function": "bulk_price"
+  },
+  "category": "coding"
+ }
+]
