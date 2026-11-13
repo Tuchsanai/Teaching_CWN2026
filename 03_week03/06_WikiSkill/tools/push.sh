@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 export MSYS_NO_PATHCONV=1
 C=${LAB_CONTAINER:-multi-account}
 W=/workspace/wklab
-B=../05_Skill_Optimizer_Basic/skills/money-coder
+B=../05_Skill_Optimizer/skills/money-coder
 docker exec "$C" mkdir -p $W/ws $W/baselines
 tar cf - -C ../../00_resource/skills --exclude=examples --exclude=__pycache__ skill-optimizer | docker exec -i "$C" tar xf - -C $W
 tar cf - --exclude=runs --exclude=__pycache__ --exclude=results.json suite wikiskill tools/pack_results.py | docker exec -i "$C" tar xf - -C $W

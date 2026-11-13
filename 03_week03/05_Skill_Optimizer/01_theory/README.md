@@ -836,7 +836,7 @@ LAB `money-coder` ใน [README หลัก](../README.md) คือ SkillOpt 
 | $D_{\text{sel}}$ | Validation Set 2 งาน | `suite/suite.json` |
 | Forward Pass | วัดสกิล 1 รุ่น 18 Trial | คำสั่ง `run` และ `report` |
 | Backward Pass | ดูข้อที่ผิด หาสาเหตุ แก้สกิล | คำสั่ง `failures` และ Claude Code |
-| Learning Rate $L_t$ | แก้ไม่เกิน 3 จุดต่อรุ่น | กติกาใน `AGENT.md` |
+| Learning Rate $L_t$ | แก้ไม่เกิน 3 จุดต่อรุ่น | ขั้นที่ 5 ของ `skill-optimizer` |
 | Validation Gate | ประตูรับ | คำสั่ง `gate` |
 | Rejected-Edit Buffer และ Meta Skill | บันทึกปัญหาและผลของการแก้ | `skills/money-coder/ISSUES.md` |
 | $s_{\text{best}}$ | รุ่นฐานล่าสุด = `v3` | `skills/money-coder/v3/` |

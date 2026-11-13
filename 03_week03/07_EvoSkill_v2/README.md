@@ -9,7 +9,7 @@
 | ขั้น | เกิดอะไรขึ้น |
 |---|---|
 | 1 เตรียมสนาม | **Benchmark Adaptor** อ่านคำสั่งของเรา (ข้อความ 1 หน้า) แล้วทำรายการโจทย์ที่ล็อกแล้ว กับโฟลเดอร์อ้างอิงที่มีเฉพาะของชุด Training |
-| 2 ทำโจทย์ | **Solver** เขียนโค้ดคิดเงินของร้าน BaanKafe (โจทย์ชุดเดียวกับ [บท 05](../05_Skill_Optimizer_Basic/README.md) และ [บท 06](../06_WikiSkill/README.md)) โจทย์ละ 3 ครั้ง |
+| 2 ทำโจทย์ | **Solver** เขียนโค้ดคิดเงินของร้าน BaanKafe (โจทย์ชุดเดียวกับ [บท 05](../05_Skill_Optimizer/README.md) และ [บท 06](../06_WikiSkill/README.md)) โจทย์ละ 3 ครั้ง |
 | 3 เขียนสกิล | **Evolver** อ่านผลของชุด Training ทดลองด้วย bash แล้วเขียนชุดสกิลถัดไป · เป็นเซสชันเดียวตั้งแต่ต้นจนจบ |
 | 4 วัดครั้งเดียว | ชุดสกิลของ epoch สุดท้ายถูกวัดกับ Test Set · **ไม่มีประตูรับ** ชุดสกิลของทุก epoch ถูกใช้ |
 
@@ -50,7 +50,7 @@
 | ชุดโจทย์ | Training 4 ข้อ · Validation 2 ข้อ · Test 3 ข้อ (ชุดเดียวกับบท 06) |
 | สิ่งเดียวที่ปรับได้ | สกิล |
 
-รายละเอียดของกฎและตัวตรวจ: [บท 05 ส่วนที่ 1](../05_Skill_Optimizer_Basic/README.md#1--โจทย์และกฎของร้าน) · Test Set: [บท 06 ข้อ 1.3](../06_WikiSkill/README.md#13-test-set-3-ข้อใหม่)
+รายละเอียดของกฎและตัวตรวจ: [บท 05 ส่วนที่ 1](../05_Skill_Optimizer/README.md#1--โจทย์และกฎของร้าน) · Test Set: [บท 06 ข้อ 1.3](../06_WikiSkill/README.md#13-test-set-3-ข้อใหม่)
 
 ## 1.2 สิ่งที่บทนี้เปลี่ยน
 
@@ -494,4 +494,4 @@ LAB นี้ไม่ใช้โทเคน: นำผลที่มีอ�
 | [`tools/`](tools/) | `push.sh` `pull.sh` · `diagrams.py` `charts.py` วาดภาพจากผลจริง |
 | [`AGENT.md`](AGENT.md) | กติกาของ LAB ที่ Claude อ่านก่อนทำทุกพรอมต์ |
 
-**ก่อนหน้า:** [WikiSkill](../06_WikiSkill/README.md) · [Skill Optimizer ฉบับเริ่มต้น](../05_Skill_Optimizer_Basic/README.md) โจทย์เดียวกัน ปรับสกิลด้วยวิธีอื่น
+**ก่อนหน้า:** [WikiSkill](../06_WikiSkill/README.md) · [Skill Optimizer ฉบับเริ่มต้น](../05_Skill_Optimizer/README.md) โจทย์เดียวกัน ปรับสกิลด้วยวิธีอื่น

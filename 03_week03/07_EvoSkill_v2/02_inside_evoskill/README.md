@@ -49,7 +49,7 @@ source code ต้นฉบับของเปเปอร์: [github.com/sen
 | **Evolver** (ตอนรัน) | `runs/<ชื่อ>/skills_v1…v3/` และ `runs/<ชื่อ>/evo/evolver_workspace/` |
 | **Solver** (ตอนรัน) | `solve.py` `test_solve.py` ใน `runs/<ชื่อ>/legs/runs/<leg>/<rollout>/sandbox/` |
 
-Solver ไม่ได้อยู่ในโฟลเดอร์นี้: `evoskill.py` เรียก `run_trial()` ของ [`skillopt.py`](../../../00_resource/skills/skill-optimizer/scripts/skillopt.py) ซึ่งเป็นตัวรัน Trial ของบท 05 (อธิบายใน [ข้างใน skill-optimizer](../../05_Skill_Optimizer_Basic/inside_skill_optimizer/README.md))
+Solver ไม่ได้อยู่ในโฟลเดอร์นี้: `evoskill.py` เรียก `run_trial()` ของ [`skillopt.py`](../../../00_resource/skills/skill-optimizer/scripts/skillopt.py) ซึ่งเป็นตัวรัน Trial ของบท 05 (อธิบายใน [ข้างใน skill-optimizer](../../05_Skill_Optimizer/inside_skill_optimizer/README.md))
 
 ---
 

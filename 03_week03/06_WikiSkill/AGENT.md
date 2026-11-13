@@ -7,7 +7,7 @@
 | ตัวรัน WikiSkill และ prompt | `wikiskill/` | `/workspace/wklab/wikiskill` |
 | ชุดโจทย์และ Grader (ชุดเดียวกับบท 05 + Test Set 3 ข้อ) | `suite/` | `/workspace/wklab/suite` |
 | ตัวรัน Trial ของบท 05 | `../../00_resource/skills/skill-optimizer` | `/workspace/wklab/skill-optimizer` |
-| สกิลของบท 05 ที่ใช้เทียบ | `../05_Skill_Optimizer_Basic/skills/money-coder/v3` | `/workspace/wklab/baselines/v3/skills` |
+| สกิลของบท 05 ที่ใช้เทียบ | `../05_Skill_Optimizer/skills/money-coder/v3` | `/workspace/wklab/baselines/v3/skills` |
 | workspace ของ WikiSkill (raw/ wiki/ skills/) | `runs/<ชื่อ>/` | `/workspace/wklab/ws/<ชื่อ>` |
 | ผลของทุก Trial | `results/` | `/workspace/wklab/suite/runs` |
 

@@ -18,7 +18,7 @@
 
 สกิลไม่ใช่โปรแกรมพิเศษ เป็น **โฟลเดอร์ 1 โฟลเดอร์** ที่ AI เปิดอ่านเมื่อได้งานที่ตรงกับคำอธิบายของสกิล
 
-โฟลเดอร์จริง: [`00_resource/skills/skill-optimizer/`](../../../00_resource/skills/skill-optimizer/)
+โฟลเดอร์จริง: [`skill-optimizer/`](../skill-optimizer/) ในบทนี้ (สำเนาเดียวกับ [`00_resource/skills/skill-optimizer/`](../../../00_resource/skills/skill-optimizer/) ไม่รวม `examples/`)
 
 ```text
 skill-optimizer/
@@ -26,10 +26,10 @@ skill-optimizer/
 ├── scripts/skillopt.py    439 บรรทัด   โปรแกรม 7 คำสั่ง (Python มาตรฐาน ไม่ต้องติดตั้งอะไรเพิ่ม)
 ├── references/suite.md    50 บรรทัด    รูปแบบของชุดโจทย์และตัวตรวจ
 ├── references/issues.md   17 บรรทัด    รูปแบบของ Issue Log
-└── examples/web-fixer/    ชุดโจทย์ตัวอย่าง (ใช้ในบท 03)
+└── examples/web-fixer/    ชุดโจทย์ตัวอย่าง (ใช้ในบท 03 · มีเฉพาะใน 00_resource)
 ```
 
-**ได้โฟลเดอร์นี้มาอย่างไร:** อยู่ใน repo นี้แล้ว · ตอนทำ LAB คำสั่ง `bash tools/push.sh` คัดลอกเข้า container ที่ `/workspace/sklab/skill-optimizer` แล้ว Claude เปิดอ่าน `SKILL.md` จากตรงนั้น
+**ได้โฟลเดอร์นี้มาอย่างไร:** อยู่ใน repo นี้แล้ว · LAB 0 ติดตั้งเป็น global skill ของบัญชี yolo ใน container (`/root/ai-accounts/.Claude/shared/skills/skill-optimizer`) แล้ว Claude เปิดอ่าน `SKILL.md` จากตรงนั้น
 
 ---
 
@@ -74,7 +74,7 @@ skill-optimizer/
 | 4 ประตูรับตัดสินอย่างไร | เกณฑ์ที่ AI ต้องอธิบายให้ผู้ใช้ได้ | "คะแนนชุด train ขึ้นแต่ชุด val ลง = สกิลจำโจทย์ → ไม่รับ" |
 | 5 ข้อห้าม | สิ่งที่ห้ามทำ | "ห้ามแก้ตัวตรวจหรือโจทย์เพื่อให้ผ่าน" |
 
-อ่านไฟล์เต็ม: [`SKILL.md`](../../../00_resource/skills/skill-optimizer/SKILL.md)
+อ่านไฟล์เต็ม: [`SKILL.md`](../skill-optimizer/SKILL.md)
 
 ## 3.2 `skillopt.py` มี 7 คำสั่ง
 
@@ -90,7 +90,7 @@ skill-optimizer/
 | `null` | `cmd_null()` → `noise_of()` | `grade.json` | ความแกว่งของรุ่นนั้น |
 | `gate` | `cmd_gate()` → `se_diff()` | ผลของสองรุ่น | ACCEPT (exit 0) หรือ REJECT (exit 1) |
 
-อ่านโค้ดเต็ม: [`scripts/skillopt.py`](../../../00_resource/skills/skill-optimizer/scripts/skillopt.py)
+อ่านโค้ดเต็ม: [`scripts/skillopt.py`](../skill-optimizer/scripts/skillopt.py)
 
 ## 3.3 ข้างในคำสั่ง `run`
 
@@ -177,7 +177,7 @@ val   68.3% -> 90.0% (+21.7) เกณฑ์ 2.5 จุด
 
 # 5 · ลองเอง
 
-ทุกข้อรันบนเครื่อง จากโฟลเดอร์ `05_Skill_Optimizer_Basic` ไม่ใช้โทเคน
+ทุกข้อรันบนเครื่อง จากโฟลเดอร์ `05_Skill_Optimizer` ไม่ใช้โทเคน
 
 | # | ทำ | ได้เห็นอะไร |
 |---|---|---|

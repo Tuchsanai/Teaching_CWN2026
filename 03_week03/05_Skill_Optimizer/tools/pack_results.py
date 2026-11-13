@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""รันใน container โดย tools/pull.sh: แพ็กผลการวัดเป็น tar ส่งออกทาง stdout
+"""tools/pull.sh ส่งไฟล์นี้เข้าไปรันใน container ทาง stdin: แพ็กผลการวัดเป็น tar ส่งออกทาง stdout
 
 Training Set  : grade.json metrics.json และโค้ดที่ Agent เขียน (sandbox/solve.py test_solve.py)
 Validation Set: เฉพาะคะแนนและตัวเลขต้นทุน (ไม่มีผลรายข้อ คำสั่ง และโค้ด) เว้นแต่ใส่ --unseal
