@@ -26,6 +26,10 @@ def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    if express and weight_g > 20000:  # นโยบาย S2: ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม
+        raise ValueError("ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม")
+    if distance_km == 0:  # นโยบาย S1: ลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+        return 0
     if weight_g <= 1000:
         fee = Fraction(4000)
     elif weight_g <= 5000:

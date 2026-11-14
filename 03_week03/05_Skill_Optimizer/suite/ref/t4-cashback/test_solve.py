@@ -28,7 +28,7 @@ class Boundary(unittest.TestCase):
 
 class NoDrift(unittest.TestCase):
     def test_no_drift_1(self):
-        self.assertEqual(cashback(10020, 'silver', True), 301)
+        self.assertEqual(cashback(10015, 'platinum', True), 801)
 
     def test_no_drift_2(self):
         self.assertEqual(cashback(10020, 'gold', True), 501)

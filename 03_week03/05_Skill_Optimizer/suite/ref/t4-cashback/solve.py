@@ -4,9 +4,9 @@ import sys
 from fractions import Fraction
 
 
-def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
+def round_down(x):
+    """นโยบาย C2: เงินคืน = เงินที่ร้านจ่ายออก ปัดลงเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -33,9 +33,9 @@ def cashback(amount, tier, birthday):
     if amount < 10000:
         return 0
     back = amount * RATES[tier]
-    if birthday:
+    if birthday and tier in ("gold", "platinum"):  # นโยบาย C1: silver ไม่ได้สิทธิ์เดือนเกิด
         back *= 2
-    return min(20000, half_up(back))
+    return min(20000, round_down(back))
 
 
 

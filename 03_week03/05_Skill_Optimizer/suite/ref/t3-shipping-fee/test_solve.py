@@ -17,13 +17,13 @@ class Normal(unittest.TestCase):
 
 class Boundary(unittest.TestCase):
     def test_boundary_1(self):
-        self.assertEqual(shipping_fee(1000, 0, False), 4000)
+        self.assertEqual(shipping_fee(1000, 10, False), 4000)
 
     def test_boundary_2(self):
-        self.assertEqual(shipping_fee(1001, 0, False), 8000)
+        self.assertEqual(shipping_fee(1001, 10, False), 8000)
 
     def test_boundary_3(self):
-        self.assertEqual(shipping_fee(5000, 0, False), 8000)
+        self.assertEqual(shipping_fee(5000, 10, False), 8000)
 
 
 class NoDrift(unittest.TestCase):

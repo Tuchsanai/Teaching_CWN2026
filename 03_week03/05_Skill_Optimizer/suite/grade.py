@@ -2,6 +2,11 @@
 """Grader ของชุดโจทย์ money-coder: python3 grade.py <sandbox> <task.json> -> JSON บรรทัดเดียว
 
 ตรวจ "ผลงาน" ใน sandbox (solve.py + test_solve.py) กับมาตรฐานคิดเงินของร้าน BaanKafe 10 ข้อ
+และข้อตรวจ `policy` (นโยบายธุรกิจที่ทีมรู้กันเอง) เฉพาะงานที่มีนโยบายซ่อน:
+  t3-shipping-fee  S1 ลูกค้ารับเองที่ร้าน (distance_km = 0) ไม่คิดค่าส่ง · S2 ส่งด่วนรับไม่เกิน 20,000 กรัม
+  t4-cashback      C1 สิทธิ์เดือนเกิด 2 เท่า เฉพาะ gold และ platinum · C2 เงินคืน = เงินที่ร้านจ่ายออก ปัดลง
+งานเงินคืนใช้การปัดของนโยบาย C2 แทนการปัดครึ่งขึ้น จึงไม่มีข้อตรวจ half_up (ตรวจใน policy แทน)
+คะแนน = จำนวนข้อที่ผ่าน ÷ จำนวนข้อตรวจของงานนั้น (10 หรือ 11 ข้อ)
 คำตอบที่ถูกคำนวณด้วยเศษส่วน (Fraction) ในไฟล์นี้ · Agent ที่ถูกวัดต้องไม่เห็นไฟล์นี้
 """
 import json, os, re, subprocess, sys
@@ -30,6 +35,8 @@ def o_split_bill(total, people, tip_percent):
 
 
 def o_shipping_fee(weight_g, distance_km, express):
+    if distance_km == 0:          # นโยบาย S1: ลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+        return 0
     if weight_g <= 1000:
         x = F(4000)
     elif weight_g <= 5000:
@@ -50,9 +57,9 @@ def o_cashback(amount, tier, birthday):
     if amount < 10000:
         return 0
     x = amount * RATE[tier]
-    if birthday:
+    if birthday and tier in ("gold", "platinum"):   # นโยบาย C1: silver ไม่ได้สิทธิ์เดือนเกิด
         x *= 2
-    return min(20000, half_up(x))
+    return min(20000, int(F(x) // 1))               # นโยบาย C2: เงินที่ร้านจ่ายออก ปัดลง
 
 
 def o_parking_fee(minutes, member):
@@ -79,6 +86,8 @@ def it(*pq):
 # ------------------------------------------------------------ กรณีทดสอบ (ซ่อนจาก Agent)
 # basic = กรณีปกติ · half_up = ผลลงท้าย .5 สตางค์ · no_drift = ปัดระหว่างทางแล้วผลเพี้ยน
 # boundary = ค่าขอบของเงื่อนไข · bad_value / bad_type = input ที่ต้องถูกปฏิเสธด้วย ValueError
+# policy = นโยบายธุรกิจที่โจทย์ไม่บอก [args, คำตอบ] หรือ [args, "ValueError"]
+# กรณีของข้อตรวจอื่นในงานที่มี policy เลือกให้คำตอบไม่ขึ้นกับนโยบาย (ข้าม policy แล้วตกข้อ policy ข้อเดียว)
 TASKS = {
     "t1-cafe-bill": {
         "func": "cafe_bill", "oracle": o_cafe_bill, "args": ["items", "member"],
@@ -108,18 +117,20 @@ TASKS = {
         "basic": [[500, 20, False], [3000, 20, False], [3000, 150, False], [500, 20, True], [7000, 20, False], [7000, 150, True]],
         "half_up": [[5019, 50, False], [5026, 50, True], [5075, 150, True]],
         "no_drift": [[5106, 150, True], [5217, 50, True], [5439, 150, False], [5328, 150, True]],
-        "boundary": [[1000, 0, False], [1001, 0, False], [5000, 0, False], [3000, 100, False], [3000, 101, False],
-                     [30000, 0, False], [1, 0, False]],
+        "boundary": [[1000, 10, False], [1001, 10, False], [5000, 10, False], [3000, 100, False], [3000, 101, False],
+                     [30000, 10, False], [1, 10, False]],
         "bad_value": [[0, 10, False], [-5, 10, False], [30001, 10, False], [1000, -1, False]],
         "bad_type": [[1000.0, 10, False], ["1000", 10, False], [True, 10, False], [1000, 10, "yes"], [1000, None, False]],
         "cli_ok": [[3000, 150, False], [7000, 150, True]],
         "cli_err": [0, 10, False],
+        "policy": [[[3000, 0, False], 0], [[7000, 0, True], 0],                      # S1 รับเองที่ร้าน
+                   [[20001, 10, True], "ValueError"], [[30000, 150, True], "ValueError"],  # S2 ด่วนเกิน 20 กก.
+                   [[20000, 10, True], 45750], [[25000, 10, False], 38000]],          # S2 ขอบ: ยังรับได้
     },
     "t4-cashback": {
         "func": "cashback", "oracle": o_cashback, "args": ["amount", "tier", "birthday"],
         "basic": [[20000, "silver", False], [20000, "gold", False], [20000, "platinum", True], [100000, "gold", True]],
-        "half_up": [[10020, "gold", False], [10300, "silver", False], [10100, "gold", False]],
-        "no_drift": [[10020, "silver", True], [10020, "gold", True], [10010, "platinum", True]],
+        "no_drift": [[10020, "gold", True], [10026, "gold", True], [10015, "platinum", True]],
         "boundary": [[9999, "gold", False], [10000, "silver", False], [500000, "platinum", False],
                      [500100, "platinum", False], [800000, "gold", True], [0, "gold", False]],
         "bad_value": [[-1, "gold", False], [20000, "bronze", False], [20000, "", False]],
@@ -127,6 +138,9 @@ TASKS = {
                      [20000, None, False], [20000, "gold", "yes"]],
         "cli_ok": [[20000, "gold", False], [100000, "gold", True]],
         "cli_err": [20000, "bronze", False],
+        "policy": [[[20000, "silver", True], 300], [[100000, "silver", True], 1500],  # C1 silver ไม่ได้ 2 เท่า
+                   [[10020, "gold", False], 250], [[10030, "gold", False], 250],       # C2 ปัดลง
+                   [[10300, "silver", False], 154], [[10020, "silver", True], 150]],   # C2 · C1+C2
     },
     "v1-parking-fee": {
         "func": "parking_fee", "oracle": o_parking_fee, "args": ["minutes", "member"],
@@ -230,12 +244,16 @@ def main():
     groups = ["basic", "half_up", "no_drift", "boundary", "bad_value", "bad_type"]
     cases, index = [], {}
     for g in groups:
-        for a in T[g]:
+        for a in T.get(g, []):
             c = {"args": a}
             if not g.startswith("bad"):
                 c["exp"] = T["oracle"](*a)
             index.setdefault(g, []).append(len(cases))
             cases.append(c)
+    for a, exp in T.get("policy", []):
+        c = {"args": a} if exp == "ValueError" else {"args": a, "exp": exp}
+        index.setdefault("policy", []).append(len(cases))
+        cases.append(c)
     have = os.path.isfile(os.path.join(sb, "solve.py"))
     res = run_cases(sb, rdir, T["func"], cases) if have else {"import_error": "ไม่มีไฟล์ solve.py", "results": []}
     R, err = res["results"], res["import_error"]
@@ -249,6 +267,8 @@ def main():
 
     # 2-5 ค่าที่คำนวณ
     for g in ("basic", "half_up", "no_drift", "boundary"):
+        if g not in T:
+            continue
         if err:
             add(g, False, "ใช้ฟังก์ชันไม่ได้")
             continue
@@ -321,6 +341,26 @@ def main():
             add("tests", False, "ไม่มีเทสต์ของ input ผิด (assertRaises ValueError)")
         else:
             add("tests", True)
+
+    # 11 policy: นโยบายธุรกิจที่ทีมรู้กันเอง (เฉพาะงานที่มี)
+    if "policy" in T:
+        if err:
+            add("policy", False, "ใช้ฟังก์ชันไม่ได้")
+        else:
+            bad = []
+            for (a, exp), i in zip(T["policy"], index["policy"]):
+                r = R[i]
+                ok = r.get("value_error") if exp == "ValueError" else r.get("same")
+                if not ok:
+                    bad.append((a, exp, r))
+            if bad:
+                a, exp, r = bad[0]
+                got = r.get("value") if "value" in r else "raise %s" % r.get("exc")
+                want = "raise ValueError" if exp == "ValueError" else exp
+                add("policy", False, "%s(%s) คาด %s ได้ %s · พลาด %d จาก %d กรณี" % (
+                    T["func"], show(a)[1:-1], want, got, len(bad), len(T["policy"])))
+            else:
+                add("policy", True)
 
     score = sum(1 for c in checks if c["pass"]) / len(checks)
     print(json.dumps({"score": round(score, 4), "checks": checks}, ensure_ascii=False))
