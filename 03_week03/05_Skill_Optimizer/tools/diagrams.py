@@ -25,12 +25,12 @@ def arrow(txt="➜"):
 def pipeline():
     row1 = "".join([
         card("#6F4E37", "โจทย์ 6 ข้อ", "suite/suite.json", "กติกาธุรกิจของแต่ละฟังก์ชัน<br>แบ่ง Training 4 · Validation 2", "flex:1"),
-        card("#6F4E37", "ตัวตรวจ (Grader)", "suite/grade.py", "โค้ด Python ที่เราเขียนเอง<br>ตรวจมาตรฐานของร้าน 10 ข้อ", "flex:1"),
+        card("#6F4E37", "ตัวตรวจ (Grader)", "suite/grade.py", "โค้ด Python ที่เราเขียนเอง<br>ตรวจข้อกำหนดของร้าน 10–11 ข้อ", "flex:1"),
         card("#6F4E37", "สกิล 1 รุ่น", "skills/money-coder/v0/SKILL.md", "มาตรฐานของร้านที่เขียนให้ AI อ่าน<br>สิ่งเดียวที่เปลี่ยนในแต่ละรุ่น", "flex:1")])
     row2 = arrow("").join([]) + "".join([
         card("#2A9D8F", "1 เตรียมโฟลเดอร์ว่าง", "sandbox/", "วางสกิลไว้ใน<br>./skills", "flex:1"), arrow(),
         card("#2A9D8F", "2 Agent เขียนโค้ด", "solve.py · test_solve.py", "อ่านโจทย์และสกิล<br>แล้วเขียนเอง", "flex:1.15"), arrow(),
-        card("#F4A261", "3 ตัวตรวจให้คะแนน", "grade.py → grade.json", "รันโค้ดของ Agent<br>ผ่านกี่ข้อจาก 10", "flex:1.1"), arrow(),
+        card("#F4A261", "3 ตัวตรวจให้คะแนน", "grade.py → grade.json", "รันโค้ดของ Agent<br>ผ่านกี่ข้อจาก 10–11", "flex:1.1"), arrow(),
         card("#6BBF59", "4 รวมผลและตัดสิน", "report · gate", "เฉลี่ย 18 Trial เทียบรุ่นฐาน<br>ACCEPT หรือ REJECT", "flex:1.15")])
     body = """<h1>ไพป์ไลน์การทดลองของสกิล 1 รุ่น</h1>
     <div class='sub' style='margin-bottom:14px'>คนเตรียม 3 อย่าง · ที่เหลือ skill-optimizer รันให้อัตโนมัติ</div>
@@ -46,8 +46,8 @@ def pipeline():
 
 def grader():
     rows = [
-        ("teal", "1", "เรียกฟังก์ชัน แล้วเทียบกับคำตอบที่ถูก", "cashback(10020, \"gold\", False)", "ต้องได้ 251",
-         "contract · basic · half_up · no_drift · boundary"),
+        ("teal", "1", "เรียกฟังก์ชัน แล้วเทียบกับคำตอบที่ถูก", "shipping_fee(5019, 50, False)", "ต้องได้ 8029",
+         "contract · basic · half_up · no_drift · boundary · policy"),
         ("orange", "2", "เรียกด้วย input ที่ผิด", "cashback(-1, \"gold\", False)", "ต้อง raise ValueError",
          "reject_value · reject_type"),
         ("brown", "3", "รันเป็นโปรแกรม ส่ง JSON เข้าทาง stdin", "python3 solve.py", "ต้องตอบ {\"ok\": true, \"result\": 500}",
@@ -65,11 +65,11 @@ def grader():
           <div style='flex:1;%s;font-size:22px;color:#7A6557;text-align:right'>%s</div></div>""" % (
             CARD, color, no, how, MONO, call, want, MONO, checks)
     body = """<h1>ตัวตรวจ (Grader) ตรวจผลงานอย่างไร</h1>
-    <div class='sub' style='margin-bottom:16px'>grade.py = โค้ด Python ที่เราเขียนครั้งเดียว · ตรวจ 4 วิธี รวม 10 ข้อ · คะแนน = ข้อที่ผ่าน ÷ 10</div>
+    <div class='sub' style='margin-bottom:16px'>grade.py = โค้ด Python ที่เราเขียนครั้งเดียว · ตรวจ 4 วิธี รวม 10–11 ข้อต่องาน · คะแนน = ข้อที่ผ่าน ÷ จำนวนข้อตรวจของงานนั้น</div>
     <div style='display:flex;gap:22px;font-size:23px;color:#7A6557;padding:0 22px 6px'>
       <div style='width:64px'></div><div style='flex:1.25'>วิธีตรวจ และตัวอย่าง</div><div style='flex:0.95'>ผลที่ต้องได้</div><div style='flex:1;text-align:right'>ข้อตรวจ</div></div>
     %s
-    <div style='font-size:25px;color:#4A2F1F;margin-top:6px'>คำตอบที่ถูกคำนวณอยู่ในตัวตรวจ (ใช้เศษส่วน ไม่ปัดระหว่างทาง) · Agent ไม่เห็นตัวตรวจและ input ที่ใช้ตรวจ</div>""" % h
+    <div style='font-size:25px;color:#4A2F1F;margin-top:6px'>คำตอบที่ถูกคำนวณอยู่ในตัวตรวจ ตามข้อกำหนดทั้ง 2 ประเภท รวมนโยบายธุรกิจ · Agent ไม่เห็นตัวตรวจและ input ที่ใช้ตรวจ</div>""" % h
     shot("d02-grader", body, 720)
 
 
