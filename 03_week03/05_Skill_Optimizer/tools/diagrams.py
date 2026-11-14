@@ -316,7 +316,7 @@ def skill_diff(base="v0", cand="v1"):
     R = json.load(open(os.path.join(root, "runs", "results.json"), encoding="utf-8"))
     gate = open(os.path.join(root, "runs", cand, "gate.txt"), encoding="utf-8").read()
     verdict = "ACCEPT" if "ACCEPT" in gate else "REJECT"
-    CH = 96                                            # ตัวอักษรต่อบรรทัดโดยประมาณ ที่ขนาด 21px
+    CH = 125                                           # ตัวอักษรต่อบรรทัดโดยประมาณ ที่ขนาด 21px
 
     def lines(s):
         return max(1, math.ceil(len(s) / CH))
@@ -334,14 +334,14 @@ def skill_diff(base="v0", cand="v1"):
     for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
         if tag == "equal":
             for s in a[i1:i2]:
-                short = s if len(s) <= CH else s[:CH - 2] + " …"
+                short = s if len(s) <= 96 else s[:94] + " …"
                 body += row("same", short)
                 h += 48
         else:
             olds, news = a[i1:i2], b[j1:j2]
             for k in range(max(len(olds), len(news))):
                 if k < len(olds):
-                    short = olds[k] if len(olds[k]) <= CH * 2 else olds[k][:CH * 2 - 2] + " …"
+                    short = olds[k] if len(olds[k]) <= 192 else olds[k][:190] + " …"
                     body += row("old", short)
                     h += 18 + 30 * lines(short)
                 if k < len(news):
@@ -364,7 +364,59 @@ def skill_diffs():
         skill_diff(base, cand)
 
 
+def skill_full(version="v0"):
+    """สกิลทั้งไฟล์ของ 1 รุ่น · อ่านจาก runs/<รุ่น>/skills/money-coder/SKILL.md · รุ่น noskill ไม่มีไฟล์ จึงแสดงสิ่งที่ Agent ได้รับแทน"""
+    import html, json, math, re
+    esc = html.escape
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    R = json.load(open(os.path.join(root, "runs", "results.json"), encoding="utf-8"))
+    a = R[version]
+    gp = os.path.join(root, "runs", version, "gate.txt")
+    verdict = ("ACCEPT" if "ACCEPT" in open(gp, encoding="utf-8").read() else "REJECT") if os.path.isfile(gp) else ""
+    col = {"ACCEPT": "#6BBF59", "REJECT": "#E76F51", "": "#6F4E37"}[verdict]
+    badge = "<span class='badge' style='background:%s;font-size:21px;padding:3px 12px'>%s</span>" % (col, verdict) if verdict else ""
+    score = "Training %.1f%% · Validation %.1f%% · รวม <b>%.1f%%</b> %s" % (
+        a["train"]["score"] * 100, a["val"]["score"] * 100, a["all"]["score"] * 100, badge)
+    f = os.path.join(root, "runs", version, "skills", "money-coder", "SKILL.md")
+    CH = 130
+    if not os.path.isfile(f):
+        body = """<h1 style='font-size:40px'>ไม่มีสกิล (รุ่น noskill)</h1>
+        <div class='sub' style='margin-bottom:14px'>%s</div>
+        <div style='background:#fff;border:3px dashed #B9A999;border-radius:18px;padding:22px 26px;font-size:26px;color:#7A6557;line-height:1.6'>
+          โฟลเดอร์ <span style='%s;color:#2A6F68'>./skills</span> ว่าง · Agent ได้รับแค่โจทย์ 1 ข้อ<br>
+          ไม่มีใครบอกมาตรฐานการเขียนโค้ดของร้าน และไม่มีใครบอกนโยบายธุรกิจ</div>""" % (score, MONO)
+        shot("d08-skill-noskill", body, 330)
+        return
+    src = open(f, encoding="utf-8").read()
+    m = re.match(r"---\n(.*?)\n---\n", src, re.S)
+    front = dict(l.split(":", 1) for l in m.group(1).split("\n") if ":" in l)
+    rest = src[m.end():]
+    rules = [l[2:].strip() for l in rest.split("\n") if l.startswith("- ")]
+    intro = [l.strip() for l in rest.split("\n") if l.strip() and not l.startswith("- ") and not l.startswith("#")]
+    h = 0
+    cards = ""
+    for i, r in enumerate(rules, 1):
+        n = max(1, math.ceil(len(r) / CH))
+        h += 22 + 30 * n
+        cards += ("<div style='display:flex;gap:10px;margin-bottom:6px'><div style='width:44px;flex:none;text-align:center;font-size:22px;font-weight:800;"
+                  "color:#fff;background:#2A9D8F;border-radius:10px;padding:5px 0;align-self:flex-start'>%d</div>"
+                  "<div style='flex:1;background:#fff;border:2px solid #E5D9CC;border-radius:12px;padding:6px 12px;font-size:21px;line-height:1.42;"
+                  "color:#3B2A20;overflow-wrap:anywhere'>%s</div></div>" % (i, esc(r)))
+    desc = front.get("description", "").strip()
+    head = """<h1 style='font-size:40px'>สกิล money-coder รุ่น %s (ทั้งไฟล์)</h1>
+    <div class='sub' style='margin-bottom:10px'>กติกา %d ข้อ · %s ไบต์ · %s</div>
+    <div style='background:#F6EFE6;border-radius:12px;padding:8px 14px;margin-bottom:8px;font-size:19px;color:#7A6557;line-height:1.45'>
+      <span style='%s;color:#2A6F68'>description:</span> %s<br>%s</div>""" % (
+        version, len(rules), format(os.path.getsize(f), ","), score, MONO, esc(desc), esc(" ".join(intro)))
+    shot("d08-skill-" + version, head + cards, 250 + 30 * math.ceil(len(desc) / 120) + h)
+
+
+def skill_fulls():
+    for v in ("noskill", "v0", "v1", "v2", "v3", "v4"):
+        skill_full(v)
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples", "lab_files", "skill_diffs"]
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples", "lab_files", "skill_diffs", "skill_fulls"]
     for w in which:
         globals()[w]()

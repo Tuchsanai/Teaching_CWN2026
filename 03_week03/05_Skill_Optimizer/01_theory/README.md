@@ -894,7 +894,7 @@ LAB `money-coder` ใน [README หลัก](../README.md) คือ SkillOpt 
 | รู้ได้อย่างไรว่าดีขึ้น | Validation | Validation Gate ทุกก้าว | ประตูรับ |
 | จำอะไรข้ามก้าว | Momentum | Buffer · Slow Update · Meta Skill | `ISSUES.md` |
 
-**ถัดไป:** กลับไปที่ [README หลัก ส่วนที่ 3](../README.md#3--ลงมือทำ-copy--paste) เพื่อลงมือทำ หรืออ่าน [ข้างใน skill-optimizer](../inside_skill_optimizer/README.md)
+**ถัดไป:** กลับไปที่ [README หลัก ส่วนที่ 3](../README.md#3--ลงมือทำ-copy--paste) เพื่อลงมือทำ
 
 ---
 
