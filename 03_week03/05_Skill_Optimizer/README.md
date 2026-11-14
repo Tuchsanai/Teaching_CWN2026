@@ -774,12 +774,29 @@ runs/
 
 | LAB | ทำอะไร | Trial | เวลาจริง |
 |---|---|---|---|
-| [0](#lab-0--เตรียม) | สร้างเครื่องมือ `skill-optimizer` แล้วส่งเข้า container พร้อมโจทย์ | – | 0.1 ใช้ 14 นาที · 0.2 ใช้ 1 นาที |
-| [1](#lab-1--วัดรุ่นฐาน-v0) | วัด `v0` และวัดแบบไม่มีสกิล | 36 | 2 นาที |
-| [2](#lab-2--สร้าง-v1) | วิเคราะห์ข้อที่พลาด สร้าง `v1` | 18 | 5 นาที |
-| [3](#lab-3--สร้าง-v2) | สร้าง `v2` | 18 | 6 นาที |
-| [4](#lab-4--ลอง-v3-ที่ถูกลง) | ลอง `v3` ที่ถูกลง | 18 | 7 นาที |
-| [5](#lab-5--ทดลอง-รุ่นที่สั้นและดูดี-v4) | ทดลองรุ่นที่สั้นและดูดี `v4` | 18 | 4 นาที |
+| [0](#lab-0--เตรียมเครื่องมือและโจทย์) | สร้างเครื่องมือ `skill-optimizer` แล้วติดตั้งใน container พร้อมโจทย์ | – | 0.1 ใช้ 14 นาที · 0.2 ใช้ 1 นาที |
+| [1](#lab-1--วัดเส้นฐาน-baseline-ไม่มีสกิล-เทียบกับ-v0) | วัดเส้นฐาน: ไม่มีสกิล เทียบกับ `v0` | 36 | 2 นาที |
+| [2](#lab-2--ปรับรุ่นที่-1-v0--v1-แก้จากข้อที่ผิด) | ปรับรุ่นที่ 1: หาสาเหตุจากข้อที่ผิด สร้าง `v1` | 18 | 5 นาที |
+| [3](#lab-3--ปรับรุ่นที่-2-v1--v2-ทำกติกาให้ตรวจได้) | ปรับรุ่นที่ 2: ทำกติกาให้ตรวจได้ สร้าง `v2` | 18 | 6 นาที |
+| [4](#lab-4--ลดต้นทุน-v2--v3-คะแนนเท่าเดิม-ใช้โทเคนน้อยลง) | ลดต้นทุน: สร้าง `v3` | 18 | 7 นาที |
+| [5](#lab-5--การทดลองควบคุม-v3--v4-ย่อสกิลให้สั้น) | การทดลองควบคุม: ย่อสกิลเป็น `v4` | 18 | 4 นาที |
+
+### แผนการทดลอง: วัดอะไร กับ Input อะไร
+
+ทุก LAB วัดด้วยแผนเดียวกัน ต่างกันแค่ **สกิลรุ่นที่ถูกวัด**
+
+| หัวข้อ | ค่าที่ใช้ |
+|---|---|
+| **Input** | โจทย์ 6 ข้อใน [`suite/suite.json`](suite/suite.json) · 1 ข้อ = ให้ Agent เขียน 1 ฟังก์ชัน |
+| **Training Set** 4 ข้อ | `t1` บิลหน้าร้าน · `t2` หารบิล · `t3` ค่าส่ง · `t4` เงินคืน → เปิดดูข้อที่ผิดได้ ใช้หาสาเหตุ |
+| **Validation Set** 2 ข้อ | `v1` ค่าจอดรถ · `v2` ค่าแรง → ดูได้แค่คะแนนรวม ใช้ตัดสินที่ประตูรับ |
+| **1 Trial** | Agent 1 ตัว + โจทย์ 1 ข้อ + สกิล 1 รุ่น → ได้ `solve.py` และ `test_solve.py` |
+| **การให้คะแนน 1 Trial** | ตัวตรวจรันโค้ดกับ Input ที่ซ่อนไว้ 25–39 ชุด แล้วสรุปเป็นข้อตรวจ 10 ข้อ (งาน 3 มี 11 ข้อ) · คะแนน = สัดส่วนข้อที่ผ่าน |
+| **1 รุ่น** | 6 โจทย์ × 3 รอบ = **18 Trial** (Training 12 · Validation 6) |
+| **ทั้งบท** | 6 รุ่น (`noskill` `v0`–`v4`) × 18 = **108 Trial** |
+| **โมเดล** | `sonnet` · effort `medium` · เหมือนกันทุกรุ่น |
+| **บัญชี** | ทุกบัญชี `yolo` ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial (ผลจริงใช้ `yolo1` `yolo2` `yolo3`) · มีบัญชีเดียวก็รันได้ แค่ช้าลง |
+| **Output** | `runs/<รุ่น>/trials/<โจทย์>-r<รอบ>/` |
 
 ### โครงสร้างโฟลเดอร์
 
@@ -810,7 +827,7 @@ runs/
 | ที่ทำงานใน container | `/workspace/sklab/` มี `suite/` และ `runs/` โครงเดียวกับข้างบน |
 | `money-coder` | อยู่ใน `runs/<รุ่น>/skills/` เท่านั้น ห้ามเป็น global skill (ไม่เช่นนั้น Trial แบบไม่มีสกิลจะเห็นสกิลด้วย) |
 
-### LAB 0 · เตรียม
+### LAB 0 · เตรียมเครื่องมือและโจทย์
 
 #### ขั้น 0.1 · สร้างโฟลเดอร์ `skill-optimizer`
 
@@ -871,24 +888,26 @@ runs/
 </details>
 <!-- /lab01-result -->
 
-#### ขั้น 0.2 · ส่งเข้า container และตรวจ Grader
+#### ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> เตรียม LAB ใน container multi-account:
-> - ติดตั้ง my-skill-optimizer เป็น global skill ชื่อ skill-optimizer ของบัญชี yolo
-> - คัดลอก suite และ runs/v0/skills ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab (คงโครงโฟลเดอร์เดิม)
-> - ตรวจ Grader ด้วย suite/check_grader.py · ดูว่าบัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
-> ยังไม่ต้องวัดอะไร · ตอบเป็นตาราง รายการ | ผล
+> งาน: เตรียม container multi-account ให้พร้อมสำหรับ LAB 1–5 (ยังไม่วัดอะไร)
+>
+> ทำตามลำดับ:
+> 1. ติดตั้ง   my-skill-optimizer เป็น global skill ชื่อ skill-optimizer ของบัญชี yolo
+> 2. คัดลอก   suite และ runs/v0/skills ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab (คงโครงโฟลเดอร์เดิม)
+> 3. ตรวจ     ตัวตรวจด้วย suite/check_grader.py · บัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
+> 4. รายงาน   ตาราง รายการ | ผล
 > ```
 
 **ผลจริง:** ติดตั้งสกิล ✅ · คัดลอกโจทย์ ✅ · Grader ผ่าน ✅ · บัญชีที่ใช้ได้ `yolo1` `yolo2` `yolo3`
 
 👀 ตรวจ Grader ก่อนเสมอ ถ้าเครื่องวัดผิด ตัวเลขหลังจากนี้ใช้ไม่ได้ทั้งหมด
 
-### LAB 1 · วัดรุ่นฐาน (v0)
+### LAB 1 · วัดเส้นฐาน (Baseline): ไม่มีสกิล เทียบกับ `v0`
 
 วัดสกิลรุ่นแรก [`v0`](runs/v0/skills/money-coder/SKILL.md) (5 บรรทัด เขียนจากความจำ) เทียบกับแบบไม่มีสกิล
 
@@ -896,12 +915,20 @@ runs/
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> วัดรุ่น v0 และวัดแบบไม่มีสกิล (รุ่น noskill) ด้วย --reps 3 --model sonnet --effort medium --par 6 ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว (รวม 36 Trial)
-> gate noskill → v0 ใช้ต้นทุนเป็น context_tokens บันทึกไว้ที่ runs/v0/gate.txt · บันทึก report ไว้ที่ runs/report.md
-> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: ตาราง report · ความแกว่งของ v0 (null) · ผล gate
+> งาน: วัดเส้นฐาน · สกิล money-coder รุ่น v0 เทียบกับแบบไม่มีสกิล (รุ่น noskill)
+>
+> ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/sklab
+> เครื่องมือ : สกิล skill-optimizer (global skill ที่ติดตั้งใน LAB 0)
+> เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · Validation Set ดูได้แค่คะแนนรวม
+> Input     : โจทย์ 6 ข้อใน suite/suite.json = Training Set 4 ข้อ (t1–t4) + Validation Set 2 ข้อ (v1 v2)
+> การวัด    : 2 รุ่น × 6 โจทย์ × 3 รอบ = 36 Trial · โมเดล sonnet · effort medium · ทุกบัญชี yolo ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial
+>
+> ทำตามลำดับ:
+> 1. วัด      run รุ่น noskill และรุ่น v0
+> 2. สรุป     report ของทั้ง 2 รุ่น บันทึกที่ runs/report.md · null ของ v0
+> 3. ตัดสิน   gate noskill → v0 ใช้ต้นทุน context_tokens บันทึกที่ runs/v0/gate.txt
+> 4. เก็บผล   รันบนเครื่อง: bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> 5. รายงาน   ตาราง report · ความแกว่งของ v0 · ผล gate
 > ```
 
 | รุ่น | Training | Validation | รวม | ผ่านครบ 10 ข้อ | Gate |
@@ -927,18 +954,28 @@ runs/
 
 </details>
 
-### LAB 2 · สร้าง v1
+### LAB 2 · ปรับรุ่นที่ 1 (`v0` → `v1`): แก้จากข้อที่ผิด
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> ดูข้อที่พลาดของ v0 แล้วเปิด Trace และโค้ดของ Trial ที่พลาด หาสาเหตุที่พบมากกว่า 1 Trial เขียน runs/ISSUES.md
-> สร้าง v1 จาก v0 แก้ไม่เกิน 3 จุด · วัด v1 ด้วยค่าเดียวกับ v0 · gate v0 → v1 บันทึกไว้ที่ runs/v1/gate.txt · บันทึก report ใหม่
-> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: ตารางปัญหา | พบกี่ Trial | สาเหตุ · จุดที่แก้ใน v1 · ตาราง report · ผล gate
+> งาน: ปรับสกิล money-coder จาก v0 เป็น v1 โดยแก้จากข้อที่ผิดของ Training Set
+>
+> ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/sklab
+> เครื่องมือ : สกิล skill-optimizer (global skill ที่ติดตั้งใน LAB 0)
+> เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · Validation Set ดูได้แค่คะแนนรวม
+> Input     : โจทย์ 6 ข้อใน suite/suite.json = Training Set 4 ข้อ (t1–t4) + Validation Set 2 ข้อ (v1 v2)
+> การวัด    : รุ่นละ 6 โจทย์ × 3 รอบ = 18 Trial · โมเดล sonnet · effort medium · ทุกบัญชี yolo ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial
+>
+> ทำตามลำดับ:
+> 1. หาสาเหตุ  failures ของ v0 (Training Set) แล้วเปิด Trace และโค้ดของ Trial ที่ผิด · เก็บเฉพาะสาเหตุที่พบมากกว่า 1 Trial
+> 2. จด        เขียน runs/ISSUES.md: ปัญหา | พบกี่ Trial | สาเหตุ | ทางแก้
+> 3. แก้        คัดลอก runs/v0/skills เป็น runs/v1/skills แล้วแก้ไม่เกิน 3 จุด
+> 4. วัด        run รุ่น v1 ด้วยค่าเดียวกับ v0
+> 5. ตัดสิน     gate v0 → v1 ใช้ต้นทุน context_tokens บันทึกที่ runs/v1/gate.txt · report ทุกรุ่นบันทึกที่ runs/report.md
+> 6. เก็บผล     รันบนเครื่อง: bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> 7. รายงาน     ตารางปัญหา · จุดที่แก้ใน v1 · ตาราง report · ผล gate
 > ```
 
 ![Gate ตัดสิน v0 → v1 อย่างไร](img/r03-threshold-v0-v1.png)
@@ -960,18 +997,27 @@ runs/
 
 </details>
 
-### LAB 3 · สร้าง v2
+### LAB 3 · ปรับรุ่นที่ 2 (`v1` → `v2`): ทำกติกาให้ตรวจได้
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> ทำ v2 จากรุ่นฐานล่าสุด โดยดู 3 อย่าง: ข้อที่พลาดของรุ่นฐาน · ปัญหาที่ยังเปิดใน runs/ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
-> แก้ไม่เกิน 3 จุด · วัด v2 ด้วยค่าเดียวกับ v0 · gate v1 → v2 บันทึกไว้ที่ runs/v2/gate.txt · อัปเดต ISSUES.md และ report
-> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: จุดที่แก้ใน v2 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
+> งาน: ปรับสกิล money-coder จากรุ่นฐานล่าสุดเป็น v2
+>
+> ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/sklab
+> เครื่องมือ : สกิล skill-optimizer (global skill ที่ติดตั้งใน LAB 0)
+> เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · Validation Set ดูได้แค่คะแนนรวม
+> Input     : โจทย์ 6 ข้อใน suite/suite.json = Training Set 4 ข้อ (t1–t4) + Validation Set 2 ข้อ (v1 v2)
+> การวัด    : รุ่นละ 6 โจทย์ × 3 รอบ = 18 Trial · โมเดล sonnet · effort medium · ทุกบัญชี yolo ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial
+>
+> ทำตามลำดับ:
+> 1. หาจุดแก้  ดู 3 อย่าง: ข้อที่ผิดของรุ่นฐาน (Training Set) · ปัญหาที่ยังเปิดใน runs/ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
+> 2. แก้        คัดลอก skills ของรุ่นฐานเป็น runs/v2/skills แล้วแก้ไม่เกิน 3 จุด
+> 3. วัด        run รุ่น v2 ด้วยค่าเดียวกับ v0
+> 4. ตัดสิน     gate v1 → v2 ใช้ต้นทุน context_tokens บันทึกที่ runs/v2/gate.txt · อัปเดต runs/ISSUES.md และ runs/report.md
+> 5. เก็บผล     รันบนเครื่อง: bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> 6. รายงาน     จุดที่แก้ใน v2 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
 > ```
 
 **ผลจริง:** Validation 90.0% → 100.0% · รวม 96.7% → 100.0% (+3.3) · **ACCEPT**
@@ -991,7 +1037,7 @@ Training ไม่มีข้อที่พลาดแล้ว Claude จึ
 
 </details>
 
-### LAB 4 · ลอง v3 ที่ถูกลง
+### LAB 4 · ลดต้นทุน (`v2` → `v3`): คะแนนเท่าเดิม ใช้โทเคนน้อยลง
 
 คะแนนเต็มแล้ว ยังปรับได้อีกทางหนึ่งคือ **ต้นทุน**
 
@@ -999,12 +1045,22 @@ Training ไม่มีข้อที่พลาดแล้ว Claude จึ
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> รุ่นฐานได้คะแนนเต็มแล้ว ลองทำ v3 ที่ถูกลง: ลดโทเคนขาเข้า (context_tokens) อย่างน้อย 10% โดยคะแนนไม่ลด
-> เปิด Trace ดูว่า Agent ใช้คำสั่งไปกับอะไร แล้วแก้ไม่เกิน 3 จุด · วัด v3 ด้วยค่าเดียวกับ v0 · gate v2 → v3 บันทึกไว้ที่ runs/v3/gate.txt · อัปเดต ISSUES.md และ report
-> ถ้า REJECT ให้ใช้ v2 ต่อ ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: จุดที่แก้ใน v3 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
+> งาน: ทำ v3 ที่ถูกลง · ลดโทเคนขาเข้า (context_tokens) อย่างน้อย 10% โดยคะแนนไม่ลด
+>
+> ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/sklab
+> เครื่องมือ : สกิล skill-optimizer (global skill ที่ติดตั้งใน LAB 0)
+> เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · Validation Set ดูได้แค่คะแนนรวม
+> Input     : โจทย์ 6 ข้อใน suite/suite.json = Training Set 4 ข้อ (t1–t4) + Validation Set 2 ข้อ (v1 v2)
+> การวัด    : รุ่นละ 6 โจทย์ × 3 รอบ = 18 Trial · โมเดล sonnet · effort medium · ทุกบัญชี yolo ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial
+>
+> ทำตามลำดับ:
+> 1. หาจุดแก้  เปิด Trace ของรุ่นฐาน (Training Set) ดูว่า Agent ใช้คำสั่งไปกับอะไร
+> 2. แก้        คัดลอก skills ของรุ่นฐานเป็น runs/v3/skills แล้วแก้ไม่เกิน 3 จุด
+> 3. วัด        run รุ่น v3 ด้วยค่าเดียวกับ v0
+> 4. ตัดสิน     gate v2 → v3 ใช้ต้นทุน context_tokens บันทึกที่ runs/v3/gate.txt · ถ้า REJECT ใช้ v2 ต่อ ห้ามวัดซ้ำเพื่อให้ผ่าน
+> 5. จด        อัปเดต runs/ISSUES.md และ runs/report.md
+> 6. เก็บผล     รันบนเครื่อง: bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> 7. รายงาน     จุดที่แก้ใน v3 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
 > ```
 
 ![Gate ตัดสิน v2 → v3 ด้วยต้นทุน](img/r03-threshold-v2-v3.png)
@@ -1024,7 +1080,7 @@ Training ไม่มีข้อที่พลาดแล้ว Claude จึ
 
 </details>
 
-### LAB 5 · ทดลอง: รุ่นที่สั้นและดูดี (v4)
+### LAB 5 · การทดลองควบคุม (`v3` → `v4`): ย่อสกิลให้สั้น
 
 สกิลยาวขึ้นทุกรุ่น ถ้าย่อให้สั้นและอ่านง่าย จะดีขึ้นหรือไม่ ให้ประตูรับตัดสิน
 
@@ -1032,12 +1088,21 @@ Training ไม่มีข้อที่พลาดแล้ว Claude จึ
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> ทดลอง: สร้าง v4 จากรุ่นฐาน โดยย่อ SKILL.md ให้สั้นและอ่านง่าย กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (การย่อทั้งไฟล์นับเป็น 1 จุด ไม่แก้อย่างอื่น)
-> วัด v4 ด้วยค่าเดียวกับ v0 · gate v3 → v4 บันทึกไว้ที่ runs/v4/gate.txt · อัปเดต ISSUES.md และ report
-> ถ้า REJECT ให้ใช้รุ่นฐานต่อ ห้ามแก้ v4 เพิ่ม ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: SKILL.md ของ v4 · ตาราง report ทุกรุ่น · ผล gate · ข้อตรวจของ Training Set ที่เปลี่ยนไป
+> งาน: ทดลองว่าสกิลที่สั้นและอ่านง่ายกว่า ดีกว่าจริงหรือไม่ · สร้าง v4 จากรุ่นฐาน
+>
+> ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/sklab
+> เครื่องมือ : สกิล skill-optimizer (global skill ที่ติดตั้งใน LAB 0)
+> เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · Validation Set ดูได้แค่คะแนนรวม
+> Input     : โจทย์ 6 ข้อใน suite/suite.json = Training Set 4 ข้อ (t1–t4) + Validation Set 2 ข้อ (v1 v2)
+> การวัด    : รุ่นละ 6 โจทย์ × 3 รอบ = 18 Trial · โมเดล sonnet · effort medium · ทุกบัญชี yolo ที่ล็อกอินแล้วช่วยกันรัน พร้อมกัน 6 Trial
+>
+> ทำตามลำดับ:
+> 1. แก้        คัดลอก skills ของรุ่นฐานเป็น runs/v4/skills แล้วย่อ SKILL.md: กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (นับเป็น 1 จุด ไม่แก้อย่างอื่น)
+> 2. วัด        run รุ่น v4 ด้วยค่าเดียวกับ v0
+> 3. ตัดสิน     gate v3 → v4 ใช้ต้นทุน context_tokens บันทึกที่ runs/v4/gate.txt · ถ้า REJECT ใช้รุ่นฐานต่อ ห้ามแก้ v4 เพิ่ม ห้ามวัดซ้ำ
+> 4. จด        อัปเดต runs/ISSUES.md และ runs/report.md
+> 5. เก็บผล     รันบนเครื่อง: bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> 6. รายงาน     SKILL.md ของ v4 · ตาราง report ทุกรุ่น · ผล gate · ข้อตรวจของ Training Set ที่เปลี่ยนไป
 > ```
 
 ![Gate ตัดสิน v3 → v4](img/r03-threshold-v3-v4.png)
