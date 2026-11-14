@@ -18,8 +18,8 @@
   },
   {
    "id": "no_drift",
-   "pass": false,
-   "note": "cafe_bill([{\"price\": 4505, \"qty\": 1}], true) คาด 4338 ได้ 4339 · พลาด 3 จาก 3 กรณี"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "boundary",
@@ -44,12 +44,12 @@
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"items[0].qty must be an integer >= 1\"}"
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"item 0: qty must be an integer >= 1\"}"
   },
   {
    "id": "tests",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "python3 -m unittest -q test_solve ไม่ผ่าน: ----------------------------------------------------------------------\nRan 0 tests in 0.000s\n\nNO TESTS RAN"
   }
  ]
 }

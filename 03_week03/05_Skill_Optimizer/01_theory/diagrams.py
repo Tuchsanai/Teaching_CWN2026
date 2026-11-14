@@ -237,19 +237,19 @@ def reflection_example():
     c2 = (chip("กลุ่มที่ 1 · 8 ใบ", "#EFE6FA") + chip("กลุ่มที่ 2 · 4 ใบ", "#EFE6FA") +
           chip("อ่านทีละกลุ่ม หาข้อผิดที่<br><b>เกิดซ้ำในกลุ่ม</b>", "#F3EDE4"))
     P = [("A", "CLI ตอบ JSON คนละรูปแบบ", "12/12", ORANGE), ("B", "เทสต์ไม่ครบ 6 หรือรันไม่ได้", "5/12", ORANGE),
-         ("C", "ข้อมูลผิดชนิด ไม่ได้ ValueError", "4/12", ORANGE), ("D", "ปัดเศษทุกขั้น คลาด 1 สตางค์", "1/12", MUTE)]
+         ("C", "ข้อมูลผิดชนิด ไม่ได้ ValueError", "4/12", ORANGE), ("D", "ผลไม่ตรงนโยบายของร้าน", "6/12", MUTE)]
     c3 = "".join(chip("<b style='color:%s'>%s</b> %s<br><span style='%s;color:%s'>พบ %s Trial</span>" % (c, k, t, MONO, MUTE, n), "#FFF6EA") for k, t, n, c in P)
     c4 = (chip("<b>1</b> &nbsp;A &nbsp;<span style='color:%s'>12/12</span>" % MUTE, "#E3F3DE") + chip("<b>2</b> &nbsp;B &nbsp;<span style='color:%s'>5/12</span>" % MUTE, "#E3F3DE") +
           chip("<b>3</b> &nbsp;C &nbsp;<span style='color:%s'>4/12</span>" % MUTE, "#E3F3DE") +
-          "<div style='border-top:3px dashed %s;margin:8px 0 8px;font-size:18px;color:%s;text-align:center'>ตัดที่ 3 ข้อ</div>" % (RED, RED) +
-          chip("<s>D &nbsp;1/12</s> &nbsp;ยังไม่แก้", "#FBE3DC", MUTE))
+          "<div style='border-top:3px dashed %s;margin:8px 0 8px;font-size:18px;color:%s;text-align:center'>ไม่มีข้อเสนอที่ใช้กับงานอื่นได้</div>" % (RED, RED) +
+          chip("D &nbsp;6/12 &nbsp;ต้องถามทีม", "#FBE3DC", MUTE))
     c5 = (chip("<b>replace</b> กฎข้อ 4<br>กำหนดรูปแบบ JSON และ exit code", "#E3F3DE") + chip("<b>replace</b> กฎข้อ 5<br>unittest อย่างน้อย 6 เทสต์", "#E3F3DE") +
           chip("<b>replace</b> กฎข้อ 3<br>ValueError เท่านั้น", "#E3F3DE"))
     a = "<div style='font-size:34px;color:%s;align-self:center;font-weight:800'>➜</div>" % BROWN
     body = """<h1>Backward Pass เดินตามด้วยผลจริงของ LAB (v0 → v1)</h1>
     <div class='sub' style='margin-bottom:12px'>จำนวน Trial ที่พบข้อผิดเป็นผลจริงของ LAB · LAB ไม่ได้แบ่ง Minibatch จริง ภาพนี้จัดผลให้อยู่ในรูปของ SkillOpt โดยใช้ B<sub>m</sub> = 8 และ L = 3</div>
     <div style='display:flex;gap:6px;align-items:stretch'>%s%s%s%s%s%s%s%s%s</div>
-    <div class='note' style='margin-top:14px'>ผลหลังผ่าน Gate: Training 71.7%% → 100.0%% · Validation 68.3%% → 90.0%% · ข้อ D ที่ถูกตัดออก กลับมาเป็นปัญหาบน Validation และถูกแก้ใน v2</div>""" % (
+    <div class='note' style='margin-top:14px'>ผลหลังผ่าน Gate: Training 68.6%% → 95.2%% · Validation 66.7%% → 90.0%% · ข้อ D ถูกแก้ใน v2 เมื่อคนในทีมให้นโยบายธุรกิจ</div>""" % (
         col(TEAL, "1", "หลักฐาน", "Rollout Batch จาก Forward Pass", c1, "width:250px"), a,
         col(PURPLE, "2", "แบ่งกลุ่ม", "Minibatch ละไม่เกิน 8 ใบ", c2, "width:250px"), a,
         col(ORANGE, "3", "ข้อเสนอ", "รวมจากทุกกลุ่ม ตัดข้อที่ซ้ำแล้ว", c3), a,

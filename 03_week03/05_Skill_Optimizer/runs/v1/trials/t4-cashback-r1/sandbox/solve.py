@@ -1,31 +1,28 @@
 import json
 import sys
 
-# อัตราเงินคืนหน่วยต่อ 1000 (silver 1.5% = 15/1000)
-_RATES = {"silver": 15, "gold": 25, "platinum": 40}
-_MIN_AMOUNT = 10000  # 100 บาท (สตางค์)
-_CAP = 20000  # 200 บาท (สตางค์)
+# อัตราเงินคืนเป็นหน่วย 1/1000 (silver 1.5%, gold 2.5%, platinum 4%)
+RATES_PERMILLE = {"silver": 15, "gold": 25, "platinum": 40}
+MIN_AMOUNT = 100 * 100   # 100 บาท (สตางค์)
+MAX_CASHBACK = 200 * 100  # 200 บาท (สตางค์)
 
 
 def cashback(amount, tier, birthday):
-    if type(amount) is not int:
-        raise ValueError("amount must be an int")
-    if amount < 0:
-        raise ValueError("amount must be >= 0")
-    if type(tier) is not str or tier not in _RATES:
-        raise ValueError("tier must be 'silver', 'gold' or 'platinum'")
+    if type(amount) is not int or amount < 0:
+        raise ValueError("amount must be a non-negative int")
+    if type(tier) is not str or tier not in RATES_PERMILLE:
+        raise ValueError("tier must be silver, gold or platinum")
     if type(birthday) is not bool:
         raise ValueError("birthday must be a bool")
-
-    if amount < _MIN_AMOUNT:
+    if amount < MIN_AMOUNT:
         return 0
-    mult = 2 if birthday else 1
+    rate = RATES_PERMILLE[tier] * (2 if birthday else 1)
     # ปัดครึ่งขึ้นด้วยเลขจำนวนเต็มล้วน
-    result = (amount * _RATES[tier] * mult + 500) // 1000
-    return min(result, _CAP)
+    result = (amount * rate + 500) // 1000
+    return min(result, MAX_CASHBACK)
 
 
-def _main():
+def main():
     try:
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
@@ -34,12 +31,11 @@ def _main():
             if k not in data:
                 raise ValueError("missing key: " + k)
         result = cashback(data["amount"], data["tier"], data["birthday"])
-    except (ValueError, RecursionError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
+    except Exception as e:  # ทุกกรณีผิดพลาด
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        sys.exit(2)
     print(json.dumps({"ok": True, "result": result}))
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(_main())
+    main()

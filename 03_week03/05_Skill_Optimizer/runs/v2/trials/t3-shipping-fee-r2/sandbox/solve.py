@@ -1,31 +1,34 @@
 import json
 import sys
+from fractions import Fraction
+
+
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def shipping_fee(weight_g, distance_km, express):
-    for v in (weight_g, distance_km):
-        if type(v) is not int:
-            raise ValueError("weight_g and distance_km must be int")
-    if type(express) is not bool:
+    if not _is_int(weight_g) or not 1 <= weight_g <= 30000:
+        raise ValueError("weight_g must be int in 1..30000")
+    if not _is_int(distance_km) or distance_km < 0:
+        raise ValueError("distance_km must be int >= 0")
+    if not isinstance(express, bool):
         raise ValueError("express must be bool")
-    if weight_g < 1 or weight_g > 30000:
-        raise ValueError("weight_g must be in 1..30000")
-    if distance_km < 0:
-        raise ValueError("distance_km must be >= 0")
-
-    # satang, as fraction num/den
+    if express and weight_g > 20000:
+        raise ValueError("express weight must not exceed 20000 g")
+    if distance_km == 0:
+        return 0  # customer pickup
     if weight_g <= 1000:
-        num, den = 4000, 1
+        fee = Fraction(4000)
     elif weight_g <= 5000:
-        num, den = 8000, 1
+        fee = Fraction(8000)
     else:
-        # 15 baht/kg = 1500 satang / 1000 g = 3/2 satang per gram
-        num, den = 16000 + 3 * (weight_g - 5000), 2
+        fee = 8000 + Fraction((weight_g - 5000) * 3, 2)  # 1.5 satang/g
     if distance_km > 100:
-        num, den = num * 6, den * 5
+        fee *= Fraction(6, 5)
     if express:
-        num, den = num * 3, den * 2
-    return (2 * num + den) // (2 * den)
+        fee *= Fraction(3, 2)
+    return int((fee * 2 + 1) // 2)  # round half up, once at the end
 
 
 def main():
@@ -33,14 +36,14 @@ def main():
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        result = shipping_fee(data["weight_g"], data["distance_km"], data["express"])
-    except KeyError as e:
-        print(json.dumps({"ok": False, "error": "missing key: %s" % e.args[0]}))
-        sys.exit(2)
-    except ValueError as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        sys.exit(2)
-    print(json.dumps({"ok": True, "result": result}))
+        args = [data[k] for k in ("weight_g", "distance_km", "express")]
+        out = {"ok": True, "result": shipping_fee(*args)}
+        code = 0
+    except (ValueError, KeyError, TypeError) as e:
+        out = {"ok": False, "error": "missing key %s" % e if isinstance(e, KeyError) else str(e)}
+        code = 2
+    print(json.dumps(out))
+    sys.exit(code)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
- "score": 1.0,
+ "score": 0.8,
  "checks": [
   {
    "id": "contract",
@@ -38,13 +38,13 @@
   },
   {
    "id": "cli_ok",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 2}], \"member\": false} ต้องได้ {\"ok\": true, \"result\": 9630} exit 0 แต่ได้ exit 0 stdout {\"total\": 9630}"
   },
   {
    "id": "cli_error",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"qty must be >= 1\"}"
   },
   {
    "id": "tests",

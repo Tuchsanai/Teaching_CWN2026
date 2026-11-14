@@ -14,15 +14,17 @@ class T(unittest.TestCase):
         self.assertEqual(cafe_bill([{"price": 50000, "qty": 2}], True), 91485)
         self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], True), 9630)
 
-    def test_empty(self):
-        self.assertEqual(cafe_bill([], True), 0)
+    def test_rounding(self):
+        self.assertEqual(cafe_bill([{"price": 5, "qty": 1}], False), 5)  # 5.35
+        self.assertEqual(cafe_bill([{"price": 50, "qty": 1}], False), 54)  # 53.5
 
     def test_invalid(self):
-        for bad in ([{"price": 1.5, "qty": 1}], [{"price": 1, "qty": 0}], [{"price": 1}], "x"):
+        for bad in ([{"price": 1.5, "qty": 1}], [{"price": 1, "qty": 0}],
+                    [{"price": -1, "qty": 1}], [{"price": 1}], "x"):
             with self.assertRaises(ValueError):
                 cafe_bill(bad, False)
         with self.assertRaises(ValueError):
-            cafe_bill([], "yes")
+            cafe_bill([], 1)
 
 
 if __name__ == "__main__":

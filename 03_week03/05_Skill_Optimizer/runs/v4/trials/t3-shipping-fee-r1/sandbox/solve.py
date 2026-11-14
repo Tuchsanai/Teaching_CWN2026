@@ -2,57 +2,48 @@ import json
 import sys
 
 
-def _check_int(v, name):
-    if type(v) is not int:
-        raise ValueError(f"{name} must be int")
-    return v
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (ปัด half-up ครั้งเดียวตอนท้าย)"""
-    _check_int(weight_g, "weight_g")
-    _check_int(distance_km, "distance_km")
-    if type(express) is not bool:
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (คำนวณด้วยเศษส่วนแม่นตรง ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)"""
+    if not _is_int(weight_g) or not 1 <= weight_g <= 30000:
+        raise ValueError("weight_g must be int in 1..30000")
+    if not _is_int(distance_km) or distance_km < 0:
+        raise ValueError("distance_km must be int >= 0")
+    if not isinstance(express, bool):
         raise ValueError("express must be bool")
-    if not 1 <= weight_g <= 30000:
-        raise ValueError("weight_g out of range")
-    if distance_km < 0:
-        raise ValueError("distance_km must be >= 0")
+    if distance_km == 0:
+        return 0  # นโยบาย: 0 กม. ไม่คิดค่าส่ง
+    if express and weight_g > 20000:
+        raise ValueError("express allowed up to 20000 g")
 
-    # หน่วย: สตางค์ x 1000 (15 บาท/กก. = 1500 สตางค์/กก. = 1.5 สตางค์/กรัม)
+    # ค่าฐานเป็นสตางค์ = num/den
     if weight_g <= 1000:
-        num = 4000 * 1000
+        num, den = 4000, 1
     elif weight_g <= 5000:
-        num = 8000 * 1000
+        num, den = 8000, 1
     else:
-        num = 8000 * 1000 + (weight_g - 5000) * 1500
-    den = 1000
-    if distance_km > 100:  # +20% = x6/5
-        num *= 6
-        den *= 5
-    if express:  # +50% = x3/2
-        num *= 3
-        den *= 2
+        # ส่วนเกิน (g) * 1500 สตางค์ / 1000 g
+        num, den = 16000 + 3 * (weight_g - 5000), 2
+    if distance_km > 100:
+        num, den = num * 12, den * 10
+    if express:
+        num, den = num * 15, den * 10
     return (2 * num + den) // (2 * den)
 
 
-def main(argv):
+def main():
     try:
-        if len(argv) != 3:
-            raise ValueError("usage: solve.py WEIGHT_G DISTANCE_KM EXPRESS(true|false)")
-        try:
-            w, d = int(argv[0]), int(argv[1])
-        except ValueError:
-            raise ValueError("weight and distance must be integers")
-        e = argv[2].lower()
-        if e not in ("true", "false"):
-            raise ValueError("express must be true or false")
-        print(json.dumps({"ok": True, "result": shipping_fee(w, d, e == "true")}))
-        return 0
-    except ValueError as ex:
-        print(json.dumps({"ok": False, "error": str(ex)}, ensure_ascii=False))
-        return 2
+        data = json.load(sys.stdin)
+        fee = shipping_fee(data["weight_g"], data["distance_km"], data["express"])
+    except (ValueError, KeyError, TypeError) as e:
+        print(json.dumps({"error": str(e)}))
+        return 1
+    print(json.dumps({"fee_satang": fee}))
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())

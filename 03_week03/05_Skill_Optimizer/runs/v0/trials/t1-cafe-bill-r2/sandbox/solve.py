@@ -2,16 +2,12 @@ import json
 import sys
 
 
-def _round_div(num, den):
-    """จำนวนเต็ม num/den ปัดครึ่งขึ้น (num >= 0)"""
-    return (num * 2 + den) // (den * 2)
-
-
 def _is_int(v):
     return isinstance(v, int) and not isinstance(v, bool)
 
 
 def cafe_bill(items, member):
+    """คืนยอดที่ต้องจ่ายเป็นจำนวนเต็มสตางค์ (คำนวณด้วยจำนวนเต็มล้วน ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)"""
     if not isinstance(items, list):
         raise ValueError("items must be a list")
     if not isinstance(member, bool):
@@ -19,19 +15,21 @@ def cafe_bill(items, member):
     total = 0
     for i, it in enumerate(items):
         if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise ValueError(f"items[{i}] must be a dict with price and qty")
-        p, q = it["price"], it["qty"]
-        if not _is_int(p) or p < 0:
-            raise ValueError(f"items[{i}].price must be a non-negative integer (satang)")
-        if not _is_int(q) or q < 1:
-            raise ValueError(f"items[{i}].qty must be an integer >= 1")
-        total += p * q
+            raise ValueError(f"item {i}: must be dict with price and qty")
+        price, qty = it["price"], it["qty"]
+        if not _is_int(price) or price < 0:
+            raise ValueError(f"item {i}: price must be a non-negative integer (satang)")
+        if not _is_int(qty) or qty < 1:
+            raise ValueError(f"item {i}: qty must be an integer >= 1")
+        total += price * qty
 
-    if total >= 50000:  # 500 บาท
-        total = _round_div(total * 95, 100)
+    num, den = total, 1
+    if total >= 50000:      # 500 บาท
+        num, den = num * 95, den * 100
     if member:
-        total = _round_div(total * 90, 100)
-    return _round_div(total * 107, 100)  # VAT 7%
+        num, den = num * 90, den * 100
+    num, den = num * 107, den * 100   # VAT 7%
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น
 
 
 def main():

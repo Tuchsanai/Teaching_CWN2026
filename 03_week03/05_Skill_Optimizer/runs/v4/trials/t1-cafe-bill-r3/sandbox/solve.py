@@ -1,48 +1,47 @@
 import json
 import sys
 
-THRESHOLD = 50000  # 500 บาท เป็นสตางค์
 
-
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
+def _check_int(v, name, minimum):
+    if isinstance(v, bool) or not isinstance(v, int):
+        raise ValueError(f"{name} must be int")
+    if v < minimum:
+        raise ValueError(f"{name} must be >= {minimum}")
 
 
 def cafe_bill(items, member):
+    """คืนยอดสุทธิเป็นสตางค์ (int) ปัดเศษครั้งเดียวตอนท้าย ปัดครึ่งขึ้น"""
     if not isinstance(items, list):
-        raise ValueError("items must be a list")
+        raise ValueError("items must be list")
     if not isinstance(member, bool):
-        raise ValueError("member must be a bool")
+        raise ValueError("member must be bool")
     total = 0
     for it in items:
         if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise ValueError("invalid item")
-        p, q = it["price"], it["qty"]
-        if not _is_int(p) or not _is_int(q) or p < 0 or q < 1:
-            raise ValueError("invalid price or qty")
-        total += p * q
-    num = total * 107
-    den = 100
-    if total >= THRESHOLD:
-        num *= 95
-        den *= 100
+            raise ValueError("item must be dict with price and qty")
+        _check_int(it["price"], "price", 0)
+        _check_int(it["qty"], "qty", 1)
+        total += it["price"] * it["qty"]
+
+    num, den = total, 1
+    if total >= 50000:          # 500 บาท
+        num, den = num * 95, den * 100
     if member:
-        num *= 90
-        den *= 100
-    # half-up ครั้งเดียวตอนท้าย (จำนวนเต็มล้วน)
-    return (2 * num + den) // (2 * den)
+        num, den = num * 90, den * 100
+    num, den = num * 107, den * 100   # VAT 7% ขั้นสุดท้าย
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น (ค่าไม่ติดลบ)
 
 
 def main():
     try:
-        data = json.loads(sys.stdin.read())
+        data = json.load(sys.stdin)
         if not isinstance(data, dict):
-            raise ValueError("input must be an object")
-        result = cafe_bill(data.get("items"), data.get("member"))
-        print(json.dumps({"ok": True, "result": result}))
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        sys.exit(2)
+            raise ValueError("input must be object")
+        result = {"total": cafe_bill(data.get("items"), data.get("member", False))}
+        print(json.dumps(result))
+    except (ValueError, json.JSONDecodeError) as e:
+        print(json.dumps({"error": str(e)}))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

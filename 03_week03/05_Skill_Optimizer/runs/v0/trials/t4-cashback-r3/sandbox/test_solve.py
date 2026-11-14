@@ -1,8 +1,4 @@
-import json
-import subprocess
-import sys
-import unittest
-
+import json, subprocess, sys, unittest
 from solve import cashback
 
 
@@ -20,36 +16,33 @@ class T(unittest.TestCase):
         self.assertEqual(cashback(10000, "gold", True), 500)
 
     def test_cap(self):
-        self.assertEqual(cashback(10_000_000, "platinum", False), 20000)
+        self.assertEqual(cashback(10_000_00, "platinum", False), 20000)
         self.assertEqual(cashback(500_000, "platinum", False), 20000)
         self.assertEqual(cashback(500_000, "gold", True), 20000)
 
     def test_rounding(self):
+        self.assertEqual(cashback(10001, "silver", False), 150)   # 150.015
         self.assertEqual(cashback(10033, "silver", False), 150)   # 150.495
         self.assertEqual(cashback(10034, "silver", False), 151)   # 150.51
         self.assertEqual(cashback(10010, "silver", False), 150)   # 150.15
-        self.assertEqual(cashback(10100, "gold", False), 253)     # 252.5 -> half up
-        # ปัดหลังคูณสองเท่า: 150.495*2 = 300.99 -> 301
-        self.assertEqual(cashback(10033, "silver", True), 301)
+        self.assertEqual(cashback(10100, "silver", False), 152)   # 151.5 -> half up
+        self.assertIsInstance(cashback(12345, "gold", True), int)
 
     def test_invalid(self):
-        for a in (-1, 1.5, "100", None, True):
+        for args in [(-1, "gold", False), (1.5, "gold", False), ("100", "gold", False),
+                     (True, "gold", False), (10000, "bronze", False), (10000, "gold", 1),
+                     (10000, None, False)]:
             with self.assertRaises(ValueError):
-                cashback(a, "gold", False)
-        with self.assertRaises(ValueError):
-            cashback(10000, "bronze", False)
-        with self.assertRaises(ValueError):
-            cashback(10000, "gold", 1)
+                cashback(*args)
 
     def test_cli(self):
-        r = subprocess.run([sys.executable, "solve.py"], input=json.dumps(
-            {"amount": 10000, "tier": "gold", "birthday": True}),
-            capture_output=True, text=True)
-        self.assertEqual(json.loads(r.stdout), {"cashback": 500})
-        r = subprocess.run([sys.executable, "solve.py"], input='{"amount": -5, "tier": "gold", "birthday": false}',
+        p = subprocess.run([sys.executable, "solve.py", json.dumps(
+            {"amount": 10000, "tier": "gold", "birthday": True})], capture_output=True, text=True)
+        self.assertEqual(json.loads(p.stdout), {"cashback": 500})
+        p = subprocess.run([sys.executable, "solve.py"], input='{"amount":-5,"tier":"gold","birthday":false}',
                            capture_output=True, text=True)
-        self.assertEqual(r.returncode, 1)
-        self.assertIn("error", json.loads(r.stdout))
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("error", json.loads(p.stdout))
 
 
 if __name__ == "__main__":

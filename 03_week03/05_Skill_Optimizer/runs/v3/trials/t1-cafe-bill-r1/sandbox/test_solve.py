@@ -1,58 +1,32 @@
-import json
-import subprocess
-import sys
 import unittest
-
 from solve import cafe_bill
 
 
-class TestCafeBill(unittest.TestCase):
+class T(unittest.TestCase):
     def test_basic(self):
         self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], False), 10700)
+
+    def test_threshold_exact(self):
+        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], False), 50825)
+
+    def test_below_threshold(self):
+        self.assertEqual(cafe_bill([{"price": 49999, "qty": 1}], False), 53499)
 
     def test_member(self):
         self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], True), 9630)
 
-    def test_threshold_discount(self):
-        self.assertEqual(cafe_bill([{"price": 25000, "qty": 2}], False), 50825)
+    def test_both(self):
+        self.assertEqual(cafe_bill([{"price": 30000, "qty": 2}], True), 54891)
 
-    def test_below_threshold(self):
-        self.assertEqual(cafe_bill([{"price": 4990, "qty": 10}], False), 53393)
-
-    def test_member_and_threshold_half_up(self):
-        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], True), 45743)
-
-    def test_empty(self):
-        self.assertEqual(cafe_bill([], False), 0)
+    def test_round_half_up(self):
+        self.assertEqual(cafe_bill([{"price": 50, "qty": 1}], False), 54)
 
     def test_invalid(self):
-        for items, m in [
-            ([{"price": 1.0, "qty": 1}], False),
-            ([{"price": 100, "qty": 0}], False),
-            ([{"price": True, "qty": 1}], False),
-            ([{"price": 100, "qty": 1}], 1),
-            ("x", False),
-            ([{"price": 100}], False),
-        ]:
+        for a in ([{"price": 1.5, "qty": 1}], [{"price": 1, "qty": 0}], "x"):
             with self.assertRaises(ValueError):
-                cafe_bill(items, m)
-
-    def run_cli(self, text):
-        return subprocess.run([sys.executable, "solve.py"], input=text,
-                              capture_output=True, text=True)
-
-    def test_cli_ok(self):
-        p = self.run_cli(json.dumps(
-            {"items": [{"price": 10000, "qty": 1}], "member": False}))
-        self.assertEqual(p.returncode, 0)
-        self.assertEqual(json.loads(p.stdout), {"ok": True, "result": 10700})
-
-    def test_cli_errors(self):
-        for text in ["not json", "{}", '{"items": [], "member": "yes"}']:
-            p = self.run_cli(text)
-            self.assertEqual(p.returncode, 2)
-            self.assertFalse(json.loads(p.stdout)["ok"])
-            self.assertNotIn("Traceback", p.stderr)
+                cafe_bill(a, False)
+        with self.assertRaises(ValueError):
+            cafe_bill([], 1)
 
 
 if __name__ == "__main__":

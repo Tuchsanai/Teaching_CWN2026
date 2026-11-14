@@ -1,41 +1,38 @@
-import pytest
+import json, subprocess, sys, unittest
 from solve import cafe_bill
 
 
-def test_basic_vat():
-    assert cafe_bill([{"price": 10000, "qty": 1}], False) == 10700
+class T(unittest.TestCase):
+    def test_basic(self):
+        self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], False), 10700)
+        self.assertEqual(cafe_bill([], False), 0)
+
+    def test_threshold(self):
+        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], False), 50825)
+        self.assertEqual(cafe_bill([{"price": 49999, "qty": 1}], False), 53499)
+
+    def test_member(self):
+        self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], True), 9630)
+        self.assertEqual(cafe_bill([{"price": 50000, "qty": 2}], True), 91485)
+
+    def test_rounding(self):
+        self.assertEqual(cafe_bill([{"price": 1, "qty": 4}], False), 4)  # 4.28
+        self.assertEqual(cafe_bill([{"price": 50, "qty": 1}], False), 54)  # 53.5
+
+    def test_invalid(self):
+        for bad in ([{"price": 1.5, "qty": 1}], [{"price": 1, "qty": 0}], [{"price": -1, "qty": 1}], [{"price": 1}], "x"):
+            with self.assertRaises(ValueError):
+                cafe_bill(bad, False)
+        with self.assertRaises(ValueError):
+            cafe_bill([], "yes")
+
+    def test_cli(self):
+        r = subprocess.run([sys.executable, "solve.py"], input=json.dumps({"items": [{"price": 10000, "qty": 1}], "member": True}), capture_output=True, text=True)
+        self.assertEqual(json.loads(r.stdout), {"total": 9630})
+        r = subprocess.run([sys.executable, "solve.py"], input="{}", capture_output=True, text=True)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("error", json.loads(r.stdout))
 
 
-def test_threshold_discount():
-    assert cafe_bill([{"price": 50000, "qty": 1}], False) == 50825  # 47500*1.07
-    assert cafe_bill([{"price": 49999, "qty": 1}], False) == 53499
-
-
-def test_member():
-    assert cafe_bill([{"price": 10000, "qty": 1}], True) == 9630
-
-
-def test_both():
-    assert cafe_bill([{"price": 60000, "qty": 1}], True) == 54891  # 51300*1.07
-
-
-def test_qty_multiplies():
-    assert cafe_bill([{"price": 25000, "qty": 2}], False) == 50825
-
-
-def test_rounding_half_up():
-    assert cafe_bill([{"price": 50, "qty": 1}], False) == 54  # 53.5 -> 54
-
-
-def test_empty():
-    assert cafe_bill([], False) == 0
-
-
-@pytest.mark.parametrize("items,member", [
-    ("x", False), ([{"price": 1.5, "qty": 1}], False), ([{"price": 1, "qty": 0}], False),
-    ([{"price": -1, "qty": 1}], False), ([{"price": 1}], False), ([1], False),
-    ([{"price": True, "qty": 1}], False), ([{"price": 1, "qty": 1}], "yes"),
-])
-def test_invalid(items, member):
-    with pytest.raises(ValueError):
-        cafe_bill(items, member)
+if __name__ == "__main__":
+    unittest.main()

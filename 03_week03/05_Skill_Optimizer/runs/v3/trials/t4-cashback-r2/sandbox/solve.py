@@ -1,26 +1,27 @@
 import json
 import sys
+from fractions import Fraction
 
-RATES = {"silver": 15, "gold": 25, "platinum": 40}  # ต่อ 1000
-RATE_DEN = 1000
-MIN_AMOUNT = 10000  # 100 บาท
-CAP = 20000  # 200 บาท
+RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(40, 1000)}
+MIN_AMOUNT = 100 * 100  # สตางค์
+CAP = 200 * 100  # สตางค์
 
 
 def cashback(amount, tier, birthday):
     if type(amount) is not int or amount < 0:
-        raise ValueError("amount must be a non-negative int")
+        raise ValueError("amount must be a non-negative int (satang)")
     if not isinstance(tier, str) or tier not in RATES:
         raise ValueError("tier must be silver, gold or platinum")
     if type(birthday) is not bool:
         raise ValueError("birthday must be a bool")
     if amount < MIN_AMOUNT:
         return 0
-    num = amount * RATES[tier] * (2 if birthday else 1)
-    den = RATE_DEN
-    if num > CAP * den:
-        return CAP
-    return (2 * num + den) // (2 * den)
+    value = amount * RATES[tier]
+    if birthday and tier in ("gold", "platinum"):
+        value *= 2
+    value = min(value, CAP)
+    # เงินคืนเป็นเงินที่ร้านจ่ายออก: ปัดเศษลงเสมอ
+    return value.numerator // value.denominator
 
 
 def main():
@@ -28,11 +29,11 @@ def main():
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        for key in ("amount", "tier", "birthday"):
-            if key not in data:
-                raise ValueError("missing key: " + key)
+        for k in ("amount", "tier", "birthday"):
+            if k not in data:
+                raise ValueError("missing key: " + k)
         result = cashback(data["amount"], data["tier"], data["birthday"])
-    except ValueError as e:
+    except (ValueError, RecursionError) as e:
         print(json.dumps({"ok": False, "error": str(e)}))
         return 2
     print(json.dumps({"ok": True, "result": result}))

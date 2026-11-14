@@ -1,25 +1,23 @@
-"""BaanKafe bill splitter. All money is integer satang (no floats)."""
 import json
 import sys
 
 
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
+def _check_int(name, value, lo, hi=None):
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{name} must be an integer")
+    if value < lo or (hi is not None and value > hi):
+        rng = f">= {lo}" if hi is None else f"between {lo} and {hi}"
+        raise ValueError(f"{name} must be {rng}")
 
 
 def split_bill(total, people, tip_percent):
-    if not _is_int(total) or total < 0:
-        raise ValueError("total must be an integer >= 0")
-    if not _is_int(people) or people < 1:
-        raise ValueError("people must be an integer >= 1")
-    if not _is_int(tip_percent) or not 0 <= tip_percent <= 100:
-        raise ValueError("tip_percent must be an integer between 0 and 100")
-
-    # tip rounded to nearest satang, half up (integer arithmetic only)
-    tip = (total * tip_percent + 50) // 100
+    _check_int("total", total, 0)
+    _check_int("people", people, 1)
+    _check_int("tip_percent", tip_percent, 0, 100)
+    tip = (total * tip_percent + 50) // 100  # round half up, integer only
     grand = total + tip
-    base, rem = divmod(grand, people)
-    return [base + 1 if i < rem else base for i in range(people)]
+    base, extra = divmod(grand, people)
+    return [base + 1 if i < extra else base for i in range(people)]
 
 
 def main(argv):
@@ -28,15 +26,15 @@ def main(argv):
         data = json.loads(raw)
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        missing = [k for k in ("total", "people", "tip_percent") if k not in data]
-        if missing:
-            raise ValueError("missing fields: " + ", ".join(missing))
+        for k in ("total", "people", "tip_percent"):
+            if k not in data:
+                raise ValueError(f"missing field: {k}")
         result = split_bill(data["total"], data["people"], data["tip_percent"])
-        print(json.dumps({"shares": result}))
-        return 0
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"error": str(e)}))
+    except ValueError as e:  # includes JSONDecodeError
+        print(json.dumps({"error": str(e)}, ensure_ascii=False))
         return 1
+    print(json.dumps(result))
+    return 0
 
 
 if __name__ == "__main__":

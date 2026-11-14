@@ -9,8 +9,6 @@ description: มาตรฐานการเขียนโค้ดคิด�
 
 - เงินทุกค่าเป็นจำนวนเต็มสตางค์ ห้ามใช้ float
 - ปัดเศษสตางค์ให้ถูกต้อง
-- ตรวจ input ทุกตัวก่อนคำนวณ ผิดชนิดหรือผิดช่วง → `raise ValueError` เท่านั้น (ห้ามใช้ `TypeError`) · ตัวเลขต้องเป็น `int` จริง: ไม่รับ `float` (แม้ค่าเต็มอย่าง `5.0`) `bool` `str` `None` · ค่า True/False ต้องเป็น `bool` จริง
-- ไฟล์โค้ดต้องรันเป็น CLI ได้: อ่าน JSON object จาก stdin (key = ชื่อพารามิเตอร์ของฟังก์ชัน) แล้วพิมพ์ JSON บรรทัดเดียวทาง stdout ตามรูปแบบนี้เท่านั้น
-  - สำเร็จ: `{"ok": true, "result": <ค่าที่ฟังก์ชันคืน>}` exit code 0
-  - input ผิดทุกแบบ (รวม JSON เสีย และ key ขาด): `{"ok": false, "error": "<ข้อความ>"}` exit code 2 ห้ามมี traceback
-- เทสต์อยู่ในไฟล์ `test_<ชื่อไฟล์โค้ด>.py` ใช้ `unittest.TestCase` (ไม่ใช้ pytest) มีอย่างน้อย 6 เมธอด `test_*` และ `python3 -m unittest -q` ต้องผ่านก่อนส่งงาน
+- ตรวจ input ทุกตัวก่อนคำนวณ: ตัวเลขต้องเป็น `int` เท่านั้น (ไม่รับ `float` `bool` `str` `None` เว้นแต่โจทย์บอกชัดว่ารับทศนิยม) ค่าจริง/เท็จต้องเป็น `bool` และทุกค่าต้องอยู่ในช่วงที่โจทย์กำหนด · ผิดทุกกรณีให้ `raise ValueError` เท่านั้น ห้ามใช้ `TypeError` หรือ exception ชนิดอื่น
+- ต้องเรียกใช้จาก command line ได้: `python3 <ไฟล์>.py` อ่าน JSON object 1 ก้อนจาก stdin (key = ชื่อพารามิเตอร์ของฟังก์ชัน) แล้วพิมพ์ JSON 1 บรรทัดทาง stdout · สำเร็จ: `{"ok": true, "result": <ค่าที่ฟังก์ชันคืน>}` exit code 0 · ผิดทุกกรณี (JSON อ่านไม่ได้ ขาด key หรือ input ไม่ผ่านการตรวจ): `{"ok": false, "error": "<ข้อความ>"}` exit code 2 และห้ามมี traceback
+- เขียนเทสต์มาด้วยทุกครั้งในไฟล์ `test_<โมดูล>.py` (โค้ดอยู่ใน `solve.py` → `test_solve.py`) ด้วย `unittest.TestCase` (ห้ามใช้ pytest) อย่างน้อย 6 เมธอด `test_*` และต้องผ่านเมื่อรัน `python3 -m unittest -q test_<โมดูล>`

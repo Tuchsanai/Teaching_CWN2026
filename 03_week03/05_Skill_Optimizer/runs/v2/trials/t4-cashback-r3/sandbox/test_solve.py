@@ -1,4 +1,3 @@
-import json
 import subprocess
 import sys
 import unittest
@@ -9,50 +8,41 @@ from solve import cashback
 class TestCashback(unittest.TestCase):
     def test_below_minimum(self):
         self.assertEqual(cashback(9999, "platinum", True), 0)
-        self.assertEqual(cashback(0, "gold", False), 0)
 
-    def test_rates_at_minimum(self):
+    def test_minimum_boundary(self):
         self.assertEqual(cashback(10000, "silver", False), 150)
-        self.assertEqual(cashback(10000, "gold", False), 250)
-        self.assertEqual(cashback(10000, "platinum", False), 400)
 
-    def test_birthday_double(self):
-        self.assertEqual(cashback(10000, "gold", True), 500)
+    def test_rates(self):
+        self.assertEqual(cashback(100000, "gold", False), 2500)
+        self.assertEqual(cashback(100000, "platinum", False), 4000)
+
+    def test_birthday_only_gold_platinum(self):
+        self.assertEqual(cashback(100000, "silver", True), 1500)
+        self.assertEqual(cashback(100000, "gold", True), 5000)
+        self.assertEqual(cashback(100000, "platinum", True), 8000)
+
+    def test_floor_rounding(self):
+        self.assertEqual(cashback(10001, "silver", False), 150)
+        self.assertEqual(cashback(10039, "gold", False), 250)
 
     def test_cap(self):
-        self.assertEqual(cashback(10000000, "platinum", False), 20000)
-        self.assertEqual(cashback(500000, "platinum", False), 20000)
-        self.assertEqual(cashback(500000, "gold", True), 20000)
-
-    def test_half_up_rounding(self):
-        self.assertEqual(cashback(10010, "silver", False), 150)  # 150.15
-        self.assertEqual(cashback(10033, "silver", False), 150)  # 150.495
-        self.assertEqual(cashback(10100, "silver", False), 152)  # 151.5
+        self.assertEqual(cashback(10000000, "platinum", True), 20000)
+        self.assertEqual(cashback(500000, "platinum", True), 20000)
 
     def test_invalid(self):
-        for args in [(5.0, "gold", False), (True, "gold", False), (-1, "gold", False),
-                     (100, "bronze", False), (100, None, False), (100, "gold", 1),
-                     ("100", "gold", False)]:
+        for args in [(1.0, "gold", False), (True, "gold", False), (-1, "gold", False),
+                     (100, "bronze", False), (100, None, False), (100, "gold", 1)]:
             with self.assertRaises(ValueError):
                 cashback(*args)
 
-    def run_cli(self, text):
-        p = subprocess.run([sys.executable, "solve.py"], input=text,
+    def test_cli(self):
+        p = subprocess.run([sys.executable, "solve.py"], input='{"amount":100000,"tier":"gold","birthday":true}',
                            capture_output=True, text=True)
-        return p.returncode, p.stdout, p.stderr
-
-    def test_cli_ok(self):
-        code, out, _ = self.run_cli('{"amount": 10000, "tier": "gold", "birthday": true}')
-        self.assertEqual(code, 0)
-        self.assertEqual(json.loads(out), {"ok": True, "result": 500})
-
-    def test_cli_errors(self):
-        for text in ["not json", "[]", '{"amount": 1}',
-                     '{"amount": 1.5, "tier": "gold", "birthday": false}']:
-            code, out, err = self.run_cli(text)
-            self.assertEqual(code, 2)
-            self.assertFalse(json.loads(out)["ok"])
-            self.assertNotIn("Traceback", err)
+        self.assertEqual(p.returncode, 0)
+        self.assertEqual(p.stdout.strip(), '{"ok": true, "result": 5000}')
+        p = subprocess.run([sys.executable, "solve.py"], input='{"amount":1}', capture_output=True, text=True)
+        self.assertEqual(p.returncode, 2)
+        self.assertNotIn("Traceback", p.stderr)
 
 
 if __name__ == "__main__":

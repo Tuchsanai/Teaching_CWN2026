@@ -1,19 +1,18 @@
+"""BaanKafe member cashback. All money is integer satang; no floats."""
 import json
 import sys
 
-# อัตราเงินคืน เป็นเศษส่วนของ 1000 (หลีกเลี่ยง float)
-RATES_PER_MILLE = {"silver": 15, "gold": 25, "platinum": 40}
-MIN_AMOUNT = 10_000   # 100 บาท (สตางค์)
-MAX_CASHBACK = 20_000  # 200 บาท (สตางค์)
+RATE_BP = {"silver": 150, "gold": 250, "platinum": 400}  # basis points (1/100 of %)
+MIN_AMOUNT = 100_00   # 100 baht
+MAX_CASHBACK = 200_00  # 200 baht per bill
 
 
 def cashback(amount, tier, birthday):
-    """คืนเงินคืนเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้น ปัดครั้งเดียวหลังคูณสองเท่า แล้วจึงจำกัดเพดาน)"""
     if isinstance(amount, bool) or not isinstance(amount, int):
-        raise ValueError("amount must be an integer (satang)")
+        raise ValueError("amount must be an integer number of satang")
     if amount < 0:
         raise ValueError("amount must be >= 0")
-    if not isinstance(tier, str) or tier not in RATES_PER_MILLE:
+    if not isinstance(tier, str) or tier not in RATE_BP:
         raise ValueError("tier must be one of: silver, gold, platinum")
     if not isinstance(birthday, bool):
         raise ValueError("birthday must be a boolean")
@@ -21,19 +20,18 @@ def cashback(amount, tier, birthday):
     if amount < MIN_AMOUNT:
         return 0
     mult = 2 if birthday else 1
-    num = amount * RATES_PER_MILLE[tier] * mult
-    result = (num + 500) // 1000  # round half up, จำนวนเต็มล้วน
+    # round half up, once, in pure integer arithmetic
+    num = amount * RATE_BP[tier] * mult
+    result = (num * 2 + 10_000) // 20_000
     return min(result, MAX_CASHBACK)
 
 
-def main():
+def main(argv):
     try:
-        data = json.load(sys.stdin)
-        if not isinstance(data, dict):
-            raise ValueError("input must be a JSON object")
-        missing = [k for k in ("amount", "tier", "birthday") if k not in data]
-        if missing:
-            raise ValueError("missing field(s): " + ", ".join(missing))
+        raw = argv[1] if len(argv) > 1 else sys.stdin.read()
+        data = json.loads(raw)
+        if not isinstance(data, dict) or not {"amount", "tier", "birthday"} <= data.keys():
+            raise ValueError("input must be a JSON object with amount, tier, birthday")
         out = {"cashback": cashback(data["amount"], data["tier"], data["birthday"])}
         print(json.dumps(out))
         return 0
@@ -43,4 +41,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))

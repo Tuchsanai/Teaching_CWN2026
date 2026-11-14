@@ -3,52 +3,44 @@ import sys
 
 
 def _is_int(v):
-    return type(v) is int
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def cafe_bill(items, member):
-    if not isinstance(items, list):
-        raise ValueError("items must be a list")
-    if type(member) is not bool:
-        raise ValueError("member must be a bool")
+    if not isinstance(member, bool):
+        raise ValueError("member must be bool")
+    if not isinstance(items, list) or not items:
+        raise ValueError("items must be a non-empty list")
     total = 0
     for it in items:
-        if not isinstance(it, dict):
-            raise ValueError("each item must be an object")
-        if "price" not in it or "qty" not in it:
-            raise ValueError("item needs price and qty")
-        price, qty = it["price"], it["qty"]
-        if not _is_int(price) or price < 0:
-            raise ValueError("price must be a non-negative int")
-        if not _is_int(qty) or qty < 1:
-            raise ValueError("qty must be an int >= 1")
-        total += price * qty
-
-    num, den = total, 1
-    if total >= 50000:  # 500 baht in satang
+        if not isinstance(it, dict) or "price" not in it or "qty" not in it:
+            raise ValueError("invalid item")
+        p, q = it["price"], it["qty"]
+        if not _is_int(p) or not _is_int(q) or p < 0 or q < 1:
+            raise ValueError("invalid price/qty")
+        total += p * q
+    num, den = 1, 1
+    if total >= 50000:
         num, den = num * 95, den * 100
     if member:
         num, den = num * 90, den * 100
     num, den = num * 107, den * 100
-    # single half-up rounding at the end
-    return (2 * num + den) // (2 * den)
+    # exact integer arithmetic, round half up once at the end
+    return (total * num * 2 + den) // (den * 2)
 
 
-def _main():
+def main():
     try:
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        for k in ("items", "member"):
-            if k not in data:
-                raise ValueError("missing key: " + k)
         result = cafe_bill(data["items"], data["member"])
-    except (ValueError, RecursionError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
+        print(json.dumps({"ok": True, "result": result}))
+        return 0
+    except (ValueError, KeyError, TypeError, RecursionError) as e:
+        print(json.dumps({"ok": False, "error": "invalid input: %s" % e}))
         return 2
-    print(json.dumps({"ok": True, "result": result}))
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(_main())
+    sys.exit(main())

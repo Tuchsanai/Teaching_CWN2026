@@ -14,20 +14,20 @@ def cafe_bill(items, member):
     total = 0
     for it in items:
         if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise ValueError("each item must be a dict with price and qty")
-        price, qty = it["price"], it["qty"]
-        if not _is_int(price) or not _is_int(qty):
-            raise ValueError("price and qty must be int")
-        if price < 0 or qty < 1:
-            raise ValueError("price must be >= 0 and qty >= 1")
-        total += price * qty
-
+            raise ValueError("invalid item")
+        p, q = it["price"], it["qty"]
+        if not _is_int(p) or p < 0:
+            raise ValueError("invalid price")
+        if not _is_int(q) or q < 1:
+            raise ValueError("invalid qty")
+        total += p * q
     num, den = total, 1
-    if total >= 50000:
+    if total >= 50000:  # 500 baht
         num, den = num * 95, den * 100
     if member:
         num, den = num * 90, den * 100
     num, den = num * 107, den * 100
+    # exact integer arithmetic, round half up once at the end
     return (2 * num + den) // (2 * den)
 
 
@@ -36,15 +36,12 @@ def main():
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        if "items" not in data or "member" not in data:
-            raise ValueError("missing key")
         result = cafe_bill(data["items"], data["member"])
-    except (ValueError, RecursionError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
-    print(json.dumps({"ok": True, "result": result}))
-    return 0
+        print(json.dumps({"ok": True, "result": result}))
+    except (ValueError, KeyError) as e:
+        print(json.dumps({"ok": False, "error": "missing key %s" % e if isinstance(e, KeyError) else str(e)}))
+        sys.exit(2)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

@@ -1,25 +1,30 @@
 import json
 import sys
 
-RATES = {"silver": 15, "gold": 25, "platinum": 40}
-RATE_DEN = 1000
-MIN_AMOUNT = 10000
-CAP = 20000
+# อัตราเงินคืนเป็นเศษส่วนจำนวนเต็ม (ตัวเศษ, ตัวส่วน)
+RATES = {"silver": (15, 1000), "gold": (25, 1000), "platinum": (40, 1000)}
+MIN_AMOUNT = 100 * 100   # 100 บาท เป็นสตางค์
+CAP = 200 * 100          # 200 บาท เป็นสตางค์
+BIRTHDAY_TIERS = ("gold", "platinum")
 
 
 def cashback(amount, tier, birthday):
     if type(amount) is not int or amount < 0:
         raise ValueError("amount must be a non-negative int")
-    if not isinstance(tier, str) or tier not in RATES:
-        raise ValueError("tier must be silver, gold or platinum")
+    if type(tier) is not str or tier not in RATES:
+        raise ValueError("invalid tier")
     if type(birthday) is not bool:
-        raise ValueError("birthday must be a bool")
+        raise ValueError("birthday must be bool")
     if amount < MIN_AMOUNT:
         return 0
-    num = amount * RATES[tier] * (2 if birthday else 1)
-    den = RATE_DEN
-    result = (2 * num + den) // (2 * den)
-    return min(result, CAP)
+    num, den = RATES[tier]
+    if birthday and tier in BIRTHDAY_TIERS:
+        num *= 2
+    # เทียบเพดานด้วยค่าแม่นตรง: amount*num/den > CAP
+    if amount * num >= CAP * den:
+        return CAP
+    # เงินคืนเป็นเงินที่ร้านจ่ายออก ปัดเศษลงเสมอ
+    return (amount * num) // den
 
 
 def main():
@@ -27,16 +32,15 @@ def main():
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        for key in ("amount", "tier", "birthday"):
-            if key not in data:
-                raise ValueError("missing key: " + key)
+        for k in ("amount", "tier", "birthday"):
+            if k not in data:
+                raise ValueError("missing key: " + k)
         result = cashback(data["amount"], data["tier"], data["birthday"])
-    except ValueError as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
+    except Exception as e:
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        sys.exit(2)
     print(json.dumps({"ok": True, "result": result}))
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

@@ -126,14 +126,12 @@ runs/<รุ่น>/trials/<id โจทย์>-r<รอบ>/
 `runs/results.json` ตัวอย่างจริง: [`runs/results.json`](runs/results.json)
 
 ```json
-{"v0": {"all":   {"n": 18, "score": 0.706, "score_sd": 0.078, "perfect": 0, "skill_read": 18, "abnormal": 0,
-                  "wall_s": 23.6, "tool_calls": 3.3, "tool_errors": 0.3, "cost_usd": 0.092,
-                  "output_tokens": 2949, "context_tokens": 120976},
+{"v0": {"all":   {"n": 18, "score": 0.679, "score_sd": 0.106, "perfect": 0, "skill_read": 18, "abnormal": 0,
+                  "wall_s": 24.017, "tool_calls": 3.056, "tool_errors": 0.556, "cost_usd": 0.112,
+                  "output_tokens": 2851.944, "context_tokens": 114908},
         "train": {"…เหมือน all…": 0, "checks": {"contract": "12/12", "cli_ok": "0/12"}},
         "val":   {}, "test": {},
-        "trials": [{"task": "t1-cafe-bill", "split": "train", "rep": 1, "account": "yolo1", "score": 0.7,
-                    "wall_s": 23.3, "tool_calls": 3, "tool_errors": 0, "cost_usd": 0.09,
-                    "output_tokens": 2955, "timed_out": false, "failed": ["cli_ok"]}]}}
+        "trials": [{"task": "t1-cafe-bill", "split": "train", "rep": 1, "account": "yolo2", "score": 0.7, "wall_s": 19.3, "tool_calls": 2, "tool_errors": 1, "cost_usd": 0.0977, "output_tokens": 2292, "timed_out": false, "failed": ["cli_ok", "cli_error", "tests"]}]}}
 ```
 
 - `score_sd` = ส่วนเบี่ยงเบนมาตรฐานแบบประชากรของคะแนนทุก Trial

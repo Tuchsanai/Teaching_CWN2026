@@ -1,60 +1,51 @@
 import json
 import math
 import sys
-from fractions import Fraction
 
 
-def _num(value, name):
-    if isinstance(value, bool) or not isinstance(value, (int, float, Fraction)):
-        raise ValueError(f"{name} ต้องเป็นตัวเลข")
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            raise ValueError(f"{name} ต้องเป็นจำนวนจำกัด")
-        return Fraction(repr(value))
-    return Fraction(value)
+def _is_num(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool)
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (คำนวณด้วยเศษส่วนแท้ ปัดครั้งเดียวตอนท้าย half-up)"""
-    w = _num(weight_g, "weight_g")
-    d = _num(distance_km, "distance_km")
-    if not isinstance(express, bool):
-        raise ValueError("express ต้องเป็น True/False")
-    if not (1 <= w <= 30000):
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (คำนวณด้วยจำนวนเต็ม ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)"""
+    if not _is_num(weight_g) or not math.isfinite(weight_g) or weight_g != int(weight_g):
+        raise ValueError("weight_g ต้องเป็นจำนวนเต็มกรัม")
+    weight_g = int(weight_g)
+    if not 1 <= weight_g <= 30000:
         raise ValueError("weight_g ต้องอยู่ระหว่าง 1 ถึง 30000")
-    if d < 0:
-        raise ValueError("distance_km ต้องไม่ติดลบ")
+    if not _is_num(distance_km) or not math.isfinite(distance_km) or distance_km < 0:
+        raise ValueError("distance_km ต้องเป็นตัวเลขตั้งแต่ 0")
+    if not isinstance(express, bool):
+        raise ValueError("express ต้องเป็น true/false")
 
-    if w <= 1000:
-        fee = Fraction(4000)
-    elif w <= 5000:
-        fee = Fraction(8000)
+    # เก็บเป็นเศษส่วน num/den (หน่วยสตางค์)
+    if weight_g <= 1000:
+        num, den = 4000, 1
+    elif weight_g <= 5000:
+        num, den = 8000, 1
     else:
-        fee = 8000 + (w - 5000) * Fraction(1500, 1000)  # 15 บาท/กก. = 1.5 สตางค์/กรัม
-    if d > 100:
-        fee *= Fraction(120, 100)
+        # 15 บาท/กก. = 1.5 สตางค์/กรัม
+        num, den = 8000 * 2 + (weight_g - 5000) * 3, 2
+    if distance_km > 100:
+        num, den = num * 6, den * 5
     if express:
-        fee *= Fraction(150, 100)
-    return math.floor(fee + Fraction(1, 2))
+        num, den = num * 3, den * 2
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น
 
 
-def main(argv=None):
-    argv = sys.argv[1:] if argv is None else argv
+def main(argv):
     try:
-        raw = argv[0] if argv else sys.stdin.read()
-        data = json.loads(raw)
-        if not isinstance(data, dict):
-            raise ValueError("input ต้องเป็น JSON object")
-        missing = [k for k in ("weight_g", "distance_km") if k not in data]
-        if missing:
-            raise ValueError("ขาดฟิลด์: " + ", ".join(missing))
-        fee = shipping_fee(data["weight_g"], data["distance_km"], data.get("express", False))
-        print(json.dumps({"fee_satang": fee}))
-        return 0
-    except (ValueError, json.JSONDecodeError) as e:
-        print(json.dumps({"error": str(e)}, ensure_ascii=False))
-        return 1
+        raw = argv[1] if len(argv) > 1 else sys.stdin.read()
+        d = json.loads(raw)
+        out = {"fee_satang": shipping_fee(d["weight_g"], d["distance_km"], d["express"])}
+        code = 0
+    except (ValueError, KeyError, TypeError) as e:
+        out = {"error": f"input ไม่ถูกต้อง: {e}"}
+        code = 1
+    print(json.dumps(out, ensure_ascii=False))
+    return code
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))

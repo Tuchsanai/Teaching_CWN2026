@@ -1,5 +1,6 @@
 import json
 import sys
+from fractions import Fraction
 
 
 def _is_int(v):
@@ -8,27 +9,27 @@ def _is_int(v):
 
 def shipping_fee(weight_g, distance_km, express):
     if not _is_int(weight_g) or not 1 <= weight_g <= 30000:
-        raise ValueError("weight_g must be int in 1..30000")
+        raise ValueError("weight_g must be an int in 1..30000")
     if not _is_int(distance_km) or distance_km < 0:
-        raise ValueError("distance_km must be int >= 0")
+        raise ValueError("distance_km must be an int >= 0")
     if not isinstance(express, bool):
-        raise ValueError("express must be bool")
-
-    # base fee in satang, scaled by 1000 (so excess grams stay exact)
+        raise ValueError("express must be a bool")
+    if express and weight_g > 20000:
+        raise ValueError("express supports at most 20000 g")
+    if distance_km == 0:
+        return 0  # customer pickup
     if weight_g <= 1000:
-        num = 4000 * 1000
+        fee = Fraction(4000)
     elif weight_g <= 5000:
-        num = 8000 * 1000
+        fee = Fraction(8000)
     else:
-        num = 8000 * 1000 + (weight_g - 5000) * 1500
-    den = 1000
+        # 15 baht/kg = 1500 satang per 1000 g
+        fee = Fraction(8000) + Fraction((weight_g - 5000) * 1500, 1000)
     if distance_km > 100:
-        num *= 6
-        den *= 5
+        fee *= Fraction(120, 100)
     if express:
-        num *= 3
-        den *= 2
-    return (2 * num + den) // (2 * den)
+        fee *= Fraction(150, 100)
+    return (2 * fee.numerator + fee.denominator) // (2 * fee.denominator)
 
 
 def main():
@@ -42,10 +43,9 @@ def main():
         result = shipping_fee(data["weight_g"], data["distance_km"], data["express"])
     except (ValueError, RecursionError) as e:
         print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
+        sys.exit(2)
     print(json.dumps({"ok": True, "result": result}))
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

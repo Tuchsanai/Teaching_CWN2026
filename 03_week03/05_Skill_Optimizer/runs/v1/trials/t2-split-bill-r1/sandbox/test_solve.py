@@ -6,47 +6,41 @@ import unittest
 from solve import split_bill
 
 
-def run_cli(text):
-    p = subprocess.run([sys.executable, "solve.py"], input=text,
-                       capture_output=True, text=True)
-    return p.returncode, p.stdout, p.stderr
-
-
 class TestSplitBill(unittest.TestCase):
     def test_even(self):
-        self.assertEqual(split_bill(1000, 4, 0), [250] * 4)
+        self.assertEqual(split_bill(1000, 2, 0), [500, 500])
 
     def test_remainder_first_people(self):
-        self.assertEqual(split_bill(1000, 3, 0), [334, 333, 333])
+        self.assertEqual(split_bill(100, 3, 0), [34, 33, 33])
 
     def test_tip(self):
-        self.assertEqual(split_bill(1000, 2, 10), [550, 550])
+        self.assertEqual(split_bill(1000, 4, 10), [275] * 4)
 
-    def test_tip_rounding_half_up(self):
-        # tip = 5*10/100 = 0.5 -> 1
-        self.assertEqual(split_bill(5, 1, 10), [6])
+    def test_rounding_half_up(self):
+        self.assertEqual(split_bill(5, 1, 10), [6])  # 5.5 -> 6
 
     def test_zero_total(self):
         self.assertEqual(split_bill(0, 3, 50), [0, 0, 0])
 
+    def test_sum_preserved(self):
+        self.assertEqual(sum(split_bill(9999, 7, 13)), (9999 * 113 * 2 + 100) // 200)
+
     def test_invalid(self):
-        for args in [(1.0, 1, 0), (True, 1, 0), (10, 0, 0), (-1, 1, 0),
-                     (10, 1, 101), ("1", 1, 0), (10, None, 0), (10, 1, 5.0)]:
+        for args in [(1.5, 1, 0), (True, 1, 0), (-1, 1, 0), (10, 0, 0),
+                     (10, 1, 101), (10, 1, -1), ("10", 1, 0), (None, 1, 0)]:
             with self.assertRaises(ValueError):
                 split_bill(*args)
 
-    def test_cli_ok(self):
-        code, out, _ = run_cli('{"total": 1000, "people": 3, "tip_percent": 0}')
-        self.assertEqual(code, 0)
-        self.assertEqual(json.loads(out), {"ok": True, "result": [334, 333, 333]})
+    def test_cli(self):
+        r = subprocess.run([sys.executable, "solve.py"], capture_output=True, text=True,
+                           input=json.dumps({"total": 100, "people": 3, "tip_percent": 0}))
+        self.assertEqual(r.returncode, 0)
+        self.assertEqual(json.loads(r.stdout), {"ok": True, "result": [34, 33, 33]})
 
-    def test_cli_errors(self):
-        for text in ["not json", '{"total": 1}', '[1]',
-                     '{"total": 1.5, "people": 1, "tip_percent": 0}']:
-            code, out, err = run_cli(text)
-            self.assertEqual(code, 2)
-            self.assertFalse(json.loads(out)["ok"])
-            self.assertNotIn("Traceback", err)
+    def test_cli_error(self):
+        r = subprocess.run([sys.executable, "solve.py"], capture_output=True, text=True, input="nope")
+        self.assertEqual(r.returncode, 2)
+        self.assertFalse(json.loads(r.stdout)["ok"])
 
 
 if __name__ == "__main__":

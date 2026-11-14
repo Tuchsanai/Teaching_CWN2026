@@ -1,5 +1,5 @@
 {
- "score": 0.9,
+ "score": 0.8,
  "checks": [
   {
    "id": "contract",
@@ -8,11 +8,6 @@
   },
   {
    "id": "basic",
-   "pass": true,
-   "note": ""
-  },
-  {
-   "id": "half_up",
    "pass": true,
    "note": ""
   },
@@ -39,15 +34,20 @@
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"amount\": 20000, \"tier\": \"gold\", \"birthday\": false} ต้องได้ {\"ok\": true, \"result\": 500} exit 0 แต่ได้ exit 2 stdout {\"ok\": false, \"error\": \"usage: solve.py AMOUNT TIER true|false\"}"
+   "note": "stdin {\"amount\": 20000, \"tier\": \"gold\", \"birthday\": false} ต้องได้ {\"ok\": true, \"result\": 500} exit 0 แต่ได้ exit 0 stdout {\"cashback\": 500}"
   },
   {
    "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"amount\": 20000, \"tier\": \"bronze\", \"birthday\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"invalid tier\"}"
+  },
+  {
+   "id": "tests",
    "pass": true,
    "note": ""
   },
   {
-   "id": "tests",
+   "id": "policy",
    "pass": true,
    "note": ""
   }

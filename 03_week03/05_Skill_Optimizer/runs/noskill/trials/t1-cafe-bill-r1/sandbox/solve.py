@@ -1,10 +1,14 @@
 def cafe_bill(items, member):
-    """คืนยอดชำระเป็นสตางค์ (int). คำนวณด้วยจำนวนเต็มล้วน ปัดครั้งเดียวตอนท้าย (half up)."""
+    """คิดยอดที่ต้องจ่าย (สตางค์, int) ด้วยเลขจำนวนเต็มล้วน ปัดเศษครั้งเดียวตอนท้าย"""
     total = sum(i["price"] * i["qty"] for i in items)
-    num, den = 1, 1
-    if total >= 50000:      # 500 บาท = 50,000 สตางค์
-        num *= 95; den *= 100
-    if member:
-        num *= 90; den *= 100
-    num *= 107; den *= 100  # VAT 7% ขั้นสุดท้าย
-    return (total * num * 2 + den) // (den * 2)
+
+    num = total * 107          # VAT 7%
+    den = 100
+    if total >= 50000:         # ตั้งแต่ 500 บาท ลด 5%
+        num *= 95
+        den *= 100
+    if member:                 # สมาชิกลดอีก 10%
+        num *= 90
+        den *= 100
+
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น

@@ -3,53 +3,46 @@ import sys
 
 
 def _is_int(v):
-    return type(v) is int
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def cafe_bill(items, member):
     if not isinstance(items, list):
         raise ValueError("items must be a list")
-    if type(member) is not bool:
+    if not isinstance(member, bool):
         raise ValueError("member must be a bool")
     total = 0
     for it in items:
-        if not isinstance(it, dict):
-            raise ValueError("each item must be a dict")
-        if "price" not in it or "qty" not in it:
-            raise ValueError("item needs price and qty")
-        price, qty = it["price"], it["qty"]
-        if not _is_int(price) or not _is_int(qty):
-            raise ValueError("price and qty must be int")
-        if price < 0 or qty < 1:
-            raise ValueError("price must be >= 0 and qty >= 1")
-        total += price * qty
-    num = total
-    den = 1
+        if not isinstance(it, dict) or "price" not in it or "qty" not in it:
+            raise ValueError("invalid item")
+        p, q = it["price"], it["qty"]
+        if not _is_int(p) or not _is_int(q) or p < 0 or q < 1:
+            raise ValueError("invalid price or qty")
+        total += p * q
+    num, den = total, 1
     if total >= 50000:
-        num *= 95
-        den *= 100
+        num, den = num * 95, den * 100
     if member:
-        num *= 90
-        den *= 100
-    num *= 107
-    den *= 100
+        num, den = num * 90, den * 100
+    num, den = num * 107, den * 100
     return (2 * num + den) // (2 * den)
 
 
-def main():
+def _main():
     try:
         data = json.loads(sys.stdin.read())
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
         if "items" not in data or "member" not in data:
             raise ValueError("missing key")
-        result = cafe_bill(data["items"], data["member"])
-    except (ValueError, RecursionError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
-    print(json.dumps({"ok": True, "result": result}))
-    return 0
+        out = {"ok": True, "result": cafe_bill(data["items"], data["member"])}
+        code = 0
+    except Exception as e:
+        out = {"ok": False, "error": str(e) or "invalid input"}
+        code = 2
+    print(json.dumps(out, ensure_ascii=False))
+    sys.exit(code)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    _main()

@@ -7,40 +7,39 @@ def _is_int(v):
 
 
 def cafe_bill(items, member):
+    """คืนยอดที่ต้องจ่าย (int สตางค์) ปัดเศษครั้งเดียวตอนท้าย ปัดครึ่งขึ้น"""
     if not isinstance(items, list):
         raise ValueError("items must be a list")
     if not isinstance(member, bool):
         raise ValueError("member must be a bool")
     total = 0
     for it in items:
-        if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise ValueError("invalid item")
-        p, q = it["price"], it["qty"]
-        if not _is_int(p) or not _is_int(q) or p < 0 or q < 1:
-            raise ValueError("invalid price or qty")
-        total += p * q
-    num, den = 107, 100
-    if total >= 50000:
+        if not isinstance(it, dict):
+            raise ValueError("item must be a dict")
+        price, qty = it.get("price"), it.get("qty")
+        if not _is_int(price) or price < 0:
+            raise ValueError("price must be a non-negative int")
+        if not _is_int(qty) or qty < 1:
+            raise ValueError("qty must be an int >= 1")
+        total += price * qty
+
+    num, den = total * 107, 100  # VAT 7%
+    if total >= 50000:  # 500 บาท
         num, den = num * 95, den * 100
     if member:
         num, den = num * 90, den * 100
-    # half-up rounding once at the end
-    return (2 * total * num + den) // (2 * den)
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น
 
 
-def main(argv):
+def main():
+    data = json.load(sys.stdin)
     try:
-        raw = argv[1] if len(argv) > 1 else sys.stdin.read()
-        data = json.loads(raw)
-        if not isinstance(data, dict):
-            raise ValueError("input must be an object")
-        result = cafe_bill(data.get("items"), data.get("member"))
-        print(json.dumps({"ok": True, "result": result}))
-        return 0
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
+        out = {"total": cafe_bill(data.get("items"), data.get("member"))}
+    except ValueError as e:
+        print(json.dumps({"error": str(e)}))
+        sys.exit(1)
+    print(json.dumps(out))
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    main()

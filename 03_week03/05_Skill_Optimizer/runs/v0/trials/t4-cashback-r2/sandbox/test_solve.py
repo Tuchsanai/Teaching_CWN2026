@@ -1,62 +1,50 @@
-import io
-import json
-import unittest
-from unittest import mock
-
-import solve
+import json, subprocess, sys
+import pytest
 from solve import cashback
 
 
-class CashbackTests(unittest.TestCase):
-    def test_below_minimum(self):
-        self.assertEqual(cashback(9999, "platinum", True), 0)
-        self.assertEqual(cashback(0, "gold", False), 0)
-
-    def test_minimum_boundary(self):
-        self.assertEqual(cashback(10000, "silver", False), 150)
-        self.assertEqual(cashback(10000, "gold", False), 250)
-        self.assertEqual(cashback(10000, "platinum", False), 400)
-
-    def test_birthday_double(self):
-        self.assertEqual(cashback(10000, "gold", True), 500)
-
-    def test_rounding_half_up(self):
-        self.assertEqual(cashback(10010, "silver", False), 150)  # 150.15
-        self.assertEqual(cashback(10033, "silver", False), 150)  # 150.495
-        self.assertEqual(cashback(10034, "silver", False), 151)  # 150.51
-        self.assertEqual(cashback(10020, "gold", False), 251)    # 250.5 -> 251
-
-    def test_cap(self):
-        self.assertEqual(cashback(10**9, "platinum", True), 20000)
-        self.assertEqual(cashback(500000, "platinum", False), 20000)
-        self.assertEqual(cashback(499999, "platinum", False), 20000)  # 19999.96
-        self.assertEqual(cashback(499900, "platinum", False), 19996)
-
-    def test_invalid(self):
-        for args in [(-1, "gold", False), (1.5, "gold", False), ("100", "gold", False),
-                     (True, "gold", False), (10000, "bronze", False),
-                     (10000, None, False), (10000, "gold", 1), (10000, "gold", None)]:
-            with self.assertRaises((ValueError, TypeError), msg=str(args)):
-                cashback(*args)
+@pytest.mark.parametrize("a,t,b,exp", [
+    (9999, "platinum", True, 0),
+    (10000, "silver", False, 150),
+    (10000, "gold", False, 250),
+    (10000, "platinum", False, 400),
+    (10000, "silver", True, 300),
+    (0, "gold", False, 0),
+    (10033, "silver", False, 150),   # 150.495 -> 150
+    (10034, "silver", False, 151),   # 150.51 -> 151
+    (10010, "gold", False, 250),     # 250.25
+    (10020, "gold", False, 251),     # 250.5 -> half up 251
+    (600000, "platinum", False, 20000),  # ชนเพดานพอดี
+    (10**9, "platinum", True, 20000),
+])
+def test_cashback(a, t, b, exp):
+    assert cashback(a, t, b) == exp
 
 
-class CliTests(unittest.TestCase):
-    def run_cli(self, payload):
-        with mock.patch("sys.stdin", io.StringIO(payload)), \
-             mock.patch("sys.stdout", new_callable=io.StringIO) as out:
-            code = solve.main([])
-        return code, json.loads(out.getvalue())
-
-    def test_ok(self):
-        self.assertEqual(self.run_cli('{"amount":10000,"tier":"gold","birthday":true}'),
-                         (0, {"cashback": 500}))
-
-    def test_errors(self):
-        for p in ['not json', '[]', '{"amount":1}', '{"amount":-5,"tier":"gold","birthday":false}']:
-            code, res = self.run_cli(p)
-            self.assertEqual(code, 1)
-            self.assertIn("error", res)
+@pytest.mark.parametrize("args,exc", [
+    ((-1, "gold", False), ValueError),
+    ((100.0, "gold", False), TypeError),
+    ((True, "gold", False), TypeError),
+    ((100, "bronze", False), ValueError),
+    ((100, None, False), ValueError),
+    ((100, "gold", 1), TypeError),
+])
+def test_invalid(args, exc):
+    with pytest.raises(exc):
+        cashback(*args)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def run(inp):
+    return subprocess.run([sys.executable, "solve.py"], input=inp,
+                          capture_output=True, text=True)
+
+
+def test_cli_ok():
+    r = run('{"amount": 20000, "tier": "gold", "birthday": true}')
+    assert r.returncode == 0 and json.loads(r.stdout) == {"cashback": 1000}
+
+
+def test_cli_error():
+    for bad in ('not json', '{"amount": 1}', '{"amount": -5, "tier": "gold", "birthday": false}'):
+        r = run(bad)
+        assert r.returncode == 1 and "error" in json.loads(r.stdout)

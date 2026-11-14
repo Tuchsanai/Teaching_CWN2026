@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.5455,
  "checks": [
   {
    "id": "contract",
@@ -44,12 +44,17 @@
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"weight_g ต้องอยู่ระหว่าง 1 ถึง 30000\"}"
+   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {\"error\": \"input ไม่ถูกต้อง: weight_g ต้องอยู่ระหว่าง 1 ถึง 30000\"}"
   },
   {
    "id": "tests",
    "pass": false,
-   "note": "unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)"
+   "note": "unittest พบ 3 เทสต์ (ต้องมีอย่างน้อย 6)"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี"
   }
  ]
 }

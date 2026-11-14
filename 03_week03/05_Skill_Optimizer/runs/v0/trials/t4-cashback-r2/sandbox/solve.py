@@ -1,28 +1,27 @@
-"""BaanKafe cashback calculator. All money is integer satang (no floats)."""
+"""BaanKafe cashback. เงินทุกค่าเป็นจำนวนเต็มสตางค์ ไม่ใช้ float"""
 import json
 import sys
 
-RATES_PERMILLE = {"silver": 15, "gold": 25, "platinum": 40}  # 1.5%, 2.5%, 4%
-MIN_AMOUNT = 10000   # 100 baht
-MAX_CASHBACK = 20000  # 200 baht per bill
+RATES_BP = {"silver": 150, "gold": 250, "platinum": 400}  # หน่วย 1/10000
+MIN_AMOUNT = 100 * 100   # 100 บาท
+MAX_CASHBACK = 200 * 100  # 200 บาท
 
 
 def cashback(amount, tier, birthday):
     if isinstance(amount, bool) or not isinstance(amount, int):
-        raise TypeError("amount must be an integer number of satang")
+        raise TypeError("amount must be an integer (satang)")
     if amount < 0:
         raise ValueError("amount must be >= 0")
-    if not isinstance(tier, str) or tier not in RATES_PERMILLE:
+    if not isinstance(tier, str) or tier not in RATES_BP:
         raise ValueError("tier must be one of: silver, gold, platinum")
     if not isinstance(birthday, bool):
         raise TypeError("birthday must be a boolean")
 
     if amount < MIN_AMOUNT:
         return 0
-    mult = 2 if birthday else 1
-    # exact: amount * permille * mult / 1000, rounded half up once, in integers
-    num = amount * RATES_PERMILLE[tier] * mult
-    result = (num * 2 + 1000) // 2000
+    num = amount * RATES_BP[tier] * (2 if birthday else 1)
+    # ปัดครึ่งขึ้นเป็นสตางค์ด้วยจำนวนเต็มล้วน
+    result = (2 * num + 10000) // 20000
     return min(result, MAX_CASHBACK)
 
 
@@ -35,11 +34,11 @@ def main(argv=None):
             raise ValueError("input must be a JSON object")
         missing = [k for k in ("amount", "tier", "birthday") if k not in data]
         if missing:
-            raise ValueError("missing field(s): " + ", ".join(missing))
+            raise ValueError("missing fields: " + ", ".join(missing))
         out = {"cashback": cashback(data["amount"], data["tier"], data["birthday"])}
         print(json.dumps(out))
         return 0
-    except (ValueError, TypeError) as e:  # includes JSON decode errors
+    except (ValueError, TypeError) as e:  # รวม JSONDecodeError
         print(json.dumps({"error": str(e)}))
         return 1
 

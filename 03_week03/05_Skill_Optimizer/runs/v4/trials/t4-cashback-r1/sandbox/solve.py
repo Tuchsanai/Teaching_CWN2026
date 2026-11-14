@@ -1,42 +1,36 @@
 import json
 import sys
 
-RATE_BP = {"silver": 150, "gold": 250, "platinum": 400}  # หน่วย 1/10000
-MIN_AMOUNT = 10000  # 100 บาท (สตางค์)
-CAP = 20000         # 200 บาท (สตางค์)
-BP_BASE = 10000
+RATES_BP = {"silver": 150, "gold": 250, "platinum": 400}  # หน่วย 1/10000
+MIN_AMOUNT = 10000   # 100 บาท
+CAP = 20000          # 200 บาท
+BIRTHDAY_TIERS = {"gold", "platinum"}  # นโยบายร้าน: 2 เท่าเฉพาะ gold/platinum
 
 
 def cashback(amount, tier, birthday):
     if type(amount) is not int or amount < 0:
         raise ValueError("amount must be a non-negative int (satang)")
-    if type(tier) is not str or tier not in RATE_BP:
-        raise ValueError("tier must be silver, gold or platinum")
+    if type(tier) is not str or tier not in RATES_BP:
+        raise ValueError("invalid tier")
     if type(birthday) is not bool:
-        raise ValueError("birthday must be a bool")
+        raise ValueError("birthday must be bool")
     if amount < MIN_AMOUNT:
         return 0
-    mult = 2 if birthday else 1
-    q, r = divmod(amount * RATE_BP[tier] * mult, BP_BASE)
-    if r * 2 >= BP_BASE:  # ปัด half-up ครั้งเดียวตอนท้าย
-        q += 1
-    return min(q, CAP)
+    mult = 2 if birthday and tier in BIRTHDAY_TIERS else 1
+    # คำนวณแบบจำนวนเต็ม ปัดเศษลงครั้งเดียวตอนท้าย
+    return min(amount * RATES_BP[tier] * mult // 10000, CAP)
 
 
-def _main(argv):
+def main():
     try:
-        if len(argv) != 3:
-            raise ValueError("usage: solve.py AMOUNT TIER true|false")
-        flags = {"true": True, "false": False}
-        if argv[2] not in flags:
-            raise ValueError("birthday must be true or false")
-        result = cashback(int(argv[0]), argv[1], flags[argv[2]])
-    except ValueError as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
-        return 2
-    print(json.dumps({"ok": True, "result": result}))
+        d = json.load(sys.stdin)
+        out = {"cashback": cashback(d["amount"], d["tier"], d["birthday"])}
+    except (ValueError, KeyError, TypeError) as e:
+        print(json.dumps({"error": str(e)}))
+        return 1
+    print(json.dumps(out))
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(_main(sys.argv[1:]))
+    sys.exit(main())

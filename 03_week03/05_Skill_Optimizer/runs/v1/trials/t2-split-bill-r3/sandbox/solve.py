@@ -13,7 +13,8 @@ def split_bill(total, people, tip_percent):
     _check_int("total", total, 0)
     _check_int("people", people, 1)
     _check_int("tip_percent", tip_percent, 0, 100)
-    tip = (total * tip_percent + 50) // 100  # ปัดครึ่งขึ้น
+    # tip rounded half-up to whole satang, integer arithmetic only
+    tip = (total * tip_percent * 2 + 100) // 200
     grand = total + tip
     base, extra = divmod(grand, people)
     return [base + 1 if i < extra else base for i in range(people)]

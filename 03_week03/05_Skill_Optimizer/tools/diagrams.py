@@ -249,7 +249,122 @@ def trial_examples(label="v0"):
             trial_example(label, x["id"] + "-r1")
 
 
+LAB_FILES = [  # (LAB, ชื่อสั้น, รุ่นที่วัดใน LAB นี้, ไฟล์ที่ได้เพิ่ม, เอาไปใช้ต่ออย่างไร)
+    ("LAB 0", "เตรียมเครื่องมือและโจทย์", None,
+     ["my-skill-optimizer/|เครื่องมือ (บนเครื่อง)", "/workspace/sklab/suite/|โจทย์และตัวตรวจ (ใน container)", "/workspace/sklab/runs/v0/skills/|สกิลรุ่นแรก"],
+     "ทุก LAB สั่งงานผ่านเครื่องมือนี้"),
+    ("LAB 1", "การวัดผลตั้งต้น", "v0",
+     ["runs/noskill/trials/|18 Trial แบบไม่มีสกิล", "runs/v0/trials/|18 Trial ของ v0", "runs/v0/gate.txt|ผลตัดสิน noskill → v0", "runs/report.md|ตารางเทียบทุกรุ่น"],
+     "LAB 2 อ่านข้อที่ผิดของ v0 จาก trials/"),
+    ("LAB 2", "ปรับรอบที่ 1: วิเคราะห์ข้อผิดพลาด", "v1",
+     ["runs/ISSUES.md|ปัญหา สาเหตุ ทางแก้", "runs/v1/skills/|สกิลรุ่นใหม่", "runs/v1/trials/|18 Trial ของ v1", "runs/v1/gate.txt|ผลตัดสิน v0 → v1"],
+     "ISSUES.md บอกปัญหาที่ยังเปิด → ถามทีมใน LAB 3"),
+    ("LAB 3", "ปรับรอบที่ 2: เติมความรู้แฝงจากทีม", "v2",
+     ["runs/v2/skills/|สกิล + นโยบายธุรกิจ", "runs/v2/trials/|18 Trial ของ v2", "runs/v2/gate.txt|ผลตัดสิน v1 → v2", "runs/ISSUES.md|ปิดปัญหา policy"],
+     "Training เต็มแล้ว → LAB 4 ดูกติกาที่ยังกว้าง"),
+    ("LAB 4", "ปรับรอบที่ 3: ทำกติกาให้ตรวจสอบได้", "v3",
+     ["runs/v3/skills/|สกิลที่กติกาชัดขึ้น", "runs/v3/trials/|18 Trial ของ v3", "runs/v3/gate.txt|ผลตัดสิน v2 → v3"],
+     "รุ่นที่ถูกรับเป็นรุ่นฐานของ LAB 5"),
+    ("LAB 5", "การทดลองควบคุม: ย่อสกิลเพื่อลดต้นทุน", "v4",
+     ["runs/v4/skills/|สกิลฉบับย่อ", "runs/v4/trials/|18 Trial ของ v4", "runs/v4/gate.txt|ผลตัดสินเทียบรุ่นฐาน"],
+     "รุ่นที่ใช้งานจริง = รุ่นล่าสุดที่ถูกรับ"),
+]
+
+
+def lab_files():
+    """หลังรันแต่ละ LAB ได้ไฟล์อะไร และเอาไปใช้ต่ออย่างไร · คะแนนและผลตัดสินอ่านจาก runs/ (รุ่นที่ยังไม่ได้รันจะไม่แสดงตัวเลข)"""
+    import json
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    rp = os.path.join(root, "runs", "results.json")
+    R = json.load(open(rp, encoding="utf-8")) if os.path.isfile(rp) else {}
+    cards = ""
+    for i, (lab, name, ver, files, nxt) in enumerate(LAB_FILES):
+        badge = ""
+        if ver and ver in R:
+            gp = os.path.join(root, "runs", ver, "gate.txt")
+            verdict = ("ACCEPT" if "ACCEPT" in open(gp, encoding="utf-8").read() else "REJECT") if os.path.isfile(gp) else ""
+            col = {"ACCEPT": "#6BBF59", "REJECT": "#E76F51", "": "#6F4E37"}[verdict]
+            badge = ("<span style='float:right;font-size:20px;font-weight:800;color:#fff;background:%s;border-radius:10px;padding:2px 10px'>%s %.1f%% %s</span>"
+                     % (col, ver, R[ver]["all"]["score"] * 100, verdict))
+        rows = "".join("<div style='margin-bottom:3px'><span style='%s;font-size:17px;color:#2A6F68'>%s</span>"
+                       "<span style='font-size:17px;color:#7A6557'> &nbsp;%s</span></div>" % (MONO, f.split("|")[0], f.split("|")[1]) for f in files)
+        cards += """<div style='background:#fff;border:3px solid #E5D9CC;border-top:12px solid %s;border-radius:20px;padding:10px 14px'>
+          <div style='font-size:24px;font-weight:800;color:#4A2F1F'>%s%s</div>
+          <div style='font-size:19px;color:#7A6557;margin-bottom:6px'>%s</div>
+          <div style='font-size:17px;font-weight:800;color:#6F4E37;margin-bottom:3px'>ได้ไฟล์เพิ่ม</div>%s
+          <div style='margin-top:6px;background:#FFF4E0;border-radius:10px;padding:5px 9px;font-size:18px;color:#4A2F1F'><b>ใช้ต่อ ➜</b> %s</div></div>""" % (
+            "#6F4E37" if i == 0 else "#2A9D8F", lab, badge, name, rows, nxt)
+    body = """<h1 style='font-size:42px'>หลังรันแต่ละ LAB ได้ไฟล์อะไร และเอาไปใช้ต่ออย่างไร</h1>
+    <div class='sub' style='margin-bottom:10px'>ทุกอย่างอยู่ในโฟลเดอร์ runs/ · 1 รุ่น = 1 โฟลเดอร์ · ป้ายขวาบน = คะแนนรวมและผลตัดสินของรุ่นที่วัดใน LAB นั้น</div>
+    <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px'>%s</div>""" % cards
+    shot("d06-lab-files", body, 900)
+
+
+def skill_rules(version):
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    f = os.path.join(root, "runs", version, "skills", "money-coder", "SKILL.md")
+    return [l[2:].strip() for l in open(f, encoding="utf-8").read().split("\n") if l.startswith("- ")], os.path.getsize(f)
+
+
+def skill_diff(base="v0", cand="v1"):
+    """สกิลเปลี่ยนอย่างไรระหว่างสองรุ่น · อ่านกติกา (บรรทัดที่ขึ้นต้นด้วย "- ") จาก SKILL.md ของทั้งสองรุ่นแล้วเทียบกัน"""
+    import difflib, html, json, math
+    esc = html.escape
+    a, size_a = skill_rules(base)
+    b, size_b = skill_rules(cand)
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    R = json.load(open(os.path.join(root, "runs", "results.json"), encoding="utf-8"))
+    gate = open(os.path.join(root, "runs", cand, "gate.txt"), encoding="utf-8").read()
+    verdict = "ACCEPT" if "ACCEPT" in gate else "REJECT"
+    CH = 96                                            # ตัวอักษรต่อบรรทัดโดยประมาณ ที่ขนาด 21px
+
+    def lines(s):
+        return max(1, math.ceil(len(s) / CH))
+
+    def row(kind, text, n=None):
+        style = {"same": ("#F3EEE7", "#E5D9CC", "#7A6557", "คงเดิม"), "old": ("#FBE3DC", "#E76F51", "#A63D25", "เดิม"),
+                 "new": ("#E3F3DE", "#6BBF59", "#2F6B22", "ใหม่"), "add": ("#E3F3DE", "#6BBF59", "#2F6B22", "เพิ่ม")}[kind]
+        deco = "text-decoration:line-through;" if kind == "old" else ""
+        return ("<div style='display:flex;gap:10px;margin-bottom:6px'><div style='width:84px;flex:none;text-align:center;font-size:19px;font-weight:800;"
+                "color:#fff;background:%s;border-radius:10px;padding:5px 0;align-self:flex-start'>%s</div>"
+                "<div style='flex:1;background:%s;border:2px solid %s;border-radius:12px;padding:6px 12px;font-size:21px;line-height:1.42;color:%s;%soverflow-wrap:anywhere'>%s</div></div>"
+                % (style[1] if kind != "same" else "#B9A999", style[3], style[0], style[1], style[2], deco, esc(text)))
+
+    body, h, n_change = "", 0, 0
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        if tag == "equal":
+            for s in a[i1:i2]:
+                short = s if len(s) <= CH else s[:CH - 2] + " …"
+                body += row("same", short)
+                h += 48
+        else:
+            olds, news = a[i1:i2], b[j1:j2]
+            for k in range(max(len(olds), len(news))):
+                if k < len(olds):
+                    short = olds[k] if len(olds[k]) <= CH * 2 else olds[k][:CH * 2 - 2] + " …"
+                    body += row("old", short)
+                    h += 18 + 30 * lines(short)
+                if k < len(news):
+                    body += row("new" if k < len(olds) else "add", news[k])
+                    h += 18 + 30 * lines(news[k])
+                    n_change += 1
+                body += "<div style='height:6px'></div>"
+                h += 6
+    sb, sc = R[base]["all"]["score"] * 100, R[cand]["all"]["score"] * 100
+    col = "#6BBF59" if verdict == "ACCEPT" else "#E76F51"
+    head = """<h1 style='font-size:40px'>สกิลเปลี่ยนอย่างไร: %s → %s</h1>
+    <div class='sub' style='margin-bottom:12px'>กติกา %d ข้อ → %d ข้อ · เปลี่ยน %d จุด · ขนาดไฟล์ %s → %s ไบต์ ·
+      คะแนนรวม %.1f%% → %.1f%% <span class='badge' style='background:%s;font-size:21px;padding:3px 12px'>%s</span></div>""" % (
+        base, cand, len(a), len(b), n_change, format(size_a, ","), format(size_b, ","), sb, sc, col, verdict)
+    shot("d07-skill-diff-%s-%s" % (base, cand), head + body, 215 + h)
+
+
+def skill_diffs():
+    for base, cand in (("v0", "v1"), ("v1", "v2"), ("v2", "v3"), ("v3", "v4")):
+        skill_diff(base, cand)
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples"]
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples", "lab_files", "skill_diffs"]
     for w in which:
         globals()[w]()

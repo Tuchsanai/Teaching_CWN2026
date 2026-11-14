@@ -1,49 +1,60 @@
-## t1-cafe-bill r1 (train) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t1-cafe-bill-r1/transcript.jsonl
+## t1-cafe-bill r1 (train) score 0.70 · คำสั่งล้ม 1 · /workspace/sklab/runs/v0/trials/t1-cafe-bill-r1/transcript.jsonl
   ✗ cli_ok: stdin {"items": [{"price": 4500, "qty": 2}], "member": false} ต้องได้ {"ok": true, "result": 9630} exit 0 แต่ได้ exit 0 stdout {"total": 9630}
   ✗ cli_error: stdin {"items": [{"price": 4500, "qty": 0}], "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "qty must be an integer >= 1"}
   ✗ tests: unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)
-## t1-cafe-bill r2 (train) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t1-cafe-bill-r2/transcript.jsonl
-  ✗ no_drift: cafe_bill([{"price": 4505, "qty": 1}], true) คาด 4338 ได้ 4339 · พลาด 3 จาก 3 กรณี
-  ✗ cli_ok: stdin {"items": [{"price": 4500, "qty": 2}], "member": false} ต้องได้ {"ok": true, "result": 9630} exit 0 แต่ได้ exit 0 stdout {"total": 9630}
-  ✗ cli_error: stdin {"items": [{"price": 4500, "qty": 0}], "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "items[0].qty must be an integer >= 1"}
-## t1-cafe-bill r3 (train) score 0.70 · คำสั่งล้ม 2 · /workspace/sklab/suite/runs/v0/t1-cafe-bill-r3/transcript.jsonl
+## t1-cafe-bill r2 (train) score 0.70 · คำสั่งล้ม 1 · /workspace/sklab/runs/v0/trials/t1-cafe-bill-r2/transcript.jsonl
   ✗ cli_ok: stdin {"items": [{"price": 4500, "qty": 2}], "member": false} ต้องได้ {"ok": true, "result": 9630} exit 0 แต่ได้ exit 0 stdout {"total": 9630}
   ✗ cli_error: stdin {"items": [{"price": 4500, "qty": 0}], "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "item 0: qty must be an integer >= 1"}
   ✗ tests: python3 -m unittest -q test_solve ไม่ผ่าน: ----------------------------------------------------------------------
 Ran 0 tests in 0.000s
 
 NO TESTS RAN
-## t2-split-bill r1 (train) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t2-split-bill-r1/transcript.jsonl
+## t1-cafe-bill r3 (train) score 0.80 · คำสั่งล้ม 2 · /workspace/sklab/runs/v0/trials/t1-cafe-bill-r3/transcript.jsonl
+  ✗ cli_ok: stdin {"items": [{"price": 4500, "qty": 2}], "member": false} ต้องได้ {"ok": true, "result": 9630} exit 0 แต่ได้ exit 0 stdout {"total": 9630}
+  ✗ cli_error: stdin {"items": [{"price": 4500, "qty": 0}], "member": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "qty must be an integer >= 1"}
+## t2-split-bill r1 (train) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t2-split-bill-r1/transcript.jsonl
+  ✗ cli_ok: stdin {"total": 10000, "people": 3, "tip_percent": 0} ต้องได้ {"ok": true, "result": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3334, 3333, 3333]
+  ✗ cli_error: stdin {"total": 10000, "people": 0, "tip_percent": 0} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "people ต้องอยู่ในช่วง ตั้งแต่ 1"}
+## t2-split-bill r2 (train) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t2-split-bill-r2/transcript.jsonl
   ✗ cli_ok: stdin {"total": 10000, "people": 3, "tip_percent": 0} ต้องได้ {"ok": true, "result": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3334, 3333, 3333]
   ✗ cli_error: stdin {"total": 10000, "people": 0, "tip_percent": 0} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "people must be >= 1"}
-## t2-split-bill r2 (train) score 0.80 · คำสั่งล้ม 1 · /workspace/sklab/suite/runs/v0/t2-split-bill-r2/transcript.jsonl
-  ✗ cli_ok: stdin {"total": 10000, "people": 3, "tip_percent": 0} ต้องได้ {"ok": true, "result": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout {"shares": [3334, 3333, 3333]}
-  ✗ cli_error: stdin {"total": 10000, "people": 0, "tip_percent": 0} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "people must be an integer >= 1"}
-## t2-split-bill r3 (train) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t2-split-bill-r3/transcript.jsonl
-  ✗ cli_ok: stdin {"total": 10000, "people": 3, "tip_percent": 0} ต้องได้ {"ok": true, "result": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout {"shares": [3334, 3333, 3333]}
+## t2-split-bill r3 (train) score 0.80 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t2-split-bill-r3/transcript.jsonl
+  ✗ cli_ok: stdin {"total": 10000, "people": 3, "tip_percent": 0} ต้องได้ {"ok": true, "result": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3334, 3333, 3333]
   ✗ cli_error: stdin {"total": 10000, "people": 0, "tip_percent": 0} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "people must be >= 1"}
-## t3-shipping-fee r1 (train) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t3-shipping-fee-r1/transcript.jsonl
-  ✗ cli_ok: stdin {"weight_g": 3000, "distance_km": 150, "express": false} ต้องได้ {"ok": true, "result": 9600} exit 0 แต่ได้ exit 0 stdout {"satang": 9600}
-  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "weight_g ต้องอยู่ระหว่าง 1 ถึง 30000"}
-  ✗ tests: unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)
-## t3-shipping-fee r2 (train) score 0.60 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t3-shipping-fee-r2/transcript.jsonl
+## t3-shipping-fee r1 (train) score 0.64 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t3-shipping-fee-r1/transcript.jsonl
   ✗ reject_type: shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 1 จาก 5 กรณี
   ✗ cli_ok: stdin {"weight_g": 3000, "distance_km": 150, "express": false} ต้องได้ {"ok": true, "result": 9600} exit 0 แต่ได้ exit 0 stdout {"fee_satang": 9600}
-  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "weight_g must be between 1 and 30000"}
-  ✗ tests: unittest พบ 4 เทสต์ (ต้องมีอย่างน้อย 6)
-## t3-shipping-fee r3 (train) score 0.60 · คำสั่งล้ม 1 · /workspace/sklab/suite/runs/v0/t3-shipping-fee-r3/transcript.jsonl
+  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "ValueError: weight_g must be between 1 and 30000"}
+  ✗ policy: shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี
+## t3-shipping-fee r2 (train) score 0.55 · คำสั่งล้ม 1 · /workspace/sklab/runs/v0/trials/t3-shipping-fee-r2/transcript.jsonl
   ✗ reject_type: shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 1 จาก 5 กรณี
   ✗ cli_ok: stdin {"weight_g": 3000, "distance_km": 150, "express": false} ต้องได้ {"ok": true, "result": 9600} exit 0 แต่ได้ exit 0 stdout {"fee_satang": 9600}
-  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "weight_g ต้องอยู่ระหว่าง 1 ถึง 30000"}
-  ✗ tests: unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)
-## t4-cashback r1 (train) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/suite/runs/v0/t4-cashback-r1/transcript.jsonl
+  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "weight_g ต้องอยู่ระหว่าง 1–30000"}
+  ✗ tests: python3 -m unittest -q test_solve ไม่ผ่าน: ----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+NO TESTS RAN
+  ✗ policy: shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี
+## t3-shipping-fee r3 (train) score 0.55 · คำสั่งล้ม 1 · /workspace/sklab/runs/v0/trials/t3-shipping-fee-r3/transcript.jsonl
+  ✗ reject_type: shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 1 จาก 5 กรณี
+  ✗ cli_ok: stdin {"weight_g": 3000, "distance_km": 150, "express": false} ต้องได้ {"ok": true, "result": 9600} exit 0 แต่ได้ exit 0 stdout {"fee_satang": 9600}
+  ✗ cli_error: stdin {"weight_g": 0, "distance_km": 10, "express": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "input ไม่ถูกต้อง: weight_g ต้องอยู่ระหว่าง 1 ถึง 30000"}
+  ✗ tests: unittest พบ 3 เทสต์ (ต้องมีอย่างน้อย 6)
+  ✗ policy: shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี
+## t4-cashback r1 (train) score 0.70 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t4-cashback-r1/transcript.jsonl
+  ✗ cli_ok: stdin {"amount": 20000, "tier": "gold", "birthday": false} ต้องได้ {"ok": true, "result": 500} exit 0 แต่ได้ exit 0 stdout {"cashback": 500}
+  ✗ cli_error: stdin {"amount": 20000, "tier": "bronze", "birthday": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "tier must be one of: silver, gold, platinum"}
+  ✗ policy: cashback(20000, "silver", true) คาด 300 ได้ 600 · พลาด 6 จาก 6 กรณี
+## t4-cashback r2 (train) score 0.50 · คำสั่งล้ม 0 · /workspace/sklab/runs/v0/trials/t4-cashback-r2/transcript.jsonl
   ✗ reject_type: cashback(20000.0, "gold", false) ต้อง raise ValueError แต่ raise TypeError · พลาด 4 จาก 5 กรณี
   ✗ cli_ok: stdin {"amount": 20000, "tier": "gold", "birthday": false} ต้องได้ {"ok": true, "result": 500} exit 0 แต่ได้ exit 0 stdout {"cashback": 500}
   ✗ cli_error: stdin {"amount": 20000, "tier": "bronze", "birthday": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "tier must be one of: silver, gold, platinum"}
-## t4-cashback r2 (train) score 0.70 · คำสั่งล้ม 1 · /workspace/sklab/suite/runs/v0/t4-cashback-r2/transcript.jsonl
-  ✗ reject_type: cashback(20000.0, "gold", false) ต้อง raise ValueError แต่ raise TypeError · พลาด 4 จาก 5 กรณี
+  ✗ tests: python3 -m unittest -q test_solve ไม่ผ่าน: ----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+NO TESTS RAN
+  ✗ policy: cashback(20000, "silver", true) คาด 300 ได้ 600 · พลาด 6 จาก 6 กรณี
+## t4-cashback r3 (train) score 0.70 · คำสั่งล้ม 1 · /workspace/sklab/runs/v0/trials/t4-cashback-r3/transcript.jsonl
   ✗ cli_ok: stdin {"amount": 20000, "tier": "gold", "birthday": false} ต้องได้ {"ok": true, "result": 500} exit 0 แต่ได้ exit 0 stdout {"cashback": 500}
   ✗ cli_error: stdin {"amount": 20000, "tier": "bronze", "birthday": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "tier must be one of: silver, gold, platinum"}
-## t4-cashback r3 (train) score 0.80 · คำสั่งล้ม 1 · /workspace/sklab/suite/runs/v0/t4-cashback-r3/transcript.jsonl
-  ✗ cli_ok: stdin {"amount": 20000, "tier": "gold", "birthday": false} ต้องได้ {"ok": true, "result": 500} exit 0 แต่ได้ exit 0 stdout {"cashback": 500}
-  ✗ cli_error: stdin {"amount": 20000, "tier": "bronze", "birthday": false} ต้องได้ {"ok": false, "error": "..."} exit 2 ไม่มี traceback แต่ได้ exit 1 stdout {"error": "tier must be one of: silver, gold, platinum"}
+  ✗ policy: cashback(20000, "silver", true) คาด 300 ได้ 600 · พลาด 6 จาก 6 กรณี

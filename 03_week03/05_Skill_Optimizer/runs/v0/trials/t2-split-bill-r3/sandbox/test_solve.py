@@ -1,48 +1,38 @@
-import json
-import subprocess
-import sys
 import unittest
-
-from solve import split_bill
+from solve import split_bill, main
 
 
 class T(unittest.TestCase):
     def test_even(self):
         self.assertEqual(split_bill(1000, 4, 0), [250] * 4)
 
-    def test_remainder_first(self):
+    def test_remainder(self):
         self.assertEqual(split_bill(100, 3, 0), [34, 33, 33])
 
     def test_tip(self):
-        self.assertEqual(split_bill(1000, 3, 10), [367, 367, 366])
+        self.assertEqual(split_bill(1000, 2, 10), [550, 550])
 
-    def test_tip_rounding_half_up(self):
-        self.assertEqual(split_bill(5, 1, 10), [6])    # 0.5 -> 1
-        self.assertEqual(split_bill(4, 1, 10), [4])    # 0.4 -> 0
+    def test_tip_rounding(self):
+        # 105*10% = 10.5 -> 11 ; 116 / 3
+        self.assertEqual(split_bill(105, 3, 10), [39, 39, 38])
 
-    def test_zero_total(self):
+    def test_zero(self):
         self.assertEqual(split_bill(0, 3, 50), [0, 0, 0])
 
-    def test_sum_preserved(self):
-        r = split_bill(99999, 7, 15)
-        self.assertEqual(sum(r), 99999 + (99999 * 15 * 2 + 100) // 200)
+    def test_sum(self):
+        r = split_bill(9999, 7, 13)
+        self.assertEqual(sum(r), 9999 + (9999 * 13 + 50) // 100)
 
     def test_invalid(self):
-        for args in [(-1, 1, 0), (1, 0, 0), (1, 1, -1), (1, 1, 101),
-                     (1.5, 1, 0), (1, 1.0, 0), (1, 1, 5.5), (True, 1, 0),
-                     ("1", 1, 0)]:
+        for a in [(-1, 1, 0), (1, 0, 0), (1, 1, 101), (1, 1, -1),
+                  (1.5, 1, 0), (1, 1.0, 0), (1, 1, 5.0), (True, 1, 0), ("1", 1, 0)]:
             with self.assertRaises(ValueError):
-                split_bill(*args)
+                split_bill(*a)
 
     def test_cli(self):
-        p = subprocess.run([sys.executable, "solve.py"],
-                           input='{"total":100,"people":3,"tip_percent":0}',
-                           capture_output=True, text=True)
-        self.assertEqual(json.loads(p.stdout), {"shares": [34, 33, 33]})
-        p = subprocess.run([sys.executable, "solve.py", '{"total":1,"people":0,"tip_percent":0}'],
-                           capture_output=True, text=True)
-        self.assertEqual(p.returncode, 1)
-        self.assertIn("error", json.loads(p.stdout))
+        self.assertEqual(main(['{"total":100,"people":3,"tip_percent":0}']), 0)
+        self.assertEqual(main(['{"total":100}']), 1)
+        self.assertEqual(main(['nope']), 1)
 
 
 if __name__ == "__main__":

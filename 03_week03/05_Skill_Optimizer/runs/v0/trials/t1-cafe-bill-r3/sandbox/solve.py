@@ -9,31 +9,29 @@ def _is_int(v):
 
 
 def cafe_bill(items, member):
-    """คืนยอดที่ต้องจ่าย (สตางค์, int) คำนวณด้วยจำนวนเต็มล้วน ปัดครึ่งขึ้นครั้งเดียวตอนท้าย"""
     if not isinstance(items, list):
         raise ValueError("items must be a list")
     if not isinstance(member, bool):
         raise ValueError("member must be a bool")
-    subtotal = 0
-    for i, it in enumerate(items):
+    total = 0
+    for it in items:
         if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise ValueError(f"item {i}: must be a dict with price and qty")
+            raise ValueError("each item needs price and qty")
         p, q = it["price"], it["qty"]
         if not _is_int(p) or p < 0:
-            raise ValueError(f"item {i}: price must be a non-negative integer")
+            raise ValueError("price must be a non-negative integer (satang)")
         if not _is_int(q) or q < 1:
-            raise ValueError(f"item {i}: qty must be an integer >= 1")
-        subtotal += p * q
+            raise ValueError("qty must be an integer >= 1")
+        total += p * q
 
-    num = subtotal * 107
-    den = 100
-    if subtotal >= THRESHOLD:
-        num *= 95
-        den *= 100
+    # เลขสัดส่วนแบบจำนวนเต็ม ปัดเศษครั้งเดียวตอนท้าย (half up)
+    num, den = total, 1
+    if total >= THRESHOLD:
+        num, den = num * 95, den * 100
     if member:
-        num *= 90
-        den *= 100
-    return (2 * num + den) // (2 * den)  # half-up
+        num, den = num * 90, den * 100
+    num, den = num * 107, den * 100
+    return (2 * num + den) // (2 * den)
 
 
 def main():
@@ -41,11 +39,12 @@ def main():
         data = json.load(sys.stdin)
         if not isinstance(data, dict):
             raise ValueError("input must be a JSON object")
-        total = cafe_bill(data.get("items"), data.get("member", False))
+        out = {"total": cafe_bill(data.get("items"), data.get("member", False))}
+        code = 0
     except (ValueError, json.JSONDecodeError) as e:
-        print(json.dumps({"error": str(e)}, ensure_ascii=False))
-        sys.exit(1)
-    print(json.dumps({"total": total}))
+        out, code = {"error": str(e)}, 1
+    print(json.dumps(out, ensure_ascii=False))
+    sys.exit(code)
 
 
 if __name__ == "__main__":

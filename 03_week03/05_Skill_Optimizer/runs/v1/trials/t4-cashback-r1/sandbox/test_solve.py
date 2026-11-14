@@ -20,46 +20,39 @@ class TestCashback(unittest.TestCase):
         self.assertEqual(cashback(10000, "gold", True), 500)
 
     def test_cap(self):
-        self.assertEqual(cashback(10_000_000, "platinum", False), 20000)
+        self.assertEqual(cashback(10000000, "platinum", False), 20000)
         self.assertEqual(cashback(500000, "platinum", True), 20000)
 
     def test_rounding_half_up(self):
-        # 10001*15/1000 = 150.015 -> 150 ; 10033*15/1000=150.495 -> 150
-        self.assertEqual(cashback(10001, "silver", False), 150)
-        # 10034*15/1000 = 150.51 -> 151
-        self.assertEqual(cashback(10034, "silver", False), 151)
-        # 10100*15/1000 = 151.5 -> 152
-        self.assertEqual(cashback(10100, "silver", False), 152)
+        self.assertEqual(cashback(10010, "silver", False), 150)   # 150.15
+        self.assertEqual(cashback(10033, "silver", False), 150)   # 150.495
+        self.assertEqual(cashback(10034, "silver", False), 151)   # 150.51
+        self.assertIsInstance(cashback(12345, "gold", False), int)
 
     def test_invalid(self):
-        bad = [
-            (5.0, "gold", False), (True, "gold", False), ("1", "gold", False),
-            (None, "gold", False), (-1, "gold", False),
-            (10000, "bronze", False), (10000, None, False),
-            (10000, "gold", 1), (10000, "gold", None),
-        ]
-        for a in bad:
-            with self.subTest(args=a):
-                with self.assertRaises(ValueError):
-                    cashback(*a)
+        for args in [(1.5, "gold", False), (True, "gold", False),
+                     (-1, "gold", False), (10000, "bronze", False),
+                     (10000, None, False), (10000, "gold", 1),
+                     ("10000", "gold", False)]:
+            with self.assertRaises(ValueError):
+                cashback(*args)
 
-    def _run(self, text):
-        p = subprocess.run([sys.executable, "solve.py"], input=text,
-                           capture_output=True, text=True)
-        return p.returncode, p.stdout, p.stderr
+    def run_cli(self, text):
+        return subprocess.run([sys.executable, "solve.py"], input=text,
+                              capture_output=True, text=True)
 
     def test_cli_ok(self):
-        code, out, _ = self._run('{"amount": 10000, "tier": "gold", "birthday": false}')
-        self.assertEqual(code, 0)
-        self.assertEqual(json.loads(out), {"ok": True, "result": 250})
+        p = self.run_cli('{"amount": 10000, "tier": "gold", "birthday": false}')
+        self.assertEqual(p.returncode, 0)
+        self.assertEqual(json.loads(p.stdout), {"ok": True, "result": 250})
 
     def test_cli_errors(self):
-        for text in ["not json", "{}", '{"amount": 1.5, "tier": "gold", "birthday": true}', "[]"]:
-            with self.subTest(text=text):
-                code, out, err = self._run(text)
-                self.assertEqual(code, 2)
-                self.assertFalse(json.loads(out)["ok"])
-                self.assertNotIn("Traceback", err)
+        for text in ["not json", "{}", "[]",
+                     '{"amount": 1.5, "tier": "gold", "birthday": false}']:
+            p = self.run_cli(text)
+            self.assertEqual(p.returncode, 2)
+            self.assertFalse(json.loads(p.stdout)["ok"])
+            self.assertNotIn("Traceback", p.stderr)
 
 
 if __name__ == "__main__":
