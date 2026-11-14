@@ -1,16 +1,15 @@
-"""เทมเพลต solve.py สำหรับฟังก์ชันคิดเงิน — เปลี่ยนชื่อฟังก์ชัน/สูตรให้ตรงโจทย์"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ) — เงินที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -23,27 +22,27 @@ def need_bool(value, name):
     return value
 
 
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
-
-
 def shipping_fee(weight_g, distance_km, express):
+    """ค่าส่งเป็นสตางค์ (int)
+    ข้อสันนิษฐาน: distance_km เป็นจำนวนเต็ม; ระยะ 0 (รับเองที่ร้าน) = ไม่คิดค่าส่ง คืน 0
+    (ตรวจ input ทั้งหมดก่อน); ปัดเศษ half-up ครั้งเดียวตอนจบ
+    """
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    if distance_km == 0:
+        return 0
     if weight_g <= 1000:
-        fee = Fraction(40)
+        fee = Fraction(4000)
     elif weight_g <= 5000:
-        fee = Fraction(80)
+        fee = Fraction(8000)
     else:
-        fee = 80 + Fraction(15 * (weight_g - 5000), 1000)
+        fee = Fraction(8000) + Fraction(weight_g - 5000, 1000) * 1500
     if distance_km > 100:
         fee *= Fraction(120, 100)
     if express:
         fee *= Fraction(150, 100)
-    return half_up(fee * 100)
+    return half_up(fee)
 
 
 def main():

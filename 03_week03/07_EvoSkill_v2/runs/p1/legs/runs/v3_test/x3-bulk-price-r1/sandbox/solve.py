@@ -1,36 +1,34 @@
-"""bulk_price — โหมดปัดเศษ r1: ปัดครึ่งขึ้นครั้งเดียวที่ยอดสุดท้าย
-
-ข้อสมมติ:
-- qty>=50 ลด 7.5%, qty>=10 ลด 3.5% (อัตราเดียว ไม่ซ้อนกัน)
-- คูปองลดอีก 2.5% คูณทบต่อจากส่วนลดปริมาณ
-- VAT 7% เป็นขั้นสุดท้าย; คำนวณด้วย Fraction ไม่ปัดกลางทาง
-"""
 from fractions import Fraction
 
 
-class InputError(ValueError, TypeError):
-    """input ผิด — เป็นทั้ง ValueError และ TypeError"""
+def _rnd_even(x):
+    """ปัดใกล้สุด เศษ .5 พอดีปัดไปหาเลขคู่ (เหมือน round()) — ปัดครั้งเดียวตอนจบ"""
+    x = Fraction(x)
+    q, r = divmod(x.numerator, x.denominator)
+    twice = 2 * r
+    if twice > x.denominator or (twice == x.denominator and q % 2 == 1):
+        q += 1
+    return q
 
 
-def _check_int(name, v, lo, hi=None):
-    if isinstance(v, bool) or not isinstance(v, int):
-        raise InputError(f"{name} must be an int, got {v!r}")
-    if v < lo or (hi is not None and v > hi):
-        raise InputError(f"{name} out of range: {v!r}")
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def bulk_price(unit_price, qty, coupon):
-    _check_int("unit_price", unit_price, 0)
-    _check_int("qty", qty, 1, 1000)
+    if not _is_int(unit_price) or unit_price < 0:
+        raise ValueError("unit_price must be int >= 0")
+    if not _is_int(qty) or not (1 <= qty <= 1000):
+        raise ValueError("qty must be int in 1..1000")
     if not isinstance(coupon, bool):
-        raise InputError(f"coupon must be a bool, got {coupon!r}")
+        raise ValueError("coupon must be bool")
 
     total = Fraction(unit_price * qty)
     if qty >= 50:
-        total *= Fraction(1000 - 75, 1000)
+        total *= Fraction(1000 - 75, 1000)   # ลด 7.5%
     elif qty >= 10:
-        total *= Fraction(1000 - 35, 1000)
+        total *= Fraction(1000 - 35, 1000)   # ลด 3.5%
     if coupon:
-        total *= Fraction(1000 - 25, 1000)
-    total *= Fraction(107, 100)
-    return (2 * total.numerator + total.denominator) // (2 * total.denominator)
+        total *= Fraction(1000 - 25, 1000)   # ลดอีก 2.5%
+    total *= Fraction(107, 100)              # VAT 7% ขั้นสุดท้าย
+    return int(_rnd_even(total))

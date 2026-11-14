@@ -1,4 +1,4 @@
-"""BaanKafe shipping_fee: คืนค่าส่งเป็นจำนวนเต็มสตางค์ (half-up)"""
+"""BaanKafe shipping fee (คืนค่าเป็นจำนวนเต็มสตางค์)"""
 import json
 import math
 import sys
@@ -9,24 +9,21 @@ def half_up(x):
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def _need_int(value, name, low, high):
-    if type(value) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if value < low or value > high:
-        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
-    return value
-
-
 def shipping_fee(weight_g, distance_km, express):
-    _need_int(weight_g, "weight_g", 1, 30000)
+    if type(weight_g) is not int or not 1 <= weight_g <= 30000:
+        raise ValueError("weight_g ต้องเป็นจำนวนเต็ม 1-30000")
     if type(distance_km) not in (int, float):
         raise ValueError("distance_km ต้องเป็นตัวเลข")
-    if isinstance(distance_km, float) and not math.isfinite(distance_km):
-        raise ValueError("distance_km ไม่ถูกต้อง")
+    if type(distance_km) is float and not math.isfinite(distance_km):
+        raise ValueError("distance_km ต้องเป็นจำนวนจำกัด")
     if distance_km < 0:
-        raise ValueError("distance_km ต้อง >= 0")
+        raise ValueError("distance_km ต้องไม่ติดลบ")
     if type(express) is not bool:
         raise ValueError("express ต้องเป็น True หรือ False")
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับไม่เกิน 20000 กรัม")
+    if distance_km == 0:  # ลูกค้ารับเองที่ร้าน
+        return 0
 
     if weight_g <= 1000:
         fee = Fraction(4000)

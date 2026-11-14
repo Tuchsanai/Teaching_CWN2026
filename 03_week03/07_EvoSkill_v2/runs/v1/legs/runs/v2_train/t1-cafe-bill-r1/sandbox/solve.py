@@ -1,55 +1,59 @@
-"""BaanKafe: คิดเงินหน้าร้าน (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
-def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
-
-
-def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+def need_int(v, name, low=None, high=None):
+    if type(v) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and value < low) or (high is not None and value > high):
-        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
-    return value
+    if (low is not None and v < low) or (high is not None and v > high):
+        raise ValueError(f"{name} อยู่นอกช่วง")
+    return v
 
 
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
+def need_bool(v, name):
+    if type(v) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True/False")
+    return v
 
 
 def cafe_bill(items, member):
-    """คิดยอดสุทธิ: ลด 5% เมื่อรวม >= 500 บาท, สมาชิกลดอีก 10%, VAT 7% ปัดครึ่งขึ้นครั้งเดียว"""
+    """คืนยอดที่ลูกค้าต้องจ่าย (สตางค์, int).
+
+    สมมติฐาน: ส่วนลดสมาชิกคูณต่อจากส่วนลดตามยอด (0.95 * 0.90) ไม่บวกรวมกัน,
+    เกณฑ์ 500 บาท (50000 สตางค์) เทียบกับยอดก่อนลด (>=), ปัดครึ่งขึ้นครั้งเดียวตอนจบ,
+    list ว่าง = ยอด 0
+    """
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
     subtotal = 0
-    for item in items:
-        if type(item) is not dict:
+    for it in items:
+        if type(it) is not dict:
             raise ValueError("แต่ละรายการต้องเป็น dict")
-        subtotal += need_int(item.get("price") if "price" in item else None, "price", 0) * need_int(item.get("qty") if "qty" in item else None, "qty", 1)
-    amount = Fraction(subtotal)
-    if subtotal >= 50000:          # "ตั้งแต่" = >=
-        amount *= Fraction(95, 100)
+        if "price" not in it or "qty" not in it:
+            raise ValueError("รายการต้องมี price และ qty")
+        price = need_int(it["price"], "price", low=0)
+        qty = need_int(it["qty"], "qty", low=1)
+        subtotal += price * qty
+
+    total = Fraction(subtotal)
+    if subtotal >= 50000:
+        total *= Fraction(95, 100)
     if member:
-        amount *= Fraction(90, 100)
-    return half_up(amount * Fraction(107, 100))   # ปัดครั้งเดียวตอนท้าย
+        total *= Fraction(90, 100)
+    total *= Fraction(107, 100)
+    return int((total * 2 + 1) // 2)
 
 
-# CLI (บังคับ): อ่าน JSON object จาก stdin -> พิมพ์ {"ok":..., "result"/"error":...}
 def main():
     try:
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cafe_bill(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}))
+    except (ValueError, TypeError, json.JSONDecodeError) as error:
+        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}))
     return 0

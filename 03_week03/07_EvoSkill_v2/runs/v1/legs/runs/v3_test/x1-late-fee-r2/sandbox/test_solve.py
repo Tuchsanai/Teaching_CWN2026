@@ -1,43 +1,34 @@
 import unittest
+from fractions import Fraction
 from solve import late_fee
 
 
-class Normal(unittest.TestCase):
-    def test_cases(self):
-        self.assertEqual(late_fee(100000, 10), 7500)   # 7.5%
-        self.assertEqual(late_fee(100000, 4), 3000)    # 3%
+class T(unittest.TestCase):
+    def test_normal(self):
+        self.assertEqual(late_fee(100000, 10), 7500)
+        self.assertEqual(late_fee(20000, 4), 600)
         self.assertEqual(late_fee(0, 100), 0)
 
-
-class Boundary(unittest.TestCase):
-    def test_grace(self):
+    def test_boundary(self):
         self.assertEqual(late_fee(100000, 3), 0)
-        self.assertEqual(late_fee(100000, 0), 0)
         self.assertEqual(late_fee(100000, 4), 3000)
-
-    def test_cap(self):
-        self.assertEqual(late_fee(100000, 19), 14250)
         self.assertEqual(late_fee(100000, 20), 15000)
         self.assertEqual(late_fee(100000, 21), 15000)
         self.assertEqual(late_fee(100000, 365), 15000)
+        self.assertEqual(late_fee(100000, 0), 0)
 
+    def test_nodrift(self):
+        for a in (1, 2, 66, 67, 133, 999, 12345):
+            for d in range(0, 366):
+                f = min(Fraction(a * 75 * d, 10000), Fraction(a * 15, 100)) if d > 3 else 0
+                self.assertEqual(late_fee(a, d), int((Fraction(f) * 2 + 1) // 2))
+        self.assertEqual(late_fee(200, 5), 8)   # 7.5 -> 8
+        self.assertEqual(late_fee(2, 4), 0)
 
-class NoDrift(unittest.TestCase):
-    def test_half_up(self):
-        # 10*4*0.0075 = 0.3 -> 0 ; 70*4*.0075=2.1 ->2 ; 50*5*.0075=1.875 ->2
-        self.assertEqual(late_fee(70, 4), 2)
-        self.assertEqual(late_fee(50, 5), 2)
-        # 200*5*.0075 = 7.5 -> 8
-        self.assertEqual(late_fee(200, 5), 8)
-        # 10 * 0.03 = 0.3 -> 0 ; 50*0.03=1.5 -> 2
-        self.assertEqual(late_fee(50, 4), 2)
-        self.assertEqual(late_fee(10, 4), 0)
-
-
-class Reject(unittest.TestCase):
-    def test_bad(self):
-        for a, d in [(-1, 5), (100, -1), (100, 366), (100.0, 5), (100, 5.0),
-                     ("100", 5), (100, "5"), (True, 5), (100, True), (None, 5), (100, None)]:
+    def test_reject(self):
+        for a, d in [(-1, 5), (1000, -1), (1000, 366), (1000.0, 5), ("1000", 5),
+                     (True, 5), (1000, 5.0), (1000, "5"), (1000, True), (None, 5),
+                     (1000, None), (float("nan"), 5)]:
             with self.assertRaises(ValueError):
                 late_fee(a, d)
 

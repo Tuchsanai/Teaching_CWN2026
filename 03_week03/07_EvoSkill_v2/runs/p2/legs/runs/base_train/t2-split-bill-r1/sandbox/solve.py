@@ -1,5 +1,6 @@
 def split_bill(total, people, tip_percent):
-    # ยอดรวม = บิล + ทิป (ปัดเศษสตางค์แบบ half-up ด้วยจำนวนเต็ม ไม่ใช้ float)
-    grand = (total * (100 + tip_percent) + 50) // 100
+    # ทิปเป็นสตางค์ ปัดเศษครึ่งขึ้น (จำนวนเต็มล้วน ไม่ใช้ float)
+    tip = (total * tip_percent + 50) // 100
+    grand = total + tip
     base, extra = divmod(grand, people)
     return [base + 1 if i < extra else base for i in range(people)]

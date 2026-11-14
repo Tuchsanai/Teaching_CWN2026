@@ -1,12 +1,12 @@
-"""คิดเงิน BaanKafe — template: คัดลอกเป็น solve.py แล้วแก้เฉพาะฟังก์ชันหลัก"""
+"""BaanKafe: คิดเงินคืนคอร์สสอนชงกาแฟ (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
-def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
+def round_down(x):
+    """ปัดลง — เงินคืนเป็นเงินที่ร้านจ่ายออก"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -24,15 +24,18 @@ def need_bool(value, name):
 
 
 def refund(paid, used_percent, restock):
+    # validate ก่อนทุกอย่าง
     need_int(paid, "paid", 0)
     need_int(used_percent, "used_percent", 0, 100)
     need_bool(restock, "restock")
+    # เรียนเกิน 80% ไม่คืนเงิน
     if used_percent > 80:
         return 0
-    amount = Fraction(paid * (100 - used_percent), 100)
+    amount = Fraction(paid) * Fraction(100 - used_percent, 100)
     if restock:
-        amount *= Fraction(875, 1000)  # หักค่าดำเนินการ 12.5%
-    return half_up(amount)
+        amount *= Fraction(875, 1000)  # หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
+    # นโยบาย: เงินที่ร้านจ่ายออก -> ปัดลงครั้งเดียวตอนท้าย
+    return round_down(amount)
 
 
 def main():
@@ -40,7 +43,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = refund(**args)  # เปลี่ยนเป็นชื่อฟังก์ชันจริง
+        result = refund(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

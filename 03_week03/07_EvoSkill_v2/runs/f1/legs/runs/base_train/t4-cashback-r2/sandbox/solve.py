@@ -1,11 +1,15 @@
-RATES_BP = {"silver": 150, "gold": 250, "platinum": 400}  # basis points (1% = 100)
-MIN_AMOUNT = 10_000   # 100 baht in satang
-CAP = 20_000          # 200 baht in satang
+# อัตราเงินคืนเป็นหน่วย 1/1000 (หลีกเลี่ยง float)
+_RATES = {"silver": 15, "gold": 25, "platinum": 40}
+_MIN_AMOUNT = 100 * 100   # 100 บาท = 10,000 สตางค์
+_CAP = 200 * 100          # 200 บาท = 20,000 สตางค์
 
 
 def cashback(amount, tier, birthday):
-    """Return cashback in whole satang (rounded down)."""
-    if amount < MIN_AMOUNT:
+    """คืนเงินคืนเป็นจำนวนเต็มสตางค์ (ปัดเศษลง)"""
+    if tier not in _RATES:
+        raise ValueError(f"unknown tier: {tier!r}")
+    if amount < _MIN_AMOUNT:
         return 0
-    bp = RATES_BP[tier] * (2 if birthday else 1)
-    return min(amount * bp // 10_000, CAP)
+    mult = 2 if birthday else 1
+    result = amount * _RATES[tier] * mult // 1000
+    return min(result, _CAP)

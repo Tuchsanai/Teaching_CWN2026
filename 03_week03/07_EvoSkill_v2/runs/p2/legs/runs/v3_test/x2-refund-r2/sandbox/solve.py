@@ -1,16 +1,18 @@
-# rounding policy r2 (ceiling at the end)
+from fractions import Fraction
 
 
 def refund(paid, used_percent, restock):
-    if type(paid) is not int or type(used_percent) is not int or type(restock) is not bool:
-        raise ValueError("invalid input type")
-    if paid < 0 or not 0 <= used_percent <= 100:
-        raise ValueError("input out of range")
+    # H2: any invalid input -> ValueError
+    if isinstance(paid, bool) or not isinstance(paid, int) or paid < 0:
+        raise ValueError("paid")
+    if isinstance(used_percent, bool) or not isinstance(used_percent, int) or not 0 <= used_percent <= 100:
+        raise ValueError("used_percent")
+    if not isinstance(restock, bool):
+        raise ValueError("restock")
     if used_percent > 80:
         return 0
-    num = paid * (100 - used_percent)
-    den = 100
+    amt = Fraction(paid * (100 - used_percent), 100)
     if restock:
-        num *= 7  # หักค่าดำเนินการ 12.5% => เหลือ 7/8
-        den *= 8
-    return -(-num // den)
+        amt *= Fraction(7, 8)  # หัก 12.5%
+    # ปัดครึ่งขึ้นครั้งเดียวตอนท้าย
+    return (2 * amt.numerator + amt.denominator) // (2 * amt.denominator)

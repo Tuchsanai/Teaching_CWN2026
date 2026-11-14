@@ -1,6 +1,12 @@
 def bulk_price(unit_price, qty, coupon):
-    """Return amount payable in whole satang (exact integer math, round half up at the end)."""
-    d = 75 if qty >= 50 else 35 if qty >= 10 else 0  # per-mille volume discount
-    num = unit_price * qty * (1000 - d) * (975 if coupon else 1000) * 107
+    """Return total payable in whole satang (integer), rounded half up once at the end."""
+    if qty >= 50:
+        d1 = 925      # 7.5% off (per 1000)
+    elif qty >= 10:
+        d1 = 965      # 3.5% off
+    else:
+        d1 = 1000
+    d2 = 975 if coupon else 1000   # extra 2.5% off
+    num = unit_price * qty * d1 * d2 * 107   # VAT 7%
     den = 1000 * 1000 * 100
-    return (2 * num + den) // (2 * den)
+    return (2 * num + den) // (2 * den)      # exact integer round-half-up

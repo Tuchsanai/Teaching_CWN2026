@@ -1,64 +1,64 @@
-"""คิดเงินคืนสมาชิกของร้านกาแฟ BaanKafe
-
-หน่วยทั้งหมดเป็นสตางค์ ผลลัพธ์เป็นจำนวนเต็มสตางค์
-"""
-
-import math
 from fractions import Fraction
+import math
 
-# อัตราเงินคืนของแต่ละระดับสมาชิก (ไม่ใช้ float)
+# หน่วยทั้งหมดเป็นสตางค์ (1 บาท = 100 สตางค์)
+MIN_PURCHASE = 100 * 100      # ยอดซื้อขั้นต่ำ 100 บาท (ต่ำกว่านี้ไม่ได้เงินคืน)
+MAX_CASHBACK = 200 * 100      # เงินคืนสูงสุดต่อบิล 200 บาท
+
+# อัตราเงินคืน (เปอร์เซ็นต์)
 RATES = {
-    "silver": Fraction(15, 1000),    # 1.5%
-    "gold": Fraction(25, 1000),      # 2.5%
-    "platinum": Fraction(40, 1000),  # 4%
+    "silver": 1.5,
+    "gold": 2.5,
+    "platinum": 4,
 }
-
-MIN_AMOUNT = 100 * 100        # ยอดซื้อขั้นต่ำ 100 บาท (สตางค์)
-MAX_CASHBACK = 200 * 100      # เงินคืนสูงสุดต่อบิล 200 บาท (สตางค์)
-BIRTHDAY_MULTIPLIER = 2       # เดือนเกิดได้เงินคืน 2 เท่า
-
-
-def _to_fraction(value):
-    """แปลงตัวเลขเป็น Fraction โดยไม่เกิดคลาดเคลื่อนจาก float"""
-    if isinstance(value, bool) or not isinstance(value, (int, float, Fraction)):
-        raise ValueError(f"amount ต้องเป็นตัวเลข ได้ {value!r}")
-    return Fraction(str(value)) if isinstance(value, float) else Fraction(value)
-
-
-def _round_half_up(value):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ใช้ครั้งเดียวตอนคืนค่า, ค่าไม่ติดลบ)"""
-    return math.floor(value + Fraction(1, 2))
 
 
 def cashback(amount, tier, birthday):
-    """คืนจำนวนเงินคืนสมาชิก (สตางค์, int)
+    """คำนวณเงินคืนสมาชิก BaanKafe เป็นจำนวนเต็มสตางค์
 
-    amount   : ยอดซื้อ หน่วยสตางค์ ตั้งแต่ 0
+    amount   : ยอดซื้อ หน่วยสตางค์ (จำนวนเต็ม >= 0)
     tier     : "silver" | "gold" | "platinum"
-    birthday : True ถ้าซื้อในเดือนเกิด
+    birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)
+
+    ลำดับการคิด:
+      1. ยอดต่ำกว่า 100 บาท -> 0
+      2. เงินคืนดิบ = ยอด × อัตรา% (เก็บเป็น Fraction ยังไม่ปัด)
+      3. เดือนเกิด -> คูณ 2
+      4. ปัดลงเป็นจำนวนเต็มสตางค์ (ปัดครั้งเดียวที่ขั้นสุดท้าย)
+      5. ตัดเพดานที่ 200 บาท (ตัดหลังคูณ 2 แล้ว)
     """
-    total = _to_fraction(amount)
-    if total < 0:
+    if not isinstance(amount, int) or isinstance(amount, bool):
+        raise TypeError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
+    if amount < 0:
         raise ValueError("amount ต้องไม่ติดลบ")
-
-    key = tier.lower() if isinstance(tier, str) else tier
+    key = tier.strip().lower() if isinstance(tier, str) else tier
     if key not in RATES:
-        raise ValueError(f"tier ไม่รู้จัก: {tier!r}")
+        raise ValueError(f"tier ไม่ถูกต้อง: {tier!r} (ต้องเป็น silver, gold หรือ platinum)")
 
-    # ยอดต่ำกว่า 100 บาท ไม่ได้เงินคืน
-    if total < MIN_AMOUNT:
+    if amount < MIN_PURCHASE:
         return 0
 
-    result = total * RATES[key]
+    raw = Fraction(amount) * Fraction(RATES[key]) / 100
     if birthday:
-        result *= BIRTHDAY_MULTIPLIER
-
-    # เพดานใช้กับผลสุดท้ายหลังคูณทุกตัว
-    result = min(result, Fraction(MAX_CASHBACK))
-    return _round_half_up(result)
+        raw *= 2
+    value = math.floor(raw)
+    return min(value, MAX_CASHBACK)
 
 
 if __name__ == "__main__":
-    print(cashback(100000, "silver", False))    # 1000 บาท silver -> 1500
-    print(cashback(100000, "silver", True))     # เดือนเกิด -> 3000
-    print(cashback(1000000, "platinum", False)) # 4% = 40000 -> เพดาน 20000
+    # ตัวอย่างและกรณีขอบ (หน่วยสตางค์)
+    checks = [
+        (9999, "platinum", False, 0),        # ต่ำกว่า 100 บาท
+        (10000, "silver", False, 150),       # พอดี 100 บาท: 1.5% = 1.50 บาท
+        (10000, "silver", True, 300),        # เดือนเกิด 2 เท่า
+        (100000, "gold", False, 2500),       # 1,000 บาท × 2.5%
+        (100000, "platinum", True, 8000),    # 1,000 บาท × 4% × 2
+        (500000, "platinum", False, 20000),  # 4% = 200 บาท พอดีเพดาน
+        (500000, "gold", True, 20000),       # 2.5% × 2 = 250 บาท -> ตัดเพดาน 200
+        (1000000, "silver", False, 15000),   # 1.5% = 150 บาท
+        (33333, "silver", False, 499),       # 333.33 บาท × 1.5% = 4.99995 บาท -> ปัดลง 499 สตางค์
+    ]
+    for amount, tier, bday, expected in checks:
+        got = cashback(amount, tier, bday)
+        assert got == expected, (amount, tier, bday, got, expected)
+    print("ตัวอย่างและกรณีขอบผ่านทั้งหมด")

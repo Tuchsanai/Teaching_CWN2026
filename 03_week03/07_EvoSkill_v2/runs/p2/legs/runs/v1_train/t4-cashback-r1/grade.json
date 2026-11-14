@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.4,
  "checks": [
   {
    "id": "contract",
@@ -8,11 +8,6 @@
   },
   {
    "id": "basic",
-   "pass": true,
-   "note": ""
-  },
-  {
-   "id": "half_up",
    "pass": true,
    "note": ""
   },
@@ -28,13 +23,13 @@
   },
   {
    "id": "reject_value",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "cashback(-1, \"gold\", false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "reject_type",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "cashback(20000.0, \"gold\", false) ต้อง raise ValueError แต่ raise AttributeError · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",
@@ -50,6 +45,11 @@
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "cashback(20000, \"silver\", true) คาด 300 ได้ 600 · พลาด 3 จาก 6 กรณี"
   }
  ]
 }

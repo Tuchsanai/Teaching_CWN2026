@@ -1,10 +1,11 @@
-"""split_bill: หารบิลพร้อมทิป (หน่วยสตางค์) · half-up ครั้งเดียวตอนท้าย"""
+"""BaanKafe split_bill: หารบิลรวมทิป (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -20,9 +21,10 @@ def split_bill(total, people, tip_percent):
     need_int(total, "total", 0)
     need_int(people, "people", 1)
     need_int(tip_percent, "tip_percent", 0, 100)
-    grand = half_up(Fraction(total) * (100 + tip_percent) / 100)
+    # ยอดรวมทิป: ปัดครึ่งขึ้นครั้งเดียว (เงินที่ลูกค้าจ่ายให้ร้าน)
+    grand = half_up(Fraction(total * (100 + tip_percent), 100))
     base, extra = divmod(grand, people)
-    return [base + 1] * extra + [base] * (people - extra)
+    return [base + 1 if i < extra else base for i in range(people)]
 
 
 def main():

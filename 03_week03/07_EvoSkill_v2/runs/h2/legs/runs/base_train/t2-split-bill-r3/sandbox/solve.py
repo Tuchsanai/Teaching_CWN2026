@@ -1,27 +1,33 @@
 """BaanKafe bill splitter.
 
-split_bill(total, people, tip_percent) -> list[int]
-
-- total: bill amount in satang (integer >= 0)
-- people: number of people (integer >= 1)
-- tip_percent: tip as a whole-number percentage (integer 0-100)
-
-The amount to split is total + tip, where tip = total * tip_percent / 100
-(rounded down to the nearest satang, so all values stay integers).
-The amount is split evenly; any remainder satang is given one each to the
-first people in order. Returns each person's payment in satang, in order.
+All money is handled as integer satang (1 baht = 100 satang) to avoid
+floating-point error.
 """
 
 
 def split_bill(total: int, people: int, tip_percent: int) -> list[int]:
-    if not isinstance(total, int) or isinstance(total, bool) or total < 0:
-        raise ValueError("total must be a non-negative integer (satang)")
-    if not isinstance(people, int) or isinstance(people, bool) or people < 1:
-        raise ValueError("people must be an integer >= 1")
-    if not isinstance(tip_percent, int) or isinstance(tip_percent, bool) or not 0 <= tip_percent <= 100:
-        raise ValueError("tip_percent must be an integer between 0 and 100")
+    """Split a bill (plus tip) evenly among `people`.
 
-    tip = total * tip_percent // 100
+    Args:
+        total: bill amount in satang (>= 0).
+        people: number of people sharing the bill (>= 1).
+        tip_percent: tip as an integer percentage (0-100).
+
+    Returns:
+        A list of length `people` with the amount in satang each person pays,
+        in person order. The first few people pay 1 satang more when the
+        amount does not divide evenly, so the list always sums to the total
+        plus tip.
+    """
+    if total < 0:
+        raise ValueError("total must be >= 0")
+    if people < 1:
+        raise ValueError("people must be >= 1")
+    if not 0 <= tip_percent <= 100:
+        raise ValueError("tip_percent must be between 0 and 100")
+
+    # Tip in satang, rounded half-up using integer arithmetic only.
+    tip = (total * tip_percent * 2 + 100) // 200
     amount = total + tip
 
     base, remainder = divmod(amount, people)
@@ -29,9 +35,6 @@ def split_bill(total: int, people: int, tip_percent: int) -> list[int]:
 
 
 if __name__ == "__main__":
-    assert split_bill(10000, 3, 0) == [3334, 3333, 3333]
-    assert split_bill(10000, 4, 10) == [2750, 2750, 2750, 2750]
-    assert split_bill(0, 2, 50) == [0, 0]
-    assert split_bill(999, 1, 0) == [999]
-    assert sum(split_bill(12345, 7, 15)) == 12345 + 12345 * 15 // 100
-    print("all checks passed")
+    print(split_bill(10000, 3, 10))  # 100 baht, 10% tip, 3 people
+    print(split_bill(0, 4, 0))       # [0, 0, 0, 0]
+    print(split_bill(1, 3, 0))       # [1, 0, 0]

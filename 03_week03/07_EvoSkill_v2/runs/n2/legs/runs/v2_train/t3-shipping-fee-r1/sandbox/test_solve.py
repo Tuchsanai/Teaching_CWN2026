@@ -1,34 +1,66 @@
 import unittest
-from solve import shipping_fee as f
+
+from solve import shipping_fee
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(f(500, 10, False), 4000)
-        self.assertEqual(f(3000, 10, False), 8000)
-        self.assertEqual(f(10000, 10, False), 15500)  # 80+5*15=155 บาท
-        self.assertEqual(f(1000, 101, True), 7200)   # 40*1.2*1.5=72
-        self.assertEqual(f(30000, 200, True), int(((8000 + 25*1500) * 1.8) + 0.5))
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
+        self.assertEqual(shipping_fee(500, 10, False), 4000)
 
-    def test_boundary(self):
-        self.assertEqual(f(1000, 100, False), 4000)
-        self.assertEqual(f(1001, 100, False), 8000)
-        self.assertEqual(f(5000, 100, False), 8000)
-        self.assertEqual(f(5001, 100, False), 8002)  # 1.5 สตางค์ -> ปัดขึ้น
-        self.assertEqual(f(1, 0, False), 4000)
+    def test_normal_2(self):
+        self.assertEqual(shipping_fee(3000, 150, False), 9600)  # 80*1.2
 
-    def test_half(self):
-        # 5001g: 8001.5 -> 8002 ; express: 12002.25 -> 12002
-        self.assertEqual(f(5001, 0, True), 12002)
-        # 5003g: 8004.5 *1.5 = 12006.75 -> 12007
-        self.assertEqual(f(5003, 0, True), 12007)
+    def test_normal_3(self):
+        self.assertEqual(shipping_fee(10000, 50, True), 23250)  # (80+75)*1.5
 
-    def test_reject(self):
-        for a in [(0, 1, False), (30001, 1, False), (1, -1, False), (1.0, 1, False),
-                  (1, 1.0, False), ("1", 1, False), (True, 1, False), (None, 1, False),
-                  (1, 1, 1), (1, 1, None), (1, True, False), (1, "1", False)]:
+
+class Boundary(unittest.TestCase):
+    def test_boundary_1(self):
+        self.assertEqual(shipping_fee(1000, 1, False), 4000)
+        self.assertEqual(shipping_fee(1001, 1, False), 8000)
+
+    def test_boundary_2(self):
+        self.assertEqual(shipping_fee(5000, 100, False), 8000)
+        self.assertEqual(shipping_fee(5001, 101, False), 9602)  # 8001.5*1.2=9601.8
+
+    def test_boundary_3(self):
+        self.assertEqual(shipping_fee(1, 0, False), 0)
+        self.assertEqual(shipping_fee(20000, 5, True), 45750)  # (80+225)*1.5=457.5 baht
+
+
+class NoDrift(unittest.TestCase):
+    def test_no_drift_1(self):
+        # 5001 g: 80.015 baht = 8001.5 -> 8002
+        self.assertEqual(shipping_fee(5001, 1, False), 8002)
+
+    def test_no_drift_2(self):
+        # 5001,101km,express: 8001.5*1.2*1.5 = 14402.7 -> 14403
+        self.assertEqual(shipping_fee(5001, 101, True), 14403)
+
+
+class Reject(unittest.TestCase):
+    def test_reject_1(self):
+        for args in [(0, 1, False), (30001, 1, False), (1, -1, False)]:
             with self.assertRaises(ValueError):
-                f(*a)
+                shipping_fee(*args)
+
+    def test_reject_2(self):
+        with self.assertRaises(ValueError):
+            shipping_fee(1000.0, 1, False)
+
+    def test_reject_3(self):
+        with self.assertRaises(ValueError):
+            shipping_fee("1000", 1, False)
+
+    def test_reject_4(self):
+        with self.assertRaises(ValueError):
+            shipping_fee(True, 1, False)
+        with self.assertRaises(ValueError):
+            shipping_fee(100, 1, 1)
+
+    def test_reject_express_over_20000(self):
+        with self.assertRaises(ValueError):
+            shipping_fee(20001, 0, True)
 
 
 if __name__ == "__main__":

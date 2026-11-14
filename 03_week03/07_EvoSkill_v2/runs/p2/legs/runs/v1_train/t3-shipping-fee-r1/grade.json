@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.2727,
  "checks": [
   {
    "id": "contract",
@@ -13,13 +13,13 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(5019, 50, false) คาด 8029 ได้ 8028 · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(5328, 150, true) คาด 15286 ได้ 15285 · พลาด 1 จาก 4 กรณี"
   },
   {
    "id": "boundary",
@@ -28,13 +28,13 @@
   },
   {
    "id": "reject_value",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 4 จาก 4 กรณี"
   },
   {
    "id": "reject_type",
    "pass": false,
-   "note": "shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 1 จาก 5 กรณี"
+   "note": "shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",
@@ -50,6 +50,11 @@
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี"
   }
  ]
 }

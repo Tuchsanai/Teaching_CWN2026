@@ -1,24 +1,70 @@
+"""รัน: python3 -m unittest -q test_solve (ค่าที่คาดคำนวณมือ)"""
 import unittest
+
 from solve import cafe_bill
 
-def I(p, q=1): return [{"price": p, "qty": q}]
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(cafe_bill(I(10000, 2), False), 21400)
+def one(price, qty=1):
+    return [{"price": price, "qty": qty}]
+
+
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
+        self.assertEqual(cafe_bill(one(10000), False), 10700)  # 10000*1.07
+
+    def test_normal_2(self):
+        self.assertEqual(cafe_bill(one(10000), True), 9630)  # 9000*1.07
+
+    def test_normal_3(self):
+        self.assertEqual(cafe_bill(one(20000, 3), True), 54891)  # 60000*.95*.9*1.07
+
+
+class Boundary(unittest.TestCase):
+    def test_boundary_1(self):
+        self.assertEqual(cafe_bill(one(50000), False), 50825)  # 47500*1.07 ลดที่ 500 พอดี
+
+    def test_boundary_2(self):
+        self.assertEqual(cafe_bill(one(49999), False), 53499)  # 53498.93 ไม่ลด
+
+    def test_boundary_3(self):
         self.assertEqual(cafe_bill([], False), 0)
-    def test_boundary(self):
-        self.assertEqual(cafe_bill(I(49999), False), 53499)   # 49999*1.07=53498.93
-        self.assertEqual(cafe_bill(I(50000), False), 50825)   # 50000*.95*1.07
-    def test_member(self):
-        self.assertEqual(cafe_bill(I(10000), True), 9630)
-        self.assertEqual(cafe_bill(I(50000), True), 45742.5 and 45743)
-    def test_half(self):
-        self.assertEqual(cafe_bill(I(50), False), 54)  # 53.5 -> 54
-    def test_reject(self):
-        for items, m in [(None, False), ([1], False), (I(1.0), False), (I(1, 0), False),
-                         (I(-1), False), (I("1"), False), (I(True), False),
-                         ([{"price": 1}], False), (I(1), None), (I(1), 1), (I(1, 1.0), False)]:
+
+
+class NoDrift(unittest.TestCase):
+    def test_no_drift_1(self):
+        self.assertEqual(cafe_bill(one(50), False), 54)  # 53.5 -> half-up
+
+    def test_no_drift_2(self):
+        self.assertEqual(cafe_bill(one(50001), False), 50826)  # 50826.0165
+
+    def test_no_drift_3(self):
+        self.assertEqual(cafe_bill(one(5), True), 5)  # 4.815
+
+
+class Reject(unittest.TestCase):
+    def test_reject_1(self):
+        for bad in (one(-1), one(100, 0), one(100, -2)):
             with self.assertRaises(ValueError):
-                cafe_bill(items, m)
-unittest.main() if __name__ == "__main__" else None
+                cafe_bill(bad, False)
+
+    def test_reject_2(self):
+        for bad in (one(100.0), one(100, 1.0)):
+            with self.assertRaises(ValueError):
+                cafe_bill(bad, False)
+
+    def test_reject_3(self):
+        for bad in (one("100"), one(100, "1"), "x", None, [1], [{"price": 1}]):
+            with self.assertRaises(ValueError):
+                cafe_bill(bad, False)
+
+    def test_reject_4(self):
+        for bad in (one(True), one(100, True)):
+            with self.assertRaises(ValueError):
+                cafe_bill(bad, False)
+        for m in (1, "yes", None):
+            with self.assertRaises(ValueError):
+                cafe_bill(one(100), m)
+
+
+if __name__ == "__main__":
+    unittest.main()

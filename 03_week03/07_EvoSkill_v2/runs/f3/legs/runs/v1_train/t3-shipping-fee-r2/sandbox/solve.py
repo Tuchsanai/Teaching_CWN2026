@@ -1,17 +1,21 @@
-"""BaanKafe — ค่าส่งเมล็ดกาแฟ (คืนค่าเป็นจำนวนเต็มสตางค์)"""
+"""แม่แบบ solve.py — แก้เฉพาะฟังก์ชันหลัก (ชื่อ/พารามิเตอร์ตามโจทย์)"""
 import json
-import math
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — ใช้กับยอดที่ลูกค้าจ่าย/ค่าบริการ"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
+def round_down(x):
+    """ปัดลง — ใช้กับเงินที่ร้านจ่ายออก เช่น cashback"""
+    return int(Fraction(x) // 1)
+
+
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool และ float ไม่ใช่ int
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -24,32 +28,37 @@ def need_bool(value, name):
     return value
 
 
-def need_distance(value, name):
-    if type(value) not in (int, float):
-        raise ValueError(f"{name} ต้องเป็นตัวเลข")
-    if type(value) is float and not math.isfinite(value):
-        raise ValueError(f"{name} ต้องเป็นตัวเลขจำกัด")
-    if value < 0:
-        raise ValueError(f"{name} ต้องไม่ติดลบ")
-    return Fraction(value)
+def need_choice(value, name, choices):
+    if type(value) is not str or value not in choices:
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+    return value
 
 
 def shipping_fee(weight_g, distance_km, express):
+    """ค่าส่งเมล็ดกาแฟ คืนเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)"""
+    # validate ทั้งหมดก่อนคำนวณ
     need_int(weight_g, "weight_g", 1, 30000)
-    distance = need_distance(distance_km, "distance_km")
+    need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    # นโยบายร้าน: ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม")
+    # นโยบายร้าน: ระยะ 0 = รับเองที่ร้าน ไม่คิดค่าส่ง
+    if distance_km == 0:
+        return 0
 
     if weight_g <= 1000:
-        amount = Fraction(4000)
+        fee = Fraction(4000)
     elif weight_g <= 5000:
-        amount = Fraction(8000)
+        fee = Fraction(8000)
     else:
-        amount = Fraction(8000) + Fraction(1500 * (weight_g - 5000), 1000)
-    if distance > 100:
-        amount *= Fraction(120, 100)
+        # 15 บาท/กก. = 1500 สตางค์/1000 กรัม ตามสัดส่วนกรัม
+        fee = Fraction(8000) + Fraction((weight_g - 5000) * 1500, 1000)
+    if distance_km > 100:
+        fee *= Fraction(120, 100)
     if express:
-        amount *= Fraction(150, 100)
-    return half_up(amount)
+        fee *= Fraction(150, 100)
+    return half_up(fee)
 
 
 def main():

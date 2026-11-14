@@ -1,44 +1,34 @@
-import math
 from fractions import Fraction
+import math
 
 
-class InputError(ValueError, TypeError):
-    """Invalid input: both ValueError and TypeError."""
-
-
-def _round_half_up(x):
-    x = Fraction(x)
-    return (2 * x.numerator + x.denominator) // (2 * x.denominator)
+def _num(v, name):
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        raise ValueError(f"{name} must be a number")
+    if isinstance(v, float) and not math.isfinite(v):
+        raise ValueError(f"{name} must be finite")
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """Shipping fee in integer satang.
-
-    Assumptions: rounding half-up once at the final amount; surcharges
-    multiply in order (distance +20% if > 100 km, then express +50%).
-    """
-    if isinstance(weight_g, bool) or not isinstance(weight_g, int):
-        raise InputError(f"weight_g must be an int, got {weight_g!r}")
-    if not 1 <= weight_g <= 30000:
-        raise InputError("weight_g must be in 1..30000")
-    if isinstance(distance_km, bool) or not isinstance(distance_km, (int, float)):
-        raise InputError(f"distance_km must be a number, got {distance_km!r}")
-    if isinstance(distance_km, float) and not math.isfinite(distance_km):
-        raise InputError("distance_km must be finite")
-    if distance_km < 0:
-        raise InputError("distance_km must be >= 0")
+    _num(weight_g, "weight_g")
+    _num(distance_km, "distance_km")
     if not isinstance(express, bool):
-        raise InputError(f"express must be a bool, got {express!r}")
+        raise ValueError("express must be bool")
+    if not (1 <= weight_g <= 30000):
+        raise ValueError("weight_g out of range 1-30000")
+    if distance_km < 0:
+        raise ValueError("distance_km must be >= 0")
 
-    if weight_g <= 1000:
+    w = Fraction(weight_g)
+    if w <= 1000:
         fee = Fraction(4000)
-    elif weight_g <= 5000:
+    elif w <= 5000:
         fee = Fraction(8000)
     else:
-        # 15 baht/kg = 1.5 satang/gram
-        fee = Fraction(8000) + Fraction(3, 2) * (weight_g - 5000)
+        fee = Fraction(8000) + (w - 5000) * Fraction(1500, 1000)  # satang
     if distance_km > 100:
-        fee *= Fraction(6, 5)
+        fee *= Fraction(120, 100)
     if express:
-        fee *= Fraction(3, 2)
-    return _round_half_up(fee)
+        fee *= Fraction(150, 100)
+    # floor once at the end -> integer satang
+    return fee.numerator // fee.denominator

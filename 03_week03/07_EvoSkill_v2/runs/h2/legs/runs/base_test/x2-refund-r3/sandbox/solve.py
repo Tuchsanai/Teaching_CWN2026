@@ -1,39 +1,30 @@
-"""คำนวณเงินคืนคอร์สสอนชงกาแฟของ BaanKafe.
+"""BaanKafe: คำนวณเงินคืนสำหรับคอร์สสอนชงกาแฟ
 
-หน่วยทั้งหมดเป็นสตางค์ และผลลัพธ์เป็นจำนวนเต็มสตางค์ (ปัดเศษลง)
+กติกา
+- paid         : เงินที่ลูกค้าจ่าย (สตางค์ จำนวนเต็ม >= 0)
+- used_percent : เปอร์เซ็นต์ที่เรียนไปแล้ว (จำนวนเต็ม 0–100)
+- restock      : True = หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
+- คืนตามสัดส่วนที่ยังไม่ได้เรียน
+- เรียนไปแล้วเกิน 80% ไม่คืนเงิน (80% พอดียังคืน)
+- ผลลัพธ์เป็นจำนวนเต็มสตางค์ ปัดเศษลง (ไม่จ่ายเกินให้ลูกค้า)
 """
 
 
 def refund(paid: int, used_percent: int, restock: bool) -> int:
-    """คืนยอดเงินที่ต้องคืนให้ลูกค้า.
-
-    paid         เงินที่ลูกค้าจ่าย (สตางค์, จำนวนเต็ม >= 0)
-    used_percent เปอร์เซ็นต์ที่เรียนไปแล้ว (จำนวนเต็ม 0-100)
-    restock      True = หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
-    """
     if not isinstance(paid, int) or isinstance(paid, bool) or paid < 0:
         raise ValueError("paid ต้องเป็นจำนวนเต็มสตางค์ที่ >= 0")
     if not isinstance(used_percent, int) or isinstance(used_percent, bool) \
             or not 0 <= used_percent <= 100:
-        raise ValueError("used_percent ต้องเป็นจำนวนเต็ม 0-100")
+        raise ValueError("used_percent ต้องเป็นจำนวนเต็มระหว่าง 0 ถึง 100")
 
-    # เรียนไปแล้วเกิน 80% ไม่คืนเงิน
     if used_percent > 80:
         return 0
 
-    remaining = 100 - used_percent  # เปอร์เซ็นต์ที่ยังไม่ได้เรียน
-
+    # ยอดคืนก่อนหักค่าดำเนินการ = paid * (100 - used_percent) / 100
+    # ค่าดำเนินการ 12.5% (= 1/8) ของยอดนั้น ดังนั้นยอดสุทธิ = ยอดคืน * 7/8
+    #   = paid * (100 - used_percent) * 7 / 800
+    # ใช้จำนวนเต็มทั้งหมดเพื่อหลีกเลี่ยงข้อผิดพลาดจากทศนิยม
+    remaining = paid * (100 - used_percent)
     if restock:
-        # ยอดคืน = paid * remaining/100 * (1 - 12.5%) = paid * remaining * 7 / 800
-        return paid * remaining * 7 // 800
-
-    # ยอดคืน = paid * remaining / 100
-    return paid * remaining // 100
-
-
-if __name__ == "__main__":
-    print(refund(100000, 0, False))   # 100000
-    print(refund(100000, 50, False))  # 50000
-    print(refund(100000, 50, True))   # 43750
-    print(refund(100000, 80, True))   # 17500
-    print(refund(100000, 81, False))  # 0
+        return remaining * 7 // 800
+    return remaining // 100

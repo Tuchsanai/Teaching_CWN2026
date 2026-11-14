@@ -1,15 +1,16 @@
-"""BaanKafe late fee (satang) · half-up once at the end · strict input validation"""
+"""late_fee ของ BaanKafe — ค่าปรับชำระช้า (สตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — เงินที่ลูกค้าต้องจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool, float, str ไม่ผ่าน
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -21,9 +22,10 @@ def late_fee(amount, days_late):
     need_int(days_late, "days_late", 0, 365)
     if days_late <= 3:
         return 0
-    fee = min(Fraction(amount) * Fraction(75, 10000) * days_late,
-              Fraction(amount) * Fraction(15, 100))
-    return half_up(fee)
+    amt = Fraction(amount)
+    fee = amt * Fraction(75, 10000) * days_late  # 0.75% ต่อวัน นับทุกวัน
+    fee = min(fee, amt * Fraction(15, 100))      # เพดาน 15%
+    return half_up(fee)                          # ลูกค้าจ่าย -> half-up ครั้งเดียวท้ายสุด
 
 
 def main():

@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.5,
  "checks": [
   {
    "id": "contract",
@@ -13,8 +13,8 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "refund(150, 25, false) คาด 113 ได้ 112 · พลาด 2 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
@@ -34,7 +34,7 @@
   {
    "id": "reject_type",
    "pass": false,
-   "note": "refund(100000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 90000 · พลาด 4 จาก 5 กรณี"
+   "note": "refund(100000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 90000 · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",

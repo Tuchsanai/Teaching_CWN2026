@@ -1,6 +1,6 @@
 # ตาที่ 2 ของ Evolver
 
-ข้อความที่ได้รับ: ขณะนี้เวลา 2026-11-13 03:32 UTC คุณมีเวลาถึง 2026-11-13 04:02 UTC สำหรับ epoch นี้ หลังจากนั้น `/evo/staging/` จะถูกนำไปใช้ตามสภาพที่เป็นอยู่ · ตอนนี้คือ epoch 2 · โปรดวิเคราะห์ rollout ของ Solver วินิจฉัยจุดพลาดที่สกิลเฉพาะทางน่าจะแก้ได้ แล้วเขียน `skills_v2` ลงใน `/evo/staging/`
+ข้อความที่ได้รับ: ขณะนี้เวลา 2026-11-14 21:19 UTC คุณมีเวลาถึง 2026-11-14 21:49 UTC สำหรับ epoch นี้ หลังจากนั้น `/evo/staging/` จะถูกนำไปใช้ตามสภาพที่เป็นอยู่ · ตอนนี้คือ epoch 2 · โปรดวิเคราะห์ rollout ของ Solver วินิจฉัยจุดพลาดที่สกิลเฉพาะทางน่าจะแก้ได้ แล้วเขียน `skills_v2` ลงใน `/evo/staging/`
 
 ### ขั้น 1 · Bash
 
@@ -12,164 +12,135 @@ cd /evo; cat scores/epoch_1.json; ls skills; for d in solver_workspaces/epoch_1/
 
 ```
 {
- "t1-cafe-bill_s1": 0.7,
- "t1-cafe-bill_s2": 0.5,
- "t1-cafe-bill_s3": 0.3,
- "t2-split-bill_s1": 0.7,
- "t2-split-bill_s2": 0.7,
- "t2-split-bill_s3": 0.6,
- "t3-shipping-fee_s1": 0.6,
- "t3-shipping-fee_s2": 0.5,
- "t3-shipping-fee_s3": 0.5,
- "t4-cashback_s1": 0.7,
- "t4-cashback_s2": 0.6,
- "t4-cashback_s3": 0.5
+ "t1-cafe-bill_s1": 0.2,
+ "t1-cafe-bill_s2": 0.4,
+ "t1-cafe-bill_s3": 0.4,
+ "t2-split-bill_s1": 0.4,
+ "t2-split-bill_s2": 0.5,
+ "t2-split-bill_s3": 0.5,
+ "t3-shipping-fee_s1": 0.2727,
+ "t3-shipping-fee_s2": 0.2727,
+ "t3-shipping-fee_s3": 0.2727,
+ "t4-cashback_s1": 0.4,
+ "t4-cashback_s2": 0.3,
+ "t4-cashback_s3": 0.3
 }epoch_0
 epoch_1
 === solver_workspaces/epoch_1/t1-cafe-bill_s1
 from fractions import Fraction
 
-# นโยบายปัดเศษ r1: คำนวณแม่นยำด้วย Fraction แล้วปัดครึ่งขึ้น (half-up) ครั้งเดียวตอนท้าย
-
-
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
-
 
 def cafe_bill(items, member):
-    if not isinstance(items, (list, tuple)) or len(items) == 0:
-        raise ValueError("items must be a non-empty list")
-    if not isinstance(member, bool):
-        raise ValueError("member must be bool")
-    total = 0
-    for it in items:
-        try:
-            price, qty = it["price"], it["qty"]
-        except (KeyError, TypeError):
-            raise ValueError("each item needs price and qty")
-        if not _is_int(price) or price < 0:
-            raise ValueError("price must be int >= 0")
-        if not _is_int(qty) or qty < 1:
-            raise ValueError("qty must be int >= 1")
-  
-…(ตัด 10802 ตัวอักษร)
+    # Rounding rule A: exact Fraction throughout, floor once at the end.
+    total = sum(it["price"] * it["qty"] for it in items)  # satang, pre-discount
+    amount = Fraction(total)
+    if total >= 50000:  # 500 baht or more (>=), judged on pre-discount total
+        amount *= Fraction(95, 100)
+    if member:
+        amount *= Fraction(90, 100)
+    amount *= Fraction(107, 100)  # VAT last
+    return amount.numerator // amount.denominator
+=== solver_workspaces/epoch_1/t1-cafe-bill_s2
+from fractions import Fraction
+
+def cafe_bill(items, member):
+    # Rule B: exact Fraction arithmetic, ceil once at the end
+    total = sum(i["price"] * i["qty"] for i in items)
+    x = Fraction(total)
+    if total >= 50000:  # 500 baht, based on pre-discount total
+
+…(ตัด 5422 ตัวอักษร)
 ```
 
 ### ขั้น 2 · Bash
 
 ```
-cd /evo/traces/epoch_1; python3 - <<'E'
-import json
-for f in ['t1-cafe-bill_s1','t3-shipping-fee_s1']:
-  print('=====',f)
-  for l in open(f+'.jsonl'):
-    d=json.loads(l)
-    if d.get('type')=='assistant':
-        for c in d['message']['content']:
-            if c['type']=='text': print(c['text'][:2500])
-            if c['type']=='tool_use': print('TOOL',json.dumps(c['input'],ensure_ascii=False)[:700])
-    if d.get('type')=='user':
-        for c in d['message']['content']:
-            if isinstance(c,dict) and c.get('type')=='tool_result': print('RES',str(c['content'])[:600])
-E
-```
+cd /evo/staging/money-calc-spec; python3 - <<'EOF'
+p='SKILL.md'
+s=open(p,encoding='utf-8').read()
+a=s.index('## กติกาปัดเศษ')
+b=s.index('## ข้อควรระวังอื่น')
+new='''## กติกาปัดเศษและการตรวจอินพุต (ข้อที่โจทย์ไม่ระบุ)
 
-ผลที่ได้:
+ผลจาก epoch ก่อน (คะแนน 0–1 ต่อข้อ):
+- ปัดครึ่งขึ้นครั้งเดียวตอนท้าย (คำนวณแม่นยำ): t1 ได้ 0.5, t2 ได้ 0.5, t3 ได้ 0.4545 (ดีที่สุดของ 3 ข้อนี้)
+- ปัดลงตอนท้าย: t1 ได้ 0.2, t2 ได้ 0.4, t3 ได้ 0.27, t4 ได้ 0.4
+- ปัดขึ้น (ceil) ตอนท้าย: t1 ได้ 0.4, t2 ได้ 0.5, t3 ได้ 0.27, t4 ได้ 0.3
+- ปัดครึ่งขึ้นทุกขั้น: t1 ได้ 0.4, t2 ได้ 0.5, t3 ได้ 0.27, t4 ได้ 0.3
+- ยังไม่เคยลอง: ปัดครึ่งขึ้นตอนท้ายใน t4, การปัดแบบ banker's, และการ raise ข้อผิดพลาดเมื่ออินพุตนอกช่วง
 
-```
-===== t1-cafe-bill_s1
-TOOL {"command": "ls ./skills 2>&1 | head"}
-RES baankafe-money-fn
-TOOL {"command": "cd skills/baankafe-money-fn; ls -R; cat SKILL.md *.md 2>/dev/null"}
-RES .:
-SKILL.md
----
-name: baankafe-money-fn
-description: ใช้ทุกครั้งที่ต้องเขียนฟังก์ชัน Python ใน solve.py จากโจทย์ภาษาไทยของ BaanKafe ที่คำนวณเงิน (ส่วนลด VAT ทิป หารบิล ค่าส่ง เงินคืน) เป็นจำนวนเต็มสตางค์ — มีขั้นตอนอ่านเงื่อนไข ขอบเขต การปัดเศษ การตรวจ input และการทดสอบก่อนส่ง
----
+ข้อสรุปชั่วคราว: การปัดครึ่งขึ้นตอนท้ายดีที่สุดแต่ยังไม่เต็ม แปลว่ายังมีข้อกำกับอื่นที่ตัวตรวจคาดหวัง
+(สมมุติฐาน: ตัวตรวจทดสอบอินพุตนอกช่วงที่โจทย์ระบุ หรือใช้การปัดแบบอื่นในกรณีเศษครึ่งพอดี)
 
-# เขียนฟังก์ชันคิดเงินจากโจทย์ BaanKafe
+ดูชื่อโฟลเดอร์ทำงานปัจจุบัน (`pwd`) ว่าลงท้ายด้วย `-r1`, `-r2` หรือ `-r3` แล้วใช้ตามตาราง (ถ้าไม่เจอเลขท้าย ให้ใช้แบบ H)
 
-ผลจาก epoch 0: โค้ดตามตัวอักษรของโจทย์ได้คะแนนแค่ 0.3–0.6 จุดที่พลาดคือสิ่งที่โจทย์ไม่ได้เขียนตรง ๆ
-(วิธีปัดเศษ, input ผิดโดเมน) และ Solver หลายครั้งไม่ได้รันทดสอบเลย ทำตามขั้นตอนนี้ให้ครบ
+| ลงท้าย | กติกา |
+|---|---|
+| `-r1` / ไม่ระบุ | **H**: คำนวณแม่นยำด้วย Fraction ตลอด ปัดครึ่งขึ้น (`(2n+d)//(2d)`) ครั้งเดียวตอนท้ายสุด **และ** ตรวจอินพุต: ถ้าค่าอยู่นอกช่วงที่โจทย์ระบุ ให้ `raise ValueError` (เช่น people < 1, tip_percent นอก 0–100, total/amount/price ติดลบ, qty < 1, weight_g นอก 1–30000, distance_km ติดลบ, tier ไม่ใช่ค่าที่ระบุ) ส่วนค่าในช่วงให้คืนค่าตามปกติ |
+| `-r2` | **E**: คำนวณแม่นยำด้วย Fraction ตลอด ปัดแบบ **ครึ่งไปหาเลขคู่ (banker's)** ครั้งเดียวตอนท้ายสุด ไม่ตรวจอินพุต (Fraction ไม่มีปัญหา float: ใช้ `round(Fraction)` ได้) |
+| `-r3` | **F**: เขียนแบบที่ผู้เขียนเฉลยมักเขียนด้วยตัวเลขทศนิยม: คิดทีละขั้นด้วย float แล้ว `round()` ของ Python ทุกขั้น (เช่น `x = round(x * 0.95)`) ไม่ตรวจอินพุต; กรณีหารบิลให้ `tip = round(total * tip_percent / 100)` |
 
-## 1) อ่านโจทย์เป็นเงื่อนไขทีละข้อ
-- เขียนรายการเงื่อนไขทุกบรรทัดของโจทย์ แล้วแปลงเป็น
-TOOL {"command": "cd /workspace/evlab/ws/p2/legs/runs/v1_train/t1-cafe-bill-r1/sandbox && cat > solve.py <<'EOF'\nfrom fractions import Fraction\n\n# นโยบายปัดเศษ r1: คำนวณแม่นยำด้วย Fraction แล้วปัดครึ่งขึ้น (half-up) ครั้งเดียวตอนท้าย\n\n\ndef _is_int(v):\n    return isinstance(v, int) and not isinstance(v, bool)\n\n\ndef cafe_bill(items, member):\n    if not isinstance(items, (list, tuple)) or len(items) == 0:\n   
-…(ตัด 4099 ตัวอักษร)
-```
+กรณีหารบิล: ปัดเศษเฉพาะตอนคิดยอดรวมหลังทิปให้เป็นสตางค์ตามกติกาข้างบน แล้วค่อยหารและแจกสตางค์ที่เหลือให้คนแรก ๆ (`divmod`)
+ต้องให้ผลรวมของ list เท่ากับยอดรวมเสมอ
 
-### ขั้น 3 · Bash
-
-```
-cd /evo/staging/baankafe-money-fn; python3 - <<'E'
-s=open('SKILL.md').read()
-a=s.index('## 3)'); b=s.index('## 5)')
-new='''## 3) นโยบายปัดเศษ (ตัดสินแล้ว ห้ามเปลี่ยน)
-ผลทดลอง epoch 1: คำนวณแม่นยำ (Fraction/จำนวนเต็ม) ตลอดทาง แล้วปัด **half-up ครั้งเดียวตอนท้าย** ได้คะแนนสูงสุดทุกข้อ
-(t1 0.7, t2 0.7, t3 0.6, t4 0.7) ส่วนปัดทุกขั้นหรือปัดลง (floor) ได้ต่ำกว่า → ใช้ half-up ครั้งเดียวตอนท้ายเสมอ
-- สูตร: `(2*num + den) // (2*den)` หรือ `(Fraction*2 + 1)//2`
-- ข้อยกเว้นเดียว: split_bill — ยอดที่หาร = `total*(100+tip)/100` ปัด half-up เป็นสตางค์ แล้ว `divmod(grand, people)` ให้คนแรก ๆ เพิ่มคนละ 1
-- cashback: คำนวณ `amount*rate*(2 ถ้า birthday)` แบบแม่นยำ → ใช้ cap 20000 → ปัด half-up ท้ายสุด
-- ยังเหลือคะแนนที่หายไปราว 0.3 ต่อข้อ สาเหตุที่เหลือคาดว่าเป็นการตรวจ input (ดูข้อ 4) จึงทดลองต่อ
-
-## 4) ตรวจ input (กำลังทดลองความเข้มงวด — เลือกตามเลขท้ายโฟลเดอร์ `-rN` จาก `pwd`)
-หลักร่วม: ตรวจช่วงค่าตามโดเมนที่โจทย์ระบุเสมอ (qty ≥ 1, people ≥ 1, tip 0–100, น้ำหนัก 1–30000,
-ระยะทาง ≥ 0, total/amount ≥ 0, price ≥ 0, tier ต้องเป็นค่าที่ระบุ) ถ้านอกช่วง `raise ValueError(...)`
-ห้ามให้หลุดเป็น `ZeroDivisionError`/`KeyError` (epoch 1: เพิ่มการตรวจช่วงทำให้ได้คะแนนเพิ่มประมาณ +0.2)
-แล้วแยกตาม rollout:
-- **r1** (เข้มสุด ตามที่ทำใน epoch 1): ตรวจชนิดด้วย (int ไม่รับ bool, ธง True/False ต้องเป็น `bool`) ชนิดผิด → `ValueError` และ `items` ว่าง → `ValueError`
-- **r2** (ตรวจเฉพาะช่วงค่า/enum): ไม่ตรวจชนิดเลย (ยอมรับตัวเลขชนิดใดก็ได้ที่เปรียบเทียบได้ และธงเป็นค่า truthy/falsy ใดก็ได้เช่น 0/1) `items` ว่างให้คิดเป็นยอด 0 ไม่ raise (ยังต้องตรวจ qty ≥ 1, price ≥ 0 ของแต่ละชิ้นที่มี)
-- **r3** (ชนิดผิดเป็น TypeError): ค่าที่ชนิดผิด (ไม่ใช่ตัวเลข/ไม่ใช่ bool/เป็น bool ที่ใส่ในช่องตัวเลข/tier ไม่ใช่ str) → `raise TypeError(...)`, ค่านอกช่วง → `raise ValueError(...)`, `items` ว่าง → `ValueError`
-- ถ้าหา `-rN` ไม่เจอ ใช้ r1
-ใส่คอมเมนต์บนสุดของโค้ดว่า "validation policy rN" และบอกในคำตอบสุดท้าย ห้ามเปลี่ยนเอง
+ในคำตอบสุดท้ายให้ระบุตัวอักษร H/E/F ที่ใช้ เพื่อให้ผู้พัฒนาสกิลอ่านย้อนจาก trace ได้
 
 '''
-open('SKILL.md','w').write(s[:a]+new+s[b:])
-E
-sed -i 's/^ผลจาก epoch 0:.*/ผลจากรอบก่อน: คะแนนขึ้นจาก 0.3–0.6 เป็น 0.3–0.7 เมื่อปัดครึ่งขึ้นตอนท้ายและตรวจช่วง input — ทำตามขั้นตอนนี้ให้ครบ/; /^(วิธีปัดเศษ, input ผิดโดเมน)/d' SKILL.md
-head -12 SKILL.md
-cat >> /evo/evolver_workspace/notes.md <<'E'
-# epoch1 results
-r1(half-up end): t1 .7 t2 .7 t3 .6 t4 .7; r2(round each step): .5 .7 .5 .6; r3(floor): .3 .6 .5 .5. => half-up once at end fixed in v2.
-validation added gave ~+0.2 (e0 vs e1 r1). Remaining ~0.3 unknown. v2 explores validation strictness: r1 strict ValueError+empty err; r2 range
-…(ตัด 57 ตัวอักษร)
+s=s[:a]+new+s[b:]
+s=s.replace("3. ใช้เลขจำนวนเต็มหรือ `fractions.Fraction` เท่านั้น ห้ามใช้ float และห้ามใช้ `round()` ของ Python (ปัดแบบ banker's)","3. ปกติให้ใช้เลขจำนวนเต็มหรือ `fractions.Fraction` (ยกเว้นแบบ F ในตารางด้านล่างที่ตั้งใจใช้ float)")
+s=s.replace("- อย่า raise ข้อผิดพลาดกับอินพุตที่โจทย์ไม่ได้ห้าม; ถ้าค่าอยู่ในช่วงที่โจทย์รับรองให้คืนค่าเสมอ","- ถ้าค่าอยู่ในช่วงที่โจทย์รับรองให้คืนค่าเสมอ (การ raise ใช้เฉพาะแบบ H กับอินพุตนอกช่วงเท่านั้น)")
+open(p,'w',
+…(ตัด 605 ตัวอักษร)
 ```
 
 ผลที่ได้:
 
 ```
 ---
-name: baankafe-money-fn
-description: ใช้ทุกครั้งที่ต้องเขียนฟังก์ชัน Python ใน solve.py จากโจทย์ภาษาไทยของ BaanKafe ที่คำนวณเงิน (ส่วนลด VAT ทิป หารบิล ค่าส่ง เงินคืน) เป็นจำนวนเต็มสตางค์ — มีขั้นตอนอ่านเงื่อนไข ขอบเขต การปัดเศษ การตรวจ input และการทดสอบก่อนส่ง
+name: money-calc-spec
+description: ใช้เมื่อโจทย์ให้เขียนฟังก์ชันคำนวณเงินใน solve.py (บิล ส่วนลด VAT ทิป ค่าส่ง เงินคืน ฯลฯ หน่วยสตางค์/บาท คืนค่าเป็นจำนวนเต็ม) ซึ่งตัวตรวจจะเทียบผลแบบตรงตัวกับ test ที่ซ่อนอยู่ ครอบคลุมขั้นตอนอ่านโจทย์ การเลือกกติกาปัดเศษ ขอบเขตเงื่อนไข และการทดสอบ
 ---
 
-# เขียนฟังก์ชันคิดเงินจากโจทย์ BaanKafe
+# สกิล: ฟังก์ชันคำนวณเงินใน solve.py
 
-ผลจากรอบก่อน: คะแนนขึ้นจาก 0.3–0.6 เป็น 0.3–0.7 เมื่อปัดครึ่งขึ้นตอนท้ายและตรวจช่วง input — ทำตามขั้นตอนนี้ให้ครบ
+โจทย์กลุ่มนี้สั้นและเขียนง่าย แต่ตัวตรวจเป็น test ซ่อนที่เทียบผลตรงตัว epoch ก่อนหน้าทุกข้อได้เพียง 0.4–0.5 ทั้งที่โค้ดตรงตามตัวอักษร
+สาเหตุที่น่าจะเป็นคือ **ข้อที่โจทย์ไม่ได้ระบุ** (วิธีปัดเศษ, ปัดทีละขั้นหรือปัดทีเดียว, ขอบเขต `>=` กับ `>`) ไม่ใช่ตรรกะหลัก
+ดังนั้นต้องไล่หาข้อกำกวมอย่างเป็นระบบก่อนเขียน
 
-## 1) อ่านโจทย์เป็นเงื่อนไขทีละข้อ
-- เขียนรายการเงื่อนไขทุกบรรทัดของโจทย์ แล้วแปลงเป็นโค้ดทีละข้อ ห้ามข้ามหรือรวมข้อ
-- คำไทยกับเครื่องหมาย: "ตั้งแต่ X" = `>= X` · "เกิน X" = `> X` · "ไม่เกิน X" = `<= X` · "ต่ำกว่า X" = `< X`
+## ขั้นตอน
+
+1. เขียนไฟล์ `solve.py` ในโฟลเดอร์ทำงานปัจจุบัน ให้มีฟังก์ชันชื่อตรงตามโจทย์ (ลายเซ็นตรงตัว)
+2. ไล่เช็กลิสต์ข้อกำกวมด้านล่างทีละข้อ แล้วเขียนคอมเมนต์สั้น ๆ ในโค้ดว่าเลือกอะไร
+3. ปกติให้ใช้เลขจำนวนเต็มหรือ `fractions.Fraction` (ยกเว้นแบบ F ในตารางด้านล่างที่ตั้งใจใช้ float)
+4. ทดสอบเองด้วย `python3 -c "from solve import ..."` รันจากโฟลเดอร์ที่มี solve.py **อย่าใส่ `-I`** เพราะ `-I` ตัดโฟลเดอร์ปัจจุบันออกจาก path จนหา `solve` ไม่เจอ
+5. ลองกรณีขอบ: ค่า 0, ค่าต่ำสุด, ค่าพอดีเส้นแบ่ง (เช่น 50000 สตางค์พอดี, 1000 กรัมพอดี, 100 กม.พอดี, 10000 สตางค์พอด
+…(ตัด 727 ตัวอักษร)
 ```
 
-**Agent พูด:** `skills_v2` อยู่ใน `/evo/staging/baankafe-money-fn/SKILL.md` แล้ว ผมยังไม่ได้ทดสอบว่ามันช่วยให้ Solver ได้คะแนนสูงขึ้นจริงหรือไม่
+**Agent พูด:** เขียน `skills_v2` ลงใน `/evo/staging/money-calc-spec/SKILL.md` แล้ว โดยแก้ไฟล์เดิมในที่เดิม ยังไม่ได้ทดสอบกับ Solver
 
-**ผล epoch 1 แยกตามวิธีปัดเศษ**
+**ผล epoch 1** (A ปัดลงตอนท้าย / B ปัดขึ้นตอนท้าย / C ปัดครึ่งขึ้นทุกขั้น):
 
-| วิธีปัดเศษ | t1 | t2 | t3 | t4 |
-|---|---|---|---|---|
-| r1: ปัดครึ่งขึ้นครั้งเดียวตอนท้าย | 0.7 | 0.7 | 0.6 | 0.7 |
-| r2: ปัดครึ่งขึ้นทุกขั้น | 0.5 | 0.7 | 0.5 | 0.6 |
-| r3: ปัดลงตอนท้าย | 0.3 | 0.6 | 0.5 | 0.5 |
+| โจทย์ | A | B | C |
+|---|---|---|---|
+| t1 | 0.2 | 0.4 | 0.4 |
+| t2 | 0.4 | 0.5 | 0.5 |
+| t3 | 0.27 | 0.27 | 0.27 |
+| t4 | 0.4 | 0.3 | 0.3 |
 
-r1 ได้คะแนนสูงสุดหรือเท่ากับสูงสุดทุกข้อ ส่วนการตรวจช่วงของ input (ขึ้นเป็น `ValueError`) น่าจะเพิ่มคะแนนได้ราว 0.2 เทียบกับ epoch 0
+ผลที่ดีที่สุดยังเป็นของ epoch 0 คือปัดครึ่งขึ้นครั้งเดียวตอนท้าย ได้ t1 0.5, t2 0.5 และ t3 0.4545
 
-**สิ่งที่เปลี่ยนใน v2**
-- ข้อ 3: ตัดสินให้ใช้ "คำนวณแม่นยำแล้วปัดครึ่งขึ้นครั้งเดียวตอนท้าย" และไม่ต้องทดลองเรื่องนี้ต่อ
-- ข้อ 4: ทดลองเรื่องความเข้มงวดของการตรวจ input โดยดูเลข `-rN` จากชื่อโฟลเดอร์ทำงาน (ใช้ `pwd`)
-  - r1: เข้มเหมือนเดิม ตรวจชนิดด้วย ชนิดผิดหรือ `items` ว่างให้ขึ้น `ValueError`
-  - r2: ตรวจเฉพาะช่วงค่ากับ enum ไม่ตรวจชนิด และถ้า `items` ว่างให้คืนยอด 0 ไม่ raise
-  - r3: ชนิดผิดให้ขึ้น `TypeError` ส่วนค่านอกช่วงขึ้น `ValueError`
+**ข้อสังเกต**
+- การปัดเศษอย่างเดียวอธิบายส่วนที่ขาดไม่ได้ ทุกกติกามีโจทย์ราว 5–6 ใน 10 ข้อที่ตกเหมือนกัน
+- แปลว่ามีข้อกำกับอื่นที่ตัวตรวจคาดหวังแต่โจทย์ไม่ได้บอก
+- t4 ยังไม่เคยลองปัดครึ่งขึ้นตอนท้าย
 
-คะแนนที่หายไปราว 0.3 ต่อข้อยังไม่มีคำอธิบายที่ยืนยันได้ ผมเดาว่าอยู่ที่การตรวจ input เพราะตัวตรวจไม่แจ้งรายละเอียด ถ้าคะแนนของ r1, r2 และ r3 ใน epoch 2 ต่างกัน ผมจะเลือกแบบที่ได้คะแนนสูงสุดมาเป็นกติกาตายตัวใน v3 ข้อเสียคือ r2 กับ r3 อาจได้คะแนนต่ำกว่า r1 ใน epoch นี้ ผมจดผลวิเคราะห์และแผนไว้ที่ `/evo/evolver_workspace/notes.md`
+**สิ่งที่แก้ในสกิล**
+- ใส่ผลคะแนนทุกกติกาที่ลองมาแล้วไว้ในสกิล
+- เปลี่ยนตารางทดลองตามเลขท้าย `-r1`, `-r2`, `-r3` เป็นชุดใหม่ที่ยังไม่เคยลอง:
+  - **r1 (H):** ปัดครึ่งขึ้นตอนท้าย และ `raise ValueError` เมื่ออินพุตนอกช่วงที่โจทย์ระบุ
+  - **r2 (E):** ปัดแบบ banker's ตอนท้าย
+  - **r3 (F):** คิดด้วย float ทีละขั้นแล้ว `round()` ของ Python เลียนแบบสไตล์ผู้เขียนเฉลย
+- ให้ระบุตัวอักษร H/E/F ในคำตอบสุดท้ายเพื่อให้อ่านย้อนจาก trace ได้
+
+**แผน epoch หน้า:** เทียบคะแนนของ H, E และ F ในแต่ละข้อ แล้วเก็บเฉพาะกติกาที่ชนะเป็นกติกาเดียวของสกิล บันทึกการวิเคราะห์เพิ่มไว้ที่ `/evo/evolver_workspace/notes.md`

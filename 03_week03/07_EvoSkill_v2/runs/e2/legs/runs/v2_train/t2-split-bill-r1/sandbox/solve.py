@@ -1,11 +1,10 @@
-"""BaanKafe: หารบิล (สตางค์, half-up, ตรวจ input เข้ม)"""
+"""BaanKafe: split_bill"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 

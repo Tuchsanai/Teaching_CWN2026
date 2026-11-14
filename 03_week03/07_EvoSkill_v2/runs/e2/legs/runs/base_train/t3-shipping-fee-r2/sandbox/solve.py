@@ -3,16 +3,17 @@ import math
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """Return shipping fee in integer satang."""
-    if weight_g <= 1000:
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้น ครั้งเดียวตอนท้าย)"""
+    w = Fraction(weight_g)
+    if w <= 1000:
         fee = Fraction(4000)
-    elif weight_g <= 5000:
+    elif w <= 5000:
         fee = Fraction(8000)
     else:
-        # 15 baht/kg = 1500 satang/kg, proportional by gram
-        fee = Fraction(8000) + Fraction(weight_g - 5000) * 1500 / 1000
+        # 15 บาท/กก. = 1500 สตางค์/1000 กรัม ตามสัดส่วน
+        fee = Fraction(8000) + (w - 5000) * Fraction(1500, 1000)
     if distance_km > 100:
-        fee *= Fraction(12, 10)
+        fee *= Fraction(120, 100)
     if express:
-        fee *= Fraction(3, 2)
-    return math.floor(fee + Fraction(1, 2))  # round half up
+        fee *= Fraction(150, 100)
+    return math.floor(fee + Fraction(1, 2))

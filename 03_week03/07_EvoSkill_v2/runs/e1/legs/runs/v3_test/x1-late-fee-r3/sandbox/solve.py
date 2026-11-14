@@ -1,28 +1,30 @@
+"""BaanKafe: ค่าปรับชำระเงินช้าของลูกค้าขายส่ง (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
-def _need_int(v, name, low=None, high=None):
-    if type(v) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
-
-
-def _half_up(x):
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
+def need_int(value, name, low=None, high=None):
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
 def late_fee(amount, days_late):
-    _need_int(amount, "amount", low=0)
-    _need_int(days_late, "days_late", low=0, high=365)
+    need_int(amount, "amount", low=0)
+    need_int(days_late, "days_late", low=0, high=365)
     if days_late <= 3:
         return 0
     fee = Fraction(amount) * Fraction(75, 10000) * days_late
     fee = min(fee, Fraction(amount) * Fraction(15, 100))
-    return _half_up(fee)
+    return half_up(fee)
 
 
 def main():

@@ -1,38 +1,38 @@
-import json, sys
+import json
+import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ — ยอดที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(v, name, low=None, high=None):
-    if type(v) is not int:
+def need_int(value, name, low=None):
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
+    if low is not None and value < low:
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
 
 
 def cafe_bill(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     if type(member) is not bool:
-        raise ValueError("member ต้องเป็น True/False")
+        raise ValueError("member ต้องเป็น True หรือ False")
     total = 0
     for it in items:
-        if type(it) is not dict:
-            raise ValueError("item ต้องเป็น dict")
-        price = need_int(it.get("price"), "price", 0)
-        qty = need_int(it.get("qty"), "qty", 1)
-        total += price * qty
-    amt = Fraction(total)
-    if total >= 50000:
-        amt *= Fraction(95, 100)
+        if type(it) is not dict or "price" not in it or "qty" not in it:
+            raise ValueError("item ต้องเป็น dict ที่มี price และ qty")
+        total += need_int(it["price"], "price", 0) * need_int(it["qty"], "qty", 1)
+    value = Fraction(total)
+    if total >= 50000:  # 500 บาท = 50000 สตางค์
+        value *= Fraction(95, 100)
     if member:
-        amt *= Fraction(90, 100)
-    amt *= Fraction(107, 100)
-    return half_up(amt)
+        value *= Fraction(90, 100)
+    value *= Fraction(107, 100)  # VAT ขั้นสุดท้าย ปัดครั้งเดียวท้ายสุด
+    return half_up(value)
 
 
 def main():
@@ -41,8 +41,8 @@ def main():
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cafe_bill(**args)
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
+    except (ValueError, TypeError) as error:
+        print(json.dumps({"ok": False, "error": str(error)}))
         return 2
     print(json.dumps({"ok": True, "result": result}))
     return 0

@@ -1,72 +1,78 @@
-"""BaanKafe: คิดเงินหน้าร้าน
+"""BaanKafe cafe bill calculator.
 
-หน่วยทั้งหมดเป็นสตางค์ (จำนวนเต็ม)
-ลำดับการคิด:
-  1. รวมยอด = Σ price × qty
-  2. ยอดรวม >= 50,000 สตางค์ (500 บาท) ลด 5%  (× 95/100)
-  3. member = True ลดอีก 10%                 (× 90/100), คูณต่อจากข้อ 2
-  4. บวก VAT 7% เป็นขั้นสุดท้าย                (× 107/100)
-  5. ปัดครึ่งขึ้นเป็นสตางค์ครั้งเดียวตอนท้าย (คำนวณด้วย Fraction ไม่มี float)
+กติกา (หน่วยเป็นสตางค์ทั้งหมด):
+- items: list ของ {"price": ราคาต่อชิ้น (int สตางค์, >= 0), "qty": จำนวนชิ้น (int >= 1)}
+- ยอดรวม (subtotal) = sum(price * qty)
+- ยอดรวมตั้งแต่ 500 บาท (50000 สตางค์) ขึ้นไป ลด 5%
+- member = True ลดอีก 10% (คำนวณต่อจากยอดหลังลด 5%)
+- บวก VAT 7% เป็นขั้นสุดท้าย
+- ปัดครั้งเดียวตอนท้ายสุดด้วยการปัดครึ่งขึ้น ให้ได้จำนวนเต็มสตางค์
+- คำนวณทั้งหมดด้วย Fraction เพื่อไม่ให้ float คลาดเคลื่อน
 """
 
 import json
 import sys
 from fractions import Fraction
+from math import floor
 
-THRESHOLD_SATANG = 50_000  # 500 บาท
-DISCOUNT_THRESHOLD_RATE = Fraction(95, 100)  # ลด 5%
-MEMBER_RATE = Fraction(90, 100)              # ลดอีก 10%
-VAT_RATE = Fraction(107, 100)                # VAT 7%
+DISCOUNT_THRESHOLD = 50000  # 500 บาท เป็นสตางค์
+DISCOUNT_RATE = Fraction(5, 100)
+MEMBER_RATE = Fraction(10, 100)
+VAT_RATE = Fraction(7, 100)
+
+
+def _half_up(x):
+    """ปัดครึ่งขึ้น สำหรับ x >= 0: 2.5 -> 3, 2.4 -> 2."""
+    return floor(Fraction(x) + Fraction(1, 2))
 
 
 def _validate_items(items):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
-    for index, item in enumerate(items):
-        label = f"items[{index}]"
+    for i, item in enumerate(items):
         if type(item) is not dict:
-            raise ValueError(f"{label} ต้องเป็น dict")
+            raise ValueError(f"items[{i}] ต้องเป็น dict")
         if "price" not in item or "qty" not in item:
-            raise ValueError(f"{label} ต้องมี field price และ qty")
+            raise ValueError(f"items[{i}] ต้องมี key 'price' และ 'qty'")
         price = item["price"]
         qty = item["qty"]
         if type(price) is not int:
-            raise ValueError(f"{label}.price ต้องเป็นจำนวนเต็มสตางค์")
-        if price < 0:
-            raise ValueError(f"{label}.price ต้องไม่ติดลบ")
+            raise ValueError(f"items[{i}].price ต้องเป็น int (สตางค์)")
         if type(qty) is not int:
-            raise ValueError(f"{label}.qty ต้องเป็นจำนวนเต็ม")
+            raise ValueError(f"items[{i}].qty ต้องเป็น int")
+        if price < 0:
+            raise ValueError(f"items[{i}].price ต้องไม่ติดลบ")
         if qty < 1:
-            raise ValueError(f"{label}.qty ต้องไม่น้อยกว่า 1")
+            raise ValueError(f"items[{i}].qty ต้องมีค่าตั้งแต่ 1")
 
 
 def cafe_bill(items, member):
-    """คืนยอดที่ลูกค้าต้องจ่ายเป็นจำนวนเต็มสตางค์"""
+    """คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์."""
     _validate_items(items)
     if type(member) is not bool:
-        raise ValueError("member ต้องเป็น True หรือ False")
+        raise ValueError("member ต้องเป็น bool")
 
     subtotal = sum(item["price"] * item["qty"] for item in items)
 
-    amount = Fraction(subtotal)
-    if subtotal >= THRESHOLD_SATANG:
-        amount *= DISCOUNT_THRESHOLD_RATE
+    total = Fraction(subtotal)
+    if subtotal >= DISCOUNT_THRESHOLD:
+        total *= 1 - DISCOUNT_RATE
     if member:
-        amount *= MEMBER_RATE
-    amount *= VAT_RATE
+        total *= 1 - MEMBER_RATE
+    total *= 1 + VAT_RATE
 
-    # ปัดครึ่งขึ้นครั้งเดียว (amount >= 0 เสมอ)
-    return int((amount * 2 + 1) // 2)
+    return _half_up(total)
 
 
 def main():
     try:
-        args = json.load(sys.stdin)
+        raw = sys.stdin.read()
+        args = json.loads(raw)
         if type(args) is not dict:
             raise ValueError("input ต้องเป็น JSON object")
         result = cafe_bill(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
+    except (ValueError, TypeError, json.JSONDecodeError) as exc:
+        print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
     return 0

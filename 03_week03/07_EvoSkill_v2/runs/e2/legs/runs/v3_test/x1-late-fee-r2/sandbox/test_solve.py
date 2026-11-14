@@ -1,47 +1,74 @@
-import json
-import subprocess
-import sys
 import unittest
-
+from fractions import Fraction
 from solve import late_fee
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(late_fee(100000, 10), 7500)
-        self.assertEqual(late_fee(100000, 4), 3000)
-        self.assertEqual(late_fee(0, 100), 0)
+def ref(a, d):
+    if d <= 3:
+        return 0
+    v = Fraction(a) * min(Fraction(75, 10000) * d, Fraction(15, 100))
+    return int((v * 2 + 1) // 2)
 
-    def test_boundary(self):
-        self.assertEqual(late_fee(100000, 3), 0)
-        self.assertEqual(late_fee(100000, 4), 3000)
+
+class Normal(unittest.TestCase):
+    def test_basic(self):
+        self.assertEqual(late_fee(100000, 10), 7500)
+        self.assertEqual(late_fee(5001, 7), ref(5001, 7))
+        self.assertEqual(late_fee(0, 30), 0)
+
+    def test_cap(self):
+        self.assertEqual(late_fee(100000, 100), 15000)
+        self.assertEqual(late_fee(25075, 365), ref(25075, 365))
+
+
+class Boundary(unittest.TestCase):
+    def test_grace(self):
+        for d in (0, 1, 2, 3):
+            self.assertEqual(late_fee(100000, d), 0)
+        self.assertEqual(late_fee(100000, 4), 3000)  # นับรวม 3 วันแรก
+        self.assertEqual(late_fee(100000, 5), 3750)
+
+    def test_cap_edge(self):
+        self.assertEqual(late_fee(100000, 19), 14250)
         self.assertEqual(late_fee(100000, 20), 15000)
         self.assertEqual(late_fee(100000, 21), 15000)
         self.assertEqual(late_fee(100000, 365), 15000)
 
-    def test_rounding(self):
-        # 200*0.0075*4 = 6.0 ; 10*0.0075*4=0.3 ; 70*0.0075*4=2.1 ; 2*.0075*... 
+
+class NoDrift(unittest.TestCase):
+    def test_half(self):
+        # 200*0.03=6 ; 10*0.03=0.3->0 ; 50*0.03=1.5->2 ; 150*0.0375=5.625->6
+        self.assertEqual(late_fee(50, 4), 2)
         self.assertEqual(late_fee(10, 4), 0)
-        self.assertEqual(late_fee(1234, 5), 46)   # 46.275
-        self.assertEqual(late_fee(1100, 5), 41)   # 41.25
-        self.assertEqual(late_fee(200, 5), 8)     # 7.5 -> 8 (floor would give 7)
-        self.assertEqual(late_fee(10**12, 365), 15 * 10**10)
+        self.assertEqual(late_fee(150, 5), 6)
+        self.assertEqual(late_fee(10, 20), 2)   # 1.5 -> 2
+        self.assertEqual(late_fee(30, 20), 5)   # 4.5 -> 5
+        self.assertEqual(late_fee(10, 10), 1)   # 0.75 -> 1
+        self.assertEqual(late_fee(1, 4), 0)
 
-    def test_reject(self):
-        for a, d in [(-1, 5), (5, -1), (5, 366), (1000.0, 5), (1000, 5.0),
-                     ("1", 5), (1000, "5"), (True, 5), (1000, True), (None, 5),
-                     (1000, None), (float("nan"), 5), (float("inf"), 5)]:
+    def test_many(self):
+        for a in (1, 33, 5333, 25075, 99999):
+            for d in range(0, 366, 7):
+                self.assertEqual(late_fee(a, d), ref(a, d))
+
+
+class Reject(unittest.TestCase):
+    def test_amount(self):
+        for v in (-1, 1000.0, "1000", True, None, [1]):
             with self.assertRaises(ValueError):
-                late_fee(a, d)
+                late_fee(v, 5)
 
-    def test_cli(self):
-        p = subprocess.run([sys.executable, "solve.py"], input='{"amount":100000,"days_late":10}',
-                           capture_output=True, text=True)
-        self.assertEqual(json.loads(p.stdout), {"ok": True, "result": 7500})
-        p = subprocess.run([sys.executable, "solve.py"], input='{"amount":-1,"days_late":10}',
-                           capture_output=True, text=True)
-        self.assertEqual(p.returncode, 2)
-        self.assertFalse(json.loads(p.stdout)["ok"])
+    def test_days(self):
+        for v in (-1, 366, 5.0, "5", True, False, None):
+            with self.assertRaises(ValueError):
+                late_fee(1000, v)
+
+    def test_order(self):
+        with self.assertRaises(ValueError):
+            late_fee(1000, 366)
+        with self.assertRaises(ValueError):
+            late_fee(-1, 0)
 
 
-unittest.main() if __name__ == "__main__" else None
+if __name__ == "__main__":
+    unittest.main()

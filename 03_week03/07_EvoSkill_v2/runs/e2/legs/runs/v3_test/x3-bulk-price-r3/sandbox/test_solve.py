@@ -1,44 +1,66 @@
-import json
-import subprocess
-import sys
 import unittest
+from fractions import Fraction as F
 from solve import bulk_price
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(bulk_price(10000, 1, False), 10700)
-        self.assertEqual(bulk_price(10000, 10, False), 103255)
-        self.assertEqual(bulk_price(10000, 50, True), 482503)  # 450937.5*1.07=482503.125
-        self.assertEqual(bulk_price(5, 10, False), 52)  # 51.6275
+def ref(p, q, c):
+    v = F(p * q)
+    if q >= 50:
+        v = v * F(92500, 100000)
+    elif q >= 10:
+        v = v * F(96500, 100000)
+    if c:
+        v = v * F(97500, 100000)
+    v = v * F(107, 100)
+    return int((v * 2 + 1) // 2)
 
-    def test_boundary(self):
-        self.assertEqual(bulk_price(1000, 9, False), 9630)
-        self.assertEqual(bulk_price(1000, 10, False), 10326)  # 10325.5 half-up
-        self.assertEqual(bulk_price(1000, 49, False), 50595)  # 50594.95
-        self.assertEqual(bulk_price(1000, 50, False), 49488)  # 49487.5 half-up
 
-    def test_zero_price(self):
+class Normal(unittest.TestCase):
+    def test_basic(self):
+        self.assertEqual(bulk_price(1000, 1, False), 1070)
+        self.assertEqual(bulk_price(1000, 1, True), 1043)  # 1000*.975*1.07=1043.25
+        self.assertEqual(bulk_price(1000, 20, False), 20000 * 965 * 107 // 100000 + 0 if False else ref(1000, 20, False))
+        self.assertEqual(bulk_price(5333, 60, True), ref(5333, 60, True))
         self.assertEqual(bulk_price(0, 5, True), 0)
 
-    def test_reject(self):
-        for a in [(-1, 1, False), (1, 0, False), (1, 1001, False), (1.0, 1, False),
-                  ("1", 1, False), (True, 1, False), (1, 1.0, False), (1, True, False),
-                  (None, 1, False), (1, 1, 1), (1, 1, None), (float("nan"), 1, False)]:
-            with self.assertRaises(ValueError):
+
+class Boundary(unittest.TestCase):
+    def test_tiers(self):
+        for q in (1, 9, 10, 11, 49, 50, 51, 1000):
+            for c in (True, False):
+                self.assertEqual(bulk_price(5001, q, c), ref(5001, q, c))
+        self.assertLess(bulk_price(5001, 10, False), bulk_price(5001, 9, False) * 10 // 9)
+        self.assertEqual(bulk_price(100000, 50, False), 4949 * 1000 * 1 // 1 * 0 + 4949750 if False else ref(100000, 50, False))
+        self.assertEqual(bulk_price(100000, 10, False), 1032550)
+        self.assertEqual(bulk_price(100000, 9, False), 963000)
+
+
+class NoDrift(unittest.TestCase):
+    def test_half(self):
+        self.assertEqual(bulk_price(1000, 10, False), 10326)  # 10325.5
+        self.assertEqual(bulk_price(1000, 1, False), 1070)
+        self.assertEqual(bulk_price(100, 10, False), 1033)  # 1032.55
+        self.assertEqual(bulk_price(1, 1, False), 1)  # 1.07
+        self.assertEqual(bulk_price(25075, 37, True), ref(25075, 37, True))
+
+    def test_many(self):
+        for p in (1, 7, 333, 5001, 25075):
+            for q in (3, 10, 50, 77, 999):
+                for c in (True, False):
+                    self.assertEqual(bulk_price(p, q, c), ref(p, q, c))
+
+
+class Reject(unittest.TestCase):
+    def test_bad(self):
+        bad = [
+            (-1, 1, False), (1.0, 1, False), ("1", 1, False), (True, 1, False), (None, 1, False),
+            (100, 0, False), (100, 1001, False), (100, -1, False), (100, 1.0, False),
+            (100, "1", False), (100, True, False), (100, None, False),
+            (100, 1, 1), (100, 1, 0), (100, 1, "True"), (100, 1, None),
+        ]
+        for a in bad:
+            with self.assertRaises(ValueError, msg=str(a)):
                 bulk_price(*a)
-
-    def test_big(self):
-        self.assertIsInstance(bulk_price(10**12, 1000, True), int)
-
-    def test_cli(self):
-        r = subprocess.run([sys.executable, "solve.py"], input='{"unit_price":10000,"qty":1,"coupon":false}',
-                           capture_output=True, text=True)
-        self.assertEqual(json.loads(r.stdout), {"ok": True, "result": 10700})
-        r = subprocess.run([sys.executable, "solve.py"], input='{"unit_price":-1,"qty":1,"coupon":false}',
-                           capture_output=True, text=True)
-        self.assertEqual(r.returncode, 2)
-        self.assertFalse(json.loads(r.stdout)["ok"])
 
 
 if __name__ == "__main__":

@@ -1,109 +1,73 @@
 """ค่าส่งเมล็ดกาแฟ BaanKafe
 
-shipping_fee(weight_g, distance_km, express) -> int (หน่วยเป็นสตางค์)
+ลำดับการคิด (ทำตามลำดับนี้ตรงตัว):
+  1. ค่าส่งตามน้ำหนัก (หน่วยบาท, ใช้ Fraction เพื่อไม่คลาดจาก float)
+       - w <= 1,000 กรัม            -> 40 บาท
+       - 1,000 < w <= 5,000 กรัม     -> 80 บาท
+       - w > 5,000 กรัม              -> 80 + 15 * (w - 5,000) / 1,000 บาท (คิดตามสัดส่วนกรัม)
+  2. ระยะทางเกิน 100 กม. (d > 100)   -> คูณ 1.20
+  3. ส่งด่วน (express = True)        -> คูณ 1.50 ต่อจากข้อ 2
+  4. ผลลัพธ์เป็นจำนวนเต็มสตางค์      -> แปลงเป็นสตางค์ (x100) แล้วปัดครึ่งขึ้นครั้งเดียวที่ขั้นสุดท้าย
 
-กติกา (ตามลำดับที่โจทย์ระบุ):
-1. ค่าส่งตามน้ำหนัก (บาท)
-   - ไม่เกิน 1,000 กรัม            -> 40 บาท
-   - ไม่เกิน 5,000 กรัม            -> 80 บาท
-   - เกิน 5,000 กรัม               -> 80 บาท + 15 บาทต่อกิโลกรัมของส่วนที่เกิน 5,000 กรัม
-     (คิดตามสัดส่วนของกรัม ไม่ปัดเป็นก้อน)
-2. ระยะทางเกิน 100 กม. คิดเพิ่ม 20% (เกิน 100 พอดีไม่คิด)
-3. ส่งด่วน (express=True) คิดเพิ่ม 50% คูณต่อจากข้อ 2
-4. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ครั้งเดียวตอนคืนค่า
+หมายเหตุการตีความ:
+  - "เกิน 100 กม." ใช้ d > 100 (ที่ 100 พอดียังไม่คิดเพิ่ม)
+  - ปัดเศษ: ปัดครึ่งขึ้น (half-up) ที่ขั้นสุดท้าย ไม่ใช่ banker's rounding
+  - ค่าที่อยู่นอกช่วงที่โจทย์กำหนด (น้ำหนักนอก 1–30,000 กรัม หรือระยะทางติดลบ) จะ raise ValueError
 """
 
 import math
 from fractions import Fraction
 
-WEIGHT_MIN_G = 1
-WEIGHT_MAX_G = 30_000
-
-LIGHT_LIMIT_G = 1_000
-MID_LIMIT_G = 5_000
-
-FEE_LIGHT_BAHT = Fraction(40)
-FEE_MID_BAHT = Fraction(80)
-PER_KG_OVER_MID_BAHT = Fraction(15)
-
-LONG_DISTANCE_KM = Fraction(100)
-LONG_DISTANCE_MULT = Fraction(6, 5)   # +20%
-EXPRESS_MULT = Fraction(3, 2)         # +50%
+SATANG_PER_BAHT = 100
+MIN_WEIGHT_G = 1
+MAX_WEIGHT_G = 30000
 
 
-def to_frac(x):
-    """แปลงตัวเลขเป็น Fraction ผ่าน str เพื่อไม่ให้เกิดคลาดเคลื่อนจาก float"""
+def _to_fraction(x):
+    """แปลงค่าตัวเลขเป็น Fraction ผ่าน str เพื่อให้เลขทศนิยมที่เขียนไว้ เช่น 100.5 แม่นยำ"""
+    if isinstance(x, Fraction):
+        return x
     return Fraction(str(x))
 
 
-def round_half_up(f):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ใช้ครั้งเดียวตอนคืนค่า ยอดไม่ติดลบ)"""
-    return math.floor(f + Fraction(1, 2))
-
-
-def _is_number(x):
-    return isinstance(x, (int, float, Fraction)) and not isinstance(x, bool)
-
-
-def _weight_fee_baht(weight_g):
-    """ค่าส่งตามน้ำหนัก เป็นบาท (Fraction)"""
-    if weight_g <= LIGHT_LIMIT_G:
-        return FEE_LIGHT_BAHT
-    if weight_g <= MID_LIMIT_G:
-        return FEE_MID_BAHT
-    over_kg = (weight_g - MID_LIMIT_G) / Fraction(1000)
-    return FEE_MID_BAHT + PER_KG_OVER_MID_BAHT * over_kg
-
-
 def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์"""
-    if not _is_number(weight_g):
-        raise ValueError("weight_g ต้องเป็นตัวเลข")
-    if not _is_number(distance_km):
-        raise ValueError("distance_km ต้องเป็นตัวเลข")
-    if express not in (True, False):
-        raise ValueError("express ต้องเป็น True หรือ False")
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (int)
 
-    w = to_frac(weight_g)
-    d = to_frac(distance_km)
+    weight_g    : น้ำหนักเป็นกรัม 1–30,000
+    distance_km : ระยะทางเป็นกิโลเมตร (>= 0)
+    express     : True = ส่งด่วน
+    """
+    w = _to_fraction(weight_g)
+    d = _to_fraction(distance_km)
 
-    if not (WEIGHT_MIN_G <= w <= WEIGHT_MAX_G):
-        raise ValueError("weight_g ต้องอยู่ระหว่าง 1 ถึง 30,000 กรัม")
+    if not (MIN_WEIGHT_G <= w <= MAX_WEIGHT_G):
+        raise ValueError(f"weight_g ต้องอยู่ระหว่าง {MIN_WEIGHT_G:,}–{MAX_WEIGHT_G:,} กรัม")
     if d < 0:
         raise ValueError("distance_km ต้องไม่ติดลบ")
 
-    fee = _weight_fee_baht(w)            # 1. ตามน้ำหนัก
-    if d > LONG_DISTANCE_KM:             # 2. ระยะทางเกิน 100 กม.
-        fee *= LONG_DISTANCE_MULT
-    if express is True:                  # 3. ส่งด่วน (ต่อจากข้อ 2)
-        fee *= EXPRESS_MULT
+    # 1) ค่าส่งตามน้ำหนัก (บาท)
+    if w <= 1000:
+        fee = Fraction(40)
+    elif w <= 5000:
+        fee = Fraction(80)
+    else:
+        fee = Fraction(80) + Fraction(15) * (w - 5000) / 1000
 
-    return round_half_up(fee * 100)      # 4. บาท -> สตางค์ ปัดครึ่งขึ้นครั้งเดียว
+    # 2) ระยะทางเกิน 100 กม. คิดเพิ่ม 20%
+    if d > 100:
+        fee *= Fraction(120, 100)
+
+    # 3) ส่งด่วนคิดเพิ่ม 50% (คูณต่อจากข้อก่อน)
+    if express:
+        fee *= Fraction(150, 100)
+
+    # 4) เป็นจำนวนเต็มสตางค์ ปัดครึ่งขึ้นครั้งเดียวที่ขั้นสุดท้าย
+    satang = fee * SATANG_PER_BAHT
+    return math.floor(satang + Fraction(1, 2))
 
 
 if __name__ == "__main__":
-    cases = [
-        # (weight_g, distance_km, express, expected_satang)
-        (1, 0, False, 4000),                    # เบาสุด 40 บาท
-        (1000, 50, False, 4000),                # เท่ากับเกณฑ์ 1,000 -> ยังเป็น 40
-        (1001, 50, False, 8000),                # เกิน 1,000 -> 80
-        (5000, 100, False, 8000),               # เท่ากับ 5,000 และระยะ 100 พอดี ไม่คิดเพิ่ม
-        (5001, 100, False, 8002),               # 80.015 บาท -> 8001.5 สตางค์ -> ปัดขึ้น 8002
-        (5000, 100.5, False, 9600),             # 80 * 1.2 = 96 บาท
-        (5000, 100, True, 12000),               # 80 * 1.5 = 120 บาท
-        (5000, 100.01, True, 14400),            # 80 * 1.2 * 1.5 = 144 บาท (ลำดับคูณไม่กระทบผล)
-        (10000, 0, False, 15500),               # 80 + 5 * 15 = 155 บาท
-        (30000, 0, False, 45500),               # 80 + 25 * 15 = 455 บาท
-        (2500, 0, False, 8000),                 # 80 บาท (ไม่เกิน 5,000)
-        (5500, 0, False, 8750),                 # 80 + 0.5 * 15 = 87.5 บาท
-        (5001, 0, False, 8002),                 # ทดสอบซ้ำขอบเขต
-        (5001, 200, True, 14403),               # 80.015 * 1.2 * 1.5 = 144.027 บาท -> 14402.7 -> 14403
-    ]
-    ok = True
-    for w, d, e, exp in cases:
-        got = shipping_fee(w, d, e)
-        flag = "OK " if got == exp else "NG "
-        if got != exp:
-            ok = False
-        print(f"{flag} weight={w} dist={d} express={e} -> {got} สตางค์ (คาดหวัง {exp})")
-    print("ALL PASS" if ok else "SOME FAILED")
+    # ตัวอย่างการใช้งาน
+    print(shipping_fee(500, 10, False))     # 4000  (40 บาท)
+    print(shipping_fee(5001, 10, False))    # 8002  (80.015 บาท -> 8001.5 สตางค์ -> ปัดขึ้น)
+    print(shipping_fee(30000, 150, True))   # 81900 (819 บาท)

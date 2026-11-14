@@ -1,24 +1,20 @@
-# นโยบายปัดเศษ r2: ปัดครึ่งขึ้นเป็นสตางค์เต็มทุกครั้งที่ขั้นตอนให้ผลเป็นเงินใหม่
-_RATES = {"silver": (15, 1000), "gold": (25, 1000), "platinum": (4, 100)}
-_MIN_AMOUNT = 10000  # 100 บาท
-_CAP = 20000         # 200 บาท
+from fractions import Fraction
 
-
-def _div_half_up(n, d):
-    return (2 * n + d) // (2 * d)
+# กติกาปัดเศษ B: คำนวณด้วย Fraction ตลอด แล้วปัดขึ้น (ceil) ครั้งเดียวตอนท้าย
+_RATES = {
+    "silver": Fraction(15, 1000),    # 1.5%
+    "gold": Fraction(25, 1000),      # 2.5%
+    "platinum": Fraction(4, 100),    # 4%
+}
+_MIN_AMOUNT = 10000   # 100 บาท (ต่ำกว่านี้ไม่ได้เงินคืน; พอดี 100 บาทได้)
+_CAP = 20000          # 200 บาทต่อบิล (ใช้หลังคูณ 2 เท่า)
 
 
 def cashback(amount, tier, birthday):
-    if isinstance(amount, bool) or not isinstance(amount, int) or amount < 0:
-        raise ValueError("amount must be an int >= 0")
-    if not isinstance(tier, str) or tier not in _RATES:
-        raise ValueError("invalid tier")
-    if not isinstance(birthday, bool):
-        raise ValueError("birthday must be bool")
     if amount < _MIN_AMOUNT:
         return 0
-    num, den = _RATES[tier]
-    result = _div_half_up(amount * num, den)  # เงินคืนพื้นฐาน ปัดเป็นสตางค์
+    value = Fraction(amount) * _RATES[tier]
     if birthday:
-        result *= 2
-    return min(result, _CAP)
+        value *= 2
+    value = min(value, Fraction(_CAP))
+    return -((-value.numerator) // value.denominator)  # ceil

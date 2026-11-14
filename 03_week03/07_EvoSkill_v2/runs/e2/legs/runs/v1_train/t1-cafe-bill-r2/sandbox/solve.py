@@ -1,4 +1,4 @@
-"""BaanKafe cafe_bill (satang, half-up, strict validation)"""
+"""BaanKafe: คิดเงินหน้าร้าน (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
@@ -26,20 +26,20 @@ def cafe_bill(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
-    total = 0
+    subtotal = 0
     for it in items:
         if type(it) is not dict:
-            raise ValueError("item ต้องเป็น dict")
+            raise ValueError("แต่ละรายการต้องเป็น dict")
         price = need_int(it.get("price"), "price", 0)
         qty = need_int(it.get("qty"), "qty", 1)
-        total += price * qty
-    amount = Fraction(total)
-    if total >= 50000:
-        amount *= Fraction(95, 100)
+        subtotal += price * qty
+    value = Fraction(subtotal)
+    if subtotal >= 50000:
+        value *= Fraction(95, 100)
     if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
-    return half_up(amount)
+        value *= Fraction(90, 100)
+    value *= Fraction(107, 100)
+    return half_up(value)
 
 
 def main():

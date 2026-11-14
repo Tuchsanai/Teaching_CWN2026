@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.4545,
  "checks": [
   {
    "id": "contract",
@@ -28,8 +28,8 @@
   },
   {
    "id": "reject_value",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 4 จาก 4 กรณี"
   },
   {
    "id": "reject_type",
@@ -50,6 +50,11 @@
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี"
   }
  ]
 }

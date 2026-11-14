@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.9091,
  "checks": [
   {
    "id": "contract",
@@ -38,18 +38,23 @@
   },
   {
    "id": "cli_ok",
-   "pass": false,
-   "note": "stdin {\"weight_g\": 3000, \"distance_km\": 150, \"express\": false} ต้องได้ {\"ok\": true, \"result\": 9600} exit 0 แต่ได้ exit 0 stdout (ว่าง)"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "cli_error",
-   "pass": false,
-   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "tests",
    "pass": false,
-   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+   "note": "unittest พบ 2 เทสต์ (ต้องมีอย่างน้อย 6)"
+  },
+  {
+   "id": "policy",
+   "pass": true,
+   "note": ""
   }
  ]
 }

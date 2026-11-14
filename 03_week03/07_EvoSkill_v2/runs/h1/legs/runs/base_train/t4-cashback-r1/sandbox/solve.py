@@ -1,64 +1,50 @@
 """BaanKafe member cashback calculator.
 
-All money is handled in satang (1 baht = 100 satang) as integers so that
-results are exact integer satang with no floating-point rounding error.
+Units: amounts are in satang (1 baht = 100 satang).
 """
 
-# Cashback rate in basis points (1 bp = 0.01%), so 1.5% = 150 bp.
-TIER_RATE_BP = {
-    "silver": 150,    # 1.5%
-    "gold": 250,      # 2.5%
-    "platinum": 400,  # 4%
+# อัตราเงินคืนหน่วยเป็น basis point (1 bp = 0.01%) เพื่อใช้จำนวนเต็มล้วน
+# silver 1.5% = 150 bp, gold 2.5% = 250 bp, platinum 4% = 400 bp
+RATE_BP = {
+    "silver": 150,
+    "gold": 250,
+    "platinum": 400,
 }
 
-MIN_PURCHASE = 100 * 100      # 100 baht, in satang
-MAX_CASHBACK = 200 * 100      # 200 baht cap per bill, in satang
-BIRTHDAY_MULTIPLIER = 2       # double cashback in birthday month
-BP_DENOMINATOR = 10_000
+MIN_AMOUNT = 100 * 100      # 100 บาท ในหน่วยสตางค์
+MAX_CASHBACK = 200 * 100    # 200 บาท ต่อบิล ในหน่วยสตางค์
+BIRTHDAY_MULTIPLIER = 2
 
 
-def cashback(amount, tier, birthday=False):
-    """Return the cashback amount in whole satang.
+def cashback(amount: int, tier: str, birthday: bool) -> int:
+    """คำนวณเงินคืนสมาชิก (หน่วยสตางค์, จำนวนเต็ม)
 
-    amount   -- purchase total in satang (int, >= 0)
-    tier     -- "silver", "gold" or "platinum"
-    birthday -- True if the purchase is made during the member's birthday month
+    - amount: ยอดซื้อ (สตางค์, >= 0)
+    - tier: "silver" | "gold" | "platinum"
+    - birthday: True ถ้าซื้อในเดือนเกิด (ได้เงินคืนเป็น 2 เท่า)
 
-    Rules:
-      * purchases under 100 baht earn nothing
-      * tier rate: silver 1.5%, gold 2.5%, platinum 4%
-      * birthday month doubles the cashback
-      * cashback is capped at 200 baht per bill (applied after doubling)
-      * result is floored to whole satang
+    กติกา: ยอดต่ำกว่า 100 บาท ไม่ได้เงินคืน, คิดตามอัตรา tier,
+    เดือนเกิดคูณ 2, แล้วจำกัดไม่เกิน 200 บาทต่อบิล, ปัดเศษทิ้ง (floor).
     """
     if isinstance(amount, bool) or not isinstance(amount, int):
-        raise TypeError("amount must be an int (satang)")
+        raise TypeError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
     if amount < 0:
-        raise ValueError("amount must be >= 0")
+        raise ValueError("amount ต้องไม่ติดลบ")
+    if tier not in RATE_BP:
+        raise ValueError(f"tier ไม่ถูกต้อง: {tier!r}")
 
-    key = tier.strip().lower() if isinstance(tier, str) else tier
-    if key not in TIER_RATE_BP:
-        raise ValueError(f"unknown tier: {tier!r}")
-
-    if amount < MIN_PURCHASE:
+    if amount < MIN_AMOUNT:
         return 0
 
-    multiplier = BIRTHDAY_MULTIPLIER if birthday else 1
-    result = amount * TIER_RATE_BP[key] * multiplier // BP_DENOMINATOR
+    result = amount * RATE_BP[tier] // 10000
+    if birthday:
+        result *= BIRTHDAY_MULTIPLIER
     return min(result, MAX_CASHBACK)
 
 
 if __name__ == "__main__":
-    # Quick sanity checks (amounts in satang).
-    assert cashback(9_999, "platinum") == 0          # under 100 baht
-    assert cashback(10_000, "silver") == 150         # 100 baht * 1.5% = 1.50 baht
-    assert cashback(10_000, "gold") == 250           # 2.5%
-    assert cashback(10_000, "platinum") == 400       # 4%
-    assert cashback(10_000, "silver", True) == 300   # birthday x2
-    assert cashback(100_000, "platinum") == 4_000    # 1000 baht * 4% = 40 baht
-    assert cashback(1_000_000, "platinum") == 20_000 # 4% = 400 baht -> capped 200
-    assert cashback(1_000_000, "platinum", True) == 20_000  # capped even with birthday
-    assert cashback(600_000, "gold", True) == 20_000  # 6000*2.5%*2 = 300 -> capped 200
-    assert cashback(333, "gold") == 0
-    assert cashback(12_345, "silver") == 185         # 12345*150/10000 = 185.17 -> 185
-    print("all checks passed")
+    # ตัวอย่างการใช้งาน
+    print(cashback(10000, "silver", False))   # 100 บาท -> 1.50 บาท = 150
+    print(cashback(10000, "silver", True))    # เดือนเกิด -> 300
+    print(cashback(9999, "platinum", True))   # ต่ำกว่า 100 บาท -> 0
+    print(cashback(1000000, "platinum", True))  # 10,000 บาท -> cap 20000

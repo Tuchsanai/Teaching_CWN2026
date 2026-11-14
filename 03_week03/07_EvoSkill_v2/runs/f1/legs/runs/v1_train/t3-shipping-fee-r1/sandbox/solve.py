@@ -1,48 +1,42 @@
-"""เทมเพลต solve.py สำหรับฟังก์ชันคิดเงิน — เปลี่ยนชื่อฟังก์ชัน/สูตรให้ตรงโจทย์"""
 import json
+import math
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and value < low) or (high is not None and value > high):
-        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
-    return value
-
-
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
-
-
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
-
-
 def shipping_fee(weight_g, distance_km, express):
-    need_int(weight_g, "weight_g", 1, 30000)
-    need_int(distance_km, "distance_km", 0)
-    need_bool(express, "express")
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)
+
+    ข้อสันนิษฐาน: distance_km รับ int หรือ float ที่จำกัดค่า (ไม่ใช่ bool/NaN/inf);
+    distance_km == 0 (รับเองที่ร้าน) -> ไม่คิดค่าส่ง คืน 0
+    """
+    if type(weight_g) is not int or not (1 <= weight_g <= 30000):
+        raise ValueError("weight_g ต้องเป็นจำนวนเต็ม 1-30000")
+    if type(distance_km) not in (int, float):
+        raise ValueError("distance_km ต้องเป็นตัวเลข")
+    if type(distance_km) is float and not math.isfinite(distance_km):
+        raise ValueError("distance_km ไม่ถูกต้อง")
+    if distance_km < 0:
+        raise ValueError("distance_km ต้อง >= 0")
+    if type(express) is not bool:
+        raise ValueError("express ต้องเป็น True หรือ False")
+
+    if distance_km == 0:
+        return 0
     if weight_g <= 1000:
         fee = Fraction(40)
     elif weight_g <= 5000:
         fee = Fraction(80)
     else:
-        fee = 80 + Fraction(15 * (weight_g - 5000), 1000)
+        fee = 80 + Fraction(weight_g - 5000, 1000) * 15
     if distance_km > 100:
-        fee *= Fraction(120, 100)
+        fee *= Fraction(6, 5)
     if express:
-        fee *= Fraction(150, 100)
+        fee *= Fraction(3, 2)
     return half_up(fee * 100)
 
 

@@ -1,43 +1,27 @@
 import unittest
-from fractions import Fraction
 from solve import cafe_bill
-
-
-def I(p, q=1):
-    return {"price": p, "qty": q}
 
 
 class T(unittest.TestCase):
     def test_normal(self):
-        self.assertEqual(cafe_bill([I(10000, 2)], False), 21400)
-        self.assertEqual(cafe_bill([I(10000, 2)], True), 19260)
-        self.assertEqual(cafe_bill([], False), 0)
+        self.assertEqual(cafe_bill([{"price": 10000, "qty": 2}], False), 21400)
+        self.assertEqual(cafe_bill([{"price": 10000, "qty": 2}], True), 19260)
 
     def test_boundary(self):
-        self.assertEqual(cafe_bill([I(49999)], False), 53499)
-        self.assertEqual(cafe_bill([I(50000)], False), 50825)
-        self.assertEqual(cafe_bill([I(25000), I(25000)], True), 45743)
+        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], False), 50825)
+        self.assertEqual(cafe_bill([{"price": 49999, "qty": 1}], False), 53499)
 
     def test_nodrift(self):
-        for p in range(49990, 50010):
-            for m in (False, True):
-                t = Fraction(p)
-                if p >= 50000:
-                    t *= Fraction(95, 100)
-                if m:
-                    t *= Fraction(90, 100)
-                t *= Fraction(107, 100)
-                self.assertEqual(cafe_bill([I(p)], m), int((t * 2 + 1) // 2))
-        self.assertIs(type(cafe_bill([I(1)], False)), int)
+        # 1*0.95*0.9*1.07 ไม่ใช่ครึ่งพอดี; 50000*.95*.9*1.07=45742.5 -> 45743
+        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], True), 45743)
 
     def test_reject(self):
-        for bad in ([I(100, 0)], [I(-1)], [I(100.0)], [I("3")], [I(True)],
-                    [I(100, True)], [{"price": 1}], ["x"], None, "abc"):
+        for items, m in [([{"price": 1, "qty": 0}], False), ([{"price": 1.0, "qty": 1}], False),
+                         ([{"price": True, "qty": 1}], False), ([{"price": 1}], False),
+                         ([{"price": -1, "qty": 1}], False), ({}, False),
+                         ([{"price": 1, "qty": 1}], 1), ([{"price": 1, "qty": "2"}], False)]:
             with self.assertRaises(ValueError):
-                cafe_bill(bad, False)
-        for m in (1, 0, None, "true"):
-            with self.assertRaises(ValueError):
-                cafe_bill([I(100)], m)
+                cafe_bill(items, m)
 
 
 if __name__ == "__main__":

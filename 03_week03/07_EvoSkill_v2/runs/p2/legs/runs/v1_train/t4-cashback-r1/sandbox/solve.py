@@ -1,26 +1,14 @@
 from fractions import Fraction
 
-# นโยบายปัดเศษ r1: คำนวณแบบแม่นยำ (Fraction) แล้วปัดครึ่งขึ้นครั้งเดียวตอนท้าย
-_RATES = {
-    "silver": Fraction(15, 1000),
-    "gold": Fraction(25, 1000),
-    "platinum": Fraction(4, 100),
-}
-_MIN_AMOUNT = 10000  # 100 บาท
-_CAP = 20000         # 200 บาท
+# Rounding rule A (-r1): exact Fraction math, floor once at the end.
+_RATES = {"silver": Fraction(3, 200), "gold": Fraction(1, 40), "platinum": Fraction(1, 25)}
 
 
 def cashback(amount, tier, birthday):
-    if isinstance(amount, bool) or not isinstance(amount, int) or amount < 0:
-        raise ValueError("amount must be an int >= 0")
-    if not isinstance(tier, str) or tier not in _RATES:
-        raise ValueError("invalid tier")
-    if not isinstance(birthday, bool):
-        raise ValueError("birthday must be bool")
-    if amount < _MIN_AMOUNT:
+    if amount < 10000:  # under 100 baht -> nothing
         return 0
-    value = amount * _RATES[tier]
+    v = amount * _RATES[tier]
     if birthday:
-        value *= 2
-    value = min(value, _CAP)
-    return int((value * 2 + 1) // 2)  # half-up
+        v *= 2
+    v = min(v, 20000)  # cap 200 baht per bill, after multiplier
+    return int(v.numerator // v.denominator)

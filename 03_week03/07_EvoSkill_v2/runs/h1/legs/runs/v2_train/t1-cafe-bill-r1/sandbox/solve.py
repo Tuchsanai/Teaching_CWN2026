@@ -1,65 +1,80 @@
-"""คิดเงินหน้าร้าน BaanKafe
+"""BaanKafe: คิดเงินหน้าร้าน
 
-หน่วยทั้งหมดเป็นสตางค์ (จำนวนเต็ม)
+กติกา
+1. ยอดรวมก่อนลด = sum(price * qty) หน่วยสตางค์
+2. ยอดรวมตั้งแต่ 500 บาท (50000 สตางค์) ขึ้นไป ลด 5%
+3. ถ้า member = True ลดอีก 10% (คิดต่อจากยอดหลังลด 5%)
+4. บวก VAT 7% เป็นขั้นสุดท้าย (คิดจากยอดหลังลดทั้งหมด)
+5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ครั้งเดียวตอนท้ายสุด
 
-ลำดับการคิด:
-1. รวมยอดจาก price * qty ทุกรายการ
-2. ยอดรวม >= 50000 สตางค์ (500 บาท) ลด 5%
-3. member = True ลดอีก 10% (คูณต่อจากข้อ 2)
-4. บวก VAT 7% เป็นขั้นสุดท้าย
-5. คำนวณด้วย Fraction ไม่ปัดระหว่างทาง แล้วปัดครึ่งขึ้นครั้งเดียวตอนท้าย
+หมายเหตุการตีความ
+- เกณฑ์ 500 บาทใช้ยอดรวมก่อนลดทั้งหมด (ก่อนหักส่วนลดสมาชิก)
+- ส่วนลดสมาชิกคิดต่อจากยอดหลังลด 5% (ทบต้น) ไม่ได้รวมกับ 5% เป็น 15%
 """
 
 import json
 import sys
 from fractions import Fraction
+from math import floor
 
-DISCOUNT_THRESHOLD = 50000  # 500 บาท เป็นสตางค์
+THRESHOLD_SATANG = 50000  # 500 บาท
+ITEM_KEYS = {"price", "qty"}
 
 
-def _require_int(value, label, minimum):
-    if type(value) is not int:
-        raise ValueError(f"{label} ต้องเป็นจำนวนเต็ม")
-    if value < minimum:
-        raise ValueError(f"{label} ต้องไม่น้อยกว่า {minimum}")
-    return value
+def _half_up(x):
+    # ปัดครึ่งขึ้น สำหรับ x >= 0: 2.4 -> 2, 2.5 -> 3
+    return floor(Fraction(x) + Fraction(1, 2))
+
+
+def _validate_items(items):
+    if type(items) is not list:
+        raise ValueError("items ต้องเป็น list")
+    for i, item in enumerate(items):
+        if type(item) is not dict:
+            raise ValueError(f"items[{i}] ต้องเป็น dict")
+        if set(item.keys()) != ITEM_KEYS:
+            raise ValueError(f"items[{i}] ต้องมีเฉพาะ key 'price' และ 'qty'")
+        price = item["price"]
+        qty = item["qty"]
+        if type(price) is not int or price < 0:
+            raise ValueError(f"items[{i}].price ต้องเป็น int >= 0 (สตางค์)")
+        if type(qty) is not int or qty < 1:
+            raise ValueError(f"items[{i}].qty ต้องเป็น int >= 1")
 
 
 def cafe_bill(items, member):
-    if type(items) is not list:
-        raise ValueError("items ต้องเป็น list")
+    """คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์"""
+    _validate_items(items)
     if type(member) is not bool:
-        raise ValueError("member ต้องเป็น True หรือ False")
+        raise ValueError("member ต้องเป็น bool")
 
-    subtotal = 0
-    for index, item in enumerate(items):
-        if type(item) is not dict:
-            raise ValueError(f"รายการที่ {index} ต้องเป็น dict")
-        if "price" not in item or "qty" not in item:
-            raise ValueError(f"รายการที่ {index} ต้องมี price และ qty")
-        price = _require_int(item["price"], f"price ของรายการที่ {index}", 0)
-        qty = _require_int(item["qty"], f"qty ของรายการที่ {index}", 1)
-        subtotal += price * qty
+    try:
+        subtotal = sum(item["price"] * item["qty"] for item in items)  # int สตางค์
 
-    amount = Fraction(subtotal)
-    if subtotal >= DISCOUNT_THRESHOLD:
-        amount *= Fraction(95, 100)
-    if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
+        # ส่วนลดตามยอดรวม: ตั้งแต่ 500 บาทขึ้นไป ลด 5%
+        total = Fraction(subtotal)
+        if subtotal >= THRESHOLD_SATANG:
+            total *= Fraction(95, 100)
 
-    # ปัดครึ่งขึ้นครั้งเดียว (amount ไม่ติดลบเสมอ)
-    return int((amount * 2 + 1) // 2)
+        # ส่วนลดสมาชิก: ลดอีก 10% ทบจากยอดที่ลดแล้ว
+        if member:
+            total *= Fraction(90, 100)
+
+        # VAT 7% ขั้นสุดท้าย แล้วปัดครั้งเดียว
+        total *= Fraction(107, 100)
+        return _half_up(total)
+    except (ValueError, TypeError, ZeroDivisionError, OverflowError) as exc:
+        raise ValueError(f"คำนวณไม่ได้: {exc}") from exc
 
 
 def main():
     try:
         args = json.load(sys.stdin)
-        if not isinstance(args, dict):
-            raise ValueError("input ต้องเป็น JSON object")
+        if type(args) is not dict:
+            raise ValueError("stdin ต้องเป็น JSON object")
         result = cafe_bill(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
+    except (ValueError, TypeError) as exc:
+        print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
     return 0

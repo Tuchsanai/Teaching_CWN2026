@@ -1,37 +1,33 @@
-import json, sys
+"""BaanKafe: ราคาขายส่งเมล็ดกาแฟ (หน่วยสตางค์)"""
+import json
+import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้น — ใช้กับยอดที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(v, name, low=None, high=None):
-    if type(v) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
-
-
-def need_bool(v, name):
-    if type(v) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True/False")
-    return v
-
-
 def bulk_price(unit_price, qty, coupon):
-    need_int(unit_price, "unit_price", 0)
-    need_int(qty, "qty", 1, 1000)
-    need_bool(coupon, "coupon")
+    if type(unit_price) is not int or unit_price < 0:
+        raise ValueError("unit_price ต้องเป็นจำนวนเต็ม >= 0")
+    if type(qty) is not int or qty < 1 or qty > 1000:
+        raise ValueError("qty ต้องเป็นจำนวนเต็ม 1-1000")
+    if type(coupon) is not bool:
+        raise ValueError("coupon ต้องเป็น True หรือ False")
+
     total = Fraction(unit_price * qty)
+    # ส่วนลดปริมาณ: อัตราเดียว (50+ -> 7.5%, 10+ -> 3.5%)
     if qty >= 50:
-        total *= Fraction(925, 1000)
+        total *= 1 - Fraction(75, 1000)
     elif qty >= 10:
-        total *= Fraction(965, 1000)
+        total *= 1 - Fraction(35, 1000)
+    # คูปอง ลดอีก 2.5% (คูณต่อจากขั้นก่อน)
     if coupon:
-        total *= Fraction(975, 1000)
-    total *= Fraction(107, 100)
+        total *= 1 - Fraction(25, 1000)
+    # VAT 7% ขั้นสุดท้าย แล้วปัดครั้งเดียว (half-up)
+    total *= 1 + Fraction(7, 100)
     return half_up(total)
 
 
@@ -41,8 +37,8 @@ def main():
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = bulk_price(**args)
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
+    except (ValueError, TypeError) as error:
+        print(json.dumps({"ok": False, "error": str(error)}))
         return 2
     print(json.dumps({"ok": True, "result": result}))
     return 0

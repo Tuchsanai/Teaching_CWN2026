@@ -1,4 +1,4 @@
-"""คิดค่าปรับชำระช้า BaanKafe"""
+"""BaanKafe: ค่าปรับชำระช้าของลูกค้าขายส่ง (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
@@ -10,7 +10,7 @@ def half_up(x):
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool และ float ไม่ใช่ int
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -18,13 +18,15 @@ def need_int(value, name, low=None, high=None):
 
 
 def late_fee(amount, days_late):
+    # validate ก่อนคำนวณเสมอ
     need_int(amount, "amount", 0)
     need_int(days_late, "days_late", 0, 365)
-    if days_late <= 3:
+    if days_late <= 3:  # ช้าไม่เกิน 3 วัน ไม่คิดค่าปรับ
         return 0
-    fee = Fraction(amount) * Fraction(75, 10000) * days_late
-    fee = min(fee, Fraction(amount) * Fraction(15, 100))
-    return half_up(fee)
+    # วันละ 0.75% นับทุกวัน (รวม 3 วันแรก) เพดาน 15% ของยอดค้าง
+    rate = min(Fraction(75, 10000) * days_late, Fraction(15, 100))
+    # ค่าปรับเป็นรายได้ร้าน -> half-up ปัดครั้งเดียวตอนท้าย
+    return half_up(Fraction(amount) * rate)
 
 
 def main():

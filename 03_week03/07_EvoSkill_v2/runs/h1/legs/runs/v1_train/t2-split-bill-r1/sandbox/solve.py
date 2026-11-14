@@ -1,45 +1,66 @@
+"""BaanKafe: หารบิลพร้อมทิป (หน่วยเป็นสตางค์)
+
+กติกา:
+- total = ยอดบิลเป็นสตางค์ (int, >= 0)
+- people = จำนวนคน (int, >= 1)
+- tip_percent = ทิปเป็นเปอร์เซ็นต์ (int, 0–100)
+- ยอดที่ต้องหาร = total + ทิป (total * tip_percent / 100)
+- หารเท่ากันทุกคน ถ้าไม่ลงตัว คนลำดับต้น ๆ จ่ายเพิ่มคนละ 1 สตางค์
+- คืน list ของยอดที่แต่ละคนจ่าย (int สตางค์) เรียงตามลำดับคน
+
+การตีความที่เลือกเอง:
+- คำนวณทิปใน Fraction แล้วปัดครั้งเดียวตอนท้าย (ปัดครึ่งขึ้น เพราะเป็นยอดที่ลูกค้าจ่าย)
+"""
+import json
+import sys
 from fractions import Fraction
+from math import floor
 
 
-def _require_int(value, label, lo=None, hi=None):
-    # type(...) is int ปฏิเสธ bool, float และ str ทุกกรณี
+def _need_int(value, name, low=None, high=None):
+    # bool เป็น subclass ของ int จึงต้องเช็คด้วย type() ตรง ๆ
     if type(value) is not int:
-        raise ValueError(f"{label} ต้องเป็นจำนวนเต็ม")
-    if lo is not None and value < lo:
-        raise ValueError(f"{label} ต้องไม่น้อยกว่า {lo}")
-    if hi is not None and value > hi:
-        raise ValueError(f"{label} ต้องไม่เกิน {hi}")
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
     return value
 
 
 def _half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม สำหรับค่าที่ไม่ติดลบ"""
-    return int((Fraction(x) * 2 + 1) // 2)
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    return floor(Fraction(x) + Fraction(1, 2))
+
+
+def _split_even(amount, n):
+    """หารเท่ากัน คนลำดับต้นได้เพิ่มคนละ 1 สตางค์ ผลรวมเท่ากับ amount เสมอ"""
+    base, extra = divmod(amount, n)
+    return [base + 1] * extra + [base] * (n - extra)
 
 
 def split_bill(total, people, tip_percent):
-    """หารบิลให้คนละเท่า ๆ กัน (หน่วยสตางค์) รวมทิปก่อนหาร
+    total = _need_int(total, "total", low=0)
+    people = _need_int(people, "people", low=1)
+    tip_percent = _need_int(tip_percent, "tip_percent", low=0, high=100)
 
-    total        ยอดบิลเป็นสตางค์ (>= 0)
-    people       จำนวนคน (>= 1)
-    tip_percent  ทิปเป็นเปอร์เซ็นต์ จำนวนเต็ม 0–100
+    # ทิปและยอดรวมคำนวณใน Fraction ปัดครั้งเดียวที่ปลายสุด
+    amount_due = total + Fraction(total * tip_percent, 100)
+    amount_satang = _half_up(amount_due)
 
-    คืน list ของยอดที่แต่ละคนจ่าย (int สตางค์) เรียงตามลำดับคน
-    คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์เมื่อหารไม่ลงตัว
-    """
-    total = _require_int(total, "total", lo=0)
-    people = _require_int(people, "people", lo=1)
-    tip_percent = _require_int(tip_percent, "tip_percent", lo=0, hi=100)
+    return _split_even(amount_satang, people)
 
-    # ยอดที่ต้องหาร = บิล + ทิป คำนวณเป็นเศษส่วนแล้วปัดครึ่งขึ้นครั้งเดียว
-    # เพราะยอดที่หารต้องเป็นจำนวนเต็มสตางค์ (บิลเป็นจำนวนเต็มอยู่แล้ว จึงเท่ากับปัดทิปแล้วบวก)
-    grand_total = _half_up(Fraction(total) * (100 + tip_percent) / 100)
 
-    base, extra = divmod(grand_total, people)
-    return [base + 1 if i < extra else base for i in range(people)]
+def main():
+    try:
+        args = json.loads(sys.stdin.read())
+        if not isinstance(args, dict):
+            raise ValueError("input ต้องเป็น JSON object")
+        result = split_bill(**args)
+    except (ValueError, TypeError) as e:
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        return 2
+    print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
+    return 0
 
 
 if __name__ == "__main__":
-    print(split_bill(10000, 3, 0))    # [3334, 3333, 3333]
-    print(split_bill(10000, 4, 10))   # [2750, 2750, 2750, 2750]
-    print(split_bill(1, 1, 50))       # [2]
+    sys.exit(main())

@@ -1,74 +1,50 @@
-"""ค่าส่งเมล็ดกาแฟ BaanKafe
+"""BaanKafe shipping fee calculator.
 
-shipping_fee(weight_g, distance_km, express) -> int (หน่วยเป็นสตางค์)
+shipping_fee(weight_g, distance_km, express) -> int (satang)
 
-กติกา:
-- ฐานตามน้ำหนัก:
-    ไม่เกิน 1,000 กรัม  -> 40 บาท
-    ไม่เกิน 5,000 กรัม  -> 80 บาท
-    เกิน 5,000 กรัม     -> 80 บาท + 15 บาท/กก. ของส่วนที่เกิน 5,000 กรัม (คิดตามสัดส่วนกรัม)
-- ระยะทางเกิน 100 กม. -> คิดเพิ่ม 20% (เกิน 100 จริง ๆ; 100 กม. พอดีไม่เพิ่ม)
-- ส่งด่วน (express=True) -> คิดเพิ่ม 50% คูณต่อจากข้อก่อนหน้า
-- ผลลัพธ์ปัดเศษเป็นสตางค์จำนวนเต็ม (ปัดครึ่งขึ้น)
+Rules (all amounts in baht, computed exactly with Fraction, then rounded
+half-up to whole satang):
+  1. Base by weight:
+       weight <= 1,000 g   -> 40 baht
+       weight <= 5,000 g   -> 80 baht
+       weight  > 5,000 g   -> 80 baht + 15 baht per kg above 5,000 g
+                              (pro-rated by grams)
+  2. distance > 100 km    -> +20% (multiply by 1.2)
+  3. express = True       -> +50% (multiply by 1.5), applied after rule 2
 """
 
-from decimal import Decimal, ROUND_HALF_UP
+from fractions import Fraction
 
-MIN_WEIGHT_G = 1
 MAX_WEIGHT_G = 30_000
-
-BASE_LIGHT_SATANG = 4000     # 40 บาท
-BASE_MEDIUM_SATANG = 8000    # 80 บาท
-EXCESS_PER_KG_SATANG = 1500  # 15 บาท/กก.
-
-LIGHT_LIMIT_G = 1_000
-MEDIUM_LIMIT_G = 5_000
-
-FAR_DISTANCE_KM = 100
-FAR_SURCHARGE = Decimal("1.20")
-EXPRESS_SURCHARGE = Decimal("1.50")
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์"""
-    if isinstance(weight_g, bool) or not isinstance(weight_g, (int, float)):
-        raise TypeError("weight_g ต้องเป็นตัวเลข")
-    if not (MIN_WEIGHT_G <= weight_g <= MAX_WEIGHT_G):
-        raise ValueError(f"weight_g ต้องอยู่ระหว่าง {MIN_WEIGHT_G}–{MAX_WEIGHT_G} กรัม")
-    if isinstance(distance_km, bool) or not isinstance(distance_km, (int, float)):
-        raise TypeError("distance_km ต้องเป็นตัวเลข")
+    if isinstance(weight_g, bool) or not isinstance(weight_g, (int, float, Fraction)):
+        raise TypeError("weight_g must be a number")
+    if not (1 <= weight_g <= MAX_WEIGHT_G):
+        raise ValueError("weight_g must be between 1 and 30,000 grams")
     if distance_km < 0:
-        raise ValueError("distance_km ต้องไม่ต่ำกว่า 0")
+        raise ValueError("distance_km must be >= 0")
 
-    # คำนวณเป็นสตางค์ด้วย Decimal เพื่อหลีกเลี่ยงความคลาดเคลื่อนของ float
-    weight = Decimal(str(weight_g))
-    if weight <= LIGHT_LIMIT_G:
-        fee = Decimal(BASE_LIGHT_SATANG)
-    elif weight <= MEDIUM_LIMIT_G:
-        fee = Decimal(BASE_MEDIUM_SATANG)
+    weight = Fraction(weight_g)
+    distance = Fraction(distance_km)
+
+    # 1) Base fee by weight (baht, exact)
+    if weight <= 1000:
+        fee = Fraction(40)
+    elif weight <= 5000:
+        fee = Fraction(80)
     else:
-        excess_g = weight - MEDIUM_LIMIT_G
-        fee = Decimal(BASE_MEDIUM_SATANG) + Decimal(EXCESS_PER_KG_SATANG) * excess_g / Decimal(1000)
+        fee = Fraction(80) + (weight - 5000) * Fraction(15, 1000)
 
-    if Decimal(str(distance_km)) > FAR_DISTANCE_KM:
-        fee *= FAR_SURCHARGE
+    # 2) Long-distance surcharge: +20% when distance exceeds 100 km
+    if distance > 100:
+        fee *= Fraction(120, 100)
 
+    # 3) Express surcharge: +50%, applied on top of the previous step
     if express:
-        fee *= EXPRESS_SURCHARGE
+        fee *= Fraction(150, 100)
 
-    return int(fee.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
-
-
-if __name__ == "__main__":
-    examples = [
-        (500, 10, False),     # 4000
-        (1000, 10, False),    # 4000
-        (3000, 10, False),    # 8000
-        (5000, 10, False),    # 8000
-        (6000, 10, False),    # 8000 + 1500 = 9500
-        (6000, 150, False),   # 9500 * 1.2 = 11400
-        (6000, 150, True),    # 11400 * 1.5 = 17100
-        (30000, 10, True),    # (8000 + 25*1500) * 1.5 = 68250
-    ]
-    for w, d, e in examples:
-        print(f"weight={w:>6} g  distance={d:>4} km  express={e!s:<5}  ->  {shipping_fee(w, d, e)} satang")
+    # Convert to satang and round half-up to an integer
+    satang = fee * 100
+    return int(satang + Fraction(1, 2))  # floor(x + 0.5), x >= 0

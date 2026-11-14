@@ -1,52 +1,40 @@
-import math
 from fractions import Fraction
 
 
-def _to_int(x, name):
-    """รับเฉพาะตัวเลขจำนวนเต็ม (หรือ float ที่เป็นจำนวนเต็มลงตัว) ไม่รับ bool"""
-    if isinstance(x, bool):
-        raise ValueError(f"{name} ต้องเป็นตัวเลข")
-    if isinstance(x, int):
-        return x
-    if isinstance(x, float) and x.is_integer():
-        return int(x)
-    raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-
-
-def _round_half_up(f):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม ใช้ครั้งเดียวตอนคำนวณยอดรวม"""
-    return math.floor(f + Fraction(1, 2))
-
-
 def split_bill(total, people, tip_percent):
-    """หารบิลให้คนเท่า ๆ กัน โดยรวมทิปก่อนหาร
+    """หารบิลของ BaanKafe
 
-    total       ยอดบิล (สตางค์, >= 0)
-    people      จำนวนคน (>= 1)
-    tip_percent ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0-100)
+    total        : ยอดบิลเป็นสตางค์ (int, >= 0)
+    people       : จำนวนคน (int, >= 1)
+    tip_percent  : ทิปเป็นเปอร์เซ็นต์ (int, 0-100)
 
-    คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน
-    คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์เมื่อหารไม่ลงตัว
+    คืน list[int] ยอดที่แต่ละคนจ่ายเป็นสตางค์ เรียงตามลำดับคน
+
+    กติกาที่เลือกตีความ:
+    - ทิป = ยอดบิล × tip_percent / 100 ปัดลง (ตัดเศษสตางค์ทิ้ง) ที่ขั้นสุดท้ายของทิป
+    - ยอดที่ต้องหาร = ยอดบิล + ทิป
+    - หารเท่ากัน เศษสตางค์ให้คนลำดับแรก ๆ คนละ 1 สตางค์
     """
-    total = _to_int(total, "total")
-    people = _to_int(people, "people")
-    tip_percent = _to_int(tip_percent, "tip_percent")
+    if not isinstance(total, int) or isinstance(total, bool) or total < 0:
+        raise ValueError("total ต้องเป็นจำนวนเต็มสตางค์ตั้งแต่ 0 ขึ้นไป")
+    if not isinstance(people, int) or isinstance(people, bool) or people < 1:
+        raise ValueError("people ต้องเป็นจำนวนเต็มตั้งแต่ 1 ขึ้นไป")
+    if not isinstance(tip_percent, int) or isinstance(tip_percent, bool) or not (0 <= tip_percent <= 100):
+        raise ValueError("tip_percent ต้องเป็นจำนวนเต็มระหว่าง 0 ถึง 100")
 
-    if total < 0:
-        raise ValueError("total ต้องไม่ติดลบ")
-    if people < 1:
-        raise ValueError("people ต้องอย่างน้อย 1 คน")
-    if not 0 <= tip_percent <= 100:
-        raise ValueError("tip_percent ต้องอยู่ในช่วง 0-100")
+    # ทิป: คำนวณเป็น Fraction แล้วปัดลงครั้งเดียวที่ขั้นสุดท้าย
+    tip = (Fraction(total) * Fraction(tip_percent, 100)).__floor__()
 
-    # ยอดที่ต้องหาร = ยอดบิล + ทิป (คิดเป็นเศษส่วนก่อน แล้วปัดครั้งเดียว)
-    amount = _round_half_up(Fraction(total) * (100 + tip_percent) / 100)
+    # ยอดที่ต้องหาร = ยอดบิล + ทิป
+    amount = total + tip
 
-    base, remainder = divmod(amount, people)
-    return [base + 1] * remainder + [base] * (people - remainder)
+    # หารให้ผลรวมตรงเป๊ะ คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์
+    q, r = divmod(amount, people)
+    shares = [q + 1 if i < r else q for i in range(people)]
+    return shares
 
 
 if __name__ == "__main__":
-    print(split_bill(10000, 3, 0))    # [3334, 3333, 3333]
-    print(split_bill(10000, 4, 10))   # [2750, 2750, 2750, 2750]
-    print(split_bill(12345, 3, 15))   # ทดสอบ half-up และการกระจายเศษ
+    # ตัวอย่างการใช้งาน
+    print(split_bill(10001, 3, 10))  # 10001 + ทิป 1000 = 11001 -> [3667, 3667, 3667]
+    print(split_bill(1000, 3, 0))    # 1000 หาร 3 -> [334, 333, 333]

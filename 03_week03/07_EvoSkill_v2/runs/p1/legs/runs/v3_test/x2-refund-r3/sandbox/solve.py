@@ -1,33 +1,30 @@
-"""refund(paid, used_percent, restock) - BaanKafe course refund (satang).
-
-Rounding mode r3: round half up at every money step.
-Assumptions: refund = paid*(100-used)/100 (rounded to satang);
-used > 80 -> 0; if restock, fee = 12.5% of that refund (rounded), refund - fee.
-"""
+from fractions import Fraction
 
 
-class InputError(ValueError, TypeError):
-    pass
+def _rnd_even(x):
+    """ปัดแบบ round() ของ Python (ใกล้สุด, .5 ปัดไปหาเลขคู่) ครั้งเดียวตอนจบ"""
+    x = Fraction(x)
+    q, r = divmod(x.numerator, x.denominator)
+    twice = 2 * r
+    if twice > x.denominator or (twice == x.denominator and q % 2 == 1):
+        q += 1
+    return q
 
 
-def _half_up(num, den):
-    return (2 * num + den) // (2 * den)
-
-
-def _is_int(x):
-    return isinstance(x, int) and not isinstance(x, bool)
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def refund(paid, used_percent, restock):
     if not _is_int(paid) or paid < 0:
-        raise InputError("paid must be int >= 0")
+        raise ValueError("paid must be int >= 0")
     if not _is_int(used_percent) or not 0 <= used_percent <= 100:
-        raise InputError("used_percent must be int 0-100")
+        raise ValueError("used_percent must be int in 0..100")
     if not isinstance(restock, bool):
-        raise InputError("restock must be bool")
+        raise ValueError("restock must be bool")
     if used_percent > 80:
         return 0
-    amount = _half_up(paid * (100 - used_percent), 100)
+    amount = Fraction(paid * (100 - used_percent), 100)
     if restock:
-        amount -= _half_up(amount * 125, 1000)
-    return int(amount)
+        amount *= Fraction(875, 1000)  # หัก 12.5% ของยอดที่จะคืน
+    return int(_rnd_even(amount))

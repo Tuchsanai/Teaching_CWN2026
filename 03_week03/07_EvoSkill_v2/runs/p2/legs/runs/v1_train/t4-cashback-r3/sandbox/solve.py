@@ -1,25 +1,12 @@
-# นโยบายปัดเศษ r3: คำนวณแม่นยำด้วยจำนวนเต็ม/เศษส่วน แล้วปัดลง (floor) ครั้งเดียวตอนท้าย
-from fractions import Fraction
-
-_RATES = {
-    "silver": Fraction(15, 1000),
-    "gold": Fraction(25, 1000),
-    "platinum": Fraction(4, 100),
-}
-_MIN_AMOUNT = 100 * 100   # 100 บาท (สตางค์)
-_CAP = 200 * 100          # 200 บาท (สตางค์)
+# กติกาปัดเศษแบบ C: ปัดครึ่งขึ้นเป็นสตางค์เต็มหลังคิดเงินคืนก่อนคูณ 2 (จำนวนเต็มล้วน)
+RATES = {"silver": (3, 200), "gold": (1, 40), "platinum": (1, 25)}
 
 
 def cashback(amount, tier, birthday):
-    if isinstance(amount, bool) or not isinstance(amount, int) or amount < 0:
-        raise ValueError("amount must be a non-negative int (satang)")
-    if not isinstance(tier, str) or tier not in _RATES:
-        raise ValueError("tier must be 'silver', 'gold' or 'platinum'")
-    if not isinstance(birthday, bool):
-        raise ValueError("birthday must be bool")
-    if amount < _MIN_AMOUNT:
+    if amount < 10000:  # ต่ำกว่า 100 บาท ไม่ได้เงินคืน (พอดี 100 บาทได้)
         return 0
-    value = amount * _RATES[tier]
+    n, d = RATES[tier]
+    cb = (2 * amount * n + d) // (2 * d)  # ปัดครึ่งขึ้น
     if birthday:
-        value *= 2
-    return min(int(value // 1), _CAP)  # floor ครั้งเดียว แล้วจำกัดเพดาน
+        cb *= 2
+    return min(cb, 20000)  # เพดาน 200 บาทต่อบิล หลังคูณ 2

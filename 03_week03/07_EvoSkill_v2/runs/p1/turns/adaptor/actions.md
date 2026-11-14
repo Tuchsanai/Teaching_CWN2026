@@ -9,12 +9,12 @@ cd /ba/setup; ls -la; cat plugin_api.py plugin_skeleton.py benchmark_grader.py; 
 ผลที่ได้:
 
 ```
-total 36
-drwxr-xr-x 2 root root  4096 Nov 13 09:02 .
-drwxr-xr-x 6 root root  4096 Nov 13 09:02 ..
--rwxr-xr-x 1 root root 20223 Nov 13 09:02 benchmark_grader.py
--rw-r--r-- 1 root root  1667 Nov 13 09:02 plugin_api.py
--rw-r--r-- 1 root root   560 Nov 13 09:02 plugin_skeleton.py
+total 40
+drwxr-xr-x 2 root root  4096 Nov 15 04:05 .
+drwxr-xr-x 6 root root  4096 Nov 15 04:05 ..
+-rwxr-xr-x 1 root root 24093 Nov 15 04:05 benchmark_grader.py
+-rw-r--r-- 1 root root  1667 Nov 15 04:05 plugin_api.py
+-rw-r--r-- 1 root root   560 Nov 15 04:05 plugin_skeleton.py
 """plugin_api.py - รูปแบบของ 1 โจทย์ ที่ plug-in ของ Benchmark Adaptor ต้องคืน
 
 plug-in (benchmark_plugin.py) มีฟังก์ชันเดียว:
@@ -36,51 +36,43 @@ class Task:
     instruction: str                          # ข้อความโจทย์ที่ Solver ได้รับ
     inputs: list = field(default_factory=list)        # ไฟล์ตั้งต้นของโจทย์ (path เทียบกับ root) · โจทย์นี้ไม่มี
     answer_files: list = field(default_factory=list)  # ไฟล์เฉลยของ
-…(ตัด 20586 ตัวอักษร)
+…(ตัด 23161 ตัวอักษร)
 ```
 
 ### ขั้น 2 · Bash
 
 ```
-cd /data/baankafe/tasks; cat t1-cafe-bill.json; echo; ls -la /ba /ba/reference /ba/setup; grep -l "answers\|grader" *.json
+cd /data/baankafe/tasks; for f in *.json; do echo "== $f"; cat $f; echo; done; ls -la /ba /ba/reference 2>&1
 ```
 
 ผลที่ได้:
 
 ```
+== t1-cafe-bill.json
 {
  "id": "t1-cafe-bill",
  "function": "cafe_bill",
  "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `cafe_bill(items, member)` ในไฟล์ `solve.py` สำหรับคิดเงินหน้าร้าน\n- `items` = list ของ dict `{\"price\": ราคาต่อชิ้น (สตางค์), \"qty\": จำนวนชิ้น (ตั้งแต่ 1)}`\n- ยอดรวมตั้งแต่ 500 บาทขึ้นไป ลด 5%\n- `member` = True ลดอีก 10%\n- บวก VAT 7% เป็นขั้นสุดท้าย\n- คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์"
 }
-/ba:
-total 24
-drwxr-xr-x 6 root root 4096 Nov 13 09:02 .
-drwxr-xr-x 1 root root 4096 Nov 13 08:52 ..
-drwxr-xr-x 3 root root 4096 Nov 13 09:02 data
-drwxr-xr-x 2 root root 4096 Nov 13 09:02 reference
-drwxr-xr-x 2 root root 4096 Nov 13 09:02 setup
-drwxr-xr-x 2 root root 4096 Nov 13 09:02 work
-
-/ba/reference:
-total 8
-drwxr-xr-x 2 root root 4096 Nov 13 09:02 .
-drwxr-xr-x 6 root root 4096 Nov 13 09:02 ..
-
-/ba/setup:
-total 36
-drwxr-xr-x 2 root root  4096 Nov 13 09:02 .
-drwxr-xr-x 6 root root  4096 Nov 13 09:02 ..
--rwxr-xr-x 1 root root 20223 Nov 13 09:02 benchmark_grader.py
--rw-r--r-- 1 root root  1667 Nov 13 09:02 plugin_api.py
--rw-r--r-- 1 root root   560 Nov 13 09:02 plugin_skeleton.py
+== t2-split-bill.json
+{
+ "id": "t2-split-bill",
+ "function": "split_bill",
+ "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `split_bill(total, people, tip_percent)` ในไฟล์ `solve.py` สำหรับหารบิล\n- `total` = ยอดบิล (สตางค์ ตั้งแต่ 0) · `people` = จำนวนคน (ตั้งแต่ 1) · `tip_percent` = ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0–100)\n- ยอดที่ต้องหาร = ยอดบิลบวกทิป\n- หารเท่ากันทุกคน ถ้าหารไม่ลงตัว ให้คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์จนครบ\n- คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน"
+}
+== t3-shipping-fee.json
+{
+ "id": "t3-shipping-fee",
+ "function": "shipping_fee",
+ "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `shipping_fee(weight_g, distance_km, express)` ในไฟล์ `solve.py` สำหรับคิดค่าส่งเมล็ดกาแฟ\n- `weight_g` = น้ำหนัก 1–30,000 กรัม · `distance_km` = ระยะ
+…(ตัด 3800 ตัวอักษร)
 ```
 
 ### ขั้น 3 · Bash
 
 ```
-cat > /ba/setup/benchmark_plugin.py <<'EOF'
-"""benchmark_plugin.py - BaanKafe: 9 โจทย์เขียนฟังก์ชันคิดเงิน (train 4 / validation 2 / test 3)"""
+ls -laR /ba/data | head; cat > /ba/setup/benchmark_plugin.py <<'EOF'
+"""benchmark_plugin.py - BaanKafe: 9 โจทย์เขียนฟังก์ชันคิดเงิน (train 4 · validation 2 · test 3)"""
 import json
 import os
 
@@ -101,70 +93,77 @@ SPLIT = {
 
 def list_tasks(root):
     tasks = []
-    tdir = os.path.join(root, "tasks")
     for tid, split in SPLIT.items():
-        with open(os.path.join(tdir, tid + ".json"), encoding="utf-8") as f:
+        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
             d = json.load(f)
         tasks.append(Task(
-            id=tid,
+            id=d["id"],
             split=split,
             instruction=d["brief"],
             inputs=[],
-            answer_files=[
-                "answers/%s/solve.py" % tid,
-                "answers/%s/test_solve.py" % tid,
-            ],
-            grading={"key": tid, "function": d["function"]},
+            answer_files=[],  # เฉลยใน answers/ ไม่ถูกใส่ไว้ เพราะตัวตรวจไม่ใช้ และห้ามให้ Evolver เห็น
+            grading={"key": d["id"], "function": d["function"]},
             category="coding",
         ))
     return tasks
 EOF
-mkdir -p /ba/reference/baankafe/tasks
-for t in t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback; do cp /data/baankafe/tasks/$t.json /ba/reference/baankafe/tasks/; done
+mkdir -p /ba/reference/tasks && cp /data/baankafe/tasks/t[1-4]-*.json /ba/reference/tasks/
 cd /ba/setup && python3 -I -c "
-import sys; sys.path.insert(0,'/ba/setup')
-import benchmark_plugin as b, os
-ts=b.list_tasks('/data/baankafe')
-for t in ts:
-    print(t.id,t.split,all(os.path.isfile('/data/baankafe/'+p) for p in t.answer_files),t.grading)
-import benchmark_grader as g
-print(all(t.id in g.TASKS for t in ts))
-"; find /ba/reference -type f; grep -rl "ValueError\|answers" /ba/reference
+import sys; sys.path.insert(0,'.')
+import benchmark_plugin as b
+for t in b.list_tasks('/data/baankafe'): print(t.id,t.split,t.grading,len(t.instruction))
+"; find /ba/reference -type f; grep -rl -e v1- -e x1- -e answers /ba/reference
 ```
 
 ผลที่ได้:
 
 ```
-t1-cafe-bill train True {'key': 't1-cafe-bill', 'function': 'cafe_bill'}
-t2-split-bill train True {'key': 't2-split-bill', 'function': 'split_bill'}
-t3-shipping-fee train True {'key': 't3-shipping-fee', 'function': 'shipping_fee'}
-t4-cashback train True {'key': 't4-cashback', 'function': 'cashback'}
-v1-parking-fee validation True {'key': 'v1-parking-fee', 'function': 'parking_fee'}
-v2-net-pay validation True {'key': 'v2-net-pay', 'function': 'net_pay'}
-x1-late-fee test True {'key': 'x1-late-fee', 'function': 'late_fee'}
-x2-refund test True {'key': 'x2-refund', 'function': 'refund'}
-x3-bulk-price test True {'key': 'x3-bulk-price', 'function': 'bulk_price'}
-True
-/ba/reference/baankafe/tasks/t3-shipping-fee.json
-/ba/reference/baankafe/tasks/t4-cashback.json
-/ba/reference/baankafe/tasks/t1-cafe-bill.json
-/ba/reference/baankafe/tasks/t2-split-bill.json
+/ba/data:
+total 16
+drwxr-xr-x 3 root root 4096 Nov 15 04:05 .
+drwxr-xr-x 6 root root 4096 Nov 15 04:05 ..
+drwxr-xr-x 4 root root 4096 Nov 13 08:46 baankafe
+-rw-r--r-- 1 root root  213 Nov 15 04:05 split.json
+
+/ba/data/baankafe:
+total 16
+drwxr-xr-x  4 root root 4096 Nov 13 08:46 .
+t1-cafe-bill train {'key': 't1-cafe-bill', 'function': 'cafe_bill'} 329
+t2-split-bill train {'key': 't2-split-bill', 'function': 'split_bill'} 405
+t3-shipping-fee train {'key': 't3-shipping-fee', 'function': 'shipping_fee'} 485
+t4-cashback train {'key': 't4-cashback', 'function': 'cashback'} 417
+v1-parking-fee validation {'key': 'v1-parking-fee', 'function': 'parking_fee'} 408
+v2-net-pay validation {'key': 'v2-net-pay', 'function': 'net_pay'} 458
+x1-late-fee test {'key': 'x1-late-fee', 'function': 'late_fee'} 405
+x2-refund test {'key': 'x2-refund', 'function': 'refund'} 429
+x3-bulk-price test {'key': 'x3-bulk-price', 'function': 'bulk_price'} 391
+/ba/reference/tasks/t3-shipping-fee.json
+/ba/reference/tasks/t4-cashback.json
+/ba/reference/tasks/t1-cafe-bill.json
+/ba/reference/tasks/t2-split-bill.json
 ```
 
-**Agent พูด:** ผมเขียน `/ba/setup/benchmark_plugin.py` และเติม `/ba/reference/` เสร็จแล้ว ทดสอบปลั๊กอินกับ `/data/baankafe` แล้ว รันตัวตรวจจริงไม่ได้เพราะกติกาห้าม
+### ขั้น 4 · Bash
 
-**`benchmark_plugin.py`**
-- `list_tasks(root)` คืน `Task` 9 ตัว แบ่งตาม `/data/split.json`: train 4, validation 2, test 3 ผมเขียนการแบ่งชุดไว้ในไฟล์ปลั๊กอินเอง ตามกติกา
-- `instruction` มาจาก `brief` ของแต่ละโจทย์ และ `answer_files` ชี้ไปที่ `answers/<id>/solve.py` กับ `answers/<id>/test_solve.py` ทั้ง 9 โจทย์
-- `grading` ใส่ `{"key": <task id>, "function": <ชื่อฟังก์ชัน>}` ตัวตรวจอ่าน `key` นี้เลือกชุดกรณีทดสอบ
-- ปลั๊กอินสร้าง path ทั้งหมดจาก `root` และ import เฉพาะ standard library กับ `plugin_api`
-- ผลทดสอบ: ไฟล์เฉลยมีอยู่จริงครบทุกโจทย์ และ id ทั้ง 9 ตัวมีใน `TASKS` ของ `benchmark_grader.py`
+```
+grep -rnoE -e 'v1-|x1-|answers' /ba/reference | head
+```
 
-**`/ba/reference/`**
-- มีเฉพาะ `baankafe/tasks/` ของโจทย์ train 4 ข้อ (t1–t4) คงโครงโฟลเดอร์เดิม
-- ไม่มีโฟลเดอร์ `answers/` ของโจทย์ใดเลย รวมถึงชุด train ตามที่สั่ง
-- ไม่มีไฟล์ของโจทย์ validation หรือ test ไม่มีโค้ดตัวตรวจ และไม่มี `split.json` เพราะไฟล์นั้นระบุ id ของชุด validation กับ test
+ผลที่ได้:
 
-คำว่า `ValueError` ที่ปรากฏใน reference อยู่ในข้อความโจทย์ train เท่านั้น ไม่ใช่รายละเอียดของตัวตรวจ
+```
+(Bash completed with no output)
+```
 
-ขนาดการรัน (3 epochs, 3 samples per task) ผมไม่ได้เขียนไว้ที่ใด เพราะ `list_tasks` มีหน้าที่คืนโจทย์เท่านั้น ค่านี้ต้องตั้งฝั่ง loop
+**Agent พูด:** `/ba/setup/benchmark_plugin.py` และ `/ba/reference/` เสร็จแล้ว ผมรัน `list_tasks('/data/baankafe')` แล้วได้ 9 โจทย์ แบ่งเป็น train 4 · validation 2 · test 3 ตรงกับ `/data/split.json` ผมไม่ได้รันตัวตรวจ เพราะ loop เป็นผู้รัน
+
+- **`benchmark_plugin.py`:** ตาราง `SPLIT` ฝังอยู่ในไฟล์ และอ่านโจทย์จาก `root/tasks/<id>.json` เท่านั้น แต่ละ `Task` ใช้ `brief` เป็น `instruction` และตั้ง `grading = {"key": <id>, "function": <ชื่อฟังก์ชัน>}` ซึ่งตัวตรวจใช้ `key` เลือกชุดกรณีทดสอบ `inputs` ว่างเพราะโจทย์นี้ไม่มีไฟล์ตั้งต้น
+- **`answer_files` เว้นว่าง:** ตัวตรวจไม่ใช้เฉลย และคุณสั่งไม่ให้ Evolver เห็น `answers/` ของโจทย์ใดเลย ผมจึงไม่ใส่ path ของเฉลยลงใน `Task`
+- **`/ba/reference/`:** มี `tasks/t1-cafe-bill.json`, `t2-split-bill.json`, `t3-shipping-fee.json` และ `t4-cashback.json` ซึ่งเป็นข้อความโจทย์ของชุด train ที่คัดลอกมาตามโครงเดิม
+
+ผมไม่ได้คัดลอก 3 อย่างนี้เข้า reference:
+- โจทย์ validation และ test
+- `answers/` ทั้งหมด
+- `benchmark_grader.py`
+
+ผมไม่ได้คัดลอก `/data/split.json` เพราะมีชื่อโจทย์ validation และ test ผมค้นใน `/ba/reference/` แล้วไม่พบชื่อโจทย์ validation, test หรือคำว่า `answers`

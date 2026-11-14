@@ -1,112 +1,72 @@
 import unittest
-
 from solve import late_fee
 
 
 class Normal(unittest.TestCase):
-    def test_normal_1(self):
-        self.assertEqual(late_fee(100000, 10), 7500)
-
-    def test_normal_2(self):
-        self.assertEqual(late_fee(200000, 5), 7500)
-
-    def test_normal_3(self):
-        self.assertEqual(late_fee(0, 100), 0)
-
-    def test_normal_4(self):
+    def test_no_fee_within_grace(self):
         self.assertEqual(late_fee(100000, 0), 0)
+        self.assertEqual(late_fee(100000, 3), 0)
+
+    def test_counts_all_days_including_first_three(self):
+        # 4 วัน = 3.00% ของ 100000 = 3000
+        self.assertEqual(late_fee(100000, 4), 3000)
+        # 10 วัน = 7.5% ของ 200000 = 15000
+        self.assertEqual(late_fee(200000, 10), 15000)
+
+    def test_zero_amount(self):
+        self.assertEqual(late_fee(0, 30), 0)
 
 
 class Boundary(unittest.TestCase):
-    def test_boundary_1(self):  # 3 วัน ไม่คิด
-        self.assertEqual(late_fee(100000, 3), 0)
+    def test_grace_edge(self):
+        self.assertEqual(late_fee(10000, 3), 0)
+        self.assertEqual(late_fee(10000, 4), 300)
 
-    def test_boundary_2(self):  # 4 วัน คิดครบ 4 วัน
-        self.assertEqual(late_fee(100000, 4), 3000)
-
-    def test_boundary_3(self):
-        self.assertEqual(late_fee(100000, 2), 0)
-
-    def test_boundary_4(self):  # ยังไม่ชนเพดาน
+    def test_cap_edge(self):
+        # 19 วัน = 14.25% ; 20 วัน = 15% พอดี ; 21 วัน ชนเพดาน 15%
         self.assertEqual(late_fee(100000, 19), 14250)
-
-    def test_boundary_5(self):  # พอดีเพดาน
         self.assertEqual(late_fee(100000, 20), 15000)
-
-    def test_boundary_6(self):  # เกินเพดาน
         self.assertEqual(late_fee(100000, 21), 15000)
 
-    def test_boundary_7(self):
+    def test_max_days(self):
         self.assertEqual(late_fee(100000, 365), 15000)
 
 
 class NoDrift(unittest.TestCase):
-    def test_no_drift_1(self):  # 1.5 -> 2
+    def test_half_up(self):
+        # 4 วัน 3% ของ 50 = 1.5 -> 2 (floor=1, half-even=2)
         self.assertEqual(late_fee(50, 4), 2)
+        # 3% ของ 150 = 4.5 -> 5 (half-even จะได้ 4)
+        self.assertEqual(late_fee(150, 4), 5)
+        # 3% ของ 49 = 1.47 -> 1
+        self.assertEqual(late_fee(49, 4), 1)
+        # 5 วัน 3.75% ของ 40 = 1.5 -> 2
+        self.assertEqual(late_fee(40, 5), 2)
 
-    def test_no_drift_2(self):  # 2.625 -> 3
-        self.assertEqual(late_fee(70, 5), 3)
-
-    def test_no_drift_3(self):  # 0.3 -> 0
-        self.assertEqual(late_fee(10, 4), 0)
-
-    def test_no_drift_4(self):  # 7.125 -> 7
-        self.assertEqual(late_fee(50, 19), 7)
-
-    def test_no_drift_5(self):  # เพดาน 7.5 -> 8
-        self.assertEqual(late_fee(50, 20), 8)
-
-    def test_no_drift_6(self):  # เพดาน 1.5 -> 2
-        self.assertEqual(late_fee(10, 365), 2)
-
-    def test_type_int(self):
-        self.assertIs(type(late_fee(70, 5)), int)
+    def test_cap_rounding(self):
+        # 15% ของ 10 = 1.5 -> 2
+        self.assertEqual(late_fee(10, 30), 2)
+        # 15% ของ 3 = 0.45 -> 0
+        self.assertEqual(late_fee(3, 30), 0)
 
 
 class Reject(unittest.TestCase):
-    def test_reject_1(self):
+    def check(self, *args):
         with self.assertRaises(ValueError):
-            late_fee(-1, 5)
+            late_fee(*args)
 
-    def test_reject_2(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, -1)
+    def test_amount(self):
+        for bad in (-1, 1.5, 100.0, "100", True, None):
+            self.check(bad, 5)
 
-    def test_reject_3(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, 366)
+    def test_days(self):
+        for bad in (-1, 366, 5.0, 4.5, "5", True, False, None):
+            self.check(1000, bad)
 
-    def test_reject_4(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000.0, 5)
-
-    def test_reject_5(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, 5.0)
-
-    def test_reject_6(self):
-        with self.assertRaises(ValueError):
-            late_fee('1000', 5)
-
-    def test_reject_7(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, '5')
-
-    def test_reject_8(self):
-        with self.assertRaises(ValueError):
-            late_fee(True, 5)
-
-    def test_reject_9(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, True)
-
-    def test_reject_10(self):
-        with self.assertRaises(ValueError):
-            late_fee(None, 5)
-
-    def test_reject_11(self):
-        with self.assertRaises(ValueError):
-            late_fee(1000, None)
+    def test_invalid_even_when_no_fee(self):
+        self.check(-1, 0)
+        self.check(1000, -1)
+        self.check(1000.0, 2)
 
 
 if __name__ == "__main__":

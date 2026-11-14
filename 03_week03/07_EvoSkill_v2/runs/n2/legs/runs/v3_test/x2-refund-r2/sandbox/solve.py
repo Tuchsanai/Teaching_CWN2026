@@ -1,15 +1,16 @@
-"""BaanKafe refund (satang) · half-up once at the end · strict validation"""
+"""BaanKafe: คิดเงินคืนคอร์สสอนชงกาแฟ (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
-def half_up(x):
-    return int((Fraction(x) * 2 + 1) // 2)
+def round_down(x):
+    """ปัดลง — เงินคืนเป็นเงินที่ร้านจ่ายออก ไม่จ่ายเกินสิทธิ์"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool, float, str ไม่ผ่าน
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -26,12 +27,12 @@ def refund(paid, used_percent, restock):
     need_int(paid, "paid", 0)
     need_int(used_percent, "used_percent", 0, 100)
     need_bool(restock, "restock")
-    if used_percent > 80:
+    if used_percent > 80:  # เรียนเกิน 80% ไม่คืนเงิน (80 พอดียังคืน)
         return 0
-    x = Fraction(paid) * Fraction(100 - used_percent, 100)
+    amount = Fraction(paid) * (100 - used_percent) / 100
     if restock:
-        x *= 1 - Fraction(125, 1000)
-    return half_up(x)
+        amount *= Fraction(875, 1000)  # หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
+    return round_down(amount)  # ปัดลงครั้งเดียวตอนท้าย
 
 
 def main():

@@ -1,58 +1,77 @@
-"""BaanKafe cashback calculator.
+"""BaanKafe cashback calculator
 
-ยอดซื้อและเงินคืนทั้งหมดเป็นสตางค์ (จำนวนเต็ม)
+กติกา
+- amount   : ยอดซื้อ เป็นจำนวนเต็มสตางค์ตั้งแต่ 0 (bool, float, str ไม่รับ)
+- tier     : "silver" 1.5% · "gold" 2.5% · "platinum" 4% (ค่าอื่น raise ValueError)
+- birthday : bool, True = ซื้อในเดือนเกิด ได้เงินคืน 2 เท่า
+- ยอดซื้อต่ำกว่า 100 บาท (10000 สตางค์) ไม่ได้เงินคืน (ได้ 0)
+- เงินคืนสูงสุด 200 บาท (20000 สตางค์) ต่อบิล คิดหลังคูณเดือนเกิดแล้ว
+- ผลเป็นจำนวนเต็มสตางค์ ปัดลง (ร้านไม่จ่ายเกิน) ปัดครั้งเดียวตอนท้ายสุด
 """
 import json
 import sys
 from fractions import Fraction
+from math import floor
 
-MIN_AMOUNT = 10000   # 100 บาท ต่ำกว่านี้ไม่ได้เงินคืน
-CAP = 20000          # เพดานเงินคืนต่อบิล 200 บาท
 RATES = {
-    "silver": Fraction(15, 1000),    # 1.5%
-    "gold": Fraction(25, 1000),      # 2.5%
-    "platinum": Fraction(40, 1000),  # 4%
+    "silver": Fraction(15, 1000),  # 1.5%
+    "gold": Fraction(25, 1000),    # 2.5%
+    "platinum": Fraction(4, 100),  # 4%
 }
+MIN_AMOUNT = 10000   # 100 บาท
+MAX_CASHBACK = 20000  # 200 บาท
 
 
-def _half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
+def need_int(value, name, low=None):
+    # bool และ float ไม่ใช่ int ตามเงื่อนไขนี้
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
+def need_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+
+def need_str(value, name, allowed):
+    if type(value) is not str:
+        raise ValueError(f"{name} ต้องเป็นข้อความ")
+    if value not in allowed:
+        raise ValueError(f"{name} ไม่ถูกต้อง")
+    return value
+
+
+def round_down(x):
+    """ปัดลงเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    return floor(Fraction(x))
 
 
 def cashback(amount, tier, birthday):
-    """คืนค่าเงินคืนเป็นสตางค์ (int)
-
-    amount   : ยอดซื้อ (สตางค์ int ตั้งแต่ 0)
-    tier     : "silver" | "gold" | "platinum"
-    birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)
-    """
-    if type(amount) is not int:
-        raise ValueError("amount ต้องเป็นจำนวนเต็มสตางค์")
-    if amount < 0:
-        raise ValueError("amount ต้องไม่ติดลบ")
-    if type(tier) is not str or tier not in RATES:
-        raise ValueError("tier ต้องเป็น silver, gold หรือ platinum")
-    if type(birthday) is not bool:
-        raise ValueError("birthday ต้องเป็น True หรือ False")
+    """คืนค่าเงินคืนสมาชิกเป็นจำนวนเต็มสตางค์"""
+    amount = need_int(amount, "amount", low=0)
+    tier = need_str(tier, "tier", tuple(RATES))
+    birthday = need_bool(birthday, "birthday")
 
     if amount < MIN_AMOUNT:
         return 0
 
-    value = Fraction(amount) * RATES[tier]   # ไม่ปัดระหว่างทาง
-    if birthday:
-        value *= 2
-    return min(_half_up(value), CAP)         # ปัดครั้งเดียว แล้วจำกัดเพดาน
+    multiplier = 2 if birthday else 1
+    value = Fraction(amount) * RATES[tier] * multiplier
+    return min(round_down(value), MAX_CASHBACK)
 
 
 def main():
     try:
-        args = json.load(sys.stdin)
+        args = json.loads(sys.stdin.read())
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cashback(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
+    except (ValueError, TypeError) as exc:
+        print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
     return 0

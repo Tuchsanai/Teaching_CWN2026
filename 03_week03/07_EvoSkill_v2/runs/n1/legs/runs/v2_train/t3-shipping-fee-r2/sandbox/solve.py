@@ -1,16 +1,15 @@
-"""BaanKafe: คิดค่าส่งเมล็ดกาแฟ (คืนค่าเป็นจำนวนเต็มสตางค์)"""
+"""BaanKafe: ค่าส่งเมล็ดกาแฟ (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -27,19 +26,24 @@ def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    # สมมติฐาน: ส่งด่วนได้ไม่เกิน 20,000 กรัม (สองในสามของน้ำหนักสูงสุด)
+    if express and weight_g > 20000:
+        raise ValueError("พัสดุหนักเกิน 20,000 กรัม ส่งด่วนไม่ได้")
+    # สมมติฐาน: ระยะทาง 0 กม. (รับเองที่ร้าน) ไม่มีค่าส่ง
+    if distance_km == 0:
+        return 0
 
     if weight_g <= 1000:
-        fee = Fraction(4000)
+        amount = Fraction(4000)
     elif weight_g <= 5000:
-        fee = Fraction(8000)
+        amount = Fraction(8000)
     else:
-        # ส่วนเกิน 5,000 กรัม กก.ละ 15 บาท = 1.5 สตางค์/กรัม
-        fee = Fraction(8000) + Fraction(weight_g - 5000) * 1500 / 1000
+        amount = Fraction(8000) + Fraction(weight_g - 5000, 1000) * 1500
     if distance_km > 100:
-        fee *= Fraction(120, 100)
+        amount *= Fraction(6, 5)
     if express:
-        fee *= Fraction(150, 100)
-    return half_up(fee)  # ปัดครั้งเดียว half-up
+        amount *= Fraction(3, 2)
+    return half_up(amount)
 
 
 def main():

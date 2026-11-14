@@ -1,16 +1,16 @@
-"""เทมเพลต solve.py สำหรับฟังก์ชันคิดเงิน — เปลี่ยนชื่อฟังก์ชัน/สูตรให้ตรงโจทย์"""
+"""BaanKafe: cafe_bill — คิดเงินหน้าร้าน (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้น — เงินที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -23,42 +23,26 @@ def need_bool(value, name):
     return value
 
 
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
-
-
 def cafe_bill(items, member):
+    # มาตรฐานร้าน: ตรวจ input ครบก่อนคำนวณ; items ว่าง -> 0; price = 0 ผ่านได้
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
     total = 0
-    for item in items:
-        if type(item) is not dict:
-            raise ValueError("item ต้องเป็น dict")
-        price = need_int(item.get("price"), "price", 0)
-        qty = need_int(item.get("qty"), "qty", 1)
+    for it in items:
+        if type(it) is not dict:
+            raise ValueError("แต่ละรายการต้องเป็น dict")
+        price = need_int(it.get("price"), "price", 0)
+        qty = need_int(it.get("qty"), "qty", 1)
         total += price * qty
-    x = Fraction(total)
-    if total >= 50000:
-        x *= Fraction(95, 100)
+
+    amount = Fraction(total)
+    if total >= 50000:  # ตั้งแต่ 500 บาท (ยอดรวมก่อนลด)
+        amount *= Fraction(95, 100)
     if member:
-        x *= Fraction(90, 100)
-    x *= Fraction(107, 100)
-    return half_up(x)
-
-
-_HELPERS = {"half_up", "need_int", "need_bool", "need_choice", "main"}
-
-
-def _entry():
-    """หาฟังก์ชันของโจทย์อัตโนมัติ = ฟังก์ชันสาธารณะตัวสุดท้ายที่นิยามในไฟล์นี้ (ที่ไม่ใช่ helper)
-    จึงไม่ต้องแก้ main() เวลาเปลี่ยนชื่อฟังก์ชัน (กันบั๊ก main ยังเรียก my_function)"""
-    funcs = [f for n, f in globals().items()
-             if callable(f) and getattr(f, "__module__", None) == __name__
-             and not n.startswith("_") and n not in _HELPERS]
-    return funcs[-1]
+        amount *= Fraction(90, 100)
+    amount *= Fraction(107, 100)  # VAT ขั้นสุดท้าย
+    return half_up(amount)  # ปัดครั้งเดียวตอนจบ
 
 
 def main():
@@ -66,7 +50,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = _entry()(**args)
+        result = cafe_bill(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

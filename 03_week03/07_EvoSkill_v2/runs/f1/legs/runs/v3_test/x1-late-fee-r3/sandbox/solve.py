@@ -1,53 +1,32 @@
-"""solve.py — BaanKafe: คิดค่าปรับชำระช้า (ผลเป็นจำนวนเต็มสตางค์)"""
+"""BaanKafe: ค่าปรับชำระเงินช้า (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้น — เงินที่ลูกค้าจ่าย (ค่าปรับ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:  # ปฏิเสธ float, str, bool
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
     return value
 
 
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
-
-
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
-
-
 def late_fee(amount, days_late):
+    # ตรวจ input ให้ครบก่อนคำนวณ/early-return
     need_int(amount, "amount", 0)
     need_int(days_late, "days_late", 0, 365)
     if days_late <= 3:
         return 0
-    fee = Fraction(amount) * Fraction(75, 10000) * days_late
-    return half_up(min(fee, Fraction(amount) * Fraction(15, 100)))
-
-
-_HELPERS = {"half_up", "need_int", "need_bool", "need_choice", "main"}
-
-
-def _entry():
-    """หาฟังก์ชันของโจทย์อัตโนมัติ = ฟังก์ชันสาธารณะตัวสุดท้ายที่นิยามในไฟล์นี้ (ที่ไม่ใช่ helper)
-    จึงไม่ต้องแก้ main() เวลาเปลี่ยนชื่อฟังก์ชัน (กันบั๊ก main ยังเรียก my_function)"""
-    funcs = [f for n, f in globals().items()
-             if callable(f) and getattr(f, "__module__", None) == __name__
-             and not n.startswith("_") and n not in _HELPERS]
-    return funcs[-1]
+    amt = Fraction(amount)
+    fee = amt * Fraction(75, 10000) * days_late  # 0.75%/วัน นับทุกวัน
+    fee = min(fee, amt * Fraction(15, 100))      # เพดาน 15%
+    return half_up(fee)                          # ปัดครั้งเดียวตอนท้าย
 
 
 def main():
@@ -55,7 +34,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = _entry()(**args)
+        result = late_fee(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

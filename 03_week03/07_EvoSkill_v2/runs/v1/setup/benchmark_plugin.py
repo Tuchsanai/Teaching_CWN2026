@@ -1,4 +1,4 @@
-"""benchmark_plugin.py - BaanKafe billing-function benchmark (9 tasks)."""
+"""benchmark_plugin.py - BaanKafe: โจทย์เขียนฟังก์ชันคิดเงิน 9 ข้อ (train 4 · validation 2 · test 3)"""
 import json
 import os
 
@@ -20,21 +20,16 @@ SPLIT = {
 def list_tasks(root):
     tasks = []
     for tid, split in SPLIT.items():
-        path = os.path.join(root, "tasks", tid + ".json")
-        with open(path, encoding="utf-8") as f:
+        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
             d = json.load(f)
-        answer_files = []
-        adir = os.path.join(root, "answers", tid)
-        if os.path.isdir(adir):
-            answer_files = ["answers/%s/%s" % (tid, n) for n in sorted(os.listdir(adir))
-                            if os.path.isfile(os.path.join(adir, n))]
         tasks.append(Task(
-            id=d["id"],
+            id=tid,
             split=split,
             instruction=d["brief"],
             inputs=[],
-            answer_files=answer_files,
-            grading={"key": d["id"], "function": d["function"]},
-            category="billing",
+            answer_files=[os.path.join("answers", tid, "solve.py"),
+                          os.path.join("answers", tid, "test_solve.py")],
+            grading={"key": tid, "function": d["function"]},
+            category="coding",
         ))
     return tasks

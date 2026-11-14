@@ -1,13 +1,14 @@
 def bulk_price(unit_price, qty, coupon):
-    """Return amount payable in whole satang (exact integer arithmetic,
-    rounded half-up once at the end)."""
+    """คืนยอดชำระเป็นจำนวนเต็มสตางค์ (ใช้เลขจำนวนเต็มล้วน ปัดครึ่งขึ้นครั้งเดียวตอนท้าย)"""
+    # อัตราส่วนลด หน่วยเป็น 1/1000
     if qty >= 50:
-        a = 925      # 7.5% off (/1000)
+        tier = 925   # ลด 7.5%
     elif qty >= 10:
-        a = 965      # 3.5% off
+        tier = 965   # ลด 3.5%
     else:
-        a = 1000
-    b = 975 if coupon else 1000   # extra 2.5% off, applied multiplicatively
-    num = unit_price * qty * a * b * 107   # VAT 7% last
+        tier = 1000
+    coup = 975 if coupon else 1000  # ลดอีก 2.5%
+
+    num = unit_price * qty * tier * coup * 107
     den = 1000 * 1000 * 100
-    return (2 * num + den) // (2 * den)
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น

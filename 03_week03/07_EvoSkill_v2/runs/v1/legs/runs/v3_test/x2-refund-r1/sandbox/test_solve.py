@@ -1,43 +1,33 @@
 import unittest
+from fractions import Fraction
 from solve import refund
 
 
-class Normal(unittest.TestCase):
-    def test_basic(self):
+class T(unittest.TestCase):
+    def test_normal(self):
         self.assertEqual(refund(10000, 50, False), 5000)
-        self.assertEqual(refund(10000, 50, True), 4375)
         self.assertEqual(refund(10000, 0, False), 10000)
-        self.assertEqual(refund(0, 10, True), 0)
+        self.assertEqual(refund(10000, 50, True), 4375)
 
-
-class Boundary(unittest.TestCase):
-    def test_80_81(self):
+    def test_boundary(self):
         self.assertEqual(refund(10000, 80, False), 2000)
-        self.assertEqual(refund(10000, 80, True), 1750)
         self.assertEqual(refund(10000, 81, False), 0)
         self.assertEqual(refund(10000, 100, True), 0)
+        self.assertEqual(refund(0, 0, True), 0)
 
+    def test_nodrift(self):
+        for p in range(0, 400, 7):
+            for u in (0, 33, 79, 80):
+                for r in (True, False):
+                    x = Fraction(p * (100 - u), 100) * (Fraction(7, 8) if r else 1)
+                    self.assertEqual(refund(p, u, r), x.numerator // x.denominator)
 
-class NoDrift(unittest.TestCase):
-    def test_half_up(self):
-        # 1*99/100*0.875 = 0.86625 -> 1
-        self.assertEqual(refund(1, 1, True), 1)
-        # 10*50/100 = 5 ; *0.875 = 4.375 -> 4
-        self.assertEqual(refund(10, 50, True), 4)
-        # 1*50/100 = 0.5 -> 1
-        self.assertEqual(refund(1, 50, False), 1)
-        # 30*75/100=22.5*0.875=19.6875 -> 20
-        self.assertEqual(refund(30, 25, True), 20)
-
-
-class Reject(unittest.TestCase):
-    def test_bad(self):
-        for args in [(-1, 0, False), (100, -1, False), (100, 101, False),
-                     (100.0, 0, False), (100, 10.0, False), ("100", 0, False),
-                     (True, 0, False), (100, True, False), (None, 0, False),
-                     (100, 0, 1), (100, 0, "yes"), (100, 0, None)]:
-            with self.assertRaises(ValueError, msg=str(args)):
-                refund(*args)
+    def test_reject(self):
+        for a in [(-1, 0, False), (1, -1, False), (1, 101, False), (1.0, 0, False),
+                  ("1", 0, False), (True, 0, False), (1, 1.0, False), (1, True, False),
+                  (1, 0, 1), (1, 0, None), (None, 0, False)]:
+            with self.assertRaises(ValueError):
+                refund(*a)
 
 
 if __name__ == "__main__":

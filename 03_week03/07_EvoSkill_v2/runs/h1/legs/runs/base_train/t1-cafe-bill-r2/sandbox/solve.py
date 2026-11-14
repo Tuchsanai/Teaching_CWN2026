@@ -1,60 +1,54 @@
-"""BaanKafe: คำนวณยอดเงินที่ลูกค้าต้องจ่ายหน้าร้าน
-
-หน่วยทั้งหมดเป็นสตางค์ (จำนวนเต็ม) เพื่อหลีกเลี่ยงปัญหาทศนิยมของ float
-
-ลำดับการคิดเงิน:
-1. ยอดรวมก่อนลด = sum(price * qty)
-2. ถ้ายอดรวมก่อนลด >= 500 บาท (50,000 สตางค์) ลด 5%
-3. ถ้าเป็นสมาชิก (member=True) ลดอีก 10% (คิดต่อจากยอดหลังขั้นที่ 2)
-4. บวก VAT 7% จากยอดหลังลด
-5. ปัดผลลัพธ์เป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้น)
-"""
-
 from fractions import Fraction
 from math import floor
 
-THRESHOLD_SATANG = 50_000          # 500 บาท
-BULK_DISCOUNT = Fraction(5, 100)   # 5%
-MEMBER_DISCOUNT = Fraction(10, 100)  # 10%
-VAT_RATE = Fraction(7, 100)        # 7%
-
-
-def _validate_item(item):
-    price = item["price"]
-    qty = item["qty"]
-    if isinstance(price, bool) or not isinstance(price, int) or price < 0:
-        raise ValueError(f"price ต้องเป็นจำนวนเต็มสตางค์ที่ไม่ติดลบ: {price!r}")
-    if isinstance(qty, bool) or not isinstance(qty, int) or qty < 1:
-        raise ValueError(f"qty ต้องเป็นจำนวนเต็มตั้งแต่ 1: {qty!r}")
+BAHT = 100                 # 1 บาท = 100 สตางค์
+BULK_THRESHOLD = 500 * BAHT  # ยอดรวมตั้งแต่ 500 บาท (หน่วยสตางค์)
+BULK_RATE = Fraction(5, 100)
+MEMBER_RATE = Fraction(10, 100)
+VAT_RATE = Fraction(7, 100)
 
 
 def cafe_bill(items, member):
-    """คืนยอดที่ลูกค้าต้องจ่ายเป็นจำนวนเต็มสตางค์
+    """คำนวณยอดที่ลูกค้าต้องจ่าย (หน่วยสตางค์ เป็นจำนวนเต็ม)
 
-    items: list ของ dict {"price": ราคาต่อชิ้น (สตางค์), "qty": จำนวนชิ้น}
+    items: list ของ dict {"price": ราคาต่อชิ้น (สตางค์), "qty": จำนวนชิ้น (>= 1)}
     member: True ถ้าเป็นสมาชิก (ลดเพิ่ม 10%)
+
+    ลำดับการคิด:
+      1. ยอดรวม = sum(price * qty)
+      2. ถ้ายอดรวม >= 500 บาท ลด 5%
+      3. ถ้า member ลดอีก 10% (ทบจากยอดหลังขั้นที่ 2)
+      4. บวก VAT 7% เป็นขั้นสุดท้าย
+      5. ปัดเศษครึ่งขึ้นให้เป็นจำนวนเต็มสตางค์
     """
+    subtotal = 0
     for item in items:
-        _validate_item(item)
+        price = int(item["price"])
+        qty = int(item["qty"])
+        if price < 0:
+            raise ValueError("price ต้องไม่ติดลบ")
+        if qty < 1:
+            raise ValueError("qty ต้องอย่างน้อย 1")
+        subtotal += price * qty
 
-    subtotal = sum(item["price"] * item["qty"] for item in items)  # สตางค์
-
+    # ใช้ Fraction เพื่อหลีกเลี่ยงความคลาดเคลื่อนของทศนิยม (floating point)
     total = Fraction(subtotal)
-    if subtotal >= THRESHOLD_SATANG:
-        total *= 1 - BULK_DISCOUNT
+
+    if subtotal >= BULK_THRESHOLD:
+        total *= 1 - BULK_RATE
+
     if member:
-        total *= 1 - MEMBER_DISCOUNT
+        total *= 1 - MEMBER_RATE
+
     total *= 1 + VAT_RATE
 
-    # ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (ค่าไม่ติดลบเสมอ)
+    # ปัดเศษครึ่งขึ้น (round half up) เป็นจำนวนเต็มสตางค์
     return floor(total + Fraction(1, 2))
 
 
 if __name__ == "__main__":
     # ตัวอย่างการใช้งาน
-    sample = [
-        {"price": 4500, "qty": 2},   # 45 บาท x 2
-        {"price": 6000, "qty": 5},   # 60 บาท x 5
-    ]
-    print("ยอดต้องจ่าย (ไม่เป็นสมาชิก):", cafe_bill(sample, False), "สตางค์")
-    print("ยอดต้องจ่าย (สมาชิก):", cafe_bill(sample, True), "สตางค์")
+    sample = [{"price": 6000, "qty": 2}, {"price": 4500, "qty": 1}]  # 165 บาท
+    print(cafe_bill(sample, False))
+    big = [{"price": 15000, "qty": 4}]  # 600 บาท
+    print(cafe_bill(big, True))

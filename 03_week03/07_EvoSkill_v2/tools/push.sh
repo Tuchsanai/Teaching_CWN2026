@@ -11,5 +11,5 @@ tar cf - --exclude=__pycache__ evoskill bench tools/pack_results.py | docker exe
 # สกิลของบทก่อนหน้า ที่ใช้เทียบบน Test Set: baselines/<ชื่อ>/skills/<สกิล>/SKILL.md
 docker exec "$C" mkdir -p $W/baselines/so-v3/skills/money-coder
 docker exec -i "$C" tee $W/baselines/so-v3/skills/money-coder/SKILL.md < ../05_Skill_Optimizer/runs/v3/skills/money-coder/SKILL.md > /dev/null
-tar cf - -C ../06_WikiSkill/runs/w2 skills | docker exec -i "$C" bash -c "mkdir -p $W/baselines/wiki-w2 && tar xf - -C $W/baselines/wiki-w2"
+tar cf - -C ../06_WikiSkill/runs/w1 skills | docker exec -i "$C" bash -c "mkdir -p $W/baselines/wiki-w1 && tar xf - -C $W/baselines/wiki-w1"
 docker exec "$C" bash -lc "cd $W && ls -d skill-optimizer evoskill bench baselines/*/skills/*"

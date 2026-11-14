@@ -1,34 +1,73 @@
+"""รัน: python3 -m unittest -q test_solve"""
 import unittest
+
 from solve import late_fee
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(late_fee(100000, 4), 3000)
-        self.assertEqual(late_fee(100000, 10), 7500)
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
+        self.assertEqual(late_fee(100000, 10), 7500)  # 1000*0.075 = 75 บาท
 
-    def test_boundary(self):
+    def test_normal_2(self):
+        self.assertEqual(late_fee(200000, 5), 7500)  # 200000*0.0375
+
+    def test_normal_3(self):
+        self.assertEqual(late_fee(0, 30), 0)
+
+
+class Boundary(unittest.TestCase):
+    def test_grace_edge(self):
         self.assertEqual(late_fee(100000, 3), 0)
+        self.assertEqual(late_fee(100000, 4), 3000)  # นับรวม 3 วันแรก
+
+    def test_cap_edge(self):
+        self.assertEqual(late_fee(100000, 20), 15000)  # 20*0.75% = 15% พอดี
+        self.assertEqual(late_fee(100000, 19), 14250)
+        self.assertEqual(late_fee(100000, 21), 15000)  # ติดเพดาน
+
+    def test_range_edge(self):
         self.assertEqual(late_fee(100000, 0), 0)
-        self.assertEqual(late_fee(100000, 20), 15000)
         self.assertEqual(late_fee(100000, 365), 15000)
-        self.assertEqual(late_fee(0, 10), 0)
 
-    def test_rounding(self):
-        # 10 * 4 * 0.0075 = 0.3 -> 0 ; 70*4*.0075=2.1 -> 2 ; 100*5*.0075=3.75 -> 4
-        self.assertEqual(late_fee(70, 4), 2)
-        self.assertEqual(late_fee(100, 5), 4)
-        # exactly .5: 200*... amount=2, days=... 2*0.15=0.3; use 50*... 10*.0075*... 
-        # amount=200,days=5 -> 7.5 -> 8
-        self.assertEqual(late_fee(200, 5), 8)
-        # cap half: amount=10, 15% =1.5 -> 2
-        self.assertEqual(late_fee(10, 100), 2)
 
-    def test_reject(self):
-        for a, d in [(-1, 5), (1, -1), (1, 366), (1.0, 5), (1, 5.0), ("1", 5),
-                     (1, "5"), (True, 5), (1, True), (None, 5), (1, None), ([], 5)]:
-            with self.assertRaises(ValueError):
-                late_fee(a, d)
+class NoDrift(unittest.TestCase):
+    def test_half_rounds_up(self):
+        self.assertEqual(late_fee(200, 5), 8)  # 7.5 -> 8
+
+    def test_fraction_up(self):
+        self.assertEqual(late_fee(50, 5), 2)  # 1.875 -> 2
+
+    def test_fraction_down(self):
+        self.assertEqual(late_fee(10, 4), 0)  # 0.3 -> 0
+        self.assertEqual(late_fee(1001, 4), 30)  # 30.03 -> 30
+
+
+class Reject(unittest.TestCase):
+    def test_negative(self):
+        with self.assertRaises(ValueError):
+            late_fee(-1, 5)
+        with self.assertRaises(ValueError):
+            late_fee(100, -1)
+
+    def test_out_of_range(self):
+        with self.assertRaises(ValueError):
+            late_fee(100, 366)
+
+    def test_float(self):
+        with self.assertRaises(ValueError):
+            late_fee(100.0, 5)
+        with self.assertRaises(ValueError):
+            late_fee(100, 5.0)
+
+    def test_str(self):
+        with self.assertRaises(ValueError):
+            late_fee("100", 5)
+
+    def test_bool(self):
+        with self.assertRaises(ValueError):
+            late_fee(True, 5)
+        with self.assertRaises(ValueError):
+            late_fee(100, True)
 
 
 if __name__ == "__main__":

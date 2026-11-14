@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.8182,
  "checks": [
   {
    "id": "contract",
@@ -38,18 +38,23 @@
   },
   {
    "id": "cli_ok",
-   "pass": false,
-   "note": "stdin {\"weight_g\": 3000, \"distance_km\": 150, \"express\": false} ต้องได้ {\"ok\": true, \"result\": 9600} exit 0 แต่ได้ exit 0 stdout ok  shipping_fee(1000, 0, False) = 4000 (คาด 4000)\nok  shipping_fee(1001, 0, False) = 8000 (คาด 8000)\nok  shipping_fee(5"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "cli_error",
-   "pass": false,
-   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout ok  shipping_fee(1000, 0, False) = 4000 (คาด 4000)\nok  shipping_fee(1001, 0, False) = 8000 (คาด 8000"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี"
   }
  ]
 }

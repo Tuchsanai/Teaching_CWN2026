@@ -1,100 +1,66 @@
 import unittest
-
 from solve import late_fee
 
 
 class Normal(unittest.TestCase):
-    def test_normal_1(self):
-        self.assertEqual(late_fee(10000, 4), 300)
+    def test_grace(self):
+        self.assertEqual(late_fee(100000, 0), 0)
+        self.assertEqual(late_fee(100000, 3), 0)
 
-    def test_normal_2(self):
-        self.assertEqual(late_fee(200000, 10), 15000)
+    def test_4_days(self):  # 100000*0.03 = 3000
+        self.assertEqual(late_fee(100000, 4), 3000)
 
-    def test_normal_3(self):
-        self.assertEqual(late_fee(10000, 19), 1425)
+    def test_10_days(self):  # 100000*0.075 = 7500
+        self.assertEqual(late_fee(100000, 10), 7500)
 
-    def test_normal_4(self):
-        self.assertEqual(late_fee(0, 30), 0)
+    def test_cap(self):  # 15% = 15000
+        self.assertEqual(late_fee(100000, 30), 15000)
+        self.assertEqual(late_fee(100000, 365), 15000)
 
 
 class Boundary(unittest.TestCase):
-    def test_boundary_1(self):  # ไม่เกิน 3 วัน
+    def test_grace_edge(self):
         self.assertEqual(late_fee(10000, 3), 0)
-
-    def test_boundary_2(self):  # วันที่ 4 คิดย้อนหลังรวม 3 วันแรก
         self.assertEqual(late_fee(10000, 4), 300)
 
-    def test_boundary_3(self):
-        self.assertEqual(late_fee(10000, 5), 375)
-
-    def test_boundary_4(self):
-        self.assertEqual(late_fee(10000, 0), 0)
-
-    def test_boundary_5(self):  # ยังไม่ชนเพดาน
-        self.assertEqual(late_fee(10000, 19), 1425)
-
-    def test_boundary_6(self):  # พอดีเพดาน 15%
+    def test_cap_edge(self):  # 20 วัน = 15% พอดี
+        self.assertEqual(late_fee(10000, 19), 1425)  # 14.25%
         self.assertEqual(late_fee(10000, 20), 1500)
-
-    def test_boundary_7(self):  # เกินเพดาน
         self.assertEqual(late_fee(10000, 21), 1500)
-        self.assertEqual(late_fee(10000, 365), 1500)
+
+    def test_zero_amount(self):
+        self.assertEqual(late_fee(0, 100), 0)
+
+    def test_max_days(self):
+        self.assertEqual(late_fee(333, 365), 50)  # 49.95 -> 50
 
 
 class NoDrift(unittest.TestCase):
-    def test_no_drift_1(self):  # 1.5 -> 2
+    def test_half_up(self):  # 100*0.03=3 ; 50*0.03=1.5 -> 2 (floor 1, even 2)
         self.assertEqual(late_fee(50, 4), 2)
+        self.assertEqual(late_fee(150, 4), 5)  # 4.5 -> 5 (even would be 4)
 
-    def test_no_drift_2(self):  # 4.5 -> 5
-        self.assertEqual(late_fee(100, 6), 5)
+    def test_below_half(self):  # 49*0.03 = 1.47 -> 1
+        self.assertEqual(late_fee(49, 4), 1)
 
-    def test_no_drift_3(self):  # 2.1 -> 2
-        self.assertEqual(late_fee(70, 4), 2)
-
-    def test_no_drift_4(self):  # 3.375 -> 3
-        self.assertEqual(late_fee(90, 5), 3)
-
-    def test_no_drift_5(self):  # เพดาน 1.5 -> 2
-        self.assertEqual(late_fee(10, 365), 2)
+    def test_fraction(self):  # 1234*0.0375 (5 วัน) = 46.275 -> 46
+        self.assertEqual(late_fee(1234, 5), 46)
+        self.assertEqual(late_fee(1234567, 7), 64815)  # 64814.8 -> 64815
 
 
 class Reject(unittest.TestCase):
-    def check(self, *args):
+    def bad(self, *a):
         with self.assertRaises(ValueError):
-            late_fee(*args)
+            late_fee(*a)
 
-    def test_reject_1(self):
-        self.check(-1, 5)
+    def test_amount(self):
+        for v in (-1, 1.5, 100.0, "100", True, None):
+            self.bad(v, 5)
+            self.bad(v, 0)  # ผิดแม้ไป early-return
 
-    def test_reject_2(self):
-        self.check(1000, -1)
-
-    def test_reject_3(self):
-        self.check(1000, 366)
-
-    def test_reject_4(self):
-        self.check(1000.0, 5)
-
-    def test_reject_5(self):
-        self.check(1000, 5.0)
-
-    def test_reject_6(self):
-        self.check('1000', 5)
-
-    def test_reject_7(self):
-        self.check(1000, '5')
-
-    def test_reject_8(self):
-        self.check(True, 5)
-
-    def test_reject_9(self):
-        self.check(1000, True)
-
-    def test_reject_10(self):
-        self.check(None, 5)
-
-    def test_reject_11(self):
-        self.check(1000, None)
+    def test_days(self):
+        for v in (-1, 366, 5.0, 4.5, "5", True, False, None):
+            self.bad(1000, v)
 
 
 if __name__ == "__main__":

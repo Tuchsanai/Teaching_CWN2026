@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.5,
  "checks": [
   {
    "id": "contract",
@@ -18,8 +18,8 @@
   },
   {
    "id": "no_drift",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "cafe_bill([{\"price\": 4505, \"qty\": 1}], true) คาด 4338 ได้ 4339 · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "boundary",
@@ -39,12 +39,12 @@
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 2}], \"member\": false} ต้องได้ {\"ok\": true, \"result\": 9630} exit 0 แต่ได้ exit 0 stdout 52430\n47187"
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 2}], \"member\": false} ต้องได้ {\"ok\": true, \"result\": 9630} exit 0 แต่ได้ exit 0 stdout สมาชิก: 54891\nไม่ใช่สมาชิก: 60990"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 52430\n47187"
+   "note": "stdin {\"items\": [{\"price\": 4500, \"qty\": 0}], \"member\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout สมาชิก: 54891\nไม่ใช่สมาชิก: 60990"
   },
   {
    "id": "tests",

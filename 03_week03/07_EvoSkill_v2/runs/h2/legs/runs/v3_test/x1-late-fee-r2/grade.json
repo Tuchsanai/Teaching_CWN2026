@@ -13,8 +13,8 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "late_fee(100, 6) คาด 5 ได้ 4 · พลาด 4 จาก 4 กรณี"
   },
   {
    "id": "no_drift",
@@ -33,18 +33,18 @@
   },
   {
    "id": "reject_type",
-   "pass": false,
-   "note": "late_fee(100000.0, 5) ต้อง raise ValueError แต่คืนค่า 3750 · พลาด 3 จาก 5 กรณี"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"amount\": 100000, \"days_late\": 10} ต้องได้ {\"ok\": true, \"result\": 7500} exit 0 แต่ได้ exit 0 stdout (ว่าง)"
+   "note": "stdin {\"amount\": 100000, \"days_late\": 10} ต้องได้ {\"ok\": true, \"result\": 7500} exit 0 แต่ได้ exit 0 stdout 3000\n0\n15000"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"amount\": 100000, \"days_late\": 366} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)"
+   "note": "stdin {\"amount\": 100000, \"days_late\": 366} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 3000\n0\n15000"
   },
   {
    "id": "tests",

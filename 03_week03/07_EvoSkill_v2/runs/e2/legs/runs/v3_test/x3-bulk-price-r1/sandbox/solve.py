@@ -1,16 +1,16 @@
-"""คิดราคาขายส่งเมล็ดกาแฟ BaanKafe (สตางค์, half-up, ตรวจ input เข้ม)"""
+"""BaanKafe: ราคาขายส่งเมล็ดกาแฟ (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (ยอดที่ลูกค้าจ่าย)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -27,15 +27,16 @@ def bulk_price(unit_price, qty, coupon):
     need_int(unit_price, "unit_price", 0)
     need_int(qty, "qty", 1, 1000)
     need_bool(coupon, "coupon")
-    amount = Fraction(unit_price * qty)
+
+    value = Fraction(unit_price * qty)
     if qty >= 50:
-        amount *= Fraction(1000 - 75, 1000)
+        value *= Fraction(925, 1000)
     elif qty >= 10:
-        amount *= Fraction(1000 - 35, 1000)
+        value *= Fraction(965, 1000)
     if coupon:
-        amount *= Fraction(1000 - 25, 1000)
-    amount *= Fraction(107, 100)
-    return half_up(amount)
+        value *= Fraction(975, 1000)
+    value *= Fraction(107, 100)
+    return half_up(value)
 
 
 def main():

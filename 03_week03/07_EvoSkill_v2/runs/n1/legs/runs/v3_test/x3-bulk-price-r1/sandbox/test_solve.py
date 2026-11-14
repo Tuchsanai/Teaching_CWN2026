@@ -4,82 +4,78 @@ from solve import bulk_price
 
 
 class Normal(unittest.TestCase):
-    def test_normal_1(self):
-        self.assertEqual(bulk_price(10000, 1, False), 10700)
+    def test_no_discount(self):
+        self.assertEqual(bulk_price(1000, 1, False), 1070)  # 1000*1.07
+        self.assertEqual(bulk_price(1000, 9, False), 9630)  # 9000*1.07
 
-    def test_normal_2(self):
-        self.assertEqual(bulk_price(10000, 10, False), 103255)
+    def test_tier_10(self):
+        self.assertEqual(bulk_price(1000, 20, False), 20651)  # 20000*.965*1.07=20651
 
-    def test_normal_3(self):
-        self.assertEqual(bulk_price(10000, 50, False), 494875)
+    def test_tier_50(self):
+        self.assertEqual(bulk_price(2000, 100, False), 197950)  # 200000*.925*1.07
 
-    def test_normal_4(self):
-        self.assertEqual(bulk_price(10000, 50, True), 482503)
+    def test_coupon_only(self):
+        self.assertEqual(bulk_price(1000, 1, True), 1043)  # 975*1.07=1043.25
 
-    def test_normal_5(self):
-        self.assertEqual(bulk_price(10000, 10, True), 100674)
+    def test_coupon_tier10(self):
+        self.assertEqual(bulk_price(1000, 10, True), 10067)  # 9650*.975*1.07=10067.06
+
+    def test_coupon_tier50(self):
+        self.assertEqual(bulk_price(1000, 50, True), 48250)  # 46250*.975*1.07=48250.31
 
 
 class Boundary(unittest.TestCase):
-    def test_boundary_1(self):  # 9 ถุง ยังไม่ลด
-        self.assertEqual(bulk_price(10000, 9, False), 96300)
+    def test_around_10(self):
+        self.assertEqual(bulk_price(1000, 9, False), 9630)
+        self.assertEqual(bulk_price(1000, 10, False), 10326)  # 9650*1.07=10325.5
 
-    def test_boundary_2(self):  # 10 ถุง ลด 3.5%
-        self.assertEqual(bulk_price(10000, 10, False), 103255)
+    def test_around_50(self):
+        self.assertEqual(bulk_price(1000, 49, False), 50595)  # 47285*1.07=50594.95
+        self.assertEqual(bulk_price(1000, 50, False), 49488)  # 46250*1.07=49487.5
 
-    def test_boundary_3(self):  # 11 ถุง: 110000*.965*1.07
-        self.assertEqual(bulk_price(10000, 11, False), 113581)
-
-    def test_boundary_4(self):  # 49 ถุง ยังลด 3.5% (505949.5 -> half-up)
-        self.assertEqual(bulk_price(10000, 49, False), 505950)
-
-    def test_boundary_5(self):  # 50 ถุง ลด 7.5% เท่านั้น
-        self.assertEqual(bulk_price(10000, 50, False), 494875)
-
-    def test_boundary_6(self):  # 51 ถุง: 510000*.925*1.07
-        self.assertEqual(bulk_price(10000, 51, False), 504773)
-
-    def test_boundary_7(self):
-        self.assertEqual(bulk_price(0, 5, True), 0)
-
-    def test_boundary_8(self):
-        self.assertEqual(bulk_price(10000, 1000, False), 9897500)
+    def test_extremes(self):
+        self.assertEqual(bulk_price(0, 1, False), 0)
+        self.assertEqual(bulk_price(0, 1000, True), 0)
+        self.assertEqual(bulk_price(1, 1, False), 1)  # 1.07
+        self.assertEqual(bulk_price(1, 1000, False), 990)  # 925*1.07=989.75
 
 
 class NoDrift(unittest.TestCase):
-    def test_no_drift_1(self):  # 53.5 -> 54
-        self.assertEqual(bulk_price(50, 1, False), 54)
+    def test_half_up_not_floor(self):
+        self.assertEqual(bulk_price(1000, 10, False), 10326)  # .5 -> up
+        self.assertEqual(bulk_price(1000, 50, False), 49488)  # .5 -> up (even would give 49488 too)
 
-    def test_no_drift_2(self):  # 5.35 -> 5
-        self.assertEqual(bulk_price(5, 1, False), 5)
+    def test_half_up_not_even(self):
+        self.assertEqual(bulk_price(50, 1, False), 54)  # 53.5 -> 54 (even gives 54)
+        self.assertEqual(bulk_price(150, 1, False), 161)  # 160.5 -> 161 (even gives 160)
 
-    def test_no_drift_3(self):  # 10.0674 -> 10 (ปัดทีละขั้นจะได้ 11)
-        self.assertEqual(bulk_price(1, 10, True), 10)
-
-    def test_no_drift_4(self):  # 505949.5 -> 505950
-        self.assertEqual(bulk_price(10000, 49, False), 505950)
+    def test_no_intermediate_rounding(self):
+        # 333*10=3330*.965=3213.45*1.07=3438.3615 -> 3438
+        self.assertEqual(bulk_price(333, 10, False), 3438)
+        # 3330*.965*.975*1.07=3352.43 -> 3352
+        self.assertEqual(bulk_price(333, 10, True), 3352)
 
 
 class Reject(unittest.TestCase):
-    def check(self, *a):
+    def bad(self, *args):
         with self.assertRaises(ValueError):
-            bulk_price(*a)
+            bulk_price(*args)
 
-    def test_reject_1(self): self.check(-1, 1, False)
-    def test_reject_2(self): self.check(100, 0, False)
-    def test_reject_3(self): self.check(100, 1001, False)
-    def test_reject_4(self): self.check(100, -5, False)
-    def test_reject_5(self): self.check(100.0, 1, False)
-    def test_reject_6(self): self.check('100', 1, False)
-    def test_reject_7(self): self.check(True, 1, False)
-    def test_reject_8(self): self.check(None, 1, False)
-    def test_reject_9(self): self.check(100, 1.0, False)
-    def test_reject_10(self): self.check(100, '1', False)
-    def test_reject_11(self): self.check(100, True, False)
-    def test_reject_12(self): self.check(100, None, False)
-    def test_reject_13(self): self.check(100, 1, 1)
-    def test_reject_14(self): self.check(100, 1, 'True')
-    def test_reject_15(self): self.check(100, 1, None)
+    def test_unit_price(self):
+        for v in (1000.0, 10.5, "1000", True, None, -1):
+            self.bad(v, 10, False)
+
+    def test_qty(self):
+        for v in (10.0, 10.5, "10", True, None, 0, -1, 1001):
+            self.bad(1000, v, False)
+
+    def test_coupon(self):
+        for v in (0, 1, "yes", None, 1.0):
+            self.bad(1000, 10, v)
+
+    def test_invalid_even_when_other_branch(self):
+        self.bad(0, 0, False)
+        self.bad(0, 1, 1)
 
 
 if __name__ == "__main__":

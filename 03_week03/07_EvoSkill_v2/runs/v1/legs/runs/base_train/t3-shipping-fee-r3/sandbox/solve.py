@@ -1,17 +1,27 @@
 from fractions import Fraction
+from math import floor
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้นเมื่อได้เศษสตางค์)"""
-    w = Fraction(weight_g)
-    if w <= 1000:
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (คำนวณด้วย Fraction เพื่อเลี่ยง float error)"""
+    if weight_g < 1 or weight_g > 30000:
+        raise ValueError("weight_g must be between 1 and 30000")
+    if distance_km < 0:
+        raise ValueError("distance_km must be >= 0")
+
+    weight = Fraction(weight_g)
+    if weight <= 1000:
         fee = Fraction(4000)
-    elif w <= 5000:
+    elif weight <= 5000:
         fee = Fraction(8000)
     else:
-        fee = 8000 + (w - 5000) * Fraction(1500, 1000)  # 15 บาท/กก. = 1.5 สตางค์/กรัม
+        # 15 บาท/กก. = 1500 สตางค์/1000 กรัม
+        fee = Fraction(8000) + (weight - 5000) * Fraction(1500, 1000)
+
     if distance_km > 100:
-        fee *= Fraction(6, 5)
+        fee *= Fraction(120, 100)
     if express:
-        fee *= Fraction(3, 2)
-    return int((fee * 2 + 1) // 2)  # ปัดครึ่งขึ้น
+        fee *= Fraction(150, 100)
+
+    # ปัดครึ่งขึ้น เป็นจำนวนเต็มสตางค์
+    return int(floor(fee + Fraction(1, 2)))

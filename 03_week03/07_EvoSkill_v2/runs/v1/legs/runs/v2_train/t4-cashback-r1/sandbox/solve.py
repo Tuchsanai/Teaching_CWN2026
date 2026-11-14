@@ -1,41 +1,51 @@
-"""BaanKafe: คิดเงินคืนสมาชิก (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(4, 100)}
-MIN_AMOUNT = 10000   # 100 บาท
-MAX_CASHBACK = 20000  # 200 บาท
+MIN_AMOUNT = 100 * 100   # 100 baht in satang
+CAP = 200 * 100          # 200 baht per bill in satang
+# Assumption (baankafe-money-rules): birthday x2 bonus applies to gold/platinum only.
+BIRTHDAY_TIERS = {"gold", "platinum"}
 
 
-def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
+def need_int(v, name, low=None, high=None):
+    if type(v) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and v < low) or (high is not None and v > high):
+        raise ValueError(f"{name} อยู่นอกช่วง")
+    return v
+
+
+def need_bool(v, name):
+    if type(v) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True/False")
+    return v
 
 
 def cashback(amount, tier, birthday):
-    """คืนเงินคืน (สตางค์) จากยอดซื้อ ระดับสมาชิก และเดือนเกิด"""
-    if type(amount) is not int or amount < 0:
-        raise ValueError("amount ต้องเป็นจำนวนเต็มตั้งแต่ 0")
+    need_int(amount, "amount", low=0)
     if type(tier) is not str or tier not in RATES:
-        raise ValueError("tier ต้องเป็น silver, gold หรือ platinum")
-    if type(birthday) is not bool:
-        raise ValueError("birthday ต้องเป็น True หรือ False")
+        raise ValueError("tier ไม่ถูกต้อง")
+    need_bool(birthday, "birthday")
+
     if amount < MIN_AMOUNT:
         return 0
-    rate = RATES[tier] * (2 if birthday else 1)
-    return min(MAX_CASHBACK, half_up(amount * rate))
+    value = amount * RATES[tier]
+    if birthday and tier in BIRTHDAY_TIERS:
+        value *= 2
+    # store pays out -> floor, then cap
+    return min(CAP, int(value // 1))
 
 
 def main():
-    """CLI: อ่าน JSON จาก stdin พิมพ์ผลเป็น JSON"""
     try:
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cashback(**args)
     except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}))
+        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}))
     return 0

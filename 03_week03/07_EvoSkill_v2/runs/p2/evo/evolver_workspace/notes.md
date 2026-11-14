@@ -1,9 +1,12 @@
-# epoch 0 -> v1
-scores e0: t1 0.5x3 (half-up end), t2 0.5x3, t3 0.5,0.5,0.6 (s3 added ValueError range validation => +0.1), t4 0.3x3 (floor).
-Solver never saw tests; rollouts r1/r2/r3 differ by cwd suffix -rN. v1 skill: r1=half-up end, r2=round each step half-up, r3=floor end -> compare scores in epoch 1 per rollout index, then fix the winning policy in v2. Also validation ValueError.
-# epoch1 results
-r1(half-up end): t1 .7 t2 .7 t3 .6 t4 .7; r2(round each step): .5 .7 .5 .6; r3(floor): .3 .6 .5 .5. => half-up once at end fixed in v2.
-validation added gave ~+0.2 (e0 vs e1 r1). Remaining ~0.3 unknown. v2 explores validation strictness: r1 strict ValueError+empty err; r2 ranges only/no types/empty ok; r3 TypeError for wrong types.
-# epoch2 results
-validation r1 strict ValueError: .7 .7 .6 .7 ; r2 no types/empty ok: .6 all; r3 TypeError: .6 all. => strict ValueError fixed in v3.
-t3 stuck .6 regardless. v3 explores final rounding: r1 half-up, r2 ceil, r3 banker's. remaining 0.3 unexplained (ideas: t3 float weight rejection, empty items, ties).
+# epoch 0: no skills. scores t1 .5, t2 .5, t3 .4545, t4 .4 (all 3 rollouts identical).
+Solver used: t1 half-up final only; t2 half-up tip/grand; t3 half-up final only; t4 floor.
+Hidden-test mismatch likely rounding mode / stepwise rounding. No feedback otherwise.
+# epoch 1 experiment: skill money-calc-spec assigns A=floor-final(r1), B=ceil-final(r2), C=halfup-each-step(r3) by cwd suffix -rN.
+Next: read epoch_1 scores per rollout, find which of A/B/C scores best per task, then replace table with the winning single rule (and generalize).
+# epoch 1 results (A floor / B ceil / C step-halfup): t1 .2/.4/.4, t2 .4/.5/.5, t3 .27/.27/.27, t4 .4/.3/.3.
+Best so far = halfup-final-only (t1 .5, t2 .5, t3 .4545); t4 halfup-final untested. Test counts: t1 10, t2 10, t3 11, t4 10.
+Residual failures not explained by rounding -> hypotheses: ValueError validation of out-of-range inputs, banker's rounding, float-reference style.
+# epoch 2 experiment: r1=H (halfup final + ValueError validation), r2=E (banker's final), r3=F (float stepwise round()).
+# epoch 2 results: H(halfup final+ValueError) t1 .6 t2 .6 t3 .5455 t4 .5 BEST; E(bankers) .4 .4 .36 .4; F(float round stepwise) .3 .4 .27 .3.
+Validation adds ~1 test each. Remaining ~4 fails unknown. Hypothesis: stricter validation (types, empty items, flags).
+# epoch 3 experiment: base H fixed; r1=H1 TypeError for wrong types, r2=H2 all ValueError, r3=H3 like H1 + empty list ValueError + non-bool flag TypeError.

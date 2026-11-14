@@ -1,38 +1,42 @@
-import json, sys
+"""BaanKafe: cafe_bill (หน่วยสตางค์)"""
+import json
+import sys
 from fractions import Fraction
+
+THRESHOLD = 50000  # 500 บาท = 50,000 สตางค์
 
 
 def half_up(x):
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(v, name, low=None, high=None):
-    if type(v) is not int:
+def need_int(value, name, low=None, high=None):
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
 
 
 def cafe_bill(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     if type(member) is not bool:
-        raise ValueError("member ต้องเป็น True/False")
-    total = 0
+        raise ValueError("member ต้องเป็น True หรือ False")
+    subtotal = 0
     for it in items:
-        if type(it) is not dict:
-            raise ValueError("item ต้องเป็น dict")
-        price = need_int(it.get("price"), "price", 0)
-        qty = need_int(it.get("qty"), "qty", 1)
-        total += price * qty
-    amount = Fraction(total)
-    if total >= 50000:
-        amount *= Fraction(95, 100)
+        if type(it) is not dict or "price" not in it or "qty" not in it:
+            raise ValueError("item ต้องเป็น dict ที่มี price และ qty")
+        price = need_int(it["price"], "price", 0)
+        qty = need_int(it["qty"], "qty", 1)
+        subtotal += price * qty
+    value = Fraction(subtotal)
+    if subtotal >= THRESHOLD:
+        value *= Fraction(95, 100)
     if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
-    return half_up(amount)
+        value *= Fraction(90, 100)
+    value *= Fraction(107, 100)  # VAT ขั้นสุดท้าย
+    return half_up(value)  # ปัดครั้งเดียวท้ายสุด half-up
 
 
 def main():
@@ -41,8 +45,8 @@ def main():
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cafe_bill(**args)
-    except (ValueError, TypeError) as e:
-        print(json.dumps({"ok": False, "error": str(e)}))
+    except (ValueError, TypeError) as error:
+        print(json.dumps({"ok": False, "error": str(error)}))
         return 2
     print(json.dumps({"ok": True, "result": result}))
     return 0

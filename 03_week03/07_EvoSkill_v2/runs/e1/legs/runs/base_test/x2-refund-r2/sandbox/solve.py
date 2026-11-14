@@ -1,13 +1,15 @@
 def refund(paid, used_percent, restock):
-    """คืนเงินเป็นจำนวนเต็มสตางค์ (ใช้เลขจำนวนเต็มล้วน ไม่มีปัญหา float)."""
+    """คืนเงินคอร์ส (หน่วยสตางค์) เป็นจำนวนเต็ม
+
+    - คืนตามสัดส่วนที่ยังไม่ได้เรียน
+    - เรียนเกิน 80% ไม่คืน
+    - restock=True หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
+    คำนวณด้วยจำนวนเต็มล้วน (ไม่มีปัญหา float) ปัดเศษลงครั้งเดียวตอนท้าย
+    """
     if used_percent > 80:
         return 0
-    # ยอดคืนตามสัดส่วน = paid * (100 - used) / 100
-    # หลังหักค่าดำเนินการ 12.5% = x * 875 / 1000
-    num = paid * (100 - used_percent)
-    den = 100
+    remaining = 100 - used_percent
     if restock:
-        num *= 875
-        den *= 1000
-    # ปัดเศษครึ่งขึ้น (half up) ครั้งเดียวตอนท้าย
-    return (2 * num + den) // (2 * den)
+        # paid * remaining/100 * (1 - 1/8) = paid * remaining * 7 / 800
+        return paid * remaining * 7 // 800
+    return paid * remaining // 100

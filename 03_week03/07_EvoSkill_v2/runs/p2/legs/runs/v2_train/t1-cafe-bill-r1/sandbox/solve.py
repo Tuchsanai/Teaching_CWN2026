@@ -1,33 +1,19 @@
-# validation policy r1
 from fractions import Fraction
 
 
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
-
-
 def cafe_bill(items, member):
-    if not isinstance(member, bool):
-        raise ValueError("member must be bool")
-    if not isinstance(items, (list, tuple)) or len(items) == 0:
-        raise ValueError("items must be a non-empty list")
+    # แบบ H: Fraction ตลอด ปัดครึ่งขึ้นครั้งเดียวตอนท้าย ตรวจอินพุตนอกช่วง
     total = 0
     for it in items:
-        if not isinstance(it, dict):
-            raise ValueError("item must be a dict")
-        price, qty = it.get("price"), it.get("qty")
-        if not _is_int(price) or not _is_int(qty):
-            raise ValueError("price and qty must be int")
-        if price < 0:
-            raise ValueError("price must be >= 0")
-        if qty < 1:
-            raise ValueError("qty must be >= 1")
+        price, qty = it["price"], it["qty"]
+        if price < 0 or qty < 1:
+            raise ValueError("invalid item")
         total += price * qty
-
-    amount = Fraction(total)
-    if total >= 50000:
-        amount *= Fraction(95, 100)
+    x = Fraction(total)
+    if total >= 50000:  # 500 บาท ตัดสินจากยอดก่อนลด
+        x *= Fraction(95, 100)
     if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
-    return (2 * amount.numerator + amount.denominator) // (2 * amount.denominator)
+        x *= Fraction(90, 100)
+    x *= Fraction(107, 100)  # VAT ขั้นสุดท้าย
+    n, d = x.numerator, x.denominator
+    return int((2 * n + d) // (2 * d))

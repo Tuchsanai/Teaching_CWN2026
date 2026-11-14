@@ -1,8 +1,10 @@
 def refund(paid, used_percent, restock):
-    """คืนเงินเป็นสตางค์ (จำนวนเต็ม) - คิดด้วยเลขจำนวนเต็ม ปัดเศษลงครั้งเดียวตอนท้าย"""
+    """Refund in whole satang (integer), rounded half up."""
     if used_percent > 80:
         return 0
     num = paid * (100 - used_percent)
+    den = 100
     if restock:
-        return num * 7 // 800   # หัก 12.5% => คูณ 7/8
-    return num // 100
+        num *= 7  # keep 87.5% = 7/8
+        den *= 8
+    return (2 * num + den) // (2 * den)

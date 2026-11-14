@@ -7,7 +7,7 @@
 | ตัวรัน EvoSkill v2 และ prompt | `evoskill/` | `/workspace/evlab/evoskill` |
 | สิ่งที่ผู้ใช้ส่งให้การรัน: คำสั่ง · ข้อมูล · การแบ่งชุด · ตัวตรวจ | `bench/` | `/workspace/evlab/bench` |
 | ตัวรัน Trial ของบท 05 (ใช้เป็น Solver) | `../../00_resource/skills/skill-optimizer` | `/workspace/evlab/skill-optimizer` |
-| สกิลของบท 05 และ 06 ที่ใช้เทียบ | `../05_…/skills/money-coder/v3` · `../06_WikiSkill/runs/w2/skills` | `/workspace/evlab/baselines/so-v3/skills` · `baselines/wiki-w2/skills` |
+| สกิลของบท 05 และ 06 ที่ใช้เทียบ | `../05_Skill_Optimizer/runs/v3/skills` · `../06_WikiSkill/runs/w1/skills` | `/workspace/evlab/baselines/so-v3/skills` · `baselines/wiki-w1/skills` |
 | โฟลเดอร์ของแต่ละการรัน | `runs/<ชื่อ>/` | `/workspace/evlab/ws/<ชื่อ>` |
 
 ## ทำตามนี้ทุกครั้ง
@@ -36,7 +36,8 @@
 7. คำสั่ง `run` `base` `turn` `rollout` `test` `eval` ใช้เวลาหลายนาที ให้รันแบบเบื้องหลังแล้วรอจนจบ ไม่ต้องรันซ้ำ (รันซ้ำได้: rollout ที่เสร็จแล้วจะไม่ถูกรันใหม่) · `adapt` ใช้ราว 20 วินาที · `status` `noise` `audit` ไม่ใช้โทเคน
 
 ตรวจบัญชีที่ล็อกอินแล้ว: `docker exec multi-account bash -lc 'for a in yolo1 yolo2 yolo3 yolo4 yolo5; do $a auth status 2>/dev/null | grep -q "loggedIn.: *true" && echo "$a ok" || echo "$a ยังไม่ล็อกอิน"; done'`
-ตรวจ Grader: `docker exec multi-account bash -lc 'cd /workspace/evlab && python3 bench/check_grader.py'` (รันได้ แต่ไม่ต้องเปิดอ่านไฟล์)
+ตรวจ Grader: `docker exec multi-account bash -lc 'cd /workspace/evlab && python3 bench/check_grader.py'` (รันได้ แต่ไม่ต้องเปิดอ่านไฟล์ · ตารางที่พิมพ์ออกมาเป็นผลของเฉลยอ้างอิงของโจทย์ทุกชุด ไม่ใช่ผลของ Solver จึงดูได้)
+เมื่อพรอมต์ให้เทียบกับการรันอื่น (เช่น "เทียบ e1") ใช้ `results/status-<ชื่อ>.txt` บนเครื่อง หรือ `status ws/<ชื่อ>` ใน container
 ไฟล์ที่เปิดอ่านได้หลังแต่ละขั้น (ใน container ใต้ `ws/<ชื่อ>/` หรือบนเครื่องใต้ `runs/<ชื่อ>/` หลัง pull):
 `RUN.json` · `state.json` · `setup/benchmark_plugin.py` · `setup/freeze.json` · `setup/audit.md` · `reference/` · `skills_v*/` · `turns/*/message.md` `actions.md` `stats.json` · `evo/evolver_workspace/` · `evo/scores/` · `legs/*.json`
 

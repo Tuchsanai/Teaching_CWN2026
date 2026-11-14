@@ -1,5 +1,5 @@
 def bulk_price(unit_price, qty, coupon):
-    """Return the amount to pay in whole satang (exact integer math, round half up once at the end)."""
+    """Return amount payable in whole satang (exact integer math, round half up at the end)."""
     num = unit_price * qty
     den = 1
     if qty >= 50:

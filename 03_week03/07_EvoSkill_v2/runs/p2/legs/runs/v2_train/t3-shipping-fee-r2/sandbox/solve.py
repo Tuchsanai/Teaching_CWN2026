@@ -1,23 +1,17 @@
-# validation policy r2
 from fractions import Fraction
 
 
 def shipping_fee(weight_g, distance_km, express):
-    if not (1 <= weight_g <= 30000):
-        raise ValueError("weight_g must be between 1 and 30000")
-    if distance_km < 0:
-        raise ValueError("distance_km must be >= 0")
-
+    # แบบ E: Fraction แม่นยำตลอด ปัดครึ่งไปหาเลขคู่ครั้งเดียวตอนท้าย ไม่ตรวจอินพุต
     w = Fraction(weight_g)
     if w <= 1000:
-        fee = Fraction(40)
+        fee = Fraction(4000)          # 40 บาท
     elif w <= 5000:
-        fee = Fraction(80)
+        fee = Fraction(8000)          # 80 บาท
     else:
-        fee = 80 + (w - 5000) * 15 / 1000
-    fee *= 100  # satang
+        fee = Fraction(8000) + (w - 5000) * Fraction(1500, 1000)  # 15 บาท/กก.
     if distance_km > 100:
         fee *= Fraction(120, 100)
     if express:
         fee *= Fraction(150, 100)
-    return int((fee * 2 + 1) // 2)
+    return int(round(fee))

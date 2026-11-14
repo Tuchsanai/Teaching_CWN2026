@@ -1,48 +1,60 @@
 """BaanKafe member cashback calculator.
 
-Units: all amounts are in satang (1 บาท = 100 สตางค์), as integers.
+Amounts are in satang (1 baht = 100 satang). All arithmetic is integer-only,
+so the result is always a whole number of satang.
 """
 
-MIN_AMOUNT = 100 * 100          # ยอดซื้อขั้นต่ำ 100 บาท = 10000 สตางค์
-MAX_CASHBACK = 200 * 100        # เงินคืนสูงสุดต่อบิล 200 บาท = 20000 สตางค์
-
-# อัตราเงินคืนเป็นหน่วย basis points (1 bp = 0.01%) เพื่อให้คำนวณด้วยจำนวนเต็มล้วน
-RATE_BP = {
-    "silver": 150,     # 1.5%
-    "gold": 250,       # 2.5%
-    "platinum": 400,   # 4%
+# อัตราเงินคืนต่อระดับสมาชิก เก็บเป็นส่วนในพัน (permille) เพื่อหลีกเลี่ยงทศนิยม
+# silver 1.5% = 15/1000, gold 2.5% = 25/1000, platinum 4% = 40/1000
+RATE_PERMILLE = {
+    "silver": 15,
+    "gold": 25,
+    "platinum": 40,
 }
 
+MIN_AMOUNT = 100 * 100        # ยอดซื้อขั้นต่ำ 100 บาท (satang)
+MAX_CASHBACK = 200 * 100      # เงินคืนสูงสุดต่อบิล 200 บาท (satang)
+BIRTHDAY_MULTIPLIER = 2       # เดือนเกิดได้เงินคืน 2 เท่า
 
-def cashback(amount: int, tier: str, birthday: bool = False) -> int:
-    """คืนค่าเงินคืนเป็นสตางค์ (จำนวนเต็ม, ปัดทิ้งเศษสตางค์)
 
-    amount   : ยอดซื้อ หน่วยสตางค์ (>= 0)
-    tier     : "silver" | "gold" | "platinum"
-    birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า ก่อนคิดเพดาน)
+def cashback(amount, tier, birthday=False):
+    """Return the cashback in satang for one bill.
+
+    amount   -- purchase total in satang (int, >= 0)
+    tier     -- "silver", "gold" or "platinum"
+    birthday -- True if the purchase is in the member's birthday month
+
+    Rules:
+      * amount < 100 baht          -> 0
+      * rate by tier               -> silver 1.5%, gold 2.5%, platinum 4%
+      * birthday month             -> cashback doubled
+      * cap at 200 baht per bill
+      * result is floored to whole satang
     """
     if isinstance(amount, bool) or not isinstance(amount, int):
-        raise TypeError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
+        raise TypeError("amount must be an int (satang)")
     if amount < 0:
-        raise ValueError("amount ต้องไม่ติดลบ")
+        raise ValueError("amount must be >= 0")
 
     key = tier.strip().lower() if isinstance(tier, str) else tier
-    if key not in RATE_BP:
-        raise ValueError(f"tier ไม่ถูกต้อง: {tier!r} (ต้องเป็น silver, gold หรือ platinum)")
+    if key not in RATE_PERMILLE:
+        raise ValueError(f"unknown tier: {tier!r}")
 
     if amount < MIN_AMOUNT:
         return 0
 
-    result = amount * RATE_BP[key] // 10000
-    if birthday:
-        result *= 2
-
+    multiplier = BIRTHDAY_MULTIPLIER if birthday else 1
+    result = amount * RATE_PERMILLE[key] * multiplier // 1000
     return min(result, MAX_CASHBACK)
 
 
 if __name__ == "__main__":
-    # ตัวอย่างการใช้งาน
-    print(cashback(10000, "silver"))                # 100 บาท -> 1.5 บาท = 150
-    print(cashback(10000, "gold", birthday=True))   # 100 บาท *2.5% *2 = 5 บาท = 500
-    print(cashback(1000000, "platinum"))            # 10,000 บาท *4% = 400 บาท -> เพดาน 200 บาท = 20000
-    print(cashback(9999, "platinum"))               # ต่ำกว่า 100 บาท -> 0
+    # ตัวอย่างและการทดสอบพื้นฐาน
+    assert cashback(9999, "gold") == 0                 # ต่ำกว่า 100 บาท
+    assert cashback(10000, "silver") == 150            # 100 บาท * 1.5% = 1.50 บาท
+    assert cashback(10000, "silver", True) == 300      # เดือนเกิด x2
+    assert cashback(50000, "gold") == 1250             # 500 บาท * 2.5% = 12.50 บาท
+    assert cashback(1000000, "platinum") == 20000      # 4% = 400 บาท -> ติดเพดาน 200 บาท
+    assert cashback(10000, "Platinum") == 400          # 100 บาท * 4% = 4 บาท
+    assert cashback(7777, "silver") == 0               # ไม่ถึง 100 บาท
+    print("all checks passed")

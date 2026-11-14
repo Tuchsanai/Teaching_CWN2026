@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.5,
  "checks": [
   {
    "id": "contract",
@@ -8,11 +8,6 @@
   },
   {
    "id": "basic",
-   "pass": true,
-   "note": ""
-  },
-  {
-   "id": "half_up",
    "pass": true,
    "note": ""
   },
@@ -34,22 +29,27 @@
   {
    "id": "reject_type",
    "pass": false,
-   "note": "cashback(20000.0, \"gold\", false) ต้อง raise ValueError แต่คืนค่า 500 · พลาด 2 จาก 5 กรณี"
+   "note": "cashback(20000.0, \"gold\", false) ต้อง raise ValueError แต่ raise TypeError · พลาด 4 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"amount\": 20000, \"tier\": \"gold\", \"birthday\": false} ต้องได้ {\"ok\": true, \"result\": 500} exit 0 แต่ได้ exit 0 stdout 1500\n3000\n20000"
+   "note": "stdin {\"amount\": 20000, \"tier\": \"gold\", \"birthday\": false} ต้องได้ {\"ok\": true, \"result\": 500} exit 0 แต่ได้ exit 0 stdout ตัวอย่างและกรณีขอบผ่านทั้งหมด"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"amount\": 20000, \"tier\": \"bronze\", \"birthday\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 1500\n3000\n20000"
+   "note": "stdin {\"amount\": 20000, \"tier\": \"bronze\", \"birthday\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout ตัวอย่างและกรณีขอบผ่านทั้งหมด"
   },
   {
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "cashback(20000, \"silver\", true) คาด 300 ได้ 600 · พลาด 3 จาก 6 กรณี"
   }
  ]
 }

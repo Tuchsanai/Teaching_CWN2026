@@ -1,16 +1,23 @@
-"""BaanKafe: คิดเงินคืนคอร์สสอนชงกาแฟ (หน่วยสตางค์)"""
+"""refund(paid, used_percent, restock) — เงินคืนคอร์สสอนชงกาแฟ BaanKafe หน่วยสตางค์
+
+สมมติฐาน (brief เงียบ):
+- เงินคืนเป็นเงินที่ร้านจ่ายออก จึงปัดลง (floor) ครั้งเดียวที่ผลสุดท้าย
+- used_percent > 80 → คืน 0 (พอดี 80 ยังคืนตามสัดส่วน)
+- restock=True หักค่าดำเนินการ 12.5% ของยอดที่จะคืน (คูณ 7/8)
+- ตัวเลขต้องเป็น int เท่านั้น (ปฏิเสธ float/str/bool/None), restock ต้องเป็น bool
+"""
 import json
 import sys
 from fractions import Fraction
 
 
-def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
-    return int((Fraction(x) * 2 + 1) // 2)
+def round_down(x):
+    """ปัดลง ใช้กับเงินที่ร้านจ่ายออก"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool, float, str ไม่ผ่าน
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -23,19 +30,16 @@ def need_bool(value, name):
     return value
 
 
-FEE = Fraction(125, 1000)  # 12.5%
-
-
 def refund(paid, used_percent, restock):
     need_int(paid, "paid", 0)
     need_int(used_percent, "used_percent", 0, 100)
     need_bool(restock, "restock")
     if used_percent > 80:
         return 0
-    amount = Fraction(paid * (100 - used_percent), 100)  # สัดส่วนที่ยังไม่ได้เรียน
+    amount = Fraction(paid) * (100 - used_percent) / 100
     if restock:
-        amount *= 1 - FEE
-    return half_up(amount)  # ปัดครั้งเดียว half-up
+        amount *= Fraction(875, 1000)  # หัก 12.5%
+    return round_down(amount)
 
 
 def main():

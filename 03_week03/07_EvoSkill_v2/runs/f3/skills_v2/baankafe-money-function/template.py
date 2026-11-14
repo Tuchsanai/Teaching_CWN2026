@@ -1,12 +1,17 @@
-"""คิดเงิน BaanKafe — template: คัดลอกเป็น solve.py แล้วแก้เฉพาะฟังก์ชันหลัก"""
+"""แม่แบบ solve.py — แก้เฉพาะฟังก์ชันหลัก (ชื่อ/พารามิเตอร์ตามโจทย์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — ใช้กับยอดที่ลูกค้าจ่าย/ค่าบริการ"""
     return int((Fraction(x) * 2 + 1) // 2)
+
+
+def round_down(x):
+    """ปัดลง — ใช้กับเงินที่ร้านจ่ายออก เช่น cashback"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -23,7 +28,13 @@ def need_bool(value, name):
     return value
 
 
-# ตัวอย่างรูปแบบ (เปลี่ยนชื่อ/พารามิเตอร์/กฎตาม brief)
+def need_choice(value, name, choices):
+    if type(value) is not str or value not in choices:
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+    return value
+
+
+# ตัวอย่างโครงฟังก์ชัน: validate ก่อน -> คำนวณด้วย Fraction -> ปัดครั้งเดียวตอนท้าย
 def example(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
@@ -34,11 +45,11 @@ def example(items, member):
             raise ValueError("แต่ละรายการต้องเป็น dict")
         subtotal += need_int(item.get("price"), "price", 0) * need_int(item.get("qty"), "qty", 1)
     amount = Fraction(subtotal)
-    if subtotal >= 50000:          # เทียบกับยอดก่อนลด
+    if subtotal >= 50000:
         amount *= Fraction(95, 100)
     if member:
         amount *= Fraction(90, 100)
-    return half_up(amount * Fraction(107, 100))  # ปัดครั้งเดียวตอนท้าย
+    return half_up(amount * Fraction(107, 100))
 
 
 def main():

@@ -1,7 +1,13 @@
 def late_fee(amount, days_late):
-    """Late fee in satang (integer). 0.75%/day on all late days if days_late > 3, capped at 15%."""
+    """ค่าปรับชำระช้า (หน่วยสตางค์, คืนค่าเป็นจำนวนเต็ม)
+
+    - ช้าไม่เกิน 3 วัน: 0
+    - ช้าเกิน 3 วัน: 0.75% ต่อวัน นับทุกวัน (รวม 3 วันแรก)
+    - สูงสุด 15% ของยอดค้างชำระ
+    คำนวณด้วยจำนวนเต็มล้วน (หน่วย basis point) เพื่อเลี่ยงปัญหา float
+    ปัดเศษแบบ half-up
+    """
     if days_late <= 3:
         return 0
-    # work in units of 1/10000 satang to avoid float errors
-    num = min(amount * 75 * days_late, amount * 1500)
-    return (num + 5000) // 10000  # round half up
+    bp = min(days_late * 75, 1500)  # basis points (1 bp = 0.01%)
+    return (amount * bp + 5000) // 10000

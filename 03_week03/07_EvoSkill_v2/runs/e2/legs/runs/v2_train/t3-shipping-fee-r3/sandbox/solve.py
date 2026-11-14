@@ -1,12 +1,17 @@
-"""template ฟังก์ชันคิดเงิน (สตางค์, half-up, ตรวจ input เข้ม)"""
+"""แม่แบบ solve.py สำหรับฟังก์ชันคิดเงิน BaanKafe (แก้เฉพาะส่วน FUNCTION)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) ใช้กับยอดที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
+
+
+def round_down(x):
+    """ปัดลง ใช้กับเงินที่ร้านจ่ายออก (เงินคืน/แต้ม)"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -22,21 +27,34 @@ def need_bool(value, name):
         raise ValueError(f"{name} ต้องเป็น True หรือ False")
     return value
 
+
+def need_choice(value, name, allowed):
+    if type(value) is not str or value not in allowed:
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(allowed)}")
+    return value
+
+
+# ---------------- FUNCTION ----------------
 def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับไม่เกิน 20,000 กรัม")
+    if distance_km == 0:  # ลูกค้ารับเองที่ร้าน
+        return 0
     if weight_g <= 1000:
-        fee = Fraction(4000)
+        baht = Fraction(40)
     elif weight_g <= 5000:
-        fee = Fraction(8000)
+        baht = Fraction(80)
     else:
-        fee = Fraction(8000) + Fraction(1500 * (weight_g - 5000), 1000)
+        baht = 80 + Fraction(15 * (weight_g - 5000), 1000)
     if distance_km > 100:
-        fee *= Fraction(120, 100)
+        baht *= Fraction(120, 100)
     if express:
-        fee *= Fraction(150, 100)
-    return half_up(fee)
+        baht *= Fraction(150, 100)
+    return half_up(baht * 100)
+# ----------------------------------------------------------------------------------
 
 
 def main():

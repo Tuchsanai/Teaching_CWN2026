@@ -1,4 +1,4 @@
-"""benchmark_plugin.py - BaanKafe: 9 โจทย์เขียนฟังก์ชันคิดเงิน (train 4 / validation 2 / test 3)"""
+"""benchmark_plugin.py - BaanKafe: 9 โจทย์เขียนฟังก์ชันคิดเงิน (train 4 · validation 2 · test 3)"""
 import json
 import os
 
@@ -19,20 +19,16 @@ SPLIT = {
 
 def list_tasks(root):
     tasks = []
-    tdir = os.path.join(root, "tasks")
     for tid, split in SPLIT.items():
-        with open(os.path.join(tdir, tid + ".json"), encoding="utf-8") as f:
+        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
             d = json.load(f)
         tasks.append(Task(
-            id=tid,
+            id=d["id"],
             split=split,
             instruction=d["brief"],
             inputs=[],
-            answer_files=[
-                "answers/%s/solve.py" % tid,
-                "answers/%s/test_solve.py" % tid,
-            ],
-            grading={"key": tid, "function": d["function"]},
+            answer_files=[],  # เฉลยใน answers/ ไม่ถูกใส่ไว้ เพราะตัวตรวจไม่ใช้ และห้ามให้ Evolver เห็น
+            grading={"key": d["id"], "function": d["function"]},
             category="coding",
         ))
     return tasks

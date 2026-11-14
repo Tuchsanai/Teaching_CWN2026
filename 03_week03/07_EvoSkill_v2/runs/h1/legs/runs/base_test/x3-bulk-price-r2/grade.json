@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.3,
  "checks": [
   {
    "id": "contract",
@@ -8,18 +8,18 @@
   },
   {
    "id": "basic",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "bulk_price(25000, 20, true) คาด 503368 ได้ 502900 · พลาด 1 จาก 4 กรณี"
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "bulk_price(800, 100, true) คาด 77201 ได้ 77040 · พลาด 1 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "bulk_price(4989, 50, true) คาด 240721 ได้ 240220 · พลาด 4 จาก 4 กรณี"
   },
   {
    "id": "boundary",
@@ -33,18 +33,18 @@
   },
   {
    "id": "reject_type",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "bulk_price(25000.0, 5, false) ต้อง raise ValueError แต่ raise TypeError · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"unit_price\": 25000, \"qty\": 10, \"coupon\": false} ต้องได้ {\"ok\": true, \"result\": 258138} exit 0 แต่ได้ exit 0 stdout ok"
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 10, \"coupon\": false} ต้องได้ {\"ok\": true, \"result\": 258138} exit 0 แต่ได้ exit 0 stdout all checks passed"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"unit_price\": 25000, \"qty\": 0, \"coupon\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout ok"
+   "note": "stdin {\"unit_price\": 25000, \"qty\": 0, \"coupon\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout all checks passed"
   },
   {
    "id": "tests",

@@ -1,60 +1,58 @@
 """BaanKafe cashback calculator.
 
-Units: amount is in satang (1 baht = 100 satang). Result is integer satang.
+หน่วยทั้งหมดเป็นสตางค์ (1 บาท = 100 สตางค์) คำนวณด้วย Fraction แล้วปัดครั้งเดียวที่ขั้นสุดท้าย
 
-Rules, applied in order:
-1. amount below 100 baht (10,000 satang) -> no cashback.
-2. Base rate by tier: silver 1.5%, gold 2.5%, platinum 4%.
-3. Birthday purchase (birthday=True) -> cashback doubled.
-4. Cap at 200 baht (20,000 satang) per bill, applied after doubling.
-5. Round once, at the end, half-up to whole satang.
+ลำดับการคิด:
+1. ยอดต่ำกว่า 100 บาท (10000 สตางค์) -> ไม่ได้เงินคืน (0)
+2. เงินคืนดิบ = ยอด × อัตราตามระดับสมาชิก (silver 1.5%, gold 2.5%, platinum 4%)
+3. ถ้าซื้อในเดือนเกิด -> คูณ 2
+4. ปัดเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้น)
+5. ตัดเพดานสูงสุด 200 บาท (20000 สตางค์) ต่อบิล
 """
 
-import math
 from fractions import Fraction
+import math
 
-RATES = {
-    "silver": Fraction(15, 1000),    # 1.5%
-    "gold": Fraction(25, 1000),      # 2.5%
-    "platinum": Fraction(4, 100),    # 4%
+MIN_AMOUNT_SATANG = 100 * 100      # 100 บาท
+MAX_CASHBACK_SATANG = 200 * 100    # 200 บาทต่อบิล
+BIRTHDAY_MULTIPLIER = 2
+
+RATE_PERCENT = {
+    "silver": Fraction(15, 10),    # 1.5%
+    "gold": Fraction(25, 10),      # 2.5%
+    "platinum": Fraction(4),       # 4%
 }
-MIN_AMOUNT = 100 * 100      # 100 baht in satang
-MAX_CASHBACK = 200 * 100    # 200 baht in satang
 
 
-def _round_half_up(f):
-    """Round a non-negative Fraction to the nearest integer, halves go up."""
-    return math.floor(f + Fraction(1, 2))
+def _round_half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    return math.floor(x + Fraction(1, 2))
 
 
-def cashback(amount, tier, birthday):
-    """Return the cashback in whole satang for one bill.
+def cashback(amount, tier, birthday=False):
+    """คืนค่าเงินคืนเป็นจำนวนเต็มสตางค์
 
-    amount   -- purchase total in satang (int, >= 0)
-    tier     -- "silver", "gold" or "platinum"
-    birthday -- True if the purchase is in the member's birthday month
+    amount   : ยอดซื้อ หน่วยสตางค์ (int, >= 0)
+    tier     : "silver" | "gold" | "platinum"
+    birthday : True ถ้าซื้อในเดือนเกิด
     """
-    if isinstance(amount, bool) or not isinstance(amount, (int, float)):
-        raise TypeError("amount must be a number of satang")
-    amt = Fraction(str(amount))  # avoid float binary error
-    if amt < 0:
-        raise ValueError("amount must not be negative")
+    if isinstance(amount, bool) or not isinstance(amount, int):
+        raise ValueError("amount ต้องเป็นจำนวนเต็มสตางค์")
+    if amount < 0:
+        raise ValueError("amount ต้องไม่ติดลบ")
 
-    key = tier.strip().lower() if isinstance(tier, str) else None
-    if key not in RATES:
-        raise ValueError(f"unknown tier: {tier!r}")
+    key = str(tier).strip().lower() if tier is not None else ""
+    if key not in RATE_PERCENT:
+        raise ValueError(f"tier ไม่ถูกต้อง: {tier!r} (ต้องเป็น silver, gold หรือ platinum)")
 
-    if amt < MIN_AMOUNT:
+    # 1. เกณฑ์ขั้นต่ำ ตรวจจากยอดตั้งต้น
+    if amount < MIN_AMOUNT_SATANG:
         return 0
 
-    result = amt * RATES[key]
+    # 2-3. อัตรา และคูณ 2 ถ้าเดือนเกิด (เก็บเป็น Fraction ยังไม่ปัด)
+    raw = Fraction(amount) * RATE_PERCENT[key] / 100
     if birthday:
-        result *= 2
-    result = _round_half_up(result)
-    return min(result, MAX_CASHBACK)
+        raw *= BIRTHDAY_MULTIPLIER
 
-
-if __name__ == "__main__":
-    print(cashback(10000, "silver", False))   # 150 satang = 1.50 baht
-    print(cashback(10100, "silver", False))   # 151.5 -> 152
-    print(cashback(500000, "platinum", False))  # 20000 (capped)
+    # 4-5. ปัดครั้งเดียว แล้วตัดเพดาน
+    return min(_round_half_up(raw), MAX_CASHBACK_SATANG)

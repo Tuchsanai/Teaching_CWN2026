@@ -3,26 +3,26 @@
 
   python tools/charts.py            (รันบนเครื่อง จากโฟลเดอร์ของบท หลัง bash tools/pull.sh)
 
-ตัวเลขของบทนี้อ่านจาก runs/<ชื่อ>/state.json · ตัวเลขของบท 05 และ 06 อ่านจาก ../06_WikiSkill/results/results.json
-และ ../06_WikiSkill/runs/w2/state.json (วัดบน Test Set ชุดเดียวกัน) ไม่มีค่าที่พิมพ์เอง
+ตัวเลขของบทนี้อ่านจาก runs/<ชื่อ>/state.json · ตัวเลขของบท 05 และ 06 อ่านจาก ../06_WikiSkill/runs/results.json
+และ ../06_WikiSkill/runs/w1/status.txt (วัดบน Test Set ชุดเดียวกัน ด้วยตัวตรวจชุดเดียวกัน) ไม่มีค่าที่พิมพ์เอง
 """
-import json, os, sys
+import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from draw import ROOT, USER, ADAPT, SOLVER, EVOLVER, FILE, BAD, INK, MUTE, LINE, shot
 
 GREY = "#BCAAA4"
 RUNS = [("e1", "e1 · เห็นเฉลยของ Training", "การตั้งค่าหลัก (Fine-grained Ground Truth)"),
         ("e2", "e2 · รันซ้ำของ e1", "การตั้งค่าเดียวกับ e1 ทุกค่า"),
-        ("v1", "v1 · รันซ้ำของ e1", "Agent อิสระทำตามพรอมต์ LAB 0–2"),
+        ("v1", "v1 · รันซ้ำของ e1", "การตั้งค่าเดียวกับ e1 ทุกค่า"),
         ("n1", "n1 · เฉลย + หมายเหตุ 1 ประโยค", "ผู้ใช้บอกว่างานที่ได้คะแนนเต็มมี 2 ไฟล์"),
-        ("n2", "n2 · รันซ้ำของ n1", "Agent อิสระทำตามพรอมต์ LAB 3"),
+        ("n2", "n2 · รันซ้ำของ n1", "การตั้งค่าเดียวกับ n1 ทุกค่า"),
         ("p1", "p1 · เห็นแต่คะแนน", "ไม่มีเฉลยใน Reference Folder"),
-        ("p2", "p2 · รันซ้ำของ p1", "Agent อิสระทำตามพรอมต์ LAB 4"),
+        ("p2", "p2 · รันซ้ำของ p1", "การตั้งค่าเดียวกับ p1 ทุกค่า"),
         ("f1", "f1 · เซสชันใหม่ทุก epoch", "เหมือน e1 แต่ Evolver ไม่ใช้ --resume"),
         ("f2", "f2 · รันซ้ำของ f1", "การตั้งค่าเดียวกับ f1 ทุกค่า"),
-        ("f3", "f3 · รันซ้ำของ f1", "Agent อิสระทำตามพรอมต์ LAB 5"),
+        ("f3", "f3 · รันซ้ำของ f1", "การตั้งค่าเดียวกับ f1 ทุกค่า"),
         ("h1", "h1 · haiku ทั้ง Solver และ Evolver", "Self-evolution ของโมเดลเล็ก"),
-        ("h2", "h2 · รันซ้ำของ h1", "Agent อิสระทำตามพรอมต์ LAB 6")]
+        ("h2", "h2 · รันซ้ำของ h1", "การตั้งค่าเดียวกับ h1 ทุกค่า")]
 PATHS = ("e1", "e2", "n1", "p1", "f1", "h1")
 GROUPS = [("เห็นเฉลย", ("e1", "e2", "v1")), ("เฉลย + หมายเหตุ", ("n1", "n2")), ("เห็นแต่คะแนน", ("p1", "p2")), ("เซสชันใหม่ทุก epoch", ("f1", "f2", "f3"))]
 
@@ -129,22 +129,22 @@ def runs_table():
             EVOLVER, name, MUTE, desc, steps, bar, ft["passes"], ft["n"], sum(t["cost_usd"] for t in T))
     body = """<h1>ทุกการรันของบทนี้</h1>
     <div class='sub'>ผลจริง · Solver = sonnet / effort medium (ยกเว้น h1) · 3 epochs · โจทย์ละ 3 ครั้ง · แต่ละการตั้งค่ารัน 2–3 ครั้ง · ขีดสีเข้มบนแท่ง = คะแนน Test ตอนไม่มีสกิล</div>
-    <table class='t'><tr><th>การรัน</th><th>Validation ราย epoch (0 → 3)</th><th>Test Set · ชุดของ epoch สุดท้าย</th><th>ผ่านครบ 10 ข้อ</th><th>ต้นทุนของ Evolver</th></tr>%s</table>""" % rows
+    <table class='t'><tr><th>การรัน</th><th>Validation ราย epoch (0 → 3)</th><th>Test Set · ชุดของ epoch สุดท้าย</th><th>ผ่านครบทุกข้อ</th><th>ต้นทุนของ Evolver</th></tr>%s</table>""" % rows
     shot("img/r02-runs.png", body)
 
 
 # ------------------------------------------------------------------ r03 เทียบกับบท 05 และ 06 บน Test Set
 def compare():
-    p6 = os.path.join(ROOT, "..", "06_WikiSkill", "results", "results.json")
+    p6 = os.path.join(ROOT, "..", "06_WikiSkill", "runs", "results.json")
     R = json.load(open(p6, encoding="utf-8")) if os.path.isfile(p6) else {}
     items = []
-    if "noskill-test" in R:
-        items.append(("ไม่มีสกิล", "วัดในบท 06", GREY, R["noskill-test"]["test"]))
+    if "noskill" in R:
+        items.append(("ไม่มีสกิล", "วัดในบท 06", GREY, R["noskill"]["test"]))
     if "so-v3" in R:
         items.append(("Skill Optimizer v3", "บท 05 · คนเขียน แล้วปรับ 3 รอบ", USER, R["so-v3"]["test"]))
-    for k, nm in (("w1-final", "WikiSkill (w1)"), ("w2-final", "WikiSkill (w2)")):
+    for k, nm, d in (("w1", "WikiSkill (w1)", "บท 06 · เริ่มจากว่าง"), ("w1q", "WikiSkill (w1q)", "บท 06 · w1 + นโยบายที่ทีมตอบ")):
         if k in R:
-            items.append((nm, "บท 06 · เริ่มจากว่าง", FILE, R[k]["test"]))
+            items.append((nm, d, FILE, R[k]["test"]))
     for gname, members in GROUPS:
         ss = [state(w)["legs"]["v3_test"] for w in members if state(w)]
         if ss:
@@ -173,16 +173,16 @@ def effort():
     cols = []
     cols.append(("Skill Optimizer", "บท 05", USER, [("สกิลรุ่นแรก", "คนเขียน 5 บรรทัด"), ("ผู้ปรับสกิล", "Claude ตามพรอมต์ของคน"), ("เห็นอะไรจากตัวตรวจ", "ข้อตรวจที่ไม่ผ่าน"),
                                                     ("รอบ (รับ · ไม่รับ)", "5 (4 · 1)"), ("rollout ระหว่างปรับ", "108"), ("คนสั่งงาน", "5 พรอมต์")]))
-    p = os.path.join(ROOT, "..", "06_WikiSkill", "runs", "w2", "state.json")
+    p = os.path.join(ROOT, "..", "06_WikiSkill", "runs", "w1", "status.txt")
     if os.path.isfile(p):
-        w = json.load(open(p, encoding="utf-8"))
-        H = w["history"]
-        tr = w["baseline"]["trials"] + sum(h["train"]["trials"] + (h.get("val") or {}).get("trials", 0) for h in H)
-        acc = sum(1 for h in H if h.get("accepted"))
-        oc = sum((h.get("maintainer") or {}).get("cost_usd") or 0 for h in H) + sum((h.get("proposer") or {}).get("cost_usd") or 0 for h in H)
-        cols.append(("WikiSkill (w2)", "บท 06", FILE, [("สกิลรุ่นแรก", "ว่าง"), ("ผู้ปรับสกิล", "Maintainer + Proposer"), ("เห็นอะไรจากตัวตรวจ", "ข้อความของตัวตรวจใน Trace"),
-                                                        ("รอบ (รับ · ไม่รับ)", "%d (%d · %d)" % (len(H), acc, len(H) - acc)), ("rollout ระหว่างปรับ", str(tr)), ("คนสั่งงาน", "1 คำสั่ง"),
-                                                        ("ต้นทุนของผู้ปรับสกิล", "$%.2f" % oc)]))
+        txt = open(p, encoding="utf-8").read()                      # ข้อความที่คำสั่ง status ของ wikiskill พิมพ์
+        res = re.findall(r"\| (ACCEPTED|REJECTED) \|", txt)
+        acc = res.count("ACCEPTED")
+        tr = re.search(r"Inference Agent (\d+) ครั้ง", txt).group(1)
+        oc = re.search(r"Maintainer \+ Proposer \d+ ครั้ง \(\$([\d.]+)\)", txt).group(1)
+        cols.append(("WikiSkill (w1)", "บท 06", FILE, [("สกิลรุ่นแรก", "ว่าง"), ("ผู้ปรับสกิล", "Maintainer + Proposer"), ("เห็นอะไรจากตัวตรวจ", "ข้อความของตัวตรวจใน Trace"),
+                                                        ("รอบ (รับ · ไม่รับ)", "%d (%d · %d)" % (len(res), acc, len(res) - acc)), ("rollout ระหว่างปรับ", tr), ("คนสั่งงาน", "1 คำสั่ง"),
+                                                        ("ต้นทุนของผู้ปรับสกิล", "$" + oc)]))
     for ws in ("e1", "n1", "f1"):
         st = state(ws)
         if not st:

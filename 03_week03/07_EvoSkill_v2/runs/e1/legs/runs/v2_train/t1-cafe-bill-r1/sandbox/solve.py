@@ -1,31 +1,43 @@
+"""แม่แบบ solve.py สำหรับฟังก์ชันคิดเงินของ BaanKafe — คัดลอกไปแก้เฉพาะส่วน TODO"""
 import json
 import sys
 from fractions import Fraction
 
 
-def _need_int(v, name, low=None, high=None):
-    if type(v) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
-
-
-def _half_up(x):
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — ใช้กับเงินที่ลูกค้าต้องจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
+def round_down(x):
+    """ปัดลง — ใช้กับเงินที่ร้านต้องจ่ายออก (เช่น เงินคืน/cashback)"""
+    return int(Fraction(x) // 1)
+
+
+def need_int(value, name, low=None, high=None):
+    if type(value) is not int:  # bool และ float และ str ไม่ผ่าน
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
+def need_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+
 def cafe_bill(items, member):
-    if type(items) is not list:
+    if not isinstance(items, list):
         raise ValueError("items ต้องเป็น list")
-    if type(member) is not bool:
-        raise ValueError("member ต้องเป็น True/False")
+    need_bool(member, "member")
     total = 0
-    for it in items:
-        if type(it) is not dict:
+    for item in items:
+        if not isinstance(item, dict):
             raise ValueError("item ต้องเป็น dict")
-        price = _need_int(it.get("price"), "price", 0)
-        qty = _need_int(it.get("qty"), "qty", 1)
+        price = need_int(item.get("price"), "price", 0)
+        qty = need_int(item.get("qty"), "qty", 1)
         total += price * qty
     amount = Fraction(total)
     if total >= 50000:
@@ -33,7 +45,7 @@ def cafe_bill(items, member):
     if member:
         amount *= Fraction(90, 100)
     amount *= Fraction(107, 100)
-    return _half_up(amount)
+    return half_up(amount)
 
 
 def main():

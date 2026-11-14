@@ -1,36 +1,65 @@
+"""รัน: python3 -m unittest -q test_solve"""
 import unittest
+
 from solve import refund
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(refund(10000, 50, False), 5000)
-        self.assertEqual(refund(10000, 50, True), 4375)
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
         self.assertEqual(refund(10000, 0, False), 10000)
 
-    def test_boundary(self):
+    def test_normal_2(self):
+        self.assertEqual(refund(10000, 50, False), 5000)
+
+    def test_normal_3(self):
+        self.assertEqual(refund(10000, 0, True), 8750)
+
+
+class Boundary(unittest.TestCase):
+    def test_boundary_80_refunds(self):
         self.assertEqual(refund(10000, 80, False), 2000)
+
+    def test_boundary_81_zero(self):
         self.assertEqual(refund(10000, 81, False), 0)
-        self.assertEqual(refund(0, 0, True), 0)
+
+    def test_boundary_100_and_zero_paid(self):
         self.assertEqual(refund(10000, 100, True), 0)
+        self.assertEqual(refund(0, 0, True), 0)
 
-    def test_half_up(self):
-        # 1*(50/100)=0.5 -> 1 ; 1*0.5*7/8=0.4375 -> 0 ; 4*0.9*... 
-        self.assertEqual(refund(1, 50, False), 1)
-        self.assertEqual(refund(1, 50, True), 0)
-        # 20*80/100*7/8 = 14 ; 30*70/100*7/8=18.375 -> 18 ; 12*... 
-        self.assertEqual(refund(30, 70, True), 8)
-        # 4*(87.5/100)? paid=1,used=0,restock -> 0.875 -> 1
-        self.assertEqual(refund(1, 0, True), 1)
-        # exactly .5: paid=4, used 0, restock => 3.5 -> 4
-        self.assertEqual(refund(4, 0, True), 4)
 
-    def test_reject(self):
-        for a in [(-1, 0, False), (1.0, 0, False), ("1", 0, False), (True, 0, False),
-                  (None, 0, False), (1, -1, False), (1, 101, False), (1, 5.0, False),
-                  (1, True, False), (1, 0, 1), (1, 0, None), (1, [], False)]:
-            with self.assertRaises(ValueError):
-                refund(*a)
+class NoDrift(unittest.TestCase):
+    def test_no_drift_1(self):
+        self.assertEqual(refund(9, 0, True), 7)  # 7.875 -> 7
+
+    def test_no_drift_2(self):
+        self.assertEqual(refund(3, 50, False), 1)  # 1.5 -> 1
+
+    def test_no_drift_3(self):
+        self.assertEqual(refund(101, 10, True), 79)  # 79.5375 -> 79
+
+
+class Reject(unittest.TestCase):
+    def test_reject_negative(self):
+        with self.assertRaises(ValueError):
+            refund(-1, 0, False)
+
+    def test_reject_percent_range(self):
+        with self.assertRaises(ValueError):
+            refund(100, 101, False)
+        with self.assertRaises(ValueError):
+            refund(100, -1, False)
+
+    def test_reject_float_str(self):
+        with self.assertRaises(ValueError):
+            refund(100.0, 0, False)
+        with self.assertRaises(ValueError):
+            refund(100, "0", False)
+
+    def test_reject_bool_and_restock(self):
+        with self.assertRaises(ValueError):
+            refund(True, 0, False)
+        with self.assertRaises(ValueError):
+            refund(100, 0, 1)
 
 
 if __name__ == "__main__":

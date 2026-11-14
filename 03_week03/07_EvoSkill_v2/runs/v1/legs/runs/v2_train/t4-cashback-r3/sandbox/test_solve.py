@@ -4,40 +4,48 @@ from solve import cashback
 
 class Normal(unittest.TestCase):
     def test_basic(self):
-        self.assertEqual(cashback(20000, "silver", False), 300)
-        self.assertEqual(cashback(20000, "gold", False), 500)
-        self.assertEqual(cashback(20000, "platinum", False), 800)
-        self.assertEqual(cashback(20000, "gold", True), 1000)
+        self.assertEqual(cashback(100000, "silver", False), 1500)
+        self.assertEqual(cashback(100000, "gold", False), 2500)
+        self.assertEqual(cashback(100000, "platinum", False), 4000)
+
+    def test_birthday(self):
+        self.assertEqual(cashback(100000, "gold", True), 5000)
+        self.assertEqual(cashback(100000, "platinum", True), 8000)
+        self.assertEqual(cashback(100000, "silver", True), 1500)
 
 
 class Boundary(unittest.TestCase):
     def test_min(self):
         self.assertEqual(cashback(9999, "platinum", True), 0)
-        self.assertEqual(cashback(10000, "silver", False), 150)
-        self.assertEqual(cashback(0, "gold", False), 0)
+        self.assertEqual(cashback(10000, "platinum", False), 400)
 
     def test_cap(self):
-        self.assertEqual(cashback(500000, "platinum", False), 20000)  # 20000 พอดี
-        self.assertEqual(cashback(500000, "platinum", True), 20000)   # 40000 -> cap
-        self.assertEqual(cashback(499900, "platinum", False), 19996)
+        self.assertEqual(cashback(500000, "platinum", False), 20000)
+        self.assertEqual(cashback(500001, "platinum", False), 20000)
+        self.assertEqual(cashback(499999, "platinum", False), 19999)
+        self.assertEqual(cashback(10**7, "platinum", True), 20000)
+
+    def test_zero(self):
+        self.assertEqual(cashback(0, "gold", False), 0)
 
 
 class NoDrift(unittest.TestCase):
-    def test_half_up(self):
-        self.assertEqual(cashback(10020, "silver", True), 301)   # 300.6
-        self.assertEqual(cashback(10010, "silver", False), 150)  # 150.15
-        self.assertEqual(cashback(10030, "gold", False), 251)    # 250.75
-        self.assertEqual(cashback(10020, "gold", False), 251)    # 250.5 -> 251
+    def test_floor(self):
+        self.assertEqual(cashback(10033, "silver", False), 150)  # 150.495
+        self.assertEqual(cashback(10034, "silver", False), 151 - 1)  # 150.51 -> floor 150
+        self.assertEqual(cashback(10100, "gold", False), 252)    # 252.5 -> 252
 
 
 class Reject(unittest.TestCase):
     def test_bad(self):
-        for a, t, b in [(-1, "gold", False), (1.0, "gold", False), ("5", "gold", False),
-                        (True, "gold", False), (None, "gold", False),
-                        (20000, "bronze", False), (20000, None, False), (20000, ["x"], False),
-                        (20000, "gold", 1), (20000, "gold", "yes"), (5, "bronze", False)]:
-            with self.assertRaises(ValueError):
-                cashback(a, t, b)
+        bad = [(-1, "gold", False), (1000.0, "gold", False), ("1000", "gold", False),
+               (True, "gold", False), (None, "gold", False),
+               (10000, "bronze", False), (10000, "Gold", False), (10000, None, False),
+               (10000, "gold", 1), (10000, "gold", "yes"), (5, "gold", None),
+               (-5, "bronze", 0)]
+        for a in bad:
+            with self.assertRaises(ValueError, msg=repr(a)):
+                cashback(*a)
 
 
 if __name__ == "__main__":

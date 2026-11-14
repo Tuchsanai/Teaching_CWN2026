@@ -1,39 +1,32 @@
 from fractions import Fraction
 
 
-class InputError(ValueError, TypeError):
-    """Invalid input (both ValueError and TypeError)."""
-
-
-def _round_half_up(x):
-    x = Fraction(x)
-    return (2 * x.numerator + x.denominator) // (2 * x.denominator)
-
-
-def _check_int(name, v, lo):
-    if isinstance(v, bool) or not isinstance(v, int):
-        raise InputError(f"{name} must be an int, got {v!r}")
-    if v < lo:
-        raise InputError(f"{name} must be >= {lo}")
-    return v
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def cafe_bill(items, member):
-    # Assumptions: threshold (>= 500 baht = 50000 satang) uses raw subtotal;
-    # discounts compound (5% then 10%), VAT last; round half up once at the end.
-    if not isinstance(items, (list, tuple)):
-        raise InputError("items must be a list or tuple")
+    # ตรวจอินพุตก่อนคำนวณ
     if not isinstance(member, bool):
-        raise InputError("member must be a bool")
+        raise ValueError("member must be bool")
+    if not isinstance(items, list):
+        raise ValueError("items must be list")
     total = 0
     for it in items:
         if not isinstance(it, dict) or "price" not in it or "qty" not in it:
-            raise InputError("each item must be a dict with price and qty")
-        total += _check_int("price", it["price"], 0) * _check_int("qty", it["qty"], 1)
-    amount = Fraction(total)
-    if total >= 50000:
-        amount *= Fraction(95, 100)
+            raise ValueError("invalid item")
+        p, q = it["price"], it["qty"]
+        if not _is_int(p) or not _is_int(q):
+            raise ValueError("price/qty must be int")
+        if p < 0 or q < 1:
+            raise ValueError("price/qty out of range")
+        total += p * q
+
+    amt = Fraction(total)
+    if total >= 50000:          # ตั้งแต่ 500 บาท (ยอดรวมก่อนลด)
+        amt *= Fraction(95, 100)
     if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
-    return _round_half_up(amount)
+        amt *= Fraction(90, 100)
+    amt *= Fraction(107, 100)   # VAT ขั้นสุดท้าย
+    # ไม่ปัดกลางทาง ปัดลง (floor) ครั้งเดียวตอนจบ
+    return amt.numerator // amt.denominator

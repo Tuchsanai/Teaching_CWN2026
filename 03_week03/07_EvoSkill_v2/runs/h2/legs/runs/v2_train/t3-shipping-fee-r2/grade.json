@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.3636,
  "checks": [
   {
    "id": "contract",
@@ -13,13 +13,13 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(5019, 50, false) คาด 8029 ได้ 8028 · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "shipping_fee(5328, 150, true) คาด 15286 ได้ 15285 · พลาด 1 จาก 4 กรณี"
   },
   {
    "id": "boundary",
@@ -34,22 +34,27 @@
   {
    "id": "reject_type",
    "pass": false,
-   "note": "shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 3 จาก 5 กรณี"
+   "note": "shipping_fee(1000.0, 10, false) ต้อง raise ValueError แต่คืนค่า 4000 · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"weight_g\": 3000, \"distance_km\": 150, \"express\": false} ต้องได้ {\"ok\": true, \"result\": 9600} exit 0 แต่ได้ exit 0 stdout 4000\n8000\n9500\n14400"
+   "note": "stdin {\"weight_g\": 3000, \"distance_km\": 150, \"express\": false} ต้องได้ {\"ok\": true, \"result\": 9600} exit 0 แต่ได้ exit 0 stdout 4000\n14402"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 4000\n8000\n9500\n14400"
+   "note": "stdin {\"weight_g\": 0, \"distance_km\": 10, \"express\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout 4000\n14402"
   },
   {
    "id": "tests",
    "pass": false,
    "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี"
   }
  ]
 }

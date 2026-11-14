@@ -1,4 +1,8 @@
-"""BaanKafe bulk_price (หน่วยสตางค์) · half-up ครั้งเดียวตอนท้าย · ตรวจ input เข้ม"""
+"""BaanKafe: ราคาขายส่งเมล็ดกาแฟ (หน่วยสตางค์)
+
+สมมติฐาน: ปัดครึ่งขึ้น (half-up) ครั้งเดียวตอนท้าย เพราะเป็นเงินที่ลูกค้าจ่าย
+ส่วนลดคูณต่อเนื่อง: ลดตามจำนวน -> ลดคูปอง -> VAT 7% ไม่ปัดระหว่างทาง
+"""
 import json
 import sys
 from fractions import Fraction
@@ -26,15 +30,15 @@ def bulk_price(unit_price, qty, coupon):
     need_int(unit_price, "unit_price", 0)
     need_int(qty, "qty", 1, 1000)
     need_bool(coupon, "coupon")
-    x = Fraction(unit_price) * qty
+    amount = Fraction(unit_price * qty)
     if qty >= 50:
-        x *= 1 - Fraction(75, 1000)
+        amount *= Fraction(1000 - 75, 1000)
     elif qty >= 10:
-        x *= 1 - Fraction(35, 1000)
+        amount *= Fraction(1000 - 35, 1000)
     if coupon:
-        x *= 1 - Fraction(25, 1000)
-    x *= 1 + Fraction(7, 100)
-    return half_up(x)
+        amount *= Fraction(1000 - 25, 1000)
+    amount *= Fraction(107, 100)
+    return half_up(amount)
 
 
 def main():

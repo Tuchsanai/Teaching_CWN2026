@@ -1,107 +1,73 @@
 import unittest
-
 from solve import refund
 
 
 class Normal(unittest.TestCase):
-    def test_normal_1(self):
+    def test_no_restock(self):
+        self.assertEqual(refund(10000, 30, False), 7000)  # 10000*70%
+
+    def test_restock(self):
+        self.assertEqual(refund(10000, 30, True), 6125)  # 7000*0.875
+
+    def test_unused_full(self):
         self.assertEqual(refund(10000, 0, False), 10000)
+        self.assertEqual(refund(10000, 0, True), 8750)
 
-    def test_normal_2(self):
-        self.assertEqual(refund(10000, 50, False), 5000)
+    def test_fully_used(self):
+        self.assertEqual(refund(10000, 100, False), 0)
+        self.assertEqual(refund(10000, 100, True), 0)
 
-    def test_normal_3(self):
-        self.assertEqual(refund(10000, 50, True), 4375)
-
-    def test_normal_4(self):
-        self.assertEqual(refund(20000, 25, True), 13125)
+    def test_zero_paid(self):
+        self.assertEqual(refund(0, 10, True), 0)
 
 
 class Boundary(unittest.TestCase):
-    def test_boundary_1(self):  # 79 -> คืน
-        self.assertEqual(refund(10000, 79, False), 2100)
-
-    def test_boundary_2(self):  # 80 พอดี ยังคืน
+    def test_exactly_80_refunds(self):
         self.assertEqual(refund(10000, 80, False), 2000)
-
-    def test_boundary_3(self):  # 81 ไม่คืน
-        self.assertEqual(refund(10000, 81, False), 0)
-
-    def test_boundary_4(self):
-        self.assertEqual(refund(10000, 100, True), 0)
-
-    def test_boundary_5(self):
-        self.assertEqual(refund(0, 0, True), 0)
-
-    def test_boundary_6(self):
         self.assertEqual(refund(10000, 80, True), 1750)
+
+    def test_81_no_refund(self):
+        self.assertEqual(refund(10000, 81, False), 0)
+        self.assertEqual(refund(10000, 81, True), 0)
+
+    def test_79(self):
+        self.assertEqual(refund(10000, 79, False), 2100)
 
 
 class NoDrift(unittest.TestCase):
-    def test_no_drift_1(self):  # 3.5 -> 4 (floor ได้ 3)
-        self.assertEqual(refund(4, 0, True), 4)
+    def test_floor_not_half_up(self):
+        self.assertEqual(refund(1, 50, False), 0)  # 0.5 -> 0
+        self.assertEqual(refund(3, 50, False), 1)  # 1.5 -> 1
 
-    def test_no_drift_2(self):  # 1.5 -> 2
-        self.assertEqual(refund(3, 50, False), 2)
+    def test_restock_floor(self):
+        self.assertEqual(refund(99, 0, True), 86)  # 86.625 -> 86
+        self.assertEqual(refund(1001, 33, True), 586)  # 1001*.67=670.67*.875=586.836
 
-    def test_no_drift_3(self):  # 0.5 -> 1
-        self.assertEqual(refund(1, 50, False), 1)
-
-    def test_no_drift_4(self):  # 2.625 -> 3 ; ปัดสองรอบ (3 -> 2.625) จะต่าง
-        self.assertEqual(refund(3, 0, True), 3)
-
-    def test_no_drift_5(self):  # 0.4375 -> 0
-        self.assertEqual(refund(1, 50, True), 0)
+    def test_single_rounding(self):
+        # 101*0.99=99.99 ; *0.875=87.49125 -> 87 (ปัดกลางทางเป็น 99 จะได้ 86)
+        self.assertEqual(refund(101, 1, True), 87)
 
 
 class Reject(unittest.TestCase):
-    def test_reject_1(self):
+    def bad(self, *a):
         with self.assertRaises(ValueError):
-            refund(-1, 0, False)
+            refund(*a)
 
-    def test_reject_2(self):
-        with self.assertRaises(ValueError):
-            refund(100, -1, False)
+    def test_paid(self):
+        for v in (-1, 1.5, 100.0, "100", True, None):
+            self.bad(v, 10, False)
 
-    def test_reject_3(self):
-        with self.assertRaises(ValueError):
-            refund(100, 101, False)
+    def test_used(self):
+        for v in (-1, 101, 10.0, 10.5, "10", True, False, None):
+            self.bad(100, v, False)
 
-    def test_reject_4(self):
-        with self.assertRaises(ValueError):
-            refund(100.0, 0, False)
+    def test_restock(self):
+        for v in (0, 1, "yes", None, 1.0):
+            self.bad(100, 10, v)
 
-    def test_reject_5(self):
-        with self.assertRaises(ValueError):
-            refund('100', 0, False)
-
-    def test_reject_6(self):
-        with self.assertRaises(ValueError):
-            refund(True, 0, False)
-
-    def test_reject_7(self):
-        with self.assertRaises(ValueError):
-            refund(100, 50.0, False)
-
-    def test_reject_8(self):
-        with self.assertRaises(ValueError):
-            refund(100, '50', False)
-
-    def test_reject_9(self):
-        with self.assertRaises(ValueError):
-            refund(100, True, False)
-
-    def test_reject_10(self):
-        with self.assertRaises(ValueError):
-            refund(100, 50, 1)
-
-    def test_reject_11(self):
-        with self.assertRaises(ValueError):
-            refund(100, 50, None)
-
-    def test_reject_12(self):
-        with self.assertRaises(ValueError):
-            refund(None, 50, False)
+    def test_invalid_even_when_no_refund(self):
+        self.bad(100, 90, "x")
+        self.bad(-5, 90, False)
 
 
 if __name__ == "__main__":

@@ -1,30 +1,28 @@
-"""late_fee — BaanKafe. โหมดปัดเศษ: r2 (ครึ่งไปหาเลขคู่ / banker's ครั้งเดียวตอนท้าย)
-
-ข้อสมมติ: ช้า > 3 วัน -> ค่าปรับ = amount * 0.75% * days_late (นับทุกวัน) แล้ว cap ที่ 15% ของ amount
-ก่อนปัดเศษ; ช้า <= 3 วัน -> 0
-"""
 from fractions import Fraction
 
 
-class InputError(ValueError, TypeError):
-    """input ผิด — เป็นทั้ง ValueError และ TypeError"""
+def _rnd_even(x):
+    """ปัดเป็นจำนวนเต็มแบบ round() ของ Python (ใกล้สุด, .5 พอดีปัดไปหาเลขคู่)"""
+    x = Fraction(x)
+    q, r = divmod(x.numerator, x.denominator)
+    twice = 2 * r
+    if twice > x.denominator or (twice == x.denominator and q % 2 == 1):
+        q += 1
+    return q
 
 
-def _check_int(name, v, lo, hi=None):
-    if isinstance(v, bool) or not isinstance(v, int):
-        raise InputError(f"{name} must be an int, got {v!r}")
-    if v < lo:
-        raise InputError(f"{name} must be >= {lo}")
-    if hi is not None and v > hi:
-        raise InputError(f"{name} must be <= {hi}")
-    return v
+def _is_int(v):
+    return isinstance(v, int) and not isinstance(v, bool)
 
 
 def late_fee(amount, days_late):
-    _check_int("amount", amount, 0)
-    _check_int("days_late", days_late, 0, 365)
+    if not _is_int(amount) or amount < 0:
+        raise ValueError("amount must be an int >= 0")
+    if not _is_int(days_late) or not 0 <= days_late <= 365:
+        raise ValueError("days_late must be an int in 0..365")
     if days_late <= 3:
         return 0
-    fee = Fraction(amount * 75 * days_late, 10000)
-    cap = Fraction(amount * 15, 100)
-    return int(round(min(fee, cap)))
+    # Fraction ทั้งสาย: 0.75%/วัน × ทุกวันที่ช้า, เพดาน 15%, ปัดครั้งเดียวตอนจบ
+    fee = min(Fraction(amount) * Fraction(75, 10000) * days_late,
+              Fraction(amount) * Fraction(15, 100))
+    return int(_rnd_even(fee))

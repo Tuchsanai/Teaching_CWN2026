@@ -1,59 +1,71 @@
 import unittest
+from fractions import Fraction
 from solve import cafe_bill
+
+
+def ref(sub, member):
+    t = Fraction(sub)
+    if sub >= 50000:
+        t *= Fraction(95, 100)
+    if member:
+        t *= Fraction(9, 10)
+    t *= Fraction(107, 100)
+    return int((t * 2 + 1) // 2)
+
+
+def one(p, q=1):
+    return [{"price": p, "qty": q}]
 
 
 class Normal(unittest.TestCase):
     def test_basic(self):
-        # 4500*2=9000 -> *1.07 = 9630
-        self.assertEqual(cafe_bill([{"price": 4500, "qty": 2}], False), 9630)
+        self.assertEqual(cafe_bill(one(4500, 2), False), 9630)
 
-    def test_member_no_discount5(self):
-        # 10000*.9*1.07 = 9630
-        self.assertEqual(cafe_bill([{"price": 10000, "qty": 1}], True), 9630)
+    def test_member(self):
+        self.assertEqual(cafe_bill(one(4500, 2), True), 8667)
 
-    def test_both(self):
-        # 60000*.95*.9*1.07 = 54891
-        self.assertEqual(cafe_bill([{"price": 30000, "qty": 2}], True), 54891)
+    def test_discount_both(self):
+        self.assertEqual(cafe_bill(one(10000, 6), True), ref(60000, True))
 
     def test_empty(self):
-        self.assertEqual(cafe_bill([], False), 0)
+        self.assertEqual(cafe_bill([], True), 0)
 
 
 class Boundary(unittest.TestCase):
-    def test_49999(self):
-        # 49999*1.07 = 53498.93
-        self.assertEqual(cafe_bill([{"price": 49999, "qty": 1}], False), 53499)
-
-    def test_50000(self):
-        # 50000*.95*1.07 = 50825
-        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], False), 50825)
+    def test_edges(self):
+        self.assertEqual(cafe_bill(one(49999), False), ref(49999, False))
+        self.assertEqual(cafe_bill(one(50000), False), ref(50000, False))
+        self.assertEqual(cafe_bill(one(50000), False), 50825)
+        self.assertEqual(cafe_bill(one(49999), False), 53499)
 
 
 class NoDrift(unittest.TestCase):
-    def test_half_up(self):
-        # 50 *1.07 = 53.5 -> 54
-        self.assertEqual(cafe_bill([{"price": 50, "qty": 1}], False), 54)
-
-    def test_single_rounding(self):
-        # 50010*.95=47509.5; *1.07=50835.165 -> 50835
-        self.assertEqual(cafe_bill([{"price": 50010, "qty": 1}], False), 50835)
+    def test_many(self):
+        for s in range(1, 300):
+            for m in (False, True):
+                self.assertEqual(cafe_bill(one(s), m), ref(s, m))
+        for s in range(49990, 50010):
+            self.assertEqual(cafe_bill(one(s), True), ref(s, True))
 
 
 class Reject(unittest.TestCase):
-    def bad(self, items, member=False):
-        with self.assertRaises(ValueError):
-            cafe_bill(items, member)
+    def test_bad(self):
+        bad = [
+            (one(-1), False), (one(100, 0), False), (one(100, -1), False),
+            (one(100.0), False), (one("100"), False), (one(True), False),
+            (one(100, 1.0), False), (one(100, True), False),
+            (one(100), 1), (one(100), 0), (one(100), "yes"), (one(100), None),
+            ([{"price": 100}], False), ([{"qty": 1}], False), ([5], False),
+            (None, False), ("x", False), ({"price": 1, "qty": 1}, False),
+            (one(float("nan")), False),
+        ]
+        for items, member in bad:
+            with self.assertRaises(ValueError):
+                cafe_bill(items, member)
 
-    def test_cases(self):
-        self.bad([{"price": 100, "qty": 0}])
-        self.bad([{"price": -1, "qty": 1}])
-        self.bad([{"price": 100.0, "qty": 1}])
-        self.bad([{"price": "100", "qty": 1}])
-        self.bad([{"price": True, "qty": 1}])
-        self.bad([{"price": 100}])
-        self.bad([{"price": 100, "qty": 1}], 1)
-        self.bad("x")
-        self.bad([5])
+    def test_reject_before_early_return(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([{"price": 100, "qty": 1}, {"price": "a", "qty": 1}], False)
 
 
 if __name__ == "__main__":

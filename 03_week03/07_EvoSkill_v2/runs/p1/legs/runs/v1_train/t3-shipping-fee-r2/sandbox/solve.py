@@ -1,36 +1,29 @@
 from fractions import Fraction
-import numbers
 
 
-def _num(name, v):
-    if isinstance(v, bool) or not isinstance(v, numbers.Real):
-        raise ValueError(f"{name} must be a number, got {v!r}")
-    if isinstance(v, numbers.Integral):
-        return Fraction(int(v))
-    if v != v or v in (float("inf"), float("-inf")):
-        raise ValueError(f"{name} must be finite")
-    return Fraction(str(v))
+def _rnd(x):
+    """ปัดครึ่งขึ้นเป็นสตางค์เต็ม (ใช้หลังทุกขั้นที่คูณเปอร์เซ็นต์/สัดส่วน)"""
+    x = Fraction(x)
+    return (2 * x.numerator + x.denominator) // (2 * x.denominator)
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """Return shipping fee in integer satang."""
-    w = _num("weight_g", weight_g)
-    d = _num("distance_km", distance_km)
-    if not isinstance(express, bool):
-        raise ValueError(f"express must be a bool, got {express!r}")
-    if w < 1 or w > 30000:
-        raise ValueError("weight_g must be within 1..30000")
-    if d < 0:
+    if weight_g < 1 or weight_g > 30000:
+        raise ValueError("weight_g must be in 1..30000")
+    if distance_km < 0:
         raise ValueError("distance_km must be >= 0")
 
+    w = Fraction(weight_g)
     if w <= 1000:
-        fee = Fraction(4000)
+        fee = 4000
     elif w <= 5000:
-        fee = Fraction(8000)
+        fee = 8000
     else:
-        fee = Fraction(8000) + (w - 5000) * Fraction(3, 2)  # 1.5 satang/g
-    if d > 100:
-        fee *= Fraction(6, 5)
+        # 15 บาท/กก. = 1.5 สตางค์/กรัม ตามสัดส่วน
+        fee = _rnd(8000 + (w - 5000) * Fraction(3, 2))
+
+    if Fraction(distance_km) > 100:
+        fee = _rnd(fee * Fraction(120, 100))
     if express:
-        fee *= Fraction(3, 2)
-    return (2 * fee.numerator + fee.denominator) // (2 * fee.denominator)  # half-up, once
+        fee = _rnd(fee * Fraction(150, 100))
+    return int(fee)

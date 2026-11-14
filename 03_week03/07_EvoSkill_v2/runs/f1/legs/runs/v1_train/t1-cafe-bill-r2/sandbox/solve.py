@@ -1,4 +1,3 @@
-"""BaanKafe cafe_bill — exact arithmetic, result in integer satang."""
 import json
 import sys
 from fractions import Fraction
@@ -8,38 +7,34 @@ def half_up(x):
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(value, name, low=None, high=None):
+def need_int(value, name, low=None):
     if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and value < low) or (high is not None and value > high):
+    if low is not None and value < low:
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
     return value
 
 
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
-
-
 def cafe_bill(items, member):
-    if type(items) is not list:
-        raise ValueError("items ต้องเป็น list")
-    need_bool(member, "member")
+    # สมมติฐาน: items ว่างถือเป็น input ผิด (ValueError); ราคา >= 0
+    if type(items) is not list or not items:
+        raise ValueError("items ต้องเป็น list ที่ไม่ว่าง")
+    if type(member) is not bool:
+        raise ValueError("member ต้องเป็น True หรือ False")
     total = 0
     for it in items:
         if type(it) is not dict:
-            raise ValueError("item ต้องเป็น dict")
+            raise ValueError("แต่ละรายการต้องเป็น dict")
         price = need_int(it.get("price"), "price", 0)
         qty = need_int(it.get("qty"), "qty", 1)
         total += price * qty
-    x = Fraction(total)
-    if total >= 50000:
-        x *= Fraction(95, 100)
+    amount = Fraction(total)
+    if total >= 50000:  # 500 บาท
+        amount *= Fraction(95, 100)
     if member:
-        x *= Fraction(90, 100)
-    x *= Fraction(107, 100)
-    return half_up(x)
+        amount *= Fraction(90, 100)
+    amount *= Fraction(107, 100)  # VAT ขั้นสุดท้าย ปัดครั้งเดียว
+    return half_up(amount)
 
 
 def main():

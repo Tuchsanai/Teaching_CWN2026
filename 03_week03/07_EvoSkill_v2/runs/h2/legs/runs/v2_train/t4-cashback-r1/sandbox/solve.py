@@ -1,56 +1,54 @@
 """BaanKafe cashback calculator.
 
-หน่วยทั้งหมดเป็นสตางค์ (1 บาท = 100 สตางค์)
+หน่วยทั้งหมดเป็นสตางค์ (1 บาท = 100 สตางค์) และคำนวณด้วยจำนวนเต็มล้วน
+ไม่ใช้ float เพื่อกันค่าคลาดเคลื่อน
+
+ลำดับการคิด:
+1. ยอดต่ำกว่า 100 บาท (10,000 สตางค์) -> เงินคืน 0
+2. เงินคืนฐาน = ยอด x อัตรา tier (ปัดลงเป็นสตางค์ทีเดียวที่ขั้นสุดท้าย)
+3. ถ้าเป็นเดือนเกิด -> คูณ 2 (ก่อนปัด)
+4. ปัดลงเป็นสตางค์ครั้งเดียวที่ขั้นสุดท้าย
+5. ตัดเพดาน 200 บาท (20,000 สตางค์) ต่อบิล
+
+การปัดเศษ: ปัดลง (ตัดเศษสตางค์ทิ้ง) ตามค่าเริ่มต้นของร้าน
 """
 
-import math
-from fractions import Fraction
-
-# อัตราเงินคืนตามระดับสมาชิก
-RATES = {
-    "silver": Fraction(15, 1000),   # 1.5%
-    "gold": Fraction(25, 1000),     # 2.5%
-    "platinum": Fraction(40, 1000), # 4%
+# อัตราเงินคืนเป็น basis point (1 bp = 0.01%) เพื่อให้เป็นจำนวนเต็มล้วน
+# silver 1.5% = 150 bp, gold 2.5% = 250 bp, platinum 4% = 400 bp
+_RATE_BP = {
+    "silver": 150,
+    "gold": 250,
+    "platinum": 400,
 }
 
-MIN_AMOUNT = 100 * 100      # ยอดซื้อขั้นต่ำ 100 บาท = 10000 สตางค์ (ต่ำกว่านี้ไม่ได้เงินคืน)
-BIRTHDAY_MULTIPLIER = 2     # เดือนเกิดได้เงินคืน 2 เท่า
-MAX_CASHBACK = 200 * 100    # เงินคืนสูงสุดต่อบิล 200 บาท = 20000 สตางค์
-
-
-def _round_half_up(value):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม ใช้ครั้งเดียวตอนคืนค่า (ค่าไม่ติดลบ)"""
-    return math.floor(value + Fraction(1, 2))
+_MIN_AMOUNT = 10_000       # 100 บาท ในหน่วยสตางค์
+_MAX_CASHBACK = 20_000     # 200 บาท ในหน่วยสตางค์
+_BP_DENOM = 10_000         # 100% = 10,000 bp
 
 
 def cashback(amount, tier, birthday):
-    """คำนวณเงินคืนสมาชิกของบิลหนึ่งใบ (คืนค่าเป็นจำนวนเต็มสตางค์)
+    """คืนค่าเงินคืนเป็นจำนวนเต็มสตางค์
 
-    amount   : ยอดซื้อ (สตางค์ ตั้งแต่ 0)
-    tier     : "silver", "gold" หรือ "platinum"
-    birthday : True ถ้าซื้อในเดือนเกิด
+    amount   : ยอดซื้อ หน่วยสตางค์ (int, >= 0)
+    tier     : "silver" | "gold" | "platinum"
+    birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)
     """
-    # ตรวจอินพุต
-    if isinstance(amount, bool) or not isinstance(amount, (int, float)):
-        raise ValueError("amount ต้องเป็นตัวเลข (สตางค์)")
-    if amount != int(amount):
-        raise ValueError("amount ต้องเป็นจำนวนเต็มสตางค์")
-    amount = int(amount)
+    if isinstance(amount, bool) or not isinstance(amount, int):
+        raise TypeError("amount ต้องเป็นจำนวนเต็มสตางค์")
     if amount < 0:
-        raise ValueError("amount ต้องไม่ติดลบ")
+        raise ValueError("amount ต้องไม่ต่ำกว่า 0")
+    if tier not in _RATE_BP:
+        raise ValueError(f"tier ไม่ถูกต้อง: {tier!r} (ต้องเป็น silver, gold หรือ platinum)")
 
-    if not isinstance(tier, str) or tier.strip().lower() not in RATES:
-        raise ValueError(f"tier ไม่รู้จัก: {tier!r} (ใช้ silver, gold หรือ platinum)")
-    rate = RATES[tier.strip().lower()]
-
-    # ยอดต่ำกว่า 100 บาท ไม่ได้เงินคืน
-    if amount < MIN_AMOUNT:
+    # ขั้นที่ 1: ยอดต่ำกว่า 100 บาท ไม่ได้เงินคืน
+    if amount < _MIN_AMOUNT:
         return 0
 
-    # อัตรา x ตัวคูณเดือนเกิด (ถ้ามี) แล้วจึงเทียบเพดานต่อบิล
-    cashback_exact = Fraction(amount) * rate
-    if birthday:
-        cashback_exact *= BIRTHDAY_MULTIPLIER
+    # ขั้นที่ 2: เดือนเกิดได้ 2 เท่า (คูณกับค่าที่ยังไม่ปัด)
+    multiplier = 2 if birthday else 1
 
-    capped = min(cashback_exact, Fraction(MAX_CASHBACK))
-    return int(_round_half_up(capped))
+    # ขั้นที่ 3: ปัดลงเป็นสตางค์ครั้งเดียวที่ขั้นสุดท้ายของการคำนวณ
+    cb = amount * _RATE_BP[tier] * multiplier // _BP_DENOM
+
+    # ขั้นที่ 4: เพดานต่อบิล 200 บาท
+    return min(cb, _MAX_CASHBACK)

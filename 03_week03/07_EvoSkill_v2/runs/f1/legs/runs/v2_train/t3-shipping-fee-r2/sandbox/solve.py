@@ -1,16 +1,16 @@
-"""เทมเพลต solve.py สำหรับฟังก์ชันคิดเงิน — เปลี่ยนชื่อฟังก์ชัน/สูตรให้ตรงโจทย์"""
+"""BaanKafe shipping fee (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้น — เงินที่ลูกค้าจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -23,39 +23,27 @@ def need_bool(value, name):
     return value
 
 
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
-
-
 def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    # มาตรฐานร้าน: ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม")
+    # มาตรฐานร้าน: ระยะ 0 กม. = รับเองที่ร้าน ค่าส่ง 0
+    if distance_km == 0:
+        return 0
     if weight_g <= 1000:
-        x = Fraction(4000)
+        fee = Fraction(4000)
     elif weight_g <= 5000:
-        x = Fraction(8000)
+        fee = Fraction(8000)
     else:
-        x = Fraction(8000) + Fraction(1500 * (weight_g - 5000), 1000)
+        fee = Fraction(8000) + Fraction(weight_g - 5000, 1000) * 1500
     if distance_km > 100:
-        x *= Fraction(120, 100)
+        fee *= Fraction(120, 100)
     if express:
-        x *= Fraction(150, 100)
-    return half_up(x)
-
-
-_HELPERS = {"half_up", "need_int", "need_bool", "need_choice", "main"}
-
-
-def _entry():
-    """หาฟังก์ชันของโจทย์อัตโนมัติ = ฟังก์ชันสาธารณะตัวสุดท้ายที่นิยามในไฟล์นี้ (ที่ไม่ใช่ helper)
-    จึงไม่ต้องแก้ main() เวลาเปลี่ยนชื่อฟังก์ชัน (กันบั๊ก main ยังเรียก my_function)"""
-    funcs = [f for n, f in globals().items()
-             if callable(f) and getattr(f, "__module__", None) == __name__
-             and not n.startswith("_") and n not in _HELPERS]
-    return funcs[-1]
+        fee *= Fraction(150, 100)
+    return half_up(fee)
 
 
 def main():
@@ -63,7 +51,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = _entry()(**args)
+        result = shipping_fee(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

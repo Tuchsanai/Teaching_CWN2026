@@ -1,35 +1,21 @@
-# validation policy r1
 from fractions import Fraction
-import math
-
-
-def _num(x, name):
-    if isinstance(x, bool) or not isinstance(x, (int, float, Fraction)):
-        raise ValueError(f"{name} must be a number")
-    if isinstance(x, float) and not math.isfinite(x):
-        raise ValueError(f"{name} must be finite")
-    return Fraction(x)
 
 
 def shipping_fee(weight_g, distance_km, express):
-    w = _num(weight_g, "weight_g")
-    d = _num(distance_km, "distance_km")
-    if not isinstance(express, bool):
-        raise ValueError("express must be bool")
-    if w < 1 or w > 30000:
+    # แบบ H: Fraction ตลอด ปัดครึ่งขึ้นครั้งเดียวตอนท้าย + ตรวจอินพุต
+    if weight_g < 1 or weight_g > 30000:
         raise ValueError("weight_g must be in 1..30000")
-    if d < 0:
+    if distance_km < 0:
         raise ValueError("distance_km must be >= 0")
-
+    w = Fraction(weight_g)
     if w <= 1000:
-        fee = Fraction(40)
+        fee = Fraction(4000)
     elif w <= 5000:
-        fee = Fraction(80)
+        fee = Fraction(8000)
     else:
-        fee = 80 + (w - 5000) * 15 / 1000
-    if d > 100:
-        fee = fee * 120 / 100
+        fee = Fraction(8000) + (w - 5000) * Fraction(1500, 1000)  # สตางค์
+    if distance_km > 100:
+        fee *= Fraction(6, 5)
     if express:
-        fee = fee * 150 / 100
-    s = fee * 100
-    return (2 * s.numerator + s.denominator) // (2 * s.denominator)
+        fee *= Fraction(3, 2)
+    return int((2 * fee.numerator + fee.denominator) // (2 * fee.denominator))

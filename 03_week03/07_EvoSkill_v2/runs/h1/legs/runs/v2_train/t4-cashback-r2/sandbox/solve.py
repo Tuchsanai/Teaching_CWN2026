@@ -1,35 +1,27 @@
-"""คำนวณเงินคืนสมาชิกร้าน BaanKafe
+"""BaanKafe cashback calculator.
 
-หน่วยทั้งหมดเป็นสตางค์ (จำนวนเต็ม)
-- amount  : ยอดซื้อ (สตางค์, >= 0)
-- tier    : "silver" | "gold" | "platinum" (ตรงตัวอักษร)
-- birthday: True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)
-
-กติกา
-- อัตราเงินคืน: silver 1.5%, gold 2.5%, platinum 4%
-- ยอดซื้อต่ำกว่า 100 บาท (10000 สตางค์) ไม่ได้เงินคืน (ยอด 100 บาทพอดีได้)
-- เดือนเกิด ได้เงินคืน 2 เท่า
-- เพดานเงินคืน 200 บาท (20000 สตางค์) ต่อบิล ใช้หลังคูณทุกตัวแล้ว
-- ผลลัพธ์เป็นจำนวนเต็มสตางค์ ปัดครึ่งขึ้นครั้งเดียวตอนท้าย
+กติกา:
+- amount   : ยอดซื้อเป็นสตางค์ (int, ตั้งแต่ 0)
+- tier     : "silver" 1.5% · "gold" 2.5% · "platinum" 4%
+- birthday : True = ซื้อในเดือนเกิด ได้เงินคืน 2 เท่า
+- ยอดซื้อต่ำกว่า 100 บาท (10000 สตางค์) ไม่ได้เงินคืน
+- เงินคืนสูงสุด 200 บาท (20000 สตางค์) ต่อบิล (ตัดเพดานหลังคูณ 2 เท่าแล้ว)
+- ผลเป็นจำนวนเต็มสตางค์ ปัดลง เพราะเป็นเงินที่ร้านจ่ายคืนลูกค้า
 """
+
 import json
 import sys
 from fractions import Fraction
+from math import floor
 
-# อัตราเงินคืนเป็นเศษส่วน (1.5% = 15/1000, 2.5% = 25/1000, 4% = 40/1000)
 RATES = {
-    "silver": Fraction(15, 1000),
-    "gold": Fraction(25, 1000),
-    "platinum": Fraction(40, 1000),
+    "silver": Fraction(15, 1000),    # 1.5%
+    "gold": Fraction(25, 1000),      # 2.5%
+    "platinum": Fraction(40, 1000),  # 4%
 }
-MIN_AMOUNT = 100 * 100      # 100 บาท เป็นสตางค์
-MAX_CASHBACK = 200 * 100    # 200 บาท เป็นสตางค์
+MIN_AMOUNT = 100 * 100        # 100 บาท -> สตางค์
+MAX_CASHBACK = 200 * 100      # 200 บาท -> สตางค์
 BIRTHDAY_MULTIPLIER = 2
-
-
-def _half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม สำหรับค่าที่ไม่ติดลบ"""
-    return int((Fraction(x) * 2 + 1) // 2)
 
 
 def cashback(amount, tier, birthday):
@@ -38,8 +30,10 @@ def cashback(amount, tier, birthday):
         raise ValueError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
     if amount < 0:
         raise ValueError("amount ต้องไม่ติดลบ")
-    if not isinstance(tier, str) or tier not in RATES:
-        raise ValueError('tier ต้องเป็น "silver", "gold" หรือ "platinum"')
+    if type(tier) is not str:
+        raise ValueError("tier ต้องเป็นสตริง")
+    if tier not in RATES:
+        raise ValueError("tier ไม่รู้จัก: %r" % tier)
     if type(birthday) is not bool:
         raise ValueError("birthday ต้องเป็น True หรือ False")
 
@@ -49,18 +43,18 @@ def cashback(amount, tier, birthday):
     value = Fraction(amount) * RATES[tier]
     if birthday:
         value *= BIRTHDAY_MULTIPLIER
-    value = min(value, MAX_CASHBACK)
-    return _half_up(value)
+    value = min(value, Fraction(MAX_CASHBACK))
+    return floor(value)
 
 
 def main():
     try:
-        args = json.load(sys.stdin)
+        args = json.loads(sys.stdin.read())
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = cashback(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
+    except (ValueError, TypeError) as e:
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
     return 0

@@ -39,12 +39,12 @@
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"amount\": 100000, \"days_late\": 10} ต้องได้ {\"ok\": true, \"result\": 7500} exit 0 แต่ได้ exit 0 stdout amount=    100000 days_late=  0 -> fee=0\namount=    100000 days_late=  3 -> fee=0\namount=    100000 days_late=  4 -> fee"
+   "note": "stdin {\"amount\": 100000, \"days_late\": 10} ต้องได้ {\"ok\": true, \"result\": 7500} exit 0 แต่ได้ exit 0 stdout ผ่านการทดสอบทั้งหมด"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"amount\": 100000, \"days_late\": 366} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout amount=    100000 days_late=  0 -> fee=0\namount=    100000 days_late=  3 -> fee=0\namount=    100000 "
+   "note": "stdin {\"amount\": 100000, \"days_late\": 366} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout ผ่านการทดสอบทั้งหมด"
   },
   {
    "id": "tests",

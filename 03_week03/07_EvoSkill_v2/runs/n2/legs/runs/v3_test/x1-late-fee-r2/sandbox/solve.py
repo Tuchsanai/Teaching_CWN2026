@@ -1,4 +1,8 @@
-"""BaanKafe late fee (satang) · half-up once at the end · strict input checks"""
+"""BaanKafe: late_fee — ค่าปรับชำระช้าของลูกค้าขายส่ง (หน่วยสตางค์)
+
+สมมติฐาน (โจทย์เงียบ): ค่าปรับเป็นเงินที่ลูกค้าจ่ายให้ร้าน -> ปัดครึ่งขึ้น (half-up)
+ครั้งเดียวตอนท้ายด้วย Fraction; เพดาน 15% เทียบก่อนปัดเศษ (ผลเท่ากับปัดแล้วเทียบ)
+"""
 import json
 import sys
 from fractions import Fraction
@@ -21,9 +25,10 @@ def late_fee(amount, days_late):
     need_int(days_late, "days_late", 0, 365)
     if days_late <= 3:
         return 0
-    fee = min(Fraction(amount) * Fraction(75, 10000) * days_late,
-              Fraction(amount) * Fraction(15, 100))
-    return half_up(fee)
+    amt = Fraction(amount)
+    fee = amt * Fraction(75, 10000) * days_late  # 0.75% ต่อวัน นับทุกวันที่ช้า
+    cap = amt * Fraction(15, 100)
+    return half_up(min(fee, cap))
 
 
 def main():

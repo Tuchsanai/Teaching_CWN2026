@@ -1,15 +1,16 @@
-"""split_bill (หน่วยสตางค์) · half-up ครั้งเดียวตอนท้าย · ตรวจ input เข้ม"""
+"""BaanKafe: หารบิลพร้อมทิป"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
+    if type(value) is not int:  # bool, float, str ไม่ผ่าน
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -20,9 +21,10 @@ def split_bill(total, people, tip_percent):
     need_int(total, "total", 0)
     need_int(people, "people", 1)
     need_int(tip_percent, "tip_percent", 0, 100)
-    grand = half_up(Fraction(total) * (100 + tip_percent) / 100)
+    # ยอดรวมทิปเป็นเงินที่ลูกค้าจ่าย -> half-up ครั้งเดียว (สมมติฐานตามนโยบายร้าน)
+    grand = half_up(Fraction(total * (100 + tip_percent), 100))
     base, extra = divmod(grand, people)
-    return [base + 1] * extra + [base] * (people - extra)
+    return [base + 1 if i < extra else base for i in range(people)]
 
 
 def main():

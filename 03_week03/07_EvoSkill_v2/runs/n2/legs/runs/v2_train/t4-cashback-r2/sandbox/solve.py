@@ -1,15 +1,20 @@
-"""BaanKafe cashback (หน่วยสตางค์) · half-up ครั้งเดียวตอนท้าย · ตรวจ input เข้ม"""
+"""BaanKafe cashback. Amounts in satang.
+Assumptions (brief silent, per baankafe-policy-conventions):
+- cashback is paid out by the shop -> round down (floor), once at the end
+- birthday 2x applies to gold/platinum only; silver gets no bonus
+- cap (20000 satang) applied after doubling and flooring
+"""
 import json
 import sys
 from fractions import Fraction
 
 RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(4, 100)}
-MIN_AMOUNT = 10000   # 100 บาท
-CAP = 20000          # 200 บาท
+MIN_AMOUNT = 10000   # 100 baht
+CAP = 20000          # 200 baht
 
 
-def half_up(x):
-    return int((Fraction(x) * 2 + 1) // 2)
+def round_down(x):
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -26,22 +31,17 @@ def need_bool(value, name):
     return value
 
 
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่กำหนด")
-    return value
-
-
 def cashback(amount, tier, birthday):
     need_int(amount, "amount", 0)
-    need_choice(tier, "tier", RATES)
+    if type(tier) is not str or tier not in RATES:
+        raise ValueError("tier ต้องเป็น silver, gold หรือ platinum")
     need_bool(birthday, "birthday")
     if amount < MIN_AMOUNT:
         return 0
-    x = Fraction(amount) * RATES[tier]
-    if birthday:
-        x *= 2
-    return min(CAP, half_up(x))
+    value = Fraction(amount) * RATES[tier]
+    if birthday and tier != "silver":
+        value *= 2
+    return min(round_down(value), CAP)
 
 
 def main():

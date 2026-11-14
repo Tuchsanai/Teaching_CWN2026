@@ -1,68 +1,75 @@
-import math
+"""BaanKafe: คิดค่าส่งเมล็ดกาแฟ
+
+shipping_fee(weight_g, distance_km, express) -> int (จำนวนเต็มสตางค์)
+
+ลำดับการคิด (ทุกขั้นเป็น Fraction ไม่ใช้ float):
+  1. ค่าส่งตามน้ำหนัก (บาท)
+       w <= 1,000 g           -> 40
+       1,000 < w <= 5,000 g   -> 80
+       w > 5,000 g            -> 80 + 15 * (w - 5,000) / 1,000   (คิดตามสัดส่วนกรัม)
+  2. ระยะทาง > 100 กม.         -> คูณ 1.20 (เกิน 100 พอดีไม่คิด)
+  3. ส่งด่วน (express=True)    -> คูณ 1.50 ต่อจากข้อ 2
+  4. แปลงเป็นสตางค์ แล้วปัดลง (ตัดเศษสตางค์ทิ้ง) ที่ขั้นสุดท้ายครั้งเดียว
+       ค่าเริ่มต้นเลือก "ปัดลง" เพราะโจทย์ไม่ได้ระบุโหมดปัด
+"""
+
 from fractions import Fraction
+import math
+
+MIN_WEIGHT_G = 1
+MAX_WEIGHT_G = 30_000
+
+BASE_LIGHT = Fraction(40)           # ไม่เกิน 1,000 กรัม
+BASE_MEDIUM = Fraction(80)          # 1,001 - 5,000 กรัม (และเป็นฐานของส่วนที่เกิน 5,000)
+LIGHT_LIMIT_G = 1_000
+MEDIUM_LIMIT_G = 5_000
+PER_KG_OVER_LIMIT = Fraction(15)    # บาทต่อกิโลกรัม ส่วนที่เกิน 5,000 กรัม
+
+LONG_DISTANCE_KM = Fraction(100)
+LONG_DISTANCE_SURCHARGE = Fraction(120, 100)   # +20%
+EXPRESS_SURCHARGE = Fraction(150, 100)         # +50%
 
 
-def to_frac(x):
-    """รับได้ทั้ง int, float, Decimal โดยไม่เกิดคลาดเคลื่อนจาก float"""
-    return Fraction(str(x))
-
-
-def round_half_up(f):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม ใช้ครั้งเดียวตอนคืนค่า (ยอดไม่ติดลบ)"""
-    return math.floor(f + Fraction(1, 2))
-
-
-def _check_number(name, x):
-    if isinstance(x, bool):
-        raise ValueError(f"{name} ต้องเป็นตัวเลข")
-    try:
-        return to_frac(x)
-    except (ValueError, TypeError, ArithmeticError):
-        raise ValueError(f"{name} ต้องเป็นตัวเลข")
+def _to_fraction(value):
+    """แปลง input เป็น Fraction โดยไม่ผ่าน float ของ binary (เช่น 0.1 -> 1/10)"""
+    if isinstance(value, Fraction):
+        return value
+    if isinstance(value, int):
+        return Fraction(value)
+    if isinstance(value, float):
+        return Fraction(repr(value))
+    return Fraction(str(value))
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คำนวณค่าส่งเมล็ดกาแฟ คืนค่าเป็นจำนวนเต็มสตางค์
+    weight = _to_fraction(weight_g)
+    distance = _to_fraction(distance_km)
 
-    ลำดับการคิด:
-      1. ค่าส่งตามน้ำหนัก (บาท)
-         - ไม่เกิน 1,000 กรัม          -> 40 บาท
-         - เกิน 1,000 ถึง 5,000 กรัม   -> 80 บาท
-         - เกิน 5,000 กรัม             -> 80 บาท + (กรัมที่เกิน 5,000 / 1,000) * 15 บาท
-           (คิดตามสัดส่วน ไม่ปัดเป็นกิโลกรัมเต็ม)
-      2. ระยะทางเกิน 100 กม. คิดเพิ่ม 20% (คูณ 1.2)
-      3. ส่งด่วน คิดเพิ่ม 50% ต่อจากข้อ 2 (คูณ 1.5)
-      4. ปัดครึ่งขึ้นครั้งเดียวที่ผลสุดท้ายเป็นสตางค์
-    """
-    w = _check_number("weight_g", weight_g)
-    d = _check_number("distance_km", distance_km)
-
-    if not (Fraction(1) <= w <= Fraction(30000)):
-        raise ValueError("weight_g ต้องอยู่ในช่วง 1–30,000 กรัม")
-    if d < 0:
+    if not (MIN_WEIGHT_G <= weight <= MAX_WEIGHT_G):
+        raise ValueError(f"weight_g ต้องอยู่ในช่วง {MIN_WEIGHT_G}-{MAX_WEIGHT_G} กรัม")
+    if distance < 0:
         raise ValueError("distance_km ต้องไม่ติดลบ")
-    if not isinstance(express, bool):
-        raise ValueError("express ต้องเป็น True หรือ False")
 
     # 1) ค่าส่งตามน้ำหนัก (บาท)
-    if w <= 1000:
-        fee = Fraction(40)
-    elif w <= 5000:
-        fee = Fraction(80)
+    if weight <= LIGHT_LIMIT_G:
+        fee = BASE_LIGHT
+    elif weight <= MEDIUM_LIMIT_G:
+        fee = BASE_MEDIUM
     else:
-        fee = Fraction(80) + (w - 5000) / 1000 * Fraction(15)
+        fee = BASE_MEDIUM + PER_KG_OVER_LIMIT * (weight - MEDIUM_LIMIT_G) / 1000
 
-    # 2) ระยะทางเกิน 100 กม. เพิ่ม 20%
-    if d > 100:
-        fee *= Fraction(120, 100)
+    # 2) ระยะทางเกิน 100 กม. คิดเพิ่ม 20%
+    if distance > LONG_DISTANCE_KM:
+        fee *= LONG_DISTANCE_SURCHARGE
 
-    # 3) ส่งด่วนเพิ่ม 50% (คิดต่อจากข้อก่อน)
+    # 3) ส่งด่วน คิดเพิ่ม 50% (คูณต่อจากข้อก่อน)
     if express:
-        fee *= Fraction(150, 100)
+        fee *= EXPRESS_SURCHARGE
 
-    # 4) แปลงเป็นสตางค์และปัดครึ่งขึ้นครั้งเดียว
-    return round_half_up(fee * 100)
+    # 4) เป็นสตางค์ แล้วปัดลงครั้งเดียว
+    return math.floor(fee * 100)
 
 
 if __name__ == "__main__":
-    print(shipping_fee(2500, 50, False))  # 8000
+    print(shipping_fee(500, 10, False))     # 4000 (40 บาท)
+    print(shipping_fee(7000, 120, True))    # 19800 (110 * 1.2 * 1.5 = 198 บาท)

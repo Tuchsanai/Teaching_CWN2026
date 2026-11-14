@@ -6,7 +6,7 @@
 | โค้ดของตัวตรวจ | ไม่พบ |
 
 ไฟล์ทั้งหมด:
-- reference/baankafe/tasks/t1-cafe-bill.json
-- reference/baankafe/tasks/t2-split-bill.json
-- reference/baankafe/tasks/t3-shipping-fee.json
-- reference/baankafe/tasks/t4-cashback.json
+- reference/tasks/t1-cafe-bill.json
+- reference/tasks/t2-split-bill.json
+- reference/tasks/t3-shipping-fee.json
+- reference/tasks/t4-cashback.json

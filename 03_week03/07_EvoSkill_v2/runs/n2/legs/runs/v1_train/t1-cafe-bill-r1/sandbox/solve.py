@@ -1,10 +1,11 @@
-"""cafe_bill: คิดเงินหน้าร้าน BaanKafe (หน่วยสตางค์) · half-up ครั้งเดียวตอนท้าย"""
+"""BaanKafe: cafe_bill(items, member) - หน่วยเงินเป็นสตางค์"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -26,20 +27,21 @@ def cafe_bill(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
-    total = 0
+    subtotal = 0
     for it in items:
-        if type(it) is not dict:
-            raise ValueError("แต่ละรายการต้องเป็น dict")
-        price = need_int(it.get("price"), "price", 0)
-        qty = need_int(it.get("qty"), "qty", 1)
-        total += price * qty
-    x = Fraction(total)
-    if total >= 50000:
-        x *= Fraction(95, 100)
+        if type(it) is not dict or "price" not in it or "qty" not in it:
+            raise ValueError("แต่ละรายการต้องเป็น dict ที่มี price และ qty")
+        price = need_int(it["price"], "price", 0)
+        qty = need_int(it["qty"], "qty", 1)
+        subtotal += price * qty
+
+    amount = Fraction(subtotal)
+    if subtotal >= 50000:  # 500 บาท ตั้งแต่ขึ้นไป
+        amount *= Fraction(95, 100)
     if member:
-        x *= Fraction(90, 100)
-    x *= Fraction(107, 100)
-    return half_up(x)
+        amount *= Fraction(90, 100)
+    amount *= Fraction(107, 100)  # VAT ขั้นสุดท้าย
+    return half_up(amount)  # ปัดครั้งเดียวตอนท้าย
 
 
 def main():

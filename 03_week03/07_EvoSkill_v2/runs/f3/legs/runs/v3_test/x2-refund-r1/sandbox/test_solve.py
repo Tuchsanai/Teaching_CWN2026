@@ -1,37 +1,55 @@
 import unittest
+
 from solve import refund
 
 
 class Normal(unittest.TestCase):
-    def test_basic(self):
+    def test_half(self):
         self.assertEqual(refund(10000, 50, False), 5000)
+
+    def test_restock(self):
         self.assertEqual(refund(10000, 50, True), 4375)
-        self.assertEqual(refund(0, 0, True), 0)
+
+    def test_unused(self):
+        self.assertEqual(refund(8000, 0, True), 7000)
 
 
 class Boundary(unittest.TestCase):
-    def test_edges(self):
+    def test_80_refunds(self):
         self.assertEqual(refund(10000, 80, False), 2000)
+
+    def test_81_none(self):
         self.assertEqual(refund(10000, 81, False), 0)
+
+    def test_100_and_zero_paid(self):
         self.assertEqual(refund(10000, 100, True), 0)
-        self.assertEqual(refund(10000, 0, False), 10000)
+        self.assertEqual(refund(0, 0, True), 0)
 
 
 class NoDrift(unittest.TestCase):
-    def test_half_up(self):
-        self.assertEqual(refund(1, 50, False), 1)      # 0.5 -> 1
-        self.assertEqual(refund(4, 0, True), 4)        # 3.5 -> 4
-        self.assertEqual(refund(10001, 0, True), 8751)  # 8750.875
+    def test_floor_once(self):
+        # 1001*0.5 = 500.5 -> 500
+        self.assertEqual(refund(1001, 50, False), 500)
+        # 500.5*0.875 = 437.9375 -> 437 (ปัดครั้งเดียว)
+        self.assertEqual(refund(1001, 50, True), 437)
+
+    def test_large(self):
+        self.assertEqual(refund(10**15 + 1, 0, False), 10**15 + 1)
 
 
 class Reject(unittest.TestCase):
     def test_bad(self):
-        for a in [(100.0, 0, False), ("1", 0, False), (-1, 0, False), (True, 0, False),
-                  (None, 0, False), (100, 101, False), (100, -1, False), (100, 5.0, False),
-                  (100, True, False), (100, 0, 1), (100, 0, None), (100, 90, "yes"),
-                  (-5, 90, False)]:
-            with self.assertRaises(ValueError):
-                refund(*a)
+        for args in [(100.0, 10, False), ("100", 10, False), (None, 10, False),
+                     (True, 10, False), (-1, 10, False), (100, 10.0, False),
+                     (100, -1, False), (100, 101, False), (100, 10, 1),
+                     (100, 10, None), (100, True, False), (100, 90.5, True)]:
+            with self.subTest(args=args):
+                with self.assertRaises(ValueError):
+                    refund(*args)
+
+    def test_validate_before_shortcut(self):
+        with self.assertRaises(ValueError):
+            refund(100, 95, "yes")
 
 
 if __name__ == "__main__":

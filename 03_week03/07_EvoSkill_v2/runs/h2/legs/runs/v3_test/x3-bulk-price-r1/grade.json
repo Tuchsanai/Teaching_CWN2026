@@ -1,5 +1,5 @@
 {
- "score": 0.6,
+ "score": 0.5,
  "checks": [
   {
    "id": "contract",
@@ -13,8 +13,8 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "bulk_price(100, 60, false) คาด 5939 ได้ 5938 · พลาด 2 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
@@ -34,7 +34,7 @@
   {
    "id": "reject_type",
    "pass": false,
-   "note": "bulk_price(25000.0, 5, false) ต้อง raise ValueError แต่คืนค่า 133750 · พลาด 4 จาก 5 กรณี"
+   "note": "bulk_price(25000.0, 5, false) ต้อง raise ValueError แต่คืนค่า 133750 · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",

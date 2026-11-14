@@ -1,4 +1,6 @@
-import json, sys
+"""BaanKafe: bulk_price (หน่วยสตางค์)"""
+import json
+import sys
 from fractions import Fraction
 
 
@@ -6,33 +8,22 @@ def half_up(x):
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def need_int(v, name, low=None, high=None):
-    if type(v) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
-
-
-def need_bool(v, name):
-    if type(v) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True/False")
-    return v
-
-
 def bulk_price(unit_price, qty, coupon):
-    need_int(unit_price, "unit_price", 0)
-    need_int(qty, "qty", 1, 1000)
-    need_bool(coupon, "coupon")
+    if type(unit_price) is not int or unit_price < 0:
+        raise ValueError("unit_price ต้องเป็นจำนวนเต็ม >= 0")
+    if type(qty) is not int or not (1 <= qty <= 1000):
+        raise ValueError("qty ต้องเป็นจำนวนเต็ม 1-1000")
+    if type(coupon) is not bool:
+        raise ValueError("coupon ต้องเป็น bool")
     total = Fraction(unit_price * qty)
     if qty >= 50:
-        total *= Fraction(1000 - 75, 1000)
+        total *= 1 - Fraction(75, 1000)   # ใช้อัตราเดียว (ไม่ซ้อน)
     elif qty >= 10:
-        total *= Fraction(1000 - 35, 1000)
+        total *= 1 - Fraction(35, 1000)
     if coupon:
-        total *= Fraction(975, 1000)
-    total *= Fraction(107, 100)
-    return half_up(total)
+        total *= 1 - Fraction(25, 1000)   # คูณต่อจากส่วนลดก่อนหน้า
+    total *= Fraction(107, 100)           # VAT ขั้นสุดท้าย
+    return half_up(total)                 # ปัดครั้งเดียว half-up
 
 
 def main():

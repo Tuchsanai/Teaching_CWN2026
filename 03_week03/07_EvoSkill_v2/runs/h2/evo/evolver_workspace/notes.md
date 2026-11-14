@@ -1,44 +1,51 @@
-# Evolver notes (persist across epochs)
+# บันทึกของ Skill Evolver (ข้าม epoch)
 
-## Layout facts (verified)
-- Solver cwd in traces: /workspace/evlab/ws/h2/legs/runs/base_train/<task>-r<i>/sandbox (path only; not on this machine)
-- Solver checks `./skills` in its cwd at start; in epoch 0 it did not exist.
-- Trace jsonl: `assistant` entries carry `tool_use` (Write/Edit/Bash), `user` entries carry `tool_result`, final `result` entry has the answer text.
-- Helper scripts: /evo/evolver_workspace/tools/condense.py (readable transcript), tools/writes.py (extract Write/Edit contents).
-- Trace does NOT include the original task prompt (brief); only /evo/reference/baankafe/tasks/*.json has the brief text.
-- Do NOT use /evo/reference/baankafe/answers/*/solve.py to write skills (train-answer leakage; skills must generalize).
+## Epoch 0 (ไม่มีสกิล)
+คะแนน: t1-cafe-bill 0.5 · t2-split-bill 0.6 · t3-shipping-fee 0.5455 · t4-cashback 0.5 (ทั้ง 3 rollout ของแต่ละโจทย์ได้คะแนนเท่ากันทุกครั้ง)
 
-## Epoch 0 results (scores)
-- t1-cafe-bill: 0.5, 0.5, 0.6 (s1,s2 per-step half-up rounding; s3 Fraction + single final half-up rounding)
-- t2-split-bill: 0.6 (s1 tip half-up), 0.5 (s2 tip floor), 0.6 (s3 tip floor)
-- t3-shipping-fee: 0.6 x3 (Decimal, half-up at satang)
-- t4-cashback: 0.4 x3 (all: <100 baht -> 0, rate, birthday x2 before cap, cap 200, floor rounding)
-- Consistent 0.4 on t4 across 3 different implementations => likely a systematic interpretation mismatch (cap ordering? threshold? rounding?) not yet identified.
+สังเกตจาก trace (ไม่มีผลตรวจแบบ test รายกรณี จึงไม่รู้ว่าพลาดกรณีไหน):
+- Solver ไม่มีสกิลให้อ่านเลย (โฟลเดอร์ skills ว่าง) ใช้เวลา 5–6 turn ต่อ rollout
+- การตีความที่เลือกเหมือนกันทุก rollout ของโจทย์เดียวกัน จึงน่าจะเป็นสาเหตุที่คะแนนไม่ขยับ:
+  - t1: "ลดอีก 10%" เป็นต่อเนื่อง (0.95 × 0.9) ไม่ใช่รวม 15%; ปัดครั้งเดียวที่ท้าย
+  - t2: ทิปปัดครึ่งขึ้น; ส่วนเกินหารแจกคนลำดับแรก
+  - t3: ค่าส่งเกิน 5,000 g คิดเป็นสัดส่วนราย g; ปัดครึ่งขึ้นที่สตางค์สุดท้าย (5,001 g → 8,002)
+  - t4: เกิดเดือนเกิดคูณ 2 แล้วค่อยเทียบเพดาน 200 บาท; เศษสตางค์ปัดลง (s1, s3) หรือปัดครึ่งขึ้น (s2) ได้คะแนนเท่ากัน
+- ข้อผิดพลาดที่ไม่เกี่ยวกับกติกา: ใช้ `python3 -I` แล้ว import ไม่ได้ (เสียรอบ); เขียนค่า assert ผิดจากการคิดเลขในหัว (t1 s2, t3 s1)
+- ความไม่สม่ำเสมอของการปัด (t4 ปัดลงบ้างปัดขึ้นบ้าง) ทำให้สงสัยว่าการปัดไม่ใช่ตัวที่ทำให้คะแนนต่าง แต่ยังสรุปไม่ได้
 
-## Recurring solver failure modes (epoch 0)
-- `python3 -I` used for import from cwd -> ModuleNotFoundError, wasted turns (seen in t1 s1/s2/s3, t3 s1, t4 s3).
-- Strict isinstance(int) checks raising TypeError on float inputs (t4 s1, s2, s3) -> risk on hidden tests.
-- Per-step rounding vs single final rounding (t1).
-- Solvers reported ambiguity honestly in their answers; good.
+## Epoch 1
+- เขียน staging: `thai-spec-reading`, `satang-money-math`, `solution-verification`
+- ไม่ได้เปิดโฟลเดอร์ `reference/answers/` เพื่อดูคำตอบของโจทย์ train เพราะจะเป็นการเรียนจากเฉลยที่ไม่ generalize และทำให้คะแนน train ไม่สะท้อนความสามารถจริง
+- ตัวช่วยวิเคราะห์ trace: `/evo/evolver_workspace/tools/summarize.py <trace> [maxlen]`
 
-## Skills written
-- epoch 1 staging: money-rule-functions (Thai; keyword->operator table, round once half-up, Fraction, python -I warning).
-- Open question for epoch 2: check whether epoch 1 scores moved t1 (single-rounding hypothesis) and whether t4 changed.
+### สมมติฐานที่ยังไม่ได้ทดสอบ (ใช้ดูคะแนน epoch ถัดไป)
+- H1: ถ้า "ลดอีก" เป็นการรวมเปอร์เซ็นต์ คะแนน t1 จะเปลี่ยน (สมาชิก 4 จาก 8 กรณีอาจพลาดทั้งหมด → เข้ากับ 0.5)
+- H2: การปัดเศษแบบปัดลงหรือปัดขึ้นอาจเป็นสาเหตุของ t2 และ t3 ที่คะแนนไม่เต็ม
+- H3: ลำดับ "คูณ 2 แล้วเทียบเพดาน" กับ "เทียบเพดานแล้วคูณ 2" ของ t4 ให้ผลต่างกันเฉพาะกรณีที่ชนเพดาน
+- วิธีทดสอบ: ในแต่ละ epoch เปลี่ยนสมมติฐานหนึ่งข้อในสกิลแบบทั่วไป (ไม่เจาะจงโจทย์) แล้วดูว่าคะแนนของโจทย์ที่เกี่ยวข้องขยับไหม
 
-## Epoch 1 results (skills_v1 = money-rule-functions)
-- t1: 0.5 (s1), 0.6 (s2), 0.6 (s3). t2: 0.6 x3. t3: 0.6 x3. t4: 0.6 x3 (was 0.4)
-- Mean: epoch0 0.525 -> epoch1 0.592
-- t4 0.4 -> 0.6 after skill: round-once half-up + Fraction + cap after birthday doubling. Confirms rounding was part of the t4 gap.
-- All solvers in epoch 1 read ./skills/money-rule-functions/SKILL.md and followed it; no -I import errors seen in epoch 1.
-- Plateau at 0.6 across all 4 tasks: remaining 0.4 unidentified. Candidates (unverified): additive vs sequential member discount in t1, tip rounding in t2, signature/edge-input expectations.
+## Epoch 1 (ใช้ skills_v1)
+คะแนน: t1 0.6 / 0.5 / 0.6 · t2 0.7 / 0.7 / 0.6 · t3 0.5455 ×3 · t4 0.5 ×3
+- Solver อ่านสกิลทั้งสามตัวทุก rollout ใช้ 5–7 turn
+- t3 และ t4 ไม่ขยับเลย ทั้งที่ปัดครึ่งขึ้นทุกรัน (t4 s1 ใช้ครึ่งขึ้นแต่ยังได้ 0.5)
+- t1 และ t2 ขยับขึ้นบ้าง แต่การตีความหลักเหมือนเดิม ความต่างอยู่ที่การตรวจ input (t1 s2 ไม่มี ValueError ได้ 0.5 ส่วนที่มีได้ 0.6) ยังสรุปไม่ได้ว่าเป็นสาเหตุจริง
+- ผลสรุป: ตรรกะที่ Solver ทำถูกตามสกิลแล้ว แต่สิ่งที่ทำให้คะแนนไม่เต็มยังไม่ถูกแตะ
 
-## Skills written
-- epoch 2 staging (v2): same skill, added default-readings table (threshold base, sequential discounts, cap placement, tip rounded once after combining), signature contract section (no extra defaults, return plain int/list, solve.py in start dir), example-matching rule.
+## Epoch 2 (เขียน skills_v2)
+- ทดลองหนึ่งสมมติฐาน: ค่าเริ่มต้นการปัดเมื่อโจทย์ไม่ระบุเปลี่ยนจากปัดครึ่งขึ้นเป็น **ปัดลง**
+  - เหตุผล: ปัดครึ่งขึ้นถูกใช้ทุกรันแล้วใน epoch 0–1 แต่ t2/t3 ยังไม่เคยลองปัดลง
+  - ตรวจผล: ถ้า t2 และ t3 ขยับขึ้น แปลว่าการปัดลงน่าจะถูก ถ้าไม่ขยับ ตัดสมมติฐานนี้ทิ้ง
+  - ถ้า t1 ลดลง อาจเป็นเพราะยอดรวมที่ลูกค้าจ่ายถูกปัดลงด้วย ซึ่งเป็นการเปลี่ยนที่กว้างเกินไป
+- ยังไม่ทดสอบ H1 (ลดอีก = รวมเปอร์เซ็นต์) และ H3 (เพดานก่อน/หลังคูณ 2) เพื่อให้เห็นผลทีละตัว
+- ตรวจไฟล์: `/evo/solver_workspaces/epoch_1/<id>/solve.py` คือไฟล์ที่ Solver ส่งจริง ใช้เทียบข้อแตกต่างได้
 
-## Epoch 2 results (skills_v2)
-- All 12 rollouts 0.6 (t1 x3, t2 x3, t3 x3, t4 x3). Mean 0.6 (epoch1 0.592). Plateau confirmed; no rollout below 0.6.
-- Solvers followed v2: sequential discounts, cap after birthday doubling, half-up once, tip combined then rounded once.
+## Epoch 2 ผล (ใช้ skills_v2 = ปัดลงเป็นค่าเริ่มต้น)
+คะแนน: t1 0.2 ×3 (ลดจาก 0.5/0.6) · t2 0.5/0.6/0.6 (ลดจาก 0.7/0.7/0.6) · t3 0.3636 ×3 (ลดจาก 0.5455) · t4 0.5 ×3 (เท่าเดิม)
+- สรุป: ปัดลงแย่กว่าปัดครึ่งขึ้นในทุกโจทย์ที่เปลี่ยน → H2 (ปัดลง) ตัดทิ้ง
+- ข้อสังเกต: เมื่อปัดลง t1 เหลือ 0.2 แสดงว่าการปัดส่วนที่ปัดครึ่งขึ้นแล้วถูก มีผลกับหลายกรณีมาก
 
-## Skills written
-- epoch 3 staging (v3): added generic rule-pattern section (tiers vs marginal, clamps, percent-of-percent via Fraction, points floor, negative amounts, date/bool inputs, condition-pair test coverage). Core rules unchanged on purpose: no evidence in traces for an alternative reading of the remaining 0.4.
-- Still-unknown gap: candidates remain additive vs sequential member discount (t1), tip rounding (t2), error-handling expectations. Needs grader feedback to resolve.
+## Epoch 3 (เขียน skills_v3)
+- กลับมาใช้ปัดครึ่งเป็นค่าเริ่มต้น แต่เปลี่ยนจากปัดครึ่งขึ้นเป็น **ปัดครึ่งเข้าเลขคู่ (banker's / `round()` ของ Python กับ Fraction)**
+  - เหตุผล: ผู้ออกโจทย์อาจเขียน reference ด้วย `round()` ซึ่งต่างจากปัดครึ่งขึ้นเฉพาะกรณีที่ผลเป็น .5 สตางค์พอดี
+  - ตรวจผล: ถ้า t1/t2/t3 ดีกว่า 0.5/0.6/0.5455 แปลว่า banker's ใกล้เคียงกับ grader กว่า; ถ้าแย่ลงให้กลับไปปัดครึ่งขึ้น
+  - ยังไม่ทดสอบ H1 (ลดอีก = รวมเปอร์เซ็นต์) และ H3 (เพดานก่อน/หลังคูณ 2)

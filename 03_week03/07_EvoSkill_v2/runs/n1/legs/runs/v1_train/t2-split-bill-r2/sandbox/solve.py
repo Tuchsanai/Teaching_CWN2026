@@ -1,10 +1,17 @@
+"""BaanKafe split_bill (หน่วยสตางค์)
+
+สมมติฐาน:
+- ยอดรวม = total + total*tip/100 คำนวณด้วย Fraction แล้วปัดครึ่งขึ้น (half-up) ครั้งเดียว
+  (ทิปเป็นเงินที่ลูกค้าจ่าย)
+- total=0 รับได้ -> ทุกคนจ่าย 0
+- ชนิดข้อมูลต้องเป็น int จริง (bool/float/str ถูกปฏิเสธด้วย ValueError)
+"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -20,7 +27,7 @@ def split_bill(total, people, tip_percent):
     need_int(total, "total", 0)
     need_int(people, "people", 1)
     need_int(tip_percent, "tip_percent", 0, 100)
-    grand = half_up(total + Fraction(total * tip_percent, 100))
+    grand = half_up(Fraction(total) * (100 + tip_percent) / 100)
     base, extra = divmod(grand, people)
     return [base + 1 if i < extra else base for i in range(people)]
 

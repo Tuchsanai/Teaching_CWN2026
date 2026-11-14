@@ -1,4 +1,3 @@
-"""BaanKafe shipping fee (satang)"""
 import json
 import sys
 from fractions import Fraction
@@ -24,20 +23,28 @@ def need_bool(value, name):
 
 
 def shipping_fee(weight_g, distance_km, express):
+    # validate ทั้งหมดก่อนคำนวณ
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    # นโยบายร้าน: ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม")
+    # นโยบายร้าน: ระยะทาง 0 = ลูกค้ารับเองที่ร้าน ค่าส่ง 0
+    if distance_km == 0:
+        return 0
+
     if weight_g <= 1000:
-        amount = Fraction(4000)
+        fee = Fraction(40)
     elif weight_g <= 5000:
-        amount = Fraction(8000)
+        fee = Fraction(80)
     else:
-        amount = Fraction(8000) + Fraction(1500 * (weight_g - 5000), 1000)
+        fee = 80 + Fraction(15) * (weight_g - 5000) / 1000
     if distance_km > 100:
-        amount *= Fraction(120, 100)
+        fee *= Fraction(120, 100)
     if express:
-        amount *= Fraction(150, 100)
-    return half_up(amount)
+        fee *= Fraction(150, 100)
+    return half_up(fee * 100)  # สตางค์ ปัดครั้งเดียวตอนท้าย
 
 
 def main():
@@ -45,7 +52,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = shipping_fee(**args)  # เปลี่ยนเป็นชื่อฟังก์ชันจริง
+        result = shipping_fee(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

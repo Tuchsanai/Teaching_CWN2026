@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.4,
  "checks": [
   {
    "id": "contract",
@@ -13,8 +13,8 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "split_bill(1010, 1, 5) คาด [1061] ได้ [1060] · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
@@ -28,13 +28,13 @@
   },
   {
    "id": "reject_value",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "split_bill(10000, 0, 0) ต้อง raise ValueError แต่ raise ZeroDivisionError · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "reject_type",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "split_bill(10000.0, 2, 0) ต้อง raise ValueError แต่คืนค่า [5000.0, 5000.0] · พลาด 4 จาก 4 กรณี"
   },
   {
    "id": "cli_ok",

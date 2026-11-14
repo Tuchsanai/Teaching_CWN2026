@@ -1,40 +1,40 @@
 {
- "score": 0.0,
+ "score": 0.5,
  "checks": [
   {
    "id": "contract",
-   "pass": false,
-   "note": "ใช้ฟังก์ชัน bulk_price ไม่ได้: ไม่มีผลจาก harness: "
+   "pass": true,
+   "note": ""
   },
   {
    "id": "basic",
-   "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "half_up",
-   "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "no_drift",
-   "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "boundary",
-   "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "reject_value",
    "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "note": "bulk_price(25000, 0, false) ต้อง raise ValueError แต่คืนค่า 0 · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "reject_type",
    "pass": false,
-   "note": "ใช้ฟังก์ชันไม่ได้"
+   "note": "bulk_price(25000.0, 5, false) ต้อง raise ValueError แต่คืนค่า 133750.0 · พลาด 5 จาก 5 กรณี"
   },
   {
    "id": "cli_ok",

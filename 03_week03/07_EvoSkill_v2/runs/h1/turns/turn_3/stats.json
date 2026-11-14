@@ -1,59 +1,51 @@
 {
  "ok": true,
- "tool_calls": 10,
+ "tool_calls": 7,
  "tools": {
-  "Bash": 9,
-  "Edit": 1
+  "Bash": 5,
+  "Edit": 2
  },
- "bash": 9,
- "bash_python": 7,
- "rerun_old_scripts": 7,
+ "bash": 5,
+ "bash_python": 2,
+ "rerun_old_scripts": 0,
  "subagents": 0,
  "compactions": 0,
  "touch": {
   "traces": 1,
-  "solver_workspaces": 5,
-  "reference": 4,
+  "solver_workspaces": 1,
+  "reference": 1,
   "scores": 0,
   "skills": 0,
-  "staging": 2,
-  "evolver_workspace": 6
+  "staging": 3,
+  "evolver_workspace": 0
  },
- "num_turns": 11,
- "cost_usd": 0.0686,
- "output_tokens": 10408,
- "context_tokens": 1122491,
- "session_cost_usd": 0.1147,
+ "num_turns": 8,
+ "cost_usd": 0.0594,
+ "output_tokens": 6958,
+ "context_tokens": 849933,
+ "session_cost_usd": 0.1194,
  "k": 3,
- "wall_s": 57.9,
+ "wall_s": 35.6,
  "timed_out": false,
  "fresh_session": false,
- "session_id": "dd5c7665-85e8-438d-adfd-00dfa553b028",
+ "session_id": "e818a229-0f88-448a-8644-3be49f9b0297",
  "rollouts_given": 12,
- "old_scripts": 3,
+ "old_scripts": 0,
  "skills": [
-  "money-exact-rounding",
-  "solve-py-delivery",
-  "strict-input-validation",
-  "thai-spec-reading"
+  "money-rounding-satang",
+  "thai-spec-solve-py"
  ],
- "skill_md_bytes": 21148,
- "skill_other_files": [],
+ "skill_md_bytes": 16497,
+ "skill_other_files": [
+  "money-rounding-satang/money_helpers.py"
+ ],
  "skill_problems": [],
  "files_added": [],
  "files_removed": [],
  "files_changed": [
-  "solve-py-delivery/SKILL.md"
+  "thai-spec-solve-py/SKILL.md"
  ],
  "workspace_files": [
-  "notes.md",
-  "analysis/cli_check.py",
-  "analysis/fuzz.py",
-  "analysis/probe.py",
-  "analysis/probes_t1.json",
-  "analysis/probes_t4.json",
-  "analysis/run_tests.py",
-  "analysis/cli/solve.py",
-  "analysis/snip/check.py"
+  "notes.md"
  ]
 }

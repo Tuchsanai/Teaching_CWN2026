@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.9,
  "checks": [
   {
    "id": "contract",
@@ -38,18 +38,18 @@
   },
   {
    "id": "cli_ok",
-   "pass": false,
-   "note": "stdin {\"total\": 10000, \"people\": 3, \"tip_percent\": 0} ต้องได้ {\"ok\": true, \"result\": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout (ว่าง)"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "cli_error",
-   "pass": false,
-   "note": "stdin {\"total\": 10000, \"people\": 0, \"tip_percent\": 0} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout (ว่าง)"
+   "pass": true,
+   "note": ""
   },
   {
    "id": "tests",
    "pass": false,
-   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+   "note": "unittest พบ 3 เทสต์ (ต้องมีอย่างน้อย 6)"
   }
  ]
 }

@@ -1,22 +1,14 @@
-# validation policy r2
 from fractions import Fraction
 
-_RATES = {
-    "silver": Fraction(15, 1000),
-    "gold": Fraction(25, 1000),
-    "platinum": Fraction(4, 100),
-}
-_MIN_AMOUNT = 10000   # 100 baht
-_CAP = 20000          # 200 baht
+# แบบ E: Fraction ตลอด ปัดครึ่งไปหาเลขคู่ (banker's) ครั้งเดียวตอนท้าย ไม่ตรวจอินพุต
+_RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(4, 100)}
 
 
 def cashback(amount, tier, birthday):
-    if amount < 0:
-        raise ValueError("amount must be >= 0")
-    if tier not in _RATES:
-        raise ValueError("invalid tier")
-    if amount < _MIN_AMOUNT:
+    if amount < 10000:  # ต่ำกว่า 100 บาท ไม่ได้เงินคืน
         return 0
-    value = Fraction(amount) * _RATES[tier] * (2 if birthday else 1)
-    value = min(value, _CAP)
-    return int((2 * value.numerator + value.denominator) // (2 * value.denominator))
+    v = Fraction(amount) * _RATES[tier]
+    if birthday:
+        v *= 2
+    v = min(v, Fraction(20000))  # เพดาน 200 บาทต่อบิล (หลังคูณ 2)
+    return int(round(v))

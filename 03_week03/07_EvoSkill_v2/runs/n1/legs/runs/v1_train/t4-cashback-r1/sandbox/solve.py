@@ -1,11 +1,26 @@
-"""BaanKafe cashback (หน่วยสตางค์)"""
+"""BaanKafe cashback (หน่วยสตางค์)
+
+สมมติฐาน (โจทย์ไม่ได้ระบุ):
+- เงินคืนเป็นเงินที่ร้านจ่ายออก -> ปัดลง ครั้งเดียวท้ายสุด
+- เกณฑ์ "ต่ำกว่า 100 บาท" เทียบกับยอดดิบ (amount < 10000 -> 0)
+- เดือนเกิดคูณ 2 กับทุก tier แล้วค่อยใช้เพดาน 200 บาท (20000 สตางค์)
+- input ผิดชนิด/ช่วง raise ValueError ก่อน early-return ทุกกรณี
+"""
 import json
 import sys
 from fractions import Fraction
 
+RATES = {
+    "silver": Fraction(15, 1000),
+    "gold": Fraction(25, 1000),
+    "platinum": Fraction(4, 100),
+}
+MIN_AMOUNT = 10000   # 100 บาท
+CAP = 20000          # 200 บาท
 
-def half_up(x):
-    return int((Fraction(x) * 2 + 1) // 2)
+
+def round_down(x):
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -22,22 +37,22 @@ def need_bool(value, name):
     return value
 
 
-RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(4, 100)}
-MIN_AMOUNT = 10000   # 100 บาท
-MAX_CASHBACK = 20000  # 200 บาท
+def need_choice(value, name, choices):
+    if type(value) is not str or value not in choices:
+        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
+    return value
 
 
 def cashback(amount, tier, birthday):
     need_int(amount, "amount", 0)
-    if type(tier) is not str or tier not in RATES:
-        raise ValueError("tier ไม่ถูกต้อง")
+    need_choice(tier, "tier", RATES)
     need_bool(birthday, "birthday")
     if amount < MIN_AMOUNT:
         return 0
-    back = amount * RATES[tier]
+    value = Fraction(amount) * RATES[tier]
     if birthday:
-        back *= 2
-    return min(half_up(back), MAX_CASHBACK)
+        value *= 2
+    return round_down(min(value, CAP))
 
 
 def main():

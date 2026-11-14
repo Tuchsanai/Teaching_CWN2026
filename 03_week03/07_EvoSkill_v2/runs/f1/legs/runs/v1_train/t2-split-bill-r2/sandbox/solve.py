@@ -1,4 +1,4 @@
-"""เทมเพลต solve.py สำหรับฟังก์ชันคิดเงิน — เปลี่ยนชื่อฟังก์ชัน/สูตรให้ตรงโจทย์"""
+"""BaanKafe: split_bill"""
 import json
 import sys
 from fractions import Fraction
@@ -10,22 +10,10 @@ def half_up(x):
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
-    return value
-
-
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
-
-
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
     return value
 
 
@@ -33,9 +21,10 @@ def split_bill(total, people, tip_percent):
     need_int(total, "total", 0)
     need_int(people, "people", 1)
     need_int(tip_percent, "tip_percent", 0, 100)
-    grand = half_up(Fraction(total) * Fraction(100 + tip_percent, 100))
+    # ข้อสันนิษฐาน: ยอดบิล+ทิป ปัดครึ่งขึ้นเป็นสตางค์ครั้งเดียวก่อนหาร
+    grand = half_up(Fraction(total) * (100 + tip_percent) / 100)
     base, extra = divmod(grand, people)
-    return [base + 1 if i < extra else base for i in range(people)]
+    return [base + 1] * extra + [base] * (people - extra)
 
 
 def main():

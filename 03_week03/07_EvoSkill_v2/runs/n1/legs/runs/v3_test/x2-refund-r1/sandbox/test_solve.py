@@ -1,96 +1,56 @@
 import unittest
-
 from solve import refund
 
 
 class Normal(unittest.TestCase):
-    def test_normal_1(self):
-        self.assertEqual(refund(10000, 50, False), 5000)
-
-    def test_normal_2(self):
-        self.assertEqual(refund(10000, 50, True), 4375)
-
-    def test_normal_3(self):
-        self.assertEqual(refund(20000, 25, True), 13125)
-
-    def test_normal_4(self):
-        self.assertEqual(refund(0, 0, True), 0)
+    def test_no_restock(self):
+        self.assertEqual(refund(10000, 50, False), 5000)   # 10000*50%
+    def test_restock(self):
+        self.assertEqual(refund(10000, 50, True), 4375)    # 5000*0.875
+    def test_unused(self):
+        self.assertEqual(refund(10000, 0, False), 10000)
+        self.assertEqual(refund(10000, 0, True), 8750)
+    def test_zero_paid(self):
+        self.assertEqual(refund(0, 10, True), 0)
 
 
 class Boundary(unittest.TestCase):
-    def test_boundary_1(self):  # 80% ยังคืน
-        self.assertEqual(refund(1000, 80, False), 200)
-
-    def test_boundary_2(self):
-        self.assertEqual(refund(1000, 80, True), 175)
-
-    def test_boundary_3(self):  # 81% ไม่คืน
-        self.assertEqual(refund(1000, 81, False), 0)
-
-    def test_boundary_4(self):
-        self.assertEqual(refund(1000, 79, False), 210)
-
-    def test_boundary_5(self):
-        self.assertEqual(refund(1000, 100, True), 0)
-
-    def test_boundary_6(self):
-        self.assertEqual(refund(1000, 0, False), 1000)
+    def test_80_refunds(self):
+        self.assertEqual(refund(10000, 80, False), 2000)
+        self.assertEqual(refund(10000, 80, True), 1750)    # 2000*0.875
+    def test_81_zero(self):
+        self.assertEqual(refund(10000, 81, False), 0)
+        self.assertEqual(refund(10000, 81, True), 0)
+    def test_100_zero(self):
+        self.assertEqual(refund(10000, 100, False), 0)
 
 
 class NoDrift(unittest.TestCase):
-    def test_no_drift_1(self):  # 0.875 -> 1
-        self.assertEqual(refund(1, 0, True), 1)
-
-    def test_no_drift_2(self):  # 3.5 -> 4
-        self.assertEqual(refund(4, 0, True), 4)
-
-    def test_no_drift_3(self):  # 9.5 -> 10
-        self.assertEqual(refund(10, 5, False), 10)
-
-    def test_no_drift_4(self):  # 2.1875 -> 2 (ปัดสองรอบจะได้ 3)
-        self.assertEqual(refund(5, 50, True), 2)
+    def test_floor_no_restock(self):
+        self.assertEqual(refund(1, 50, False), 0)          # 0.5 -> 0
+        self.assertEqual(refund(999, 33, False), 669)      # 669.33
+    def test_floor_restock(self):
+        self.assertEqual(refund(10, 0, True), 8)           # 8.75 -> 8 (ไม่ใช่ 9)
+        self.assertEqual(refund(1001, 7, True), 814)       # 930.93*0.875=814.56 -> 814
 
 
 class Reject(unittest.TestCase):
-    def bad(self, *a):
+    def test_bad(self):
+        bad = [4500.0, 5.0, "2", True, None, -1]
+        for b in bad:
+            with self.assertRaises(ValueError):
+                refund(b, 10, False)
+        for b in [10.0, 10.5, "2", True, None, -1, 101]:
+            with self.assertRaises(ValueError):
+                refund(100, b, False)
+        for b in [0, 1, "yes", None, 1.0]:
+            with self.assertRaises(ValueError):
+                refund(100, 10, b)
+    def test_invalid_with_zero_branch(self):
         with self.assertRaises(ValueError):
-            refund(*a)
-
-    def test_reject_1(self):
-        self.bad(-1, 10, False)
-
-    def test_reject_2(self):
-        self.bad(1000, -1, False)
-
-    def test_reject_3(self):
-        self.bad(1000, 101, False)
-
-    def test_reject_4(self):
-        self.bad(1000.0, 10, False)
-
-    def test_reject_5(self):
-        self.bad('1000', 10, False)
-
-    def test_reject_6(self):
-        self.bad(True, 10, False)
-
-    def test_reject_7(self):
-        self.bad(1000, 10.0, False)
-
-    def test_reject_8(self):
-        self.bad(1000, '10', False)
-
-    def test_reject_9(self):
-        self.bad(1000, True, False)
-
-    def test_reject_10(self):
-        self.bad(1000, 10, 1)
-
-    def test_reject_11(self):
-        self.bad(1000, 10, None)
-
-    def test_reject_12(self):
-        self.bad(None, 10, False)
+            refund(-5, 90, False)
+        with self.assertRaises(ValueError):
+            refund(100, 90, 1)
 
 
 if __name__ == "__main__":

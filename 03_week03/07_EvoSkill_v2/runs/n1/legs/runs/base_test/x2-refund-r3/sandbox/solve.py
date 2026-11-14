@@ -1,13 +1,16 @@
 def refund(paid, used_percent, restock):
-    """Refund in whole satang for a coffee course.
+    """คืนเงินคอร์ส (หน่วยสตางค์, จำนวนเต็ม)
 
-    Computed with exact integer arithmetic and rounded once (half up) at the end.
+    - คืนตามสัดส่วนที่ยังไม่ได้เรียน
+    - เรียนเกิน 80% ไม่คืน
+    - restock=True หักค่าดำเนินการ 12.5% ของยอดที่จะคืน
+    ใช้เลขจำนวนเต็มล้วนเพื่อเลี่ยงปัญหาทศนิยม ปัดครึ่งขึ้นเมื่อเศษสตางค์
     """
     if used_percent > 80:
         return 0
-    num = paid * (100 - used_percent)  # refund = num / 100
+    num = paid * (100 - used_percent)
     den = 100
     if restock:
-        num *= 7  # keep 87.5% = 7/8
-        den *= 8
-    return (2 * num + den) // (2 * den)
+        num *= 875  # คงเหลือ 87.5%
+        den *= 1000
+    return (2 * num + den) // (2 * den)  # round half up

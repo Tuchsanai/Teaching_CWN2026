@@ -1,10 +1,11 @@
-"""BaanKafe shipping fee (satang) · half-up once at the end · strict input checks"""
+"""BaanKafe shipping_fee — คืนค่าส่งเป็นจำนวนเต็มสตางค์"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
+    """ปัดครึ่งขึ้นเป็นสตางค์ (ค่าส่งเป็นเงินที่ลูกค้าจ่าย)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -22,20 +23,28 @@ def need_bool(value, name):
     return value
 
 
+EXPRESS_MAX_G = 20000  # นโยบายร้าน: ส่งด่วนรับไม่เกิน 20,000 กรัม
+
+
 def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    if express and weight_g > EXPRESS_MAX_G:
+        raise ValueError("ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม")
+    if distance_km == 0:  # รับเองที่ร้าน -> ฟรี
+        return 0
     if weight_g <= 1000:
         fee = Fraction(4000)
     elif weight_g <= 5000:
         fee = Fraction(8000)
     else:
+        # 15 บาท/กก. = 1500 สตางค์ต่อ 1000 กรัม ตามสัดส่วนกรัม
         fee = Fraction(8000) + Fraction(weight_g - 5000, 1000) * 1500
     if distance_km > 100:
-        fee *= Fraction(120, 100)
+        fee *= Fraction(6, 5)
     if express:
-        fee *= Fraction(150, 100)
+        fee *= Fraction(3, 2)
     return half_up(fee)
 
 

@@ -1,16 +1,16 @@
-"""คิดเงิน BaanKafe — template: คัดลอกเป็น solve.py แล้วแก้เฉพาะฟังก์ชันหลัก"""
+"""BaanKafe: cafe_bill — คิดเงินหน้าร้าน (หน่วยสตางค์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
 def need_int(value, name, low=None, high=None):
-    if type(value) is not int:  # bool และ float ไม่ใช่ int
+    if type(value) is not int:  # กัน float / str / None / bool
         raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
     if (low is not None and value < low) or (high is not None and value > high):
         raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
@@ -23,8 +23,8 @@ def need_bool(value, name):
     return value
 
 
-# ตัวอย่างรูปแบบ (เปลี่ยนชื่อ/พารามิเตอร์/กฎตาม brief)
 def cafe_bill(items, member):
+    # validate ทั้งหมดก่อนคำนวณ
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
@@ -32,13 +32,17 @@ def cafe_bill(items, member):
     for item in items:
         if type(item) is not dict:
             raise ValueError("แต่ละรายการต้องเป็น dict")
-        subtotal += need_int(item.get("price"), "price", 0) * need_int(item.get("qty"), "qty", 1)
+        price = need_int(item.get("price"), "price", 0)
+        qty = need_int(item.get("qty"), "qty", 1)
+        subtotal += price * qty
+
     amount = Fraction(subtotal)
-    if subtotal >= 50000:          # เทียบกับยอดก่อนลด
+    if subtotal >= 50000:  # ตั้งแต่ 500 บาท = 50000 สตางค์ (เทียบก่อนลด)
         amount *= Fraction(95, 100)
     if member:
         amount *= Fraction(90, 100)
-    return half_up(amount * Fraction(107, 100))  # ปัดครั้งเดียวตอนท้าย
+    amount *= Fraction(107, 100)  # VAT ขั้นสุดท้าย
+    return half_up(amount)  # ปัดครั้งเดียวตอนท้าย
 
 
 def main():
@@ -46,7 +50,7 @@ def main():
         args = json.load(sys.stdin)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
-        result = cafe_bill(**args)  # เปลี่ยนเป็นชื่อฟังก์ชันจริง
+        result = cafe_bill(**args)
     except (ValueError, TypeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}))
         return 2

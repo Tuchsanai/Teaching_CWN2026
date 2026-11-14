@@ -1,12 +1,12 @@
 def bulk_price(unit_price, qty, coupon):
-    """คืนยอดที่ต้องจ่าย (จำนวนเต็มสตางค์) คำนวณด้วยจำนวนเต็มล้วน ปัดครั้งเดียวตอนท้าย (half up)"""
-    num = unit_price * qty
-    den = 1
+    """Return the amount payable in whole satang (integer), computed exactly."""
     if qty >= 50:
-        num *= 925; den *= 1000
+        d = 75      # 7.5% in per-mille
     elif qty >= 10:
-        num *= 965; den *= 1000
-    if coupon:
-        num *= 975; den *= 1000
-    num *= 107; den *= 100
-    return (2 * num + den) // (2 * den)
+        d = 35      # 3.5%
+    else:
+        d = 0
+    c = 25 if coupon else 0  # 2.5%
+    num = unit_price * qty * (1000 - d) * (1000 - c) * 107
+    den = 1000 * 1000 * 100
+    return (2 * num + den) // (2 * den)  # round half up, no float error

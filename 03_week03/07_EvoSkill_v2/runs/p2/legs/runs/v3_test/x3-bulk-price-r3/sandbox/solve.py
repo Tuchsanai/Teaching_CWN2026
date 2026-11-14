@@ -1,12 +1,17 @@
-# rounding policy r3 (banker's / half-even, exact, rounded once at the end)
 from fractions import Fraction
 
 
 def bulk_price(unit_price, qty, coupon):
-    if type(unit_price) is not int or type(qty) is not int or type(coupon) is not bool:
-        raise ValueError("invalid input type")
-    if unit_price < 0 or not (1 <= qty <= 1000):
-        raise ValueError("value out of range")
+    # H3: wrong type -> TypeError, out of range -> ValueError
+    for v in (unit_price, qty):
+        if isinstance(v, bool) or not isinstance(v, int):
+            raise TypeError("unit_price and qty must be int")
+    if not isinstance(coupon, bool):
+        raise TypeError("coupon must be bool")
+    if unit_price < 0:
+        raise ValueError("unit_price must be >= 0")
+    if qty < 1 or qty > 1000:
+        raise ValueError("qty must be 1..1000")
 
     total = Fraction(unit_price * qty)
     if qty >= 50:
@@ -16,4 +21,5 @@ def bulk_price(unit_price, qty, coupon):
     if coupon:
         total *= Fraction(1000 - 25, 1000)
     total *= Fraction(107, 100)
-    return int(round(total))  # Fraction round() is half-even -> int
+    # round half up once at the end
+    return (2 * total.numerator + total.denominator) // (2 * total.denominator)

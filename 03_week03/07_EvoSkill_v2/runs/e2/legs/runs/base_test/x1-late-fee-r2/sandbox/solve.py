@@ -1,13 +1,6 @@
 def late_fee(amount, days_late):
-    """ค่าปรับชำระช้า (หน่วยสตางค์, จำนวนเต็ม)
-
-    - ช้าไม่เกิน 3 วัน: 0
-    - ช้าเกิน 3 วัน: 0.75% ต่อวัน นับทุกวันที่ช้า (รวม 3 วันแรก)
-    - สูงสุด 15% ของยอดค้างชำระ
-    ใช้เลขจำนวนเต็มล้วน (ไม่มีปัญหา float) ปัดครึ่งขึ้น
-    """
     if days_late <= 3:
         return 0
-    # หน่วยเป็น 1/10000 ของสตางค์: 0.75% = 75, 15% = 1500
-    scaled = min(amount * 75 * days_late, amount * 1500)
-    return (scaled + 5000) // 10000
+    # 0.75% per day = 75/10000; cap 15% = 1500/10000 (exact integer math)
+    num = amount * min(75 * days_late, 1500)
+    return (num * 2 + 10000) // 20000  # round half up to whole satang

@@ -1,22 +1,21 @@
 from fractions import Fraction
 
 
-def _check_int(name, v, lo=None, hi=None):
-    if isinstance(v, bool) or not isinstance(v, int):
-        raise ValueError(f"{name} must be an int, got {v!r}")
-    if lo is not None and v < lo:
-        raise ValueError(f"{name} must be >= {lo}")
-    if hi is not None and v > hi:
-        raise ValueError(f"{name} must be <= {hi}")
-    return v
+def _rnd(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์"""
+    x = Fraction(x)
+    return (2 * x.numerator + x.denominator) // (2 * x.denominator)
 
 
 def split_bill(total, people, tip_percent):
-    _check_int("total", total, 0)
-    _check_int("people", people, 1)
-    _check_int("tip_percent", tip_percent, 0, 100)
-    # grand = total * (100 + tip) / 100, rounded half up once
-    num = total * (100 + tip_percent)
-    grand = (2 * num + 100) // 200
+    if isinstance(total, bool) or not isinstance(total, int) or total < 0:
+        raise ValueError("total must be an integer >= 0")
+    if isinstance(people, bool) or not isinstance(people, int) or people < 1:
+        raise ValueError("people must be an integer >= 1")
+    if isinstance(tip_percent, bool) or not isinstance(tip_percent, int) or not 0 <= tip_percent <= 100:
+        raise ValueError("tip_percent must be an integer in 0..100")
+
+    # ยอดรวม = ยอดบิล + ทิป ปัดครึ่งขึ้นเป็นสตางค์เต็ม
+    grand = _rnd(Fraction(total * (100 + tip_percent), 100))
     base, extra = divmod(grand, people)
     return [base + 1 if i < extra else base for i in range(people)]

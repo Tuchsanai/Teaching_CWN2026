@@ -1,89 +1,87 @@
-"""BaanKafe shipping fee calculator.
+"""คิดค่าส่งเมล็ดกาแฟ BaanKafe
 
-shipping_fee(weight_g, distance_km, express) -> int (satang)
+กติกา (หน่วยภายในเป็นสตางค์ทั้งหมด):
+1. ฐานตามน้ำหนัก (weight_g, 1–30,000 กรัม)
+   - ไม่เกิน 1,000 กรัม          -> 40 บาท
+   - ไม่เกิน 5,000 กรัม          -> 80 บาท
+   - เกิน 5,000 กรัม             -> 80 บาท + ส่วนที่เกิน 5,000 กรัม คิดตามสัดส่วน กิโลกรัมละ 15 บาท
+2. ระยะทางเกิน 100 กม. คิดเพิ่ม 20% (คูณ 1.2) จากยอดข้อ 1
+3. ส่งด่วน (express=True) คิดเพิ่ม 50% (คูณ 1.5) ต่อจากยอดข้อ 2
+4. ปัดครึ่งขึ้น เป็นจำนวนเต็มสตางค์ ปัดครั้งเดียวตอนท้ายสุด
 
-Rules (all money in satang, 1 baht = 100 satang):
-  1. Weight tier
-       weight_g <= 1000          -> 40 baht  (4000 satang)
-       1000 < weight_g <= 5000   -> 80 baht  (8000 satang)
-       weight_g > 5000           -> 80 baht + 15 baht per kg of excess,
-                                    prorated per gram (1.5 satang per gram)
-  2. distance_km > 100          -> x 1.2 (applied after step 1)
-  3. express is True            -> x 1.5 (applied after step 2)
-  4. Round half-up to an integer number of satang, once, at the end.
+การคำนวณใช้ Fraction ตลอดทาง ไม่ใช้ float
 """
-
 import json
 import sys
 from fractions import Fraction
-
-WEIGHT_MIN_G = 1
-WEIGHT_MAX_G = 30000
-
-BASE_FEE_LIGHT = 4000        # 40 baht
-BASE_FEE_MEDIUM = 8000       # 80 baht
-MEDIUM_LIMIT_G = 5000
-EXCESS_PER_GRAM = Fraction(3, 2)   # 15 baht/kg = 1500 satang / 1000 g = 1.5 satang/g
-
-LONG_DISTANCE_KM = 100
-LONG_DISTANCE_MULT = Fraction(6, 5)   # +20%
-EXPRESS_MULT = Fraction(3, 2)         # +50%
+from math import floor
 
 
-def _require_int(value, label, lo=None, hi=None):
+# ---------- ตัวตรวจ input ----------
+
+def need_int(value, name, low=None, high=None):
+    # bool และ float ไม่ถือเป็น int ในที่นี้
     if type(value) is not int:
-        raise ValueError(f"{label} ต้องเป็นจำนวนเต็ม")
-    if lo is not None and value < lo:
-        raise ValueError(f"{label} ต้องไม่น้อยกว่า {lo}")
-    if hi is not None and value > hi:
-        raise ValueError(f"{label} ต้องไม่เกิน {hi}")
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
     return value
 
 
-def _require_bool(value, label):
+def need_bool(value, name):
     if type(value) is not bool:
-        raise ValueError(f"{label} ต้องเป็น True หรือ False")
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
     return value
 
 
-def _half_up(x):
-    """Round a non-negative Fraction/int to the nearest int, halves go up."""
-    return int((Fraction(x) * 2 + 1) // 2)
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    return floor(Fraction(x) + Fraction(1, 2))
 
+
+# ---------- ฟังก์ชันหลัก ----------
 
 def shipping_fee(weight_g, distance_km, express):
-    weight_g = _require_int(weight_g, "weight_g", WEIGHT_MIN_G, WEIGHT_MAX_G)
-    distance_km = _require_int(distance_km, "distance_km", 0)
-    express = _require_bool(express, "express")
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์"""
+    weight_g = need_int(weight_g, "weight_g", 1, 30000)
+    distance_km = need_int(distance_km, "distance_km", 0)
+    express = need_bool(express, "express")
 
-    # 1. weight tier (exact, no rounding yet)
+    # ข้อ 1: ฐานตามน้ำหนัก (สตางค์)
     if weight_g <= 1000:
-        fee = Fraction(BASE_FEE_LIGHT)
-    elif weight_g <= MEDIUM_LIMIT_G:
-        fee = Fraction(BASE_FEE_MEDIUM)
+        fee = Fraction(40 * 100)
+    elif weight_g <= 5000:
+        fee = Fraction(80 * 100)
     else:
-        fee = BASE_FEE_MEDIUM + EXCESS_PER_GRAM * (weight_g - MEDIUM_LIMIT_G)
+        # 15 บาท/กก. = 1500 สตางค์/กก. ; ส่วนเกินเป็นกรัม หาร 1000 เป็นกิโลกรัม
+        fee = Fraction(80 * 100) + Fraction(weight_g - 5000, 1000) * 1500
 
-    # 2. long distance surcharge (strictly more than 100 km)
-    if distance_km > LONG_DISTANCE_KM:
-        fee *= LONG_DISTANCE_MULT
+    # ข้อ 2: ระยะทางเกิน 100 กม. เพิ่ม 20%
+    if distance_km > 100:
+        fee *= Fraction(120, 100)
 
-    # 3. express surcharge, multiplied on top of the previous step
+    # ข้อ 3: ส่งด่วนเพิ่ม 50% ต่อจากข้อก่อน
     if express:
-        fee *= EXPRESS_MULT
+        fee *= Fraction(150, 100)
 
-    # 4. single rounding at the end
-    return _half_up(fee)
+    # ข้อ 4: ปัดครั้งเดียวตอนท้าย
+    return half_up(fee)
 
+
+# ---------- CLI (stdin JSON -> stdout JSON) ----------
 
 def main():
     try:
-        args = json.load(sys.stdin)
+        raw = sys.stdin.read()
+        args = json.loads(raw)
         if not isinstance(args, dict):
             raise ValueError("input ต้องเป็น JSON object")
         result = shipping_fee(**args)
-    except (ValueError, TypeError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
+    except (ValueError, TypeError, KeyError) as exc:
+        print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
+        return 2
+    except json.JSONDecodeError as exc:
+        print(json.dumps({"ok": False, "error": f"JSON ไม่ถูกต้อง: {exc}"}, ensure_ascii=False))
         return 2
     print(json.dumps({"ok": True, "result": result}, ensure_ascii=False))
     return 0

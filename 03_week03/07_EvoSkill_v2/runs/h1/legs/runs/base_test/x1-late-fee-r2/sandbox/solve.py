@@ -1,49 +1,50 @@
-"""ค่าปรับการชำระเงินล่าช้าสำหรับลูกค้าขายส่ง BaanKafe
+"""คำนวณค่าปรับการชำระเงินล่าช้าของลูกค้าขายส่ง BaanKafe."""
 
-กติกา:
-- amount: ยอดค้างชำระ (สตางค์, จำนวนเต็ม >= 0)
-- days_late: จำนวนวันที่ช้า (จำนวนเต็ม 0-365)
-- ช้าไม่เกิน 3 วัน: ไม่คิดค่าปรับ
-- ช้าเกิน 3 วัน: คิด 0.75% ต่อวันของยอดค้างชำระ นับทุกวันที่ช้า (รวม 3 วันแรก)
-- ค่าปรับสูงสุด 15% ของยอดค้างชำระ
-- ผลลัพธ์เป็นจำนวนเต็มสตางค์ (ปัดเศษแบบ round half up)
-
-ใช้จำนวนเต็มล้วน: 0.75% = 75/10000, 15% = 1500/10000
-"""
-
-GRACE_DAYS = 3
-DAILY_RATE_BP = 75     # 0.75% ต่อวัน หน่วยเป็น 1/10000
-CAP_RATE_BP = 1500     # 15% หน่วยเป็น 1/10000
-SCALE = 10000
+GRACE_DAYS = 3          # ช้าไม่เกินกี่วันไม่คิดค่าปรับ
+DAILY_RATE_BP = 75      # 0.75% ต่อวัน ในหน่วย basis point (1 bp = 0.01%)
+CAP_PERCENT = 15        # ค่าปรับสูงสุดเป็นเปอร์เซ็นต์ของยอดค้างชำระ
+MAX_DAYS_LATE = 365
 
 
 def late_fee(amount: int, days_late: int) -> int:
-    if not isinstance(amount, int) or isinstance(amount, bool) or amount < 0:
-        raise ValueError("amount ต้องเป็นจำนวนเต็มสตางค์ที่ไม่ติดลบ")
-    if not isinstance(days_late, int) or isinstance(days_late, bool) or not 0 <= days_late <= 365:
-        raise ValueError("days_late ต้องเป็นจำนวนเต็มระหว่าง 0 ถึง 365")
+    """คืนค่าปรับเป็นจำนวนเต็มสตางค์
+
+    amount     ยอดค้างชำระ (สตางค์ ตั้งแต่ 0)
+    days_late  จำนวนวันที่ช้า (จำนวนเต็ม 0–365)
+
+    กติกา:
+      - ช้าไม่เกิน 3 วัน ไม่คิดค่าปรับ
+      - ช้าเกิน 3 วัน คิดวันละ 0.75% ของยอดค้างชำระ นับทุกวันที่ช้า (รวม 3 วันแรก)
+      - ค่าปรับสูงสุด 15% ของยอดค้างชำระ
+
+    การปัดเศษ: ปัดครึ่งขึ้นเป็นสตางค์ที่ใกล้ที่สุด (คำนวณด้วยจำนวนเต็มล้วน ไม่มีค่าทศนิยม)
+    เพดาน 15% ปัดลง เพื่อไม่ให้ค่าปรับเกินเพดานจริง
+    """
+    if isinstance(amount, bool) or not isinstance(amount, int):
+        raise TypeError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
+    if isinstance(days_late, bool) or not isinstance(days_late, int):
+        raise TypeError("days_late ต้องเป็นจำนวนเต็ม")
+    if amount < 0:
+        raise ValueError("amount ต้องไม่ติดลบ")
+    if not 0 <= days_late <= MAX_DAYS_LATE:
+        raise ValueError(f"days_late ต้องอยู่ระหว่าง 0–{MAX_DAYS_LATE}")
 
     if days_late <= GRACE_DAYS:
         return 0
 
-    # หน่วยเป็น "สตางค์ x 1/10000" เพื่อให้คำนวณเป็นจำนวนเต็มทั้งหมด
-    raw = amount * DAILY_RATE_BP * days_late
-    cap = amount * CAP_RATE_BP
-    capped = min(raw, cap)
+    # ค่าปรับดิบ = amount * 0.75% * days_late  ->  amount * 75 * days / 10000 (ปัดครึ่งขึ้น)
+    raw_fee = (amount * DAILY_RATE_BP * days_late + 5000) // 10000
 
-    # ปัดเศษครึ่งขึ้นกลับเป็นสตางค์
-    return (capped + SCALE // 2) // SCALE
+    # เพดาน = 15% ของ amount (ปัดลงเป็นสตางค์)
+    cap = amount * CAP_PERCENT // 100
+
+    return min(raw_fee, cap)
 
 
 if __name__ == "__main__":
-    # ตัวอย่างการทดสอบ
-    assert late_fee(100_000, 0) == 0
-    assert late_fee(100_000, 3) == 0          # ช้า 3 วัน ยังไม่คิด
-    assert late_fee(100_000, 4) == 3_000      # 0.75% x 4 = 3% -> 3,000 สตางค์
-    assert late_fee(100_000, 10) == 7_500     # 7.5%
-    assert late_fee(100_000, 20) == 15_000    # ถึงเพดาน 15% พอดี
-    assert late_fee(100_000, 21) == 15_000    # ไม่เกินเพดาน
-    assert late_fee(100_000, 365) == 15_000
-    assert late_fee(0, 30) == 0
-    assert late_fee(333, 4) == 10             # 333 * 0.03 = 9.99 -> 10
-    print("ผ่านทุกตัวอย่าง")
+    import sys
+
+    if len(sys.argv) == 3:
+        print(late_fee(int(sys.argv[1]), int(sys.argv[2])))
+    else:
+        print("usage: python solve.py <amount_satang> <days_late>")

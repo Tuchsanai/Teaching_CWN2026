@@ -1,11 +1,16 @@
-"""BaanKafe: หารบิล (หน่วยสตางค์)"""
+"""BaanKafe split_bill (หน่วยสตางค์)
+
+สมมติฐาน:
+- ยอดรวม = total * (100 + tip) / 100 คำนวณด้วย Fraction ปัดครึ่งขึ้นครั้งเดียว (ลูกค้าจ่าย)
+- หารด้วย divmod; คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์ตามเศษ
+- total=0 ได้ รับได้ (ทุกคนจ่าย 0)
+"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 

@@ -22,12 +22,12 @@
  "n": 3,
  "phase": "test",
  "k": 3,
- "session_id": "003ada14-0307-4d07-a38a-c196b59a0171",
+ "session_id": "8a3b228b-101e-4d91-aae9-4246fc1375d5",
  "legs": {
   "base_train": {
    "n": 12,
    "tasks": 4,
-   "score": 0.4666666666666666,
+   "score": 0.462875,
    "passes": 0,
    "pass3": 0,
    "all3": 0,
@@ -40,25 +40,25 @@
      0.5
     ],
     "t2-split-bill": [
-     0.5,
+     0.4,
      0.5,
      0.5
     ],
     "t3-shipping-fee": [
-     0.6,
-     0.5,
-     0.6
+     0.4545,
+     0.5455,
+     0.4545
     ],
     "t4-cashback": [
-     0.3,
-     0.3,
-     0.3
+     0.4,
+     0.4,
+     0.4
     ]
    },
-   "cost_usd": 1.022,
-   "context_tokens": 87542,
-   "tool_calls": 2.42,
-   "skill_read": 2,
+   "cost_usd": 1.072,
+   "context_tokens": 94379,
+   "tool_calls": 2.75,
+   "skill_read": 7,
    "grader_failed": 0,
    "label": "base_train",
    "split": "train",
@@ -68,7 +68,7 @@
   "base_val": {
    "n": 6,
    "tasks": 2,
-   "score": 0.43333333333333335,
+   "score": 0.39999999999999997,
    "passes": 0,
    "pass3": 0,
    "all3": 0,
@@ -81,14 +81,14 @@
      0.5
     ],
     "v2-net-pay": [
-     0.5,
+     0.3,
      0.3,
      0.3
     ]
    },
-   "cost_usd": 0.516,
-   "context_tokens": 87440,
-   "tool_calls": 2.17,
+   "cost_usd": 0.542,
+   "context_tokens": 99098,
+   "tool_calls": 2.67,
    "skill_read": 1,
    "grader_failed": 0,
    "label": "base_val",
@@ -99,7 +99,7 @@
   "base_test": {
    "n": 9,
    "tasks": 3,
-   "score": 0.5,
+   "score": 0.47777777777777775,
    "passes": 0,
    "pass3": 0,
    "all3": 0,
@@ -107,7 +107,7 @@
    "mixed": 0,
    "by_task": {
     "x1-late-fee": [
-     0.5,
+     0.3,
      0.5,
      0.5
     ],
@@ -122,9 +122,9 @@
      0.5
     ]
    },
-   "cost_usd": 0.765,
-   "context_tokens": 85711,
-   "tool_calls": 2.33,
+   "cost_usd": 0.79,
+   "context_tokens": 91105,
+   "tool_calls": 2.44,
    "skill_read": 1,
    "grader_failed": 0,
    "label": "base_test",
@@ -135,7 +135,7 @@
   "v1_val": {
    "n": 6,
    "tasks": 2,
-   "score": 0.9,
+   "score": 0.7999999999999999,
    "passes": 0,
    "pass3": 0,
    "all3": 0,
@@ -148,27 +148,28 @@
      0.9
     ],
     "v2-net-pay": [
-     0.9,
-     0.9,
-     0.9
+     0.7,
+     0.7,
+     0.7
     ]
    },
-   "cost_usd": 0.763,
-   "context_tokens": 165737,
+   "cost_usd": 0.824,
+   "context_tokens": 178523,
    "tool_calls": 4.5,
    "skill_read": 6,
    "grader_failed": 0,
    "label": "v1_val",
    "split": "validation",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   },
   "v1_train": {
    "n": 12,
    "tasks": 4,
-   "score": 0.9,
+   "score": 0.8394,
    "passes": 0,
    "pass3": 0,
    "all3": 0,
@@ -186,112 +187,115 @@
      0.9
     ],
     "t3-shipping-fee": [
-     0.9,
-     0.9,
-     0.9
+     0.6364,
+     0.8182,
+     0.8182
     ],
     "t4-cashback": [
-     0.9,
-     0.9,
-     0.9
+     0.8,
+     0.8,
+     0.8
     ]
    },
-   "cost_usd": 1.457,
-   "context_tokens": 144407,
-   "tool_calls": 3.83,
-   "skill_read": 12,
+   "cost_usd": 1.571,
+   "context_tokens": 150320,
+   "tool_calls": 3.75,
+   "skill_read": 11,
    "grader_failed": 0,
    "label": "v1_train",
    "split": "train",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   },
   "v2_val": {
    "n": 6,
    "tasks": 2,
-   "score": 1.0,
-   "passes": 6,
-   "pass3": 2,
-   "all3": 2,
-   "none3": 0,
+   "score": 0.7999999999999999,
+   "passes": 0,
+   "pass3": 0,
+   "all3": 0,
+   "none3": 2,
    "mixed": 0,
    "by_task": {
     "v1-parking-fee": [
-     1.0,
-     1.0,
-     1.0
+     0.9,
+     0.9,
+     0.9
     ],
     "v2-net-pay": [
-     1.0,
-     1.0,
-     1.0
+     0.7,
+     0.7,
+     0.7
     ]
    },
-   "cost_usd": 1.051,
-   "context_tokens": 220758,
-   "tool_calls": 5.67,
+   "cost_usd": 0.844,
+   "context_tokens": 176908,
+   "tool_calls": 4.5,
    "skill_read": 6,
    "grader_failed": 0,
    "label": "v2_val",
    "split": "validation",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   },
   "v2_train": {
    "n": 12,
    "tasks": 4,
-   "score": 1.0,
-   "passes": 12,
-   "pass3": 4,
-   "all3": 4,
-   "none3": 0,
-   "mixed": 0,
+   "score": 0.9106083333333334,
+   "passes": 1,
+   "pass3": 1,
+   "all3": 0,
+   "none3": 3,
+   "mixed": 1,
    "by_task": {
     "t1-cafe-bill": [
-     1.0,
-     1.0,
-     1.0
+     0.9,
+     0.9,
+     0.9
     ],
     "t2-split-bill": [
-     1.0,
-     1.0,
-     1.0
+     0.9,
+     0.9,
+     0.9
     ],
     "t3-shipping-fee": [
-     1.0,
-     1.0,
-     1.0
+     0.9091,
+     0.9091,
+     0.9091
     ],
     "t4-cashback": [
      1.0,
-     1.0,
-     1.0
+     0.9,
+     0.9
     ]
    },
-   "cost_usd": 1.865,
-   "context_tokens": 171062,
-   "tool_calls": 4.42,
+   "cost_usd": 1.62,
+   "context_tokens": 154301,
+   "tool_calls": 3.92,
    "skill_read": 12,
    "grader_failed": 0,
    "label": "v2_train",
    "split": "train",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   },
   "v3_val": {
    "n": 6,
    "tasks": 2,
-   "score": 1.0,
-   "passes": 6,
-   "pass3": 2,
-   "all3": 2,
-   "none3": 0,
+   "score": 0.8666666666666667,
+   "passes": 3,
+   "pass3": 1,
+   "all3": 1,
+   "none3": 1,
    "mixed": 0,
    "by_task": {
     "v1-parking-fee": [
@@ -300,31 +304,32 @@
      1.0
     ],
     "v2-net-pay": [
-     1.0,
-     1.0,
-     1.0
+     0.8,
+     0.6,
+     0.8
     ]
    },
-   "cost_usd": 0.969,
-   "context_tokens": 192918,
-   "tool_calls": 5.0,
+   "cost_usd": 1.041,
+   "context_tokens": 192742,
+   "tool_calls": 4.67,
    "skill_read": 6,
    "grader_failed": 0,
    "label": "v3_val",
    "split": "validation",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   },
   "v3_test": {
    "n": 9,
    "tasks": 3,
-   "score": 1.0,
-   "passes": 9,
-   "pass3": 3,
-   "all3": 3,
-   "none3": 0,
+   "score": 0.9333333333333333,
+   "passes": 6,
+   "pass3": 2,
+   "all3": 2,
+   "none3": 1,
    "mixed": 0,
    "by_task": {
     "x1-late-fee": [
@@ -333,9 +338,9 @@
      1.0
     ],
     "x2-refund": [
-     1.0,
-     1.0,
-     1.0
+     0.8,
+     0.8,
+     0.8
     ],
     "x3-bulk-price": [
      1.0,
@@ -343,15 +348,16 @@
      1.0
     ]
    },
-   "cost_usd": 1.349,
-   "context_tokens": 165656,
-   "tool_calls": 4.33,
+   "cost_usd": 1.472,
+   "context_tokens": 196062,
+   "tool_calls": 4.78,
    "skill_read": 9,
    "grader_failed": 0,
    "label": "v3_test",
    "split": "test",
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
    "model": "sonnet"
   }
@@ -364,13 +370,13 @@
     "Bash": 8
    },
    "bash": 8,
-   "bash_python": 4,
+   "bash_python": 2,
    "rerun_old_scripts": 0,
    "subagents": 0,
    "compactions": 0,
    "touch": {
     "traces": 2,
-    "solver_workspaces": 1,
+    "solver_workspaces": 3,
     "reference": 2,
     "scores": 0,
     "skills": 0,
@@ -378,28 +384,30 @@
     "evolver_workspace": 1
    },
    "num_turns": 9,
-   "cost_usd": 0.1943,
-   "output_tokens": 6582,
-   "context_tokens": 307671,
-   "session_cost_usd": 0.1943,
+   "cost_usd": 0.2,
+   "output_tokens": 8177,
+   "context_tokens": 289408,
+   "session_cost_usd": 0.2,
    "k": 1,
-   "wall_s": 57.1,
+   "wall_s": 67.0,
    "timed_out": false,
    "fresh_session": true,
-   "session_id": "003ada14-0307-4d07-a38a-c196b59a0171",
+   "session_id": "8a3b228b-101e-4d91-aae9-4246fc1375d5",
    "rollouts_given": 12,
    "old_scripts": 0,
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
-   "skill_md_bytes": 6493,
+   "skill_md_bytes": 11168,
    "skill_other_files": [
-    "money-func-solver/template_solve.py"
+    "money-function-solve/template.py"
    ],
    "skill_problems": [],
    "files_added": [
-    "money-func-solver/SKILL.md",
-    "money-func-solver/template_solve.py"
+    "money-edge-policies/SKILL.md",
+    "money-function-solve/SKILL.md",
+    "money-function-solve/template.py"
    ],
    "files_removed": [],
    "files_changed": [],
@@ -409,51 +417,50 @@
   },
   {
    "ok": true,
-   "tool_calls": 9,
+   "tool_calls": 6,
    "tools": {
-    "Bash": 9
+    "Bash": 6
    },
-   "bash": 9,
-   "bash_python": 6,
+   "bash": 6,
+   "bash_python": 4,
    "rerun_old_scripts": 0,
    "subagents": 0,
    "compactions": 0,
    "touch": {
-    "traces": 2,
-    "solver_workspaces": 4,
-    "reference": 3,
+    "traces": 1,
+    "solver_workspaces": 2,
+    "reference": 1,
     "scores": 0,
     "skills": 0,
     "staging": 1,
     "evolver_workspace": 1
    },
-   "num_turns": 10,
-   "cost_usd": 0.2192,
-   "output_tokens": 9871,
-   "context_tokens": 487529,
-   "session_cost_usd": 0.4135,
+   "num_turns": 7,
+   "cost_usd": 0.204,
+   "output_tokens": 8315,
+   "context_tokens": 365249,
+   "session_cost_usd": 0.404,
    "k": 2,
-   "wall_s": 93.1,
+   "wall_s": 68.7,
    "timed_out": false,
    "fresh_session": false,
-   "session_id": "003ada14-0307-4d07-a38a-c196b59a0171",
+   "session_id": "8a3b228b-101e-4d91-aae9-4246fc1375d5",
    "rollouts_given": 12,
    "old_scripts": 0,
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
-   "skill_md_bytes": 8709,
+   "skill_md_bytes": 12797,
    "skill_other_files": [
-    "money-func-solver/template_solve.py",
-    "money-func-solver/template_test.py"
+    "money-function-solve/template.py"
    ],
    "skill_problems": [],
-   "files_added": [
-    "money-func-solver/template_test.py"
-   ],
+   "files_added": [],
    "files_removed": [],
    "files_changed": [
-    "money-func-solver/SKILL.md"
+    "money-edge-policies/SKILL.md",
+    "money-function-solve/SKILL.md"
    ],
    "workspace_files": [
     "notes.md"
@@ -461,48 +468,51 @@
   },
   {
    "ok": true,
-   "tool_calls": 2,
+   "tool_calls": 11,
    "tools": {
-    "Bash": 2
+    "Bash": 11
    },
-   "bash": 2,
-   "bash_python": 0,
+   "bash": 11,
+   "bash_python": 7,
    "rerun_old_scripts": 0,
    "subagents": 0,
    "compactions": 0,
    "touch": {
-    "traces": 0,
-    "solver_workspaces": 0,
-    "reference": 0,
+    "traces": 1,
+    "solver_workspaces": 7,
+    "reference": 2,
     "scores": 0,
     "skills": 0,
-    "staging": 0,
+    "staging": 2,
     "evolver_workspace": 1
    },
-   "num_turns": 3,
-   "cost_usd": 0.0355,
-   "output_tokens": 760,
-   "context_tokens": 196209,
-   "session_cost_usd": 0.449,
+   "num_turns": 12,
+   "cost_usd": 0.2713,
+   "output_tokens": 9067,
+   "context_tokens": 903600,
+   "session_cost_usd": 0.6753,
    "k": 3,
-   "wall_s": 10.1,
+   "wall_s": 102.8,
    "timed_out": false,
    "fresh_session": false,
-   "session_id": "003ada14-0307-4d07-a38a-c196b59a0171",
+   "session_id": "8a3b228b-101e-4d91-aae9-4246fc1375d5",
    "rollouts_given": 12,
    "old_scripts": 0,
    "skills": [
-    "money-func-solver"
+    "money-edge-policies",
+    "money-function-solve"
    ],
-   "skill_md_bytes": 8709,
+   "skill_md_bytes": 16377,
    "skill_other_files": [
-    "money-func-solver/template_solve.py",
-    "money-func-solver/template_test.py"
+    "money-function-solve/template.py"
    ],
    "skill_problems": [],
    "files_added": [],
    "files_removed": [],
-   "files_changed": [],
+   "files_changed": [
+    "money-function-solve/SKILL.md",
+    "money-function-solve/template.py"
+   ],
    "workspace_files": [
     "notes.md"
    ]
@@ -510,12 +520,12 @@
  ],
  "adapt": {
   "ok": true,
-  "tool_calls": 3,
+  "tool_calls": 4,
   "tools": {
-   "Bash": 3
+   "Bash": 4
   },
-  "bash": 3,
-  "bash_python": 1,
+  "bash": 4,
+  "bash_python": 2,
   "rerun_old_scripts": 0,
   "subagents": 0,
   "compactions": 0,
@@ -528,11 +538,11 @@
    "staging": 0,
    "evolver_workspace": 0
   },
-  "num_turns": 4,
-  "cost_usd": 0.0988,
-  "output_tokens": 2384,
-  "context_tokens": 129109,
-  "wall_s": 19.5,
+  "num_turns": 5,
+  "cost_usd": 0.1309,
+  "output_tokens": 2544,
+  "context_tokens": 173015,
+  "wall_s": 21.9,
   "tasks": {
    "train": 4,
    "validation": 2,
@@ -545,5 +555,5 @@
   },
   "audit_ok": true
  },
- "session_cost": 0.449
+ "session_cost": 0.6753
 }

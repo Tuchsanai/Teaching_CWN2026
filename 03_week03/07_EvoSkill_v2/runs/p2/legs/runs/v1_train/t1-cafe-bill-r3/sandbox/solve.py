@@ -1,25 +1,13 @@
-from fractions import Fraction
-
-# Rounding policy r3: exact arithmetic throughout, floor once at the end.
-
-
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
+def _rhu(n, d):
+    # ปัดครึ่งขึ้นเป็นจำนวนเต็ม (จำนวนเต็มล้วน)
+    return (2 * n + d) // (2 * d)
 
 
 def cafe_bill(items, member):
-    total = 0
-    for it in items:
-        price, qty = it["price"], it["qty"]
-        if not _is_int(price) or price < 0:
-            raise ValueError("price must be a non-negative int")
-        if not _is_int(qty) or qty < 1:
-            raise ValueError("qty must be an int >= 1")
-        total += price * qty
-    amount = Fraction(total)
-    if total >= 50000:  # 500 baht, judged on the undiscounted total
-        amount *= Fraction(95, 100)
-    if member:
-        amount *= Fraction(90, 100)
-    amount *= Fraction(107, 100)
-    return amount.numerator // amount.denominator
+    # กติกา C: ปัดครึ่งขึ้นเป็นสตางค์ทุกขั้นตอน
+    total = sum(i["price"] * i["qty"] for i in items)
+    if total >= 50000:  # ตั้งแต่ 500 บาท (ก่อนลด) -> ลด 5%
+        total = _rhu(total * 95, 100)
+    if member:  # ลดอีก 10%
+        total = _rhu(total * 90, 100)
+    return _rhu(total * 107, 100)  # VAT 7% ขั้นสุดท้าย

@@ -1,11 +1,20 @@
-"""BaanKafe: คิดราคาขายส่งเมล็ดกาแฟ (หน่วยสตางค์)"""
+"""bulk_price(unit_price, qty, coupon) — ราคาขายส่งเมล็ดกาแฟ BaanKafe (หน่วยสตางค์)
+
+สูตร: unit_price*qty * (1-ส่วนลดปริมาณ) * (1-2.5% ถ้ามีคูปอง) * 1.07 แล้วปัดครึ่งขึ้นครั้งเดียว
+
+สมมติฐาน (brief เงียบ):
+- ส่วนลดปริมาณ: qty>=50 ลด 7.5%, qty>=10 ลด 3.5% (ใช้อัตราเดียว ไม่ซ้อนกัน)
+- ส่วนลดทั้งหมดคูณต่อกัน ไม่บวกเปอร์เซ็นต์
+- ยอดที่ลูกค้าจ่าย ปัดครึ่งขึ้น (half-up) ครั้งเดียวตอนท้าย
+- ตัวเลขทุกตัวต้องเป็น int (ปฏิเสธ float/str/bool/None); coupon ต้องเป็น bool
+"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x >= 0)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -27,17 +36,15 @@ def bulk_price(unit_price, qty, coupon):
     need_int(unit_price, "unit_price", 0)
     need_int(qty, "qty", 1, 1000)
     need_bool(coupon, "coupon")
+    amount = Fraction(unit_price * qty)
     if qty >= 50:
-        volume = Fraction(75, 1000)
+        amount *= Fraction(1000 - 75, 1000)
     elif qty >= 10:
-        volume = Fraction(35, 1000)
-    else:
-        volume = Fraction(0)
-    total = Fraction(unit_price * qty) * (1 - volume)
+        amount *= Fraction(1000 - 35, 1000)
     if coupon:
-        total *= 1 - Fraction(25, 1000)
-    total *= Fraction(107, 100)
-    return half_up(total)
+        amount *= Fraction(975, 1000)
+    amount *= Fraction(107, 100)
+    return half_up(amount)
 
 
 def main():

@@ -1,4 +1,4 @@
-"""benchmark_plugin.py - โจทย์คิดเงินของร้านกาแฟ BaanKafe (9 ข้อ)"""
+"""benchmark_plugin.py - BaanKafe: โจทย์เขียนฟังก์ชันคิดเงิน 9 ข้อ"""
 import json
 import os
 
@@ -28,7 +28,7 @@ def list_tasks(root):
             instruction=d["brief"],
             inputs=[],
             answer_files=["answers/%s/solve.py" % tid, "answers/%s/test_solve.py" % tid],
-            grading={"key": tid, "function": d["function"]},
+            grading={"key": tid},
             category="coding",
         ))
     return tasks

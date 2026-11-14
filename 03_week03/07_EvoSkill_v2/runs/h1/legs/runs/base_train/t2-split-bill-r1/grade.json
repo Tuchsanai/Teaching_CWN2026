@@ -1,5 +1,5 @@
 {
- "score": 0.7,
+ "score": 0.6,
  "checks": [
   {
    "id": "contract",
@@ -13,8 +13,8 @@
   },
   {
    "id": "half_up",
-   "pass": true,
-   "note": ""
+   "pass": false,
+   "note": "split_bill(1010, 1, 5) คาด [1061] ได้ [1060] · พลาด 3 จาก 3 กรณี"
   },
   {
    "id": "no_drift",
@@ -39,12 +39,12 @@
   {
    "id": "cli_ok",
    "pass": false,
-   "note": "stdin {\"total\": 10000, \"people\": 3, \"tip_percent\": 0} ต้องได้ {\"ok\": true, \"result\": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout [3667, 3667, 3666]\n[0, 0, 0, 0]\n[999]"
+   "note": "stdin {\"total\": 10000, \"people\": 3, \"tip_percent\": 0} ต้องได้ {\"ok\": true, \"result\": [3334, 3333, 3333]} exit 0 แต่ได้ exit 0 stdout all checks passed"
   },
   {
    "id": "cli_error",
    "pass": false,
-   "note": "stdin {\"total\": 10000, \"people\": 0, \"tip_percent\": 0} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout [3667, 3667, 3666]\n[0, 0, 0, 0]\n[999]"
+   "note": "stdin {\"total\": 10000, \"people\": 0, \"tip_percent\": 0} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout all checks passed"
   },
   {
    "id": "tests",

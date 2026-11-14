@@ -1,7 +1,4 @@
-"""benchmark_plugin.py - BaanKafe billing-function benchmark (9 tasks)
-
-Reads tasks/<id>.json under the data root. Split is hard-coded below (from the given split.json).
-"""
+"""benchmark_plugin.py - BaanKafe billing-function benchmark (9 tasks)."""
 import json
 import os
 
@@ -22,8 +19,9 @@ SPLIT = {
 
 def list_tasks(root):
     tasks = []
+    tdir = os.path.join(root, "tasks")
     for tid, split in SPLIT.items():
-        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
+        with open(os.path.join(tdir, tid + ".json"), encoding="utf-8") as f:
             d = json.load(f)
         tasks.append(Task(
             id=d["id"],
@@ -31,10 +29,10 @@ def list_tasks(root):
             instruction=d["brief"],
             inputs=[],
             answer_files=[
-                "answers/%s/solve.py" % tid,
-                "answers/%s/test_solve.py" % tid,
+                os.path.join("answers", tid, "solve.py"),
+                os.path.join("answers", tid, "test_solve.py"),
             ],
             grading={"key": d["id"], "function": d["function"]},
-            category="billing",
+            category="coding",
         ))
     return tasks

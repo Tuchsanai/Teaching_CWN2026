@@ -35,7 +35,7 @@ source code ต้นฉบับของเปเปอร์: [github.com/sen
     ├── instruction_with_note.md เหมือนข้างบน + ให้เขียนหมายเหตุ 1 ประโยคไว้ใน reference
     ├── instruction_score_only.md  Evolver ไม่เห็นเฉลยของชุดใดเลย
     ├── split.json               การแบ่งชุด train 4 · validation 2 · test 3
-    ├── benchmark_grader.py      ตัวตรวจ: grade(task, snapshot) → 0 ถึง 1 (การตรวจ 10 ข้อเดิมของบท 05 และ 06)
+    ├── benchmark_grader.py      ตัวตรวจ: grade(task, snapshot) → 0 ถึง 1 (ตัวตรวจชุดเดียวกับบท 05 และ 06 รวมข้อ policy)
     ├── check_grader.py          ตรวจตัวตรวจก่อนใช้
     ├── solver_prompt.txt        พรอมต์ของ Solver (ข้อความเดียวกับบท 05 และ 06)
     └── data/baankafe/           tasks/<id>.json (โจทย์) · answers/<id>/ (เฉลยอ้างอิง)
@@ -71,7 +71,7 @@ init ─▶ adapt ─▶ base ─▶ turn ─▶ rollout ─┬─▶ test ─�
 | `k` | epoch ปัจจุบัน | `3` |
 | `epochs` · `n` | ขนาดของการรัน อ่านจากคำสั่งของผู้ใช้ | `3` · `3` |
 | `session_id` | เซสชันของ Evolver ที่ใช้ `--resume` | UUID 1 ตัวตลอดการรัน |
-| `adapt` | สถิติของ Benchmark Adaptor และผลตรวจการรั่ว | `audit_ok: true` · reference 13 ไฟล์ |
+| `adapt` | สถิติของ Benchmark Adaptor และผลตรวจการรั่ว | `audit_ok: true` · reference 12 ไฟล์ |
 | `turns[]` | สถิติของแต่ละตา: เวลา · เครื่องมือ · ค่าใช้จ่าย · ไฟล์ของสกิลที่เพิ่ม แก้ ลบ | 3 รายการ |
 | `legs{}` | ผลของแต่ละ leg: คะแนน · จำนวนที่ผ่าน · คะแนนของแต่ละโจทย์ทั้ง 3 ครั้ง (`by_task`) | 9 leg |
 
@@ -210,7 +210,7 @@ unshare -m --propagation private bash -c '
 | ข้อสุดท้ายของ "งานของคุณ" | ถ้าคำสั่งของผู้ใช้จำกัดมากกว่านี้ ให้ทำตามผู้ใช้ | ทำให้การตั้งค่า "เห็นแต่คะแนน" ทำได้ด้วยการแก้คำสั่งของผู้ใช้อย่างเดียว | ขั้น 5 |
 | "สิ่งที่คุณอ่านได้" | อ่านตัวตรวจได้ · ทดสอบ plug-in ก่อนจบ | Adaptor ต้องรู้ว่าตัวตรวจอ่านค่าอะไรจาก `Task` | ขั้น 5 |
 
-สิ่งที่ Adaptor ทำจริงใน `e1` ([`actions.md`](../runs/e1/turns/adaptor/actions.md)): อ่านไฟล์ใน `/ba/setup` และ `/data` → เขียน plug-in → ทดสอบ → คัดลอกโจทย์และเฉลยของ Training เข้า reference → เขียน `split.json` ใหม่ที่มีเฉพาะชื่อโจทย์ของ Training (ไฟล์เดิมมีชื่อโจทย์ของ Validation และ Test)
+สิ่งที่ Adaptor ทำจริงใน `e1` ([`actions.md`](../runs/e1/turns/adaptor/actions.md)): อ่านไฟล์ใน `/ba/setup` และ `/data` → เขียน plug-in → ทดสอบ → คัดลอกโจทย์และเฉลยของ Training เข้า reference → ไม่คัดลอก `split.json` เข้า reference (ไฟล์นั้นมีชื่อโจทย์ของ Validation และ Test) → ค้นหาการรั่วใน reference เองก่อนจบ
 
 ---
 
@@ -285,7 +285,7 @@ unshare -m --propagation private bash -c '
 | effort ของ Evolver | ไม่ระบุ (ค่าเริ่มต้นของ Claude Code) | `--effort high` | เท่ากับผู้ปรับสกิลของบท 06 |
 | เวลาต่อตา | 2 ชั่วโมง | 30 นาที | ใช้จริงไม่ถึง 2 นาที |
 | prompt | ภาษาอังกฤษ | ภาษาไทย ถ้อยคำของบทเรียน | – |
-| คะแนน | 0 หรือ 1 | สัดส่วนของข้อตรวจ 10 ข้อ | Evolver ของเราได้สัญญาณละเอียดกว่า (เช่น 0.7 → 0.9) |
+| คะแนน | 0 หรือ 1 | สัดส่วนของข้อตรวจ 10–11 ข้อ | Evolver ของเราได้สัญญาณละเอียดกว่า (เช่น 0.5 → 0.9) |
 
 ---
 
@@ -296,11 +296,11 @@ unshare -m --propagation private bash -c '
 | # | ทำ | ได้เห็นอะไร |
 |---|---|---|
 | 1 | `python evoskill/evoskill.py status runs/e1` | ตารางราย epoch และต้นทุนของการรันหลัก |
-| 2 | `python evoskill/evoskill.py noise runs/f1` | โจทย์ที่ผ่านบางครั้ง และประตูรับแบบวัดครั้งเดียวที่ตัดสินไม่เหมือนกันทุกคู่ |
+| 2 | `python evoskill/evoskill.py noise runs/e2` | โจทย์ที่ผ่านบางครั้ง และประตูรับแบบวัดครั้งเดียวที่ตัดสินไม่เหมือนกันทุกคู่ |
 | 3 | เปิด [`runs/e1/turns/turn_2/actions.md`](../runs/e1/turns/turn_2/actions.md) | ทุกคำสั่ง bash ที่ Evolver รัน และข้อสรุปของมัน |
-| 4 | เทียบ [`runs/e1/skills_v1`](../runs/e1/skills_v1/) กับ [`skills_v3`](../runs/e1/skills_v3/) | สกิลโตจาก 8.4 KB เป็น 13.7 KB: หัวข้อใดถูกเพิ่มในตาใด |
+| 4 | เทียบ [`runs/e1/skills_v1`](../runs/e1/skills_v1/) กับ [`skills_v3`](../runs/e1/skills_v3/) | สกิล 2 ตัวโตจาก 11.9 KB เป็น 13.0 KB: หัวข้อใดถูกเพิ่มในตาใด |
 | 5 | เปิด [`runs/e1/setup/freeze.json`](../runs/e1/setup/freeze.json) แล้วคำนวณ sha256 ของ [`benchmark_plugin.py`](../runs/e1/setup/benchmark_plugin.py) เอง | hash ตรงกัน = ไฟล์ไม่ถูกแก้หลังล็อก |
-| 6 | เปิด [`runs/p1/evo/evolver_workspace/notes.txt`](../runs/p1/evo/evolver_workspace/notes.txt) | บันทึกที่ Evolver เขียนให้ตัวเองข้าม epoch |
+| 6 | เปิด [`runs/p1/evo/evolver_workspace/notes.md`](../runs/p1/evo/evolver_workspace/notes.md) | บันทึกที่ Evolver เขียนให้ตัวเองข้าม epoch |
 | 7 | อ่าน `cmd_turn()` แล้วหาบรรทัดที่ต้องแก้ ถ้าจะเพิ่มประตูรับแบบบท 05 | เข้าใจว่า "รับทุก epoch" คือการ **ไม่มี** โค้ดส่วนใด |
 
 **กลับไป:** [บทหลัก](../README.md) · [ทฤษฎี](../01_theory/README.md)

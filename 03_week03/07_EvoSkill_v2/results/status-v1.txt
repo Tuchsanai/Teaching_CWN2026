@@ -4,16 +4,16 @@ Benchmark Adaptor: โจทย์ train 4 · validation 2 · test 3 · referenc
 
 | epoch | ชุดสกิลที่ Solver ใช้ | SKILL.md | ไฟล์อื่น | Training คะแนน (ผ่าน) | Validation คะแนน (ผ่าน) | ตาของ Evolver (นาที) | เครื่องมือ | Bash | รันสคริปต์เดิมซ้ำ | ย่อบริบท | ค่าใช้จ่าย |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 0 | (ไม่มีสกิล) | - | - | 45.8% (0/12) | 43.3% (0/6) | - | - | - | - | - | - |
-| 1 | baankafe-money-function | 6.0 KB | 1 | 71.7% (0/12) | 70.0% (0/6) | 0.8 | 7 | 7 | 0 | 0 | $0.16 |
-| 2 | baankafe-money-function | 7.6 KB | 1 | 95.0% (6/12) | 96.7% (4/6) | 0.9 | 9 | 9 | 0 | 0 | $0.19 |
-| 3 | baankafe-money-function | 9.0 KB | 1 | - | 100.0% (6/6) | 0.8 | 6 | 6 | 0 | 0 | $0.16 |
+| 0 | (ไม่มีสกิล) | - | - | 48.6% (0/12) | 40.0% (0/6) | - | - | - | - | - | - |
+| 1 | baankafe-money-rules, baankafe-strict-validation | 9.7 KB | 0 | 69.8% (0/12) | 60.0% (0/6) | 1.1 | 8 | 8 | 0 | 0 | $0.21 |
+| 2 | baankafe-money-rules, baankafe-strict-validation, deliverable-format | 14.1 KB | 0 | 100.0% (12/12) | 86.7% (2/6) | 0.7 | 3 | 3 | 0 | 0 | $0.13 |
+| 3 | baankafe-money-rules, baankafe-strict-validation, deliverable-format | 14.1 KB | 0 | - | 90.0% (3/6) | 0.1 | 1 | 1 | 0 | 0 | $0.03 |
 
 | Test Set (held-out) | คะแนน | pass@1 (rollout ที่ผ่าน) | pass@3 (ผ่านอย่างน้อย 1 ครั้ง) | all@3 (ผ่านทุกครั้ง) |
 |---|---|---|---|---|
-| ไม่มีสกิล | 40.0% | 0/9 | 0/3 | 0/3 |
-| skills_v3 (epoch สุดท้าย) | 93.3% | 3/9 | 2/3 | 0/3 |
+| ไม่มีสกิล | 43.3% | 0/9 | 0/3 | 0/3 |
+| skills_v3 (epoch สุดท้าย) | 84.4% | 0/9 | 0/3 | 0/3 |
 
-รวม: rollout ของ Solver 78 ครั้ง ($8.77) · Evolver 3 ตา ($0.52) · Benchmark Adaptor $0.10
-Test Set: คะแนนเพิ่ม +53.3 จุด · pass rate เพิ่ม +33.3 จุด · ต้นทุนของ Evolver ต่อ 1 จุดที่เพิ่ม: คะแนน $0.010 · pass rate $0.016
+รวม: rollout ของ Solver 78 ครั้ง ($8.82) · Evolver 3 ตา ($0.37) · Benchmark Adaptor $0.10
+Test Set: คะแนนเพิ่ม +41.1 จุด · pass rate เพิ่ม +0.0 จุด · ต้นทุนของ Evolver ต่อ 1 จุดที่เพิ่ม: คะแนน $0.009 · pass rate ไม่เพิ่ม
 สถานะ: จบแล้ว (วัด Test Set แล้ว)

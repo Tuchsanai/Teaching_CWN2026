@@ -1,32 +1,41 @@
+"""BaanKafe bill splitter.
+
+All money is handled as integer satang to avoid floating-point error.
+"""
+
+
 def split_bill(total, people, tip_percent):
-    """หารบิลของร้าน BaanKafe
+    """Split a bill (in satang) evenly among people, including tip.
 
-    total       : ยอดบิล (สตางค์, >= 0)
-    people      : จำนวนคน (>= 1)
-    tip_percent : ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0–100)
+    Args:
+        total: bill amount in satang (>= 0).
+        people: number of people sharing the bill (>= 1).
+        tip_percent: tip as an integer percentage (0-100).
 
-    คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน
+    Returns:
+        A list of integers (satang), one per person, in person order.
+        The first few people pay an extra satang when the amount does not
+        divide evenly.
+
+    Raises:
+        ValueError: if any argument is out of range.
     """
-    if total < 0:
-        raise ValueError("total must be >= 0")
-    if people < 1:
-        raise ValueError("people must be >= 1")
-    if not 0 <= tip_percent <= 100:
-        raise ValueError("tip_percent must be between 0 and 100")
+    if not isinstance(total, int) or total < 0:
+        raise ValueError("total must be a non-negative integer (satang)")
+    if not isinstance(people, int) or people < 1:
+        raise ValueError("people must be an integer >= 1")
+    if not isinstance(tip_percent, int) or not 0 <= tip_percent <= 100:
+        raise ValueError("tip_percent must be an integer between 0 and 100")
 
-    # ทิปคิดเป็นสตางค์แบบจำนวนเต็ม (ปัดลง) เพื่อไม่ให้เกิดเศษทศนิยม
-    tip = total * tip_percent // 100
+    # Tip rounded half-up to the nearest satang, using integer arithmetic only.
+    tip = (total * tip_percent + 50) // 100
     amount = total + tip
 
-    # หารเท่ากัน ส่วนที่เหลือให้คนลำดับแรก ๆ คนละ 1 สตางค์
     base, remainder = divmod(amount, people)
     return [base + 1 if i < remainder else base for i in range(people)]
 
 
 if __name__ == "__main__":
-    assert split_bill(10000, 3, 0) == [3334, 3333, 3333]
-    assert split_bill(10000, 4, 10) == [2750, 2750, 2750, 2750]
-    assert split_bill(0, 5, 50) == [0, 0, 0, 0, 0]
-    assert split_bill(12345, 1, 15) == [14196]
-    assert sum(split_bill(9999, 7, 33)) == 9999 + 9999 * 33 // 100
-    print("ok")
+    print(split_bill(10000, 3, 10))  # 11000 satang -> [3667, 3667, 3666]
+    print(split_bill(0, 4, 0))       # [0, 0, 0, 0]
+    print(split_bill(12345, 1, 0))   # [12345]

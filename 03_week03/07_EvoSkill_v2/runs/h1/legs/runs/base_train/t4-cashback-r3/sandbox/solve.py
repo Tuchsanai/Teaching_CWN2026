@@ -1,58 +1,57 @@
-"""คำนวณเงินคืนสมาชิกร้าน BaanKafe
+"""BaanKafe cashback calculator.
 
-หน่วยของ amount เป็นสตางค์ (จำนวนเต็มตั้งแต่ 0)
-ผลลัพธ์เป็นจำนวนเต็มสตางค์
+ยอดทั้งหมดคิดเป็นสตางค์ (จำนวนเต็ม) เพื่อหลีกเลี่ยงปัญหาทศนิยมของ float
 """
 
-from decimal import Decimal, ROUND_DOWN
-
-MIN_AMOUNT = 100 * 100          # 100 บาท = 10000 สตางค์ (ยอดต่ำกว่านี้ไม่ได้เงินคืน)
-MAX_CASHBACK = 200 * 100        # เงินคืนสูงสุด 200 บาท = 20000 สตางค์ ต่อบิล
+MIN_AMOUNT = 100 * 100          # ยอดซื้อขั้นต่ำที่ได้เงินคืน: 100 บาท = 10,000 สตางค์
+MAX_CASHBACK = 200 * 100        # เงินคืนสูงสุดต่อบิล: 200 บาท = 20,000 สตางค์
 BIRTHDAY_MULTIPLIER = 2         # เดือนเกิดได้เงินคืน 2 เท่า
 
+# อัตราเงินคืนเป็นเศษส่วนของจำนวนเต็ม: rate = num / den
+# silver 1.5% = 15/1000, gold 2.5% = 25/1000, platinum 4% = 40/1000
 RATES = {
-    "silver": Decimal("0.015"),    # 1.5%
-    "gold": Decimal("0.025"),      # 2.5%
-    "platinum": Decimal("0.04"),   # 4%
+    "silver": (15, 1000),
+    "gold": (25, 1000),
+    "platinum": (40, 1000),
 }
 
 
-def cashback(amount: int, tier: str, birthday: bool) -> int:
-    """คืนจำนวนเงินคืน (สตางค์, จำนวนเต็ม)
+def cashback(amount, tier, birthday):
+    """คืนค่าเงินคืนเป็นจำนวนเต็มสตางค์
 
-    - amount: ยอดซื้อ (สตางค์) ต้องไม่ติดลบ
-    - tier: "silver" | "gold" | "platinum"
-    - birthday: True ถ้าซื้อในเดือนเกิด (ได้ 2 เท่า)
+    amount   : ยอดซื้อ (สตางค์, จำนวนเต็มตั้งแต่ 0)
+    tier     : "silver" | "gold" | "platinum"
+    birthday : True ถ้าซื้อในเดือนเกิด
     """
     if isinstance(amount, bool) or not isinstance(amount, int):
         raise TypeError("amount ต้องเป็นจำนวนเต็ม (สตางค์)")
     if amount < 0:
         raise ValueError("amount ต้องไม่ติดลบ")
-    if tier not in RATES:
+
+    key = tier.strip().lower() if isinstance(tier, str) else tier
+    if key not in RATES:
         raise ValueError(f"tier ไม่ถูกต้อง: {tier!r}")
 
     if amount < MIN_AMOUNT:
         return 0
 
-    # คำนวณด้วย Decimal เพื่อไม่ให้เกิดความคลาดเคลื่อนจากทศนิยม
-    # ปัดลง (ROUND_DOWN) ให้เป็นจำนวนเต็มสตางค์
-    value = (Decimal(amount) * RATES[tier]).to_integral_value(rounding=ROUND_DOWN)
-    result = int(value)
-
+    num, den = RATES[key]
+    result = amount * num // den            # ปัดลง (floor) เป็นจำนวนเต็มสตางค์
     if birthday:
         result *= BIRTHDAY_MULTIPLIER
-
     return min(result, MAX_CASHBACK)
 
 
 if __name__ == "__main__":
-    # ตัวอย่างการใช้งานและการทดสอบเบื้องต้น
-    assert cashback(9999, "gold", False) == 0          # ต่ำกว่า 100 บาท
-    assert cashback(10000, "silver", False) == 150     # 100 บาท * 1.5% = 1.5 บาท
-    assert cashback(10000, "silver", True) == 300      # เดือนเกิด 2 เท่า
-    assert cashback(100000, "gold", False) == 2500     # 1000 บาท * 2.5% = 25 บาท
-    assert cashback(1000000, "platinum", False) == 20000  # 40,000 สตางค์ ถูกจำกัดที่ 200 บาท
-    assert cashback(1000000, "silver", True) == 20000  # 15,000 * 2 = 30,000 ถูกจำกัดที่ 20,000
-    assert cashback(5000000, "platinum", True) == 20000
-    assert cashback(12345, "gold", False) == 308       # 12345 * 2.5% = 308.625 → 308
+    # ตัวอย่างการตรวจสอบเบื้องต้น
+    assert cashback(9999, "platinum", True) == 0          # ต่ำกว่า 100 บาท
+    assert cashback(10000, "silver", False) == 150        # 100 บาท × 1.5%
+    assert cashback(10000, "silver", True) == 300         # เดือนเกิด 2 เท่า
+    assert cashback(10000, "gold", False) == 250          # 100 บาท × 2.5%
+    assert cashback(10000, "platinum", False) == 400      # 100 บาท × 4%
+    assert cashback(1000000, "platinum", False) == 20000  # 4% = 400 บาท -> ถูกจำกัดที่ 200 บาท
+    assert cashback(1000000, "gold", True) == 20000       # 5% = 500 บาท -> ถูกจำกัดที่ 200 บาท
+    assert cashback(500000, "silver", False) == 7500      # 5,000 บาท × 1.5% = 75 บาท
+    assert cashback(500000, "silver", True) == 15000      # เดือนเกิด 150 บาท
+    assert cashback(0, "gold", True) == 0
     print("ทดสอบผ่านทั้งหมด")

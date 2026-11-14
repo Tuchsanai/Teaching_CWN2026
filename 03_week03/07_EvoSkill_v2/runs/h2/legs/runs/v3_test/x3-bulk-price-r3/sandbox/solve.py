@@ -1,67 +1,83 @@
-"""BaanKafe: คิดราคาขายส่งเมล็ดกาแฟ (หน่วยเป็นสตางค์)
+"""BaanKafe bulk coffee pricing.
 
-ลำดับการคิด (คิดต่อเนื่องจากยอดที่เหลือ ไม่บวกอัตรารวมกัน):
-  1. ยอดรวม = unit_price * qty
-  2. ส่วนลดตามจำนวน: qty >= 50 ลด 7.5%, qty >= 10 ลด 3.5% (ใช้อัตราเดียวตามขั้นสูงสุดที่เข้าเงื่อนไข)
-  3. ถ้ามีคูปอง ลดอีก 2.5% จากยอดหลังข้อ 2
-  4. บวก VAT 7% เป็นขั้นสุดท้าย
-  5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ครั้งเดียวที่ผลสุดท้าย
+หน่วยทั้งหมดเป็นสตางค์ (1 บาท = 100 สตางค์). คำนวณด้วย Fraction ทุกขั้น
+แล้วปัดครั้งเดียวที่ขั้นสุดท้าย (ปัดครึ่งเข้าเลขคู่).
+
+ลำดับการคิด:
+1. ยอดตั้งต้น = unit_price × qty
+2. ส่วนลดขายส่ง (อัตราเดียว ไม่ซ้อนกัน): qty >= 50 ลด 7.5%, qty >= 10 ลด 3.5%
+   ยอด × (1 − rate)
+3. ถ้า coupon = True ลดอีก 2.5% บนยอดที่เหลือ (ต่อเนื่องจากข้อ 2)
+4. VAT 7% เป็นขั้นสุดท้าย บนยอดหลังส่วนลดทั้งหมด
+5. ปัดเป็นจำนวนเต็มสตางค์ครั้งเดียว
 """
 
 from fractions import Fraction
-import math
 
+BULK_TIER_1_MIN_QTY = 10
+BULK_TIER_1_RATE = Fraction(35, 1000)   # 3.5%
+BULK_TIER_2_MIN_QTY = 50
+BULK_TIER_2_RATE = Fraction(75, 1000)   # 7.5%
+COUPON_RATE = Fraction(25, 1000)        # 2.5%
+VAT_RATE = Fraction(7, 100)             # 7%
 
-def _to_frac(x):
-    """แปลงตัวเลขเป็น Fraction ผ่าน str เพื่อไม่ให้เกิดความคลาดเคลื่อนของ float"""
-    return Fraction(str(x))
-
-
-def _round_half_up(f):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ใช้กับยอดที่ไม่ติดลบ)"""
-    return math.floor(f + Fraction(1, 2))
+MIN_QTY = 1
+MAX_QTY = 1000
 
 
 def _bulk_rate(qty):
-    """อัตราส่วนลดตามจำนวนถุง (ใช้อัตราเดียวตามขั้นสูงสุดที่เข้าเงื่อนไข)"""
-    if qty >= 50:
-        return Fraction(75, 1000)  # 7.5%
-    if qty >= 10:
-        return Fraction(35, 1000)  # 3.5%
+    """อัตราส่วนลดขายส่งตามจำนวนถุง (อัตราเดียว ไม่สะสม)."""
+    if qty >= BULK_TIER_2_MIN_QTY:
+        return BULK_TIER_2_RATE
+    if qty >= BULK_TIER_1_MIN_QTY:
+        return BULK_TIER_1_RATE
     return Fraction(0)
 
 
+def _round_half_even(x):
+    """ปัดครึ่งเข้าเลขคู่ (เหมือน round() ของ Fraction)."""
+    return round(x)
+
+
 def bulk_price(unit_price, qty, coupon):
-    """คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์
+    """คืนยอดที่ลูกค้าต้องจ่ายเป็นจำนวนเต็มสตางค์.
 
-    unit_price: ราคาต่อถุง (สตางค์, >= 0)
-    qty:        จำนวนถุง (1–1000)
-    coupon:     True ถ้ามีคูปอง
+    unit_price: ราคาต่อถุง (สตางค์, int >= 0)
+    qty: จำนวนถุง (int, 1–1000)
+    coupon: True ถ้ามีคูปอง
     """
-    if isinstance(unit_price, bool) or isinstance(qty, bool):
-        raise ValueError("unit_price และ qty ต้องเป็นตัวเลข")
-
-    price = _to_frac(unit_price)
-    if price < 0:
-        raise ValueError("unit_price ต้องไม่ติดลบ")
-
-    q = _to_frac(qty)
-    if q.denominator != 1 or not (1 <= q <= 1000):
-        raise ValueError("qty ต้องเป็นจำนวนเต็มระหว่าง 1 ถึง 1000")
-    qty_int = int(q)
-
-    if price.denominator != 1:
+    if isinstance(unit_price, bool) or not isinstance(unit_price, int):
         raise ValueError("unit_price ต้องเป็นจำนวนเต็มสตางค์")
+    if unit_price < 0:
+        raise ValueError("unit_price ต้องไม่ติดลบ")
+    if isinstance(qty, bool) or not isinstance(qty, int):
+        raise ValueError("qty ต้องเป็นจำนวนเต็ม")
+    if not (MIN_QTY <= qty <= MAX_QTY):
+        raise ValueError("qty ต้องอยู่ระหว่าง 1 ถึง 1000")
 
-    subtotal = price * qty_int
-    after_bulk = subtotal * (1 - _bulk_rate(qty_int))
-    after_coupon = after_bulk * (1 - Fraction(25, 1000)) if coupon else after_bulk
-    total = after_coupon * (1 + Fraction(7, 100))  # VAT 7%
+    # 1. ยอดตั้งต้น (จำนวนเต็มสตางค์ ไม่มีความคลาด)
+    total = Fraction(unit_price * qty)
 
-    return _round_half_up(total)
+    # 2. ส่วนลดขายส่ง
+    total *= 1 - _bulk_rate(qty)
+
+    # 3. คูปอง ลดอีก 2.5% บนยอดที่เหลือ
+    if coupon:
+        total *= 1 - COUPON_RATE
+
+    # 4. VAT 7% ขั้นสุดท้าย
+    total *= 1 + VAT_RATE
+
+    # 5. ปัดครั้งเดียว
+    return int(_round_half_even(total))
 
 
 if __name__ == "__main__":
-    print(bulk_price(10000, 1, False))
-    print(bulk_price(10000, 10, False))
-    print(bulk_price(10000, 50, True))
+    examples = [
+        (10000, 1, False),
+        (10000, 10, False),
+        (10000, 50, True),
+        (0, 1000, True),
+    ]
+    for unit_price, qty, coupon in examples:
+        print(unit_price, qty, coupon, "->", bulk_price(unit_price, qty, coupon))

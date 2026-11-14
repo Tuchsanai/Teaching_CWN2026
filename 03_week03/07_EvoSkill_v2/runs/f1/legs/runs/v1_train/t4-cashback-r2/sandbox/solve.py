@@ -1,47 +1,26 @@
-"""BaanKafe cashback"""
+"""BaanKafe: cashback(amount, tier, birthday) — หน่วยสตางค์"""
 import json
 import sys
 from fractions import Fraction
 
 RATES = {"silver": Fraction(15, 1000), "gold": Fraction(25, 1000), "platinum": Fraction(4, 100)}
-MIN_AMOUNT = 100 * 100
-CAP = 200 * 100
-
-
-def half_up(x):
-    return int((Fraction(x) * 2 + 1) // 2)
-
-
-def need_int(value, name, low=None, high=None):
-    if type(value) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and value < low) or (high is not None and value > high):
-        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
-    return value
-
-
-def need_bool(value, name):
-    if type(value) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True หรือ False")
-    return value
-
-
-def need_choice(value, name, choices):
-    if type(value) is not str or value not in choices:
-        raise ValueError(f"{name} ไม่อยู่ในรายการที่อนุญาต")
-    return value
+MIN_AMOUNT = 100 * 100  # 100 บาท
+CAP = 200 * 100  # 200 บาทต่อบิล
 
 
 def cashback(amount, tier, birthday):
-    need_int(amount, "amount", 0)
-    need_choice(tier, "tier", RATES)
-    need_bool(birthday, "birthday")
+    # ข้อสันนิษฐาน: โจทย์ไม่ได้จำกัดโบนัสเดือนเกิดตามระดับ -> ทุกระดับได้ 2 เท่า
+    # เงินคืนเป็นเงินที่ร้านจ่ายออก -> ปัดลง (floor) เป็นสตางค์
+    if type(amount) is not int or amount < 0:
+        raise ValueError("amount ต้องเป็นจำนวนเต็มสตางค์ตั้งแต่ 0")
+    if type(tier) is not str or tier not in RATES:
+        raise ValueError("tier ต้องเป็น silver, gold หรือ platinum")
+    if type(birthday) is not bool:
+        raise ValueError("birthday ต้องเป็น True หรือ False")
     if amount < MIN_AMOUNT:
         return 0
-    x = Fraction(amount) * RATES[tier]
-    if birthday:
-        x *= 2
-    return min(CAP, half_up(x))
+    value = Fraction(amount) * RATES[tier] * (2 if birthday else 1)
+    return min(int(value // 1), CAP)
 
 
 def main():

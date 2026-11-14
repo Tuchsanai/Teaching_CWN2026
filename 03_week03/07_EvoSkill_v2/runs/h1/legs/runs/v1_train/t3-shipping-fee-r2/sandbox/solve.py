@@ -1,102 +1,73 @@
-"""ค่าส่งเมล็ดกาแฟ ร้าน BaanKafe
+"""ค่าส่งเมล็ดกาแฟ BaanKafe
 
-shipping_fee(weight_g, distance_km, express) -> int (หน่วยเป็นสตางค์)
+กติกา (ทุกยอดเป็นสตางค์):
+1. น้ำหนัก weight_g ต้องเป็นจำนวนเต็ม 1–30,000 กรัม
+2. ฐานราคาตามน้ำหนัก:
+   - ไม่เกิน 1,000 กรัม  -> 40 บาท
+   - ไม่เกิน 5,000 กรัม  -> 80 บาท
+   - เกิน 5,000 กรัม     -> 80 บาท + ส่วนที่เกิน 5,000 กรัม คิดกิโลกรัมละ 15 บาท (คิดตามสัดส่วนของกรัม)
+3. ระยะทาง distance_km ต้องไม่ติดลบ ถ้าเกิน 100 กม. คิดเพิ่ม 20% ของยอดที่ได้จากข้อก่อน
+4. ส่งด่วน (express=True) คิดเพิ่ม 50% ของยอดที่ได้จากข้อก่อน (คูณต่อจากข้อ 3)
+5. คืนค่าส่งเป็นจำนวนเต็มสตางค์ ปัดครึ่งขึ้นครั้งเดียวตอนท้ายสุด
 """
-
-import math
 from fractions import Fraction
+import math
 
-MIN_WEIGHT_G = 1
-MAX_WEIGHT_G = 30_000
-LONG_DISTANCE_KM = 100
 
-# หน่วยสตางค์ (บาท x 100)
-BASE_FEE_LIGHT = 40 * 100        # ไม่เกิน 1,000 กรัม
-BASE_FEE_MEDIUM = 80 * 100       # ไม่เกิน 5,000 กรัม (และฐานของส่วนที่เกิน 5,000)
-LIGHT_LIMIT_G = 1_000
-MEDIUM_LIMIT_G = 5_000
-# กิโลกรัมละ 15 บาท = 15 * 100 สตางค์ / 1000 กรัม ต่อ 1 กรัม (คิดตามสัดส่วน)
-EXCESS_SATANG_PER_G = Fraction(15 * 100, 1000)
+def _need_int(value, name, low=None, high=None):
+    # bool ไม่นับเป็น int ที่นี่
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
+def _need_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+
+def _need_distance(value, name):
+    # รับจำนวนจริงที่ไม่ใช่ bool, ไม่ติดลบ, ไม่ใช่ NaN/inf
+    if type(value) not in (int, float, Fraction):
+        raise ValueError(f"{name} ต้องเป็นตัวเลข")
+    if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+        raise ValueError(f"{name} ต้องเป็นตัวเลขจำกัด")
+    if value < 0:
+        raise ValueError(f"{name} ต้องไม่ติดลบ")
+    return Fraction(value)
 
 
 def _half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม รับ int หรือ Fraction ที่ไม่ติดลบ"""
-    return int((Fraction(x) * 2 + 1) // 2)
-
-
-def _require_int(value, label, lo, hi):
-    if type(value) is not int:
-        raise ValueError(f"{label} ต้องเป็นจำนวนเต็ม")
-    if value < lo or value > hi:
-        raise ValueError(f"{label} ต้องอยู่ระหว่าง {lo} ถึง {hi}")
-    return value
-
-
-def _require_distance(value):
-    if type(value) not in (int, float):
-        raise ValueError("distance_km ต้องเป็นตัวเลข")
-    if not math.isfinite(value) or value < 0:
-        raise ValueError("distance_km ต้องเป็นจำนวนจริงที่ไม่ติดลบ")
-    return value
-
-
-def _require_flag(value, label):
-    if type(value) is not bool:
-        raise ValueError(f"{label} ต้องเป็น True หรือ False")
-    return value
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
+    return math.floor(Fraction(x) + Fraction(1, 2))
 
 
 def shipping_fee(weight_g, distance_km, express):
-    """คิดค่าส่งเมล็ดกาแฟ คืนค่าเป็นจำนวนเต็มสตางค์
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์"""
+    weight_g = _need_int(weight_g, "weight_g", 1, 30000)
+    distance = _need_distance(distance_km, "distance_km")
+    express = _need_bool(express, "express")
 
-    ลำดับการคิด:
-      1. ค่าส่งตามน้ำหนัก (ส่วนที่เกิน 5,000 กรัม คิดตามสัดส่วน)
-      2. ระยะทางเกิน 100 กม. คูณ 1.2
-      3. ส่งด่วน คูณ 1.5 (คูณต่อจากข้อ 2)
-      4. ปัดครึ่งขึ้นครั้งเดียวตอนท้าย
-    """
-    weight_g = _require_int(weight_g, "weight_g", MIN_WEIGHT_G, MAX_WEIGHT_G)
-    distance_km = _require_distance(distance_km)
-    express = _require_flag(express, "express")
-
-    # 1. ค่าส่งตามน้ำหนัก (Fraction เพื่อไม่ให้คลาดเคลื่อน)
-    if weight_g <= LIGHT_LIMIT_G:
-        fee = Fraction(BASE_FEE_LIGHT)
-    elif weight_g <= MEDIUM_LIMIT_G:
-        fee = Fraction(BASE_FEE_MEDIUM)
+    # ฐานตามน้ำหนัก (สตางค์) คำนวณเป็น Fraction ทั้งหมด
+    if weight_g <= 1000:
+        fee = Fraction(40 * 100)
+    elif weight_g <= 5000:
+        fee = Fraction(80 * 100)
     else:
-        fee = BASE_FEE_MEDIUM + (weight_g - MEDIUM_LIMIT_G) * EXCESS_SATANG_PER_G
+        # 15 บาท/กก. = 1500 สตางค์/1000 กรัม
+        excess_g = weight_g - 5000
+        fee = Fraction(80 * 100) + Fraction(excess_g * 1500, 1000)
 
-    # 2. ระยะทางเกิน 100 กม. เพิ่ม 20%
-    if distance_km > LONG_DISTANCE_KM:
+    # ระยะทางเกิน 100 กม. คิดเพิ่ม 20%
+    if distance > 100:
         fee *= Fraction(120, 100)
 
-    # 3. ส่งด่วน เพิ่ม 50% (คูณต่อจากข้อก่อน)
+    # ส่งด่วน คิดเพิ่ม 50% (คูณต่อจากข้อก่อน)
     if express:
         fee *= Fraction(150, 100)
 
-    # 4. ปัดครั้งเดียว
+    # ปัดครั้งเดียวตอนท้ายสุด
     return _half_up(fee)
-
-
-if __name__ == "__main__":
-    # ตัวอย่างตรวจผล (ค่าเป็นสตางค์)
-    cases = [
-        ((500, 10, False), 4000),
-        ((1000, 0, False), 4000),
-        ((1001, 0, False), 8000),
-        ((5000, 0, False), 8000),
-        ((5001, 0, False), 8002),      # 8001.5 -> ปัดขึ้น
-        ((6000, 0, False), 9500),
-        ((30000, 0, False), 45500),
-        ((1000, 100, False), 4000),    # 100 กม. ไม่เกิน ไม่คิดเพิ่ม
-        ((1000, 100.5, False), 4800),
-        ((1000, 50, True), 6000),
-        ((1000, 101, True), 7200),
-        ((5001, 0, True), 12002),      # 12002.25 -> 12002
-        ((5001, 101, True), 14403),    # 14402.7 -> 14403
-    ]
-    for args, expected in cases:
-        got = shipping_fee(*args)
-        status = "ok" if got == expected else "FAIL"
-        print(f"{status}  shipping_fee{args} = {got} (คาด {expected})")

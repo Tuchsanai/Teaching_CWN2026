@@ -4,13 +4,11 @@ MAX_CASHBACK = 200 * 100  # 200 baht in satang
 
 
 def cashback(amount, tier, birthday):
+    """Return cashback in whole satang (rounded down)."""
     if tier not in RATES_PERMILLE:
         raise ValueError(f"unknown tier: {tier!r}")
-    if amount < 0:
-        raise ValueError("amount must be >= 0")
     if amount < MIN_AMOUNT:
         return 0
-    mult = 2 if birthday else 1
-    # integer math (no float error); fractional satang is floored
-    result = amount * RATES_PERMILLE[tier] * mult // 1000
+    multiplier = 2 if birthday else 1
+    result = amount * RATES_PERMILLE[tier] * multiplier // 1000  # integer math, no float error
     return min(result, MAX_CASHBACK)

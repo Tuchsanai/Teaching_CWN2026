@@ -1,35 +1,86 @@
 import unittest
+
 from solve import cafe_bill
 
 
-class T(unittest.TestCase):
-    def test_normal(self):
-        self.assertEqual(cafe_bill([{"price": 10000, "qty": 2}], False), 21400)
-        self.assertEqual(cafe_bill([], False), 0)
+def it(price, qty=1):
+    return {"price": price, "qty": qty}
 
-    def test_boundary(self):
-        # 49999*1.07 = 53498.93 ; 50000*.95*1.07 = 50825
-        self.assertEqual(cafe_bill([{"price": 49999, "qty": 1}], False), 53499)
-        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], False), 50825)
 
-    def test_member_half(self):
-        # 42750*1.07 = 45742.5 -> 45743 (half-up)
-        self.assertEqual(cafe_bill([{"price": 50000, "qty": 1}], True), 45743)
-        # 50*0.9*1.07=48.15 -> 48 ; 5*1.07=5.35 ; 50*1.07=53.5 -> 54
-        self.assertEqual(cafe_bill([{"price": 50, "qty": 1}], False), 54)
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
+        self.assertEqual(cafe_bill([it(100, 2)], False), 214)  # 200*1.07
 
-    def test_reject(self):
-        ok = [{"price": 100, "qty": 1}]
-        for items, m in [(None, False), (ok, 1), (ok, None), ("x", True),
-                         ([1], False), ([{"price": 100}], False),
-                         ([{"price": 100, "qty": 0}], False),
-                         ([{"price": -1, "qty": 1}], False),
-                         ([{"price": 1.0, "qty": 1}], False),
-                         ([{"price": "1", "qty": 1}], False),
-                         ([{"price": 1, "qty": True}], False),
-                         ([{"price": 1, "qty": 1.0}], False)]:
-            with self.assertRaises(ValueError):
-                cafe_bill(items, m)
+    def test_normal_2(self):
+        self.assertEqual(cafe_bill([it(1000, 3), it(500)], False), 3745)  # 3500*1.07
+
+    def test_normal_3(self):
+        self.assertEqual(cafe_bill([it(100, 2)], True), 193)  # 180*1.07=192.6
+
+    def test_empty(self):
+        self.assertEqual(cafe_bill([], True), 0)
+
+
+class Boundary(unittest.TestCase):
+    def test_boundary_1(self):
+        self.assertEqual(cafe_bill([it(50000)], False), 50825)  # 47500*1.07
+
+    def test_boundary_2(self):
+        self.assertEqual(cafe_bill([it(49999)], False), 53499)  # 53498.93
+
+    def test_boundary_3(self):
+        self.assertEqual(cafe_bill([it(25000, 2)], True), 45743)  # 42750*1.07=45742.5
+
+    def test_boundary_4(self):
+        self.assertEqual(cafe_bill([it(49999)], True), 48149)  # 48149.037
+
+
+class NoDrift(unittest.TestCase):
+    def test_no_drift_1(self):
+        self.assertEqual(cafe_bill([it(1)], True), 1)  # 0.963
+
+    def test_no_drift_2(self):
+        self.assertEqual(cafe_bill([it(5)], False), 5)  # 5.35
+
+    def test_no_drift_3(self):
+        self.assertEqual(cafe_bill([it(50)], True), 48)  # 48.15
+
+    def test_half_up(self):
+        self.assertEqual(cafe_bill([it(50000)], True), 45743)
+
+
+class Reject(unittest.TestCase):
+    def test_reject_negative_price(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(-1)], False)
+
+    def test_reject_qty_zero(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(100, 0)], False)
+
+    def test_reject_float(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(100.0)], False)
+
+    def test_reject_str_qty(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(100, "1")], False)
+
+    def test_reject_bool_price(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(True)], False)
+
+    def test_reject_member_type(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([it(100)], 1)
+
+    def test_reject_missing_key(self):
+        with self.assertRaises(ValueError):
+            cafe_bill([{"price": 100}], False)
+
+    def test_reject_items_type(self):
+        with self.assertRaises(ValueError):
+            cafe_bill("x", False)
 
 
 if __name__ == "__main__":

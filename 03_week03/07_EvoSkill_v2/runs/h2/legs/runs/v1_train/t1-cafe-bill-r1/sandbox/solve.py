@@ -1,56 +1,65 @@
-import math
+"""BaanKafe: คิดเงินหน้าร้าน
+
+ลำดับการคิด (ทำตามโจทย์ทุกข้อ):
+1. ยอดรวม = sum(price * qty)                         (หน่วยสตางค์, จำนวนเต็ม)
+2. ถ้ายอดรวม >= 50000 สตางค์ (500 บาท) ลด 5%         (เทียบกับยอดก่อนลดทุกข้อ)
+3. ถ้า member = True ลดอีก 10%                       (คิดต่อเนื่องจากยอดหลังข้อ 2)
+4. บวก VAT 7% เป็นขั้นสุดท้าย                         (คูณ 1.07 บนยอดหลังส่วนลดทั้งหมด)
+5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ ครั้งเดียวที่ขั้นสุดท้าย
+
+การตีความที่เลือก (กำกวม):
+- "ลดอีก 10%" อ่านเป็นลดต่อเนื่อง (x * 0.95 * 0.90) ไม่ใช่รวมเป็น 15%
+- เกณฑ์ 500 บาทตรวจจากยอดก่อนหักส่วนลดของสมาชิก
+- การปัดเศษ: ครึ่งขึ้น (ROUND_HALF_UP) ที่ขั้นสุดท้ายเท่านั้น
+"""
+
 from fractions import Fraction
+import math
 
-THRESHOLD = Fraction(50000)          # 500 บาท เป็นสตางค์
-DISCOUNT_BULK = Fraction(5, 100)     # ลด 5% เมื่อยอดรวม >= 500 บาท
-DISCOUNT_MEMBER = Fraction(10, 100)  # สมาชิกลดอีก 10%
-VAT = Fraction(7, 100)               # VAT 7% ขั้นสุดท้าย
-
-
-def to_frac(x):
-    """รับได้ทั้ง int, float, Decimal โดยไม่เกิดคลาดเคลื่อนจาก float"""
-    return Fraction(str(x))
+THRESHOLD_SATANG = 50_000      # 500 บาท
+DISCOUNT_BULK_PCT = 5          # ลด 5% เมื่อถึงเกณฑ์
+DISCOUNT_MEMBER_PCT = 10       # ลดอีก 10% สำหรับสมาชิก
+VAT_PCT = 7
 
 
-def round_half_up(f):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม ใช้ครั้งเดียวตอนคืนค่า"""
-    return math.floor(f + Fraction(1, 2))
+def _round_half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ค่าไม่ติดลบ)."""
+    return math.floor(Fraction(x) + Fraction(1, 2))
 
 
-def cafe_bill(items, member=False):
-    """คืนยอดที่ลูกค้าต้องจ่ายเป็นจำนวนเต็มสตางค์
+def cafe_bill(items, member):
+    """คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์.
 
-    ลำดับการคิด:
-      1. ยอดรวม = sum(price * qty) (สตางค์)
-      2. ถ้ายอดรวม >= 500 บาท ลด 5%
-      3. ถ้า member = True ลดอีก 10% (คูณต่อจากข้อ 2)
-      4. บวก VAT 7% (คูณด้วย 1.07)
-      5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ครั้งเดียวที่ค่าที่คืน
+    items: list ของ dict {"price": ราคาต่อชิ้น (สตางค์), "qty": จำนวนชิ้น (>= 1)}
+    member: True ถ้าเป็นสมาชิก
     """
-    subtotal = Fraction(0)
+    subtotal = 0
     for item in items:
-        price = item["price"]
-        qty = item["qty"]
-        if isinstance(qty, bool) or to_frac(qty) < 1:
-            raise ValueError("qty ต้องเป็นจำนวนเต็มตั้งแต่ 1")
-        subtotal += to_frac(price) * to_frac(qty)
+        price = int(item["price"])
+        qty = int(item["qty"])
+        if price < 0:
+            raise ValueError("price ต้องไม่ติดลบ")
+        if qty < 1:
+            raise ValueError("qty ต้องมีค่าตั้งแต่ 1 ขึ้นไป")
+        subtotal += price * qty
 
-    total = subtotal
-    if subtotal >= THRESHOLD:
-        total *= 1 - DISCOUNT_BULK
+    amount = Fraction(subtotal)
+
+    # ขั้น 2: ลด 5% เมื่อยอดก่อนลดตั้งแต่ 500 บาทขึ้นไป
+    if subtotal >= THRESHOLD_SATANG:
+        amount *= Fraction(100 - DISCOUNT_BULK_PCT, 100)
+
+    # ขั้น 3: สมาชิกลดอีก 10% (ต่อเนื่องจากข้อ 2)
     if member:
-        total *= 1 - DISCOUNT_MEMBER
-    total *= 1 + VAT
+        amount *= Fraction(100 - DISCOUNT_MEMBER_PCT, 100)
 
-    return round_half_up(total)
+    # ขั้น 4: VAT 7% เป็นขั้นสุดท้าย
+    amount *= Fraction(100 + VAT_PCT, 100)
+
+    # ขั้น 5: ปัดครั้งเดียว
+    return _round_half_up(amount)
 
 
 if __name__ == "__main__":
-    # ตัวอย่าง: กาแฟ 3 แก้ว ราคา 150 บาท (15000 สตางค์) + เค้ก 2 ชิ้น ราคา 100 บาท (10000 สตางค์)
-    # ยอดรวม 65000 สตางค์ (650 บาท) >= 500 บาท -> ลด 5% -> 61750 -> VAT 7% -> 66072.5 -> 66073 สตางค์
-    sample = [
-        {"price": 15000, "qty": 3},
-        {"price": 10000, "qty": 2},
-    ]
-    print(cafe_bill(sample, member=False))
+    sample = [{"price": 15000, "qty": 2}, {"price": 25000, "qty": 2}]
     print(cafe_bill(sample, member=True))

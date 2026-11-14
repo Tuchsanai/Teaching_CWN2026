@@ -1,11 +1,19 @@
-"""BaanKafe: คิดค่าส่งเมล็ดกาแฟ (ผลลัพธ์เป็นจำนวนเต็มสตางค์)"""
+"""BaanKafe shipping_fee (หน่วยสตางค์)
+
+สมมติฐาน (brief เงียบ ใช้มาตรฐานร้าน):
+1. distance_km == 0 → ลูกค้ารับเองที่ร้าน ค่าส่ง 0 (ตรวจ input ก่อนเสมอ)
+2. ส่งด่วนได้ไม่เกิน 20,000 กรัม (2/3 ของน้ำหนักสูงสุด) เกินนี้ ValueError
+3. ค่าส่งเป็นเงินที่ลูกค้าจ่าย → ปัดครึ่งขึ้นครั้งเดียวตอนท้าย
+4. ทุกตัวเลขต้องเป็น int (ปฏิเสธ float/str/bool/None)
+"""
 import json
 import sys
 from fractions import Fraction
 
+MAX_EXPRESS_WEIGHT_G = 20000
+
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -27,14 +35,17 @@ def shipping_fee(weight_g, distance_km, express):
     need_int(weight_g, "weight_g", 1, 30000)
     need_int(distance_km, "distance_km", 0)
     need_bool(express, "express")
+    if express and weight_g > MAX_EXPRESS_WEIGHT_G:
+        raise ValueError("พัสดุหนักเกินกว่าจะส่งด่วนได้")
+    if distance_km == 0:
+        return 0
 
     if weight_g <= 1000:
         fee = Fraction(4000)
     elif weight_g <= 5000:
         fee = Fraction(8000)
     else:
-        # ส่วนเกิน (กรัม) / 1000 * 15 บาท * 100 สตางค์ = กรัม * 3/2 สตางค์
-        fee = Fraction(8000) + Fraction(weight_g - 5000) * Fraction(3, 2)
+        fee = Fraction(8000) + Fraction(weight_g - 5000, 1000) * 1500
     if distance_km > 100:
         fee *= Fraction(120, 100)
     if express:

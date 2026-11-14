@@ -1,31 +1,53 @@
+"""แม่แบบ solve.py สำหรับฟังก์ชันคิดเงินของ BaanKafe — คัดลอกไปแก้เฉพาะส่วน TODO"""
 import json
 import sys
 from fractions import Fraction
 
 
-def _half_up(x):
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — ใช้กับเงินที่ลูกค้าต้องจ่าย"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
-def shipping_fee(weight_g, distance_km, express):
-    if type(weight_g) is not int or not (1 <= weight_g <= 30000):
-        raise ValueError("weight_g ต้องเป็นจำนวนเต็ม 1-30000")
-    if type(distance_km) is not int or distance_km < 0:
-        raise ValueError("distance_km ต้องเป็นจำนวนเต็ม >= 0")
-    if type(express) is not bool:
-        raise ValueError("express ต้องเป็น True/False")
+def round_down(x):
+    """ปัดลง — ใช้กับเงินที่ร้านต้องจ่ายออก (เช่น เงินคืน/cashback)"""
+    return int(Fraction(x) // 1)
 
+
+def need_int(value, name, low=None, high=None):
+    if type(value) is not int:  # bool และ float และ str ไม่ผ่าน
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
+def need_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+
+# TODO: เขียนฟังก์ชันตามโจทย์ — ตรวจ input ทุกตัวก่อนคำนวณ, คำนวณด้วย Fraction, ปัดครั้งเดียวตอนท้าย
+def shipping_fee(weight_g, distance_km, express):
+    need_int(weight_g, "weight_g", 1, 30000)
+    need_int(distance_km, "distance_km", 0)
+    need_bool(express, "express")
+    if express and weight_g > 20000:
+        raise ValueError("ส่งด่วนรับไม่เกิน 20,000 กรัม")
+    if distance_km == 0:  # ลูกค้ารับเอง
+        return 0
     if weight_g <= 1000:
         fee = Fraction(4000)
     elif weight_g <= 5000:
         fee = Fraction(8000)
     else:
-        fee = Fraction(8000) + Fraction((weight_g - 5000) * 1500, 1000)
+        fee = 8000 + Fraction(1500 * (weight_g - 5000), 1000)
     if distance_km > 100:
         fee *= Fraction(120, 100)
     if express:
         fee *= Fraction(150, 100)
-    return _half_up(fee)
+    return half_up(fee)
 
 
 def main():

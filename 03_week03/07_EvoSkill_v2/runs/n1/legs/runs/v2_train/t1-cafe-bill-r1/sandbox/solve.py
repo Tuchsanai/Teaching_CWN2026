@@ -1,11 +1,17 @@
-"""BaanKafe: คิดเงินหน้าร้าน (หน่วยสตางค์)"""
+"""BaanKafe cafe_bill — หน่วยสตางค์
+
+สมมติฐาน:
+- price >= 0 (0 รับได้), qty >= 1, ทั้งคู่ต้องเป็น int ล้วน
+- items ว่างได้ (ยอด 0 -> จ่าย 0)
+- เกณฑ์ 500 บาท (50000 สตางค์) เทียบกับยอดรวมดิบ ด้วย >=
+- ลดคูณต่อกัน (x0.95, x0.90) แล้วคูณ VAT 1.07 ปัดครึ่งขึ้นครั้งเดียวตอนท้าย
+"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
     return int((Fraction(x) * 2 + 1) // 2)
 
 
@@ -23,24 +29,19 @@ def need_bool(value, name):
     return value
 
 
-THRESHOLD = 50000  # 500 บาท
-
-
 def cafe_bill(items, member):
     if type(items) is not list:
         raise ValueError("items ต้องเป็น list")
     need_bool(member, "member")
     total = 0
     for item in items:
-        if type(item) is not dict:
-            raise ValueError("item ต้องเป็น dict")
-        if "price" not in item or "qty" not in item:
-            raise ValueError("item ต้องมี price และ qty")
+        if type(item) is not dict or "price" not in item or "qty" not in item:
+            raise ValueError("แต่ละรายการต้องเป็น dict ที่มี price และ qty")
         price = need_int(item["price"], "price", 0)
         qty = need_int(item["qty"], "qty", 1)
         total += price * qty
     amount = Fraction(total)
-    if total >= THRESHOLD:
+    if total >= 50000:
         amount *= Fraction(95, 100)
     if member:
         amount *= Fraction(90, 100)

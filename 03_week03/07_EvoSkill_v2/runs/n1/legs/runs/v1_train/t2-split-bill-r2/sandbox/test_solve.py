@@ -1,41 +1,30 @@
 import unittest
-from fractions import Fraction
 from solve import split_bill
 
 
 class T(unittest.TestCase):
     def test_normal(self):
-        self.assertEqual(split_bill(1000, 4, 0), [250] * 4)
-        self.assertEqual(split_bill(1000, 3, 10), [367, 367, 366])
-        self.assertEqual(split_bill(10, 3, 0), [4, 3, 3])
+        self.assertEqual(split_bill(10000, 4, 10), [2750] * 4)
+        self.assertEqual(split_bill(1000, 3, 0), [334, 333, 333])
 
     def test_boundary(self):
-        self.assertEqual(split_bill(0, 1, 0), [0])
-        self.assertEqual(split_bill(0, 3, 100), [0, 0, 0])
-        self.assertEqual(split_bill(500, 1, 100), [1000])
-        self.assertEqual(split_bill(1, 3, 0), [1, 0, 0])
+        self.assertEqual(split_bill(0, 3, 50), [0, 0, 0])
+        self.assertEqual(split_bill(100, 1, 100), [200])
+        self.assertEqual(split_bill(5, 2, 0), [3, 2])
 
     def test_nodrift(self):
-        # 1005*5% = 50.25 ; 1 -> 10*15% =1.5 -> total 11.5 -> 12
-        self.assertEqual(sum(split_bill(10, 1, 15)), 12)
-        self.assertEqual(sum(split_bill(1005, 1, 5)), 1055)
-        for t in (1, 7, 99, 12345):
-            for p in (1, 3, 7):
-                for tip in (0, 5, 12, 33, 100):
-                    r = split_bill(t, p, tip)
-                    g = Fraction(t) * (100 + tip) / 100
-                    exp = int((g * 2 + 1) // 2)
-                    self.assertEqual(sum(r), exp)
-                    self.assertTrue(all(type(x) is int for x in r))
-                    self.assertLessEqual(max(r) - min(r), 1)
-                    self.assertEqual(r, sorted(r, reverse=True))
+        # 1 * 1.05 = 1.05 -> 1 ; 10*1.05=10.5 -> 11 (half-up)
+        self.assertEqual(split_bill(10, 1, 5), [11])
+        r = split_bill(99999, 7, 13)
+        self.assertEqual(sum(r), 112999)  # 99999*1.13=112998.87
+        self.assertLessEqual(max(r) - min(r), 1)
 
     def test_reject(self):
-        bad = [(-1, 1, 0), (1, 0, 0), (1, 1, -1), (1, 1, 101),
-               (4500.0, 1, 0), (1, 2.0, 0), (1, 1, 5.0), ('3', 1, 0),
-               (True, 1, 0), (1, True, 0), (1, 1, True), (None, 1, 0)]
+        bad = [(-1, 1, 0), (10, 0, 0), (10, 1, -1), (10, 1, 101),
+               (10.0, 1, 0), (10, 1.0, 0), (10, 1, 5.0), ("10", 1, 0),
+               (True, 1, 0), (10, True, 0), (10, 1, True), (None, 1, 0)]
         for a in bad:
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError, msg=str(a)):
                 split_bill(*a)
 
 

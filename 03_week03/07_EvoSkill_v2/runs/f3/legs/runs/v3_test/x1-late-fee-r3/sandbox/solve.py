@@ -1,12 +1,17 @@
-"""คิดเงิน BaanKafe — template: คัดลอกเป็น solve.py แล้วแก้เฉพาะฟังก์ชันหลัก"""
+"""แม่แบบ solve.py — แก้เฉพาะฟังก์ชันหลัก (ชื่อ/พารามิเตอร์ตามโจทย์)"""
 import json
 import sys
 from fractions import Fraction
 
 
 def half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ) — ใช้กับยอดที่ลูกค้าจ่าย/ค่าบริการ"""
     return int((Fraction(x) * 2 + 1) // 2)
+
+
+def round_down(x):
+    """ปัดลง — ใช้กับเงินที่ร้านจ่ายออก เช่น cashback"""
+    return int(Fraction(x) // 1)
 
 
 def need_int(value, name, low=None, high=None):
@@ -23,11 +28,20 @@ def need_bool(value, name):
     return value
 
 
+def need_choice(value, name, choices):
+    if type(value) is not str or value not in choices:
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+    return value
+
+
 def late_fee(amount, days_late):
+    # validate ก่อนคำนวณ
     need_int(amount, "amount", 0)
     need_int(days_late, "days_late", 0, 365)
+    # นโยบาย: ช้าไม่เกิน 3 วัน ไม่คิดค่าปรับ (days_late <= 3 -> 0)
     if days_late <= 3:
         return 0
+    # 0.75% ต่อวัน นับทุกวันที่ช้า (รวม 3 วันแรก) เพดาน 15% ของยอด; ปัดครั้งเดียวท้ายสุด (half-up)
     rate = min(Fraction(75, 10000) * days_late, Fraction(15, 100))
     return half_up(Fraction(amount) * rate)
 
