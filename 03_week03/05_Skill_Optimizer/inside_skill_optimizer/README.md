@@ -29,7 +29,7 @@ skill-optimizer/
 └── examples/web-fixer/    ชุดโจทย์ตัวอย่าง (ใช้ในบท 03 · มีเฉพาะใน 00_resource)
 ```
 
-**ได้โฟลเดอร์นี้มาอย่างไร:** อยู่ใน repo นี้แล้ว · LAB 0 ติดตั้งเป็น global skill ของบัญชี yolo ใน container (`/root/ai-accounts/.Claude/shared/skills/skill-optimizer`) แล้ว Claude เปิดอ่าน `SKILL.md` จากตรงนั้น
+**ได้โฟลเดอร์นี้มาอย่างไร:** ฉบับของผู้สอนอยู่ใน repo นี้แล้ว · อยากสร้างเอง ใช้พรอมต์ใน [LAB 0 ขั้น 0.1](../README.md#ขั้น-01--สร้างโฟลเดอร์-skill-optimizer) · LAB 0 ขั้น 0.2 ติดตั้งเป็น global skill ของบัญชี yolo ใน container (`/root/ai-accounts/.Claude/shared/skills/skill-optimizer`) แล้ว Claude เปิดอ่าน `SKILL.md` จากตรงนั้น
 
 ---
 
