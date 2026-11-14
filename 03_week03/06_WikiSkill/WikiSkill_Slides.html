@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WikiSkill · Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#12305e;--teal:#0f8f8c;--teal-soft:#e2f5f4;--orange:#e87f1c;--orange-soft:#fff1e3;--red:#c92a2a;--red-soft:#fdecec;
+--green:#15803d;--green-soft:#e7f7ec;--ink:#1c2533;--muted:#5b6b80;--line:#d8e0ec;--bg:#f5f7fb;--card:#fff;--code:#0e1a2b;
+--font:'IBM Plex Sans Thai','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif;--mono:'JetBrains Mono','Cascadia Code',Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#070d18;overflow:hidden;font-family:var(--font);color:var(--ink)}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1600px;height:900px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--bg);padding:40px 72px 44px;display:none;flex-direction:column;overflow:hidden}
+.slide.active,.slide.measure{display:flex}
+.slide.measure{visibility:hidden}
+.slide.active{animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hd{flex:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--line)}
+.kicker{font-size:17px;font-weight:600;color:var(--teal);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kicker code{font-size:.9em;background:none;padding:0;color:inherit}
+h2{font-size:36px;line-height:1.22;margin:3px 0 0;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:14px}
+h2 .tt{min-width:0}
+h2 code{font-size:.88em}
+.tag{flex:none;font-size:15px;font-weight:600;background:var(--orange-soft);color:#9a4d06;border:1px solid #f6d3ad;border-radius:999px;padding:3px 13px;white-space:nowrap}
+.pg{flex:none;margin-left:auto;font-size:16px;font-weight:500;color:var(--muted);white-space:nowrap}
+.slide .no{display:none;position:absolute;right:26px;bottom:12px;font-size:13px;color:#8796ab}
+.slide .dk{position:absolute;left:72px;bottom:12px;font-size:13px;color:#8796ab}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:.5em;font-size:calc(23px*var(--fs,1));overflow:hidden}
+.body.scroll{overflow:auto}
+.body>*{flex:none;margin:0}
+p{line-height:1.55}
+ul{padding-left:1.3em;margin:0}
+li{line-height:1.5;margin:.22em 0}
+b,strong{color:var(--navy)}
+a{color:#1d5fd0;text-decoration:none;border-bottom:1px solid rgba(29,95,208,.3)}
+.xref{color:var(--navy);font-weight:600}
+code{font-family:var(--mono);font-size:.84em;background:#e6edf7;color:#0b3b7a;padding:.08em .38em;border-radius:5px;overflow-wrap:break-word}
+pre,code{font-variant-ligatures:none}
+h3.lead{font-size:1.14em;color:var(--navy);font-weight:700;line-height:1.35;padding-left:.6em;border-left:5px solid var(--teal)}
+h3.lead span{font-weight:400;color:var(--muted);font-size:.86em}
+h3.lead span b{color:var(--muted)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.9em;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:.4em .62em;text-align:left;vertical-align:top;line-height:1.42;border-bottom:1px solid var(--line)}
+th{background:var(--navy);color:#fff;font-weight:600}
+th code{background:rgba(255,255,255,.16);color:#fff}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even) td{background:#f6f9fd}
+td:first-child{font-weight:500}
+td.yes{color:#0f5132}td.no{color:#9b1c1c}
+table.c6,table.c7{font-size:.84em}
+.v{font-weight:700;font-size:.92em;padding:.05em .5em;border-radius:6px;white-space:nowrap}
+.v.accept{background:var(--green-soft);color:var(--green)}
+.v.reject{background:var(--red-soft);color:var(--red)}
+.note{border-left:6px solid var(--teal);background:var(--teal-soft);padding:.55em .9em;border-radius:8px;line-height:1.5}
+.note>*{margin:0}
+.note>*+*{margin-top:.4em}
+.note.ok{border-color:var(--green);background:var(--green-soft)}
+.note.warn{border-color:var(--orange);background:var(--orange-soft)}
+.note.bad{border-color:var(--red);background:var(--red-soft)}
+.note.result{border-color:var(--navy);background:#e9eff8}
+.note.eye{border-color:var(--orange);background:var(--orange-soft);display:flex;gap:.8em;align-items:baseline}
+.note.eye>*+*{margin-top:0}
+.note .lbl{flex:none;font-size:.72em;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--orange);border-radius:6px;padding:.15em .6em}
+pre.code{position:relative;background:var(--code);color:#dbe7ff;font-family:var(--mono);font-size:.74em;line-height:1.5;padding:.85em 1.1em;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4}
+pre.code.term{border-left:6px solid var(--teal)}
+pre .copy{position:absolute;top:8px;right:8px;font-family:var(--font);font-size:14px;background:#26406a;color:#fff;border:0;border-radius:7px;padding:5px 12px;cursor:pointer;opacity:.85}
+pre .copy:hover,.copy.big:hover{background:var(--teal);opacity:1}
+pre .err{color:#ff9b9b}pre .ok{color:#86e3ae}pre .dim{color:#8ea3c4}pre .cmd{color:#ffd28a}
+.tk-c{color:#7f93b5;font-style:italic}.tk-s{color:#a5e8b5}.tk-k{color:#ffb86b}.tk-n{color:#8fd3ff}
+.fig{flex:1 1 0;min-height:var(--figmin,260px);display:flex;align-items:center;justify-content:center}
+.fig img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 6px 22px rgba(18,48,94,.16);background:#fff;cursor:zoom-in}
+.fig.wide{flex:none;min-height:0;display:block}
+.fig.wide img{width:100%;max-height:none}
+.body>.fig.wide:only-child{margin:auto 0}
+.figrow{flex:1 1 0;min-height:0;display:flex;gap:24px;align-items:center}
+.figrow .fig{height:100%}
+.cols{display:flex;gap:26px;align-items:flex-start}
+.cols .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5em}
+.cols .col>*{margin:0}
+.cmp pre.code{font-size:.72em}
+.fails{display:flex;flex-direction:column;gap:.45em}
+.fails .cardx{padding:.4em .8em}
+.slide.mid .body{justify-content:center;gap:.8em}
+.cardx h4 code{font-size:.9em}
+.fails .cardx p{font-size:.8em;font-family:var(--mono);line-height:1.45}
+/* พรอมต์ */
+.pbar{display:flex;align-items:center;gap:16px;background:var(--orange-soft);border:1px solid #f6d3ad;border-radius:10px;padding:.45em .8em;font-size:.86em}
+.pbar .how{flex:1;min-width:0}
+.pbar .plabel{flex:none;color:var(--muted);font-size:.9em}
+.copy.big{flex:none;font-family:var(--font);font-size:19px;font-weight:700;background:var(--orange);color:#fff;border:0;border-radius:9px;padding:9px 20px;cursor:pointer;box-shadow:0 3px 10px rgba(232,127,28,.35)}
+.copy.done{background:var(--green)!important}
+pre.code.prompt{font-size:.76em;line-height:1.52;border:2px solid #f08a24}
+.full{display:none}
+/* checklist */
+.checks{display:flex;flex-direction:column;gap:.45em}
+.chk{display:flex;gap:.7em;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.5em .8em;cursor:pointer;line-height:1.45}
+.chk input{width:1.15em;height:1.15em;margin-top:.2em;flex:none;accent-color:var(--teal)}
+.chk:has(input:checked){background:var(--green-soft);border-color:#a7dcb8}
+/* ภาพ + ขั้นตอน */
+.fitbox{overflow:hidden}
+.ex{flex:1 1 0;min-height:0;display:flex;gap:30px;align-items:stretch}
+.ex .fig{flex:1.5 1 0;min-height:0;min-width:0}
+.ex .side{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.5em}
+.ex .side>*{flex:none;margin:0}
+.stp{display:flex;gap:.7em;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:.5em .8em;line-height:1.45;box-shadow:0 2px 6px rgba(18,48,94,.05)}
+.stp .n{flex:none;width:1.75em;height:1.75em;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.88em;margin-top:.05em}
+.cap{color:var(--muted);line-height:1.5;text-align:center}
+.cap b{color:var(--navy)}
+/* ตัวเลขใหญ่ */
+.tiles{display:flex;gap:20px;align-items:stretch}
+.tile{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-top:7px solid var(--teal);border-radius:14px;padding:.6em .85em .7em;box-shadow:0 3px 10px rgba(18,48,94,.06)}
+.tile .k{font-size:.74em;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.tile .num{font-size:2.05em;font-weight:700;color:var(--navy);line-height:1.2;white-space:nowrap}
+.tile .num small{font-size:.5em;font-weight:600;color:var(--muted)}
+.tile .s{font-size:.8em;color:var(--muted);line-height:1.4}
+.tile.ok{border-top-color:var(--green)}.tile.ok .num{color:var(--green)}
+.tile.bad{border-top-color:var(--red)}.tile.bad .num{color:var(--red)}
+.tile.warn{border-top-color:var(--orange)}
+/* การ์ด */
+.cards{display:grid;gap:18px;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+.cardx{background:#fff;border:1px solid var(--line);border-left:7px solid var(--teal);border-radius:14px;padding:.65em .9em;box-shadow:0 3px 10px rgba(18,48,94,.05);display:flex;flex-direction:column;gap:.3em}
+.cardx>*{margin:0}
+.cardx h4{font-size:1.02em;color:var(--navy);line-height:1.35}
+.cardx p,.cardx li{font-size:.88em;line-height:1.48;color:#2b3648}
+.cardx .n{display:inline-flex;width:1.6em;height:1.6em;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font-size:.85em;margin-right:.45em}
+.cardx.ok{border-left-color:var(--green)}.cardx.bad{border-left-color:var(--red)}.cardx.warn{border-left-color:var(--orange)}.cardx.navy{border-left-color:var(--navy)}
+.cardx .chips{display:flex;flex-direction:column;gap:.3em}
+.cardx .chips div{font-size:.86em;line-height:1.45}
+/* สมการ (KaTeX) */
+.katex{font-size:1.1em;font-family:KaTeX_Main,'IBM Plex Sans Thai','Leelawadee UI','Times New Roman',serif}
+.katex-display{margin:0}
+.eqbox{background:#fff;border:2px solid var(--line);border-radius:18px;padding:.3em .6em;text-align:center;box-shadow:0 4px 14px rgba(18,48,94,.06);font-size:2.2em;color:var(--ink);display:flex;flex-direction:column;gap:.12em}
+.eqbox .row+.row{border-top:1px dashed var(--line);padding-top:.12em}
+.eqbox .sub{font-size:.36em;color:var(--muted);line-height:1.4;padding-bottom:.3em}
+.eqlead{color:var(--muted);font-size:.95em;line-height:1.45}
+.parts{display:grid;gap:16px;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))}
+.part{background:#fff;border:1px solid var(--line);border-top:9px solid var(--c);border-radius:14px;padding:.55em .8em .65em;display:flex;flex-direction:column;gap:.22em;box-shadow:0 3px 10px rgba(18,48,94,.05)}
+.part>*{margin:0}
+.part .role{font-size:.64em;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.part .top{display:flex;align-items:center;gap:.5em;min-height:2.3em}
+.part .n{flex:none;display:inline-flex;width:1.7em;height:1.7em;border-radius:50%;background:var(--c);color:#fff;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.part .sym{font-size:1.3em;color:var(--c)}
+.part h4{font-size:1em;color:var(--navy);line-height:1.3}
+.part p{font-size:.86em;line-height:1.45;color:#2b3648}
+.part .lab{align-self:flex-start;font-family:var(--mono);font-size:.74em;color:#0b6b69;background:var(--teal-soft);border-radius:6px;padding:.12em .5em;margin-top:.15em}
+/* เทียบ 2 ฝั่ง */
+.vs{display:flex;gap:26px;align-items:stretch}
+.vs .sidebox{flex:1;min-width:0;border-radius:16px;padding:.8em 1em;border:2px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:.4em}
+.vs .sidebox>*{margin:0}
+.vs .bad{border-color:#f0b4b4;background:#fff8f8}.vs .good{border-color:#a7dcb8;background:#f5fcf7}
+.vs .hd2{font-size:.8em;font-weight:700;letter-spacing:.03em}
+.vs .bad .hd2{color:var(--red)}.vs .good .hd2{color:var(--green)}
+.vs .bigv{font-family:var(--mono);font-size:2.6em;font-weight:700;line-height:1.15}
+.vs .bad .bigv{color:var(--red)}.vs .good .bigv{color:var(--green)}
+.vs .calc{font-family:var(--mono);font-size:.95em;color:#2b3648}
+.callbox{background:var(--code);color:#dbe7ff;font-family:var(--mono);border-radius:12px;padding:.6em 1em;font-size:1.05em;text-align:center}
+.formula{background:#fff;border:2px solid var(--navy);border-radius:16px;padding:.7em 1em;text-align:center;font-size:1.25em;font-weight:700;color:var(--navy);line-height:1.5}
+.bigq{font-size:1.9em;font-weight:700;color:var(--navy);line-height:1.35;margin:auto 0 .2em!important}
+.bigq em{font-style:normal;color:var(--orange)}
+.bigsub{font-size:1.05em;color:var(--muted);line-height:1.6;margin-bottom:auto!important}
+/* แท่ง */
+.bars{display:flex;flex-direction:column;gap:.5em}
+.bar{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) 7.5em;gap:18px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:.45em .85em}
+.bar .lb{line-height:1.4}
+.bar .lb small{display:block;color:var(--muted);font-size:.8em}
+.bar .tr{height:1.15em;background:#e7edf5;border-radius:999px;overflow:hidden}
+.bar .fl{height:100%;border-radius:999px;background:var(--green);min-width:6px}
+.bar .fl.mid{background:var(--orange)}.bar .fl.low{background:var(--red)}
+.bar .vl{font-family:var(--mono);font-weight:700;color:var(--navy);text-align:right;font-size:.92em}
+/* ตารางสี 18 Trial */
+.heat{display:grid;grid-template-columns:auto repeat(6,1fr);gap:8px;align-items:stretch}
+.heat .hh{font-family:var(--mono);font-size:.74em;font-weight:600;color:var(--navy);text-align:center;padding:.2em 0}
+.heat .hr{font-size:.82em;color:var(--muted);display:flex;align-items:center;padding-right:.4em;white-space:nowrap}
+.heat .hc{border-radius:10px;text-align:center;font-family:var(--mono);font-weight:700;font-size:1.15em;padding:.55em 0;color:#12305e}
+.heat .grp{grid-column:span 4;text-align:center;font-size:.8em;font-weight:700;color:#fff;background:var(--teal);border-radius:8px;padding:.15em}
+.heat .grp.val{grid-column:span 2;background:var(--orange)}
+/* Input -> LAB -> Output */
+.ff{display:flex;gap:22px;align-items:center}
+.ffcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:.42em}
+.ffh{font-size:.78em;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.file{background:#fff;border:1px solid var(--line);border-left:7px solid var(--teal);border-radius:10px;padding:.42em .7em;font-size:.9em;line-height:1.42}
+.ffcol.out .file{border-left-color:var(--orange)}
+.ffmid{flex:none;width:8em;text-align:center;background:var(--navy);color:#fff;border-radius:18px;padding:1.1em .5em;font-weight:700;font-size:1.1em;line-height:1.3;position:relative}
+.ffmid small{display:block;font-weight:500;font-size:.62em;color:#b9d2f5;margin-top:.3em}
+.ffar{flex:none;font-size:2em;color:var(--orange);font-weight:700}
+/* กลุ่มข้อตรวจ */
+.ck{display:flex;gap:.55em;align-items:baseline;font-size:.86em;line-height:1.45}
+.ck code{flex:none}
+/* แผนของบท */
+.road{display:flex;gap:26px;align-items:stretch}
+.road .partbox{flex:1;border-radius:18px;padding:.8em 1em 1em;background:#fff;border:2px solid var(--line);display:flex;flex-direction:column;gap:.55em}
+.road .partbox>*{margin:0}
+.road .ph{font-size:1.25em;font-weight:700;color:var(--navy)}
+.road .ph small{font-size:.6em;font-weight:600;color:var(--teal);margin-left:.6em}
+.road .secbox{border-left:7px solid var(--teal);background:var(--bg);border-radius:10px;padding:.5em .8em}
+.road .secbox b{display:block;font-size:1.02em}
+.road .secbox span{font-size:.86em;color:#2b3648;line-height:1.45;display:block}
+.road .partbox.lab .secbox{border-left-color:var(--orange)}
+/* ปก และหน้าคั่น */
+.cover,.divider{padding:0;background:linear-gradient(135deg,#0d2447 0%,#163f7a 62%,#0f8f8c 140%);background-size:cover;background-position:center;color:#fff}
+.cover .shade,.divider.photo .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,13,26,.96) 0%,rgba(6,13,26,.86) 46%,rgba(6,13,26,.25) 80%)}
+.inner{position:relative;height:100%;padding:90px 96px 70px;display:flex;flex-direction:column;max-width:1120px;font-size:25px}
+.divider:not(.photo) .inner{max-width:1400px}
+.inner .small{font-size:21px;font-weight:600;color:#8fe0dc;letter-spacing:.03em;min-height:28px}
+.inner .big{font-size:120px;font-weight:700;line-height:1.05;color:#fff;margin-top:8px}
+.inner h1{font-size:54px;line-height:1.2;margin:10px 0 0;color:#fff}
+.cover .inner h1{font-size:68px;margin-top:120px}
+.inner .sub{margin-top:26px;color:#d6e4fb;line-height:1.55;display:flex;flex-direction:column;gap:.55em}
+.cover .inner .sub{font-size:34px;color:#cfe0ff}
+.inner .sub p,.inner .sub ul{margin:0}
+.inner b{color:#fff}
+.inner code{background:rgba(255,255,255,.14);color:#fff}
+.inner a{color:#9fd8ff;border-bottom-color:rgba(159,216,255,.4)}
+.inner .xref{color:#fff}
+.inner .hint{margin-top:auto;font-size:19px;color:#9fb6dd}
+.inner .v.accept{background:rgba(134,227,174,.2);color:#9af0bf}.inner .v.reject{background:rgba(255,155,155,.2);color:#ffb3b3}
+.imgnote{position:absolute;right:22px;bottom:14px;font-size:13px;color:#fff;background:rgba(0,0,0,.45);padding:2px 10px;border-radius:7px}
+.facts{display:flex;gap:18px;margin-top:10px}
+.facts div:last-child{flex:2}
+.facts div{flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:16px 20px;font-size:26px;font-weight:600;color:#fff}
+.facts .fl{display:block;font-size:16px;font-weight:500;color:#9fd8ff;margin-bottom:4px}
+.kbd{display:inline-block;border:1px solid #9fb6dd;border-bottom-width:3px;border-radius:7px;padding:0 9px;font-family:var(--mono);font-size:.8em;margin:0 2px;background:rgba(255,255,255,.06)}
+.body .kbd{border-color:#9aa9bf;background:#fff}
+/* ส่วนควบคุม */
+#bar{position:fixed;left:0;bottom:0;height:4px;background:var(--orange);transition:width .25s;z-index:5}
+#hud{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;align-items:center;z-index:6;font-family:var(--font);opacity:.35;transition:opacity .2s}
+#hud:hover{opacity:1}
+#hud button{background:rgba(18,48,94,.85);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:9px;height:36px;min-width:38px;font-size:16px;cursor:pointer;padding:0 10px}
+#hud button:hover{background:var(--teal)}
+#count{color:#fff;background:rgba(18,48,94,.85);border-radius:9px;padding:7px 10px;font-size:15px;min-width:80px;text-align:center}
+body.ov #stage{display:none}
+#ov{display:none;position:fixed;inset:0;overflow:auto;padding:26px 32px 60px;z-index:10;background:#0b1424;color:#dbe7ff}
+body.ov #ov{display:block}
+#ov h4{margin:22px 0 10px;font-size:19px;color:#8fe0dc;font-weight:600;border-bottom:1px solid #22324d;padding-bottom:6px}
+#ov .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+#ov .th{background:#16233a;border:2px solid transparent;border-radius:9px;padding:9px 12px;cursor:pointer;font-size:15px;line-height:1.4}
+#ov .th:hover,#ov .th.cur{border-color:var(--orange)}
+#ov .th span{color:var(--orange);font-weight:700;margin-right:6px}
+#lb{display:none;position:fixed;inset:0;z-index:20;background:rgba(4,8,16,.95);overflow:auto;padding:18px;text-align:center;cursor:zoom-out}
+#lb.on{display:block}
+#lb img{width:min(100%,2000px);height:auto;border-radius:8px;background:#fff}
+@media print{html,body{overflow:visible;height:auto;background:#fff}#hud,#bar,#ov,#lb,.copy{display:none!important}.slide .no{display:block}
+#stage{position:static;display:block}#deck{transform:none!important;height:auto}
+.slide{display:flex!important;position:relative;width:1600px;height:900px;page-break-after:always;break-after:page;animation:none}}
+@page{size:1600px 900px;margin:0}
+</style>
+</head>
+<body>
+<!-- สร้างจาก README.md ด้วย tools/build_slides.py · ห้ามแก้ไฟล์นี้ด้วยมือ ให้แก้ README.md แล้วสร้างใหม่ -->
+<div id="stage"><div id="deck">
+<section class="slide cover" style="background-image:url(img/g01-cover.jpg)" data-title="ปก" data-group="เริ่มต้น"><div class="shade"></div><div class="inner"><div class="small">03_week03 · บทที่ 06</div><h1>WikiSkill</h1><div class="sub">ให้ AI จดสมุดความรู้ แล้วเขียนสกิลจากสมุด</div><div class="hint">กด <span class="kbd">→</span> หรือ <span class="kbd">Space</span> เพื่อไปต่อ · <span class="kbd">O</span> สารบัญ · <span class="kbd">F</span> เต็มจอ · คลิกภาพเพื่อขยาย</div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="ทั้งเรื่องในภาพเดียว: ไม่มีคนเขียนสกิล ได้ 97.9% · คนตอบคำถาม 4 ข้อ ได้ 100.0%" data-group="เริ่มต้น" data-max="1.10"><header class="hd"><div class="kicker">ภาพรวมของบท</div><h2><span class="tt">ทั้งเรื่องในภาพเดียว: ไม่มีคนเขียนสกิล ได้ 97.9% · คนตอบคำถาม 4 ข้อ ได้ 100.0%</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r03-all.png" alt="ทั้งเรื่องในภาพเดียว: ไม่มีคนเขียนสกิล ได้ 97.9% · คนตอบคำถาม 4 ข้อ ได้ 100.0%" width="1600" height="760"></div><p class="cap">ผลจริงจาก 279 Trial · <code>w1</code> = สกิลที่ WikiSkill สร้างเองจากชุดสกิลว่าง · <code>w1q</code> = <code>w1</code> + นโยบายธุรกิจที่ทีมตอบ · ที่มาของแต่ละแท่งอยู่ในภาค LAB</p></div></section>
+<section class="slide " data-title="WikiSkill ใน 4 ขั้น: ทำโจทย์ → จดลงสมุดความรู้ → เขียนสกิลจากสมุด → วัดแล้วตัดสิน" data-group="เริ่มต้น" data-max="1.15"><header class="hd"><div class="kicker">ภาพรวมของบท</div><h2><span class="tt">WikiSkill ใน 4 ขั้น: ทำโจทย์ → จดลงสมุดความรู้ → เขียนสกิลจากสมุด → วัดแล้วตัดสิน</span></h2></header><div class="body"><div class="fig wide"><img src="img/d00-story.png" alt="WikiSkill ใน 4 ขั้น: ทำโจทย์ → จดลงสมุดความรู้ → เขียนสกิลจากสมุด → วัดแล้วตัดสิน" width="1600" height="480"></div><p class="bigsub" style="text-align:center">ต่างจากบท 05 ที่จุดเดียว: <b>ไม่มีคนเขียนสกิล</b> ระบบเริ่มจากชุดสกิลว่างและสมุดว่าง</p><p class="cap">สกิลที่ไม่ผ่านถูกทิ้ง แต่สิ่งที่จดลงสมุดความรู้ยังอยู่ · ทำซ้ำจนคะแนน Validation เต็ม หรือครบจำนวนรอบ</p></div></section>
+<section class="slide mid" data-title="บทนี้แบ่งเป็น 2 ภาค 4 ส่วน" data-group="เริ่มต้น" data-max="1.40"><header class="hd"><div class="kicker">ภาพรวมของบท</div><h2><span class="tt">บทนี้แบ่งเป็น 2 ภาค 4 ส่วน</span></h2></header><div class="body"><div class="road"><div class="partbox "><div class="ph">ภาคทฤษฎี<small>อ่าน ไม่ต้องรันอะไร</small></div><div class="secbox"><b>1 · โจทย์ (ฉบับย่อ)</b><span>โจทย์เดิมของบท 05 คืออะไร · บทนี้เปลี่ยนอะไร</span></div><div class="secbox"><b>2 · WikiSkill</b><span>WikiSkill คืออะไร · ทำงานอย่างไร · นำมาใช้กับโจทย์นี้อย่างไร</span></div></div><div class="partbox lab"><div class="ph">ภาค LAB<small>คัดลอกพรอมต์ แล้วรัน</small></div><div class="secbox"><b>3 · ลงมือทำ</b><span>พรอมต์ Copy &amp; Paste 6 ขั้น (LAB 0–5) พร้อมผลจริงของแต่ละ LAB</span></div><div class="secbox"><b>4 · สรุปและแบบฝึกหัด</b><span>เทียบกับ Skill Optimizer · บทเรียนจากผลจริง · โจทย์ให้ลองต่อ</span></div></div></div><div class="note info">ทฤษฎีจากงานวิจัยต้นทาง (WikiSkill) อ่านเพิ่มได้ที่ <a href="01_theory/README.md" target="_blank" rel="noopener"><code>01_theory/README.md</code></a> · รายละเอียดเต็มของทุกหัวข้ออยู่ใน <a href="README.md" target="_blank" rel="noopener"><code>README.md</code></a></div></div></section>
+<section class="slide mid" data-title="วิธีใช้สไลด์นี้" data-group="เริ่มต้น" data-max="1.40"><header class="hd"><div class="kicker">ภาพรวมของบท</div><h2><span class="tt">วิธีใช้สไลด์นี้</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4>ไปหน้าถัดไป / ก่อนหน้า</h4><p><span class="kbd">→</span> <span class="kbd">Space</span> / <span class="kbd">←</span> หรือปุ่มมุมขวาล่าง</p></div><div class="cardx "><h4>สารบัญทุกหน้า</h4><p><span class="kbd">O</span> แล้วคลิกหน้าที่ต้องการ · <span class="kbd">F</span> เต็มจอ</p></div><div class="cardx "><h4>ขยายภาพ</h4><p>คลิกที่ภาพ · คลิกอีกครั้งหรือ Esc เพื่อปิด</p></div><div class="cardx warn"><h4>คัดลอกพรอมต์ของ LAB</h4><p>ปุ่ม <b>คัดลอกพรอมต์ทั้งหมด</b> ให้ข้อความเดียวกับ <code>README.md</code> ตรงตัวอักษร แม้พรอมต์ถูกแบ่งแสดง 2 หน้า</p></div><div class="cardx warn"><h4>ตรวจผลหลังรัน</h4><p>สไลด์ <b>ตรวจผลของคุณ</b> ต่อจากพรอมต์ทุก LAB · ติ๊กได้ และจำค่าไว้ในเบราว์เซอร์นี้</p></div><div class="cardx "><h4>เปิดไฟล์จริง</h4><p>ลิงก์สีน้ำเงินเปิดไฟล์ในโฟลเดอร์ของบท · เปิดสไลด์จากโฟลเดอร์ <code>06_WikiSkill</code></p></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/s01-theory.jpg)" data-title="ภาคทฤษฎี · โจทย์ (ฉบับย่อ) และ WikiSkill" data-group="ภาคทฤษฎี"><div class="shade"></div><div class="inner"><div class="small"></div><div class="big">ภาคทฤษฎี</div><h1>โจทย์ (ฉบับย่อ) และ WikiSkill</h1><div class="sub"><p><b>ภาคนี้อ่านอย่างเดียว ไม่ต้องรันอะไร และไม่ใช้โทเคน</b></p><ul><li>ส่วนที่ 1 ทบทวนโจทย์ของบท 05 สั้น ๆ · ส่วนที่ 2 อธิบาย WikiSkill</li><li>ตัวเลขที่กำกับว่า <b>"ตัวอย่างจากผล LAB"</b> ยกมาจากการรันจริงใน <span class="xref">ภาค LAB</span> เพื่อประกอบคำอธิบายเท่านั้น</li></ul></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide divider" data-title="1 · โจทย์ (ฉบับย่อ)" data-group="ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)"><div class="shade"></div><div class="inner"><div class="small">ภาคทฤษฎี</div><div class="big">1</div><h1>โจทย์ (ฉบับย่อ)</h1><div class="sub"><p>โจทย์เดิมของบท 05 คืออะไร · บทนี้เปลี่ยนอะไร</p></div></div></section>
+<section class="slide " data-title="โจทย์เดิมของบท 05: Agent ไม่ได้รับความรู้แฝงของทีม แต่ตัวตรวจรู้ครบ" data-group="ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)</div><h2><span class="tt">โจทย์เดิมของบท 05: Agent ไม่ได้รับความรู้แฝงของทีม แต่ตัวตรวจรู้ครบ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/d01-problem.png" alt="โจทย์เดิมของบท 05: Agent ไม่ได้รับความรู้แฝงของทีม แต่ตัวตรวจรู้ครบ" width="1600" height="790"></div><p class="cap">บทนี้ใช้ <b>โจทย์ ตัวตรวจ และกติกาชุดเดียวกับบท 05</b> จึงทบทวนแค่ภาพเดียว · คำอธิบายเต็มอยู่ที่ <a href="../05_Skill_Optimizer/README.md#1--โจทย์และข้อกำหนดของร้าน" target="_blank" rel="noopener">บท 05 ส่วนที่ 1</a></p></div></section>
+<section class="slide " data-title="สิ่งที่บทนี้เปลี่ยนจากบท 05" data-group="ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)" data-max="1.25"><header class="hd"><div class="kicker">ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)</div><h2><span class="tt">สิ่งที่บทนี้เปลี่ยนจากบท 05</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n01-what-changed.jpg" alt="สิ่งที่บทนี้เปลี่ยนจากบท 05" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>สกิลรุ่นแรก: บท 05 คนเขียน (<code>v0</code>) · บทนี้ <b>ไม่มี</b> เริ่มจากชุดสกิลว่าง</span></div><div class="stp"><span class="n">2</span><span>ผู้หาสาเหตุและแก้สกิล: บท 05 คือ Claude Code ตามพรอมต์ของคน ทีละรุ่น · บทนี้ AI 2 บทบาท ทำเองทั้งวงรอบ</span></div><div class="stp"><span class="n">3</span><span>ความรู้แฝง: บท 05 คนเขียนลงสกิลและตอบคำถามของ Claude · บทนี้ต้อง <b>ค้นพบเอง</b> จาก Trace และข้อความของตัวตรวจ</span></div><div class="stp"><span class="n">4</span><span>ที่เก็บสิ่งที่เรียนรู้: <code>ISSUES.md</code> → สมุดความรู้ <code>wiki/</code></span></div><div class="stp"><span class="n">5</span><span>ชุดโจทย์เหมือนเดิม เพิ่ม <b>Test Set 3 ข้อ</b> · โมเดล จำนวนรอบ และตัวตรวจเหมือนบท 05 ทุกค่า ผลจึงเทียบกันได้</span></div></div></div></div></section>
+<section class="slide mid" data-title="Test Set 3 ข้อ: โจทย์ที่ไม่เคยถูกใช้ปรับสกิลทั้งสองวิธี" data-group="ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)" data-max="1.40"><header class="hd"><div class="kicker">ภาคทฤษฎี · 1 · โจทย์ (ฉบับย่อ)</div><h2><span class="tt">Test Set 3 ข้อ: โจทย์ที่ไม่เคยถูกใช้ปรับสกิลทั้งสองวิธี</span><span class="tag">suite/suite.json</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4><code>x1-late-fee</code></h4><p><code>late_fee(amount, days_late)</code></p><p>ค่าปรับจ่ายช้า วันละ 0.75% · 3 วันแรกไม่คิด · สูงสุด 15%</p></div><div class="cardx "><h4><code>x2-refund</code></h4><p><code>refund(paid, used_percent, restock)</code></p><p>คืนเงินคอร์สตามส่วนที่ยังไม่เรียน · เรียนเกิน 80% ไม่คืน · หักค่าดำเนินการ 12.5%</p></div><div class="cardx "><h4><code>x3-bulk-price</code></h4><p><code>bulk_price(unit_price, qty, coupon)</code></p><p>ราคาขายส่ง ลด 3.5% หรือ 7.5% ตามจำนวน · คูปองลดอีก 2.5% · VAT 7%</p></div></div><div class="note info">Test Set ตรวจเฉพาะมาตรฐานการเขียนโค้ด 5 ข้อ (ไม่มีนโยบายธุรกิจ) · โจทย์เต็ม: <a href="suite/suite.json" target="_blank" rel="noopener"><code>suite/suite.json</code></a></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/s02-wikiskill.jpg)" data-title="2 · WikiSkill" data-group="ภาคทฤษฎี · 2 · WikiSkill"><div class="shade"></div><div class="inner"><div class="small">ภาคทฤษฎี</div><div class="big">2</div><h1>WikiSkill</h1><div class="sub"><p>WikiSkill คืออะไร · ทำงานอย่างไร · นำมาใช้กับโจทย์นี้อย่างไร</p><p><b>สกิลเป็นเพียงฉบับย่อของความรู้ ณ ขณะหนึ่ง</b> เหตุผล หลักฐาน และสิ่งที่เคยลองแล้วไม่ได้ผล ต้องมีที่อยู่ของตัวเอง</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="ปัญหา: ความรู้ของแต่ละรอบหายไป" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.25"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">ปัญหา: ความรู้ของแต่ละรอบหายไป</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="01_theory/img/g02-forget-vs-remember.png" alt="ปัญหา: ความรู้ของแต่ละรอบหายไป" width="1600" height="900"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>วิธีปรับสกิลอัตโนมัติทุกวิธีทำวงรอบเดียวกัน: Agent ทำโจทย์ → วิเคราะห์ Trace → เสนอแก้สกิล → วัดแล้วตัดสิน</span></div><div class="stp"><span class="n">2</span><span>สิ่งที่วิเคราะห์ได้ในแต่ละรอบถูกใช้ครั้งเดียวตอนแก้สกิลของรอบนั้น แล้วหายไป</span></div><div class="stp"><span class="n">3</span><span><b>ลืม</b>: รอบ 3 เสนอวิธีที่รอบ 1 ลองแล้วถูกปฏิเสธ</span></div><div class="stp"><span class="n">4</span><span><b>หลักฐานไม่สะสม</b>: ปัญหาที่พบรอบละ 1 Trace ถูกมองว่าบังเอิญทุกรอบ</span></div><div class="stp"><span class="n">5</span><span><b>บริบทไม่พอ</b>: Trace ของทุกรอบรวมกันยาวเกินกว่าจะอ่านใหม่ทุกครั้ง</span></div></div></div></div></section>
+<section class="slide " data-title="แนวคิด: มีสมุดความรู้คั่นกลาง" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.25"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">แนวคิด: มีสมุดความรู้คั่นกลาง</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="01_theory/img/g01-three-layers.png" alt="แนวคิด: มีสมุดความรู้คั่นกลาง" width="1600" height="900"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>Trace</b> ตอบว่า <b>เกิดอะไรขึ้น</b> ในงานนี้ · ใบบันทึกหน้างานทุกใบ · ผู้ใช้: ผู้วิเคราะห์</span></div><div class="stp"><span class="n">2</span><span><b>Wiki</b> ตอบว่า <b>ทำไม</b> จึงเกิด และเคยลองแก้อย่างไร · สมุดความรู้ของร้าน · ผู้ใช้: ผู้เขียนสกิล</span></div><div class="stp"><span class="n">3</span><span><b>สกิล</b> ตอบว่า <b>ต้องทำอย่างไร</b> ในงานถัดไป · คู่มือพนักงาน 1 ใบ · ผู้ใช้: Agent ที่ทำงาน</span></div><div class="stp"><span class="n">4</span><span>สกิลเป็นเพียงฉบับย่อที่ใช้งานได้ของความรู้ ณ ขณะหนึ่ง · เหตุผล หลักฐาน และสิ่งที่เคยลองแล้วไม่ได้ผล ต้องมีที่อยู่ของตัวเอง</span></div></div></div></div></section>
+<section class="slide " data-title="สถาปัตยกรรม 3 ชั้น: สกิลย้อนกลับได้ แต่ Wiki มีแต่เพิ่ม" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">สถาปัตยกรรม 3 ชั้น: สกิลย้อนกลับได้ แต่ Wiki มีแต่เพิ่ม</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="01_theory/img/t03-layers.png" alt="สถาปัตยกรรม 3 ชั้น: สกิลย้อนกลับได้ แต่ Wiki มีแต่เพิ่ม" width="1600" height="760"></div><p class="cap"><b>Raw Layer</b> <code>raw/</code> คงอยู่ · ไม่มีใครแก้ · <b>Wiki Layer</b> <code>wiki/</code> <b>คงอยู่</b> · มีแต่เพิ่ม · <b>Skills Layer</b> <code>skills/</code> <b>ย้อนกลับ</b> ไปชุดเดิม</p></div></section>
+<section class="slide " data-title="ส่วนประกอบ 4 ตัว และสิทธิ์ต่อแต่ละชั้น" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">ส่วนประกอบ 4 ตัว และสิทธิ์ต่อแต่ละชั้น</span></h2></header><div class="body"><div class="fig" style="--figmin:452px"><img src="01_theory/img/t04-roles.png" alt="ส่วนประกอบ 4 ตัว และสิทธิ์ต่อแต่ละชั้น" width="1600" height="710"></div><p class="cap">แต่ละส่วนประกอบอ่านและเขียนได้เฉพาะบางชั้น · Inference Agent อ่านได้แค่ <b>Skills Layer</b></p></div></section>
+<section class="slide " data-title="ใครทำอะไร: ส่วนประกอบ 4 ตัว" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.25"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">ใครทำอะไร: ส่วนประกอบ 4 ตัว</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="01_theory/img/g05-two-roles.png" alt="ใครทำอะไร: ส่วนประกอบ 4 ตัว" width="1600" height="900"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>Inference Agent</b>: ทำโจทย์ด้วยสกิลปัจจุบัน (ตัวที่ถูกปรับ) (เรียกโมเดล: 1 เซสชันต่อ 1 งาน)</span></div><div class="stp"><span class="n">2</span><span><b>Wiki Maintainer</b>: อ่าน Trace ที่สุ่มมา แล้วจดลง Wiki ว่าพลาดเพราะอะไร แก้อย่างไร (เรียกโมเดล: 1 ครั้งต่อรอบ)</span></div><div class="stp"><span class="n">3</span><span><b>Skill Proposer</b>: อ่านสารบัญของ Wiki เลือกเปิดหน้าและ Trace เอง แล้วเสนอสร้างหรือแก้สกิล <b>1 ตัว</b> (เรียกโมเดล: 1 เซสชันต่อรอบ)</span></div><div class="stp"><span class="n">4</span><span><b>Gating and Rollback</b>: โปรแกรมวัดสกิลที่เสนอด้วย Validation Set แล้วรับหรือย้อนกลับ (เรียกโมเดล: ไม่เรียก)</span></div></div></div></div></section>
+<section class="slide " data-title="หนึ่งรอบของ WikiSkill ด้วยตัวเลขจริง" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">หนึ่งรอบของ WikiSkill ด้วยตัวเลขจริง</span></h2></header><div class="body"><div class="fig" style="--figmin:394px"><img src="01_theory/img/t05-iteration.png" alt="หนึ่งรอบของ WikiSkill ด้วยตัวเลขจริง" width="1600" height="620"></div><p class="cap">ตัวเลขในภาพคือ <b>ตัวอย่างจากผล LAB</b> (รอบที่ 1 ของ LAB 1)</p></div></section>
+<section class="slide " data-title="Algorithm 1 ทีละบรรทัด" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">Algorithm 1 ทีละบรรทัด</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="01_theory/img/t06-algorithm.png" alt="Algorithm 1 ทีละบรรทัด" width="1600" height="1060"></div><p class="cap">เครื่องมือ <code>wikiskill</code> ที่สร้างใน LAB 0 ทำตามอัลกอริทึมนี้ทุกบรรทัด · คำสั่งของแต่ละบรรทัดอยู่ใน <a href="wikiskill_format.md" target="_blank" rel="noopener"><code>wikiskill_format.md</code></a></p></div></section>
+<section class="slide mid" data-title="กติกา 3 ข้อที่ทำให้ WikiSkill ต่างจากวงรอบทั่วไป" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.40"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">กติกา 3 ข้อที่ทำให้ WikiSkill ต่างจากวงรอบทั่วไป</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4><span class="n">1</span>จดความรู้ลง Wiki <b>ก่อน</b> เสนอแก้สกิล</h4><p>ความรู้ของรอบนี้เข้า Wiki ไปแล้ว ไม่ว่าข้อเสนอจะผ่านหรือไม่</p></div><div class="cardx "><h4><span class="n">2</span>สกิลที่ไม่ผ่านถูกย้อนกลับ แต่ <b>Wiki ไม่ย้อนกลับ</b></h4><p>สกิลที่แย่ลงเป็นอันตรายต่อการใช้งาน · "วิธีนี้ลองแล้วไม่ได้ผล" เป็นความรู้ชิ้นใหม่</p></div><div class="cardx "><h4><span class="n">3</span>Agent ที่ทำโจทย์ <b>ไม่เห็น Wiki</b></h4><p>ถ้า Agent ทำถูกเพราะ Wiki จะไม่มีอะไรบอกว่าสกิลยังขาดกฎข้อใด</p></div></div><div class="note info">เหตุผลของการออกแบบทุกจุด (10 ข้อ): <a href="01_theory/README.md#ขั้น-8--วิธีคิดในการออกแบบ" target="_blank" rel="noopener">ทฤษฎี ขั้น 8</a></div></div></section>
+<section class="slide " data-title="กติกาข้อ 1–2: สกิลย้อนกลับได้ แต่ความรู้ไม่หาย" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">กติกาข้อ 1–2: สกิลย้อนกลับได้ แต่ความรู้ไม่หาย</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="01_theory/img/g03-rollback.png" alt="กติกาข้อ 1–2: สกิลย้อนกลับได้ แต่ความรู้ไม่หาย" width="1600" height="900"></div><p class="cap">สกิลที่ไม่ผ่านถูกทิ้ง ใช้ของเดิม · Wiki จดไว้ว่าเคยลองแล้วไม่ผ่าน</p></div></section>
+<section class="slide " data-title="กติกาข้อ 3: คนทำงานอ่านแค่คู่มือ" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.10"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">กติกาข้อ 3: คนทำงานอ่านแค่คู่มือ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="01_theory/img/g04-agent-no-wiki.png" alt="กติกาข้อ 3: คนทำงานอ่านแค่คู่มือ" width="1600" height="900"></div><p class="cap">Agent อ่านเฉพาะสกิล · Wiki อยู่หลังร้าน Agent ไม่เห็น</p></div></section>
+<section class="slide " data-title="จากเปเปอร์ มาสู่โจทย์ของบทนี้" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.25"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">จากเปเปอร์ มาสู่โจทย์ของบทนี้</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n02-paper-vs-chapter.jpg" alt="จากเปเปอร์ มาสู่โจทย์ของบทนี้" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>เครื่องมือของบทนี้ทำตาม <b>Algorithm 1</b> ของเปเปอร์ทุกบรรทัด ต่างกันที่ขนาดของงานและวิธีรัน Agent</span></div><div class="stp"><span class="n">2</span><span>งาน: 5 Benchmark → เขียนฟังก์ชันคิดเงิน 9 ข้อของร้าน BaanKafe (Training 4 · Validation 2 · Test 3 · ข้อละ 3 รอบ)</span></div><div class="stp"><span class="n">3</span><span>จำนวนรอบ: 8 รอบ → ไม่เกิน 8 รอบ (หยุดเมื่อ Validation = 100%)</span></div><div class="stp"><span class="n">4</span><span>Wiki Maintainer และ Skill Proposer: prompt ภาษาไทยที่เขียนใหม่ใน LAB 0 · sonnet (effort high)</span></div><div class="stp"><span class="n">5</span><span>การรัน Trial: คำสั่ง <code>run</code> ของ <code>skill-optimizer</code> ที่สร้างในบท 05 · สกิลวางใน <code>./skills</code> ให้ Agent เปิดอ่านเอง</span></div></div></div></div></section>
+<section class="slide mid" data-title="จุดที่บทนี้เพิ่มจากเปเปอร์ คือคำถามหลักของภาค LAB" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.20"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">จุดที่บทนี้เพิ่มจากเปเปอร์ คือคำถามหลักของภาค LAB</span></h2></header><div class="body"><p class="bigq">นโยบายธุรกิจ มีใน Training 2 ข้อ<br>แต่ <em>ไม่มีใน Validation</em></p><p class="bigsub">ความรู้แฝงเฉพาะงาน (นโยบายธุรกิจ) · ในเปเปอร์: ไม่มี · ในบทนี้: มีใน Training 2 ข้อ แต่ <b>ไม่มีใน Validation</b><br>แถวสุดท้ายคือจุดที่บทนี้เพิ่มจากเปเปอร์ และเป็นคำถามหลักของภาค LAB</p></div></section>
+<section class="slide mid" data-title="คำถาม 5 ข้อที่ภาค LAB จะตอบ" data-group="ภาคทฤษฎี · 2 · WikiSkill" data-max="1.40"><header class="hd"><div class="kicker">ภาคทฤษฎี · 2 · WikiSkill</div><h2><span class="tt">คำถาม 5 ข้อที่ภาค LAB จะตอบ</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4><span class="n">1</span>LAB 1 · 2</h4><p>เริ่มจากไม่มีสกิล WikiSkill ค้นพบมาตรฐานการเขียนโค้ด 5 ข้อเองได้หรือไม่</p></div><div class="cardx "><h4><span class="n">2</span>LAB 2</h4><p>นโยบายธุรกิจ 4 ข้อที่ไม่มีใครบอก WikiSkill ค้นพบได้หรือไม่</p></div><div class="cardx "><h4><span class="n">3</span>LAB 3</h4><p>รันซ้ำแล้วได้ผลเดิมหรือไม่</p></div><div class="cardx "><h4><span class="n">4</span>LAB 4</h4><p>ถ้าตัด Wiki ออก ผลต่างกันอย่างไร</p></div><div class="cardx "><h4><span class="n">5</span>LAB 5</h4><p>ความรู้ที่ WikiSkill หาเองไม่ได้ เติมอย่างไร</p></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/s03-lab.jpg)" data-title="ภาค LAB · ลงมือทำ 6 ขั้น และสรุปผล" data-group="ภาค LAB"><div class="shade"></div><div class="inner"><div class="small"></div><div class="big">ภาค LAB</div><h1>ลงมือทำ 6 ขั้น และสรุปผล</h1><div class="sub"><p><b>ภาคนี้ลงมือทำ: คัดลอกพรอมต์ → วางใน Claude Code → อ่านผล</b></p><p>ผลจริงทุกตัวในภาคนี้มาจากการรันเมื่อ 14 พ.ย. 2026 · โมเดล sonnet · effort medium · ผลดิบอยู่ใน <a href="runs/" target="_blank" rel="noopener"><code>runs/</code></a></p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="ภาค LAB: ลงมือทำ 6 ขั้น" data-group="ภาค LAB · 3 · ลงมือทำ" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · 3 · ลงมือทำ</div><h2><span class="tt">ภาค LAB: ลงมือทำ 6 ขั้น</span></h2></header><div class="body"><div class="fig wide"><img src="img/d03-lab-map.png" alt="ภาค LAB: ลงมือทำ 6 ขั้น" width="1600" height="430"></div><p class="cap">LAB 0 สร้างเครื่องมือ · LAB 1 รันทีละขั้น · LAB 2 วัดสกิลที่ได้ · LAB 3 รันซ้ำ · LAB 4 ตัด Wiki ออก · LAB 5 เติมความรู้จากทีม</p></div></section>
+<section class="slide mid" data-title="ก่อนเริ่ม LAB" data-group="ภาค LAB · 3 · ลงมือทำ" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · 3 · ลงมือทำ</div><h2><span class="tt">ก่อนเริ่ม LAB</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx warn"><h4>วิธีใช้</h4><p>เปิดโฟลเดอร์ <code>Teaching</code> ใน Claude Code Desktop → คัดลอกกล่อง <b>IMPORTANT</b> → วาง → รอผล</p></div><div class="cardx warn"><h4>ต้องมี</h4><p>container <code>multi-account</code> · บัญชี <code>yolo</code> ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี · สกิล <code>skill-optimizer</code> ที่สร้างใน <a href="../05_Skill_Optimizer/README.md#lab-0--เตรียมเครื่องมือและโจทย์" target="_blank" rel="noopener">บท 05 LAB 0</a></p></div><div class="cardx navy"><h4>ผลจริงในสไลด์</h4><p>ผลจริงทุกตัวในภาคนี้มาจากการรันเมื่อ 14 พ.ย. 2026 · โมเดล sonnet · effort medium · ผลดิบอยู่ใน <a href="runs/" target="_blank" rel="noopener"><code>runs/</code></a></p></div></div><div class="note eye"><span class="lbl">ลำดับ</span><span>ทุก LAB มีลำดับเดียวกัน: ภาพขั้นตอน → ไฟล์เข้าและออก → พรอมต์ (คัดลอก) → ตรวจผลของคุณ → ผลจริงของผู้สอน</span></div></div></section>
+<section class="slide " data-title="แผนการทดลอง" data-group="ภาค LAB · 3 · ลงมือทำ" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · 3 · ลงมือทำ</div><h2><span class="tt">แผนการทดลอง</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n03-experiment-plan.jpg" alt="แผนการทดลอง" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>Input: โจทย์ 9 ข้อใน <code>suite/suite.json</code> · 6 ข้อแรกและตัวตรวจเป็นชุดเดียวกับบท 05</span></div><div class="stp"><span class="n">2</span><span><b>Training Set</b> 4 ข้อ ใช้สร้าง Trace ให้ Wiki Maintainer อ่าน · <b>Validation Set</b> 2 ข้อ ใช้ตัดสินที่ Gate ดูได้แค่คะแนนรวม · <b>Test Set</b> 3 ข้อ ใช้วัดตอนจบเท่านั้น</span></div><div class="stp"><span class="n">3</span><span>1 Trial = Agent 1 ตัว + โจทย์ 1 ข้อ + ชุดสกิล 1 ชุด → ได้ <code>solve.py</code> และ <code>test_solve.py</code> · คะแนน = สัดส่วนข้อตรวจที่ผ่าน</span></div><div class="stp"><span class="n">4</span><span>1 รอบของ WikiSkill = Training 12 Trial + Validation 6 Trial · วัดชุดสกิล 1 ชุด = 9 โจทย์ × 3 รอบ = <b>27 Trial</b></span></div><div class="stp"><span class="n">5</span><span>Inference Agent: <code>sonnet</code> effort <code>medium</code> · Wiki Maintainer และ Skill Proposer: <code>sonnet</code> effort <code>high</code></span></div></div></div></div></section>
+<section class="slide " data-title="โครงสร้างโฟลเดอร์: 1 การรัน WikiSkill = 1 workspace = 1 โฟลเดอร์" data-group="ภาค LAB · 3 · ลงมือทำ" data-max="1.30"><header class="hd"><div class="kicker">ภาค LAB · 3 · ลงมือทำ</div><h2><span class="tt">โครงสร้างโฟลเดอร์: 1 การรัน WikiSkill = 1 workspace = 1 โฟลเดอร์</span></h2></header><div class="body"><pre class="code "><button class="copy">คัดลอก</button><span class="t">06_WikiSkill/
+├── README.md               บทเรียนนี้
+├── WikiSkill_Slides.html   สไลด์ของบทนี้ (สร้างด้วย tools/build_slides.py)
+├── wikiskill_format.md     รูปแบบที่เครื่องมือ wikiskill ต้องทำตาม
+├── suite/                  ของที่ป้อนเข้า: โจทย์ 9 ข้อ (suite.json) และตัวตรวจ (grade.py)
+├── runs/                   ผลลัพธ์
+│   ├── w1/                 workspace ของ WikiSkill (LAB 1) · w2 (LAB 3) และ n1 (LAB 4) โครงเดียวกัน
+│   │   ├── raw/iter-NN/    Raw Layer: Trace ของ Training ทุกรอบ
+│   │   ├── wiki/           Wiki Layer: index.md · log.md · skill-impact.md · patterns/
+│   │   ├── skills/         Skills Layer: สกิลที่ใช้งานเมื่อจบ
+│   │   ├── history/iter-NN/   สิ่งที่แต่ละบทบาทได้รับและตอบในรอบนั้น
+│   │   ├── rollouts/       Trial ที่วงรอบรัน (k00-val · k01-train · k01-val …)
+│   │   ├── trials/         Trial ที่วัดสกิลตอนจบ 27 Trial (LAB 2)
+│   │   └── state.json status.txt
+│   ├── noskill/ so-v3/ w1p/   ชุดสกิลที่ใช้เทียบ: skills/ และ trials/
+│   └── report.md results.json ตารางเทียบทุกชุด
+├── tools/                  สคริปต์วาดกราฟและแผนภาพจาก runs/
+└── 01_theory/              ทฤษฎีจากเปเปอร์ WikiSkill</span></pre><div class="note eye"><span class="lbl">ระวัง</span><span>สกิลที่วงรอบสร้าง อยู่ใน <code>runs/&lt;workspace&gt;/skills/</code> เท่านั้น ห้ามเป็น global skill · ที่ทำงานใน container คือ <code>/workspace/wklab/</code></span></div></div></section>
+<section class="slide divider" data-title="LAB 0 · เตรียมเครื่องมือและโจทย์" data-group="LAB 0"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 0</div><h1>เตรียมเครื่องมือและโจทย์</h1><div class="sub"><p>สร้างเครื่องมือ <code>wikiskill</code> แล้วติดตั้งใน container พร้อมโจทย์</p><div class="facts"><div><span class="fl">Trial</span>–</div><div><span class="fl">เวลาจริง</span>0.1 ใช้ 21 นาที · 0.2 ใช้ 1 นาที</div><div><span class="fl">ผลจริง</span>ทดสอบผ่าน 3 ข้อ · ตัวตรวจผ่าน · ใช้ได้ 3 บัญชี</div></div></div></div></section>
+<section class="slide " data-title="ขั้น 0.1 · สร้างสกิล wikiskill ใน 6 ขั้น" data-group="LAB 0" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ขั้น 0.1 · สร้างสกิล <code>wikiskill</code> ใน 6 ขั้น</span></h2></header><div class="body"><div class="fig" style="--figmin:420px"><img src="img/d02-build-skill.png" alt="ขั้น 0.1 · สร้างสกิล wikiskill ใน 6 ขั้น" width="1600" height="660"></div><p class="cap">ทำบนเครื่อง ไม่ใช้ container · ที่มา: เปเปอร์ WikiSkill · รูปแบบ: <a href="wikiskill_format.md" target="_blank" rel="noopener"><code>wikiskill_format.md</code></a></p></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 0.1 · สร้างสกิล wikiskill" data-group="LAB 0" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">พรอมต์ · ขั้น 0.1 · สร้างสกิล <code>wikiskill</code></span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">พรอมต์ทั้งหมด 13 บรรทัด</span><button class="copy big" data-full="prompt0">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: สร้างสกิล wikiskill ไว้ในโฟลเดอร์ใหม่ ./my-wikiskill (ทำบนเครื่องนี้ ไม่ใช้ container)
+
+ที่มา    : เปเปอร์ WikiSkill (arXiv:2608.27454) · สรุปภาษาไทย 03_week03/06_WikiSkill/01_theory/README.md
+รูปแบบ   : 03_week03/06_WikiSkill/wikiskill_format.md
+เงื่อนไข : ห้ามเปิดฉบับสำเร็จที่ 00_resource/skills/wikiskill · prompt ต้องเขียนด้วยถ้อยคำของตัวเอง
+
+ทำตามลำดับ:
+1. ศึกษา       อ่านที่มา แล้วสรุปวงรอบของ WikiSkill: 3 ชั้น 4 ส่วนประกอบ และ Algorithm 1
+2. ออกแบบ      จด references/source.md: ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง
+3. สร้าง        scripts/wikiskill.py 8 คำสั่ง (init baseline rollout maintain propose gate loop status) ตามรูปแบบ
+4. เขียน        prompts/ 3 ไฟล์ (maintainer proposer proposer_nowiki) · SKILL.md · references/workspace.md
+5. ทดสอบ       ไม่เรียกโมเดล: (ก) status ของทุก workspace ใน 03_week03/06_WikiSkill/runs ต้องพิมพ์ตรงกับ status.txt (ข) นำ history/iter-NN/proposal.json ที่เก็บไว้มา Apply ใหม่ ต้องได้ candidate/skills และ proposal.diff เหมือนที่เก็บไว้ (ค) รันวงรอบ 2 รอบด้วย Agent จำลอง ให้ได้ ACCEPTED 1 รอบ และ REJECTED 1 รอบ แล้วตรวจว่ารอบที่ถูกปฏิเสธ skills คงเดิมแต่ wiki ยังอยู่ครบ
+6. รายงาน      ตาราง ไฟล์ | หน้าที่ และผลทดสอบ 3 ข้อ</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้น 0.1 · สร้างสกิล wikiskill" data-group="LAB 0" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ตรวจผลของคุณ · ขั้น 0.1 · สร้างสกิล <code>wikiskill</code></span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-0"><span>มีโฟลเดอร์ <code>Teaching/my-wikiskill/</code> และมีไฟล์ครบ: <code>SKILL.md</code> · <code>scripts/wikiskill.py</code> · <code>prompts/</code> 3 ไฟล์ (<code>maintainer</code> <code>proposer</code> <code>proposer_nowiki</code>) · <code>references/source.md</code> · <code>references/workspace.md</code></span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-1"><span><code>scripts/wikiskill.py</code> มีครบ 8 คำสั่ง: <code>init</code> <code>baseline</code> <code>rollout</code> <code>maintain</code> <code>propose</code> <code>gate</code> <code>loop</code> <code>status</code></span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-2"><span><code>references/source.md</code> มีตาราง ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-3"><span>ทดสอบ (ก): <code>status</code> ของทุก workspace ใน <code>runs/</code> พิมพ์ตรงกับ <code>status.txt</code></span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-4"><span>ทดสอบ (ข): Apply <code>proposal.json</code> ที่เก็บไว้ใหม่ ได้ <code>candidate/skills</code> และ <code>proposal.diff</code> เหมือนที่เก็บไว้</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.1-5"><span>ทดสอบ (ค): วงรอบจำลอง 2 รอบ ได้ ACCEPTED 1 รอบ และ REJECTED 1 รอบ · รอบที่ถูกปฏิเสธ <code>skills</code> คงเดิม แต่ <code>wiki</code> ยังอยู่ครบ</span></label></div><div class="note result">ผลของผู้สอน: ใช้ 21 นาที · ไม่เรียกโมเดลอื่น · ได้ 7 ไฟล์ (<code>scripts/wikiskill.py</code> 1,144 บรรทัด) · ทดสอบผ่านทั้ง 3 ข้อ</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>เครื่องมือที่สร้างเองไม่ต้องเหมือนใครทุกบรรทัด สิ่งที่ต้องตรงคือ <b>รูปแบบ</b> ใน <code>wikiskill_format.md</code> · การเรียกโมเดลจริงยังไม่ได้ทดสอบในขั้นนี้ (รู้ผลใน LAB 1)</span></div></div></section>
+<section class="slide " data-title="ผลจริงขั้น 0.1: ได้เครื่องมือ 7 ไฟล์" data-group="LAB 0" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ผลจริงขั้น 0.1: ได้เครื่องมือ 7 ไฟล์</span><span class="tag">ผลของผู้สอน</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4><code>SKILL.md</code></h4><p><b>73 บรรทัด</b> · คู่มือที่ AI อ่าน: ใช้เมื่อไร · ตารางคำสั่ง 8 ตัว · ขั้นตอน · ข้อห้าม</p></div><div class="cardx "><h4><code>scripts/wikiskill.py</code></h4><p><b>1,144 บรรทัด</b> · โปรแกรมของวงรอบ ไฟล์เดียว ใช้ไลบรารีมาตรฐานเท่านั้น</p></div><div class="cardx "><h4><code>prompts/maintainer.md</code></h4><p><b>79 บรรทัด</b> · system prompt ของ Wiki Maintainer: วิธีอ่าน Trace · โครงหน้า pattern · กติกาของ index</p></div><div class="cardx "><h4><code>prompts/proposer.md</code></h4><p><b>73 บรรทัด</b> · system prompt ของ Skill Proposer: ลำดับการทำงาน · รูปแบบข้อเสนอ · กติกา</p></div><div class="cardx "><h4><code>prompts/proposer_nowiki.md</code></h4><p><b>73 บรรทัด</b> · system prompt ของ Skill Proposer เมื่อไม่ใช้ wiki (LAB 4)</p></div><div class="cardx "><h4><code>references/source.md</code></h4><p><b>63 บรรทัด</b> · สรุปวงรอบ และตารางตรวจย้อนกลับ 20 แถว</p></div><div class="cardx "><h4><code>references/workspace.md</code></h4><p><b>100 บรรทัด</b> · โครง workspace และไฟล์ที่แต่ละคำสั่งอ่านและเขียน</p></div></div><div class="note info">agent ใหม่รันพรอมต์นี้ตามตัวอักษรเมื่อ 14 พ.ย. 2026 · ใช้ 21 นาที · ไม่เรียกโมเดลอื่น</div></div></section>
+<section class="slide " data-title="ผลจริงขั้น 0.1: ทดสอบ 3 ข้อโดยไม่เรียกโมเดล" data-group="LAB 0" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ผลจริงขั้น 0.1: ทดสอบ 3 ข้อโดยไม่เรียกโมเดล</span><span class="tag">ผลของผู้สอน</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx ok"><h4>(ก) <code>status</code> ของ workspace ที่เก็บไว้</h4><p>✅ พิมพ์ตรงกับ <code>status.txt</code> ทุกตัวอักษร</p></div><div class="cardx ok"><h4>(ข) Apply <code>proposal.json</code> ที่เก็บไว้ใหม่</h4><p>✅ <code>SKILL.md</code> <code>PURPOSE.md</code> และ <code>proposal.diff</code> ตรงกันทุกไบต์ ทั้งข้อเสนอแบบ <code>create</code> และ <code>patch</code></p></div><div class="cardx ok"><h4>(ค) วงรอบจำลอง 2 รอบ</h4><p>✅ รอบ 1 ACCEPTED · รอบ 2 <b>REJECTED</b>: <code>skills/</code> กลับเป็นชุดของรอบ 1 · หน้า pattern ที่จดในรอบ 2 ยังอยู่ · <code>skill-impact.md</code> มีทั้ง 2 รายการพร้อม diff</p></div><div class="cardx warn"><h4>การเรียกโมเดลจริง</h4><p>⚠️ ยังไม่ได้ทดสอบในขั้นนี้ (รู้ผลใน LAB 1)</p></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>การทดสอบ (ค) คือที่เดียวในบทนี้ที่เห็นการย้อนกลับ: สกิลที่ไม่ผ่านถูกทิ้ง แต่ความรู้ของรอบนั้นยังอยู่ใน Wiki · ในการรันจริง LAB 1–4 ข้อเสนอของวงรอบผ่าน Gate ทุกครั้ง จึงไม่มีการย้อนกลับของ WikiSkill ให้ดู</span></div></div></section>
+<section class="slide " data-title="ขั้น 0.2 ทำอะไร" data-group="LAB 0" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ขั้น 0.2 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n04-lab0-setup.jpg" alt="ขั้น 0.2 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ติดตั้ง <code>my-wikiskill</code> เป็น global skill ชื่อ <code>wikiskill</code> ของบัญชี yolo (ไว้ข้างสกิล <code>skill-optimizer</code> ของบท 05)</span></div><div class="stp"><span class="n">2</span><span>คัดลอก <code>suite</code> ไปไว้ที่ <code>/workspace/wklab/suite</code> · สกิล <code>v3</code> ของบท 05 ไปไว้ที่ <code>/workspace/wklab/runs/so-v3/skills</code></span></div><div class="stp"><span class="n">3</span><span>ตรวจ: มีสกิล <code>skill-optimizer</code> อยู่แล้วหรือไม่ · ตัวตรวจด้วย <code>suite/check_grader.py</code> · บัญชี <code>yolo1</code>–<code>yolo5</code> ตัวไหนล็อกอินแล้ว</span></div><div class="stp"><span class="n">4</span><span>รายงานเป็นตาราง รายการ | ผล</span></div></div></div></div></section>
+<section class="slide mid" data-title="ขั้น 0.2 · ไฟล์เข้าและออก" data-group="LAB 0" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ขั้น 0.2 · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file"><code>my-wikiskill/</code> (จากขั้น 0.1)</div><div class="file"><a href="suite/" target="_blank" rel="noopener"><code>suite/</code></a></div><div class="file"><a href="../05_Skill_Optimizer/runs/v3/skills/" target="_blank" rel="noopener"><code>runs/v3/skills/</code></a> ของบท 05</div></div><div class="ffar">➜</div><div class="ffmid">ขั้น 0.2<small>ยังไม่วัดอะไร</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · สิ่งที่ได้ใน container</div><div class="file">global skill ชื่อ <code>wikiskill</code> ของทุกบัญชี yolo</div><div class="file"><code>/workspace/wklab/suite/</code></div><div class="file"><code>/workspace/wklab/runs/so-v3/skills/</code></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ" data-group="LAB 0" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">พรอมต์ · ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">พรอมต์ทั้งหมด 7 บรรทัด</span><button class="copy big" data-full="prompt1">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: เตรียม container multi-account ให้พร้อมสำหรับ LAB 1–5 (ยังไม่วัดอะไร)
+
+ทำตามลำดับ:
+1. ติดตั้ง   my-wikiskill เป็น global skill ชื่อ wikiskill ของบัญชี yolo (ไว้ข้างสกิล skill-optimizer ของบท 05)
+2. คัดลอก   suite ของ 03_week03/06_WikiSkill ไปไว้ที่ /workspace/wklab/suite · สกิล v3 ของบท 05 (03_week03/05_Skill_Optimizer/runs/v3/skills) ไปไว้ที่ /workspace/wklab/runs/so-v3/skills
+3. ตรวจ     มีสกิล skill-optimizer อยู่แล้วหรือไม่ · ตัวตรวจด้วย suite/check_grader.py · บัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
+4. รายงาน   ตาราง รายการ | ผล</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ" data-group="LAB 0" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 0 · เตรียมเครื่องมือและโจทย์</div><h2><span class="tt">ตรวจผลของคุณ · ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="ขั้น 0.2-0"><span>รายงานเป็นตาราง รายการ | ผล</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.2-1"><span><code>my-wikiskill</code> ถูกติดตั้งเป็น global skill ชื่อ <code>wikiskill</code> ของบัญชี yolo (อยู่ข้างสกิล <code>skill-optimizer</code> ของบท 05)</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.2-2"><span>ใน container มี <code>/workspace/wklab/suite/</code> และ <code>/workspace/wklab/runs/so-v3/skills/</code></span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.2-3"><span><code>suite/check_grader.py</code> ผ่าน: เฉลยอ้างอิงผ่าน 10/10 แปดโจทย์ และ 11/11 โจทย์ค่าส่ง</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 0.2-4"><span>มีบัญชี <code>yolo</code> ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี</span></label></div><div class="note result">ผลของผู้สอน: ติดตั้งสกิล ✅ · มี <code>skill-optimizer</code> อยู่แล้ว ✅ · ตัวตรวจผ่าน ✅ · บัญชีที่ใช้ได้ <code>yolo1</code> <code>yolo2</code> <code>yolo3</code> · ใช้ 1 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตรวจตัวตรวจก่อนเสมอ ถ้าเครื่องวัดผิด ตัวเลขหลังจากนี้ใช้ไม่ได้ทั้งหมด</span></div></div></section>
+<section class="slide divider" data-title="LAB 1 · รัน WikiSkill ทีละขั้น (w1)" data-group="LAB 1"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 1</div><h1>รัน WikiSkill ทีละขั้น (<code>w1</code>)</h1><div class="sub"><p>รัน WikiSkill ทีละขั้น จากชุดสกิลว่าง (<code>w1</code>)</p><div class="facts"><div><span class="fl">Trial</span>42</div><div><span class="fl">เวลาจริง</span>15 นาที</div><div><span class="fl">ผลจริง</span>Validation 45.0% → <b>100.0%</b> ใน 2 รอบ</div></div></div></div></section>
+<section class="slide " data-title="LAB 1 ทำอะไร" data-group="LAB 1" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">LAB 1 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n05-lab1-steps.jpg" alt="LAB 1 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>สร้าง workspace <code>w1</code> (ชุดสกิลว่าง · wiki ว่าง) แล้ววัด baseline</span></div><div class="stp"><span class="n">2</span><span>รอบที่ 1 รันทีละขั้น <code>rollout</code> → <code>maintain</code> → <code>propose</code> → <code>gate</code> · หลังแต่ละขั้นเปิดไฟล์ที่ขั้นนั้นสร้าง ดูว่าชั้นใด (raw / wiki / skills) เปลี่ยนอย่างไร</span></div><div class="stp"><span class="n">3</span><span>รันต่อด้วย <code>loop</code> จนวงรอบหยุด (R_best = 100% หรือครบ 8 รอบ) แล้วบันทึกผลของ <code>status</code></span></div><div class="stp"><span class="n">4</span><span>เก็บผล: คัดลอก <code>runs/w1</code> จาก container มาไว้บนเครื่อง · ไม่เก็บ Trace ดิบ · Validation Set เก็บแค่คะแนนและต้นทุน</span></div><div class="stp"><span class="n">5</span><span>รายงาน: ตารางของแต่ละขั้น · เนื้อหาของ <code>wiki/index.md</code> · ชื่อสกิลที่ได้ · เหตุผลที่วงรอบหยุด</span></div></div></div></div></section>
+<section class="slide mid" data-title="LAB 1 · รัน WikiSkill ทีละขั้น · ไฟล์เข้าและออก" data-group="LAB 1" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">LAB 1 · รัน WikiSkill ทีละขั้น · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file"><a href="suite/suite.json" target="_blank" rel="noopener"><code>suite/suite.json</code></a> โจทย์ Training 4 ข้อ และ Validation 2 ข้อ</div><div class="file"><code>suite/grade.py</code> ตัวตรวจ</div><div class="file">สกิล <code>wikiskill</code> (จาก LAB 0)</div></div><div class="ffar">➜</div><div class="ffmid">LAB 1<small>วงรอบของ WikiSkill · 42 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/w1/raw/" target="_blank" rel="noopener"><code>runs/w1/raw/</code></a> Trace ของ Training ทุกรอบ</div><div class="file"><a href="runs/w1/wiki/" target="_blank" rel="noopener"><code>runs/w1/wiki/</code></a> สมุดความรู้: <a href="runs/w1/wiki/index.md" target="_blank" rel="noopener"><code>index.md</code></a> · <a href="runs/w1/wiki/patterns/" target="_blank" rel="noopener"><code>patterns/</code></a> · <a href="runs/w1/wiki/skill-impact.md" target="_blank" rel="noopener"><code>skill-impact.md</code></a></div><div class="file"><a href="runs/w1/skills/" target="_blank" rel="noopener"><code>runs/w1/skills/</code></a> สกิลที่วงรอบสร้าง</div><div class="file"><a href="runs/w1/status.txt" target="_blank" rel="noopener"><code>runs/w1/status.txt</code></a> ตารางของทุกรอบ · <a href="runs/w1/history/" target="_blank" rel="noopener"><code>history/</code></a> หลักฐานของแต่ละรอบ</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 1 · รัน WikiSkill ทีละขั้น" data-group="LAB 1" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">พรอมต์ · LAB 1 · รัน WikiSkill ทีละขั้น</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–18 จาก 29</span><button class="copy big" data-full="prompt2">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: รัน WikiSkill ทีละขั้น · เริ่มจากไม่มีสกิล ให้ระบบสร้างสกิลเขียนโค้ดคิดเงินของร้าน BaanKafe เอง
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ wiki/ skills/ เอง
+
+Input: โจทย์ใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ยังไม่ใช้ใน LAB นี้
+
+วิธีทดลอง:
+- workspace ชื่อ w1 · เริ่มจากชุดสกิลว่างและ wiki ว่าง · ทำได้ไม่เกิน 8 รอบ
+- Inference Agent (ทำโจทย์): โมเดล sonnet · effort medium · โจทย์ละ 3 รอบ → Training 12 Trial และ Validation 6 Trial ต่อการวัด 1 ครั้ง
+- Wiki Maintainer และ Skill Proposer: โมเดล sonnet · effort high
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 1 · รัน WikiSkill ทีละขั้น" data-group="LAB 1" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">พรอมต์ · LAB 1 · รัน WikiSkill ทีละขั้น</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 19–29 จาก 29</span><button class="copy big" data-full="prompt2">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best (คะแนน Validation ที่ดีที่สุดก่อนหน้า) เท่านั้น · ไม่รับ = ใช้ชุดสกิลเดิม แต่ wiki ยังอยู่
+- วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. สร้าง      workspace w1 แล้ววัด baseline
+2. รอบที่ 1   รันทีละขั้น rollout → maintain → propose → gate · หลังแต่ละขั้นเปิดไฟล์ที่ขั้นนั้นสร้าง แล้วบอกว่าชั้นใด (raw / wiki / skills) เปลี่ยนอย่างไร
+3. รันต่อ     loop จนวงรอบหยุด แล้วบันทึกผลของ status ที่ runs/w1/status.txt
+4. เก็บผล     คัดลอก runs/w1 จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs/w1 บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน     ตาราง ขั้น | ชั้นที่เปลี่ยน | ไฟล์ที่เกิดหรือเปลี่ยน | สรุป 1 บรรทัด · เนื้อหาของ wiki/index.md · ชื่อสกิลที่ได้ · ตาราง status · เหตุผลที่วงรอบหยุด</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · LAB 1 · รัน WikiSkill ทีละขั้น" data-group="LAB 1" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">ตรวจผลของคุณ · LAB 1 · รัน WikiSkill ทีละขั้น</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="LAB 1-0"><span><code>runs/w1/raw/iter-01/</code> มี Trace ของ Training 12 ไฟล์ และ <code>summary.md</code></span></label><label class="chk"><input type="checkbox" data-k="LAB 1-1"><span><code>runs/w1/wiki/</code> มี <code>index.md</code> · <code>log.md</code> · <code>skill-impact.md</code> และหน้าใน <code>patterns/</code></span></label><label class="chk"><input type="checkbox" data-k="LAB 1-2"><span><code>runs/w1/skills/</code> มีสกิลที่วงรอบสร้าง (โฟลเดอร์ละ 1 สกิล มี <code>SKILL.md</code>)</span></label><label class="chk"><input type="checkbox" data-k="LAB 1-3"><span><code>runs/w1/status.txt</code> มีตารางของทุกรอบ และบรรทัด <code>สถานะ:</code> ที่บอกเหตุผลที่วงรอบหยุด</span></label><label class="chk"><input type="checkbox" data-k="LAB 1-4"><span>รายงานมีตาราง ขั้น | ชั้นที่เปลี่ยน | ไฟล์ที่เกิดหรือเปลี่ยน | สรุป 1 บรรทัด</span></label><label class="chk"><input type="checkbox" data-k="LAB 1-5"><span>ผลของ Validation Set ที่เก็บลงเครื่อง มีแค่คะแนนและต้นทุน (ไม่มีผลรายข้อ)</span></label></div><div class="note result">ผลของผู้สอน: Validation 45.0% → 93.3% → 100.0% ใน 2 รอบ · ข้อเสนอผ่าน Gate ทั้ง 2 ครั้ง · สกิล <code>solve-py-contract</code> · 42 Trial · ใช้ 15 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide mid" data-title="ผลจริง LAB 1: ไม่มีใครบอกกฎ Validation จาก 45.0% เป็น 100.0% ใน 2 รอบ" data-group="LAB 1" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">ผลจริง LAB 1: ไม่มีใครบอกกฎ Validation จาก 45.0% เป็น 100.0% ใน 2 รอบ</span><span class="tag">runs/w1/status.txt</span></h2></header><div class="body"><div class="tiles"><div class="tile "><div class="k">ชุดสกิลว่าง (baseline)</div><div class="num">45.0%</div><div class="s">Validation = R_best เริ่มต้น</div></div><div class="tile ok"><div class="k">หลังรอบที่ 1</div><div class="num">93.3%</div><div class="s">create <code>solve-py-contract</code> · <b>ACCEPTED</b></div></div><div class="tile ok"><div class="k">หลังรอบที่ 2</div><div class="num">100.0%</div><div class="s">patch <code>solve-py-contract</code> · <b>ACCEPTED</b> → หยุด</div></div><div class="tile warn"><div class="k">Trial ของ Inference Agent</div><div class="num">42</div><div class="s">Maintainer + Proposer 16 ครั้ง</div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>ไม่มีใครบอกกฎ แต่รอบที่ 1 Wiki Maintainer สรุปได้เองว่า Agent ไม่ตรวจข้อมูลที่ผิด ไม่มีโหมดรันเป็นโปรแกรม และไม่มีไฟล์เทสต์ · รอบที่ 2 เหลือปัญหาเดียวคือจำนวนเทสต์ไม่ถึงเกณฑ์ จึงแก้สกิลเฉพาะจุดนั้น</span></div></div></section>
+<section class="slide " data-title="เส้นทางของ w1: Validation ของชุดสกิลว่าง แล้วสกิลที่เสนอในแต่ละรอบ" data-group="LAB 1" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">เส้นทางของ <code>w1</code>: Validation ของชุดสกิลว่าง แล้วสกิลที่เสนอในแต่ละรอบ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r01-path-w1.png" alt="เส้นทางของ w1: Validation ของชุดสกิลว่าง แล้วสกิลที่เสนอในแต่ละรอบ" width="1600" height="760"></div><p class="cap">Validation 45.0% → 93.3% → <b>100.0%</b> ใน 2 รอบ · ข้อเสนอผ่าน Gate ทั้ง 2 ครั้ง · 42 Trial · ใช้ 15 นาที</p></div></section>
+<section class="slide " data-title="รอบที่ 1 ทีละขั้น: แต่ละคำสั่งเปลี่ยนชั้นใด" data-group="LAB 1" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">รอบที่ 1 ทีละขั้น: แต่ละคำสั่งเปลี่ยนชั้นใด</span><span class="tag">ตารางหลัก</span></h2></header><div class="body"><table class="c4"><thead><tr><th>ขั้น</th><th>ชั้นที่เปลี่ยน</th><th>ไฟล์ที่เกิดหรือเปลี่ยน</th><th>ผลจริง</th></tr></thead><tbody><tr><td><code>baseline</code></td><td>–</td><td><code>state.json</code></td><td>Validation ของชุดสกิลว่าง <b>45.0%</b> = R_best เริ่มต้น</td></tr><tr><td><code>rollout</code></td><td>Raw</td><td><a href="runs/w1/raw/iter-01/traces/" target="_blank" rel="noopener"><code>raw/iter-01/traces/</code></a> 12 ไฟล์ · <a href="runs/w1/raw/iter-01/summary.md" target="_blank" rel="noopener"><code>summary.md</code></a></td><td>Training 46.4% · ผ่านครบ 0/12</td></tr><tr><td><code>maintain</code></td><td>Wiki</td><td><a href="runs/w1/wiki/patterns/" target="_blank" rel="noopener"><code>wiki/patterns/</code></a> 6 หน้า · <code>index.md</code> · <code>log.md</code></td><td>อ่าน Trace 5 ไฟล์ · เรียกโมเดล 1 ครั้ง (99 วินาที)</td></tr><tr><td><code>propose</code></td><td>ยังไม่เปลี่ยน</td><td><a href="runs/w1/history/iter-01/proposal.json" target="_blank" rel="noopener"><code>history/iter-01/proposal.json</code></a> · <code>candidate/</code></td><td>เปิด pattern 2 หน้า + Trace 4 ไฟล์ → <code>create</code> สกิล <code>solve-py-contract</code></td></tr><tr><td><code>gate</code></td><td>Skills + Wiki</td><td><a href="runs/w1/skills/solve-py-contract/" target="_blank" rel="noopener"><code>skills/solve-py-contract/</code></a> · <a href="runs/w1/wiki/skill-impact.md" target="_blank" rel="noopener"><code>wiki/skill-impact.md</code></a></td><td>Validation <b>93.3%</b> &gt; 45.0% → <b>ACCEPTED</b></td></tr><tr><td><code>loop</code> รอบที่ 2</td><td>ทั้ง 3 ชั้น</td><td><a href="runs/w1/raw/iter-02/" target="_blank" rel="noopener"><code>raw/iter-02/</code></a> · pattern ใหม่ 1 หน้า แก้ 6 หน้า · <code>patch</code> สกิลเดิม</td><td>Training 89.5% → Validation <b>100.0%</b> → <b>ACCEPTED</b> → หยุด</td></tr></tbody></table></div></section>
+<section class="slide " data-title="สมุดความรู้ของ w1 เมื่อจบ: wiki/index.md 7 บรรทัด" data-group="LAB 1" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">สมุดความรู้ของ <code>w1</code> เมื่อจบ: <code>wiki/index.md</code> 7 บรรทัด</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/d04-wiki-w1.png" alt="สมุดความรู้ของ w1 เมื่อจบ: wiki/index.md 7 บรรทัด" width="1600" height="862"></div><p class="cap">อ่านบรรทัดที่ 2 ของสารบัญ: Wiki จดว่าข้อตรวจ <code>policy</code> <b>ยังเกิดอยู่และยังไม่ยืนยันสาเหตุ</b> และสกิลไม่ได้แตะเรื่องนี้ · LAB 2 จะวัดว่าเรื่องนี้กระทบคะแนนเท่าไร</p></div></section>
+<section class="slide mid" data-title="รอบที่ 2: Wiki ทำงานข้ามรอบ จึงอ่านน้อยลงและแก้เฉพาะจุด" data-group="LAB 1" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">รอบที่ 2: Wiki ทำงานข้ามรอบ จึงอ่านน้อยลงและแก้เฉพาะจุด</span><span class="tag">runs/w1/history</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx "><h4>รอบที่ 1 · Wiki ว่าง</h4><ul><li><b>Wiki Maintainer อ่าน Trace</b>: ไม่ผ่าน 5 (ไม่มีงานที่ผ่าน)</li><li><b>Wiki</b>: สร้าง 6 หน้า</li><li><b>Skill Proposer เปิดไฟล์</b>: pattern 2 หน้า + Trace 4 ไฟล์</li><li><b>ข้อเสนอ</b>: <code>create</code> ทั้งสกิล (96 บรรทัด)</li><li><b>เวลาของ Skill Proposer</b>: 39 วินาที</li></ul></div><div class="cardx ok"><h4>รอบที่ 2 · มี Wiki ของรอบที่ 1</h4><ul><li><b>Wiki Maintainer อ่าน Trace</b>: ไม่ผ่าน 5 + <b>ผ่าน 2</b></li><li><b>Wiki</b>: สร้าง 1 หน้า (<a href="runs/w1/wiki/patterns/too-few-test-methods.md" target="_blank" rel="noopener"><code>too-few-test-methods.md</code></a>) · <b>เติม 6 หน้าเดิม</b> ว่าแก้ได้แล้วหรือยัง</li><li><b>Skill Proposer เปิดไฟล์</b>: <code>SKILL.md</code> เดิม + pattern <b>1 หน้า</b> (หน้าใหม่) + Trace 4 ไฟล์</li><li><b>ข้อเสนอ</b>: <code>patch</code> เฉพาะส่วนเทสต์ (เป็น 107 บรรทัด)</li><li><b>เวลาของ Skill Proposer</b>: 20 วินาที</li></ul></div></div></div></section>
+<section class="slide " data-title="สิ่งที่รอบที่ 2 แก้ในสกิล: เกณฑ์จำนวนเทสต์" data-group="LAB 1" data-max="1.30"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">สิ่งที่รอบที่ 2 แก้ในสกิล: เกณฑ์จำนวนเทสต์</span></h2></header><div class="body"><pre class="code "><button class="copy">คัดลอก</button><span class="t">-รัน `python3 -m unittest test_solve -v` ในโฟลเดอร์นั้นให้ผ่านทุกเทสต์ก่อนตอบ
++### ต้องมีอย่างน้อย 8 เมธอด `def test_...` แยกกัน
++ตัวตรวจนับจำนวนเมธอดที่ unittest รายงาน (บรรทัด `Ran N tests`) และต้องได้อย่างน้อย 6 การวน for หรือ `subTest` … นับเป็น 1 เทสต์
++รัน `python3 -m unittest test_solve -v` … แล้วอ่านบรรทัด `Ran N tests` ถ้า N &lt; 8 ให้แตกเมธอดเพิ่มแล้วรันใหม่ก่อนตอบ</span></pre><div class="note info">diff นี้โปรแกรมจดไว้ใน <a href="runs/w1/wiki/skill-impact.md" target="_blank" rel="noopener"><code>wiki/skill-impact.md</code></a> · ข้อเสนอรอบที่ 1 เป็น <code>create</code> ทั้งสกิล รอบที่ 2 เป็น <code>patch</code> เฉพาะส่วนเทสต์</div></div></section>
+<section class="slide " data-title="สกิลที่ได้ทั้งไฟล์: solve-py-contract (107 บรรทัด)" data-group="LAB 1" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 1 · รัน WikiSkill ทีละขั้น (<code>w1</code>)</div><h2><span class="tt">สกิลที่ได้ทั้งไฟล์: <code>solve-py-contract</code> (107 บรรทัด)</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/d05-skill-w1.png" alt="สกิลที่ได้ทั้งไฟล์: solve-py-contract (107 บรรทัด)" width="1600" height="1780"></div><p class="cap">ไฟล์จริง: <a href="runs/w1/skills/solve-py-contract/SKILL.md" target="_blank" rel="noopener"><code>SKILL.md</code></a> · <a href="runs/w1/skills/solve-py-contract/PURPOSE.md" target="_blank" rel="noopener"><code>PURPOSE.md</code></a> (สกิลนี้แก้ pattern ใดใน Wiki) · คลิกภาพเพื่อขยาย</p></div></section>
+<section class="slide divider" data-title="LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ v3 ของบท 05" data-group="LAB 2"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 2</div><h1>วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</h1><div class="sub"><p>วัดสกิลของ <code>w1</code> กับโจทย์ 9 ข้อ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</p><div class="facts"><div><span class="fl">Trial</span>81</div><div><span class="fl">เวลาจริง</span>6 นาที</div><div><span class="fl">ผลจริง</span><code>w1</code> 97.9% · Test 100% · <code>policy</code> 0/6</div></div></div></div></section>
+<section class="slide " data-title="LAB 2 ทำอะไร" data-group="LAB 2" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">LAB 2 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n06-lab2-steps.jpg" alt="LAB 2 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>วัด <code>noskill</code> · <code>so-v3</code> · <code>w1</code> กับโจทย์ทั้ง 9 ข้อ · ชุดละ 27 Trial รวม 81 Trial</span></div><div class="stp"><span class="n">2</span><span>สรุปตารางเทียบ 3 ชุด (<code>report</code>)</span></div><div class="stp"><span class="n">3</span><span><code>gate</code> ของ <code>skill-optimizer</code> ตัดสิน <code>noskill</code> → <code>w1</code> และ <code>so-v3</code> → <code>w1</code> ด้วยกติกาเดียวกับบท 05</span></div><div class="stp"><span class="n">4</span><span>หาข้อตรวจที่ <code>w1</code> ยังไม่ผ่าน (<code>failures</code> ของชุด train และชุด test)</span></div><div class="stp"><span class="n">5</span><span>ผลรายข้อของ Test Set เปิดได้หลังวัดครบทั้ง 3 ชุดแล้วเท่านั้น · เก็บผลและรายงาน</span></div></div></div></div></section>
+<section class="slide mid" data-title="LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ v3 ของบท 05 · ไฟล์เข้าและออก" data-group="LAB 2" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05 · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file"><a href="runs/w1/skills/" target="_blank" rel="noopener"><code>runs/w1/skills/</code></a> สกิลของ WikiSkill</div><div class="file"><a href="runs/so-v3/skills/" target="_blank" rel="noopener"><code>runs/so-v3/skills/</code></a> สกิล <code>v3</code> ของบท 05</div><div class="file"><a href="suite/suite.json" target="_blank" rel="noopener"><code>suite/suite.json</code></a> โจทย์ 9 ข้อ</div></div><div class="ffar">➜</div><div class="ffmid">LAB 2<small>วัด 3 ชุดสกิล · 81 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/w1/trials/" target="_blank" rel="noopener"><code>runs/w1/trials/</code></a> · <a href="runs/so-v3/trials/" target="_blank" rel="noopener"><code>runs/so-v3/trials/</code></a> · <a href="runs/noskill/trials/" target="_blank" rel="noopener"><code>runs/noskill/trials/</code></a> ชุดละ 27 Trial</div><div class="file"><a href="runs/report.md" target="_blank" rel="noopener"><code>runs/report.md</code></a> · <a href="runs/results.json" target="_blank" rel="noopener"><code>runs/results.json</code></a> ตารางเทียบ</div><div class="file"><a href="runs/w1/gate-noskill.txt" target="_blank" rel="noopener"><code>runs/w1/gate-noskill.txt</code></a> · <a href="runs/w1/gate-so-v3.txt" target="_blank" rel="noopener"><code>gate-so-v3.txt</code></a> ผลตัดสิน · <a href="runs/w1/failures.txt" target="_blank" rel="noopener"><code>failures.txt</code></a> ข้อที่ยังผิด</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ v3 ของบท 05" data-group="LAB 2" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">พรอมต์ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–20 จาก 32</span><button class="copy big" data-full="prompt3">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: วัดสกิลที่ WikiSkill สร้าง (w1) กับโจทย์ทั้ง 9 ข้อ · เทียบกับการไม่ใช้สกิล และสกิล v3 ของบท 05
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ผลรายข้อของ Test Set เปิดได้หลังวัดครบทั้ง 3 ชุดแล้วเท่านั้น
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ไม่เคยถูกใช้ปรับสกิลทั้งสองวิธี: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- โจทย์แต่ละข้อทำซ้ำ 3 รอบ → 1 ชุดสกิล = 9 โจทย์ × 3 รอบ = 27 Trial
+- LAB นี้วัด 3 ชุดสกิล → รวม 81 Trial
+  - noskill  ไม่มีสกิล
+  - so-v3    สกิล money-coder รุ่น v3 ของบท 05 (runs/so-v3/skills) · คนเขียนรุ่นแรก แล้วปรับ 3 รอบ
+  - w1       สกิลที่ WikiSkill สร้างใน LAB 1 (runs/w1/skills) · ไม่มีคนเขียน
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ v3 ของบท 05" data-group="LAB 2" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">พรอมต์ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 21–32 จาก 32</span><button class="copy big" data-full="prompt3">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- คะแนนของชุดสกิล = ค่าเฉลี่ยของ 27 Trial
+- gate ของ skill-optimizer เทียบชุดใหม่กับชุดฐาน แล้วตอบ ACCEPT หรือ REJECT ด้วยกติกาเดียวกับบท 05
+
+ทำตามลำดับ:
+1. วัด      noskill · so-v3 · w1 กับโจทย์ทุกชุด
+2. สรุป     ตารางเทียบ 3 ชุด (report) บันทึกที่ runs/report.md
+3. ตัดสิน   gate noskill → w1 และ gate so-v3 → w1 ใช้ต้นทุน context_tokens บันทึกที่ runs/w1/gate-noskill.txt และ runs/w1/gate-so-v3.txt
+4. หาข้อผิด  ข้อตรวจที่ w1 ยังไม่ผ่าน (failures ของชุด train และชุด test) บันทึกที่ runs/w1/failures.txt
+5. เก็บผล   คัดลอก runs/ จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผลของแต่ละชุด report.md results.json และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+6. รายงาน   ตารางเทียบ 3 ชุด · ผล gate 2 คู่ · ข้อตรวจที่ w1 ยังไม่ผ่าน และสาเหตุที่เห็นจากข้อความของตัวตรวจ</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ v3 ของบท 05" data-group="LAB 2" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">ตรวจผลของคุณ · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="LAB 2-0"><span><code>runs/noskill/trials/</code> · <code>runs/so-v3/trials/</code> · <code>runs/w1/trials/</code> มีชุดละ 27 โฟลเดอร์ (9 โจทย์ × 3 รอบ) รวม 81 Trial</span></label><label class="chk"><input type="checkbox" data-k="LAB 2-1"><span><code>runs/report.md</code> มีตารางเทียบ 3 ชุด · <code>runs/results.json</code> ถูกเขียน</span></label><label class="chk"><input type="checkbox" data-k="LAB 2-2"><span><code>runs/w1/gate-noskill.txt</code> และ <code>runs/w1/gate-so-v3.txt</code> มีบรรทัด <code>ผล:</code> ของการตัดสิน</span></label><label class="chk"><input type="checkbox" data-k="LAB 2-3"><span><code>runs/w1/failures.txt</code> มีข้อตรวจที่ <code>w1</code> ยังไม่ผ่าน ของชุด train และชุด test</span></label><label class="chk"><input type="checkbox" data-k="LAB 2-4"><span>ผลรายข้อของ Test Set ถูกเปิดหลังวัดครบทั้ง 3 ชุดแล้วเท่านั้น</span></label></div><div class="note result">ผลของผู้สอน: ไม่มีสกิล 46.9% · <code>so-v3</code> 100.0% · <code>w1</code> 97.9% (Test 100.0%) · <code>noskill</code> → <code>w1</code> <span class="v accept">ACCEPT</span> · <code>so-v3</code> → <code>w1</code> <span class="v reject">REJECT</span> · <code>policy</code> 0/6 · ใช้ 6 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide mid" data-title="ผลจริง LAB 2: สกิลที่ไม่มีคนเขียน ได้ 100.0% บน Test Set" data-group="LAB 2" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">ผลจริง LAB 2: สกิลที่ไม่มีคนเขียน ได้ 100.0% บน Test Set</span><span class="tag">runs/results.json</span></h2></header><div class="body"><div class="tiles"><div class="tile "><div class="k">ไม่มีสกิล</div><div class="num">46.9%</div><div class="s">ผ่านครบทุกข้อ 0/27</div></div><div class="tile "><div class="k"><code>so-v3</code> · Skill Optimizer</div><div class="num">100.0%</div><div class="s">ผ่านครบทุกข้อ 27/27</div></div><div class="tile ok"><div class="k"><code>w1</code> · WikiSkill</div><div class="num">97.9%</div><div class="s">ผ่านครบทุกข้อ 21/27</div></div><div class="tile ok"><div class="k">Test Set ของ <code>w1</code></div><div class="num">100.0%</div><div class="s"><code>so-v3</code> 100.0% · ไม่มีสกิล 47.8%</div></div><div class="tile bad"><div class="k">ข้อตรวจ <code>policy</code> ของ <code>w1</code></div><div class="num">0/6</div><div class="s">งานค่าส่งและงานเงินคืน</div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>สกิลที่ไม่มีคนเขียนได้ <b>100% บน Test Set</b> เท่ากับ <code>v3</code> ที่คนเขียนและปรับ 3 รุ่น · จุดเดียวที่ต่างคือ Training 95.2%</span></div></div></section>
+<section class="slide " data-title="คะแนนของสกิล 3 ชุดบนโจทย์ 9 ข้อ" data-group="LAB 2" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">คะแนนของสกิล 3 ชุดบนโจทย์ 9 ข้อ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r02-compare.png" alt="คะแนนของสกิล 3 ชุดบนโจทย์ 9 ข้อ" width="1600" height="760"></div><p class="cap">ไม่มีสกิล · <code>so-v3</code> (Skill Optimizer บท 05) · <code>w1</code> (WikiSkill) · ชุดละ 27 Trial</p></div></section>
+<section class="slide " data-title="gate ของบท 05 ตัดสิน: ดีกว่าไม่มีสกิลมาก แต่ยังแทน v3 ไม่ได้" data-group="LAB 2" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">gate ของบท 05 ตัดสิน: ดีกว่าไม่มีสกิลมาก แต่ยังแทน <code>v3</code> ไม่ได้</span><span class="tag">runs/w1/gate-*.txt</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx ok"><h4>ไม่มีสกิล → <code>w1</code></h4><p><b><span class="v accept">ACCEPT</span></b> · รวม +51.0 จุด (เกณฑ์ 2.0)</p></div><div class="cardx bad"><h4><code>so-v3</code> → <code>w1</code></h4><p><b><span class="v reject">REJECT</span></b> · Training ลด 4.8 จุด (เกณฑ์ 2.0)</p></div></div><p>ข้อความที่คำสั่ง <code>gate</code> พิมพ์จริง (<a href="runs/w1/gate-so-v3.txt" target="_blank"><code>runs/w1/gate-so-v3.txt</code></a>)</p><pre class="code term"><button class="copy">คัดลอก</button><span class="t">train: 100.0% → 95.2% (-4.8) · เกณฑ์ 2.0 จุด · ค่าใช้จ่าย $0.12 → $0.14 · คำสั่ง 3.0 → 3.2
+<span class="err">  ✗ คะแนนชุด train ลดลงเกิน 2.0 จุด → การแก้ไม่ได้ผล</span>
+val: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด · ค่าใช้จ่าย $0.12 → $0.13 · คำสั่ง 2.8 → 2.3
+<span class="err">ผล: REJECT ❌ ไม่รับ w1 แทน so-v3</span></span></pre></div></section>
+<section class="slide " data-title="สกิลแต่ละชุดครอบคลุมความรู้ข้อใด" data-group="LAB 2" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">สกิลแต่ละชุดครอบคลุมความรู้ข้อใด</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r05-coverage.png" alt="สกิลแต่ละชุดครอบคลุมความรู้ข้อใด" width="1600" height="1137"></div><p class="cap"><code>w1</code> ผ่านมาตรฐานการเขียนโค้ดครบ แต่นโยบายธุรกิจ <b>0/6</b> · (ภาพนี้มี <code>w1p</code> และ <code>w1q</code> ของ LAB 5 ด้วย)</p></div></section>
+<section class="slide " data-title="ข้อเดียวที่ w1 ยังไม่ผ่าน คือ policy" data-group="LAB 2" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 2 · วัดสกิลที่ได้ เทียบกับไม่มีสกิล และ <code>v3</code> ของบท 05</div><h2><span class="tt">ข้อเดียวที่ <code>w1</code> ยังไม่ผ่าน คือ <code>policy</code></span><span class="tag">runs/w1/failures.txt</span></h2></header><div class="body"><pre class="code term"><button class="copy">คัดลอก</button><span class="t"><span class="err">✗ policy: shipping_fee(3000, 0, false) คาด 0 ได้ 8000 · พลาด 4 จาก 6 กรณี</span>
+<span class="err">✗ policy: cashback(20000, "silver", true) คาด 300 ได้ 600 · พลาด 6 จาก 6 กรณี</span></span></pre><div class="cards" style="--cols:2"><div class="cardx ok"><h4>กลุ่ม 1 · มาตรฐานการเขียนโค้ด 5 ข้อ · ได้ครบ</h4><p>เกิดซ้ำทุกโจทย์ ข้อความของตัวตรวจบอกว่าคาดอะไร และ Validation ตรวจด้วย</p></div><div class="cardx bad"><h4>กลุ่ม 2 · นโยบายธุรกิจ 4 ข้อ · ไม่ได้</h4><p>มีแค่ 2 โจทย์ ตัวตรวจบอกตัวอย่างเดียว Wiki จึงจดว่า "ยังไม่ยืนยัน" · Validation ไม่มีข้อตรวจนี้ วงรอบจึงหยุดที่ 100%</p></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>Wiki รู้ว่าตัวเองไม่รู้: หน้า <a href="runs/w1/wiki/patterns/policy-ambiguous-edge-cases.md" target="_blank" rel="noopener"><code>policy-ambiguous-edge-cases.md</code></a> ตั้งสมมติฐานไว้ถูกทาง ("ระยะ 0 ได้ค่าส่ง 0" · "silver เดือนเกิดไม่คูณ 2" · "ทิศทางการปัดเศษของ cashback") แต่ไม่ยอมใส่ลงสกิลเพราะยังไม่มีหลักฐานยืนยัน · LAB 5 จะเติมส่วนนี้</span></div></div></section>
+<section class="slide divider" data-title="LAB 3 · รันซ้ำด้วยค่าเดิม (w2)" data-group="LAB 3"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 3</div><h1>รันซ้ำด้วยค่าเดิม (<code>w2</code>)</h1><div class="sub"><p>รันซ้ำด้วยค่าเดิม (<code>w2</code>)</p><div class="facts"><div><span class="fl">Trial</span>51</div><div><span class="fl">เวลาจริง</span>12 นาที</div><div><span class="fl">ผลจริง</span>1 รอบ · 96.8%</div></div></div></div></section>
+<section class="slide " data-title="LAB 3 ทำอะไร" data-group="LAB 3" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">LAB 3 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n07-lab3-steps.jpg" alt="LAB 3 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>สร้าง workspace <code>w2</code> แล้วรัน <code>loop</code> จนวงรอบหยุด · ค่าทุกตัวเหมือน <code>w1</code> ใน LAB 1</span></div><div class="stp"><span class="n">2</span><span>วัดสกิลของ <code>w2</code> กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial แล้วสรุปตารางเทียบ <code>noskill</code> <code>so-v3</code> <code>w1</code> <code>w2</code></span></div><div class="stp"><span class="n">3</span><span>เทียบ <code>w1</code> กับ <code>w2</code>: จำนวนรอบ · pattern ใน <code>wiki/index.md</code> · ข้อเสนอและผลตัดสินของแต่ละรอบ · คะแนนของสกิลที่ได้</span></div><div class="stp"><span class="n">4</span><span>เก็บผลและรายงาน: สิ่งที่เหมือนกันและสิ่งที่ต่างกัน</span></div></div></div></div></section>
+<section class="slide mid" data-title="LAB 3 · รันซ้ำด้วยค่าเดิม · ไฟล์เข้าและออก" data-group="LAB 3" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">LAB 3 · รันซ้ำด้วยค่าเดิม · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file">ค่าทุกตัวเหมือน LAB 1</div><div class="file"><a href="runs/w1/" target="_blank" rel="noopener"><code>runs/w1/</code></a> ใช้เทียบ</div></div><div class="ffar">➜</div><div class="ffmid">LAB 3<small>วงรอบใหม่ + วัดสกิล · 51 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/w2/" target="_blank" rel="noopener"><code>runs/w2/</code></a> workspace ใหม่: <code>raw/</code> <code>wiki/</code> <code>skills/</code> · <a href="runs/w2/status.txt" target="_blank" rel="noopener"><code>status.txt</code></a></div><div class="file"><a href="runs/w2/trials/" target="_blank" rel="noopener"><code>runs/w2/trials/</code></a> 27 Trial ของสกิลที่ได้</div><div class="file"><a href="runs/report.md" target="_blank" rel="noopener"><code>runs/report.md</code></a> ตารางเทียบ 4 ชุด</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 3 · รันซ้ำด้วยค่าเดิม" data-group="LAB 3" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">พรอมต์ · LAB 3 · รันซ้ำด้วยค่าเดิม</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–17 จาก 27</span><button class="copy big" data-full="prompt4">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: รัน WikiSkill ซ้ำอีก 1 ครั้งด้วยค่าเดิมทุกค่า (workspace w2) แล้วเทียบกับ w1 · ดูว่าผลของวงรอบซ้ำได้แค่ไหน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill (รันวงรอบ) และสกิล skill-optimizer (วัดสกิลที่ได้)
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ wiki/ skills/ เอง
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ใช้วัดตอนจบ: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- workspace ชื่อ w2 · ค่าทุกตัวเหมือน w1 ใน LAB 1: เริ่มจากชุดสกิลว่างและ wiki ว่าง · ไม่เกิน 8 รอบ · Inference Agent sonnet effort medium โจทย์ละ 3 รอบ · Wiki Maintainer และ Skill Proposer sonnet effort high
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- เมื่อวงรอบหยุด วัดสกิลของ w2 กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial (ค่าเดียวกับ LAB 2)
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 3 · รันซ้ำด้วยค่าเดิม" data-group="LAB 3" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">พรอมต์ · LAB 3 · รันซ้ำด้วยค่าเดิม</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 18–27 จาก 27</span><button class="copy big" data-full="prompt4">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate ของ WikiSkill รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best เท่านั้น · วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. รัน      สร้าง workspace w2 แล้วรัน loop จนวงรอบหยุด · บันทึกผลของ status ที่ runs/w2/status.txt
+2. วัด      สกิลของ w2 กับโจทย์ทุกชุด (ป้าย w2) แล้วสรุปตารางเทียบ noskill so-v3 w1 w2 (report) บันทึกที่ runs/report.md
+3. เทียบ    w1 กับ w2: จำนวนรอบ · pattern ใน wiki/index.md · ข้อเสนอและผลตัดสินของแต่ละรอบ (wiki/skill-impact.md) · คะแนนของสกิลที่ได้
+4. เก็บผล   คัดลอก runs/w2 และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน   ตาราง status ของ w2 · ตารางเทียบ w1 กับ w2 · สิ่งที่เหมือนกันและสิ่งที่ต่างกัน</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · LAB 3 · รันซ้ำด้วยค่าเดิม" data-group="LAB 3" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">ตรวจผลของคุณ · LAB 3 · รันซ้ำด้วยค่าเดิม</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="LAB 3-0"><span><code>runs/w2/</code> เป็น workspace ใหม่ มี <code>raw/</code> <code>wiki/</code> <code>skills/</code> และ <code>status.txt</code></span></label><label class="chk"><input type="checkbox" data-k="LAB 3-1"><span><code>loop</code> ถูกเริ่ม <b>ครั้งเดียว</b> และรันจนวงรอบหยุดเอง</span></label><label class="chk"><input type="checkbox" data-k="LAB 3-2"><span><code>runs/w2/trials/</code> มี 27 โฟลเดอร์ · <code>runs/report.md</code> มี 4 ชุด (<code>noskill</code> <code>so-v3</code> <code>w1</code> <code>w2</code>)</span></label><label class="chk"><input type="checkbox" data-k="LAB 3-3"><span>รายงานมีตารางเทียบ <code>w1</code> กับ <code>w2</code>: จำนวนรอบ · pattern ใน <code>wiki/index.md</code> · ข้อเสนอและผลตัดสิน · คะแนน</span></label><label class="chk"><input type="checkbox" data-k="LAB 3-4"><span>รายงานบอกสิ่งที่เหมือนกันและสิ่งที่ต่างกัน</span></label></div><div class="note result">ผลของผู้สอน: <code>w2</code> ใช้ 1 รอบ (Validation 100.0% ตั้งแต่รอบแรก) · สกิล <code>solve-py-deliverable</code> 76 บรรทัด · รวม 96.8% · Test 97.8% · <code>policy</code> 0/6 · ใช้ 12 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide " data-title="เส้นทางของ w2: สกิลที่เสนอในรอบแรกได้ Validation 100.0% วงรอบจึงหยุด" data-group="LAB 3" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">เส้นทางของ <code>w2</code>: สกิลที่เสนอในรอบแรกได้ Validation 100.0% วงรอบจึงหยุด</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r01-path-w2.png" alt="เส้นทางของ w2: สกิลที่เสนอในรอบแรกได้ Validation 100.0% วงรอบจึงหยุด" width="1600" height="760"></div><p class="cap">ค่าทุกตัวเหมือน <code>w1</code> · สกิลที่ได้ชื่อ <code>solve-py-deliverable</code> · สถานะ: หยุดแล้ว เพราะ R_best = 100% ที่รอบ 1 (หยุดก่อนครบ 8 รอบ)</p></div></section>
+<section class="slide " data-title="รันซ้ำด้วยค่าเดิม: ผลรวมใกล้กัน แต่เส้นทางต่างกัน" data-group="LAB 3" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt">รันซ้ำด้วยค่าเดิม: ผลรวมใกล้กัน แต่เส้นทางต่างกัน</span><span class="tag">ตารางหลัก</span></h2></header><div class="body"><table class="c3"><thead><tr><th></th><th><code>w1</code> (LAB 1)</th><th><code>w2</code> (LAB 3)</th></tr></thead><tbody><tr><td>รอบที่ใช้</td><td>2</td><td><b>1</b></td></tr><tr><td>Validation หลังรอบที่ 1</td><td>93.3% → ทำรอบที่ 2</td><td>100.0% → หยุด</td></tr><tr><td>pattern ใน Wiki</td><td>7 หน้า</td><td>6 หน้า</td></tr><tr><td>สกิลที่ได้</td><td><code>solve-py-contract</code> 107 บรรทัด</td><td><code>solve-py-deliverable</code> 76 บรรทัด</td></tr><tr><td>รู้เกณฑ์ "เทสต์อย่างน้อย 6 ข้อ"</td><td><b>รู้</b> (จากรอบที่ 2)</td><td>ไม่รู้</td></tr><tr><td>Trial ระหว่างปรับ</td><td>42</td><td>24</td></tr><tr><td>คะแนนรวม 27 Trial</td><td><b>97.9%</b> (ผ่านครบ 21/27)</td><td>96.8% (ผ่านครบ 18/27)</td></tr><tr><td>Test Set</td><td><b>100.0%</b></td><td>97.8%</td></tr><tr><td>ข้อตรวจ <code>policy</code></td><td>0/6 · Wiki จดว่ายังไม่ยืนยัน</td><td>0/6 · Wiki จดว่ายังไม่ยืนยัน</td></tr></tbody></table><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>สิ่งที่ซ้ำได้: ค้นพบมาตรฐานการเขียนโค้ดเอง ได้คะแนนราว 97% และไม่รู้นโยบายธุรกิจ · สิ่งที่ไม่ซ้ำ: จำนวนรอบ ชื่อและความยาวของสกิล และจำนวน pattern</span></div></div></section>
+<section class="slide mid" data-title="w2 หยุดเร็วกว่า เพราะ Validation ผ่านครบตั้งแต่รอบแรก" data-group="LAB 3" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 3 · รันซ้ำด้วยค่าเดิม (<code>w2</code>)</div><h2><span class="tt"><code>w2</code> หยุดเร็วกว่า เพราะ Validation ผ่านครบตั้งแต่รอบแรก</span></h2></header><div class="body"><p class="bigq">Validation 6 Trial ผ่านครบ<br><em>ไม่ได้แปลว่าสกิลครบ</em></p><div class="note eye"><span class="lbl">ข้อสังเกต</span><span><code>w2</code> หยุดเร็วกว่าเพราะ Validation 6 Trial ผ่านครบในรอบแรก จึงไม่มีรอบที่ 2 ที่จะพบว่าเทสต์ยังไม่ถึง 6 ข้อ · จุดอ่อนนี้โผล่ตอนวัด 27 Trial: <code>unittest พบ 5 เทสต์ (ต้องมีอย่างน้อย 6)</code> 3 Trial · Gate ของ WikiSkill ไม่คิดความแกว่งของการวัด การหยุดจึงขึ้นกับโชคของ Validation ครั้งนั้น</span></div></div></section>
+<section class="slide divider" data-title="LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (n1)" data-group="LAB 4"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 4</div><h1>การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</h1><div class="sub"><p>ตัด Wiki ออก (<code>n1</code>)</p><div class="facts"><div><span class="fl">Trial</span>51</div><div><span class="fl">เวลาจริง</span>7 นาที</div><div><span class="fl">ผลจริง</span>1 รอบ · 95.7% · ไม่เหลือ Wiki</div></div></div></div></section>
+<section class="slide " data-title="LAB 4 ทำอะไร" data-group="LAB 4" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">LAB 4 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n08-lab4-steps.jpg" alt="LAB 4 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>สร้าง workspace <code>n1</code> แบบ <b>ไม่ใช้ wiki</b> แล้วรัน <code>loop</code> จนวงรอบหยุด · ไม่มี Wiki Maintainer · Skill Proposer เห็นเฉพาะ Trace ของรอบล่าสุด</span></div><div class="stp"><span class="n">2</span><span>วัดสกิลของ <code>n1</code> กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial</span></div><div class="stp"><span class="n">3</span><span>เทียบ <code>n1</code> กับ <code>w1</code> และ <code>w2</code>: จำนวนรอบ · จำนวน Trial · จำนวนการเรียกโมเดลของผู้ปรับสกิล · คะแนน · สิ่งที่เหลือในโฟลเดอร์เมื่อจบ</span></div><div class="stp"><span class="n">4</span><span>เก็บผลและรายงาน: สิ่งที่ <code>n1</code> ไม่มีเมื่อจบ</span></div></div></div></div></section>
+<section class="slide mid" data-title="LAB 4 · การทดลองตัดส่วนประกอบ · ไฟล์เข้าและออก" data-group="LAB 4" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">LAB 4 · การทดลองตัดส่วนประกอบ · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file">ค่าทุกตัวเหมือน LAB 1 ยกเว้นไม่ใช้ wiki</div><div class="file"><a href="runs/w1/" target="_blank" rel="noopener"><code>runs/w1/</code></a> · <a href="runs/w2/" target="_blank" rel="noopener"><code>runs/w2/</code></a> ใช้เทียบ</div></div><div class="ffar">➜</div><div class="ffmid">LAB 4<small>วงรอบแบบไม่ใช้ wiki + วัดสกิล · 51 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/n1/" target="_blank" rel="noopener"><code>runs/n1/</code></a> workspace: <code>raw/</code> <code>skills/</code> (ไม่มี <code>wiki/</code>) · <a href="runs/n1/status.txt" target="_blank" rel="noopener"><code>status.txt</code></a></div><div class="file"><a href="runs/n1/trials/" target="_blank" rel="noopener"><code>runs/n1/trials/</code></a> 27 Trial ของสกิลที่ได้</div><div class="file"><a href="runs/report.md" target="_blank" rel="noopener"><code>runs/report.md</code></a> ตารางเทียบ 5 ชุด</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 4 · การทดลองตัดส่วนประกอบ" data-group="LAB 4" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">พรอมต์ · LAB 4 · การทดลองตัดส่วนประกอบ</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–17 จาก 27</span><button class="copy big" data-full="prompt5">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: การทดลองตัดส่วนประกอบ (Ablation) · รัน WikiSkill แบบไม่มี Wiki (workspace n1) แล้วเทียบกับ w1 และ w2
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill (รันวงรอบ) และสกิล skill-optimizer (วัดสกิลที่ได้)
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ skills/ เอง
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ใช้วัดตอนจบ: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- workspace ชื่อ n1 · ค่าทุกตัวเหมือน w1 ใน LAB 1 ยกเว้นข้อเดียว: **ไม่ใช้ wiki** (ไม่มี Wiki Maintainer · Skill Proposer เห็นเฉพาะ Trace ของรอบล่าสุด)
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- เมื่อวงรอบหยุด วัดสกิลของ n1 กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial (ค่าเดียวกับ LAB 2)
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · LAB 4 · การทดลองตัดส่วนประกอบ" data-group="LAB 4" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">พรอมต์ · LAB 4 · การทดลองตัดส่วนประกอบ</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 18–27 จาก 27</span><button class="copy big" data-full="prompt5">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate ของ WikiSkill รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best เท่านั้น · วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. รัน      สร้าง workspace n1 แบบไม่ใช้ wiki แล้วรัน loop จนวงรอบหยุด · บันทึกผลของ status ที่ runs/n1/status.txt
+2. วัด      สกิลของ n1 กับโจทย์ทุกชุด (ป้าย n1) แล้วสรุปตารางเทียบ noskill so-v3 w1 w2 n1 (report) บันทึกที่ runs/report.md
+3. เทียบ    n1 กับ w1 และ w2: จำนวนรอบ · ข้อเสนอที่ถูกรับและถูกปฏิเสธ · จำนวน Trial · จำนวนการเรียกโมเดลของผู้ปรับสกิล · คะแนนของสกิลที่ได้ · สิ่งที่เหลือในโฟลเดอร์เมื่อจบ
+4. เก็บผล   คัดลอก runs/n1 และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน   ตาราง status ของ n1 · ตารางเทียบ n1 กับ w1 และ w2 · สิ่งที่ n1 ไม่มีเมื่อจบ</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · LAB 4 · การทดลองตัดส่วนประกอบ" data-group="LAB 4" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">ตรวจผลของคุณ · LAB 4 · การทดลองตัดส่วนประกอบ</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="LAB 4-0"><span><code>runs/n1/</code> มี <code>raw/</code> และ <code>skills/</code> แต่ <b>ไม่มี</b> <code>wiki/</code></span></label><label class="chk"><input type="checkbox" data-k="LAB 4-1"><span>บรรทัดแรกของ <code>runs/n1/status.txt</code> ลงท้ายด้วย <code>wiki: ไม่ใช้</code></span></label><label class="chk"><input type="checkbox" data-k="LAB 4-2"><span><code>runs/n1/trials/</code> มี 27 โฟลเดอร์ · <code>runs/report.md</code> มี 5 ชุด</span></label><label class="chk"><input type="checkbox" data-k="LAB 4-3"><span>รายงานมีตารางเทียบ <code>n1</code> กับ <code>w1</code> และ <code>w2</code>: จำนวนรอบ · จำนวน Trial · จำนวนการเรียกโมเดลของผู้ปรับสกิล · คะแนน</span></label><label class="chk"><input type="checkbox" data-k="LAB 4-4"><span>รายงานบอกสิ่งที่ <code>n1</code> ไม่มีเมื่อจบ</span></label></div><div class="note result">ผลของผู้สอน: <code>n1</code> ใช้ 1 รอบ · 24 Trial · เรียกโมเดลของผู้ปรับสกิล 5 ครั้ง · รวม 95.7% · Test 95.6% · เหลือสกิลอย่างเดียว · ใช้ 7 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide " data-title="เส้นทางของ n1: ไม่มี Wiki สกิลที่เสนอในรอบแรกได้ Validation 100% วงรอบจึงหยุด" data-group="LAB 4" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">เส้นทางของ <code>n1</code>: ไม่มี Wiki สกิลที่เสนอในรอบแรกได้ Validation 100% วงรอบจึงหยุด</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r01-path-n1.png" alt="เส้นทางของ n1: ไม่มี Wiki สกิลที่เสนอในรอบแรกได้ Validation 100% วงรอบจึงหยุด" width="1600" height="760"></div><p class="cap">เปเปอร์รายงานว่าเมื่อตัด Wiki ออก คะแนนเฉลี่ยลดจาก 63.7% เหลือ 48.7% · LAB นี้ลองกับโจทย์ของเรา: ไม่มี Wiki Maintainer และ Skill Proposer เห็นเฉพาะ Trace ของรอบล่าสุด</p></div></section>
+<section class="slide mid" data-title="ผลจริง LAB 4: ตัด Wiki ออก คะแนนไม่ต่างกันชัดเจน" data-group="LAB 4" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">ผลจริง LAB 4: ตัด Wiki ออก คะแนนไม่ต่างกันชัดเจน</span><span class="tag">ไม่มี Wiki · n1</span></h2></header><div class="body"><div class="tiles"><div class="tile "><div class="k">คะแนนรวม 27 Trial</div><div class="num">95.7%</div><div class="s"><code>w1</code> 97.9% · <code>w2</code> 96.8%</div></div><div class="tile "><div class="k">Test Set</div><div class="num">95.6%</div><div class="s"><code>w1</code> 100.0% · <code>w2</code> 97.8%</div></div><div class="tile "><div class="k">รอบที่ใช้</div><div class="num">1</div><div class="s"><code>w1</code> 2 · <code>w2</code> 1</div></div><div class="tile ok"><div class="k">การเรียกโมเดลของผู้ปรับสกิล</div><div class="num">5 ครั้ง</div><div class="s"><code>w1</code> 16 ครั้ง · <code>w2</code> 11 ครั้ง</div></div><div class="tile bad"><div class="k">Trial ที่เทสต์ไม่ถึง 6 ข้อ</div><div class="num">6</div><div class="s"><code>w1</code> 0 · <code>w2</code> 3</div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>บนโจทย์นี้การตัด Wiki ออก <b>ไม่ทำให้คะแนนต่างกันชัดเจน</b>: ผลต่าง 1–2 จุดระหว่าง 3 การรันมาจากจังหวะหยุด (<code>n1</code> และ <code>w2</code> หยุดที่รอบแรกเหมือนกัน และพลาดข้อเดียวกัน) · โจทย์นี้จบใน 1–2 รอบ จึงยังไม่มีความรู้ข้ามรอบให้สะสมมากพอจะเห็นผลแบบในเปเปอร์ที่รัน 8 รอบ</span></div></div></section>
+<section class="slide mid" data-title="สิ่งที่ต่างชัดคือสิ่งที่เหลือเมื่อจบ" data-group="LAB 4" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 4 · การทดลองตัดส่วนประกอบ: ไม่มี Wiki (<code>n1</code>)</div><h2><span class="tt">สิ่งที่ต่างชัดคือสิ่งที่เหลือเมื่อจบ</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx ok"><h4>มี Wiki · <code>w1</code></h4><ul><li><b>เหลือ</b>: สกิล + Wiki 7 หน้า + ประวัติข้อเสนอพร้อม diff</li><li><b>เรื่องนโยบายธุรกิจ</b>: Wiki จดว่ายังไม่ยืนยัน พร้อมสมมติฐาน</li></ul></div><div class="cardx ok"><h4>มี Wiki · <code>w2</code></h4><ul><li><b>เหลือ</b>: สกิล + Wiki 6 หน้า + ประวัติข้อเสนอ</li><li><b>เรื่องนโยบายธุรกิจ</b>: Wiki จดว่ายังไม่ยืนยัน</li></ul></div><div class="cardx bad"><h4>ไม่มี Wiki · <code>n1</code></h4><ul><li><b>เหลือ</b>: <b>สกิลอย่างเดียว</b></li><li><b>เรื่องนโยบายธุรกิจ</b>: ไม่มีบันทึก</li></ul></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>สิ่งที่ต่างชัดคือ <b>สิ่งที่เหลือ</b>: <code>n1</code> ถูกกว่า (5 ครั้งเทียบกับ 11–16 ครั้ง) แต่ไม่มีอะไรบอกว่าสกิลนี้มาจากหลักฐานใด และไม่มีใครจดว่ามีเรื่องที่ยังไม่รู้ · ความรู้ข้อนี้จำเป็นใน LAB 5</span></div></div></section>
+<section class="slide divider" data-title="LAB 5 · เติมความรู้จากทีม (w1p → w1q)" data-group="LAB 5"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · 3 · ลงมือทำ</div><div class="big">LAB 5</div><h1>เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</h1><div class="sub"><p>เติมนโยบายธุรกิจจากทีม (<code>w1p</code> · <code>w1q</code>)</p><div class="facts"><div><span class="fl">Trial</span>54</div><div><span class="fl">เวลาจริง</span>5.1 ใช้ 5 นาที · 5.2 ใช้ 5 นาที</div><div><span class="fl">ผลจริง</span><code>w1p</code> <b><span class="v reject">REJECT</span></b> · <code>w1q</code> 100.0% <b><span class="v accept">ACCEPT</span></b></div></div></div></div></section>
+<section class="slide " data-title="ความรู้บางอย่างไม่อยู่ใน Trace: ต้องถามทีม" data-group="LAB 5" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ความรู้บางอย่างไม่อยู่ใน Trace: ต้องถามทีม</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="01_theory/img/g06-ask-team.png" alt="ความรู้บางอย่างไม่อยู่ใน Trace: ต้องถามทีม" width="1600" height="900"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>WikiSkill หานโยบายธุรกิจเองไม่ได้ แต่ Wiki จดไว้ว่าต้องถามอะไร</span></div><div class="stp"><span class="n">2</span><span>ผู้เรียนรับบทคนในทีม ตอบเรื่องที่ Wiki จดว่ายังไม่ยืนยัน</span></div><div class="stp"><span class="n">3</span><span>เติมลงสกิลด้วยวิธีของบท 05: แก้ไม่เกิน 3 จุด → วัด → gate</span></div></div></div></div></section>
+<section class="slide " data-title="LAB 5 ทำอะไร" data-group="LAB 5" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">LAB 5 ทำอะไร</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n09-lab5-steps.jpg" alt="LAB 5 ทำอะไร" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ผู้เรียนรับบทคนในทีม: ตอบเรื่องที่ Wiki ของ <code>w1</code> จดว่ายังไม่ยืนยัน (นโยบายธุรกิจ 4 ข้อ อยู่ในพรอมต์)</span></div><div class="stp"><span class="n">2</span><span>ขั้น 5.1: คัดลอกสกิลของ <code>w1</code> เป็น <code>w1p</code> แก้ไม่เกิน 3 จุด · เขียนเป็นนโยบายของร้าน ห้ามใส่ Input หรือคำตอบของข้อตรวจ</span></div><div class="stp"><span class="n">3</span><span>วัด 27 Trial แล้ว <code>gate</code> ของบท 05 ตัดสิน <code>w1</code> → <code>w1p</code></span></div><div class="stp"><span class="n">4</span><span>ขั้น 5.2: รุ่นที่ถูกปฏิเสธไม่ถูกใช้ต่อ · เริ่มจาก <code>w1</code> อีกครั้งด้วยความรู้ชุดเดิม แต่ระบุว่านโยบายแต่ละข้อใช้กับฟังก์ชันใด เป็นรุ่น <code>w1q</code></span></div><div class="stp"><span class="n">5</span><span>วัด 27 Trial แล้ว <code>gate</code> ตัดสิน <code>w1</code> → <code>w1q</code></span></div></div></div></div></section>
+<section class="slide mid" data-title="ขั้น 5.1 · ไฟล์เข้าและออก" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ขั้น 5.1 · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file">ความรู้จากทีม 4 ข้อ (อยู่ในพรอมต์)</div><div class="file"><a href="runs/w1/wiki/" target="_blank" rel="noopener"><code>runs/w1/wiki/</code></a> เรื่องที่ยังไม่ยืนยัน · <a href="runs/w1/failures.txt" target="_blank" rel="noopener"><code>runs/w1/failures.txt</code></a></div><div class="file"><a href="runs/w1/skills/" target="_blank" rel="noopener"><code>runs/w1/skills/</code></a> สกิลรุ่นฐาน</div></div><div class="ffar">➜</div><div class="ffmid">ขั้น 5.1<small>วัด 27 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/w1p/skills/" target="_blank" rel="noopener"><code>runs/w1p/skills/</code></a> สกิลของ <code>w1</code> + นโยบายธุรกิจ</div><div class="file"><a href="runs/w1p/trials/" target="_blank" rel="noopener"><code>runs/w1p/trials/</code></a> 27 Trial</div><div class="file"><a href="runs/w1p/gate-w1.txt" target="_blank" rel="noopener"><code>runs/w1p/gate-w1.txt</code></a> · <a href="runs/w1p/gate-so-v3.txt" target="_blank" rel="noopener"><code>gate-so-v3.txt</code></a> ผลตัดสิน</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (w1p)" data-group="LAB 5" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">พรอมต์ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (<code>w1p</code>)</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–24 จาก 35</span><button class="copy big" data-full="prompt6">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: ต่อยอดสกิลที่ WikiSkill สร้าง (w1) · เติมนโยบายธุรกิจที่ทีมยืนยันแล้ว ด้วยวิธีของบท 05 เป็นรุ่น w1p แล้วให้ gate ตัดสิน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน runs/w1 (สร้างรุ่นใหม่เท่านั้น)
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้หาข้อที่ผิด: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ: x1-late-fee x2-refund x3-bulk-price
+
+ความรู้จากทีม (คำตอบของเรื่องที่ wiki ของ w1 จดว่ายังไม่ยืนยัน):
+- ระยะทาง 0 กม. คือลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+- ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม เกินกว่านี้ถือเป็นข้อมูลผิด
+- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum
+- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น
+
+วิธีทดลอง:
+- รุ่นฐาน w1 = สกิลที่ WikiSkill สร้าง (วัดไว้แล้วใน LAB 2)
+- รุ่นใหม่ w1p = สกิลของ w1 + นโยบายธุรกิจ
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- วัดรุ่นใหม่ 1 รุ่น: 9 โจทย์ × 3 รอบ = 27 Trial ด้วยค่าเดียวกับ LAB 2
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (w1p)" data-group="LAB 5" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">พรอมต์ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (<code>w1p</code>)</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 25–35 จาก 35</span><button class="copy big" data-full="prompt6">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- gate เทียบรุ่นใหม่กับรุ่นฐาน แล้วตอบ ACCEPT หรือ REJECT: Training และ Validation ต้องไม่ลด และคะแนนรวมต้องดีขึ้นเกินความแกว่ง หรือเท่าเดิมแต่ต้นทุนลดอย่างน้อย 10%
+
+ทำตามลำดับ:
+1. หาจุดแก้  ดู 3 อย่าง: ข้อที่ผิดของ w1 (Training Set) · เรื่องที่ wiki ของ w1 จดว่ายังไม่ยืนยัน (runs/w1/wiki/index.md และหน้า pattern ที่เกี่ยวข้อง) · ความรู้จากทีมข้างบน
+2. แก้        คัดลอก runs/w1/skills เป็น runs/w1p/skills แล้วแก้ไม่เกิน 3 จุด · เขียนเป็นนโยบายของร้าน ห้ามใส่ Input หรือคำตอบของข้อตรวจ
+3. วัด        รุ่น w1p กับโจทย์ทุกชุด
+4. ตัดสิน     gate w1 → w1p และ gate so-v3 → w1p ใช้ต้นทุน context_tokens บันทึกที่ runs/w1p/gate-w1.txt และ runs/w1p/gate-so-v3.txt · ตารางเทียบทุกชุด (report) บันทึกที่ runs/report.md
+5. เก็บผล     คัดลอก runs/w1p และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผล และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+6. รายงาน     จุดที่แก้ใน w1p และเหตุผล · ตารางเทียบทุกชุด · ผล gate 2 คู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (w1p)" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ตรวจผลของคุณ · ขั้น 5.1 · เติมนโยบาย 4 ข้อ (<code>w1p</code>)</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="ขั้น 5.1-0"><span><code>runs/w1p/skills/</code> = สกิลของ <code>w1</code> ที่แก้ไม่เกิน 3 จุด · ไฟล์ใน <code>runs/w1</code> ไม่ถูกแก้</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.1-1"><span>นโยบายถูกเขียนเป็นนโยบายของร้าน ไม่มี Input หรือคำตอบของข้อตรวจ</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.1-2"><span><code>runs/w1p/trials/</code> มี 27 โฟลเดอร์ · วัดด้วยค่าเดียวกับ LAB 2</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.1-3"><span><code>runs/w1p/gate-w1.txt</code> และ <code>runs/w1p/gate-so-v3.txt</code> มีบรรทัด <code>ผล:</code></span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.1-4"><span>ถ้า <span class="v reject">REJECT</span>: ไม่แก้ <code>w1p</code> เพิ่ม และไม่วัดซ้ำเพื่อให้ผ่าน (ไปขั้น 5.2)</span></label></div><div class="note result">ผลของผู้สอน: Training 95.2% → 100.0% (<code>policy</code> 0/6 → 6/6) · Validation 100.0% → 96.7% · Test 100.0% → 93.3% · รวม 97.9% → 97.0% · <span class="v reject">REJECT</span></div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide mid" data-title="ผลจริงขั้น 5.1: w1 → w1p · REJECT" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ผลจริงขั้น 5.1: <code>w1</code> → <code>w1p</code> · <span class="v reject">REJECT</span></span><span class="tag">runs/w1p/gate-w1.txt</span></h2></header><div class="body"><div class="tiles"><div class="tile "><div class="k">Training Set</div><div class="num">100.0%</div><div class="s">จาก 95.2% · <b>+4.8 จุด</b> · <code>policy</code> 6/6</div></div><div class="tile bad"><div class="k">Validation Set</div><div class="num">96.7%</div><div class="s">จาก 100.0% · <b>-3.3 จุด</b></div></div><div class="tile bad"><div class="k">Test Set</div><div class="num">93.3%</div><div class="s">จาก 100.0% · <b>-6.7 จุด</b></div></div><div class="tile bad"><div class="k">คะแนนรวมของ <code>w1p</code></div><div class="num">97.0%</div><div class="s">จาก 97.9% · <b>-0.9 จุด</b> · เกณฑ์ 2.0 จุด</div></div><div class="tile bad"><div class="k">gate ของบท 05</div><div class="num">REJECT</div><div class="s">ใช้ <code>w1</code> ต่อ</div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>นโยบายถูกทุกข้อ แต่หัวข้อสุดท้ายเขียนเป็นกติกาทั่วไป: "เงินที่ร้านจ่ายออก ให้ปัดลง" · งานคืนเงินคอร์สของ Test Set ก็เป็นเงินที่ร้านจ่ายออก Agent จึงปัดลงด้วย และผิดทั้ง 3 Trial</span></div></div></section>
+<section class="slide " data-title="นโยบายถูกทุกข้อ แต่ข้อสุดท้ายเขียนเป็นกติกาทั่วไป" data-group="LAB 5" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">นโยบายถูกทุกข้อ แต่ข้อสุดท้ายเขียนเป็นกติกาทั่วไป</span></h2></header><div class="body"><pre class="code "><button class="copy">คัดลอก</button><span class="t">+## นโยบายธุรกิจของร้าน (ทีมยืนยันแล้ว ใช้แทนการเดาเมื่อโจทย์ไม่บอก)
++### ค่าส่งและการส่งด่วน
++- ระยะทาง 0 กม. คือลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
++- ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม เกินกว่านี้ถือเป็นข้อมูลผิด ให้ raise ValueError
++### สิทธิ์เงินคืนในเดือนเกิด
++- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum สมาชิกระดับอื่นได้อัตราปกติ
++### การปัดเศษเงินที่ร้านจ่ายออก
++- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น (เงินที่ลูกค้าจ่ายเข้าร้านยังใช้กติกาปัดของโจทย์)</span></pre><p>ผลใน Test Set · งานคืนเงินคอร์ส <code>x2-refund</code> ของ <code>w1p</code></p><pre class="code term"><button class="copy">คัดลอก</button><span class="t"><span class="err">✗ half_up: refund(150, 25, false) คาด 113 ได้ 112 · พลาด 3 จาก 3 กรณี        ← x2-refund ของ w1p</span>
+    # เงินที่ร้านจ่ายออก: ปัดลงครั้งเดียวตอนท้าย (จำนวนเต็มล้วน)                ← โค้ดที่ Agent เขียน</span></pre></div></section>
+<section class="slide mid" data-title="ขั้น 5.2 · ไฟล์เข้าและออก" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ขั้น 5.2 · ไฟล์เข้าและออก</span></h2></header><div class="body"><div class="ff"><div class="ffcol in"><div class="ffh">INPUT · ไฟล์ที่ใช้</div><div class="file">ความรู้จากทีม 4 ข้อ (ชุดเดิม)</div><div class="file"><a href="runs/w1p/gate-w1.txt" target="_blank" rel="noopener"><code>runs/w1p/gate-w1.txt</code></a> ผลของรุ่นที่ถูกปฏิเสธ</div><div class="file"><a href="runs/w1/skills/" target="_blank" rel="noopener"><code>runs/w1/skills/</code></a> สกิลรุ่นฐาน</div></div><div class="ffar">➜</div><div class="ffmid">ขั้น 5.2<small>วัด 27 Trial</small></div><div class="ffar">➜</div><div class="ffcol out"><div class="ffh">OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน</div><div class="file"><a href="runs/w1q/skills/" target="_blank" rel="noopener"><code>runs/w1q/skills/</code></a> สกิลของ <code>w1</code> + นโยบายที่มีขอบเขต</div><div class="file"><a href="runs/w1q/trials/" target="_blank" rel="noopener"><code>runs/w1q/trials/</code></a> 27 Trial</div><div class="file"><a href="runs/w1q/gate-w1.txt" target="_blank" rel="noopener"><code>runs/w1q/gate-w1.txt</code></a> · <a href="runs/w1q/gate-so-v3.txt" target="_blank" rel="noopener"><code>gate-so-v3.txt</code></a> · <a href="runs/report.md" target="_blank" rel="noopener"><code>runs/report.md</code></a> ตารางเทียบ 7 ชุด</div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (w1q)" data-group="LAB 5" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">พรอมต์ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (<code>w1q</code>)</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 1/2 · บรรทัด 1–21 จาก 38</span><button class="copy big" data-full="prompt7">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">งาน: แก้รุ่นที่ถูกปฏิเสธ · สร้างรุ่น w1q จาก w1 ด้วยนโยบายธุรกิจชุดเดิม แต่กำกับขอบเขตของแต่ละข้อให้ชัด แล้วให้ gate ตัดสิน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน runs/w1 และ runs/w1p (สร้างรุ่นใหม่เท่านั้น)
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้หาข้อที่ผิด: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ: x1-late-fee x2-refund x3-bulk-price
+
+สิ่งที่รู้จากรุ่น w1p ที่ถูกปฏิเสธ (runs/w1p/gate-w1.txt และ runs/report.md):
+- Training ขึ้นเป็น 100.0% แต่ Validation ลดจาก 100.0% เป็น 96.7% และ Test ลดจาก 100.0% เป็น 93.3%
+- สมมติฐาน: นโยบายที่เขียนเป็นกติกาทั่วไป (เช่น "เงินที่ร้านจ่ายออก ให้ปัดลง") ถูก Agent นำไปใช้กับงานอื่นที่ไม่เกี่ยว
+
+ความรู้จากทีม (ชุดเดิม):
+- ระยะทาง 0 กม. คือลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+- ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม เกินกว่านี้ถือเป็นข้อมูลผิด
+- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum
+- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น</span></pre></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (w1q)" data-group="LAB 5" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">พรอมต์ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (<code>w1q</code>)</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"><b> คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter</b></span><span class="plabel">ส่วนที่ 2/2 · บรรทัด 22–38 จาก 38</span><button class="copy big" data-full="prompt7">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">วิธีทดลอง:
+- รุ่นฐาน w1 = สกิลที่ WikiSkill สร้าง (วัดไว้แล้วใน LAB 2)
+- รุ่นใหม่ w1q = สกิลของ w1 + นโยบายธุรกิจที่กำกับขอบเขต: นโยบายค่าส่งใช้กับฟังก์ชันคิดค่าส่งเท่านั้น · นโยบายเงินคืนใช้กับฟังก์ชันคิดเงินคืนสมาชิกเท่านั้น · งานอื่นทุกงานใช้กติกาเดิมของสกิล
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- วัดรุ่นใหม่ 1 รุ่น: 9 โจทย์ × 3 รอบ = 27 Trial ด้วยค่าเดียวกับ LAB 2
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- gate เทียบรุ่นใหม่กับรุ่นฐาน แล้วตอบ ACCEPT หรือ REJECT: Training และ Validation ต้องไม่ลด และคะแนนรวมต้องดีขึ้นเกินความแกว่ง หรือเท่าเดิมแต่ต้นทุนลดอย่างน้อย 10%
+
+ทำตามลำดับ:
+1. แก้        คัดลอก runs/w1/skills เป็น runs/w1q/skills แล้วแก้ไม่เกิน 3 จุด · เขียนเป็นนโยบายของร้านพร้อมขอบเขตของแต่ละข้อ ห้ามใส่ Input หรือคำตอบของข้อตรวจ
+2. วัด        รุ่น w1q กับโจทย์ทุกชุด
+3. ตัดสิน     gate w1 → w1q และ gate so-v3 → w1q ใช้ต้นทุน context_tokens บันทึกที่ runs/w1q/gate-w1.txt และ runs/w1q/gate-so-v3.txt · ตารางเทียบทุกชุด (report) บันทึกที่ runs/report.md
+4. เก็บผล     คัดลอก runs/w1q และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผล และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน     จุดที่แก้ใน w1q เทียบกับ w1p · ตารางเทียบทุกชุด · ผล gate 2 คู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (w1q)" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ตรวจผลของคุณ · ขั้น 5.2 · กำกับขอบเขตของนโยบาย (<code>w1q</code>)</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="ขั้น 5.2-0"><span><code>runs/w1q/skills/</code> สร้างจาก <code>runs/w1/skills</code> (ไม่ใช่จาก <code>w1p</code>) · แก้ไม่เกิน 3 จุด</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.2-1"><span>นโยบายแต่ละข้อมีขอบเขต: ค่าส่งใช้กับฟังก์ชันคิดค่าส่งเท่านั้น · เงินคืนใช้กับฟังก์ชันคิดเงินคืนสมาชิกเท่านั้น</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.2-2"><span><code>runs/w1q/trials/</code> มี 27 โฟลเดอร์</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.2-3"><span><code>runs/w1q/gate-w1.txt</code> และ <code>runs/w1q/gate-so-v3.txt</code> มีบรรทัด <code>ผล:</code> · <code>runs/report.md</code> มี 7 ชุด</span></label><label class="chk"><input type="checkbox" data-k="ขั้น 5.2-4"><span>รายงานมีจุดที่แก้ใน <code>w1q</code> เทียบกับ <code>w1p</code></span></label></div><div class="note result">ผลของผู้สอน: Training · Validation · Test 100.0% ทั้ง 3 ชุด (ผ่านครบ 27/27) · รวม 97.9% → 100.0% (+2.1 จุด · เกณฑ์ 2.0) · <code>w1</code> → <code>w1q</code> <span class="v accept">ACCEPT</span> · <code>so-v3</code> → <code>w1q</code> <span class="v reject">REJECT</span> (โทเคนขาเข้ามากกว่า 12%)</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ AI ไม่ตอบเหมือนกันทุกครั้ง (LAB 3 แสดงให้เห็น) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผล และรูปแบบของ <code>status</code> กับ <code>gate</code></span></div></div></section>
+<section class="slide mid" data-title="ผลจริงขั้น 5.2: w1 → w1q · ACCEPT" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ผลจริงขั้น 5.2: <code>w1</code> → <code>w1q</code> · <span class="v accept">ACCEPT</span></span><span class="tag">runs/w1q/gate-w1.txt</span></h2></header><div class="body"><div class="tiles"><div class="tile "><div class="k">Training Set</div><div class="num">100.0%</div><div class="s">จาก 95.2% · <b>+4.8 จุด</b> · <code>policy</code> 6/6</div></div><div class="tile "><div class="k">Validation Set</div><div class="num">100.0%</div><div class="s">จาก 100.0% · <b>+0.0 จุด</b></div></div><div class="tile "><div class="k">Test Set</div><div class="num">100.0%</div><div class="s">จาก 100.0% · <b>+0.0 จุด</b></div></div><div class="tile "><div class="k">คะแนนรวมของ <code>w1q</code></div><div class="num">100.0%</div><div class="s">จาก 97.9% · <b>+2.1 จุด</b> · เกณฑ์ 2.0 จุด</div></div><div class="tile ok"><div class="k">gate ของบท 05</div><div class="num">ACCEPT</div><div class="s">รับ <code>w1q</code> แทน <code>w1</code></div></div></div><div class="note info">Training · Validation · Test <b>100.0% ทั้ง 3 ชุด</b> (ผ่านครบ 27/27) · รวม 97.9% → 100.0% (+2.1 จุด · เกณฑ์ 2.0) · <b><span class="v accept">ACCEPT</span></b></div></div></section>
+<section class="slide " data-title="w1q: นโยบายชุดเดิม แต่บอกว่าใช้กับฟังก์ชันใด" data-group="LAB 5" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt"><code>w1q</code>: นโยบายชุดเดิม แต่บอกว่าใช้กับฟังก์ชันใด</span></h2></header><div class="body"><pre class="code "><button class="copy">คัดลอก</button><span class="t">+### 2. นโยบายเงินคืน (ใช้กับฟังก์ชันคิดเงินคืนสมาชิกเท่านั้น)
++ใช้เฉพาะเมื่อโจทย์ให้เขียนฟังก์ชันคิดเงินคืน (cashback) ของสมาชิก ไม่ใช้กับฟังก์ชันอื่น แม้จะมีการปัดเศษเงินเหมือนกัน
++- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum สมาชิกระดับอื่นได้อัตราปกติ
++- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น
++### 3. ขอบเขตของนโยบาย
++นโยบายข้อ 1 และ 2 ไม่มีผลกับงานอื่น … ใช้กติกาของโจทย์และกติกาเดิมของสกิลนี้เท่านั้น</span></pre><div class="note info">รุ่นที่ถูกปฏิเสธไม่ถูกใช้ต่อ · เริ่มจาก <code>w1</code> อีกครั้งด้วยความรู้ชุดเดิม แต่ระบุว่านโยบายแต่ละข้อใช้กับฟังก์ชันใด</div></div></section>
+<section class="slide mid" data-title="ความรู้ชุดเดียวกัน เขียนต่างกันแค่ขอบเขต ผลตัดสินกลับด้าน" data-group="LAB 5" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">ความรู้ชุดเดียวกัน เขียนต่างกันแค่ขอบเขต ผลตัดสินกลับด้าน</span><span class="tag">gate w1 → รุ่นใหม่</span></h2></header><div class="body"><div class="vs"><div class="sidebox bad"><div class="hd2">w1p · นโยบายเขียนกว้าง</div><div class="calc">เงินที่ร้านจ่ายออก ให้ปัดลง</div><div class="bigv">REJECT</div><p>รวม −0.9 จุด</p></div><div class="sidebox good"><div class="hd2">w1q · นโยบายมีขอบเขต</div><div class="calc">ใช้กับฟังก์ชันคิดเงินคืนสมาชิกเท่านั้น</div><div class="bigv">ACCEPT</div><p>รวม +2.1 จุด</p></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>ความรู้ชุดเดียวกัน เขียนต่างกันแค่ขอบเขต ผลต่างกัน 3 จุดและผลตัดสินกลับด้าน · บนชุด Training สองรุ่นนี้ได้ 100% เท่ากัน ต้องมี Validation และ Test Set จึงจะเห็นว่า <code>w1p</code> ทำงานอื่นพัง</span></div></div></section>
+<section class="slide " data-title="หลังเติมนโยบาย: w1p และ w1q ผ่าน policy ครบ เท่ากับ v3 ของบท 05" data-group="LAB 5" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt">หลังเติมนโยบาย: <code>w1p</code> และ <code>w1q</code> ผ่าน <code>policy</code> ครบ เท่ากับ <code>v3</code> ของบท 05</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r05-coverage.png" alt="หลังเติมนโยบาย: w1p และ w1q ผ่าน policy ครบ เท่ากับ v3 ของบท 05" width="1600" height="1137"></div><p class="cap"><code>w1</code> ไม่ผ่าน <code>policy</code> · <code>w1p</code> และ <code>w1q</code> ผ่านครบ · ต่างกันที่ <code>w1p</code> ทำงานอื่นพัง</p></div></section>
+<section class="slide " data-title="w1q ได้ 100.0% เท่ากับ v3 แต่ยังแทน v3 ไม่ได้" data-group="LAB 5" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · LAB 5 · เติมความรู้จากทีม (<code>w1p</code> → <code>w1q</code>)</div><h2><span class="tt"><code>w1q</code> ได้ 100.0% เท่ากับ <code>v3</code> แต่ยังแทน <code>v3</code> ไม่ได้</span><span class="tag">gate so-v3 → w1q</span></h2></header><div class="body"><p>ข้อความที่คำสั่ง <code>gate</code> พิมพ์จริง (<a href="runs/w1q/gate-so-v3.txt" target="_blank"><code>runs/w1q/gate-so-v3.txt</code></a>)</p><pre class="code term"><button class="copy">คัดลอก</button><span class="t">train: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด · ค่าใช้จ่าย $0.12 → $0.14 · คำสั่ง 3.0 → 3.2
+val: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด · ค่าใช้จ่าย $0.12 → $0.14 · คำสั่ง 2.8 → 2.8
+รวม: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด = ค่าที่มากกว่าระหว่าง eps 2.0 กับ z 1.5 × ความแกว่งของส่วนต่าง 0.0 จุด
+<span class="err">  ✗ คะแนนรวมไม่ดีขึ้นเกินเกณฑ์ 2.0 จุด และโทเคนขาเข้าไม่ลดลงถึง 10% [โทเคนขาเข้า 1.204e+05 → 1.349e+05 (+12%)]</span>
+<span class="err">ผล: REJECT ❌ ไม่รับ w1q แทน so-v3</span></span></pre><div class="note eye"><span class="lbl">ข้อสังเกต</span><span><code>w1q</code> ได้ 100% เท่ากับ <code>v3</code> ของบท 05 โดยคนทำแค่ตอบคำถาม 4 ข้อที่ Wiki จดไว้ · แต่ยังไม่ดีพอจะมาแทน <code>v3</code> เพราะสกิลยาวกว่า (12.8 KB เทียบกับ 6.7 KB) และใช้โทเคนมากกว่า</span></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/s04-summary.jpg)" data-title="4 · สรุปและแบบฝึกหัด" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB</div><div class="big">4</div><h1>สรุปและแบบฝึกหัด</h1><div class="sub"><p>เทียบกับ Skill Optimizer · บทเรียนจากผลจริง · โจทย์ให้ลองต่อ</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="คะแนนของสกิลทุกชุดบนโจทย์ 9 ข้อ" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">คะแนนของสกิลทุกชุดบนโจทย์ 9 ข้อ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/r03-all.png" alt="คะแนนของสกิลทุกชุดบนโจทย์ 9 ข้อ" width="1600" height="760"></div><p class="cap">ไม่มีสกิล · <code>w1</code> · <code>w2</code> · <code>n1</code> · <code>w1p</code> · <code>w1q</code> · <code>so-v3</code> ของบท 05 · ชุดละ 27 Trial</p></div></section>
+<section class="slide " data-title="ผลของทุกชุด" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">ผลของทุกชุด</span><span class="tag">ตารางหลัก</span></h2></header><div class="body"><table class="c8"><thead><tr><th>ชุดสกิล</th><th>มาจาก</th><th>Training</th><th>Validation</th><th>Test</th><th>รวม</th><th>ผ่านครบ</th><th>โทเคนขาเข้าต่อ Trial</th></tr></thead><tbody><tr><td>ไม่มีสกิล</td><td>–</td><td>48.0%</td><td>43.3%</td><td>47.8%</td><td>46.9%</td><td>0/27</td><td>85,758</td></tr><tr><td><code>w1</code></td><td>LAB 1 · WikiSkill 2 รอบ</td><td>95.2%</td><td>100.0%</td><td>100.0%</td><td>97.9%</td><td>21/27</td><td>126,533</td></tr><tr><td><code>w2</code></td><td>LAB 3 · WikiSkill รันซ้ำ 1 รอบ</td><td>94.4%</td><td>100.0%</td><td>97.8%</td><td>96.8%</td><td>18/27</td><td>116,411</td></tr><tr><td><code>n1</code></td><td>LAB 4 · ไม่มี Wiki 1 รอบ</td><td>93.7%</td><td>100.0%</td><td>95.6%</td><td>95.7%</td><td>17/27</td><td>137,248</td></tr><tr><td><code>w1p</code></td><td>LAB 5.1 · <code>w1</code> + นโยบายเขียนกว้าง</td><td>100.0%</td><td>96.7%</td><td>93.3%</td><td>97.0%</td><td>23/27</td><td>124,598</td></tr><tr><td><code>w1q</code></td><td>LAB 5.2 · <code>w1</code> + นโยบายมีขอบเขต</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td><b>100.0%</b></td><td>27/27</td><td>134,948</td></tr><tr><td><code>so-v3</code></td><td>บท 05 · Skill Optimizer</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td><b>100.0%</b></td><td>27/27</td><td>120,407</td></tr></tbody></table><div class="note info">รวม 279 Trial · ราคาตามรายการรวมประมาณ $34 (ไม่ใช่ยอดจ่ายจริงของบัญชีแบบ subscription) · ตารางเต็ม: <a href="runs/report.md" target="_blank" rel="noopener"><code>runs/report.md</code></a></div></div></section>
+<section class="slide " data-title="ต้นทุนของการปรับสกิล: Skill Optimizer เทียบกับ WikiSkill" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">ต้นทุนของการปรับสกิล: Skill Optimizer เทียบกับ WikiSkill</span></h2></header><div class="body"><div class="fig wide"><img src="img/r04-effort.png" alt="ต้นทุนของการปรับสกิล: Skill Optimizer เทียบกับ WikiSkill" width="1600" height="495"></div><p class="cap">Trial ระหว่างปรับ และสิ่งที่คนต้องทำ ของทั้งสองวิธี บนโจทย์เดียวกัน</p></div></section>
+<section class="slide " data-title="เทียบกับ Skill Optimizer ของบท 05" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">เทียบกับ Skill Optimizer ของบท 05</span><span class="tag">ตารางหลัก</span></h2></header><div class="body"><table class="c3"><thead><tr><th>ประเด็น</th><th>Skill Optimizer (บท 05)</th><th>WikiSkill (บทนี้)</th></tr></thead><tbody><tr><td>สกิลรุ่นแรก</td><td>คนเขียน</td><td>ไม่มี · เริ่มจากว่าง</td></tr><tr><td>สิ่งที่คนทำ</td><td>เขียน <code>v0</code> · สั่งทีละรุ่น 5 พรอมต์ · บอกนโยบาย 4 ข้อ</td><td>1 พรอมต์ต่อการรัน · ตอบนโยบาย 4 ข้อใน LAB 5</td></tr><tr><td>มาตรฐานการเขียนโค้ด 5 ข้อ</td><td>คนเขียนแบบกว้าง แล้ว Claude ทำให้ตรวจสอบได้</td><td><b>ค้นพบเองจาก Trace</b></td></tr><tr><td>นโยบายธุรกิจ 4 ข้อ</td><td>คนบอกใน LAB 3</td><td>ค้นพบเองไม่ได้ · Wiki จดว่ายังไม่ยืนยัน → คนบอกใน LAB 5</td></tr><tr><td>ที่เก็บความรู้</td><td><code>ISSUES.md</code> ที่ Claude จดตามคำสั่ง</td><td><code>wiki/</code> ที่ระบบเขียนเอง พร้อมประวัติข้อเสนอและ diff</td></tr><tr><td>เกณฑ์ของ Gate</td><td>ต้องดีขึ้นเกินความแกว่ง หรือต้นทุนลด ≥ 10%</td><td>Validation ต้องสูงกว่าเดิมเท่านั้น</td></tr><tr><td>Trial ระหว่างปรับ</td><td>108</td><td>24–42</td></tr><tr><td>สกิลที่ได้</td><td>6.7 KB · 100%</td><td>7.8–10.4 KB · 95.7–97.9% (100% หลังเติมนโยบาย · 12.8 KB)</td></tr></tbody></table></div></section>
+<section class="slide " data-title="คำตอบของคำถาม 5 ข้อ จากผลจริง" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">คำตอบของคำถาม 5 ข้อ จากผลจริง</span><span class="tag">ผล LAB 1–5</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx "><h4><span class="n">1</span>ค้นพบมาตรฐานการเขียนโค้ด 5 ข้อเองได้หรือไม่</h4><p><b>ได้</b> ทุกการรัน (<code>w1</code> <code>w2</code> <code>n1</code>) · ข้อที่พลาดบ้างมีข้อเดียวคือเกณฑ์จำนวนเทสต์ ซึ่งขึ้นกับว่าได้ทำรอบที่ 2 หรือไม่</p></div><div class="cardx "><h4><span class="n">2</span>ค้นพบนโยบายธุรกิจได้หรือไม่</h4><p><b>ไม่ได้</b> (<code>policy</code> 0/6 ทุกการรัน) · แต่ Wiki จดว่ามีเรื่องนี้และยังไม่ยืนยัน</p></div><div class="cardx "><h4><span class="n">3</span>รันซ้ำได้ผลเดิมหรือไม่</h4><p>ผลรวมใกล้กัน (97.9% และ 96.8%) แต่จำนวนรอบและรายละเอียดของสกิลต่างกัน</p></div><div class="cardx "><h4><span class="n">4</span>ตัด Wiki ออกแล้วเป็นอย่างไร</h4><p>คะแนนไม่ต่างชัดเจน (95.7%) เพราะโจทย์จบใน 1–2 รอบ · สิ่งที่หายคือความรู้ที่อ่านย้อนหลังได้</p></div><div class="cardx "><h4><span class="n">5</span>ความรู้ที่หาเองไม่ได้ เติมอย่างไร</h4><p>ให้คนตอบเรื่องที่ Wiki จดไว้ แล้วเติมลงสกิลแบบ <b>มีขอบเขต</b> และให้ gate ตัดสิน (<code>w1q</code> 100%)</p></div></div></div></section>
+<section class="slide " data-title="สิ่งที่ผลจริงสอน" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">สิ่งที่ผลจริงสอน</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n10-lessons.jpg" alt="สิ่งที่ผลจริงสอน" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ไม่มีสกิล 46.9% → <code>w1</code> 97.9% โดยไม่มีคนเขียนสกิล: ความรู้แฝงที่เกิดซ้ำทุกงาน ค้นพบได้จาก Trace และข้อความของตัวตรวจ</span></div><div class="stp"><span class="n">2</span><span><code>policy</code> 0/6 ทั้ง <code>w1</code> <code>w2</code> <code>n1</code>: Validation ที่ไม่มีข้อตรวจนี้ทำให้วงรอบหยุดที่ 100% · <b>สกิลดีได้เท่าที่ Validation วัด</b></span></div><div class="stp"><span class="n">3</span><span>Wiki จดว่า "ยังไม่ยืนยัน" พร้อมสมมติฐาน: Wiki ไม่ได้มีไว้ให้ AI อย่างเดียว เป็นรายการคำถามที่คนต้องตอบด้วย</span></div><div class="stp"><span class="n">4</span><span><code>w1p</code> <span class="v reject">REJECT</span> · <code>w1q</code> <span class="v accept">ACCEPT</span>: ความรู้ที่ถูกต้องแต่เขียนกว้างเกิน ทำงานอื่นพัง · ทุกการแก้ต้องผ่านการวัดกับโจทย์ที่ไม่ได้ใช้ตอนแก้</span></div><div class="stp"><span class="n">5</span><span><code>w1</code> 2 รอบ · <code>w2</code> 1 รอบ: Gate รับเมื่อ "สูงกว่าเดิม" และหยุดเมื่อได้ 100% โดยไม่คิดความแกว่ง · Validation 6 Trial ผ่านครบได้โดยบังเอิญ</span></div></div></div></div></section>
+<section class="slide mid" data-title="อีก 2 บทเรียน: เรื่อง Wiki และเรื่องต้นทุน" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">อีก 2 บทเรียน: เรื่อง Wiki และเรื่องต้นทุน</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx warn"><h4><code>n1</code> ไม่มี Wiki ได้ 95.7%</h4><p>โจทย์ที่จบเร็ว Wiki ยังไม่ให้ผลต่างด้านคะแนน · ประโยชน์ที่เปเปอร์วัดได้มาจากงานที่ปรับ 8 รอบและมีข้อเสนอถูกปฏิเสธ</p></div><div class="cardx warn"><h4><code>w1q</code> 100% แต่แพ้ <code>v3</code> ที่ต้นทุน</h4><p>WikiSkill ไม่มีเป้าหมายด้านต้นทุน สกิลจึงยาวกว่า · ต่อด้วยรอบลดต้นทุนของบท 05 ได้</p></div></div></div></section>
+<section class="slide mid" data-title="เลือกใช้เมื่อไร" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">เลือกใช้เมื่อไร</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx "><h4><span class="n">1</span>ยังไม่มีสกิล และไม่รู้ว่างานมีกฎแฝงอะไร</h4><p>เริ่มด้วย WikiSkill: ได้สกิลรุ่นแรกและ Wiki ที่บอกว่าพบอะไร ยังไม่รู้อะไร</p></div><div class="cardx "><h4><span class="n">2</span>มีคนที่รู้กฎของงานอยู่แล้ว และต้องคุมต้นทุนของสกิล</h4><p>Skill Optimizer: เริ่มจากความรู้ของคน และมีรอบลดต้นทุน</p></div><div class="cardx "><h4><span class="n">3</span>งานมีความรู้เฉพาะที่ไม่ปรากฏในโจทย์ทั่วไป</h4><p>ผสม: WikiSkill หาส่วนที่หาได้ → คนตอบเรื่องที่ Wiki เปิดไว้ → gate ของบท 05 ตัดสิน (LAB 5)</p></div><div class="cardx "><h4><span class="n">4</span>งานยาก ต้องปรับหลายรอบ มีข้อเสนอล้มเหลวระหว่างทาง</h4><p>WikiSkill: ความรู้ข้ามรอบไม่หาย (สิ่งที่เปเปอร์วัดได้ +15 จุด)</p></div></div></div></section>
+<section class="slide " data-title="แบบฝึกหัด 6 ข้อ" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">แบบฝึกหัด 6 ข้อ</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n11-exercises.jpg" alt="แบบฝึกหัด 6 ข้อ" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>เปิด <code>maintainer_input.md</code> กับ <code>maintainer_output.json</code> ของ <code>w1</code> รอบที่ 2 แล้วหาว่า Maintainer แก้หน้าเดิมด้วยรายการแก้แบบใดบ้าง (ไม่ใช้โทเคน)</span></div><div class="stp"><span class="n">2</span><span>รัน workspace <code>w3</code> ด้วยค่าเดิม แล้วเติมแถวที่ 3 ในตารางของ LAB 3</span></div><div class="stp"><span class="n">3</span><span>ย้ายโจทย์ <code>t4-cashback</code> ไปอยู่ Validation Set แล้วรัน WikiSkill ใหม่ · วงรอบหยุดที่รอบใด และ Wiki จดเรื่อง <code>policy</code> อย่างไร</span></div><div class="stp"><span class="n">4</span><span>รัน workspace ใหม่โดยตั้งให้วัดโจทย์ละ 6 รอบ แล้วเทียบจำนวนรอบกับ <code>w1</code> และ <code>w2</code></span></div><div class="stp"><span class="n">5</span><span>ทำรุ่น <code>w1r</code> จาก <code>w1q</code>: ลดโทเคนขาเข้าอย่างน้อย 10% โดยคะแนนไม่ลด แล้วให้ gate เทียบกับ <code>so-v3</code></span></div><div class="stp"><span class="n">6</span><span>ใช้ WikiSkill กับงานของตัวเอง: เขียนโจทย์ 4 + 2 + 2 ข้อและตัวตรวจ แล้วรัน <code>loop</code></span></div></div></div></div></section>
+<section class="slide " data-title="ข้อจำกัดของการทดลองนี้" data-group="ภาค LAB · 4 · สรุปและแบบฝึกหัด" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · 4 · สรุปและแบบฝึกหัด</div><h2><span class="tt">ข้อจำกัดของการทดลองนี้</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n12-limits.jpg" alt="ข้อจำกัดของการทดลองนี้" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>โจทย์เล็กและจบใน 1–2 รอบ → ข้อเสนอของวงรอบผ่าน Gate ทั้ง 4 ครั้ง จึงไม่มีการย้อนกลับจริงของ WikiSkill ให้ดู (เห็นได้จากการทดสอบของ LAB 0.1 และจาก gate ของบท 05 ใน LAB 5)</span></div><div class="stp"><span class="n">2</span><span>รันแต่ละการตั้งค่า 1–2 ครั้ง → ผลต่าง 1–2 จุดระหว่าง <code>w1</code> <code>w2</code> <code>n1</code> มีส่วนที่เป็นความบังเอิญ</span></div><div class="stp"><span class="n">3</span><span>Validation 2 ข้อ ไม่มีข้อตรวจ <code>policy</code> → วงรอบหยุดเมื่อ Validation ได้ 100% ทั้งที่ Training ยังไม่เต็ม</span></div><div class="stp"><span class="n">4</span><span>สกิลถูกวางใน <code>./skills</code> ไม่ได้ใส่ใน prompt แบบเปเปอร์ → Agent ต้องเปิดอ่านเอง ใช้คำสั่งเพิ่ม 1–2 ครั้งต่องาน</span></div><div class="stp"><span class="n">5</span><span>เครื่องมือ <code>wikiskill</code> และ prompt สร้างจากพรอมต์ของ LAB 0.1 → ฉบับของผู้เรียนอาจต่างจากฉบับที่ใช้วัดผลในบทนี้ สิ่งที่ต้องตรงคือรูปแบบใน <code>wikiskill_format.md</code></span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/s04-summary.jpg)" data-title="จบบท · ถัดไป: EvoSkill v2" data-group="จบบท"><div class="shade"></div><div class="inner"><div class="small"></div><div class="big">จบบท</div><h1>ถัดไป: EvoSkill v2</h1><div class="sub"><p>ให้ Agent 3 ตัวปรับสกิลกันเอง → <a href="../07_EvoSkill_v2/README.md" target="_blank">../07_EvoSkill_v2/README.md</a></p><p>รายละเอียดเต็มของบทนี้: <a href="README.md" target="_blank">README.md</a> · รูปแบบของเครื่องมือ: <a href="wikiskill_format.md" target="_blank">wikiskill_format.md</a> · ทฤษฎีต้นทาง (WikiSkill): <a href="01_theory/README.md" target="_blank">01_theory/README.md</a> · <a href="01_theory/WikiSkill_Theory_Slides.html" target="_blank">สไลด์ของทฤษฎี</a></p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+</div></div>
+<pre class="full" id="prompt0">งาน: สร้างสกิล wikiskill ไว้ในโฟลเดอร์ใหม่ ./my-wikiskill (ทำบนเครื่องนี้ ไม่ใช้ container)
+
+ที่มา    : เปเปอร์ WikiSkill (arXiv:2608.27454) · สรุปภาษาไทย 03_week03/06_WikiSkill/01_theory/README.md
+รูปแบบ   : 03_week03/06_WikiSkill/wikiskill_format.md
+เงื่อนไข : ห้ามเปิดฉบับสำเร็จที่ 00_resource/skills/wikiskill · prompt ต้องเขียนด้วยถ้อยคำของตัวเอง
+
+ทำตามลำดับ:
+1. ศึกษา       อ่านที่มา แล้วสรุปวงรอบของ WikiSkill: 3 ชั้น 4 ส่วนประกอบ และ Algorithm 1
+2. ออกแบบ      จด references/source.md: ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง
+3. สร้าง        scripts/wikiskill.py 8 คำสั่ง (init baseline rollout maintain propose gate loop status) ตามรูปแบบ
+4. เขียน        prompts/ 3 ไฟล์ (maintainer proposer proposer_nowiki) · SKILL.md · references/workspace.md
+5. ทดสอบ       ไม่เรียกโมเดล: (ก) status ของทุก workspace ใน 03_week03/06_WikiSkill/runs ต้องพิมพ์ตรงกับ status.txt (ข) นำ history/iter-NN/proposal.json ที่เก็บไว้มา Apply ใหม่ ต้องได้ candidate/skills และ proposal.diff เหมือนที่เก็บไว้ (ค) รันวงรอบ 2 รอบด้วย Agent จำลอง ให้ได้ ACCEPTED 1 รอบ และ REJECTED 1 รอบ แล้วตรวจว่ารอบที่ถูกปฏิเสธ skills คงเดิมแต่ wiki ยังอยู่ครบ
+6. รายงาน      ตาราง ไฟล์ | หน้าที่ และผลทดสอบ 3 ข้อ</pre>
+<pre class="full" id="prompt1">งาน: เตรียม container multi-account ให้พร้อมสำหรับ LAB 1–5 (ยังไม่วัดอะไร)
+
+ทำตามลำดับ:
+1. ติดตั้ง   my-wikiskill เป็น global skill ชื่อ wikiskill ของบัญชี yolo (ไว้ข้างสกิล skill-optimizer ของบท 05)
+2. คัดลอก   suite ของ 03_week03/06_WikiSkill ไปไว้ที่ /workspace/wklab/suite · สกิล v3 ของบท 05 (03_week03/05_Skill_Optimizer/runs/v3/skills) ไปไว้ที่ /workspace/wklab/runs/so-v3/skills
+3. ตรวจ     มีสกิล skill-optimizer อยู่แล้วหรือไม่ · ตัวตรวจด้วย suite/check_grader.py · บัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
+4. รายงาน   ตาราง รายการ | ผล</pre>
+<pre class="full" id="prompt2">งาน: รัน WikiSkill ทีละขั้น · เริ่มจากไม่มีสกิล ให้ระบบสร้างสกิลเขียนโค้ดคิดเงินของร้าน BaanKafe เอง
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ wiki/ skills/ เอง
+
+Input: โจทย์ใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ยังไม่ใช้ใน LAB นี้
+
+วิธีทดลอง:
+- workspace ชื่อ w1 · เริ่มจากชุดสกิลว่างและ wiki ว่าง · ทำได้ไม่เกิน 8 รอบ
+- Inference Agent (ทำโจทย์): โมเดล sonnet · effort medium · โจทย์ละ 3 รอบ → Training 12 Trial และ Validation 6 Trial ต่อการวัด 1 ครั้ง
+- Wiki Maintainer และ Skill Proposer: โมเดล sonnet · effort high
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best (คะแนน Validation ที่ดีที่สุดก่อนหน้า) เท่านั้น · ไม่รับ = ใช้ชุดสกิลเดิม แต่ wiki ยังอยู่
+- วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. สร้าง      workspace w1 แล้ววัด baseline
+2. รอบที่ 1   รันทีละขั้น rollout → maintain → propose → gate · หลังแต่ละขั้นเปิดไฟล์ที่ขั้นนั้นสร้าง แล้วบอกว่าชั้นใด (raw / wiki / skills) เปลี่ยนอย่างไร
+3. รันต่อ     loop จนวงรอบหยุด แล้วบันทึกผลของ status ที่ runs/w1/status.txt
+4. เก็บผล     คัดลอก runs/w1 จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs/w1 บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน     ตาราง ขั้น | ชั้นที่เปลี่ยน | ไฟล์ที่เกิดหรือเปลี่ยน | สรุป 1 บรรทัด · เนื้อหาของ wiki/index.md · ชื่อสกิลที่ได้ · ตาราง status · เหตุผลที่วงรอบหยุด</pre>
+<pre class="full" id="prompt3">งาน: วัดสกิลที่ WikiSkill สร้าง (w1) กับโจทย์ทั้ง 9 ข้อ · เทียบกับการไม่ใช้สกิล และสกิล v3 ของบท 05
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ผลรายข้อของ Test Set เปิดได้หลังวัดครบทั้ง 3 ชุดแล้วเท่านั้น
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ไม่เคยถูกใช้ปรับสกิลทั้งสองวิธี: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- โจทย์แต่ละข้อทำซ้ำ 3 รอบ → 1 ชุดสกิล = 9 โจทย์ × 3 รอบ = 27 Trial
+- LAB นี้วัด 3 ชุดสกิล → รวม 81 Trial
+  - noskill  ไม่มีสกิล
+  - so-v3    สกิล money-coder รุ่น v3 ของบท 05 (runs/so-v3/skills) · คนเขียนรุ่นแรก แล้วปรับ 3 รอบ
+  - w1       สกิลที่ WikiSkill สร้างใน LAB 1 (runs/w1/skills) · ไม่มีคนเขียน
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- คะแนนของชุดสกิล = ค่าเฉลี่ยของ 27 Trial
+- gate ของ skill-optimizer เทียบชุดใหม่กับชุดฐาน แล้วตอบ ACCEPT หรือ REJECT ด้วยกติกาเดียวกับบท 05
+
+ทำตามลำดับ:
+1. วัด      noskill · so-v3 · w1 กับโจทย์ทุกชุด
+2. สรุป     ตารางเทียบ 3 ชุด (report) บันทึกที่ runs/report.md
+3. ตัดสิน   gate noskill → w1 และ gate so-v3 → w1 ใช้ต้นทุน context_tokens บันทึกที่ runs/w1/gate-noskill.txt และ runs/w1/gate-so-v3.txt
+4. หาข้อผิด  ข้อตรวจที่ w1 ยังไม่ผ่าน (failures ของชุด train และชุด test) บันทึกที่ runs/w1/failures.txt
+5. เก็บผล   คัดลอก runs/ จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผลของแต่ละชุด report.md results.json และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+6. รายงาน   ตารางเทียบ 3 ชุด · ผล gate 2 คู่ · ข้อตรวจที่ w1 ยังไม่ผ่าน และสาเหตุที่เห็นจากข้อความของตัวตรวจ</pre>
+<pre class="full" id="prompt4">งาน: รัน WikiSkill ซ้ำอีก 1 ครั้งด้วยค่าเดิมทุกค่า (workspace w2) แล้วเทียบกับ w1 · ดูว่าผลของวงรอบซ้ำได้แค่ไหน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill (รันวงรอบ) และสกิล skill-optimizer (วัดสกิลที่ได้)
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ wiki/ skills/ เอง
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ใช้วัดตอนจบ: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- workspace ชื่อ w2 · ค่าทุกตัวเหมือน w1 ใน LAB 1: เริ่มจากชุดสกิลว่างและ wiki ว่าง · ไม่เกิน 8 รอบ · Inference Agent sonnet effort medium โจทย์ละ 3 รอบ · Wiki Maintainer และ Skill Proposer sonnet effort high
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- เมื่อวงรอบหยุด วัดสกิลของ w2 กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial (ค่าเดียวกับ LAB 2)
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate ของ WikiSkill รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best เท่านั้น · วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. รัน      สร้าง workspace w2 แล้วรัน loop จนวงรอบหยุด · บันทึกผลของ status ที่ runs/w2/status.txt
+2. วัด      สกิลของ w2 กับโจทย์ทุกชุด (ป้าย w2) แล้วสรุปตารางเทียบ noskill so-v3 w1 w2 (report) บันทึกที่ runs/report.md
+3. เทียบ    w1 กับ w2: จำนวนรอบ · pattern ใน wiki/index.md · ข้อเสนอและผลตัดสินของแต่ละรอบ (wiki/skill-impact.md) · คะแนนของสกิลที่ได้
+4. เก็บผล   คัดลอก runs/w2 และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน   ตาราง status ของ w2 · ตารางเทียบ w1 กับ w2 · สิ่งที่เหมือนกันและสิ่งที่ต่างกัน</pre>
+<pre class="full" id="prompt5">งาน: การทดลองตัดส่วนประกอบ (Ablation) · รัน WikiSkill แบบไม่มี Wiki (workspace n1) แล้วเทียบกับ w1 และ w2
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล wikiskill (รันวงรอบ) และสกิล skill-optimizer (วัดสกิลที่ได้)
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน raw/ skills/ เอง
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้สร้าง Trace: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ ใช้วัดตอนจบ: x1-late-fee x2-refund x3-bulk-price
+
+วิธีทดลอง:
+- workspace ชื่อ n1 · ค่าทุกตัวเหมือน w1 ใน LAB 1 ยกเว้นข้อเดียว: **ไม่ใช้ wiki** (ไม่มี Wiki Maintainer · Skill Proposer เห็นเฉพาะ Trace ของรอบล่าสุด)
+- คำอธิบายงาน: "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)"
+- เมื่อวงรอบหยุด วัดสกิลของ n1 กับโจทย์ทั้ง 9 ข้อ ข้อละ 3 รอบ = 27 Trial (ค่าเดียวกับ LAB 2)
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- Gate ของ WikiSkill รับสกิลที่เสนอเมื่อคะแนน Validation สูงกว่า R_best เท่านั้น · วงรอบหยุดเมื่อ R_best = 100% หรือครบ 8 รอบ
+
+ทำตามลำดับ:
+1. รัน      สร้าง workspace n1 แบบไม่ใช้ wiki แล้วรัน loop จนวงรอบหยุด · บันทึกผลของ status ที่ runs/n1/status.txt
+2. วัด      สกิลของ n1 กับโจทย์ทุกชุด (ป้าย n1) แล้วสรุปตารางเทียบ noskill so-v3 w1 w2 n1 (report) บันทึกที่ runs/report.md
+3. เทียบ    n1 กับ w1 และ w2: จำนวนรอบ · ข้อเสนอที่ถูกรับและถูกปฏิเสธ · จำนวน Trial · จำนวนการเรียกโมเดลของผู้ปรับสกิล · คะแนนของสกิลที่ได้ · สิ่งที่เหลือในโฟลเดอร์เมื่อจบ
+4. เก็บผล   คัดลอก runs/n1 และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: ไม่เก็บ Trace ดิบ (transcript.jsonl และไฟล์ *_transcript_*) โฟลเดอร์ proposer_view และ rollouts/suite · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน   ตาราง status ของ n1 · ตารางเทียบ n1 กับ w1 และ w2 · สิ่งที่ n1 ไม่มีเมื่อจบ</pre>
+<pre class="full" id="prompt6">งาน: ต่อยอดสกิลที่ WikiSkill สร้าง (w1) · เติมนโยบายธุรกิจที่ทีมยืนยันแล้ว ด้วยวิธีของบท 05 เป็นรุ่น w1p แล้วให้ gate ตัดสิน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน runs/w1 (สร้างรุ่นใหม่เท่านั้น)
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้หาข้อที่ผิด: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ: x1-late-fee x2-refund x3-bulk-price
+
+ความรู้จากทีม (คำตอบของเรื่องที่ wiki ของ w1 จดว่ายังไม่ยืนยัน):
+- ระยะทาง 0 กม. คือลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+- ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม เกินกว่านี้ถือเป็นข้อมูลผิด
+- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum
+- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น
+
+วิธีทดลอง:
+- รุ่นฐาน w1 = สกิลที่ WikiSkill สร้าง (วัดไว้แล้วใน LAB 2)
+- รุ่นใหม่ w1p = สกิลของ w1 + นโยบายธุรกิจ
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- วัดรุ่นใหม่ 1 รุ่น: 9 โจทย์ × 3 รอบ = 27 Trial ด้วยค่าเดียวกับ LAB 2
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- gate เทียบรุ่นใหม่กับรุ่นฐาน แล้วตอบ ACCEPT หรือ REJECT: Training และ Validation ต้องไม่ลด และคะแนนรวมต้องดีขึ้นเกินความแกว่ง หรือเท่าเดิมแต่ต้นทุนลดอย่างน้อย 10%
+
+ทำตามลำดับ:
+1. หาจุดแก้  ดู 3 อย่าง: ข้อที่ผิดของ w1 (Training Set) · เรื่องที่ wiki ของ w1 จดว่ายังไม่ยืนยัน (runs/w1/wiki/index.md และหน้า pattern ที่เกี่ยวข้อง) · ความรู้จากทีมข้างบน
+2. แก้        คัดลอก runs/w1/skills เป็น runs/w1p/skills แล้วแก้ไม่เกิน 3 จุด · เขียนเป็นนโยบายของร้าน ห้ามใส่ Input หรือคำตอบของข้อตรวจ
+3. วัด        รุ่น w1p กับโจทย์ทุกชุด
+4. ตัดสิน     gate w1 → w1p และ gate so-v3 → w1p ใช้ต้นทุน context_tokens บันทึกที่ runs/w1p/gate-w1.txt และ runs/w1p/gate-so-v3.txt · ตารางเทียบทุกชุด (report) บันทึกที่ runs/report.md
+5. เก็บผล     คัดลอก runs/w1p และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผล และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+6. รายงาน     จุดที่แก้ใน w1p และเหตุผล · ตารางเทียบทุกชุด · ผล gate 2 คู่</pre>
+<pre class="full" id="prompt7">งาน: แก้รุ่นที่ถูกปฏิเสธ · สร้างรุ่น w1q จาก w1 ด้วยนโยบายธุรกิจชุดเดิม แต่กำกับขอบเขตของแต่ละข้อให้ชัด แล้วให้ gate ตัดสิน
+
+ที่ทำงาน  : container multi-account โฟลเดอร์ /workspace/wklab
+เครื่องมือ : สกิล skill-optimizer
+เงื่อนไข   : ห้ามเปิดตัวตรวจ suite/grade.py และเฉลย suite/ref/ · โจทย์ของ Validation Set ดูได้แค่คะแนนรวม · ห้ามแก้ไฟล์ใน runs/w1 และ runs/w1p (สร้างรุ่นใหม่เท่านั้น)
+
+Input: โจทย์ 9 ข้อใน suite/suite.json (ข้อละ 1 ฟังก์ชันคิดเงิน)
+- Training Set 4 ข้อ ใช้หาข้อที่ผิด: t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback
+- Validation Set 2 ข้อ ใช้ตัดสิน: v1-parking-fee v2-net-pay
+- Test Set 3 ข้อ: x1-late-fee x2-refund x3-bulk-price
+
+สิ่งที่รู้จากรุ่น w1p ที่ถูกปฏิเสธ (runs/w1p/gate-w1.txt และ runs/report.md):
+- Training ขึ้นเป็น 100.0% แต่ Validation ลดจาก 100.0% เป็น 96.7% และ Test ลดจาก 100.0% เป็น 93.3%
+- สมมติฐาน: นโยบายที่เขียนเป็นกติกาทั่วไป (เช่น "เงินที่ร้านจ่ายออก ให้ปัดลง") ถูก Agent นำไปใช้กับงานอื่นที่ไม่เกี่ยว
+
+ความรู้จากทีม (ชุดเดิม):
+- ระยะทาง 0 กม. คือลูกค้ารับเองที่ร้าน ไม่คิดค่าส่ง
+- ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม เกินกว่านี้ถือเป็นข้อมูลผิด
+- สิทธิ์เงินคืน 2 เท่าในเดือนเกิด ให้เฉพาะสมาชิก gold และ platinum
+- เงินคืนเป็นเงินที่ร้านจ่ายออก ให้ปัดลง ไม่ปัดครึ่งขึ้น
+
+วิธีทดลอง:
+- รุ่นฐาน w1 = สกิลที่ WikiSkill สร้าง (วัดไว้แล้วใน LAB 2)
+- รุ่นใหม่ w1q = สกิลของ w1 + นโยบายธุรกิจที่กำกับขอบเขต: นโยบายค่าส่งใช้กับฟังก์ชันคิดค่าส่งเท่านั้น · นโยบายเงินคืนใช้กับฟังก์ชันคิดเงินคืนสมาชิกเท่านั้น · งานอื่นทุกงานใช้กติกาเดิมของสกิล
+- 1 Trial = Agent 1 ตัว (โมเดล sonnet · effort medium) ได้โจทย์ 1 ข้อ แล้วเขียน solve.py และ test_solve.py ในโฟลเดอร์ว่าง
+- วัดรุ่นใหม่ 1 รุ่น: 9 โจทย์ × 3 รอบ = 27 Trial ด้วยค่าเดียวกับ LAB 2
+- ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว รันพร้อมกันไม่เกิน 6 Trial
+
+วิธีตรวจ:
+- ทุก Trial ตัวตรวจ suite/grade.py รันโค้ดที่ Agent เขียน แล้วให้คะแนน 0–1 = สัดส่วนข้อตรวจที่ผ่าน (10 หรือ 11 ข้อต่อโจทย์)
+- gate เทียบรุ่นใหม่กับรุ่นฐาน แล้วตอบ ACCEPT หรือ REJECT: Training และ Validation ต้องไม่ลด และคะแนนรวมต้องดีขึ้นเกินความแกว่ง หรือเท่าเดิมแต่ต้นทุนลดอย่างน้อย 10%
+
+ทำตามลำดับ:
+1. แก้        คัดลอก runs/w1/skills เป็น runs/w1q/skills แล้วแก้ไม่เกิน 3 จุด · เขียนเป็นนโยบายของร้านพร้อมขอบเขตของแต่ละข้อ ห้ามใส่ Input หรือคำตอบของข้อตรวจ
+2. วัด        รุ่น w1q กับโจทย์ทุกชุด
+3. ตัดสิน     gate w1 → w1q และ gate so-v3 → w1q ใช้ต้นทุน context_tokens บันทึกที่ runs/w1q/gate-w1.txt และ runs/w1q/gate-so-v3.txt · ตารางเทียบทุกชุด (report) บันทึกที่ runs/report.md
+4. เก็บผล     คัดลอก runs/w1q และ runs/report.md runs/results.json จาก container มาไว้ที่ 03_week03/06_WikiSkill/runs บนเครื่อง: เก็บ skills ไฟล์ผล และของแต่ละ Trial เก็บ grade.json metrics.json กับโค้ดใน sandbox (ไม่เก็บ Trace ดิบ) · Trial ของ Validation Set เก็บแค่คะแนนและต้นทุน (grade.json เหลือเฉพาะ score · metrics.json ไม่มี commands และ result · ไม่มี sandbox)
+5. รายงาน     จุดที่แก้ใน w1q เทียบกับ w1p · ตารางเทียบทุกชุด · ผล gate 2 คู่</pre>
+<div id="bar"></div>
+<div id="hud"><button id="bo" title="สารบัญ (O)">☰</button><button id="bp" title="ก่อนหน้า (←)">‹</button><span id="count"></span><button id="bn" title="ถัดไป (→)">›</button><button id="bf" title="เต็มจอ (F)">⛶</button></div>
+<div id="ov"></div>
+<div id="lb"><img alt=""></div>
+<script>
+(function(){
+  const deck=document.getElementById('deck');
+  const slides=[...deck.querySelectorAll('.slide')];
+  const N=slides.length; let cur=0;
+  slides.forEach((s,k)=>{ if(!s.classList.contains('cover')){ const n=document.createElement('div'); n.className='no'; n.textContent=(k+1)+' / '+N; s.appendChild(n);} });
+  function fit(){ deck.style.transform='scale('+Math.min(innerWidth/1600,innerHeight/900)+')'; }
+  /* ปรับขนาดตัวอักษรของแต่ละสไลด์ให้พอดีหน้า: เริ่มที่ค่าสูงสุด แล้วลดจนไม่ล้น */
+  function fitSlide(s){
+    const body=s.querySelector('.body'); if(!body) return;
+    const on=s.classList.contains('active'); if(!on) s.classList.add('measure');
+    body.classList.remove('scroll');
+    let fs=parseFloat(s.dataset.max||'1.4');
+    const boxes=[body,...body.querySelectorAll('.fitbox')];
+    const over=()=>boxes.some(b=>b.scrollHeight>b.clientHeight+3||b.scrollWidth>b.clientWidth+1);
+    s.style.setProperty('--fs',fs);
+    while(over()&&fs>0.62){ fs=Math.round((fs-0.03)*100)/100; s.style.setProperty('--fs',fs); }
+    s.dataset.fs=fs; s.dataset.over=over()?'1':'0';
+    if(over()) body.classList.add('scroll');
+    if(!on) s.classList.remove('measure');
+  }
+  function fitAll(){ slides.forEach(fitSlide); document.documentElement.dataset.fitted='1'; }
+  function go(i,push){
+    cur=Math.max(0,Math.min(N-1,i));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===cur));
+    document.getElementById('count').textContent=(cur+1)+' / '+N;
+    document.getElementById('bar').style.width=((cur+1)/N*100)+'%';
+    if(push!==false){ try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){} }
+    document.querySelectorAll('#ov .th').forEach((t,k)=>t.classList.toggle('cur',k===cur));
+  }
+  const next=()=>go(cur+1), prev=()=>go(cur-1);
+  function fs(){ if(!document.fullscreenElement){ const r=document.documentElement; r.requestFullscreen&&r.requestFullscreen(); } else document.exitFullscreen&&document.exitFullscreen(); }
+  const ovEl=document.getElementById('ov'); let grid=null,last=null;
+  slides.forEach((s,k)=>{
+    if(s.dataset.group!==last){ last=s.dataset.group; const h=document.createElement('h4'); h.textContent=last; ovEl.appendChild(h); grid=document.createElement('div'); grid.className='grid'; ovEl.appendChild(grid); }
+    const d=document.createElement('div'); d.className='th';
+    const n=document.createElement('span'); n.textContent=k+1; d.appendChild(n); d.appendChild(document.createTextNode(s.dataset.title||''));
+    d.onclick=()=>{ go(k); ov(false); }; grid.appendChild(d);
+  });
+  function ov(on){ const v=on===undefined?!document.body.classList.contains('ov'):on; document.body.classList.toggle('ov',v);
+    if(v){ const c=ovEl.querySelector('.th.cur'); c&&c.scrollIntoView({block:'center'}); } }
+  const lb=document.getElementById('lb'), lbi=lb.querySelector('img');
+  deck.addEventListener('click',e=>{ const im=e.target.closest('.fig img'); if(im){ lbi.src=im.src; lbi.alt=im.alt; lb.classList.add('on'); lb.scrollTop=0; } });
+  lb.addEventListener('click',()=>lb.classList.remove('on'));
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey) return;
+    const k=e.key;
+    if(lb.classList.contains('on')){ if(k==='Escape'||k==='Enter'||k===' '){ e.preventDefault(); lb.classList.remove('on'); } return; }
+    if(['ArrowRight','PageDown',' ','Enter'].includes(k)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','PageUp','Backspace'].includes(k)){ e.preventDefault(); prev(); }
+    else if(k==='Home') go(0); else if(k==='End') go(N-1);
+    else if(k==='f'||k==='F') fs(); else if(k==='o'||k==='O') ov();
+    else if(k==='Escape'&&document.body.classList.contains('ov')) ov(false);
+  });
+  document.getElementById('bn').onclick=next; document.getElementById('bp').onclick=prev;
+  document.getElementById('bf').onclick=fs; document.getElementById('bo').onclick=()=>ov();
+  let tx=null;
+  document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; tx=null; if(Math.abs(dx)>60)(dx<0?next:prev)(); });
+  function copyText(text,btn,label){
+    const done=()=>{ btn.textContent='คัดลอกแล้ว ✓'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent=label; btn.classList.remove('done'); },1600); };
+    const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.remove(); done(); };
+    if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(text).then(done,fallback); else fallback();
+  }
+  window.promptText=id=>document.getElementById(id).textContent;
+  document.querySelectorAll('.copy').forEach(b=>{
+    const label=b.textContent;
+    b.addEventListener('click',ev=>{ ev.stopPropagation();
+      const text=b.dataset.full?window.promptText(b.dataset.full):b.parentElement.querySelector('.t').textContent;
+      copyText(text,b,label); });
+  });
+  document.querySelectorAll('.chk input').forEach(c=>{
+    const key='slides:'+location.pathname+':'+c.dataset.k;
+    try{ c.checked=localStorage.getItem(key)==='1'; }catch(e){}
+    c.addEventListener('change',()=>{ try{ localStorage.setItem(key,c.checked?'1':'0'); }catch(e){} });
+  });
+  addEventListener('resize',fit);
+  addEventListener('hashchange',()=>{ const n=parseInt(location.hash.slice(1)); if(n) go(n-1,false); });
+  fit(); const start=parseInt(location.hash.slice(1)); go(start?start-1:0,false);
+  fitAll();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitAll);
+  addEventListener('load',fitAll);
+})();
+</script>
+</body>
+</html>

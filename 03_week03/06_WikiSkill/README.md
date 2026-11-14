@@ -18,7 +18,9 @@
 | หน้า | ตอบคำถาม |
 |---|---|
 | [ทฤษฎี · WikiSkill ฉบับละเอียด](01_theory/README.md) | งานวิจัยต้นทาง: แนวคิด · สถาปัตยกรรม 3 ชั้น · อัลกอริทึม · **วิธีคิดในการออกแบบ 10 ข้อ** · ผลในเปเปอร์ |
+| [สไลด์ของทฤษฎี WikiSkill](01_theory/WikiSkill_Theory_Slides.html) | สไลด์ของบททฤษฎี (เปิดไฟล์ `.html` ในเบราว์เซอร์) |
 | [รูปแบบของ `wikiskill`](wikiskill_format.md) | เครื่องมือที่สร้างใน LAB 0 ต้องมีคำสั่งและไฟล์อะไร |
+| [สไลด์ของบทนี้](WikiSkill_Slides.html) | สไลด์ HTML สำหรับสอน: ภาคทฤษฎี + ภาค LAB พร้อมปุ่มคัดลอกพรอมต์และรายการตรวจผล (เปิดไฟล์ `.html` ในเบราว์เซอร์) |
 
 เปเปอร์ต้นทาง: Tang et al., *WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution*, Google Research, [arXiv:2608.27454](https://arxiv.org/abs/2608.27454)
 
@@ -216,6 +218,7 @@ Agent ทุกตัวได้รับพรอมต์เดียวก�
 ```text
 06_WikiSkill/
 ├── README.md               บทเรียนนี้
+├── WikiSkill_Slides.html   สไลด์ของบทนี้ (สร้างด้วย tools/build_slides.py)
 ├── wikiskill_format.md     รูปแบบที่เครื่องมือ wikiskill ต้องทำตาม
 ├── suite/                  ของที่ป้อนเข้า: โจทย์ 9 ข้อ (suite.json) และตัวตรวจ (grade.py)
 ├── runs/                   ผลลัพธ์
