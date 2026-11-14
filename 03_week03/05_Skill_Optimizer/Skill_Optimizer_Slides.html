@@ -131,6 +131,23 @@ pre.code.prompt{font-size:.76em;line-height:1.52;border:2px solid #f08a24}
 .cardx.ok{border-left-color:var(--green)}.cardx.bad{border-left-color:var(--red)}.cardx.warn{border-left-color:var(--orange)}.cardx.navy{border-left-color:var(--navy)}
 .cardx .chips{display:flex;flex-direction:column;gap:.3em}
 .cardx .chips div{font-size:.86em;line-height:1.45}
+/* สมการ (KaTeX) */
+.katex{font-size:1.1em;font-family:KaTeX_Main,'IBM Plex Sans Thai','Leelawadee UI','Times New Roman',serif}
+.katex-display{margin:0}
+.eqbox{background:#fff;border:2px solid var(--line);border-radius:18px;padding:.3em .6em;text-align:center;box-shadow:0 4px 14px rgba(18,48,94,.06);font-size:2.2em;color:var(--ink);display:flex;flex-direction:column;gap:.12em}
+.eqbox .row+.row{border-top:1px dashed var(--line);padding-top:.12em}
+.eqbox .sub{font-size:.36em;color:var(--muted);line-height:1.4;padding-bottom:.3em}
+.eqlead{color:var(--muted);font-size:.95em;line-height:1.45}
+.parts{display:grid;gap:16px;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))}
+.part{background:#fff;border:1px solid var(--line);border-top:9px solid var(--c);border-radius:14px;padding:.55em .8em .65em;display:flex;flex-direction:column;gap:.22em;box-shadow:0 3px 10px rgba(18,48,94,.05)}
+.part>*{margin:0}
+.part .role{font-size:.64em;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.part .top{display:flex;align-items:center;gap:.5em;min-height:2.3em}
+.part .n{flex:none;display:inline-flex;width:1.7em;height:1.7em;border-radius:50%;background:var(--c);color:#fff;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.part .sym{font-size:1.3em;color:var(--c)}
+.part h4{font-size:1em;color:var(--navy);line-height:1.3}
+.part p{font-size:.86em;line-height:1.45;color:#2b3648}
+.part .lab{align-self:flex-start;font-family:var(--mono);font-size:.74em;color:#0b6b69;background:var(--teal-soft);border-radius:6px;padding:.12em .5em;margin-top:.15em}
 /* เทียบ 2 ฝั่ง */
 .vs{display:flex;gap:26px;align-items:stretch}
 .vs .sidebox{flex:1;min-width:0;border-radius:16px;padding:.8em 1em;border:2px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:.4em}

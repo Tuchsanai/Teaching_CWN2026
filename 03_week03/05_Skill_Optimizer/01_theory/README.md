@@ -319,7 +319,7 @@ h( sonnet , cashback , v0/SKILL.md )  →  ( Trace ของ Trial นั้น 
 
 ![สมการ 2 แยกสี 4 ส่วน: คะแนนของงาน 1 ชิ้น บวกทุกงาน หารด้วยจำนวนงาน และเลือกรุ่นที่ดีที่สุด](img/t07-eq2.png)
 
-$$s^{\star}_{\text{sel}} = \arg\max_{s \,\in\, \mathcal{C}(D_{\text{tr}})} \; \frac{1}{|D_{\text{sel}}|} \sum_{x \in D_{\text{sel}}} r(s)$$
+$$s^{\star}_{\text{sel}} = \operatorname*{arg\,max}_{s \,\in\, \mathcal{C}(D_{\text{tr}})} \; \frac{1}{|D_{\text{sel}}|} \sum_{x \in D_{\text{sel}}} r(s)$$
 
 **อ่านเป็นภาษาคน:** ในบรรดาสกิลทุกรุ่นที่สร้างได้ระหว่างเทรน ให้เลือกรุ่นที่ได้คะแนนเฉลี่ยบน $D_{\text{sel}}$ สูงที่สุด
 

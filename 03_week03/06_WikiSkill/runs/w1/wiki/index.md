@@ -1,7 +1,0 @@
-# Wiki Index
-
-- [missing-cli-entrypoint](wiki/patterns/missing-cli-entrypoint.md): `cli_ok`/`cli_error` ล้มเพราะ solve.py มีแต่ฟังก์ชัน ไม่อ่าน stdin JSON ไม่พิมพ์ `{"ok":...}` ให้เพิ่ม `main()` + `__main__` ที่ exit 0 เมื่อสำเร็จ และ exit 2 พร้อม JSON error เมื่อ ValueError/KeyError/TypeError
-- [missing-input-validation](wiki/patterns/missing-input-validation.md): `reject_value`/`reject_type` ล้มเพราะช่วงค่าและชนิดในโจทย์ไม่ถูกบังคับ (ค่า 0/ติดลบ/float/tier ผิดผ่านเข้าไป หรือเกิด ZeroDivisionError) ให้ตรวจทุกพารามิเตอร์ก่อนคำนวณ และ raise ValueError เสมอ รวมปฏิเสธ float และ bool
-- [money-rounding-half-up](wiki/patterns/money-rounding-half-up.md): `half_up`/`no_drift` ล้มเพราะใช้ floor (`//`) กับผลที่มีเศษสตางค์ (เช่น 250.5 ได้ 250) ให้คำนวณด้วยจำนวนเต็ม/Fraction เก็บเป็น num/den แล้วปัด half-up ครั้งเดียวตอนท้าย `(2*num+den)//(2*den)` (วิธีนี้ผ่านใน cafe_bill และ shipping_fee)
-- [missing-test-file](wiki/patterns/missing-test-file.md): ข้อ `tests` ล้มเพราะไม่มี test_solve.py ข้าง solve.py (Agent ทดสอบด้วย `python3 -c` ที่ไม่เหลือไฟล์) ให้เขียนและรัน unittest/pytest ครอบกรณีปกติ ขอบ half-up ValueError และ CLI
-- [happy-path-only-verification](wiki/patterns/happy-path-only-verification.md): Agent ตรวจงานแค่ค่าปกติที่คำนวณวนจากตรรกะของตัวเอง จบใน 2–3 คำสั่ง แล้วบอกว่าถูกต้อง ทั้งที่ล้ม 5–7 จาก 10 ข้อ ให้ไล่ checklist 5 ข้อ (ฟังก์ชัน, half-up, validation, CLI, tests) และรันจริงก่อนจบ

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ภาพของส่วนที่ 5 (สมการ 1-3) · สมการเรียงพิมพ์ด้วย MathML ใน Chrome จึงคมและตรงตามเปเปอร์
+"""ภาพของส่วนที่ 5 (สมการ 1-3) · สมการเรียงพิมพ์ด้วย KaTeX (LaTeX จริง) แล้วถ่ายภาพใน Chrome
 
   python 01_theory/diagrams_eq.py            (รันบนเครื่อง จากโฟลเดอร์ของบท)
 
@@ -9,12 +9,12 @@ import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+sys.path.insert(0, os.path.join(HERE, "tools"))
 import charts
-from charts import shot
+import slides_engine as E
 
 charts.OUT = os.path.join(HERE, "img")
 MONO = "font-family:Consolas,monospace"
-MATH = "font-family:Cambria Math,STIX Two Math,serif"
 INK, MUTE, LINE = "#4A2F1F", "#7A6557", "#E5D9CC"
 TEAL, ORANGE, GREEN, RED, BROWN, PURPLE = "#1F8A7D", "#E0822F", "#3F9A35", "#D9573A", "#6F4E37", "#7B55B0"
 VERS = [("noskill", "ไม่มีสกิล"), ("v0", "v0"), ("v1", "v1"), ("v2", "v2"), ("v3", "v3"), ("v4", "v4")]
@@ -29,54 +29,60 @@ def val_scores():
     return out
 
 
+def shot(name, body, height):
+    """ถ่ายภาพ โดยฝัง CSS และฟอนต์ของ KaTeX ไว้ในหน้า"""
+    charts.shot(name, "<style>%s .katex{font-size:1em} .katex-display{margin:0}</style>%s" % (E.katex_css(body), body), height)
+
+
+def K(src, display=False):
+    return E.tex(src, display)
+
+
+def C(color, src):
+    return r"\textcolor{%s}{%s}" % (color, src)
+
+
 def badge(n, color, size=40):
     return "<span style='display:inline-flex;align-items:center;justify-content:center;width:%dpx;height:%dpx;border-radius:50%%;background:%s;color:#fff;font-size:%dpx;font-weight:800;flex:none'>%s</span>" % (
         size, size, color, int(size * 0.6), n)
 
 
-def eqbox(mathml, size=62):
-    return "<div style='background:#fff;border:4px solid %s;border-radius:22px;padding:18px 10px 14px;text-align:center'><math display='block' style='%s;font-size:%dpx;color:%s'>%s</math></div>" % (
-        LINE, MATH, size, INK, mathml)
+def eqbox(src, size=54):
+    return "<div style='background:#fff;border:4px solid %s;border-radius:22px;padding:14px 10px 12px;text-align:center;font-size:%dpx;color:%s'>%s</div>" % (
+        LINE, size, INK, K(src, True))
 
 
-EQ2 = """<msubsup><mi>s</mi><mtext>sel</mtext><mo>★</mo></msubsup><mo>=</mo>
-<munder><mrow style='color:%s'><mi mathvariant='normal'>arg</mi><mo>&#x2009;</mo><mi mathvariant='normal'>max</mi></mrow>
-  <mrow style='color:%s'><mi>s</mi><mo>∈</mo><mi>𝒞</mi><mo>(</mo><msub><mi>D</mi><mtext>tr</mtext></msub><mo>)</mo></mrow></munder>
-<mspace width='0.35em'/>
-<mfrac style='color:%s'><mn>1</mn><mrow><mo>|</mo><msub><mi>D</mi><mtext>sel</mtext></msub><mo>|</mo></mrow></mfrac>
-<munder style='color:%s'><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><msub><mi>D</mi><mtext>sel</mtext></msub></mrow></munder>
-<mrow style='color:%s'><mi>r</mi><mo>(</mo><mi>s</mi><mo>)</mo></mrow>""" % (ORANGE, GREEN, PURPLE, TEAL, RED)
-
-EQ3 = """<mtext>Test</mtext><mo>(</mo><msubsup style='color:%s'><mi>s</mi><mtext>sel</mtext><mo>★</mo></msubsup><mo>)</mo><mo>=</mo>
-<mfrac style='color:%s'><mn>1</mn><mrow><mo>|</mo><msub><mi>D</mi><mtext>test</mtext></msub><mo>|</mo></mrow></mfrac>
-<munder style='color:%s'><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><msub><mi>D</mi><mtext>test</mtext></msub></mrow></munder>
-<mrow style='color:%s'><mi>r</mi><mo>(</mo><msubsup style='color:%s'><mi>s</mi><mtext>sel</mtext><mo>★</mo></msubsup><mo>)</mo></mrow>""" % (ORANGE, PURPLE, TEAL, RED, ORANGE)
+D_TR, D_SEL, D_TEST, S_STAR = r"D_{\text{tr}}", r"D_{\text{sel}}", r"D_{\text{test}}", r"s^{\star}_{\text{sel}}"
+EQ2 = r"%s = %s \; %s %s %s" % (
+    S_STAR, C(ORANGE, r"\operatorname*{arg\,max}_{%s}" % C(GREEN, r"s \,\in\, \mathcal{C}(%s)" % D_TR)),
+    C(PURPLE, r"\frac{1}{|%s|}" % D_SEL), C(TEAL, r"\sum_{x \in %s}" % D_SEL), C(RED, "r(s)"))
+EQ3 = r"\text{Test}(%s) = %s %s %s%s%s" % (
+    C(ORANGE, S_STAR), C(TEAL, r"\frac{1}{|%s|}" % D_TEST), C(TEAL, r"\sum_{x \in %s}" % D_TEST),
+    C(RED, "r("), C(ORANGE, S_STAR), C(RED, ")"))
 
 
 def part(n, color, sym, title, text):
     return """<div style='flex:1;background:#fff;border-radius:18px;padding:14px 18px;border-top:12px solid %s'>
-      <div style='display:flex;align-items:center;gap:12px'>%s<span style='%s;font-size:34px;color:%s;font-weight:700'>%s</span></div>
+      <div style='display:flex;align-items:center;gap:14px;height:62px'>%s<span style='font-size:32px'>%s</span></div>
       <div style='font-size:27px;font-weight:800;color:%s;margin:8px 0 4px'>%s</div>
-      <div style='font-size:23px;line-height:1.4'>%s</div></div>""" % (color, badge(n, color), MATH, color, sym, INK, title, text)
+      <div style='font-size:23px;line-height:1.4'>%s</div></div>""" % (color, badge(n, color), K(C(color, sym)), INK, title, text)
 
 
 def eq2_anatomy():
+    m = lambda t: "<span style='font-size:1.02em'>%s</span>" % K(t)
     parts = "".join([
-        part(1, RED, "r(s)", "คะแนนของงาน 1 ชิ้น", "ได้จาก <b>สมการ 1</b><br>เมื่อโมเดลทำงาน x ด้วยสกิล s"),
-        part(2, TEAL, "∑ x ∈ D<sub>sel</sub>", "บวกทุกงาน", "บวกคะแนนของงาน <b>ทุกชิ้น</b><br>ในชุด D<sub>sel</sub>"),
-        part(3, PURPLE, "1 / |D<sub>sel</sub>|", "หารด้วยจำนวนงาน", "ได้ <b>คะแนนเฉลี่ย</b> ของสกิล s<br>|D<sub>sel</sub>| = จำนวนงานในชุด"),
-        part(4, ORANGE, "arg max", "เลือกรุ่นที่ดีที่สุด", "ทำข้อ 1–3 กับสกิล <b>ทุกรุ่น</b><br>แล้วตอบว่า <b>รุ่นไหน</b> เฉลี่ยสูงสุด")])
+        part(1, RED, "r(s)", "คะแนนของงาน 1 ชิ้น", "ได้จาก <b>สมการ 1</b><br>เมื่อโมเดลทำงาน %s ด้วยสกิล %s" % (m("x"), m("s"))),
+        part(2, TEAL, r"\sum_{x \in %s}" % D_SEL, "บวกทุกงาน", "บวกคะแนนของงาน <b>ทุกชิ้น</b><br>ในชุด %s" % m(D_SEL)),
+        part(3, PURPLE, r"\frac{1}{|%s|}" % D_SEL, "หารด้วยจำนวนงาน", "ได้ <b>คะแนนเฉลี่ย</b> ของสกิล %s<br>%s = จำนวนงานในชุด" % (m("s"), m("|%s|" % D_SEL))),
+        part(4, ORANGE, r"\operatorname{arg\,max}", "เลือกรุ่นที่ดีที่สุด", "ทำข้อ 1–3 กับสกิล <b>ทุกรุ่น</b><br>แล้วตอบว่า <b>รุ่นไหน</b> เฉลี่ยสูงสุด")])
     body = """<h1>สมการ 2: เลือกสกิลรุ่นที่ดีที่สุด</h1>
     <div class='sub' style='margin-bottom:14px'>สีในสมการ ตรงกับสีของการ์ดด้านล่าง · อ่านตามเลข 1 → 4 คือจากขวาไปซ้ายของสมการ (ข้างในออกข้างนอก)</div>
     %s
     <div style='display:flex;gap:12px;margin-top:16px'>%s</div>
-    <div class='note' style='margin-top:14px'><span style='color:%s;font-weight:800'>s ∈ 𝒞(D<sub>tr</sub>)</span> ใต้ arg max = "สกิล s ทุกรุ่นที่สร้างขึ้นระหว่างเทรนด้วยข้อมูล D<sub>tr</sub>" ·
-      <b>s<sup>★</sup><sub>sel</sub></b> ทางซ้าย = ชื่อของสกิลที่ถูกเลือก</div>""" % (eqbox(EQ2), "".join([
-        part(1, RED, "r(s)", "คะแนนของงาน 1 ชิ้น", "ได้จาก <b>สมการ 1</b><br>เมื่อโมเดลทำงาน x ด้วยสกิล s"),
-        part(2, TEAL, "∑", "บวกทุกงาน", "บวกคะแนนของงาน <b>ทุกชิ้น</b><br>ในชุด D<sub>sel</sub>"),
-        part(3, PURPLE, "1 / |D<sub>sel</sub>|", "หารด้วยจำนวนงาน", "ได้ <b>คะแนนเฉลี่ย</b> ของสกิล s<br>|D<sub>sel</sub>| = จำนวนงานในชุด"),
-        part(4, ORANGE, "arg max", "เลือกรุ่นที่ดีที่สุด", "ทำข้อ 1–3 กับสกิล <b>ทุกรุ่น</b><br>แล้วตอบว่า <b>รุ่นไหน</b> เฉลี่ยสูงสุด")]), GREEN)
-    shot("t07-eq2", body, 680)
+    <div class='note' style='margin-top:14px'>%s ใต้ arg max = "สกิล %s ทุกรุ่นที่สร้างขึ้นระหว่างเทรนด้วยข้อมูล %s" ·
+      %s ทางซ้าย = ชื่อของสกิลที่ถูกเลือก</div>""" % (
+        eqbox(EQ2), parts, m(C(GREEN, r"s \in \mathcal{C}(%s)" % D_TR)), m("s"), m(D_TR), m(S_STAR))
+    shot("t07-eq2", body, 650)
 
 
 def eq2_worked():
@@ -113,14 +119,15 @@ def eq2_worked():
 
 
 def eq3_anatomy():
+    m = lambda t: "<span style='font-size:1.02em'>%s</span>" % K(t)
     parts = "".join([
-        part(1, ORANGE, "s<sup>★</sup><sub>sel</sub>", "สกิลที่เลือกแล้ว", "คำตอบของ <b>สมการ 2</b><br>ใช้รุ่นนี้ <b>รุ่นเดียว</b>"),
-        part(2, RED, "r( s<sup>★</sup><sub>sel</sub> )", "คะแนนของงาน 1 ชิ้น", "ได้จาก <b>สมการ 1</b><br>แต่งาน x มาจาก D<sub>test</sub>"),
-        part(3, TEAL, "∑ และ 1 / |D<sub>test</sub>|", "เฉลี่ยทุกงาน", "วิธีเฉลี่ยเหมือนสมการ 2<br>เปลี่ยนชุดข้อมูลเป็น <b>D<sub>test</sub></b>")])
+        part(1, ORANGE, S_STAR, "สกิลที่เลือกแล้ว", "คำตอบของ <b>สมการ 2</b><br>ใช้รุ่นนี้ <b>รุ่นเดียว</b>"),
+        part(2, RED, "r(%s)" % S_STAR, "คะแนนของงาน 1 ชิ้น", "ได้จาก <b>สมการ 1</b><br>แต่งาน %s มาจาก %s" % (m("x"), m(D_TEST))),
+        part(3, TEAL, r"\frac{1}{|%s|} \sum_{x \in %s}" % (D_TEST, D_TEST), "เฉลี่ยทุกงาน", "วิธีเฉลี่ยเหมือนสมการ 2<br>เปลี่ยนชุดข้อมูลเป็น %s" % m(D_TEST))])
     body = """<h1>สมการ 3: รายงานผลของสกิลที่เลือก</h1>
     <div class='sub' style='margin-bottom:14px'>ไม่มี arg max เพราะไม่ได้เลือกอะไรแล้ว · เป็นการวัดอย่างเดียว บนข้อมูลที่ไม่เคยถูกใช้มาก่อน</div>
     %s<div style='display:flex;gap:12px;margin-top:16px'>%s</div>""" % (eqbox(EQ3), parts)
-    shot("t07c-eq3", body, 700)
+    shot("t07c-eq3", body, 600)
 
 
 def grid():

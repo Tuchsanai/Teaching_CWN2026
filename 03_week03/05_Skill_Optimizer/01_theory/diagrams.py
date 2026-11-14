@@ -7,8 +7,10 @@
 import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "tools"))
+sys.path.insert(0, os.path.join(HERE, "tools"))
 import charts
 from charts import shot
+import slides_engine as E
 
 charts.OUT = os.path.join(HERE, "img")
 MONO = "font-family:Consolas,monospace"
@@ -99,9 +101,19 @@ def compare():
     shot("t03-vs-lab", body, 860)
 
 
+def kshot(name, body, height):
+    """ถ่ายภาพที่มีสมการ LaTeX: ฝัง CSS และฟอนต์ของ KaTeX ไว้ในหน้า"""
+    shot(name, "<style>%s .katex{font-size:1em} .katex-display{margin:0}</style>%s" % (E.katex_css(body), body), height)
+
+
+def C(color, src):
+    return r"\textcolor{%s}{%s}" % (color, src)
+
+
 def box(color, sym, name, ex, w="flex:1"):
+    sym = E.tex(sym)
     return """<div style='%s;background:#fff;border:3px solid %s;border-top:14px solid %s;border-radius:18px;padding:12px 16px;text-align:center'>
-      <div style='font-size:46px;font-weight:800;color:%s;font-style:italic;font-family:Cambria,Georgia,serif'>%s</div>
+      <div style='font-size:46px;color:%s;line-height:1.25'>%s</div>
       <div style='font-size:24px;font-weight:800;color:%s'>%s</div>
       <div style='font-size:21px;color:%s;margin-top:4px'>%s</div></div>""" % (w, LINE, color, color, sym, INK, name, MUTE, ex)
 
@@ -114,12 +126,12 @@ def gd_step():
     """สูตรปรับน้ำหนัก 1 ก้าว พร้อมตัวเลขตัวอย่าง (ตัวเลขสมมติ)"""
     def term(color, top, mid, bot):
         return """<div style='text-align:center'><div style='font-size:21px;color:%s;font-weight:700;height:30px'>%s</div>
-          <div style='font-size:64px;font-weight:800;color:%s;font-family:Cambria,Georgia,serif;line-height:1.1'>%s</div>
-          <div style='font-size:22px;color:%s'>%s</div></div>""" % (color, top, color, mid, MUTE, bot)
-    op = lambda t: "<div style='font-size:58px;color:%s;font-family:Cambria,Georgia,serif;align-self:center;padding:0 6px'>%s</div>" % (INK, t)
-    sym = (term(GREEN, "น้ำหนักใหม่", "θ", "ค่าหลังปรับ") + op("←") + term(BROWN, "น้ำหนักเดิม", "θ", "ค่าก่อนปรับ") + op("−") +
-           term(ORANGE, "Learning Rate", "η", "ขนาดของก้าว") + op("×") + term(PURPLE, "Gradient", "∇Loss", "ทิศที่ Loss เพิ่ม"))
-    num = (term(GREEN, "", "4.8", "") + op("←") + term(BROWN, "", "5.0", "") + op("−") + term(ORANGE, "", "0.1", "") + op("×") + term(PURPLE, "", "2.0", ""))
+          <div style='font-size:60px;color:%s;line-height:1.25'>%s</div>
+          <div style='font-size:22px;color:%s'>%s</div></div>""" % (color, top, color, E.tex(mid), MUTE, bot)
+    op = lambda t: "<div style='font-size:54px;color:%s;align-self:center;padding:0 8px'>%s</div>" % (INK, E.tex(t))
+    sym = (term(GREEN, "น้ำหนักใหม่", r"\theta", "ค่าหลังปรับ") + op(r"\leftarrow") + term(BROWN, "น้ำหนักเดิม", r"\theta", "ค่าก่อนปรับ") + op("-") +
+           term(ORANGE, "Learning Rate", r"\eta", "ขนาดของก้าว") + op(r"\cdot") + term(PURPLE, "Gradient", r"\nabla_\theta \, \text{Loss}", "ทิศที่ Loss เพิ่ม"))
+    num = (term(GREEN, "", "4.8", "") + op(r"\leftarrow") + term(BROWN, "", "5.0", "") + op("-") + term(ORANGE, "", "0.1", "") + op(r"\times") + term(PURPLE, "", "2.0", ""))
     rows = "".join("""<div style='display:flex;align-items:center;gap:16px;background:#fff;border-radius:12px;padding:9px 18px;margin-bottom:7px;border-left:12px solid %s'>
         <div style='width:330px;font-size:25px;font-weight:800;color:%s'>%s</div><div style='flex:1;font-size:23px'>%s</div></div>""" % (c, INK, a, b) for c, a, b in [
         (PURPLE, "Gradient = +2.0", "เพิ่มน้ำหนัก 1 หน่วย Loss จะเพิ่ม 2 หน่วย → ต้อง <b>ลด</b> น้ำหนัก (เดินทางตรงข้าม)"),
@@ -129,7 +141,7 @@ def gd_step():
     <div class='sub' style='margin-bottom:10px'>บรรทัดบน = สูตร · บรรทัดล่าง = ตัวเลขตัวอย่าง (สมมติว่าโมเดลมีน้ำหนักตัวเดียว)</div>
     <div style='display:flex;justify-content:center;gap:10px;background:#fff;border:3px solid %s;border-radius:22px;padding:14px 20px 10px'>%s</div>
     <div style='display:flex;justify-content:center;gap:34px;margin:6px 0 14px'>%s</div>%s""" % (LINE, sym, num, rows)
-    shot("t04-gd-step", body, 650)
+    kshot("t04-gd-step", body, 650)
 
 
 def eq_overview():
@@ -158,24 +170,25 @@ def eq_overview():
 
 
 def eq1():
+    eq = r"(%s,\; %s) = %s(%s, %s, %s), \qquad %s \in [0, 1]" % (
+        C(PURPLE, r"\tau(s)"), C(RED, "r(s)"), C(TEAL, "h"), C(BROWN, "M"), C(GREEN, "x"), C(ORANGE, "s"), C(RED, "r(s)"))
     ins = "".join([box(BROWN, "M", "โมเดลเป้าหมาย", "ถูกล็อก ไม่ถูกแก้<br><span style='%s;color:#2A6F68'>sonnet</span>" % MONO),
                    box(GREEN, "x", "งาน 1 ชิ้น", "โจทย์ 1 ข้อ<br><span style='%s;color:#2A6F68'>cashback</span>" % MONO),
                    box(ORANGE, "s", "สกิล", "ข้อความที่ถูกปรับ<br><span style='%s;color:#2A6F68'>v0/SKILL.md</span>" % MONO)])
     mid = box(TEAL, "h", "Harness", "ระบบที่ให้โมเดลทำงาน<br><span style='%s;color:#2A6F68'>claude -p</span>" % MONO, "width:300px")
-    outs = "".join([box(PURPLE, "τ", "Trajectory", "บันทึกทุกขั้นที่โมเดลทำ<br><span style='%s;color:#2A6F68'>Trace ของ Trial</span>" % MONO),
+    outs = "".join([box(PURPLE, r"\tau", "Trajectory", "บันทึกทุกขั้นที่โมเดลทำ<br><span style='%s;color:#2A6F68'>Trace ของ Trial</span>" % MONO),
                     box(RED, "r", "คะแนน", "ตัวเลข 0 ถึง 1<br><span style='%s;color:#2A6F68'>7 จาก 10 ข้อ = 0.7</span>" % MONO)])
     body = """<h1>สมการ 1: การทำงาน 1 ครั้ง</h1>
     <div class='sub' style='margin-bottom:12px'>อ่านจากซ้ายไปขวา: ของ 3 อย่างเข้า Harness แล้วได้ของ 2 อย่างออกมา · ตัวอักษรสีเขียวเข้ม = สิ่งนั้นใน LAB ของบทนี้</div>
-    <div style='text-align:center;font-size:54px;font-family:Cambria,Georgia,serif;color:%s;background:#fff;border:3px solid %s;border-radius:20px;padding:8px;margin-bottom:18px'>
-      ( <span style='color:%s'><i>τ</i></span> , <span style='color:%s'><i>r</i></span> ) &nbsp;=&nbsp; <span style='color:%s'><i>h</i></span> ( <span style='color:%s'><i>M</i></span> , <span style='color:%s'><i>x</i></span> , <span style='color:%s'><i>s</i></span> )</div>
+    <div style='text-align:center;font-size:50px;color:%s;background:#fff;border:3px solid %s;border-radius:20px;padding:10px 8px;margin-bottom:18px'>%s</div>
     <div style='display:flex;gap:12px;align-items:stretch'>
       <div style='flex:3;display:flex;gap:10px'>%s</div>%s%s%s<div style='flex:2;display:flex;gap:10px'>%s</div></div>
-    <div class='note' style='margin-top:18px'>ถ้าเปลี่ยนแค่ <b>s</b> แล้วคะแนน <b>r</b> เปลี่ยน แปลว่าผลนั้นมาจากสกิล เพราะ M, x และ h เหมือนเดิมทุกอย่าง</div>""" % (
-        INK, LINE, PURPLE, RED, TEAL, BROWN, GREEN, ORANGE, ins, big_arrow(), mid, big_arrow(), outs)
-    shot("t06-eq1", body, 600)
+    <div class='note' style='margin-top:18px'>ถ้าเปลี่ยนแค่ %s แล้วคะแนน %s เปลี่ยน แปลว่าผลนั้นมาจากสกิล เพราะ %s, %s และ %s เหมือนเดิมทุกอย่าง</div>""" % (
+        INK, LINE, E.tex(eq, True), ins, big_arrow(), mid, big_arrow(), outs, E.tex("s"), E.tex("r"), E.tex("M"), E.tex("x"), E.tex("h"))
+    kshot("t06-eq1", body, 610)
 
 
-# สมการ 2 และ 3 และตารางที่เชื่อมทั้ง 3 สมการ วาดใน diagrams_eq.py (ใช้ MathML)
+# สมการ 2 และ 3 และตารางที่เชื่อมทั้ง 3 สมการ วาดใน diagrams_eq.py · สมการทุกภาพเรียงพิมพ์ด้วย KaTeX (LaTeX จริง)
 
 
 def edits():

@@ -1,7 +1,0 @@
-# Wiki Index
-
-- [input-validation-missing](wiki/patterns/input-validation-missing.md): ฟังก์ชันไม่ตรวจ input จึงคืนค่าแทน raise `ValueError` สำหรับค่านอกช่วง/ชนิดผิด (float, bool, qty=0, people=0, ค่าติดลบ) เพราะโจทย์ไม่สั่งตรง ๆ แก้โดยตรวจชนิด (`type(x) is int`) และช่วงที่ต้นฟังก์ชันก่อน early-return แล้ว raise `ValueError` เสมอ (`reject_value`, `reject_type`)
-- [cli-entrypoint-missing](wiki/patterns/cli-entrypoint-missing.md): solve.py ไม่มี `__main__` อ่าน JSON จาก stdin จึงได้ exit 0 stdout ว่าง (`cli_ok`, `cli_error`) เพราะโจทย์ไม่ได้พูดถึง CLI แก้โดยต่อท้ายไฟล์ด้วยโค้ดที่พิมพ์ `{"ok": true, "result": ...}` exit 0 หรือ `{"ok": false, "error": ...}` exit 2 ไม่มี traceback
-- [test-file-missing](wiki/patterns/test-file-missing.md): ไม่มี `test_solve.py` ข้าง solve.py (ข้อ `tests` ตก) เพราะ Agent ทดสอบด้วย `python3 -c` แล้วทิ้ง แก้โดยสร้างไฟล์ test ครอบคลุมปกติ ขอบ เศษ .5 และ `ValueError` แล้วรันให้ผ่านก่อนตอบ
-- [half-up-integer-rounding](wiki/patterns/half-up-integer-rounding.md): ปัดเศษสตางค์ผิดวิธี (ปัดลงด้วย `//`) ทำให้ `half_up`/`no_drift` ตก เพราะโจทย์ไม่ระบุวิธีปัดแต่ตัวตรวจคาด half-up แก้โดยใช้เลขจำนวนเต็มหรือ Fraction ปัดครึ่งขึ้นครั้งเดียวตอนท้าย `(2*n+d)//(2*d)` (pattern ที่ทำให้สำเร็จอยู่ในหน้านี้)
-- [happy-path-only-verification](wiki/patterns/happy-path-only-verification.md): Agent ทดสอบแค่ตัวอย่างปกติรอบเดียวแล้วรายงานว่าเสร็จ (บางรายไม่รันเลย) ทำให้พลาดข้อ validation/CLI/tests/rounding ซ้ำทุก Trace แก้โดยทำรายการตรวจ 5 ข้อก่อนส่งงานและรันจริง

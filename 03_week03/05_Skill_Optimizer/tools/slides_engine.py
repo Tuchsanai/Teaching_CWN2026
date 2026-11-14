@@ -7,10 +7,12 @@
 ส่วนประกอบ
 - อ่าน README.md เป็นบล็อก: load() แล้วค้นด้วย sec() table() codes() para() prompt() eye()
 - ชิ้นส่วนของสไลด์: fig() explain() tiles() cards() versus() bars() tbl() code() fileflow() note() divider() cover()
+- สมการ LaTeX: load(latex=True) ทำให้ $...$ และ $$...$$ ถูกเรียงพิมพ์ด้วย KaTeX ตอนสร้างไฟล์ (ต้องมี Node.js) ·
+  สไลด์สมการ: equation() eqbox() parts() tc() · ฟอนต์ของ KaTeX ฝังในไฟล์ HTML จึงเปิดได้โดยไม่ต้องต่ออินเทอร์เน็ต
 - สไลด์พรอมต์ (ข้อความตรงตัวอักษรจาก README + ปุ่มคัดลอก): prompt_slides() · รายการตรวจผล: check_slide()
 - write(): ประกอบไฟล์ HTML ไฟล์เดียว (CSS และ JS อยู่ในไฟล์) · ขนาดตัวอักษรของแต่ละสไลด์ปรับตอนเปิดไฟล์ให้พอดีหน้า
 """
-import html, json, math, os, re, struct, sys
+import base64, html, json, math, os, re, shutil, struct, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -115,6 +117,112 @@ def parse(lines):
     return out
 
 
+# ------------------------------------------------------------------ สมการ LaTeX (เรียงพิมพ์ด้วย KaTeX ตอนสร้างไฟล์)
+KATEX_HOME = os.environ.get("README_SLIDES_KATEX") or os.path.join(os.path.expanduser("~"), ".cache", "readme-slides")
+MATH = {}            # (ข้อความ LaTeX, เป็นสมการแยกบรรทัดหรือไม่) -> HTML ของ KaTeX
+MATH_ON = [False]    # True = inline() เรียงพิมพ์ $...$ และ $$...$$ (เปิดด้วย load(latex=True))
+MATH_RE = re.compile(r"\$\$(.+?)\$\$|(?<![\\$])\$(?!\s)([^$\n]+?)(?<!\s)\$(?![\d$])")
+PALETTE = {"navy": "#12305e", "teal": "#0f8f8c", "orange": "#e87f1c", "red": "#c92a2a", "green": "#15803d", "purple": "#6d4bb3", "ink": "#1c2533"}
+GREEK = {"theta": "θ", "eta": "η", "tau": "τ", "nabla": "∇", "star": "★", "in": "∈", "sum": "∑", "leftarrow": "←", "cdot": "·",
+         "times": "×", "lvert": "|", "rvert": "|", "arg": "arg ", "qquad": " ", "tilde": "", "frac": ""}
+NODE_JS = """const katex=require(process.argv[1]);
+const items=JSON.parse(require('fs').readFileSync(0,'utf8'));
+process.stdout.write(JSON.stringify(items.map(([tex,display])=>{
+  try{return katex.renderToString(tex,{displayMode:display,throwOnError:true,strict:false,output:'html'});}
+  catch(e){return 'ERR:'+e.message;}})));"""
+
+
+def katex_dir():
+    """โฟลเดอร์ dist ของ KaTeX · ครั้งแรกติดตั้งด้วย npm ไว้ที่ ~/.cache/readme-slides (เปลี่ยนที่ได้ด้วย README_SLIDES_KATEX)"""
+    d = os.path.join(KATEX_HOME, "node_modules", "katex", "dist")
+    if not os.path.exists(os.path.join(d, "katex.min.js")):
+        if not shutil.which("npm"):
+            raise SystemExit("สมการ LaTeX ในสไลด์ต้องใช้ Node.js (node และ npm) · ติดตั้งแล้วรันใหม่")
+        os.makedirs(KATEX_HOME, exist_ok=True)
+        subprocess.run("npm install katex@0.16 --no-audit --no-fund --silent", shell=True, cwd=KATEX_HOME, check=True)
+    return d
+
+
+def tex_many(items):
+    """เรียงพิมพ์หลายสมการในการเรียก node ครั้งเดียว · items = [(LaTeX, display)]"""
+    todo = [k for k in dict.fromkeys((t.strip(), bool(d)) for t, d in items) if k not in MATH]
+    if not todo:
+        return
+    node = shutil.which("node")
+    if not node:
+        raise SystemExit("สมการ LaTeX ในสไลด์ต้องใช้ Node.js (node และ npm) · ติดตั้งแล้วรันใหม่")
+    r = subprocess.run([node, "-e", NODE_JS, os.path.join(katex_dir(), "katex.min.js")], input=json.dumps(todo),
+                       capture_output=True, text=True, encoding="utf-8")
+    if r.returncode:
+        raise SystemExit("KaTeX ทำงานไม่สำเร็จ: " + r.stderr[-800:])
+    for k, h in zip(todo, json.loads(r.stdout)):
+        if h.startswith("ERR:"):
+            raise SystemExit("สมการ LaTeX เรียงพิมพ์ไม่ได้: %s\n  %s" % (k[0], h[4:]))
+        MATH[k] = h
+
+
+def tex(src, display=False):
+    """LaTeX -> HTML ของ KaTeX · display=True = สมการแยกบรรทัด (ตัวใหญ่ ขีดจำกัดอยู่ใต้ ∑ และ arg max)"""
+    k = (src.strip(), bool(display))
+    if k not in MATH:
+        tex_many([k])
+    return MATH[k]
+
+
+def tc(color, src):
+    """ใส่สีให้ส่วนหนึ่งของสมการ · color = ชื่อใน PALETTE หรือรหัสสี #rrggbb"""
+    return r"\textcolor{%s}{%s}" % (PALETTE.get(color, color), src)
+
+
+def uncolor(src):
+    """ถอด \textcolor{..}{..} และช่องว่างออก · ใช้ตรวจว่าสมการที่ใส่สีในสไลด์ตรงกับสมการใน README"""
+    out, stack, depth, i = [], [], 0, 0
+    while i < len(src):
+        m = re.match(r"\\textcolor\{[^}]*\}\{", src[i:])
+        if m:
+            depth += 1
+            stack.append(depth)
+            i += m.end()
+            continue
+        c = src[i]
+        if c == "{" and src[i - 1:i] != "\\":
+            depth += 1
+        elif c == "}" and src[i - 1:i] != "\\":
+            if stack and stack[-1] == depth:
+                stack.pop()
+                depth -= 1
+                i += 1
+                continue
+            depth -= 1
+        out.append(c)
+        i += 1
+    return re.sub(r"\s+", "", "".join(out))
+
+
+def detex(t):
+    """LaTeX -> ข้อความธรรมดา (ใช้ในชื่อสไลด์ของหน้าสารบัญ และการประมาณความยาว)"""
+    t = re.sub(r"\\textcolor\{[^}]*\}", "", t)
+    t = re.sub(r"\\([A-Za-z]+)", lambda m: GREEK.get(m.group(1), "" if m.group(1) in ("text", "mathcal", "mathrm", "mathbf") else m.group(1)), t)
+    return re.sub(r"[{}\\_^]|,(?=\s)|;", "", t)
+
+
+def katex_css(page):
+    """CSS ของ KaTeX พร้อมฟอนต์ woff2 ฝังในไฟล์ (ตัดตระกูลฟอนต์ที่หน้านี้ไม่ได้ใช้ออก)"""
+    d = katex_dir()
+    css = open(os.path.join(d, "katex.min.css"), encoding="utf-8").read()
+    optional = {"Fraktur": "mathfrak|textfrak", "SansSerif": "mathsf|textsf", "Script": "mathscr|textscr", "Typewriter": "mathtt|texttt",
+                "Caligraphic": "mathcal", "AMS": "amsrm|mathbb"}
+
+    def face(m):
+        f = re.search(r"fonts/(KaTeX_(\w+?)-\w+)\.woff2", m.group(0))
+        if f.group(2) in optional and not re.search(optional[f.group(2)], page):
+            return ""
+        data = base64.b64encode(open(os.path.join(d, "fonts", f.group(1) + ".woff2"), "rb").read()).decode("ascii")
+        return re.sub(r"src:[^}]*", 'src:url(data:font/woff2;base64,%s) format("woff2")' % data, m.group(0))
+
+    return re.sub(r"@font-face\{[^}]*\}", face, css)
+
+
 # ------------------------------------------------------------------ ข้อความในบรรทัด
 def esc(s):
     return html.escape(s, quote=False)
@@ -128,6 +236,13 @@ def inline(s):
         return "\x00%d\x00" % (len(codes) - 1)
 
     s = re.sub(r"`([^`]+)`", keep, s)
+    maths = []
+    if MATH_ON[0] and "$" in s:
+        def keepm(m):
+            maths.append(tex(m.group(1) or m.group(2), bool(m.group(1))))
+            return "\x01%d\x01" % (len(maths) - 1)
+
+        s = MATH_RE.sub(keepm, s)
     s = esc(s)
     s = re.sub(r"&lt;(/?(?:br|sub|sup|code))&gt;", r"<\1>", s)
     s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
@@ -141,13 +256,16 @@ def inline(s):
     s = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, s)
     s = re.sub(r'(?<![\w/"=#-])(ACCEPT|REJECT)(?![\w-])',
                lambda m: '<span class="v %s">%s</span>' % (m.group(1).lower(), m.group(1)), s)
-    return re.sub(r"\x00(\d+)\x00", lambda m: "<code>%s</code>" % esc(codes[int(m.group(1))]), s)
+    s = re.sub(r"\x00(\d+)\x00", lambda m: "<code>%s</code>" % esc(codes[int(m.group(1))]), s)
+    return re.sub(r"\x01(\d+)\x01", lambda m: maths[int(m.group(1))], s)
 
 
 COMB = re.compile("[ัิ-ฺ็-๎]")
 
 
 def plain(s):
+    if MATH_ON[0] and "$" in s:
+        s = MATH_RE.sub(lambda m: detex(m.group(1) or m.group(2)), s)
     s = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", s)
     s = re.sub(r"</?(?:br|sub|sup|code)>", " ", s)
     return re.sub(r"\s+", " ", s.replace("**", "").replace("`", "")).strip()
@@ -341,14 +459,20 @@ md = inline
 SECS = []
 
 
-def load(path="README.md", transform=None):
+def load(path="README.md", transform=None, latex=False):
     """อ่าน Markdown แล้วแบ่งเป็นหัวข้อ (ระดับ # ถึง ####) · คืน SECS = [{"level", "text", "blocks"}]
-    transform = ฟังก์ชันแปลงข้อความก่อนอ่าน (เช่น แปลงสัญลักษณ์ LaTeX เป็น HTML สำหรับบทที่มีสมการ)"""
+    transform = ฟังก์ชันแปลงข้อความก่อนอ่าน · latex=True = บทที่มีสมการ: $...$ และ $$...$$ ถูกเรียงพิมพ์ด้วย KaTeX
+    (ทั้งข้อความจาก README และข้อความที่เขียนในโครงเรื่อง · ไม่แตะข้อความในโค้ด)"""
     del SECS[:]
     cur = None
     text = read(path)
     if transform:
         text = transform(text)
+    if latex:
+        MATH_ON[0] = True
+        text = re.sub(r"^[ \t]*\$\$[ \t]*\n(.+?)\n[ \t]*\$\$[ \t]*$", lambda m: "$$" + " ".join(m.group(1).split("\n")) + "$$", text, flags=re.S | re.M)
+        bare = re.sub(r"`[^`\n]+`", "", re.sub(r"```.*?```", "", text, flags=re.S))
+        tex_many([(m.group(1) or m.group(2), bool(m.group(1))) for m in MATH_RE.finditer(bare)])
     for b in parse(text.split("\n")):
         if b["t"] == "h" and b["level"] <= 4:
             cur = {"level": b["level"], "text": b["text"], "blocks": []}
@@ -463,6 +587,31 @@ def cards(items, cols=3):
         text = text if text.startswith("<") else "<p>%s</p>" % md(text)
         out.append('<div class="cardx %s"><h4>%s%s</h4>%s</div>' % (tone, badge, md(head), text))
     return '<div class="cards" style="--cols:%d">%s</div>' % (cols, "".join(out))
+
+
+def eqbox(src, sub=""):
+    """กล่องสมการตัวใหญ่ · src = LaTeX 1 สมการ หรือรายการของสมการ (เรียงบนลงล่าง) · sub = คำอธิบายใต้สมการ"""
+    rows = "".join('<div class="row">%s</div>' % tex(x, True) for x in ([src] if isinstance(src, str) else src))
+    return '<div class="eqbox">%s%s</div>' % (rows, '<div class="sub">%s</div>' % md(sub) if sub else "")
+
+
+def parts(items, cols=0, numbered=True):
+    """การ์ดอธิบายส่วนของสมการ สีเดียวกับในสมการ
+    items = [(สี, สัญลักษณ์ LaTeX, หัวข้อ, ข้อความ, ป้ายเล็กเหนือการ์ด (เว้นได้), ค่าตัวอย่างแบบ mono (เว้นได้))]"""
+    out = []
+    for k, it in enumerate(items):
+        color, sym, head, text, role, lab = (list(it) + ["", ""])[:6]
+        out.append('<div class="part" style="--c:%s">%s<div class="top">%s<span class="sym">%s</span></div><h4>%s</h4><p>%s</p>%s</div>' % (
+            PALETTE.get(color, color), '<div class="role">%s</div>' % md(role) if role else "",
+            '<span class="n">%d</span>' % (k + 1) if numbered else "", tex(tc(color, sym)), md(head), md(text),
+            '<span class="lab">%s</span>' % esc(lab) if lab else ""))
+    return '<div class="parts" style="--cols:%d">%s</div>' % (cols or len(items), "".join(out))
+
+
+def equation(title, src, items, lead="", post="", cols=0, numbered=True, sub=""):
+    """สไลด์สมการ: บรรทัดนำ + สมการตัวใหญ่ (ใส่สีด้วย tc()) + การ์ดอธิบายทีละส่วน + หมายเหตุ"""
+    body = ('<p class="eqlead">%s</p>' % md(lead) if lead else "") + eqbox(src, sub) + parts(items, cols, numbered) + post
+    return slide(title, body, cls="mid", maxfs=1.3)
 
 
 def versus(call, bad, good):
@@ -667,6 +816,23 @@ pre.code.prompt{font-size:.76em;line-height:1.52;border:2px solid #f08a24}
 .cardx.ok{border-left-color:var(--green)}.cardx.bad{border-left-color:var(--red)}.cardx.warn{border-left-color:var(--orange)}.cardx.navy{border-left-color:var(--navy)}
 .cardx .chips{display:flex;flex-direction:column;gap:.3em}
 .cardx .chips div{font-size:.86em;line-height:1.45}
+/* สมการ (KaTeX) */
+.katex{font-size:1.1em;font-family:KaTeX_Main,'IBM Plex Sans Thai','Leelawadee UI','Times New Roman',serif}
+.katex-display{margin:0}
+.eqbox{background:#fff;border:2px solid var(--line);border-radius:18px;padding:.3em .6em;text-align:center;box-shadow:0 4px 14px rgba(18,48,94,.06);font-size:2.2em;color:var(--ink);display:flex;flex-direction:column;gap:.12em}
+.eqbox .row+.row{border-top:1px dashed var(--line);padding-top:.12em}
+.eqbox .sub{font-size:.36em;color:var(--muted);line-height:1.4;padding-bottom:.3em}
+.eqlead{color:var(--muted);font-size:.95em;line-height:1.45}
+.parts{display:grid;gap:16px;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))}
+.part{background:#fff;border:1px solid var(--line);border-top:9px solid var(--c);border-radius:14px;padding:.55em .8em .65em;display:flex;flex-direction:column;gap:.22em;box-shadow:0 3px 10px rgba(18,48,94,.05)}
+.part>*{margin:0}
+.part .role{font-size:.64em;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.part .top{display:flex;align-items:center;gap:.5em;min-height:2.3em}
+.part .n{flex:none;display:inline-flex;width:1.7em;height:1.7em;border-radius:50%;background:var(--c);color:#fff;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.part .sym{font-size:1.3em;color:var(--c)}
+.part h4{font-size:1em;color:var(--navy);line-height:1.3}
+.part p{font-size:.86em;line-height:1.45;color:#2b3648}
+.part .lab{align-self:flex-start;font-family:var(--mono);font-size:.74em;color:#0b6b69;background:var(--teal-soft);border-radius:6px;padding:.12em .5em;margin-top:.15em}
 /* เทียบ 2 ฝั่ง */
 .vs{display:flex;gap:26px;align-items:stretch}
 .vs .sidebox{flex:1;min-width:0;border-radius:16px;padding:.8em 1em;border:2px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:.4em}
@@ -884,7 +1050,7 @@ def write(slides, out="Slides.html", title="Slides"):
 <script>%s</script>
 </body>
 </html>
-""" % (html.escape(title), CSS, body, full, JS)
+""" % (html.escape(title), (katex_css(body) if 'class="katex' in body else "") + CSS, body, full, JS)
     open(out_path, "w", encoding="utf-8", newline="\n").write(page)
     print("wrote %s · %d slides · %d prompts · %.0f KB" % (os.path.relpath(out_path, ROOT), len(slides), len(PROMPTS), len(page.encode("utf-8")) / 1024))
     return slides
