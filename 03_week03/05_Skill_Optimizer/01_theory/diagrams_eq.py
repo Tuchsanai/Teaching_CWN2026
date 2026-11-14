@@ -107,7 +107,8 @@ def eq2_worked():
     body = """<h1>สมการ 2 คิดตามทีละขั้น ด้วยคะแนนจริงของ LAB</h1>
     <div class='sub' style='margin-bottom:12px'>ขั้น 1–3 คิดให้ดูกับสกิลรุ่น <b>v0</b> · D<sub>sel</sub> ของ LAB = Validation Set (2 งาน × 3 รอบ = 6 ค่า) · ขั้น 4 เทียบทุกรุ่น</div>
     <div style='display:flex;gap:12px'>%s%s%s</div>%s
-    <div class='note' style='margin-top:10px'>arg max ตอบว่า <b>v2 และ v3</b> (เสมอกัน) · ตามกติกาของเปเปอร์ คะแนนเท่ากันไม่รับรุ่นใหม่ จึงได้ v2 · LAB รับ v3 เพราะต้นทุนต่ำกว่า</div>""" % (c1, c2, c3, c4)
+    <div class='note' style='margin-top:10px'>max ตอบว่าค่าสูงสุดคือ <b>%.1f%%</b> · arg max ตอบว่ารุ่นที่ได้ค่านั้นคือ <b>%s</b> · ถ้ามีรุ่นที่เสมอกัน กติกาของเปเปอร์ไม่รับรุ่นใหม่ (ต้องสูงกว่าเดิม)</div>""" % (
+        c1, c2, c3, c4, best, " และ ".join(nm for nm, m in means if abs(m - best) < 1e-9))
     shot("t07b-eq2-worked", body, 765)
 
 

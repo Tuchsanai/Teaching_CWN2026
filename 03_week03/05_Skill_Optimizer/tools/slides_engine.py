@@ -341,11 +341,15 @@ md = inline
 SECS = []
 
 
-def load(path="README.md"):
-    """อ่าน Markdown แล้วแบ่งเป็นหัวข้อ (ระดับ # ถึง ####) · คืน SECS = [{"level", "text", "blocks"}]"""
+def load(path="README.md", transform=None):
+    """อ่าน Markdown แล้วแบ่งเป็นหัวข้อ (ระดับ # ถึง ####) · คืน SECS = [{"level", "text", "blocks"}]
+    transform = ฟังก์ชันแปลงข้อความก่อนอ่าน (เช่น แปลงสัญลักษณ์ LaTeX เป็น HTML สำหรับบทที่มีสมการ)"""
     del SECS[:]
     cur = None
-    for b in parse(read(path).split("\n")):
+    text = read(path)
+    if transform:
+        text = transform(text)
+    for b in parse(text.split("\n")):
         if b["t"] == "h" and b["level"] <= 4:
             cur = {"level": b["level"], "text": b["text"], "blocks": []}
             SECS.append(cur)

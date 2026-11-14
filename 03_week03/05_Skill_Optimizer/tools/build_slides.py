@@ -552,7 +552,7 @@ def build():
                   '<a href="../06_WikiSkill/README.md" target="_blank">../06_WikiSkill/README.md</a></p>'
                   '<p>รายละเอียดเต็มของบทนี้: <a href="README.md" target="_blank">README.md</a> · รูปแบบของเครื่องมือ: '
                   '<a href="skillopt_format.md" target="_blank">skillopt_format.md</a> · ทฤษฎีต้นทาง (SkillOpt): '
-                  '<a href="01_theory/README.md" target="_blank">01_theory/README.md</a></p>', "img/s05-summary.jpg"))
+                  '<a href="01_theory/README.md" target="_blank">01_theory/README.md</a> · <a href="01_theory/SkillOpt_Theory_Slides.html" target="_blank">สไลด์ของทฤษฎี</a></p>', "img/s05-summary.jpg"))
     return E.SL
 
 

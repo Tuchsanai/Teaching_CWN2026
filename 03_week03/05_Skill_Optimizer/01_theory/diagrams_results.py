@@ -131,12 +131,85 @@ def lab_descent():
           <div style='font-size:20px;color:%s'>%s โทเคน</div></div>""" % (
             col, err, int(err * 4.6), col, "0.55" if ok is False else "1", INK, nm, col, verdict, MUTE, sc, MUTE, format(int(tok), ","))
     body = """<h1>ผลของ LAB อ่านแบบภูมิประเทศ: เดินลงเนินทีละก้าว</h1>
-    <div class='sub' style='margin-bottom:8px'>ความสูงของแท่ง = ความผิดพลาด = 100 − คะแนนรวม (%%) · ยิ่งเตี้ยยิ่งดี · ตัวเลขจาก results/ ของ LAB</div>
+    <div class='sub' style='margin-bottom:8px'>ความสูงของแท่ง = ความผิดพลาด = 100 − คะแนนรวม (%%) · ยิ่งเตี้ยยิ่งดี · ตัวเลขจาก runs/ ของ LAB</div>
     <div style='display:flex;gap:6px;align-items:flex-end;height:470px;background:#fff;border:3px solid %s;border-radius:20px;padding:14px 18px'>%s</div>
-    <div class='note' style='margin-top:12px'>v0 → v2 = ลงเนิน 3 ก้าวจนถึงพื้น · v3 = ความสูงเท่าเดิมแต่ต้นทุนลด (LAB รับ) · v4 = ก้าวที่ทำให้สูงขึ้น ถูกปฏิเสธ สกิลที่ใช้ต่อยังเป็น v3</div>""" % (LINE, cols)
+    <div class='note' style='margin-top:12px'>ไม่มีสกิล → v3 = ลงเนิน 4 ก้าวจนถึงพื้น (ทุกก้าวถูกรับ) · v4 = ก้าวที่ทำให้สูงขึ้น ถูกปฏิเสธ สกิลที่ใช้ต่อยังเป็น v3</div>""" % (LINE, cols)
     shot("t17-lab-descent", body, 720)
 
 
+# Table 6 · GPT-5.5 เป็นทั้งโมเดลที่ทำงานและ Optimizer: (โทเคนของสกิลเริ่มต้น, สุดท้าย, จำนวนก้าวที่ถูกรับ, โทเคนที่ใช้เทรน M, โทเคนต่อ 1 จุด M)
+LEARNED = [("SearchQA", 16, 857, 4, 213.8, 37.9), ("SpreadsheetBench", 224, 1995, 4, 21.4, 0.6), ("OfficeQA", 145, 883, 1, 20.8, 1.1),
+           ("DocVQA", 81, 959, 3, 188.2, 46.4), ("LiveMath", 154, 379, 1, 23.2, 3.6), ("ALFWorld", 516, 1321, 2, 59.3, 15.9)]
+# Table 5 · (Benchmark, โมเดลที่ทำงาน, ไม่มีสกิล, Optimizer แรง GPT-5.5, Optimizer ตัวเดียวกับโมเดลที่ทำงาน)
+OPT = [("SpreadsheetBench", "GPT-5.4-mini", 36.1, 47.5, 43.2), ("SpreadsheetBench", "GPT-5.4-nano", 23.5, 42.5, 35.4),
+       ("SearchQA", "GPT-5.4-mini", 75.9, 80.2, 78.3), ("SearchQA", "GPT-5.4-nano", 55.8, 74.8, 69.9)]
+
+
+def learned_skills():
+    rows = ""
+    for name, t0, t1, edits, train, cpp in LEARNED:
+        rows += """<div style='display:grid;grid-template-columns:230px 1fr 150px 190px 190px;gap:14px;align-items:center;background:#fff;border:3px solid %s;border-radius:16px;padding:9px 16px;margin-bottom:8px'>
+          <div style='font-size:25px;font-weight:800;color:%s'>%s</div>
+          <div><div style='display:flex;align-items:center;gap:8px'><div style='width:%dpx;height:16px;background:%s;border-radius:8px;min-width:4px'></div><span style='%s;font-size:19px;color:%s'>เริ่ม %s</span></div>
+               <div style='display:flex;align-items:center;gap:8px;margin-top:5px'><div style='width:%dpx;height:22px;background:%s;border-radius:8px'></div><span style='%s;font-size:21px;font-weight:700;color:%s'>จบ %s โทเคน</span></div></div>
+          <div style='text-align:center'><span style='font-size:34px;font-weight:800;color:%s'>%d</span><div style='font-size:17px;color:%s'>ก้าวที่ถูกรับ</div></div>
+          <div style='text-align:center;%s;font-size:23px;color:%s'>%.1fM<div style='font-family:inherit;font-size:17px;color:%s'>โทเคนที่ใช้เทรน</div></div>
+          <div style='text-align:center;%s;font-size:23px;font-weight:700;color:%s'>%.1fM<div style='font-family:inherit;font-size:17px;font-weight:400;color:%s'>โทเคนต่อ 1 จุดที่เพิ่ม</div></div></div>""" % (
+            LINE, INK, name, int(t0 / 5.6), GREY, MONO, MUTE, format(t0, ","), int(t1 / 5.6), TEAL, MONO, INK, format(t1, ","),
+            ORANGE, edits, MUTE, MONO, INK, train, MUTE, MONO, PURPLE, cpp, MUTE)
+    body = """<h1>สกิลที่เทรนเสร็จ: เล็ก และมาจากก้าวที่ถูกรับเพียงไม่กี่ก้าว</h1>
+    <div class='sub' style='margin-bottom:12px'>Table 6 ของเปเปอร์ · GPT-5.5 เป็นทั้งโมเดลที่ทำงานและ Optimizer · แท่ง = ความยาวของ best_skill.md (โทเคน)</div>%s
+    <div class='note' style='margin-top:8px'>สกิลสุดท้ายยาว 379–1,995 โทเคน · ก้าวที่ถูกรับ 1–4 ก้าว · งานที่ Trajectory สั้น (Spreadsheet OfficeQA LiveMath) ใช้ 0.6–3.6M โทเคนต่อ 1 จุด</div>""" % rows
+    shot("t19-learned-skills", body, 800)
+
+
+def optimizer_strength():
+    cols = ""
+    for bench, target, base, strong, matched in OPT:
+        def bar(v, color, label):
+            return """<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end'>
+              <div style='font-size:25px;font-weight:800;color:%s'>%.1f</div><div style='font-size:18px;color:%s;height:24px'>%s</div>
+              <div style='width:78px;height:%dpx;background:%s;border-radius:10px 10px 0 0'></div></div>""" % (INK, v, MUTE, label, int(v * 4.0), color)
+        cols += """<div style='flex:1;background:#fff;border:3px solid %s;border-radius:18px;padding:12px 12px 10px'>
+          <div style='display:flex;gap:6px;align-items:flex-end;height:400px'>%s%s%s</div>
+          <div style='text-align:center;font-size:23px;font-weight:800;color:%s;margin-top:8px'>%s</div>
+          <div style='text-align:center;font-size:19px;color:%s'>โมเดลที่ทำงาน: %s</div>
+          <div style='text-align:center;font-size:19px;color:%s;font-weight:700'>ได้ %d%% ของผลจาก Optimizer แรง</div></div>""" % (
+            LINE, bar(base, GREY, ""), bar(matched, ORANGE, "+%.1f" % (matched - base)), bar(strong, TEAL, "+%.1f" % (strong - base)),
+            INK, bench, MUTE, target, PURPLE, round((matched - base) / (strong - base) * 100))
+    legend = "".join("<span style='display:inline-flex;align-items:center;gap:8px;margin-right:26px;font-size:22px;color:%s'><span style='width:26px;height:18px;background:%s;border-radius:5px'></span>%s</span>" % (INK, c, t)
+                     for c, t in ((GREY, "ไม่มีสกิล"), (ORANGE, "Optimizer = โมเดลตัวเดียวกับที่ทำงาน"), (TEAL, "Optimizer แรง (GPT-5.5)")))
+    body = """<h1>Optimizer ต้องเก่งแค่ไหน</h1>
+    <div class='sub' style='margin-bottom:10px'>Table 5 ของเปเปอร์ · วงรอบเหมือนกันทุกอย่าง ต่างกันแค่โมเดลที่ทำหน้าที่ Optimizer · คะแนนบน Test Split (%%)</div>
+    <div style='margin-bottom:10px'>%s</div><div style='display:flex;gap:12px'>%s</div>
+    <div class='note' style='margin-top:12px'>Optimizer ที่แรงกว่าได้ผลมากกว่าทุกช่อง · แต่ใช้โมเดลตัวเดียวกันก็ยังได้ 56–74%% ของผลนั้น = วงรอบเองมีส่วนสำคัญ ไม่ใช่แค่ครูเก่งสอนนักเรียน</div>""" % (legend, cols)
+    shot("t20-optimizer-strength", body, 760)
+
+
+def design_decisions():
+    D = [("ปรับอะไร", "ข้อความของสกิล 1 ไฟล์ · โมเดลถูกล็อก", "สกิลย้ายข้ามโมเดลและ Harness ได้ (Table 4)", "SKILL.md ของ money-coder"),
+         ("ใครเสนอวิธีแก้", "Optimizer Model แยกจากโมเดลที่ทำงาน", "Optimizer แรง +19.0 · ตัวเดียวกัน +11.9 (Table 5)", "Claude Code ของผู้เรียน"),
+         ("อ่านหลักฐานอย่างไร", "ทีละกลุ่มเล็ก · แยกงานที่ผิดกับงานที่ถูก", "ขนาดกลุ่ม 1–32 ให้ผลใกล้กัน ค่าตั้งต้น 8 (Table 2)", "failures เฉพาะ Training · พบมากกว่า 1 Trial"),
+         ("แก้ได้แค่ไหนต่อก้าว", "ไม่เกิน L ข้อ (เริ่ม 4 ลดเหลือ 2)", "ไม่จำกัด: Spreadsheet 77.5 → 75.7 (Table 3)", "แก้ไม่เกิน 3 จุดต่อรุ่น"),
+         ("รับรุ่นใหม่เมื่อไร", "เมื่อคะแนน Selection สูงกว่าเดิมเท่านั้น", "ก้าวที่ถูกรับ 1–4 ก้าวต่อการเทรน (Table 6)", "gate: ดีขึ้นเกินความแกว่ง"),
+         ("ก้าวที่ผิดทำอย่างไร", "จดลง Rejected-Edit Buffer", "ไม่มี Buffer: Spreadsheet 77.5 → 72.9 (Table 3)", "runs/ISSUES.md"),
+         ("ความจำระยะยาวอยู่ไหน", "Slow Update ในสกิล · Meta Skill นอกสกิล", "ไม่มีทั้งคู่: Spreadsheet 77.5 → 55.0 (Table 3)", "ISSUES.md · ไม่มี Slow Update")]
+    head = "".join("<div style='font-size:21px;font-weight:800;color:#fff;background:%s;border-radius:10px;padding:7px 12px'>%s</div>" % (c, t)
+                   for c, t in ((BROWN, "คำถามของผู้ออกแบบ"), (TEAL, "สิ่งที่เปเปอร์เลือก"), (PURPLE, "หลักฐานในเปเปอร์"), (ORANGE, "ใน LAB ของเรา")))
+    rows = ""
+    for k, (q, c, e, lab) in enumerate(D, 1):
+        rows += ("<div style='font-size:23px;font-weight:800;color:%s;display:flex;align-items:center;gap:10px'><span style='flex:none;width:36px;height:36px;border-radius:50%%;"
+                 "background:%s;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px'>%d</span>%s</div>"
+                 "<div style='font-size:21px;color:%s;background:#fff;border:2px solid %s;border-radius:10px;padding:7px 12px'>%s</div>"
+                 "<div style='font-size:20px;color:%s;background:#fff;border:2px solid %s;border-radius:10px;padding:7px 12px'>%s</div>"
+                 "<div style='font-size:20px;color:%s;background:#FFF6EA;border:2px solid %s;border-radius:10px;padding:7px 12px'>%s</div>") % (
+            INK, BROWN, k, q, INK, LINE, c, MUTE, LINE, e, INK, LINE, lab)
+    body = """<h1>วิธีคิดในการออกแบบ: การตัดสินใจ 7 ข้อ</h1>
+    <div class='sub' style='margin-bottom:12px'>แต่ละแถว = คำถาม 1 ข้อที่ผู้ออกแบบต้องตอบ · หลักฐานคือคะแนนบน Test Split เมื่อเปลี่ยนเฉพาะข้อนั้น</div>
+    <div style='display:grid;grid-template-columns:300px 1fr 1fr 0.8fr;gap:8px;align-items:stretch'>%s%s</div>""" % (head, rows)
+    shot("t18-design-decisions", body, 700)
+
+
 if __name__ == "__main__":
-    for w in sys.argv[1:] or ["main_results", "methods", "ablation", "lab_descent"]:
+    for w in sys.argv[1:] or ["main_results", "methods", "ablation", "lab_descent", "design_decisions", "learned_skills", "optimizer_strength"]:
         globals()[w]()
