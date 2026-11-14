@@ -85,8 +85,9 @@ pre .err{color:#ff9b9b}pre .ok{color:#86e3ae}pre .dim{color:#8ea3c4}pre .cmd{col
 .cmp pre.code{font-size:.72em}
 .fails{display:flex;flex-direction:column;gap:.45em}
 .fails .cardx{padding:.4em .8em}
+.slide.mid .body{justify-content:center;gap:.8em}
+.cardx h4 code{font-size:.9em}
 .fails .cardx p{font-size:.8em;font-family:var(--mono);line-height:1.45}
-.center{justify-content:center}
 /* พรอมต์ */
 .pbar{display:flex;align-items:center;gap:16px;background:var(--orange-soft);border:1px solid #f6d3ad;border-radius:10px;padding:.45em .8em;font-size:.86em}
 .pbar .how{flex:1;min-width:0}
@@ -230,9 +231,6 @@ body.ov #ov{display:block}
 #stage{position:static;display:block}#deck{transform:none!important;height:auto}
 .slide{display:flex!important;position:relative;width:1600px;height:900px;page-break-after:always;break-after:page;animation:none}}
 @page{size:1600px 900px;margin:0}
-
-.slide.mid .body{justify-content:center;gap:.8em}
-.cardx h4 code{font-size:.9em}
 </style>
 </head>
 <body>
@@ -887,7 +885,7 @@ Input: โจทย์ 6 ข้อใน suite/suite.json (ข้อละ 1 ฟ
       copyText(text,b,label); });
   });
   document.querySelectorAll('.chk input').forEach(c=>{
-    const key='skillopt-slides:'+c.dataset.k;
+    const key='slides:'+location.pathname+':'+c.dataset.k;
     try{ c.checked=localStorage.getItem(key)==='1'; }catch(e){}
     c.addEventListener('change',()=>{ try{ localStorage.setItem(key,c.checked?'1':'0'); }catch(e){} });
   });

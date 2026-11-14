@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""เครื่องมือเรนเดอร์ของสไลด์ (ใช้โดย tools/build_slides.py)
+"""เครื่องมือสร้างสไลด์ HTML จาก README.md ของบทเรียน (ไฟล์กลาง ไม่มีเนื้อหาเฉพาะบท)
 
-- อ่าน Markdown ของ README.md เป็นบล็อก (parse) และแปลงบล็อกเป็น HTML (render)
-- สไลด์พรอมต์ (ข้อความตรงตัวอักษรจาก README.md) · รายการตรวจผลของ LAB · ผลดิบของ gate · โค้ดจริงจาก runs/
-- CSS และ JS ของสไลด์ · ขนาดตัวอักษรของแต่ละสไลด์ปรับตอนเปิดไฟล์ให้พอดีหน้า (fitAll)
+วิธีใช้: คัดลอกไฟล์นี้ไว้ที่ <บท>/tools/slides_engine.py แล้วเขียนโครงเรื่องใน <บท>/tools/build_slides.py
+(ตัวอย่างโครงเรื่อง: outline_template.py ของสกิล readme-slides)
+
+ส่วนประกอบ
+- อ่าน README.md เป็นบล็อก: load() แล้วค้นด้วย sec() table() codes() para() prompt() eye()
+- ชิ้นส่วนของสไลด์: fig() explain() tiles() cards() versus() bars() tbl() code() fileflow() note() divider() cover()
+- สไลด์พรอมต์ (ข้อความตรงตัวอักษรจาก README + ปุ่มคัดลอก): prompt_slides() · รายการตรวจผล: check_slide()
+- write(): ประกอบไฟล์ HTML ไฟล์เดียว (CSS และ JS อยู่ในไฟล์) · ขนาดตัวอักษรของแต่ละสไลด์ปรับตอนเปิดไฟล์ให้พอดีหน้า
 """
 import html, json, math, os, re, struct, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "Skill_Optimizer_Slides.html")
-DECK = "Skill Optimizer · money-coder"
 
 
 def read(p):
@@ -154,89 +157,7 @@ def vlen(s):
     return len(COMB.sub("", plain(s)))
 
 
-# ------------------------------------------------------------------ ประมาณความสูง (px ที่ขนาดตัวอักษรปกติ)
-FS, W = 23.0, 1456.0
-BUD = 600.0          # ความสูงของเนื้อหาที่พอดี 1 สไลด์
-SOFT = 0.55 * BUD    # ถ้าเกินนี้ หัวข้อย่อยถัดไปขึ้นสไลด์ใหม่
-CAP = 1.22 * BUD     # เกินนี้ต้องแบ่ง (ที่เหลือให้ JS ย่อตัวอักษร)
-
-
-def text_h(s, width, fs=FS):
-    return max(1, math.ceil(vlen(s) * fs * 0.5 / width)) * fs * 1.5
-
-
-def table_rows_h(b, width=W):
-    fs = FS * 0.9
-    cols = len(b["head"])
-    rows = [b["head"]] + [r + [""] * (cols - len(r)) for r in b["rows"]]
-
-    def cell_w(c):
-        return max(vlen(x) for x in re.split(r"<br>", c)) * fs * 0.5 + 30
-
-    nat = [max(cell_w(r[k]) for r in rows) for k in range(cols)]
-    colw = list(nat)
-    if sum(nat) > width:
-        left, todo = width, sorted(range(cols), key=lambda k: nat[k])
-        while todo:
-            k = todo[0]
-            if nat[k] <= left / len(todo):
-                colw[k] = nat[k]
-                left -= nat[k]
-                todo.pop(0)
-            else:
-                tot = sum(nat[x] for x in todo)
-                for x in todo:
-                    colw[x] = left * nat[x] / tot
-                break
-    hs = []
-    for r in rows:
-        lines = 1
-        for k in range(cols):
-            n = sum(max(1, math.ceil(vlen(x) * fs * 0.5 / max(40, colw[k] - 30))) for x in re.split(r"<br>", r[k]))
-            lines = max(lines, n)
-        hs.append(lines * fs * 1.42 + 20)
-    return hs
-
-
-def code_h(text, width=W):
-    per = (width - 50) / (FS * 0.74 * 0.56)
-    n = sum(max(1, math.ceil(vlen(l) / per)) for l in text.split("\n"))
-    return n * FS * 0.74 * 1.5 + 40
-
-
-def est(b, width=W):
-    t = b["t"]
-    if t == "p":
-        return sum(text_h(l, width) for l in b["lines"]) + 14
-    if t == "lead":
-        return 52
-    if t == "ul":
-        return sum(text_h(x, width - 40) + 8 for x in b["items"]) + 12
-    if t == "table":
-        return sum(table_rows_h(b, width)) + 14
-    if t == "code":
-        return code_h(b["text"], width) + 12
-    if t == "alert":
-        return sum(est(x, width - 60) for x in b["blocks"]) + 40
-    return 0
-
-
-def split_table(b):
-    hs = table_rows_h(b)
-    total = sum(hs)
-    if total <= CAP or len(b["rows"]) < 2:
-        return [b]
-    n = math.ceil(total / BUD)
-    target = (total - hs[0]) / n
-    parts, cur, acc = [], [], 0.0
-    for r, h in zip(b["rows"], hs[1:]):
-        if cur and acc + h / 2 > target and len(parts) < n - 1:
-            parts.append(cur)
-            cur, acc = [], 0.0
-        cur.append(r)
-        acc += h
-    parts.append(cur)
-    return [{"t": "table", "head": b["head"], "rows": p} for p in parts]
+W = 1456.0   # ความกว้างของเนื้อหาในสไลด์ (px)
 
 
 # ------------------------------------------------------------------ ภาพ
@@ -270,11 +191,6 @@ def img_tag(b):
 def fig_nat_h(b):
     w, h = img_size(b["src"])
     return W * h / w
-
-
-def fig_budget(b):
-    """ข้อความที่อยู่ร่วมสไลด์กับภาพได้ (px): ภาพสัดส่วนปกติให้ภาพใหญ่ที่สุด ภาพแนวกว้างมากเหลือที่ให้ข้อความ"""
-    return max(130.0, BUD + 40 - fig_nat_h(b) - 30)
 
 
 def fig_html(b, has_text):
@@ -323,16 +239,6 @@ def pre_html(text, lang="", cls=""):
 
 
 # ------------------------------------------------------------------ บล็อก -> HTML
-def is_lead(b):
-    if b["t"] != "p" or len(b["lines"]) != 1:
-        return False
-    m = re.match(r"^\*\*(.+?)\*\*(.*)$", b["lines"][0])
-    if not m or m.group(1).endswith(":") and m.group(2).strip():
-        return False
-    rest = m.group(2).strip()
-    return rest == "" or rest.startswith("·") or rest.startswith("(")
-
-
 def table_html(b):
     cols = len(b["head"])
     h = "".join("<th>%s</th>" % inline(c) for c in b["head"])
@@ -416,173 +322,7 @@ def prompt_slides(alert, kicker, title):
     return out
 
 
-def gate_slide(cand, kicker, title):
-    txt = read("runs/%s/gate.txt" % cand).strip()
-    body = ('<p>ข้อความที่คำสั่ง <code>gate</code> พิมพ์จริง เก็บไว้ที่ <a href="runs/%s/gate.txt" target="_blank">'
-            '<code>runs/%s/gate.txt</code></a></p>%s'
-            '<table class="c2"><thead><tr><th>ส่วนของข้อความ</th><th>อ่านว่า</th></tr></thead><tbody>'
-            '<tr><td><code>train:</code> <code>val:</code> <code>รวม:</code></td><td>คะแนนของรุ่นฐาน → รุ่นใหม่ (ผลต่างเป็นจุด) แยกตามชุด</td></tr>'
-            '<tr><td><code>เกณฑ์</code></td><td>ค่าที่มากกว่าระหว่าง <code>eps</code> 2.0 จุด กับ <code>z</code> 1.5 × ความแกว่งของส่วนต่างสองรุ่น ของชุดนั้น</td></tr>'
-            '<tr><td><code>ผล:</code></td><td>คำตัดสินของโปรแกรม · <span class="v accept">ACCEPT</span> = exit 0 · <span class="v reject">REJECT</span> = exit 1</td></tr>'
-            '</tbody></table>') % (cand, cand, pre_html(txt, "text", "term"))
-    return S(kicker, "ผลดิบของ gate · " + title, body, tag="runs/%s/gate.txt" % cand, maxfs=1.1)
-
-
-def mk(cur, kicker, title, tag):
-    has_text = bool(cur["pre"] or cur["post"])
-    parts = [render(b) for b in cur["pre"]]
-    if cur["fig"]:
-        parts.append(fig_html(cur["fig"], has_text))
-    parts += [render(b) for b in cur["post"]]
-    lead = next((plain(b["text"]) for b in cur["pre"] + cur["post"] if b["t"] == "lead"), "")
-    return S(kicker, title, "".join(parts), tag=tag, maxfs=1.0 if cur["fig"] else 1.4, lead=lead)
-
-
-def flow(blocks, kicker, title, tag="", check=None):
-    out, pending = [], []          # pending = สไลด์รายละเอียดที่รอต่อท้ายสไลด์หลักที่กำลังสะสม
-    cur = {"pre": [], "fig": None, "post": [], "est": 0.0}
-
-    def flush():
-        nonlocal cur
-        if cur["pre"] or cur["fig"] or cur["post"]:
-            out.append(mk(cur, kicker, title, tag))
-        out.extend(pending)
-        pending.clear()
-        cur = {"pre": [], "fig": None, "post": [], "est": 0.0}
-
-    for b in blocks:
-        t = b["t"]
-        if t == "hr":
-            continue
-        if t == "img":
-            if cur["fig"] is not None or cur["est"] > fig_budget(b):
-                flush()
-            cur["fig"] = b
-            m = re.search(r"r03-threshold-(\w+)-(\w+)\.png", b["src"])
-            if m:
-                flush()
-                out.append(gate_slide(m.group(2), kicker, title))
-            continue
-        if t == "imgrow":
-            flush()
-            body = '<div class="figrow">%s</div>' % "".join('<div class="fig">%s</div>' % img_tag(x) for x in b["imgs"])
-            out.append(S(kicker, title, body, tag=tag, maxfs=1.0))
-            continue
-        if t == "details":
-            # ข้อความสั้นที่ตามหลัง <details> อยู่ต่อในสไลด์หลัก แล้วสไลด์รายละเอียดจึงตามมา
-            (pending if (cur["pre"] or cur["fig"] or cur["post"]) else out).extend(
-                flow(b["blocks"], "%s › %s" % (kicker, title), b["summary"], tag="รายละเอียด"))
-            continue
-        if t == "alert" and any(x["t"] == "code" for x in b["blocks"]):
-            flush()
-            out += prompt_slides(b, kicker, title)
-            if check:
-                out.append(check_slide(check, kicker, title))
-            continue
-        if t == "h":
-            b, t = {"t": "lead", "text": b["text"]}, "lead"
-        elif is_lead(b):
-            b, t = {"t": "lead", "text": b["lines"][0]}, "lead"
-        parts = split_table(b) if t == "table" else [b]
-        for k, pb in enumerate(parts):
-            h = est(pb)
-            if cur["fig"]:
-                if t == "lead" or cur["est"] + h > fig_budget(cur["fig"]):
-                    flush()
-            elif cur["est"] > 0 and (k > 0 or cur["est"] + h > CAP or (t == "lead" and cur["est"] > SOFT)):
-                flush()
-            (cur["post"] if cur["fig"] else cur["pre"]).append(pb)
-            cur["est"] += h
-    flush()
-    return out
-
-
 # ------------------------------------------------------------------ สไลด์ที่เพิ่มเอง
-# รายการตรวจผลของแต่ละ LAB · เรียบเรียงจากตาราง Input/Output พรอมต์ และ "ผลจริง" ของ LAB นั้นใน README.md
-CHECKS = {
-    "ขั้น 0.1": {
-        "items": [
-            "มีโฟลเดอร์ `Teaching/my-skill-optimizer/` และมีไฟล์ครบ: `SKILL.md` · `scripts/skillopt.py` · `references/source.md` · `references/suite.md` · `references/issues.md`",
-            "`scripts/skillopt.py` มีครบ 7 คำสั่ง: `lint` `run` `grade` `report` `failures` `null` `gate`",
-            "`references/source.md` มีตาราง ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง",
-            "รายงานมีผลทดสอบ `gate` 5 คู่ (`noskill` → `v0` → `v1` → `v2` → `v3` → `v4`) และตัดสินตรงกับ `runs/<รุ่นใหม่>/gate.txt` ทุกคู่",
-        ],
-        "ref": "ผลของผู้สอน: ใช้ 14 นาที · ไม่เรียกโมเดล · `gate` ตรงทุกตัวอักษร (ACCEPT 4 คู่ · REJECT 1 คู่) · `null` `lint` `report` ตรงกับไฟล์ที่เก็บไว้",
-        "note": "เครื่องมือที่สร้างเองไม่ต้องเหมือนใครทุกบรรทัด สิ่งที่ต้องตรงคือ **รูปแบบ** และ **ผลตัดสิน**",
-    },
-    "ขั้น 0.2": {
-        "items": [
-            "รายงานเป็นตาราง รายการ | ผล",
-            "`my-skill-optimizer` ถูกติดตั้งเป็น global skill ชื่อ `skill-optimizer` ของบัญชี yolo",
-            "ใน container มี `/workspace/sklab/suite/` และ `/workspace/sklab/runs/v0/skills/` (โครงโฟลเดอร์เดิม)",
-            "`suite/check_grader.py` ผ่าน: เฉลยอ้างอิงผ่าน 10/10 ห้าโจทย์ และ 11/11 โจทย์ค่าส่ง",
-            "มีบัญชี `yolo` ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี",
-        ],
-        "ref": "ผลของผู้สอน: ติดตั้งสกิล ✅ · คัดลอกโจทย์ ✅ · ตัวตรวจผ่าน ✅ · บัญชีที่ใช้ได้ `yolo1` `yolo2` `yolo3` · ใช้ 1 นาที",
-        "note": "ตรวจตัวตรวจก่อนเสมอ ถ้าเครื่องวัดผิด ตัวเลขหลังจากนี้ใช้ไม่ได้ทั้งหมด",
-    },
-    "LAB 1": {
-        "items": [
-            "`runs/noskill/trials/` และ `runs/v0/trials/` มีรุ่นละ 18 โฟลเดอร์ (6 โจทย์ × 3 รอบ) รวม 36 Trial",
-            "`runs/report.md` มีตารางเทียบ `noskill` กับ `v0` · `runs/results.json` ถูกเขียน",
-            "`runs/v0/null.txt` มีความแกว่งของ `v0` แยกชุด train · val · all",
-            "`runs/v0/gate.txt` มีบรรทัด `ผล:` ของการตัดสิน `noskill` → `v0`",
-            "ผลของ Validation Set ที่เก็บลงเครื่อง มีแค่คะแนนและต้นทุน (ไม่มีผลรายข้อ)",
-        ],
-        "ref": "ผลของผู้สอน: ไม่มีสกิล 45.3% → `v0` 67.9% (+22.6 จุด · เกณฑ์ 2.6) · ACCEPT · ผ่านครบทุกข้อ 0/18 ทั้งสองรุ่น · ใช้ 4 นาที",
-    },
-    "LAB 2": {
-        "items": [
-            "`runs/ISSUES.md` มีตาราง ปัญหา | พบกี่ Trial | สาเหตุ | ทางแก้ · เก็บเฉพาะสาเหตุที่พบมากกว่า 1 Trial",
-            "`runs/v1/skills/money-coder/SKILL.md` ต่างจาก `v0` ไม่เกิน 3 จุด",
-            "`runs/v1/trials/` มี 18 โฟลเดอร์ · วัดด้วยค่าเดียวกับ `v0`",
-            "`runs/v1/gate.txt` มีผลตัดสิน `v0` → `v1` · `runs/report.md` มีทุกรุ่น",
-            "ดูว่า Claude จัดการข้อ `policy` อย่างไร: เดากฎเอง หรือจดเป็นปัญหาเปิด",
-        ],
-        "ref": "ผลของผู้สอน: รวม 67.9% → 93.5% (+25.6 จุด · เกณฑ์ 2.3) · ACCEPT · แก้ 3 จุด (`cli_ok`/`cli_error` · `tests` · `reject_type`) · `policy` ยัง 0/6 และถูกจดเป็นปัญหาเปิด · ใช้ 5 นาที",
-    },
-    "LAB 3": {
-        "items": [
-            "`runs/v2/skills/money-coder/SKILL.md` มีนโยบายค่าส่งและนโยบายเงินคืน เขียนเป็นนโยบายของร้าน ไม่มี Input หรือคำตอบของข้อตรวจ",
-            "แก้ไม่เกิน 3 จุดจากรุ่นฐาน",
-            "`runs/v2/trials/` มี 18 โฟลเดอร์ · `runs/v2/gate.txt` มีผลตัดสิน `v1` → `v2`",
-            "`runs/ISSUES.md` ปิดปัญหา `policy` · `runs/report.md` มี `v2`",
-        ],
-        "ref": "ผลของผู้สอน: Training 95.2% → 100.0% · รวม 93.5% → 96.7% (+3.2 จุด · เกณฑ์ 2.0) · ACCEPT · `policy` 0/6 → 6/6 · Validation ยัง 90% · ใช้ 5 นาที",
-    },
-    "LAB 4": {
-        "items": [
-            "`runs/v3/skills/money-coder/SKILL.md` แก้ไม่เกิน 3 จุด ให้เป็นกติกาที่ตรวจสอบได้ ไม่มี Input หรือคำตอบของข้อตรวจ",
-            "ไม่มีการเปิดผลรายข้อ Trace หรือโค้ดของ Validation Set",
-            "`runs/v3/trials/` มี 18 โฟลเดอร์ · `runs/v3/gate.txt` มีผลตัดสิน `v2` → `v3`",
-            "ถ้า REJECT: ใช้ `v2` ต่อ และไม่วัดซ้ำเพื่อให้ผ่าน",
-            "`runs/ISSUES.md` และ `runs/report.md` ถูกอัปเดต",
-        ],
-        "ref": "ผลของผู้สอน: Validation 90.0% → 100.0% · รวม 96.7% → 100.0% (+3.3 จุด · เกณฑ์ 2.0) · ACCEPT · แก้ 2 จุด · โทเคนขาเข้า +10.2% · ใช้ 7 นาที",
-    },
-    "LAB 5": {
-        "items": [
-            "`runs/v4/skills/money-coder/SKILL.md`: กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (นับเป็น 1 จุด ไม่แก้อย่างอื่น)",
-            "`runs/v4/trials/` มี 18 โฟลเดอร์ · `runs/v4/gate.txt` มีผลตัดสิน `v3` → `v4`",
-            "ถ้า REJECT: ใช้ `v3` ต่อ ไม่แก้ `v4` เพิ่ม และไม่วัดซ้ำ",
-            "รายงานมีโทเคนขาเข้าเทียบกับรุ่นฐาน และข้อตรวจของ Training Set ที่เปลี่ยนไป",
-            "`runs/ISSUES.md` จดว่าการย่อแบบนี้ได้ผลหรือไม่ เพราะอะไร",
-        ],
-        "ref": "ผลของผู้สอน: รวม 100.0% → 80.3% (−19.7 จุด) · REJECT · สกิลสั้นลง 81% แต่โทเคนขาเข้าลดแค่ 5.2% · `cli_ok` และ `cli_error` 12/12 → 0/12 · ใช้ 6 นาที",
-    },
-}
-VARY = "ตัวเลขของคุณอาจต่างจากของผู้สอน เพราะ Agent เขียนไม่เหมือนกันทุกครั้ง (ข้อ 2.7) · สิ่งที่ต้องมีเหมือนกันคือไฟล์ผลและคำตัดสินของ `gate`"
-
-
-def check_slide(key, kicker, title):
-    c = CHECKS[key]
-    items = "".join('<label class="chk"><input type="checkbox" data-k="%s-%d"><span>%s</span></label>' % (key, k, inline(x))
-                    for k, x in enumerate(c["items"]))
-    body = '<div class="checks">%s</div><div class="note result">%s</div>' % (items, inline(c["ref"]))
-    body += '<div class="note eye"><span class="lbl">หมายเหตุ</span><span>%s</span></div>' % inline(c.get("note") or VARY)
-    return S(kicker, "ตรวจผลของคุณ · " + title, body, tag="Checklist", cls="cslide", maxfs=1.4)
-
-
 def photo(src):
     return os.path.exists(os.path.join(ROOT, src))
 
@@ -596,41 +336,196 @@ def divider(big, title, sub_html, img="", small=""):
     return {"raw": body, "cls": cls, "style": style, "title": "%s · %s" % (big, plain(title)), "kicker": "", "tag": "", "lead": ""}
 
 
-def compare_slides(kicker):
-    """โค้ดจริงของ Agent จาก runs/ (โจทย์เงินคืน รอบที่ 1): ไม่มีสกิล เทียบกับ v3 · ผลตรวจอ่านจาก grade.json"""
-    def one(label):
-        base = "runs/%s/trials/t4-cashback-r1" % label
-        g = json.loads(read(base + "/grade.json"))
-        return base, read(base + "/sandbox/solve.py").rstrip().split("\n"), g["checks"]
+# ------------------------------------------------------------------ ค้นบล็อกใน README.md
+md = inline
+SECS = []
 
-    def head(name, base):
-        return '<h3 class="lead">%s<span> · <a href="%s/sandbox/solve.py" target="_blank">เปิดไฟล์ solve.py</a></span></h3>' % (name, base)
 
-    def two(left, right, fl=1.15, fr=1):
-        return '<div class="cols"><div class="col" style="flex:%s">%s</div><div class="col" style="flex:%s">%s</div></div>' % (fl, left, fr, right)
+def load(path="README.md"):
+    """อ่าน Markdown แล้วแบ่งเป็นหัวข้อ (ระดับ # ถึง ####) · คืน SECS = [{"level", "text", "blocks"}]"""
+    del SECS[:]
+    cur = None
+    for b in parse(read(path).split("\n")):
+        if b["t"] == "h" and b["level"] <= 4:
+            cur = {"level": b["level"], "text": b["text"], "blocks": []}
+            SECS.append(cur)
+        elif cur is not None:
+            cur["blocks"].append(b)
+    return SECS
 
-    b0, c0, k0 = one("noskill")
-    b3, c3, k3 = one("v3")
-    cut = next(k for k, l in enumerate(c3) if l.startswith("def _main"))
-    bad = [c for c in k0 if not c["pass"]]
-    fails = "".join('<div class="cardx bad"><h4><code>%s</code></h4><p>%s</p></div>' % (c["id"], esc(c["note"])) for c in bad)
-    s1 = S(kicker, "โค้ดจริงของ Agent ตอนไม่มีสกิล: ผ่าน %d จาก %d ข้อ" % (len(k0) - len(bad), len(k0)), two(
-        head("ไม่มีสกิล · โจทย์เงินคืน รอบที่ 1", b0) + pre_html("\n".join(c0), "python"),
-        '<h3 class="lead">ข้อความจากตัวตรวจ (grade.json)</h3><div class="fails">%s</div>' % fails, 1, 1.05), tag="runs/noskill", cls="cmp", maxfs=1.2)
-    ok3 = sum(1 for c in k3 if c["pass"])
-    s2 = S(kicker, "โค้ดจริงของ Agent ด้วยสกิล `v3`: ผ่าน %d จาก %d ข้อ" % (ok3, len(k3)), two(
-        head("สกิลรุ่น v3 · ส่วนฟังก์ชัน", b3) + pre_html("\n".join(c3[:cut]).rstrip(), "python"),
-        head("สกิลรุ่น v3 · ส่วน CLI", b3) + pre_html("\n".join(c3[cut:]), "python"), 1, 1), tag="runs/v3", cls="cmp", maxfs=1.2)
-    rows = [
-        ("`type(amount) is not int` · `type(birthday) is not bool` → `raise ValueError`", "ความรู้แฝงข้อ 3 ตรวจสอบข้อมูลนำเข้า", "`reject_value` `reject_type`"),
-        ("`birthday and tier in (\"gold\", \"platinum\")`", "นโยบาย C1 สิทธิ์เดือนเกิดเฉพาะ gold และ platinum", "`policy`"),
-        ("`num // _DEN` บนตัวเศษจำนวนเต็ม ไม่มี `float`", "ความรู้แฝงข้อ 1 และนโยบาย C2 เงินคืนปัดลง", "`contract` `no_drift` `policy`"),
-        ("`_main()` อ่าน JSON จาก stdin · ตอบ `{\"ok\": …}` · `return 0` หรือ `return 2`", "ความรู้แฝงข้อ 4 สัญญาการเรียกผ่าน CLI", "`cli_ok` `cli_error`"),
-        ("ไฟล์ `test_solve.py` ที่ส่งคู่กัน", "ความรู้แฝงข้อ 5 ชุดทดสอบหน่วย", "`tests`"),
-    ]
-    tab = table_html({"t": "table", "head": ["ส่วนของโค้ด `v3`", "มาจากกติกาข้อไหนของสกิล", "ข้อตรวจที่ผ่าน"], "rows": [list(r) for r in rows]})
-    s3 = S(kicker, "โค้ดแต่ละส่วนของ `v3` มาจากกติกาข้อไหนของสกิล", tab, tag="ตารางหลัก")
-    return [s1, s2, s3]
+
+def sec(prefix):
+    """บล็อกของหัวข้อแรกที่ชื่อขึ้นต้นด้วย prefix"""
+    for s in SECS:
+        if s["text"].startswith(prefix):
+            return s["blocks"]
+    raise KeyError("ไม่พบหัวข้อที่ขึ้นต้นด้วย %r ใน README" % prefix)
+
+
+def walk(blocks):
+    for b in blocks:
+        yield b
+        if b["t"] in ("details", "alert"):
+            yield from walk(b["blocks"])
+
+
+def table(prefix, head0):
+    """ตารางในหัวข้อ prefix (รวมที่อยู่ใน <details>) ที่หัวคอลัมน์แรกขึ้นต้นด้วย head0"""
+    for b in walk(sec(prefix)):
+        if b["t"] == "table" and plain(b["head"][0]).startswith(head0):
+            return b
+    raise KeyError("ไม่พบตารางที่คอลัมน์แรกขึ้นต้นด้วย %r ในหัวข้อ %r" % (head0, prefix))
+
+
+def codes(prefix, lang=None):
+    return [b for b in walk(sec(prefix)) if b["t"] == "code" and (lang is None or b["lang"] == lang)]
+
+
+def para(prefix, start):
+    for b in walk(sec(prefix)):
+        if b["t"] == "p" and b["lines"][0].startswith(start):
+            return b
+    raise KeyError("ไม่พบย่อหน้าที่ขึ้นต้นด้วย %r ในหัวข้อ %r" % (start, prefix))
+
+
+def prompt(prefix):
+    """กล่อง > [!IMPORTANT] ที่มีพรอมต์ (code fence) ของหัวข้อ prefix"""
+    for b in sec(prefix):
+        if b["t"] == "alert" and any(x["t"] == "code" for x in b["blocks"]):
+            return b
+    raise KeyError("ไม่พบกล่องพรอมต์ในหัวข้อ %r" % prefix)
+
+
+def eye(prefix, mark="👀"):
+    """ข้อสังเกตของหัวข้อ (ย่อหน้าที่ขึ้นต้นด้วย mark) ไม่รวมเครื่องหมาย"""
+    p = para(prefix, mark)
+    return " ".join([p["lines"][0][len(mark):].strip()] + p["lines"][1:])
+
+
+# ------------------------------------------------------------------ ชิ้นส่วนของสไลด์
+SL, CTX = [], {"kicker": "", "group": ""}
+
+
+def add(s):
+    """ต่อสไลด์ (หรือรายการสไลด์) ท้ายเด็ค · group ใช้จัดกลุ่มในหน้าสารบัญ (ปุ่ม O)"""
+    for x in s if isinstance(s, list) else [s]:
+        x["group"] = CTX["group"]
+        SL.append(x)
+
+
+def slide(title, body, tag="", cls="", maxfs=1.4):
+    """สไลด์ทั่วไป · cls="mid" จัดเนื้อหากลางหน้า · maxfs = ตัวคูณขนาดตัวอักษรสูงสุดที่ยอมให้ขยาย"""
+    return S(CTX["kicker"], title, body, tag=tag, cls=cls, maxfs=maxfs)
+
+
+def note(text, kind="eye", label="ข้อสังเกต"):
+    if kind == "eye":
+        return '<div class="note eye"><span class="lbl">%s</span><span>%s</span></div>' % (label, md(text))
+    return '<div class="note %s">%s</div>' % (kind, md(text))
+
+
+def fig(title, src, cap="", tag=""):
+    """ภาพเต็มสไลด์ + คำบรรยาย 1 บรรทัด"""
+    b = {"t": "img", "src": src, "alt": plain(title)}
+    body = fig_html(b, bool(cap)) + ('<p class="cap">%s</p>' % md(cap) if cap else "")
+    return slide(title, body, tag=tag, maxfs=1.1)
+
+
+def explain(title, src, steps, post=""):
+    """ภาพด้านซ้าย + ขั้นตอนเรียงเลขด้านขวา (3-5 ขั้น ขั้นละ 1-2 บรรทัด)"""
+    side = "".join('<div class="stp"><span class="n">%d</span><span>%s</span></div>' % (k + 1, md(x)) for k, x in enumerate(steps))
+    if not os.path.exists(os.path.join(ROOT, src)):
+        return slide(title, '<div class="ex"><div class="side fitbox">%s%s</div></div>' % (side, post))
+    img = img_tag({"t": "img", "src": src, "alt": plain(title)})
+    return slide(title, '<div class="ex"><div class="fig">%s</div><div class="side fitbox">%s%s</div></div>' % (img, side, post), maxfs=1.25)
+
+
+def tiles(items):
+    """ตัวเลขใหญ่ · items = [(ป้าย, ตัวเลข, คำอธิบายสั้น, โทน "" | "ok" | "bad" | "warn")]"""
+    out = []
+    for k, num, s, tone in items:
+        out.append('<div class="tile %s"><div class="k">%s</div><div class="num">%s</div><div class="s">%s</div></div>' % (tone, md(k), num, md(s)))
+    return '<div class="tiles">%s</div>' % "".join(out)
+
+
+def cards(items, cols=3):
+    """การ์ด · items = [(หัวข้อ หรือ (เลข, หัวข้อ), ข้อความ หรือ HTML, โทน)]"""
+    out = []
+    for it in items:
+        head, text, tone = (list(it) + [""])[:3]
+        badge = ""
+        if isinstance(head, tuple):
+            badge, head = '<span class="n">%s</span>' % head[0], head[1]
+        text = text if text.startswith("<") else "<p>%s</p>" % md(text)
+        out.append('<div class="cardx %s"><h4>%s%s</h4>%s</div>' % (tone, badge, md(head), text))
+    return '<div class="cards" style="--cols:%d">%s</div>' % (cols, "".join(out))
+
+
+def versus(call, bad, good):
+    """เทียบ 2 ฝั่ง · bad และ good = (ป้าย, วิธีคิด, ค่าตัวใหญ่, คำอธิบาย) · call = โค้ดที่เรียก (เว้นว่างได้)"""
+    def box(cls, d):
+        return ('<div class="sidebox %s"><div class="hd2">%s</div><div class="calc">%s</div><div class="bigv">%s</div><p>%s</p></div>'
+                % (cls, d[0], esc(d[1]), esc(d[2]), md(d[3])))
+    top = '<div class="callbox">%s</div>' % esc(call) if call else ""
+    return top + '<div class="vs">%s%s</div>' % (box("bad", bad), box("good", good))
+
+
+def bars(rows):
+    """แท่งสัดส่วน · rows = [(ป้าย, คำอธิบายย่อย, ตัวตั้ง, ตัวหาร, ข้อความด้านขวา)]"""
+    out = []
+    for label, sub, num, den, text in rows:
+        r = num / den if den else 0
+        tone = "" if r >= 0.99 else "mid" if r >= 0.5 else "low"
+        out.append('<div class="bar"><div class="lb">%s%s</div><div class="tr"><div class="fl %s" style="width:%d%%"></div></div>'
+                   '<div class="vl">%s</div></div>' % (md(label), "<small>%s</small>" % md(sub) if sub else "", tone, round(r * 100), md(text)))
+    return '<div class="bars">%s</div>' % "".join(out)
+
+
+def tbl(title, t, pre="", post="", tag="ตารางหลัก"):
+    """ตาราง 1 ตารางจาก README (ใช้เฉพาะจุดที่ผู้ฟังต้องโฟกัสกับข้อมูลรายแถว)"""
+    return slide(title, pre + table_html(t) + post, tag=tag)
+
+
+def code(title, text, lang="text", pre="", post="", maxfs=1.3):
+    return slide(title, pre + pre_html(text, lang) + post, maxfs=maxfs)
+
+
+def heat_color(v):
+    """สีของช่องคะแนน 0.4 (แดง) ถึง 1.0 (เขียว)"""
+    hue = max(0, min(130, (v - 0.4) / 0.6 * 130))
+    return "hsl(%d,62%%,80%%)" % hue
+
+
+def fileflow(t, mid, in_label="INPUT · ไฟล์ที่ใช้", out_label="OUTPUT · ไฟล์ที่ได้เพิ่มหลังรัน"):
+    """แผนภาพ ไฟล์เข้า -> ขั้นตอน -> ไฟล์ออก จากตาราง 2 คอลัมน์ของ README (คอลัมน์ 1 = เข้า · คอลัมน์ 2 = ออก)"""
+    ins = [r[0] for r in t["rows"] if r[0].strip()]
+    outs = [r[1] for r in t["rows"] if len(r) > 1 and r[1].strip()]
+    col = lambda cls, head, items: '<div class="ffcol %s"><div class="ffh">%s</div>%s</div>' % (
+        cls, head, "".join('<div class="file">%s</div>' % md(x) for x in items))
+    return ('<div class="ff">%s<div class="ffar">➜</div><div class="ffmid">%s</div><div class="ffar">➜</div>%s</div>'
+            % (col("in", in_label, ins), mid, col("out", out_label, outs)))
+
+
+def check_slide(key, items, ref, note_text, title):
+    """รายการตรวจผลที่ติ๊กได้ · key ต้องไม่ซ้ำกันในเด็ค (ใช้จำค่าที่ติ๊กในเบราว์เซอร์)"""
+    rows = "".join('<label class="chk"><input type="checkbox" data-k="%s-%d"><span>%s</span></label>' % (key, k, inline(x))
+                   for k, x in enumerate(items))
+    body = '<div class="checks">%s</div>' % rows
+    if ref:
+        body += '<div class="note result">%s</div>' % inline(ref)
+    if note_text:
+        body += '<div class="note eye"><span class="lbl">หมายเหตุ</span><span>%s</span></div>' % inline(note_text)
+    return slide("ตรวจผลของคุณ · " + title, body, tag="Checklist", cls="cslide", maxfs=1.4)
+
+
+def cover(title, sub, img, small="", hint=""):
+    """หน้าปก: ภาพเต็มหน้า + ชื่อบท"""
+    hint = hint or ('กด <span class="kbd">→</span> หรือ <span class="kbd">Space</span> เพื่อไปต่อ · <span class="kbd">O</span> สารบัญ · '
+                    '<span class="kbd">F</span> เต็มจอ · คลิกภาพเพื่อขยาย')
+    raw = ('<div class="shade"></div><div class="inner"><div class="small">%s</div><h1>%s</h1><div class="sub">%s</div>'
+           '<div class="hint">%s</div><div class="imgnote">ภาพจำลอง</div></div>') % (esc(small), esc(title), esc(sub), hint)
+    return {"raw": raw, "cls": "cover", "style": ' style="background-image:url(%s)"' % img, "title": "ปก", "kicker": "", "tag": "", "lead": ""}
+
 
 
 def slide_html(s):
@@ -722,8 +617,9 @@ pre .err{color:#ff9b9b}pre .ok{color:#86e3ae}pre .dim{color:#8ea3c4}pre .cmd{col
 .cmp pre.code{font-size:.72em}
 .fails{display:flex;flex-direction:column;gap:.45em}
 .fails .cardx{padding:.4em .8em}
+.slide.mid .body{justify-content:center;gap:.8em}
+.cardx h4 code{font-size:.9em}
 .fails .cardx p{font-size:.8em;font-family:var(--mono);line-height:1.45}
-.center{justify-content:center}
 /* พรอมต์ */
 .pbar{display:flex;align-items:center;gap:16px;background:var(--orange-soft);border:1px solid #f6d3ad;border-radius:10px;padding:.45em .8em;font-size:.86em}
 .pbar .how{flex:1;min-width:0}
@@ -941,7 +837,7 @@ JS = r"""
       copyText(text,b,label); });
   });
   document.querySelectorAll('.chk input').forEach(c=>{
-    const key='skillopt-slides:'+c.dataset.k;
+    const key='slides:'+location.pathname+':'+c.dataset.k;
     try{ c.checked=localStorage.getItem(key)==='1'; }catch(e){}
     c.addEventListener('change',()=>{ try{ localStorage.setItem(key,c.checked?'1':'0'); }catch(e){} });
   });
@@ -955,7 +851,9 @@ JS = r"""
 """
 
 
-def write(slides):
+def write(slides, out="Slides.html", title="Slides"):
+    """เขียนไฟล์สไลด์ที่ <บท>/<out> · title = ชื่อบนแท็บของเบราว์เซอร์"""
+    out_path = os.path.join(ROOT, out)
     body = "\n".join(slide_html(s) for s in slides)
     full = "\n".join('<pre class="full" id="prompt%d">%s</pre>' % (k, esc(t)) for k, t in enumerate(PROMPTS))
     page = """<!doctype html>
@@ -963,7 +861,7 @@ def write(slides):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skill Optimizer · Slides</title>
+<title>%s</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -982,7 +880,7 @@ def write(slides):
 <script>%s</script>
 </body>
 </html>
-""" % (CSS, body, full, JS)
-    open(OUT, "w", encoding="utf-8", newline="\n").write(page)
-    print("wrote %s · %d slides · %d prompts · %.0f KB" % (os.path.relpath(OUT, ROOT), len(slides), len(PROMPTS), len(page.encode("utf-8")) / 1024))
+""" % (html.escape(title), CSS, body, full, JS)
+    open(out_path, "w", encoding="utf-8", newline="\n").write(page)
+    print("wrote %s · %d slides · %d prompts · %.0f KB" % (os.path.relpath(out_path, ROOT), len(slides), len(PROMPTS), len(page.encode("utf-8")) / 1024))
     return slides
