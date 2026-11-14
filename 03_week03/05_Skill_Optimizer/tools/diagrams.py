@@ -416,7 +416,60 @@ def skill_fulls():
         skill_full(v)
 
 
+RULE_TOPICS = ["หน่วยและชนิดของค่าเงิน", "การปัดเศษ", "การตรวจ input", "การเรียกผ่าน command line", "เทสต์", "นโยบายค่าส่ง", "นโยบายเงินคืน"]
+
+
+def skill_evolution():
+    """สกิลทุกรุ่นในภาพเดียว: กติกาแต่ละข้อ (แถว) ของแต่ละรุ่น (คอลัมน์) เป็น ใหม่ / แก้ / คงเดิม · ข้อความในช่องตัดจาก SKILL.md จริง"""
+    import html, json
+    esc = html.escape
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    R = json.load(open(os.path.join(root, "runs", "results.json"), encoding="utf-8"))
+    vers = ["noskill", "v0", "v1", "v2", "v3", "v4"]
+    lab = {"noskill": "LAB 1", "v0": "LAB 1", "v1": "LAB 2", "v2": "LAB 3", "v3": "LAB 4", "v4": "LAB 5"}
+    rules = {v: (skill_rules(v) if v != "noskill" else ([], 0)) for v in vers}
+    head = "<div></div>"
+    for v in vers:
+        gp = os.path.join(root, "runs", v, "gate.txt")
+        verdict = ("ACCEPT" if "ACCEPT" in open(gp, encoding="utf-8").read() else "REJECT") if os.path.isfile(gp) else ""
+        col = {"ACCEPT": "#6BBF59", "REJECT": "#E76F51", "": "#B9A999"}[verdict]
+        head += ("<div style='text-align:center;background:#fff;border:3px solid #E5D9CC;border-top:12px solid %s;border-radius:16px;padding:6px 4px'>"
+                 "<div style='font-size:27px;font-weight:800;color:#4A2F1F'>%s</div>"
+                 "<div style='font-size:17px;color:#7A6557'>%s · %s</div>"
+                 "<div style='font-size:24px;font-weight:800;color:#4A2F1F'>%.1f%%</div>"
+                 "<div style='font-size:16px;font-weight:800;color:%s'>%s</div></div>") % (
+            col, "ไม่มีสกิล" if v == "noskill" else v, lab[v], ("%s ไบต์" % format(rules[v][1], ",")) if rules[v][1] else "ไม่มีไฟล์",
+            R[v]["all"]["score"] * 100, col, verdict or "จุดเริ่มต้น")
+    body = ""
+    for k, topic in enumerate(RULE_TOPICS):
+        body += ("<div style='display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800;color:#4A2F1F;line-height:1.25'>"
+                 "<span style='flex:none;width:38px;height:38px;border-radius:50%%;background:#2A9D8F;color:#fff;display:flex;align-items:center;"
+                 "justify-content:center;font-size:20px'>%d</span>%s</div>") % (k + 1, topic)
+        prev = None
+        for v in vers:
+            cur = rules[v][0][k] if k < len(rules[v][0]) else None
+            if cur is None:
+                kind, bg, bd, fg, label = "none", "#F6F1EA", "#D9CCBE", "#A8998A", "ไม่มี"
+            elif prev is None:
+                kind, bg, bd, fg, label = "new", "#E3F3DE", "#6BBF59", "#2F6B22", "ใหม่"
+            elif cur != prev:
+                kind, bg, bd, fg, label = "edit", "#FDEBD3", "#F4A261", "#9A4D06", "แก้"
+            else:
+                kind, bg, bd, fg, label = "same", "#FFFFFF", "#E5D9CC", "#7A6557", "คงเดิม"
+            text = "" if cur is None else esc(cur if len(cur) <= 46 else cur[:44] + " …")
+            n = "" if cur is None else "<span style='font-weight:500;font-size:15px'> · %d ตัวอักษร</span>" % len(cur)
+            body += ("<div style='background:%s;border:2px %s %s;border-radius:12px;padding:5px 9px;min-height:78px'>"
+                     "<div style='font-size:17px;font-weight:800;color:%s'>%s%s</div>"
+                     "<div style='font-size:14.5px;line-height:1.3;color:#5A4A3E;overflow-wrap:anywhere'>%s</div></div>") % (
+                bg, "dashed" if kind == "none" else "solid", bd, fg, label, n, text if kind != "same" else "")
+            prev = cur if cur is not None else prev
+    grid = "<div style='display:grid;grid-template-columns:230px repeat(6,1fr);gap:8px;align-items:stretch'>%s%s</div>" % (head, body)
+    top = """<h1 style='font-size:40px'>สกิล money-coder ทุกรุ่น: กติกาแต่ละข้อเปลี่ยนเมื่อไร</h1>
+    <div class='sub' style='margin-bottom:12px;font-size:22px'>แถว = กติกา 7 ข้อ · คอลัมน์ = รุ่น · ข้อความในช่องตัดจาก SKILL.md จริง · ตัวเลขใต้ชื่อรุ่น = คะแนนรวมและผลของประตูรับ</div>"""
+    shot("d09-skill-evolution", top + grid, 900)
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples", "lab_files", "skill_diffs", "skill_fulls"]
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples", "lab_files", "skill_diffs", "skill_fulls", "skill_evolution"]
     for w in which:
         globals()[w]()

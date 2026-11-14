@@ -79,6 +79,50 @@ def vname(v):
     return NAME.get(v, "`%s`" % v)
 
 
+RULE_TOPICS = ["หน่วยและชนิดของค่าเงิน", "การปัดเศษ", "การตรวจ input", "การเรียกผ่าน command line", "เทสต์", "นโยบายค่าส่ง", "นโยบายเงินคืน"]
+
+
+def skill_rules(v):
+    """กติกา (บรรทัดที่ขึ้นต้นด้วย "- ") ของ SKILL.md จริงของรุ่น v และขนาดไฟล์"""
+    f = "runs/%s/skills/money-coder/SKILL.md" % v
+    if not os.path.exists(os.path.join(E.ROOT, f)):
+        return [], 0
+    return [l[2:].strip() for l in E.read(f).split("\n") if l.startswith("- ")], os.path.getsize(os.path.join(E.ROOT, f))
+
+
+def skill_slides(v, prev):
+    """สกิลของจริงของรุ่น v ทั้งไฟล์ · กติกาแต่ละข้อติดป้าย ใหม่ / แก้ / คงเดิม เทียบกับรุ่น prev"""
+    rules, size = skill_rules(v)
+    old = skill_rules(prev)[0]
+    rows, n_new, n_edit = [], 0, 0
+    for k, r in enumerate(rules):
+        if k >= len(old):
+            kind, label = "new", "ใหม่"
+            n_new += 1
+        elif r != old[k]:
+            kind, label = "edit", "แก้"
+            n_edit += 1
+        else:
+            kind, label = "same", "คงเดิม"
+        rows.append((len(r), '<div class="rule %s"><span class="n">%d</span><span class="st">%s</span><span class="rt"><b>%s</b> · %s</span></div>'
+                     % (kind, k + 1, label, RULE_TOPICS[k], md(r))))
+    what = " · ".join(x for x in ["ใหม่ %d ข้อ" % n_new if n_new else "", "แก้ %d ข้อ" % n_edit if n_edit else ""] if x)
+    link = "ไฟล์จริง: [`runs/%s/skills/money-coder/SKILL.md`](runs/%s/skills/money-coder/SKILL.md) · %d ข้อ · %s ไบต์ · คะแนนรวม %s" % (
+        v, v, len(rules), format(size, ","), pct(RES[v]["all"]["score"]))
+    if prev == "noskill":
+        link = "รุ่น `noskill` = โฟลเดอร์ `./skills` ว่าง Agent ได้รับแค่โจทย์ (%s) · " % pct(RES["noskill"]["all"]["score"]) + link
+    title = "สกิลของจริง รุ่น `%s` ทั้งไฟล์: %s" % (v, what if prev != "noskill" else "ร่างแรก %d ข้อ เขียนจากความจำ" % len(rules))
+    parts, cur, acc = [], [], 0          # สกิลยาว แบ่ง 2 หน้า เพื่อให้ตัวอักษรอ่านได้
+    for n, h in rows:
+        if cur and acc + n > 1500:
+            parts.append(cur)
+            cur, acc = [], 0
+        cur.append(h)
+        acc += n
+    parts.append(cur)
+    return [S(title, '<div class="rules">%s</div>' % "".join(x) + '<p class="cap">%s</p>' % md(link), tag="SKILL.md ของจริง", maxfs=1.3) for x in parts]
+
+
 def fileflow(prefix, mid):
     return E.fileflow(table(prefix, "Input"), mid)
 
@@ -460,8 +504,7 @@ def build():
         add(fig("ประตูรับตัดสิน %s → %s อย่างไร" % (vname(base), vname(cand)), "img/r03-threshold-%s-%s.png" % (base, cand)))
         if n == 1:
             add(gate_slide(cand, CTX["kicker"], lt))
-            add(fig("สกิลรุ่น `v0`: 5 บรรทัด เขียนจากความจำ", "img/d08-skill-v0.png",
-                    "รุ่น `noskill` = โฟลเดอร์ `./skills` ว่าง Agent ได้รับแค่โจทย์ · ไฟล์จริง: [`runs/v0/skills/money-coder/SKILL.md`](runs/v0/skills/money-coder/SKILL.md)"))
+            add(skill_slides("v0", "noskill"))
             t = table("LAB 1", "ความรู้แฝง")
             rows = []
             for r in t["rows"]:
@@ -471,7 +514,8 @@ def build():
                 "\"ห้ามใช้ float\" → 12/12 · \"ตอบเป็น JSON\" → 0/12"), tag="v0 · Training Set 12 Trial"))
             continue
         add(fig("สกิลเปลี่ยนอย่างไร: `%s` → `%s`" % (base, cand), "img/d07-skill-diff-%s-%s.png" % (base, cand),
-                "สกิลเต็มของรุ่นนี้: [`runs/%s/skills/money-coder/SKILL.md`](runs/%s/skills/money-coder/SKILL.md) · คลิกภาพเพื่อขยาย" % (cand, cand)))
+                "แถบแดง = ข้อความเดิมที่ถูกแทน · แถบเขียว = ข้อความใหม่ · สกิลทั้งไฟล์อยู่ในสไลด์ถัดไป · คลิกภาพเพื่อขยาย"))
+        add(skill_slides(cand, base))
         if n == 2:
             pp = para("LAB 2", "ข้อความที่ตัวตรวจบอกเรื่อง")
             add(tbl("ปัญหาที่ Claude พบ และจุดที่แก้ใน `v1`", table("LAB 2", "ปัญหา"),
@@ -492,6 +536,8 @@ def build():
     CTX.update(kicker="ภาค LAB · 4 · สรุปและแบบฝึกหัด", group="ภาค LAB · 4 · สรุปและแบบฝึกหัด")
     add(E.divider("4", "สรุปและแบบฝึกหัด", "<p>ผลของทุกรุ่น · บทเรียนจากผลจริง · โจทย์ให้ลองต่อ</p>", "img/s05-summary.jpg", small="ภาค LAB"))
     add(fig("เส้นทางการปรับสกิลจริง", "img/r04-path.png", "คะแนนรวมของ `noskill` `v0` `v1` `v2` `v3` `v4` และผลตัดสินของประตูรับ"))
+    add(fig("สกิลทุกรุ่นในภาพเดียว: กติกาแต่ละข้อเปลี่ยนเมื่อไร", "img/d09-skill-evolution.png",
+            "เขียว = กติกาใหม่ · ส้ม = แก้ข้อความ · ขาว = คงเดิม · ข้อความจริงของทุกรุ่นอยู่ในสไลด์ของแต่ละ LAB และใน `README.md` ข้อ 4.1"))
     add(fig("คะแนนเฉลี่ยของแต่ละรุ่น", "img/r01-scores.png"))
     add(fig("ข้อตรวจ 11 แบบ: รุ่นไหนผ่านกี่ Trial", "img/r02-checks.png", "เฉพาะ Training Set · ผลรายข้อของ Validation Set ถูกปิดไว้"))
     pp = para("4.1", "รวม 108 Trial")
@@ -509,6 +555,17 @@ def build():
                   '<a href="01_theory/README.md" target="_blank">01_theory/README.md</a></p>', "img/s05-summary.jpg"))
     return E.SL
 
+
+E.CSS += """
+.rules{display:flex;flex-direction:column;gap:.38em}
+.rule{display:flex;gap:.6em;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:8px solid #c9d3e2;border-radius:10px;padding:.34em .7em;line-height:1.42}
+.rule .n{flex:none;width:1.6em;height:1.6em;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.82em}
+.rule .st{flex:none;width:4.2em;text-align:center;font-size:.74em;font-weight:700;border-radius:6px;padding:.15em 0;background:#e7edf5;color:#56657a;margin-top:.12em}
+.rule .rt{min-width:0;font-size:.9em}
+.rule.same .rt{color:#5d6b80}
+.rule.new{border-left-color:var(--green);background:#f5fcf7}.rule.new .st{background:var(--green);color:#fff}
+.rule.edit{border-left-color:var(--orange);background:#fffaf3}.rule.edit .st{background:var(--orange);color:#fff}
+"""
 
 if __name__ == "__main__":
     for st in (sys.stdout, sys.stderr):
