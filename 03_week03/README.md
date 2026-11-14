@@ -1,4 +1,32 @@
-# Week 03 · Reverse Engineer ANYTHING (REA)
+# Week 03 · Skill · ทีม AI · Reverse Engineering · ปรับสกิลอัตโนมัติ
+
+สัปดาห์นี้มี 6 บท ทุกบทรันใน container `multi-account-devtool` และใช้พรอมต์ Copy & Paste ใน Claude Code Desktop
+
+| บท | หัวข้อ | สิ่งที่ได้ |
+|---|---|---|
+| [01_VastAi_Skill](01_VastAi_Skill/readme.md) | เช่า GPU บน Vast.ai ด้วย skill `vastai` | เช่า RTX 4090 แล้วลบเครื่อง · แชทบอทที่ใช้ AI บน RTX 5090 |
+| [02_Multi_Agent_Orchestra](02_Multi_Agent_Orchestra/readme.md) | ทีม AI หลายบัญชีสร้างร้าน "บ้านช่าง BuildMart" v3 | เว็บที่ฟังได้ พูดได้ และตอบจากเอกสาร บน GPU 3 ใบ |
+| [04_REA](#บท-04--reverse-engineer-anything-rea) | Reverse Engineer ANYTHING: สืบเว็บจริงแล้วสร้างแอปของเราเอง (7 บทย่อย) | แอปจองตั๋ว SkyThai v1–v6 พร้อมผลวัดด้วย Playwright |
+| [05_Skill_Optimizer](05_Skill_Optimizer/README.md) | Skill Optimizer: คนเขียนสกิลรุ่นแรก แล้วปรับทีละรุ่นด้วยการวัด | สกิล `money-coder` จาก 45.3% เป็น 100.0% |
+| [06_WikiSkill](06_WikiSkill/README.md) | WikiSkill: AI จดสมุดความรู้ แล้วเขียนสกิลจากสมุด | สกิลที่ไม่มีคนเขียนได้ 97.9% · เติมคำตอบของทีมแล้วได้ 100.0% |
+| [07_EvoSkill_v2](07_EvoSkill_v2/README.md) | EvoSkill v2: Agent 3 ตัวปรับสกิลกันเอง | Test Set จาก 42.2% เป็น 90.0%–100.0% ตามการตั้งค่า |
+
+## บท 05–07 · ปรับสกิลอัตโนมัติ 3 วิธี บนโจทย์เดียวกัน
+
+ทั้ง 3 บทใช้โจทย์เขียนโค้ดคิดเงินของร้าน BaanKafe · ต่างกันที่ว่าใครเป็นผู้หาสาเหตุและเขียนสกิล
+
+| | [05 · Skill Optimizer](05_Skill_Optimizer/README.md) | [06 · WikiSkill](06_WikiSkill/README.md) | [07 · EvoSkill v2](07_EvoSkill_v2/README.md) |
+|---|---|---|---|
+| สกิลรุ่นแรก | คนเขียน (`v0`) | ไม่มี · เริ่มจากชุดสกิลว่าง | ไม่มี |
+| ผู้ปรับสกิล | Claude Code ตามพรอมต์ของคน ทีละรุ่น | AI 2 บทบาท: Wiki Maintainer และ Skill Proposer | Evolver 1 ตัว เซสชันเดียวตั้งแต่ต้นจนจบ |
+| ที่เก็บสิ่งที่เรียนรู้ | `ISSUES.md` | สมุดความรู้ `wiki/` | ความจำของเซสชัน Evolver |
+| การตัดสินรุ่นใหม่ | ประตูรับ: ต้องดีขึ้นเกินความแกว่ง หรือต้นทุนลด | Gate: Validation ต้องสูงกว่าเดิม | ไม่มีประตูรับ |
+| ผลจริง | 45.3% → **100.0%** (108 Trial) | 46.9% → 97.9% → **100.0%** หลังเติมนโยบายจากทีม (279 Trial) | Test Set 42.2% → 90.0% (`e1`) · 100.0% (`n1`) |
+| สไลด์ | [บท](05_Skill_Optimizer/Skill_Optimizer_Slides.html) · [ทฤษฎี](05_Skill_Optimizer/01_theory/SkillOpt_Theory_Slides.html) | [บท](06_WikiSkill/WikiSkill_Slides.html) · [ทฤษฎี](06_WikiSkill/01_theory/WikiSkill_Theory_Slides.html) | – |
+
+บท 05 และ 06 ใช้ตัวตรวจชุดเดียวกัน (มีข้อตรวจนโยบายธุรกิจ `policy`) ผลจึงเทียบกันได้ · บท 07 วัดเมื่อ 13 พ.ย. 2026 ด้วยตัวตรวจ 10 ข้อที่ยังไม่มีข้อตรวจ `policy` ตัวเลขของบท 07 จึงยังเทียบกับสองบทแรกตรง ๆ ไม่ได้
+
+## บท 04 · Reverse Engineer ANYTHING (REA)
 
 ให้ AI "สืบ" เว็บที่มีอยู่จริง (Google Flights: กรุงเทพ → ญี่ปุ่น) แล้วสร้างแอปจองตั๋วของเราเอง (Next.js + PostgreSQL ใน Docker) ทุกอย่างรันใน container `multi-account-devtool` (`yolo1–3` · `cyolo1–2` · REA MCP · Playwright) ผู้เรียนแค่ copy พรอมต์ไปวางใน Claude Code Desktop
 
@@ -6,15 +34,15 @@
 
 | บท | หัวข้อ | เครื่องมือที่เพิ่ม | แอปที่ได้ | ผลวัดจริง |
 |---|---|---|---|---|
-| [00_REA_Theory_Setup](00_REA_Theory_Setup/README.md) | ทฤษฎี REA ทีละขั้น (T1–T15) + ติดตั้ง REA ใน container | REA (ติดตั้ง) | — | `yolo1` เห็น REA 207 tools |
-| [01_REA_Basics_Flight](01_REA_Basics_Flight/README.md) | ใช้ REA สืบ Google Flights แล้วสร้างแอป + วัดผล 5 ไม้บรรทัด | REA อย่างเดียว | **SkyThai Mini** (v1) · :5081 | playlist ผ่าน 5/5 · วัดด้วยไม้บรรทัด 5 อัน (LAB 6) |
-| [02_REA_Playwright_Exploration](02_REA_Playwright_Exploration/README.md) | สำรวจเว็บแบบ EXPLORATION (A–E) | + Playwright MCP | **SkyThai Plus** (v2) · :5082 | ชุดเทียบของบท: v1 4/35 (11.4%) → v2 33/35 (94.3%) |
-| [03_REA_Toolchain_Loop](03_REA_Toolchain_Loop/README.md) | ปิดวงจรโคลน | + HAR · trace/GIF · กรรมการอิสระ (Codex) · วนแก้ · visual diff | **SkyThai Pro** (v3) · :5083 | กรรมการ 82 ข้อ: v1 0 · v2 51 (62%) · v3 74 (90%) · เที่ยวบิน 22 → 300 |
-| [04_REA_Differential_Oracle](04_REA_Differential_Oracle/README.md) | ใช้ต้นฉบับเป็นเฉลย | + ต้นฉบับแช่แข็งจาก HAR · differential testing · เทียบโครงสร้าง (ariaSnapshot) · mutation testing · แก้แบบรุม (swarm) | **SkyThai Max** (v4) · :5084 | differential v3 4/8 → **v4 8/8** · โครงสร้าง 70.5% → **78.6%** · visual diff 8.32% → **5.13%** |
-| [05_REA_Two_Stage_Pipeline](05_REA_Two_Stage_Pipeline/README.md) | ต่อยอด v4 ด้วยอัลกอริทึม 2 ขั้น | + structure compiler · coordinate descent · ตัวล็อกโครงสร้าง · ตัวกันอ่านไม่ออก | **SkyThai v5** · :5092 | โครงสร้าง 78.6% → **96.3%** · visual diff 5.04% → **4.12%** · Score 73.56 → **92.18** · ผ่านตัวกันอ่านไม่ออก |
-| [06_REA_Two_Stage_Loop_Scratch](06_REA_Two_Stage_Loop_Scratch/README.md) | ทั้งระบบใหม่จาก URL: Parallel Exploration + two-stage loop | + สำรวจพร้อมกัน 4 บัญชี · ไม้บรรทัดใหม่ (ข้อสอบต้องผ่านกับต้นฉบับก่อน) · แช่แข็งพิกเซล · loop โครงสร้าง ≤ 2 · loop พิกเซล ≤ 2 · ตัวกันช่องโหว่ | **SkyThai Zero** (v6) · :5096 | ไม้บรรทัดชุดใหม่: gate 27/31 → **31/31** · โครงสร้าง 92.28% → **94.67%** · visual diff 5.24% → **4.77%** · Score **89.90** |
+| [00_REA_Theory_Setup](04_REA/00_REA_Theory_Setup/README.md) | ทฤษฎี REA ทีละขั้น (T1–T15) + ติดตั้ง REA ใน container | REA (ติดตั้ง) | — | `yolo1` เห็น REA 207 tools |
+| [01_REA_Basics_Flight](04_REA/01_REA_Basics_Flight/README.md) | ใช้ REA สืบ Google Flights แล้วสร้างแอป + วัดผล 5 ไม้บรรทัด | REA อย่างเดียว | **SkyThai Mini** (v1) · :5081 | playlist ผ่าน 5/5 · วัดด้วยไม้บรรทัด 5 อัน (LAB 6) |
+| [02_REA_Playwright_Exploration](04_REA/02_REA_Playwright_Exploration/README.md) | สำรวจเว็บแบบ EXPLORATION (A–E) | + Playwright MCP | **SkyThai Plus** (v2) · :5082 | ชุดเทียบของบท: v1 4/35 (11.4%) → v2 33/35 (94.3%) |
+| [03_REA_Toolchain_Loop](04_REA/03_REA_Toolchain_Loop/README.md) | ปิดวงจรโคลน | + HAR · trace/GIF · กรรมการอิสระ (Codex) · วนแก้ · visual diff | **SkyThai Pro** (v3) · :5083 | กรรมการ 82 ข้อ: v1 0 · v2 51 (62%) · v3 74 (90%) · เที่ยวบิน 22 → 300 |
+| [04_REA_Differential_Oracle](04_REA/04_REA_Differential_Oracle/README.md) | ใช้ต้นฉบับเป็นเฉลย | + ต้นฉบับแช่แข็งจาก HAR · differential testing · เทียบโครงสร้าง (ariaSnapshot) · mutation testing · แก้แบบรุม (swarm) | **SkyThai Max** (v4) · :5084 | differential v3 4/8 → **v4 8/8** · โครงสร้าง 70.5% → **78.6%** · visual diff 8.32% → **5.13%** |
+| [05_REA_Two_Stage_Pipeline](04_REA/05_REA_Two_Stage_Pipeline/README.md) | ต่อยอด v4 ด้วยอัลกอริทึม 2 ขั้น | + structure compiler · coordinate descent · ตัวล็อกโครงสร้าง · ตัวกันอ่านไม่ออก | **SkyThai v5** · :5092 | โครงสร้าง 78.6% → **96.3%** · visual diff 5.04% → **4.12%** · Score 73.56 → **92.18** · ผ่านตัวกันอ่านไม่ออก |
+| [06_REA_Two_Stage_Loop_Scratch](04_REA/06_REA_Two_Stage_Loop_Scratch/README.md) | ทั้งระบบใหม่จาก URL: Parallel Exploration + two-stage loop | + สำรวจพร้อมกัน 4 บัญชี · ไม้บรรทัดใหม่ (ข้อสอบต้องผ่านกับต้นฉบับก่อน) · แช่แข็งพิกเซล · loop โครงสร้าง ≤ 2 · loop พิกเซล ≤ 2 · ตัวกันช่องโหว่ | **SkyThai Zero** (v6) · :5096 | ไม้บรรทัดชุดใหม่: gate 27/31 → **31/31** · โครงสร้าง 92.28% → **94.67%** · visual diff 5.24% → **4.77%** · Score **89.90** |
 
-### ภาพรวมผลวัดทุกเวอร์ชัน (รันจริง · ชุดทดสอบเดียวกัน)
+### ภาพรวมผลวัดทุกเวอร์ชันของ REA (รันจริง · ชุดทดสอบเดียวกัน)
 
 | เวอร์ชัน | acceptance 82 ข้อ (กรรมการ cyolo1) | differential 8 สถานการณ์ (เทียบต้นฉบับแช่แข็ง) | โครงสร้างหน้า (ariaSnapshot) | visual diff (ต่ำ = ใกล้) | เที่ยวบิน |
 |---|---:|---:|---:|---:|---:|
@@ -28,10 +56,10 @@
 
 $$\text{visual diff} = \frac{\text{จำนวนพิกเซลที่ต่าง}}{1{,}229{,}400} \times 100\% \qquad \text{เช่น v4} = \frac{63{,}012}{1{,}229{,}400} \times 100 = 5.13\%$$
 
-(บทที่ 6 สร้างไม้บรรทัดชุดใหม่จากต้นฉบับสด จึงไม่อยู่ในตารางนี้ · ดูผลใน [บทที่ 6](06_REA_Two_Stage_Loop_Scratch/README.md))
+(บทที่ 6 สร้างไม้บรรทัดชุดใหม่จากต้นฉบับสด จึงไม่อยู่ในตารางนี้ · ดูผลใน [บทที่ 6](04_REA/06_REA_Two_Stage_Loop_Scratch/README.md))
 
-(อธิบายทีละขั้นใน [บทที่ 3 · T7](03_REA_Toolchain_Loop/README.md))
+(อธิบายทีละขั้นใน [บทที่ 3 · T7](04_REA/03_REA_Toolchain_Loop/README.md))
 
-**ต้องมีก่อน:** [LAB 03 container](../01_week02/03_MultiAccount_Container/) (เปิดด้วย `/maccount`) · [LAB 04 shared skills](../01_week02/04_Skill_Setup/00_Setup_Skill/readme.md) · Docker Desktop · Claude Code Desktop
+**ต้องมีก่อน:** [LAB 03 container](../01_week02/03_MultiAccount_Container/) (เปิดด้วย `/maccount`) · [LAB 04 shared skills](../01_week02/04_MultiAccount_Skill/) · Docker Desktop · Claude Code Desktop
 
 > ⚠️ เราสืบเว็บของคนอื่นเพื่อ **เรียนรู้แนวคิด** เท่านั้น: ไม่ล็อกอิน ไม่จ่ายเงิน ไม่ข้าม CAPTCHA ไม่ลอกโลโก้/โค้ด/แบรนด์ ไฟล์ HAR/trace มี cookie ห้ามนำออกนอก container · ราคาในแอปเป็นข้อมูลจำลอง ณ 31 ต.ค. 2569
