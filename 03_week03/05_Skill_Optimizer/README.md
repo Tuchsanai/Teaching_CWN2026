@@ -700,7 +700,7 @@ skills/money-coder/
 
 # 3 · ลงมือทำ (Copy & Paste)
 
-**วิธีใช้:** เปิดโฟลเดอร์ `Teaching` ใน Claude Code Desktop → คัดลอกพรอมต์ → วาง → รอผล
+**วิธีใช้:** เปิดโฟลเดอร์ `Teaching` ใน Claude Code Desktop → คัดลอกกล่อง **📋 IMPORTANT** ของแต่ละ LAB → วาง → รอผล · กล่องอื่นเป็นผลจริงหรือคำอธิบาย ไม่ต้องคัดลอก
 ต้องมี container `multi-account` และบัญชี `yolo` ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี
 
 **ของในบทนี้ไปอยู่ตรงไหนใน container** (LAB 0 คัดลอกให้ครั้งเดียว)
@@ -731,13 +731,16 @@ LAB 1–5 ขึ้นต้นด้วย 2 บรรทัดเดียว�
 
 ## LAB 0 · เตรียม
 
-```text
-เตรียม LAB ใน container multi-account:
-- ติดตั้ง 03_week03/05_Skill_Optimizer/skill-optimizer เป็น global skill ของบัญชี yolo
-- คัดลอกโฟลเดอร์ suite และ skills/money-coder ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab
-- ตรวจ Grader ด้วย suite/check_grader.py · ดูว่าบัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
-ยังไม่ต้องวัดอะไร · ตอบเป็นตาราง รายการ | ผล
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> เตรียม LAB ใน container multi-account:
+> - ติดตั้ง 03_week03/05_Skill_Optimizer/skill-optimizer เป็น global skill ของบัญชี yolo
+> - คัดลอกโฟลเดอร์ suite และ skills/money-coder ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab
+> - ตรวจ Grader ด้วย suite/check_grader.py · ดูว่าบัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
+> ยังไม่ต้องวัดอะไร · ตอบเป็นตาราง รายการ | ผล
+> ```
 
 ผลจริง
 
@@ -763,13 +766,16 @@ LAB 1–5 ขึ้นต้นด้วย 2 บรรทัดเดียว�
 - เขียนเทสต์มาด้วยทุกครั้ง
 ```
 
-```text
-ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-วัดสกิล skills/money-coder/v0 และวัดแบบไม่มีสกิล ด้วย --reps 3 --model sonnet --effort medium --par 6 ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว (รวม 36 Trial)
-gate ใช้ต้นทุนเป็น context_tokens · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-ตอบ: ตาราง report · ความแกว่งของ v0 (null) · ผล gate ไม่มีสกิล → v0
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
+> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
+> วัดสกิล skills/money-coder/v0 และวัดแบบไม่มีสกิล ด้วย --reps 3 --model sonnet --effort medium --par 6 ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว (รวม 36 Trial)
+> gate ใช้ต้นทุนเป็น context_tokens · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: ตาราง report · ความแกว่งของ v0 (null) · ผล gate ไม่มีสกิล → v0
+> ```
 
 ผลจริง ([report.md](results/report.md) · [gate](results/gate-noskill-v0.txt))
 
@@ -787,13 +793,16 @@ gate ใช้ต้นทุนเป็น context_tokens · เสร็จ�
 
 ## LAB 2 · สร้าง v1
 
-```text
-ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-ดูข้อที่พลาดของ v0 แล้วเปิด Trace และโค้ดของ Trial ที่พลาด หาสาเหตุที่พบมากกว่า 1 Trial เขียน skills/money-coder/ISSUES.md
-สร้าง v1 จาก v0 แก้ไม่เกิน 3 จุด · วัด v1 ด้วยค่าเดียวกับ v0 · gate v0 → v1 · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-ตอบ: ตารางปัญหา | พบกี่ Trial | สาเหตุ · จุดที่แก้ใน v1 · ตาราง report (noskill,v0,v1) · ผล gate
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
+> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
+> ดูข้อที่พลาดของ v0 แล้วเปิด Trace และโค้ดของ Trial ที่พลาด หาสาเหตุที่พบมากกว่า 1 Trial เขียน skills/money-coder/ISSUES.md
+> สร้าง v1 จาก v0 แก้ไม่เกิน 3 จุด · วัด v1 ด้วยค่าเดียวกับ v0 · gate v0 → v1 · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: ตารางปัญหา | พบกี่ Trial | สาเหตุ · จุดที่แก้ใน v1 · ตาราง report (noskill,v0,v1) · ผล gate
+> ```
 
 ผลจริง: สาเหตุที่ Claude พบจาก Trace ([ISSUES.md](skills/money-coder/ISSUES.md) · [failures-v0.txt](results/failures-v0.txt))
 
@@ -825,13 +834,16 @@ val: 68.3% → 90.0% (+21.7) · เกณฑ์ 2.5 จุด
 
 ## LAB 3 · สร้าง v2
 
-```text
-ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-ทำ v2 จากรุ่นฐานล่าสุด โดยดู 3 อย่าง: ข้อที่พลาดของรุ่นฐาน · ปัญหาที่ยังเปิดใน ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
-แก้ไม่เกิน 3 จุด · วัด v2 ด้วยค่าเดียวกับ v0 · gate v1 → v2 · อัปเดต ISSUES.md · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-ตอบ: จุดที่แก้ใน v2 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
+> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
+> ทำ v2 จากรุ่นฐานล่าสุด โดยดู 3 อย่าง: ข้อที่พลาดของรุ่นฐาน · ปัญหาที่ยังเปิดใน ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
+> แก้ไม่เกิน 3 จุด · วัด v2 ด้วยค่าเดียวกับ v0 · gate v1 → v2 · อัปเดต ISSUES.md · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: จุดที่แก้ใน v2 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
+> ```
 
 ผลจริง: Training ไม่มีข้อที่พลาดแล้ว Claude จึงแก้กติกาที่ยังกว้าง 2 ข้อ ([`v2/SKILL.md`](skills/money-coder/v2/SKILL.md))
 
@@ -853,14 +865,17 @@ val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
 
 คะแนนเต็มแล้ว ยังปรับได้อีกทางหนึ่งคือ **ต้นทุน** (เงื่อนไขข้อ 3 ของประตูรับ)
 
-```text
-ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-รุ่นฐานได้คะแนนเต็มแล้ว ลองทำ v3 ที่ถูกลง: ลดโทเคนขาเข้า (context_tokens) อย่างน้อย 10% โดยคะแนนไม่ลด
-เปิด Trace ดูว่า Agent ใช้คำสั่งไปกับอะไร แล้วแก้ไม่เกิน 3 จุด · วัด v3 ด้วยค่าเดียวกับ v0 · gate v2 → v3 · อัปเดต ISSUES.md
-ถ้า REJECT ให้ใช้ v2 ต่อ ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-ตอบ: จุดที่แก้ใน v3 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
+> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
+> รุ่นฐานได้คะแนนเต็มแล้ว ลองทำ v3 ที่ถูกลง: ลดโทเคนขาเข้า (context_tokens) อย่างน้อย 10% โดยคะแนนไม่ลด
+> เปิด Trace ดูว่า Agent ใช้คำสั่งไปกับอะไร แล้วแก้ไม่เกิน 3 จุด · วัด v3 ด้วยค่าเดียวกับ v0 · gate v2 → v3 · อัปเดต ISSUES.md
+> ถ้า REJECT ให้ใช้ v2 ต่อ ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: จุดที่แก้ใน v3 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
+> ```
 
 ผลจริง: Claude นับจาก Trace ว่า Agent เสียคำสั่งไปกับอะไร แล้วแก้ 2 จุด ([`v3/SKILL.md`](skills/money-coder/v3/SKILL.md))
 
@@ -883,14 +898,17 @@ val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
 
 สกิลยาวขึ้นทุกรุ่น ถ้าย่อให้สั้นและอ่านง่าย จะดีขึ้นหรือไม่ ให้ประตูรับตัดสิน
 
-```text
-ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
-ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-ทดลอง: สร้าง v4 จากรุ่นฐาน โดยย่อ SKILL.md ให้สั้นและอ่านง่าย กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (การย่อทั้งไฟล์นับเป็น 1 จุด ไม่แก้อย่างอื่น)
-วัด v4 ด้วยค่าเดียวกับ v0 · gate v3 → v4 · อัปเดต ISSUES.md
-ถ้า REJECT ให้ใช้รุ่นฐานต่อ ห้ามแก้ v4 เพิ่ม ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-ตอบ: SKILL.md ของ v4 · ตาราง report ทุกรุ่น · ผล gate · ข้อตรวจของ Training Set ที่เปลี่ยนไป
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
+>
+> ```text
+> ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
+> ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
+> ทดลอง: สร้าง v4 จากรุ่นฐาน โดยย่อ SKILL.md ให้สั้นและอ่านง่าย กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (การย่อทั้งไฟล์นับเป็น 1 จุด ไม่แก้อย่างอื่น)
+> วัด v4 ด้วยค่าเดียวกับ v0 · gate v3 → v4 · อัปเดต ISSUES.md
+> ถ้า REJECT ให้ใช้รุ่นฐานต่อ ห้ามแก้ v4 เพิ่ม ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: SKILL.md ของ v4 · ตาราง report ทุกรุ่น · ผล gate · ข้อตรวจของ Training Set ที่เปลี่ยนไป
+> ```
 
 ผลจริง: `v4` อ่านง่ายกว่าทุกรุ่น ([`v4/SKILL.md`](skills/money-coder/v4/SKILL.md))
 
