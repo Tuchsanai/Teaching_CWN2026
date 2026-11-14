@@ -139,7 +139,65 @@ def algorithm():
     shot("d04-algorithm", body, 900)
 
 
+def trial_example(label="v0", trial="t4-cashback-r1"):
+    """1 Trial จริงตั้งแต่โจทย์ถึงคะแนน · ตัวเลขทุกตัวอ่านจาก runs/<รุ่น>/trials/<Trial>/ ไม่มีค่าที่พิมพ์เอง"""
+    import html, json, re
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    d = os.path.join(root, "runs", label, "trials", trial)
+    m = json.load(open(os.path.join(d, "metrics.json"), encoding="utf-8"))
+    g = json.load(open(os.path.join(d, "grade.json"), encoding="utf-8"))
+    code = open(os.path.join(d, "sandbox", "solve.py"), encoding="utf-8").read()
+    tests = open(os.path.join(d, "sandbox", "test_solve.py"), encoding="utf-8").read()
+    n_code, n_tests = code.count("\n"), len(re.findall(r"^\s+def test_", tests, re.M))
+    tokens = m["input_tokens"] + m["cache_read"] + m["cache_write"]
+    ok = [c["id"] for c in g["checks"] if c["pass"]]
+    bad = {c["id"]: c["note"] for c in g["checks"] if not c["pass"]}
+    pol = re.search(r"(\w+\(.*?\)) คาด (\S+) ได้ (\S+)", bad.get("policy", ""))
+    cli = re.search(r'ต้องได้ (\{.*?\}) exit 0 แต่ได้ exit \d+ stdout (\{.*\})', bad.get("cli_ok", ""))
+
+    def col(color, num, title, sub, inner, flex="1"):
+        return """<div style='flex:%s;background:#fff;border:3px solid #E5D9CC;border-top:14px solid %s;border-radius:22px;padding:14px 16px'>
+          <div style='font-size:30px;font-weight:800;color:#4A2F1F'><span style='color:%s'>%s</span> %s</div>
+          <div style='font-size:21px;color:#7A6557;margin:2px 0 10px'>%s</div>%s</div>""" % (flex, color, color, num, title, sub, inner)
+
+    def box(txt, size=19):
+        return "<div style='%s;font-size:%dpx;background:#F6EFE6;border-radius:12px;padding:9px 11px;color:#2A6F68;line-height:1.45;margin-bottom:8px'>%s</div>" % (MONO, size, txt)
+
+    def way(name, got, want, passed):
+        mark = "<span style='color:#2F6B22;font-weight:800'>✓ ผ่าน</span>" if passed else "<span style='color:#A63D25;font-weight:800'>✗ ไม่ผ่าน</span>"
+        return """<div style='border:2px solid %s;border-radius:12px;padding:7px 10px;margin-bottom:8px;background:%s'>
+          <div style='font-size:19px;font-weight:700;color:#4A2F1F;white-space:nowrap'>%s</div><div style='font-size:19px'>%s</div>
+          <div style='%s;font-size:16px;color:#4A2F1F;line-height:1.4;white-space:nowrap'>%s</div><div style='%s;font-size:16px;color:#7A6557;white-space:nowrap'>%s</div></div>""" % (
+            "#6BBF59" if passed else "#E76F51", "#EEF8EA" if passed else "#FDEDE8", name, mark, MONO, got, MONO, want)
+
+    c1 = col("#6F4E37", "①", "Input", "โจทย์ 1 ข้อ + สกิล 1 รุ่น",
+             box("ต้องการฟังก์ชัน cashback<br>ในไฟล์ solve.py<br>· silver 1.5%<br>· gold 2.5%<br>· เดือนเกิด ได้ 2 เท่า<br>…", 17)
+             + box("./skills/money-coder/<br>SKILL.md (สกิลรุ่น %s)" % label, 17))
+    cmds = ["ls ./skills", "cat ./skills/…/SKILL.md", "เขียน solve.py<br>&nbsp;&nbsp;&nbsp;เขียน test_solve.py<br>&nbsp;&nbsp;&nbsp;รันเทสต์"]
+    c2 = col("#2A9D8F", "②", "Generate", "Agent เขียนโค้ดเอง",
+             "".join(box("%d&nbsp; %s" % (i + 1, c), 17) for i, c in enumerate(cmds[:m["tool_calls"]]))
+             + "<div style='font-size:20px;color:#4A2F1F'>%d คำสั่ง · %.1f วินาที<br>%s โทเคนขาเข้า</div>" % (m["tool_calls"], m["wall_s"], format(tokens, ",")))
+    c3 = col("#2A9D8F", "③", "Output", "ไฟล์ที่ Agent ส่ง",
+             box("solve.py<br>&nbsp;&nbsp;%d บรรทัด<br>test_solve.py<br>&nbsp;&nbsp;%d เทสต์" % (n_code, n_tests), 17)
+             + box("out = {\"cashback\": …}<br>print(json.dumps(out))", 16))
+    c4 = col("#F4A261", "④", "Grade", "ตัวตรวจรันโค้ดที่ได้ 3 วิธี",
+             way("เรียกฟังก์ชันด้วย Input ที่ซ่อน", html.escape(pol.group(1)) + " → ได้ " + pol.group(3), "ต้องได้ " + pol.group(2) + " (นโยบายของร้าน)", False)
+             + way("รันเป็นโปรแกรม ส่ง JSON ทาง stdin", "ได้ " + html.escape(cli.group(2)), "ต้องได้ " + html.escape(cli.group(1)), False)
+             + way("รันเทสต์ที่ Agent เขียน", "python3 -m unittest → %d เทสต์" % n_tests, "ต้องมีอย่างน้อย 6 และรันผ่าน", "tests" in ok), "2.1")
+    chips = "".join("<span style='%s;font-size:20px;background:#E3F3DE;border:2px solid #6BBF59;color:#2F6B22;border-radius:10px;padding:3px 9px;margin-right:6px'>✓ %s</span>" % (MONO, c) for c in ok) \
+        + "".join("<span style='%s;font-size:20px;background:#FBE3DC;border:2px solid #E76F51;color:#A63D25;border-radius:10px;padding:3px 9px;margin-right:6px'>✗ %s</span>" % (MONO, c) for c in bad)
+    body = """<h1>1 Trial: จากโจทย์ สู่โค้ด สู่คะแนน</h1>
+    <div class='sub' style='margin-bottom:12px'>ตัวอย่างจริง: รุ่น %s · โจทย์ %s · รอบที่ %s · บัญชี %s · โมเดล %s</div>
+    <div style='display:flex;gap:6px;align-items:stretch'>%s%s%s%s%s%s%s</div>
+    <div style='margin-top:14px;background:#fff;border:3px solid #E5D9CC;border-radius:18px;padding:12px 16px'>
+      <span style='font-size:30px;font-weight:800;color:#4A2F1F'>⑤ Score = ข้อที่ผ่าน ÷ ข้อตรวจทั้งหมด = %d ÷ %d = %s</span>
+      <div style='margin-top:8px;line-height:2.1'>%s</div></div>""" % (
+        label, trial.rsplit("-r", 1)[0], trial.rsplit("-r", 1)[1], m["account"], m["model"],
+        c1, arrow(), c2, arrow(), c3, arrow(), c4, len(ok), len(g["checks"]), g["score"], chips)
+    shot("d05-trial-example", body, 800)
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm"]
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_example"]
     for w in which:
         globals()[w]()

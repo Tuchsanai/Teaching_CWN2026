@@ -19,7 +19,8 @@ CHECKS = [("contract", "มีฟังก์ชัน และคืนค่�
           ("half_up", "ลงท้าย .5 สตางค์ ต้องปัดขึ้น"), ("no_drift", "ไม่ปัดระหว่างทาง ผลไม่เพี้ยน"),
           ("boundary", "ค่าขอบของเงื่อนไขถูก"), ("reject_value", "ค่าเกินช่วง ต้อง ValueError"),
           ("reject_type", "ชนิดผิด (float str bool) ต้อง ValueError"), ("cli_ok", "CLI ตอบ {\"ok\": true, \"result\": …}"),
-          ("cli_error", "CLI input ผิด ตอบ ok false และ exit 2"), ("tests", "test_solve.py ≥ 6 เทสต์ รันผ่าน")]
+          ("cli_error", "CLI input ผิด ตอบ ok false และ exit 2"), ("tests", "test_solve.py ≥ 6 เทสต์ รันผ่าน"),
+          ("policy", "ทำตามนโยบายธุรกิจของงานนั้น (งาน 3 และ 4)")]
 CSS = """
 *{box-sizing:border-box} body{margin:0;width:1600px;height:900px;background:#FBF7F0;color:#3B2A20;
 font-family:'Leelawadee UI','Noto Sans Thai','Sarabun',sans-serif;padding:44px 60px;overflow:hidden}
@@ -110,11 +111,11 @@ def chart_checks(R, labels):
             a, b = (int(x) for x in v.split("/")) if "/" in v else (0, 1)
             r = a / b
             col = "#6BBF59" if r >= 0.999 else ("#F4A261" if r >= 0.5 else "#E76F51")
-            tds += "<td style='text-align:center'><span style='display:inline-block;width:132px;padding:9px 0;border-radius:12px;background:%s;color:#fff;font-weight:800;font-size:27px'>%s</span></td>" % (col, v)
-        rows += "<tr><td style='font-size:26px;padding:7px 10px'><b style='font-family:Consolas,monospace;font-size:27px'>%s</b><span style='color:#7A6557'> · %s</span></td>%s</tr>" % (
+            tds += "<td style='text-align:center'><span style='display:inline-block;width:132px;padding:6px 0;border-radius:12px;background:%s;color:#fff;font-weight:800;font-size:25px'>%s</span></td>" % (col, v)
+        rows += "<tr><td style='font-size:24px;padding:5px 10px'><b style='font-family:Consolas,monospace;font-size:27px'>%s</b><span style='color:#7A6557'> · %s</span></td>%s</tr>" % (
             cid, html.escape(desc), tds)
-    body = """<h1>ข้อตรวจ 10 ข้อ: รุ่นไหนผ่านกี่ Trial</h1>
-    <div class='sub'>เฉพาะ Training Set (12 Trial ต่อรุ่น) · <span class='badge green'>ผ่านทุก Trial</span>
+    body = """<h1>ข้อตรวจ 11 แบบ: รุ่นไหนผ่านกี่ Trial</h1>
+    <div class='sub'>เฉพาะ Training Set (12 Trial ต่อรุ่น · ข้อที่มีเฉพาะบางงานนับเฉพาะงานนั้น) · <span class='badge green'>ผ่านทุก Trial</span>
       <span class='badge orange'>ผ่านบางส่วน</span> <span class='badge red'>ผ่านน้อยกว่าครึ่ง</span></div>
     <table style='border-collapse:separate;border-spacing:0 5px;width:100%%'><tr><th></th>%s</tr>%s</table>""" % (head, rows)
     shot("r02-checks", body)
