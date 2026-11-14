@@ -29,7 +29,7 @@ Python 3.8 ขึ้นไป ใช้เฉพาะไลบรารีม�
 
 | คำสั่ง | ทำอะไร | เรียกโมเดล |
 |---|---|---|
-| `lint <work> --label <รุ่น>` | วัดขนาดของ `SKILL.md` ของรุ่นนั้น พิมพ์เป็น JSON | ไม่ |
+| `lint <work> --label <รุ่น>` | วัดขนาดของ `SKILL.md` ของรุ่นนั้น พิมพ์เป็น JSON (ตัวอย่างจริง: [`runs/v0/lint.json`](runs/v0/lint.json)) | ไม่ |
 | `run <work> --label <รุ่น>` | ให้ Agent ทำทุกโจทย์ × ทุกรอบ ด้วยสกิลของรุ่นนั้น แล้วให้ตัวตรวจให้คะแนน | **เรียก** |
 | `grade <work> --label <รุ่น>` | ให้คะแนนซ้ำจาก `sandbox/` ที่มีอยู่ | ไม่ |
 | `report <work> --labels v0,v1` | พิมพ์ตารางเทียบรุ่น และเขียน `runs/results.json` | ไม่ |
@@ -72,7 +72,7 @@ Python 3.8 ขึ้นไป ใช้เฉพาะไลบรารีม�
 | 4 | รันใน `sandbox/` โดยปิด stdin:<br>`<บัญชี> -p <พรอมต์> --model <model> --effort <effort> --output-format stream-json --verbose --no-session-persistence --strict-mcp-config` |
 | 5 | เก็บ stdout เป็น `transcript.jsonl` · stderr เป็น `stderr.txt` · เกิน `timeout` ให้หยุด Agent |
 | 6 | เขียน `metrics.json` จาก `transcript.jsonl` |
-| 7 | เขียนโจทย์ลง `task.json` แล้วรัน `python3 suite/<grader> <sandbox> <task.json>` · stdout ของตัวตรวจคือ `grade.json` |
+| 7 | เขียนโจทย์ลง `task.json` แล้วรัน `<python> suite/<grader> <sandbox> <task.json>` ด้วย Python ตัวเดียวกับที่รันเครื่องมือ · stdout ของตัวตรวจคือ `grade.json` |
 
 ตัวตรวจล้ม หรือพิมพ์สิ่งที่ไม่ใช่ JSON → คะแนน 0 พร้อมข้อตรวจ `grader` ที่ไม่ผ่าน
 
@@ -164,7 +164,9 @@ runs/<รุ่น>/trials/<id โจทย์>-r<รอบ>/
 | 5 | นอกเหนือจากนี้ | REJECT |
 
 - ACCEPT = exit 0 · REJECT = exit 1
+- ต้นทุนในข้อ 4 คิดจากทุก Trial ของรุ่น (ชุด `all`)
+- ตัวเลขที่พิมพ์: ผลต่างของคะแนนคิดจากค่าเฉลี่ยที่ปัดเป็นทศนิยม 3 ตำแหน่งแล้ว (เช่น 0.483 → 0.717 = +23.4 จุด)
 - ชุด train หรือ val ไม่มีข้อมูลของรุ่นใดรุ่นหนึ่ง → REJECT
 - เตือนเมื่อมี Trial ที่จบไม่ปกติ หรือ Agent ไม่ได้เปิด `SKILL.md`
 - ข้อความที่พิมพ์ ตัวอย่างจริง: [`runs/v1/gate.txt`](runs/v1/gate.txt) · [`runs/v3/gate.txt`](runs/v3/gate.txt) · [`runs/v4/gate.txt`](runs/v4/gate.txt)
-- ผล `gate` ของบทนี้ทั้ง 5 คู่ (รุ่นฐาน → รุ่นใหม่) เก็บไว้ที่ `runs/<รุ่นใหม่>/gate.txt` ทุกคู่ใช้ `--cost-metric context_tokens`
+- ผล `gate` ของบทนี้มี 5 คู่ เรียงต่อกัน: `noskill` → `v0` → `v1` → `v2` → `v3` → `v4` · เก็บไว้ที่ `runs/<รุ่นใหม่>/gate.txt` · ทุกคู่ใช้ `--cost-metric context_tokens`
