@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """วาดภาพของ README หลักเป็น PNG ลง img/ จากผลจริง
 
-  python tools/charts.py            (รันบนเครื่อง จากโฟลเดอร์ของบท หลัง bash tools/pull.sh)
+  python tools/charts.py            (รันบนเครื่อง จากโฟลเดอร์ของบท หลังเก็บผลการรันไว้ใน runs/)
 
 ตัวเลขของบทนี้อ่านจาก runs/<ชื่อ>/state.json · ตัวเลขของบท 05 และ 06 อ่านจาก ../06_WikiSkill/runs/results.json
 และ ../06_WikiSkill/runs/w1/status.txt (วัดบน Test Set ชุดเดียวกัน ด้วยตัวตรวจชุดเดียวกัน) ไม่มีค่าที่พิมพ์เอง

@@ -1,0 +1,41 @@
+test_boundary_1 (test_solve.Boundary.test_boundary_1) ... ok
+test_boundary_2 (test_solve.Boundary.test_boundary_2) ... ok
+test_boundary_3 (test_solve.Boundary.test_boundary_3) ... ok
+test_no_drift_1 (test_solve.NoDrift.test_no_drift_1) ... ok
+test_no_drift_2 (test_solve.NoDrift.test_no_drift_2) ... FAIL
+test_normal_1 (test_solve.Normal.test_normal_1) ... ok
+test_normal_2 (test_solve.Normal.test_normal_2) ... ok
+test_normal_3 (test_solve.Normal.test_normal_3) ... ok
+test_reject_1 (test_solve.Reject.test_reject_1) ... ok
+test_reject_2 (test_solve.Reject.test_reject_2) ... ok
+test_reject_3 (test_solve.Reject.test_reject_3) ... FAIL
+test_reject_4 (test_solve.Reject.test_reject_4) ... FAIL
+
+======================================================================
+FAIL: test_no_drift_2 (test_solve.NoDrift.test_no_drift_2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/replay/t1-cafe-bill_s2/test_solve.py", line 34, in test_no_drift_2
+    self.assertEqual(cafe_bill([{'price': 25075, 'qty': 2}], True), 45880)
+AssertionError: 45879 != 45880
+
+======================================================================
+FAIL: test_reject_3 (test_solve.Reject.test_reject_3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/replay/t1-cafe-bill_s2/test_solve.py", line 47, in test_reject_3
+    with self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_reject_4 (test_solve.Reject.test_reject_4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/replay/t1-cafe-bill_s2/test_solve.py", line 51, in test_reject_4
+    with self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.000s
+
+FAILED (failures=3)

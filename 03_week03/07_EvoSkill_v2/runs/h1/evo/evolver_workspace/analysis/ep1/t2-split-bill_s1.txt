@@ -1,0 +1,281 @@
+[SYSTEM init]
+[THINK] 
+[assistant TOOL_USE Bash] {"command": "pwd; ls -la; ls -la ./skills 2>/dev/null || echo \"NO_SKILLS_DIR\"", "description": "List working directory and check for skills folder"}
+[RESULT] /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox
+total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 ..
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 skills
+total 20
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 integer-money-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:07 solve-task-checklist
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 strict-input-validation
+[assistant TEXT] There's a `skills` folder with three skills. I'll read them before writing anything.
+[assistant TOOL_USE Bash] {"command": "cd /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox/skills && find . -type f | sort && for f in $(find . -type f -name '*.md' | sort); do echo \"===== $f =====\"; cat \"$f\"; echo; done", "description": "Read all skill files in skills folder"}
+[RESULT] ./integer-money-rounding/SKILL.md
+./solve-task-checklist/SKILL.md
+./strict-input-validation/SKILL.md
+===== ./integer-money-rounding/SKILL.md =====
+---
+name: integer-money-rounding
+description: ใช้เมื่อโจทย์คำนวณเงิน ส่วนลด ภาษี ค่าส่ง ทิป หรือเงินคืนเป็นสตางค์ (จำนวนเต็ม) เพื่อหลีกเลี่ยงค่าคลาดเคลื่อนจาก float, การปัดเศษระหว่างขั้น และลำดับการคูณผิด
+---
+
+# คำนวณเงินเป็นสตางค์ให้ตรงทุกสตางค์
+
+## หลักการ
+
+1. **ห้าม float** ตลอดการคำนวณ เก็บค่าเป็น `int` (สตางค์) หรือ `fractions.Fraction`
+2. **ปัดเศษครั้งเดียว ตอนท้ายสุด** ห้ามปัดทุกขั้น การปัดทุกขั้นทำให้ผลเพี้ยน 1 สตางค์ได้ ซึ่งทำให้ test ที่เทียบทีละสตางค์ไม่ผ่าน
+3. **ตัวคูณต้องคูณก่อนปัด** ค่าที่ต้อง floor หรือ round ต้องเป็นผลรวมของทุกตัวคูณแล้ว ห้าม floor ค่าย่อยแล้วค่อยคูณ เช่น ถ้าได้ 250.5 แล้วต้อง ×2 ให้คูณได้ 501 ก่อนปัด ถ้า floor 250 ก่อนจะได้ 500 ซึ่งผิด
+4. **ลำดับตามที่โจทย์เขียน**
+   - "ลด X% แล้วลดอีก Y%" หรือ "คิดต่อจากข้อก่อน" = ตัวคูณทบกัน (คูณ `(1-X)` แล้วคูณ `(1-Y)`)
+   - "เพิ่ม Z% เป็นขั้นสุดท้าย" = คูณ `(1+Z)` ตอนท้าย
+   - เงื่อนไขขั้นต่ำ เช่น "ยอดตั้งแต่ N ลด X%" ให้ตรวจยอดตามที่โจทย์ระบุ (ยอดก่อนลด หรือยอดหลังลดขั้นก่อนหน้า) และเลือกความหมายที่ตรงตัวอักษรที่สุด
+5. **ทิศทางการปัด** ดูตามความหมายของโจทย์
+   - ถ้าโจทย์ไม่ระบุ ให้ใช้ **ปัดครึ่งขึ้น (half-up)**
+   - ถ้าโจทย์บอกให้ "ปัดลง" หรือ "ไม่จ่ายเกินสิทธิ์" ให้ใช้ floor
+   - ระบุทิศทางที่เลือกในคำตอบสุดท้าย
+6. **ขีดจำกัด (cap / floor / ขั้นต่ำ)** ใช้กับผลลัพธ์หลังคูณตัวคูณทั้งหมดแล้ว เช่น ถ้า "สูงสุดต่อบิล" ให้ `min(...)` หลังจากคูณทุกอย่างเสร็จ
+7. **อย่าใช้ `round()` ของ Python** เพราะเป็น banker's rounding (`round(0.5) == 0`, `round(2.5) == 2`) ใช้ helper ด้านล่างแทน
+
+## ตัวช่วยปัดเศษ (จำนวนเต็มล้วน ไม่มี float)
+
+```python
+from fractions import Fraction
+
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็น int, x ไม่ติดลบ (int หรือ Fraction)"""
+    return int((Fraction(x) * 2 + 1) // 2)
+
+def floor_int(x):
+    """ปัดลงเป็น int, x ไม่ติดลบ"""
+    return int(Fraction(x) // 1)
+
+def percent_of(amount, pct):
+    """amount * pct% โดยยังไม่ปัด คืนเป็น Fraction"""
+    return Fraction(amount) * Fraction(pct, 100)
+```
+
+ตัวอย่างรูปแบบการใช้ (ตัวเลขสมมติ):
+
+```python
+total = Fraction(subtotal)            # ยังไม่ปัด
+if subtotal >= 50_000:                # เงื่อนไขตามโจทย์
+    total -= percent_of(total, 5)
+if member:
+    total -= percent_of(total, 10)    # คิดต่อจากยอดที่ลดแล้ว
+total += percent_of(total, 7)         # ขั้นสุดท้าย
+return half_up(total)                 # ปัดครั้งเดียว
+```
+
+## วิธีตรวจว่าปัดถูก
+
+- คำนวณตัวอย่างด้วยมือด้วย `Fraction` แบบแยกขั้นตอน แล้วเทียบกับโค้ดทีละสตางค์
+- ถ้าผลต่างเป็น 1 สตางค์ ให้ตรวจก่อนว่าปัดเศษกี่ครั้ง และคูณตัวไหนก่อน
+- ทดสอบค่าที่เศษ .5 พอดี เช่น ยอดที่ทำให้ผลลัพธ์ลงท้าย .5 เพื่อดูทิศทางการปัด
+- ทดสอบค่าที่เศษ < .5 และ > .5 ทั้งสองด้าน เพื่อดูว่าไม่ได้ปัดเกิน
+
+## Checklist การเงิน
+
+- [ ] ไม่มี float ในการคำนวณ (ไม่มี `/` ที่ได้ float, ไม่มี `0.07` ฯลฯ)
+- [ ] ปัดเศษครั้งเดียวตอนท้าย
+- [ ] ตัวคูณพิเศษ (×2, ทิป, VAT) ถูกคูณก่อนปัด
+- [ ] ลำดับการลดและเพิ่มตรงตามที่โจทย์เขียน
+- [ ] cap/min ถูกใช้หลังคูณทั้งหมด
+- [ ] ผลลัพธ์เป็น `int` เสมอ
+
+===== ./solve-task-checklist/SKILL.md =====
+---
+name: solve-task-checklist
+description: ใช้ก่อนส่งงานเขียนไฟล์ solve.py ทุกครั้ง เพื่อแตกกฎจากโจทย์ ทดสอบขอบเขตและ input ผิด รันไฟล์จริง และสรุปจุดที่ตีความเอง
+---
+
+# Checklist ก่อนส่งงาน solve.py
+
+## 1. แตกโจทย์เป็นกฎ
+
+อ่านโจทย์ทุกบรรทัด แล้วเขียนกฎ 1 ข้อต่อ 1 บรรทัด ครอบคลุม:
+- พารามิเตอร์แต่ละตัว ชนิดและช่วงค่า
+- ลำดับการคำนวณ (ขั้นไหนมาก่อน)
+- เงื่อนไข ("ถ้า", "เฉพาะ", "ตั้งแต่", "เกิน", "ไม่เกิน")
+- กฎการปัดเศษ
+- รูปแบบผลลัพธ์ (ชนิด, ลำดับของ list)
+
+ทุกกฎต้องมีโค้ดที่สะท้อนมัน อย่าข้ามกฎที่ดูเล็กน้อย
+
+## 2. ทดสอบขอบเขตของทุกเงื่อนไข
+
+สำหรับทุกเงื่อนไขเชิงตัวเลข ทดสอบค่า `X-1`, `X`, `X+1` (จำนวนเต็ม) โดย X คือค่าขอบที่โจทย์พูดถึง รวมถึงค่า 0 และรายการว่างถ้าโจทย์อนุญาต ต้องรันได้โดยไม่พัง
+
+## 3. ทดสอบ input ที่ผิด
+
+ทุกพารามิเตอร์ที่มีข้อกำหนดชนิดหรือช่วง ต้องทดสอบ:
+- float ที่ค่าเป็นจำนวนเต็ม, string ที่เป็นตัวเลข, bool, None
+- ค่าต่ำกว่าช่วงและสูงกว่าช่วง
+- ค่าที่เลือกได้เฉพาะบางค่า แต่ป้อนค่าที่ไม่อยู่ในรายการ
+
+ทุกกรณีต้อง `raise ValueError` ไม่ใช่ TypeError, KeyError หรือผลลัพธ์ที่ไม่ error
+
+## 4. คำนวณตัวอย่างด้วยมือ แล้วเทียบ
+
+ใช้ `Fraction` คำนวณตามลำดับของโจทย์ทีละขั้น แล้วเทียบกับโค้ด ถ้าต่างกันเพียงสตางค์เดียว ให้ดูว่าปัดกี่ครั้งและคูณตัวไหนก่อน (ดู skill `integer-money-rounding`)
+
+## 5. รันไฟล์จริงด้วยคำสั่งที่ import ได้
+
+```bash
+python3 -c "import sys; sys.path.insert(0,'.'); from solve import ฟังก์ชัน; print(ฟังก์ชัน(...))"
+```
+
+**ห้ามใช้ `python3 -I` กับการ import ไฟล์ใน cwd** เพราะโหมด isolated จะไม่ใส่ cwd ใน sys.path ทำให้เกิด `ModuleNotFoundError` (เกิดขึ้นจริงในรอบนี้) ถ้าเขียน test ให้ใช้ `python3 -m unittest` จาก cwd โดยตรง
+
+## 6. ตรวจรูปแบบของไฟล์
+
+- มีฟังก์ชันชื่อและพารามิเตอร์ตรงกับโจทย์ทุกตัว ตามลำดับเดิม
+- ผลลัพธ์เป็นชนิดที่โจทย์กำหนด (เช่น `int` สตางค์, `list` ตามลำดับคน)
+- ไม่มี side effect ตอน import นอกจากบล็อก `if __name__ == "__main__":`
+- ใช้เฉพาะ standard library
+- ไม่มี dependency หรือไฟล์ภายนอกที่ไม่ได้ส่งมาด้วย
+
+## 7. สรุปการตีความ
+
+โจทย์ที่กำกวมหรือไม่ได้พูดถึงกรณีพิเศษ (เช่น ค่า 0, ทิศทางการปัด, ลำดับของเงื่อนไข) ให้:
+- เลือกการตีความที่ตรงตัวอักษรของโจทย์มากที่สุด
+- ระบุการตีความนั้นสั้น ๆ ในคำตอบสุดท้าย พร้อมวิธีแก้ถ้าต้องเปลี่ยน
+- อย่าเงียบ ๆ เพิ่มกฎที่โจทย์ไม่ได้บอก
+
+## 8. คำตอบสุดท้าย
+
+สั้น ๆ ระบุ: ไฟล์ที่เขียน, ผลตัวอย่างที่ตรวจแล้ว, การตีความที่เลือกเอง, และสิ่งที่ยังไม่ได้ทดสอบ
+
+===== ./strict-input-validation/SKILL.md =====
+---
+name: strict-input-validation
+description: ใช้เมื่อเขียนฟังก์ชันที่รับ input ซึ่งโจทย์กำหนดชนิดหรือช่วงค่า (จำนวนเต็ม, True/False, ค่าที่เลือกได้เฉพาะบางค่า, รายการของ dict, ช่วงตัวเลข) เพื่อปฏิเสธ input ที่ผิดด้วย ValueError แทนการแปลงค่าเงียบ ๆ
+---
+
+# ตรวจ input แบบเข้มงวด
+
+## หลักการ
+
+- ถ้า input ไม่ตรงกับที่โจทย์กำหนด ให้ **ปฏิเสธ** ไม่ใช่พยายามแปลงให้ใช้ได้
+- **ห้าม** แปลงค่าเพื่อความสะดวก: `int(x)`, `float(x)`, `str(x)`, `Fraction(str(x))`, `.strip()`, `.lower()` ทำให้ `4500.0`, `"2"`, `" Gold "` ผ่านไปเงียบ ๆ ซึ่งผิดสัญญาของฟังก์ชัน
+- ใช้ **ValueError** กับ input ผิดทุกกรณี รวมถึงชนิดผิด ไม่ใช้ TypeError เพราะผู้ตรวจคาดหวัง ValueError
+- `bool` เป็นลูกของ `int` ใน Python: `isinstance(True, int)` ได้ True จึงต้องใช้ `type(x) is int` และตรวจ bool แยกต่างหาก
+- ค่า key ที่ขาดหายใน dict ต้องกลายเป็น ValueError ไม่ใช่ KeyError: ใช้ `item.get("price")` แล้วให้ตัวตรวจ type จับ None
+- ตรวจ input **ก่อน** คำนวณ ไม่คืนผลลัพธ์บางส่วน
+
+## รูปแบบโค้ดตรวจ
+
+```python
+def require_int(value, name, low=None, high=None):
+    if type(value) is not int:          # ปฏิเสธ bool, float, str, None
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    if high is not None and value > high:
+        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+    return value
+
+def require_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+def require_choice(value, name, choices):
+    if type(value) is not str or value not in choices:   # ไม่ normalize
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+    return value
+
+def require_list_of_dicts(value, name):
+    if type(value) is not list:
+        raise ValueError(f"{name} ต้องเป็น list")
+    for entry in value:
+        if type(entry) is not dict:
+            raise ValueError(f"แต่ละรายการใน {name} ต้องเป็น dict")
+    return value
+```
+
+ใช้ตัวช่วยเหล่านี้กับทุกพารามิเตอร์ในฟังก์ชันหลัก ก่อนบรรทัดคำนวณแรก
+
+## การแปลงช่วงจากโจทย์เป็นเงื่อนไข
+
+| ข้อความในโจทย์ | เงื่อนไข |
+|---|---|
+| ตั้งแต่ X ขึ้นไป / ไม่น้อยกว่า X | `value >= X` |
+| เกิน X | `value > X` |
+| ไม่เกิน X | `value <= X` |
+| ต่ำกว่า X | `value < X` |
+| ช่วง A–B | `A <= value <= B` |
+
+ถ้าโจทย์ระบุว่า "ตั้งแต่ 0" ค่า 0 ต้องผ่าน ถ้า "ตั้งแต่ 1" ค่า 0 ต้องถูกปฏิเสธ
+
+## Checklist ของ input
+
+- [ ] ทุกพารามิเตอร์ตรวจ type ด้วย `type(x) is ...`
+- [ ] bool ถูกปฏิเสธในพารามิเตอร์ที่เป็นตัวเลข
+- [ ] float ที่ค่าเป็นจำนวนเต็ม (เช่น `1000.0`) ถูกปฏิเสธ ถ้าโจทย์บอกว่าเป็นจำนวนเต็ม
+- [ ] string ที่หน้าตาเป็นตัวเลข (เช่น `"2"`) ถูกปฏิเสธ
+- [ ] ค่าที่เลือกได้เฉพาะบางค่า ถูกเทียบแบบตรงตัว (ไม่ lower/strip)
+- [ ] ค่าที่ขอบของช่วง (min, max) ผ่าน และค่าที่ออกไปนอกช่วง (min-1, max+1) ถูกปฏิเสธ
+- [ ] ทุกกรณีผิดคือ `ValueError` (ไม่ใช่ TypeError, KeyError หรือ AttributeError)
+[THINK] 
+[assistant TEXT] Skills read. Key rules: no float, round once at the end (half-up), strict input checks that raise `ValueError`, and report any interpretation I make. The task says to save in the current folder, which is the sandbox root, not `skills/`, so I'll write `solve.py` there.
+[assistant TOOL_USE Write] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox/solve.py", "content": "from fractions import Fraction\n\n\ndef _require_int(value, name, low=None, high=None):\n    # ปฏิเสธ bool, float, str, None ก่อน (bool เป็นลูกของ int ใน Python)\n    if type(value) is not int:\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    if high is not None and value > high:\n        raise ValueError(f\"{name} ต้องไม่เกิน {high}\")\n    return value\n\n\ndef split_bill(total, people, tip_percent):\n    \"\"\"หารบิล (หน่วยสตางค์) พร้อมทิป\n\n    - ยอดที่ต้องหาร = total + ทิป (total * tip_percent / 100)\n    - ปัดเศษครั้งเดียวที่ยอดรวม แบบปัดครึ่งขึ้น (half-up)\n    - หารเท่ากัน หารไม่ลงตัวให้คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์\n    - คืน list ของยอดแต่ละคน (int สตางค์) เรียงตามลำดับคน\n    \"\"\"\n    total = _require_int(total, \"total\", low=0)\n    people = _require_int(people, \"people\", low=1)\n    tip_percent = _require_int(tip_percent, \"tip_percent\", low=0, high=100)\n\n    # ทิปรวมอยู่ในยอดก่อนปัด: (total * (100 + tip%)) / 100 ด้วย Fraction ไม่มี float\n    exact = Fraction(total) * (100 + tip_percent) / 100\n    grand_total = int(exact * 2 + 1) // 2  # ปัดครึ่งขึ้นครั้งเดียว (exact >= 0)\n\n    base, remainder = divmod(grand_total, people)\n    return [base + 1 if i < remainder else base for i in range(people)]\n\n\nif __name__ == \"__main__\":\n    print(split_bill(10000, 3, 10))\n"}
+[RESULT] File created successfully at: /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[THINK] 
+[assistant TEXT] Now I'll check it against hand-computed cases, the edge values, and the invalid inputs.
+[assistant TOOL_USE Bash] {"command": "cd /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox && python3 -c '\nimport sys; sys.path.insert(0,\".\")\nfrom solve import split_bill\ncases = [\n ((10000,3,10), [3667,3667,3666]),   # 11000/3 = 3666.67 ; 11000 = 3666*3 + 2\n ((10000,1,0), [10000]),\n ((0,4,15), [0,0,0,0]),\n ((1,2,0), [1,0]),                   # หารไม่ลงตัว คนแรกได้เพิ่ม\n ((1,1,50), [2]),                    # 1.5 -> half-up 2\n ((999,2,5), [525,525]),             # 1048.95 -> 1049 ; 1049 = 525+524 -> [525,524]? check below\n ((100,2,25), [63,62]),              # 125 -> 62.5 each -> [63,62]\n ((2000,4,0), [500,500,500,500]),\n ((12345,7,100), None),\n]\nfor args, exp in cases:\n    print(args, split_bill(*args), \"expected\", exp)\n    if exp is not None: assert sum(split_bill(*args))==sum(exp) or True\nfor bad in [(True,2,0),(100.0,2,0),(\"100\",2,0),(-1,2,0),(100,0,0),(100,True,0),(100,2,-1),(100,2,101),(100,2.0,0),(100,2,None),(None,2,0)]:\n    try:\n        split_bill(*bad); print(\"NO ERROR\", bad)\n    except ValueError as e:\n        print(\"ValueError ok\", bad, \"-\", e)\n    except Exception as e:\n        print(\"WRONG TYPE\", bad, type(e))\nr = split_bill(12345,7,100); print(\"sum check\", sum(r), round(12345*2))\n'\necho \"---- module run ----\"; python3 solve.py", "description": "Test split_bill with edge cases and invalid inputs"}
+[RESULT] (10000, 3, 10) [3667, 3667, 3666] expected [3667, 3667, 3666]
+(10000, 1, 0) [10000] expected [10000]
+(0, 4, 15) [0, 0, 0, 0] expected [0, 0, 0, 0]
+(1, 2, 0) [1, 0] expected [1, 0]
+(1, 1, 50) [2] expected [2]
+(999, 2, 5) [525, 524] expected [525, 525]
+(100, 2, 25) [63, 62] expected [63, 62]
+(2000, 4, 0) [500, 500, 500, 500] expected [500, 500, 500, 500]
+(12345, 7, 100) [3528, 3527, 3527, 3527, 3527, 3527, 3527] expected None
+ValueError ok (True, 2, 0) - total ต้องเป็นจำนวนเต็ม
+ValueError ok (100.0, 2, 0) - total ต้องเป็นจำนวนเต็ม
+ValueError ok ('100', 2, 0) - total ต้องเป็นจำนวนเต็ม
+ValueError ok (-1, 2, 0) - total ต้องไม่น้อยกว่า 0
+ValueError ok (100, 0, 0) - people ต้องไม่น้อยกว่า 1
+ValueError ok (100, True, 0) - people ต้องเป็นจำนวนเต็ม
+ValueError ok (100, 2, -1) - tip_percent ต้องไม่น้อยกว่า 0
+ValueError ok (100, 2, 101) - tip_percent ต้องไม่เกิน 100
+ValueError ok (100, 2.0, 0) - people ต้องเป็นจำนวนเต็ม
+ValueError ok (100, 2, None) - tip_percent ต้องเป็นจำนวนเต็ม
+ValueError ok (None, 2, 0) - total ต้องเป็นจำนวนเต็ม
+sum check 24690 24690
+---- module run ----
+[3667, 3667, 3666]
+[THINK] 
+[assistant TEXT] I wrote `solve.py` in the sandbox root. Every check passes; the one mismatch in my own test table was my expected value, not the code. For 999 with 5% tip, the total is 1048.95, which rounds to 1049. Split two ways that gives `[525, 524]`, and the code returned exactly that.
+
+**File:** `/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t2-split-bill-r1/sandbox/solve.py`
+
+```python
+split_bill(total, people, tip_percent) -> list[int]
+```
+
+**How it works**
+- The amount to split is `total + total × tip%`, computed with `Fraction`, so no floats are involved.
+- The result is rounded once at the end, half-up.
+- The rounded amount is divided by `people`. Any leftover satoshi-equivalent (สตางค์) goes one each to the first people in the list, so the parts always sum to the grand total.
+- Inputs are checked strictly. Non-integers, `bool`, strings, and `None` raise `ValueError`, as do out-of-range values: `total < 0`, `people < 1`, or `tip_percent` outside 0–100.
+
+**Examples (tested)**
+- `split_bill(10000, 3, 10)` → `[3667, 3667, 3666]`
+- `split_bill(1, 2, 0)` → `[1, 0]`
+- `split_bill(1, 1, 50)` → `[2]` (1.5 rounds up)
+- `split_bill(0, 4, 15)` → `[0, 0, 0, 0]`
+- `split_bill(12345, 7, 100)` → `[3528, 3527, 3527, 3527, 3527, 3527, 3527]`, which sums to 24690
+
+**Interpretations I chose**
+1. The tip is calculated on the bill before splitting, and the tip-inclusive total is rounded once, half-up. The brief doesn't say how to round the tip, so this is my choice. If the tip should be rounded separately, the result can differ by 1 satang.
+2. The extra satang go to the first people in list order, as the brief says.
+
+I didn't add a test file to the folder. I checked the behavior with inline scripts instead.
+[RESULT_FINAL] {"duration_api_ms": 17994, "stop_reason": "end_turn", "session_id": "e1f86338-8a59-4107-9386-9ef0b066d185", "total_cost_usd": 0.00910175, "usage": {"input_tokens": 10, "cache_creation_input_tokens": 28771, "cache_read_input_tokens": 146305, "output_tokens": 3767, "output_tokens_details": {"thinking_tokens": 1013}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 28771, "ephemeral_5m_input_tokens": 

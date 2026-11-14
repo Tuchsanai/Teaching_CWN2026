@@ -1,0 +1,55 @@
+{
+ "score": 0.4,
+ "checks": [
+  {
+   "id": "contract",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "basic",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "no_drift",
+   "pass": false,
+   "note": "cashback(10020, \"gold\", true) คาด 501 ได้ 500 · พลาด 3 จาก 3 กรณี"
+  },
+  {
+   "id": "boundary",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_value",
+   "pass": true,
+   "note": ""
+  },
+  {
+   "id": "reject_type",
+   "pass": false,
+   "note": "cashback(20000.0, \"gold\", false) ต้อง raise ValueError แต่ raise TypeError · พลาด 4 จาก 5 กรณี"
+  },
+  {
+   "id": "cli_ok",
+   "pass": false,
+   "note": "stdin {\"amount\": 20000, \"tier\": \"gold\", \"birthday\": false} ต้องได้ {\"ok\": true, \"result\": 500} exit 0 แต่ได้ exit 0 stdout OK  cashback(9999, 'gold', False) = 0 (expected 0)\nOK  cashback(10000, 'silver', False) = 150 (expected 150)\nOK  cashbac"
+  },
+  {
+   "id": "cli_error",
+   "pass": false,
+   "note": "stdin {\"amount\": 20000, \"tier\": \"bronze\", \"birthday\": false} ต้องได้ {\"ok\": false, \"error\": \"...\"} exit 2 ไม่มี traceback แต่ได้ exit 0 stdout OK  cashback(9999, 'gold', False) = 0 (expected 0)\nOK  cashback(10000, 'silver', False) = 150 (expec"
+  },
+  {
+   "id": "tests",
+   "pass": false,
+   "note": "ไม่มีไฟล์ test_solve.py ข้าง solve.py"
+  },
+  {
+   "id": "policy",
+   "pass": false,
+   "note": "cashback(20000, \"silver\", true) คาด 300 ได้ 600 · พลาด 3 จาก 6 กรณี"
+  }
+ ]
+}

@@ -188,7 +188,7 @@ def algorithm():
         tr += "<tr><td style='width:60px;text-align:right;color:%s;font-weight:800'>%s</td><td style='%s;font-size:23px'>%s</td><td style='color:%s;font-size:21px'>%s</td><td style='width:150px'>%s</td></tr>" % (
             MUTE, n, MONO, code, MUTE, note, pill(col[cmd], cmd, 21) if cmd else "")
     body = """<h1>อัลกอริทึมของ EvoSkill v2</h1>
-    <div class='sub'>เรียบเรียงจาก Section 3 ของเปเปอร์ · คอลัมน์ขวา = คำสั่งของ <span class='mono'>evoskill.py</span> ที่ทำบรรทัดนั้น</div>
+    <div class='sub'>เรียบเรียงจาก Section 3 ของเปเปอร์ · คอลัมน์ขวา = คำสั่งของสกิล <span class='mono'>evoskill</span> ที่ทำบรรทัดนั้น</div>
     <table class='t' style='border-spacing:0 5px'><tr><th></th><th>ขั้นตอน</th><th>หมายเหตุ</th><th>คำสั่ง</th></tr>%s</table>%s""" % (
         tr, strip(EVOLVER, "สิ่งที่ <b>ไม่มี</b> ในอัลกอริทึมนี้: บรรทัด \"ถ้าคะแนนดีขึ้นจึงรับ\" · คะแนน Validation ไม่ถูกใช้ตัดสินอะไรระหว่างการรันเลย", 24, 8))
     shot(D + "t06-algorithm.png", body, 900)
@@ -411,15 +411,15 @@ def timeline(ws="e1", out=None):
 
 # ------------------------------------------------------------------ t15 Evolver ทำอะไรในแต่ละตา (e1 · สรุปจาก turns/turn_K/actions.md)
 E1_TURNS = [
-    ("อ่านคะแนนของ epoch 0 และรายการไฟล์<br>อ่านโจทย์และเฉลยอ้างอิงใน <span class='mono'>reference/</span><br>ดู Trace ของ Solver",
-     "Solver ไม่ตรวจ input และเดาทิศการปัดเศษ<br><b>เฉลยมีกฎของร้าน 4 ข้อที่โจทย์ไม่ได้เขียน</b>",
-     "เขียนสกิล 2 ตัว: วิธีเขียนฟังก์ชันคิดเงิน (มีแม่แบบโค้ด) และ <b>นโยบายของร้าน</b> ที่อ่านจากเฉลย"),
-    ("<b>รันเทสต์ของเฉลยกับโค้ดของ Solver ทุก rollout</b> ผ่าน 12/12<br>เทียบกับเฉลยด้วย input หลายหมื่นแบบ ผลตรงกัน<br>แต่คะแนนยังเป็น 0.9",
-     "\"หาสาเหตุของ 0.1 ที่ขาดไม่เจอ\"<br>เดาว่าเป็นเรื่องรูปแบบการส่งมอบ",
-     "ให้ Solver <b>ย้ายไฟล์เทสต์ไปไว้ที่ <span class='mono'>/tmp</span></b> และลบไฟล์ชั่วคราวก่อนจบ (เดาผิดทาง)"),
-    ("เทียบโค้ดของ Solver กับเฉลยด้วย input ราว 2 หมื่นแบบ<br>ไม่พบความต่างแม้แต่จุดเดียว<br>คะแนนยังเป็น 0.9 เท่าเดิม",
-     "\"ถ้าจะแก้ต่อ ผมต้องเดา ซึ่งเสี่ยงทำให้ส่วนที่ผ่านแล้วเสียหาย\"",
-     "ไม่แก้อะไร <span class='mono'>skills_v3</span> = <span class='mono'>skills_v2</span>"),
+    ("อ่านคะแนนของ epoch 0 · อ่านโจทย์และเฉลยอ้างอิงใน <span class='mono'>reference/</span><br>อ่าน <span class='mono'>solve.py</span> ที่ Solver เขียนไว้ใน <span class='mono'>solver_workspaces/</span><br>เทียบโค้ดของ Solver กับเฉลย",
+     "Solver ไม่ตรวจ input และไม่เขียนเทสต์<br><b>เฉลยมีนโยบายของร้าน 4 ข้อที่โจทย์ไม่ได้เขียน</b> (เช่น ระยะ 0 กม. คิด 0 บาท · cashback ปัดลง)",
+     "เขียนสกิล 1 ตัว <span class='mono'>baankafe-solve</span> + แม่แบบโค้ด: ขั้นตอน · ตรวจ input · ปัดเศษ · <b>นโยบายของร้าน</b> ที่อ่านจากเฉลย"),
+    ("<b>รันเทสต์ของเฉลยกับโค้ดของ Solver ทุก rollout</b> ผ่าน 12/12<br>เขียนสคริปต์สุ่ม input เทียบกับเฉลย<br>พบจุดต่างเดียว: ระยะทางของค่าส่งรับ float · คะแนนยังเป็น 0.9",
+     "\"ยังหาไม่เจอว่าทำไมเหลือคะแนนขาด 0.1\"<br>เดาว่าเป็นเรื่อง float ของ <span class='mono'>distance_km</span>",
+     "เพิ่มข้อ <b>ห้ามรับ float</b> (ตัวเลขทุกตัวเป็น <span class='mono'>int</span>) และขั้นไล่หามุมแปลกของทุกพารามิเตอร์"),
+    ("นำสคริปต์ของตาที่ 2 มารันซ้ำกับโค้ดของ epoch 2 · เทียบโหมดรันเป็นโปรแกรม (CLI)<br>เทสต์ของเฉลยผ่าน 12/12 · ไม่พบความต่าง<br>คะแนนยังเป็น 0.9 แม้ Solver เลิกรับ float แล้ว",
+     "ข้อสันนิษฐานเรื่อง float ผิด · \"หาสาเหตุที่คะแนนค้างที่ 0.9 ไม่เจอ\"<br>เหลือข้อเดียว: <span class='mono'>test_solve.py</span> ของ Solver อาจชนกับเทสต์ของผู้ตรวจ",
+     "<b>ทดลอง:</b> ให้ Solver เขียนเทสต์ไว้นอกโฟลเดอร์งาน (<span class='mono'>/tmp</span>) เหลือแต่ <span class='mono'>solve.py</span> (เดาผิดทาง) · ไม่มีตาถัดไปให้ย้อนกลับ"),
 ]
 
 
@@ -454,21 +454,21 @@ def evolver_turns():
 def code_map():
     m = "<span class='mono'>%s</span>"
     rows = [
-        ((ADAPT,), "1–2 &nbsp; Benchmark Adaptor และการล็อก", (m % "adapt") + " · " + (m % "cmd_adapt() audit() verify()") + "<br>prompt: " + (m % "prompts/adaptor.md"),
+        ((ADAPT,), "1–2 &nbsp; Benchmark Adaptor และการล็อก", (m % "adapt") + " · " + (m % "audit") + "<br>" + (m % "prompts/adaptor.md") + " · " + (m % "scripts/plugin_api.py") + "<br>รูปแบบ ข้อ 5",
          (m % "prompts/BA_GUIDANCE.template.md") + "<br>" + (m % "plugin_runner.py") + " · " + (m % "plugin_api.py")),
-        ((SOLVER,), "3–4 &nbsp; epoch 0 ไม่มีสกิล", (m % "base") + " · " + (m % "cmd_base()") + " → " + (m % "rollouts()"),
+        ((SOLVER,), "3–4 &nbsp; epoch 0 ไม่มีสกิล", (m % "base") + " → " + (m % "skillopt.py run") + " ของบท 05<br>รูปแบบ ข้อ 6",
          (m % "scripts/cc_solver/") + "<br>" + (m % "scripts/daytona/cc_leg_driver.py")),
-        ((EVOLVER,), "6–7 &nbsp; ตาของ Evolver · รับทุกชุด", (m % "turn") + " · " + (m % "cmd_turn() sync_evo() agent()") + "<br>prompt: " + (m % "evolver_system.md") + " · " + (m % "evolver_message.md"),
+        ((EVOLVER,), "6–7 &nbsp; ตาของ Evolver · รับทุกชุด", (m % "turn") + " · " + (m % "prompts/evolver_system.md") + "<br>" + (m % "prompts/evolver_message.md") + " · รูปแบบ ข้อ 7–9",
          (m % "scripts/daytona/evolver_session.py") + "<br>" + (m % "prompts/EVOLVER_SYSTEM.md") + " · " + (m % "EPOCH_MESSAGE.md")),
-        ((SOLVER,), "8–9 &nbsp; Solver ใช้ skills_vK", (m % "rollout") + " · " + (m % "cmd_rollout()") + " → " + (m % "rollouts()"), m % "src/orchestrator/loop.py"),
-        ((INK,), "10 &nbsp; Held-out Test", (m % "test") + " · " + (m % "cmd_test()"), m % "src/orchestrator/loop.py"),
-        ((FILE,), "ทั้งอัลกอริทึม", (m % "run") + " · " + (m % "cmd_run() next_step()"), (m % "src/run.py") + " (คำสั่ง " + (m % "evoskill run") + ")"),
+        ((SOLVER,), "8–9 &nbsp; Solver ใช้ skills_vK", (m % "rollout") + " → " + (m % "skillopt.py run") + "<br>รูปแบบ ข้อ 6", m % "src/orchestrator/loop.py"),
+        ((INK,), "10 &nbsp; Held-out Test", (m % "test") + " · วัดด้วย " + (m % "skills_vE"), m % "src/orchestrator/loop.py"),
+        ((FILE,), "ทั้งอัลกอริทึม", (m % "run") + " · รูปแบบ ข้อ 4 (ลำดับของขั้น)", (m % "src/run.py") + " (คำสั่ง " + (m % "evoskill run") + ")"),
         ((USER,), "สิ่งที่ผู้ใช้ส่ง", (m % "bench/instruction.md") + " · " + (m % "split.json") + "<br>" + (m % "benchmark_grader.py") + " · " + (m % "data/"),
          (m % "examples/ssbv2/") + " · " + (m % "examples/tau3_banking/") + "<br>(" + (m % "instruction.md") + " · " + (m % "split.json") + " · " + (m % "grader.py") + ")"),
     ]
-    body = """<h1>อัลกอริทึม → โค้ดของบทนี้ → source code ต้นฉบับ</h1>
-    <div class='sub'>คอลัมน์กลาง = <span class='mono'>evoskill/evoskill.py</span> ของบทนี้ · คอลัมน์ขวา = <span class='mono'>github.com/sentient-agi/EvoSkill</span> (branch v2)</div>%s""" % table(
-        ["บรรทัดของอัลกอริทึม (ขั้น 10)", "คำสั่งและฟังก์ชันของบทนี้", "ไฟล์ใน source code ต้นฉบับ"], rows, [430, None, None], 21)
+    body = """<h1>อัลกอริทึม → สกิล evoskill ของบทนี้ → source code ต้นฉบับ</h1>
+    <div class='sub'>คอลัมน์กลาง = คำสั่ง ไฟล์ของสกิล <span class='mono'>evoskill</span> และข้อของ <span class='mono'>evoskill_format.md</span> · คอลัมน์ขวา = <span class='mono'>github.com/sentient-agi/EvoSkill</span> (branch v2)</div>%s""" % table(
+        ["บรรทัดของอัลกอริทึม (ขั้น 10)", "คำสั่ง ไฟล์ และข้อของรูปแบบ (สกิลของบทนี้)", "ไฟล์ใน source code ต้นฉบับ"], rows, [430, None, None], 21)
     shot(D + "t16-code-map.png", body)
 
 

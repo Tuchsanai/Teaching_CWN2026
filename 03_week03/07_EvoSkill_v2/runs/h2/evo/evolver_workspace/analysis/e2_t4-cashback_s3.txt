@@ -1,0 +1,112 @@
+[assistant] TOOL_USE: {"command": "ls -la && ls -la ./skills 2>/dev/null; echo \"exit=$?\"", "description": "List working directory and check for skills folder"}
+[user] RESULT: total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:26 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:26 ..
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 skills
+total 24
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:26 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 money-arithmetic-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:24 solver-selftest-workflow
+drwxr-xr-x 2 root root 4096 Nov 15 06:24 spec-reading-thai
+drwxr-xr-x 2 root root 4096 Nov 15 06:24 strict-input-validation
+exit=0
+[assistant] TEXT: There's a `skills` folder with four skills. I'll read them before writing anything.
+[assistant] TOOL_USE: {"command": "cd /workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox/skills && find . -type f | sort && for f in $(find . -type f -name '*.md' | sort); do echo \"=== $f ===\"; cat \"$f\"; echo; done", "description": "Find and print all skill markdown files"}
+[user] RESULT: ./money-arithmetic-rounding/SKILL.md
+./money-arithmetic-rounding/money_helpers.py
+./solver-selftest-workflow/SKILL.md
+./solver-selftest-workflow/test_template.py
+./spec-reading-thai/SKILL.md
+./strict-input-validation/SKILL.md
+./strict-input-validation/validators.py
+=== ./money-arithmetic-rounding/SKILL.md ===
+---
+name: money-arithmetic-rounding
+description: คำนวณยอดเงิน ส่วนลด VAT ทิป ค่าส่ง เงินคืน และการหารบิลให้แม่นยำ โดยใช้จำนวนเต็มสตางค์/Fraction, ปัดเศษครั้งเดียวตอนท้าย และเรียงลำดับตัวคูณกับเพดานให้ถูก ใช้ทุกครั้งที่โจทย์เกี่ยวกับตัวเลขเงินหรือการปัดเศษ
+---
+
+# การคำนวณเงินและการปัดเศษ
+
+## หลักการ
+
+1. **เก็บเงินเป็นสตางค์ (จำนวนเต็ม)** ตั้งแต่รับ input. ถ้าโจทย์บอกหน่วยเป็นบาท ให้คูณ 100 ตอนเริ่มเท่านั้น. อัตราที่เป็นทศนิยม (เช่น 1.5%, 15 บาทต่อกิโลกรัม) ให้ใช้ `Fraction` ไม่ใช่ floa
+[assistant] TOOL_USE: {"command": "cat money-arithmetic-rounding/money_helpers.py; echo \"=== validators ===\"; cat strict-input-validation/validators.py; echo \"=== test_template ===\"; cat solver-selftest-workflow/test_template.py", "description": "Print helper modules and test template from skills"}
+[user] RESULT: """ตัวช่วยคำนวณเงินและตรวจข้อมูลนำเข้า
+
+ไม่มี side effect ตอน import. วิธีใช้: คัดลอกฟังก์ชันที่ต้องใช้ไปไว้ใน solve.py
+(ปลอดภัยที่สุด เพราะไม่ต้องพึ่ง sys.path) หรือ import จากไฟล์นี้ถ้าอยู่โฟลเดอร์เดียวกัน
+
+หลักการ: ผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น (ไม่ใช้ TypeError)
+"""
+
+import math
+from fractions import Fraction
+
+
+# ---------- ตรวจข้อมูลนำเข้า ----------
+
+def need_int(value, name, low=None, high=None):
+    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    if high is not None and value > high:
+        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+    return value
+
+
+def need_bool(value, name):
+    "
+[assistant] TEXT: Skills read. Four rules apply: integer satang with strict type checks, a single rounding step at the end, validation before business logic, and `ValueError` only. I'll compute the expected test values with a Fraction script before writing any tests.
+[assistant] TOOL_USE: {"command": "cd /tmp && python3 -c \"\nfrom fractions import Fraction as F\nimport math\nR={'silver':F(15,1000),'gold':F(25,1000),'platinum':F(4,100)}\ndef cb(a,t,b):\n    if a<10000: return 0\n    v=a*R[t]\n    if b: v*=2\n    v=min(v,20000)\n    return math.floor(v)\ncases=[(10000,'silver',False),(9999,'silver',False),(10000,'gold',True),(10000,'platinum',False),(10000,'platinum',True),\n(600000,'platinum',False),(1000000,'gold',True),(800000,'gold',False),(799999,'gold',False),(40060,'gold',False),(40060,'gold',True),\n(66667,'silver',False),(9999,'gold',True),(0,'platinum',True),(1,'silver',False),(500000,'platinum',False),(499999,'platinum',False)]\nfor c in cases: print(c, cb(*c), float(c[0]*R[c[1]]))\n\"", "description": "Compute expected cashback values with Fraction"}
+[user] RESULT: (10000, 'silver', False) 150 150.0
+(9999, 'silver', False) 0 149.985
+(10000, 'gold', True) 500 250.0
+(10000, 'platinum', False) 400 400.0
+(10000, 'platinum', True) 800 400.0
+(600000, 'platinum', False) 20000 24000.0
+(1000000, 'gold', True) 20000 25000.0
+(800000, 'gold', False) 20000 20000.0
+(799999, 'gold', False) 19999 19999.975
+(40060, 'gold', False) 1001 1001.5
+(40060, 'gold', True) 2003 1001.5
+(66667, 'silver', False) 1000 1000.005
+(9999, 'gold', True) 0 249.975
+(0, 'platinum', True) 0 0.0
+(1, 'silver', False) 0 0.015
+(500000, 'platinum', False) 20000 20000.0
+(499999, 'platinum', False) 19999 19999.96
+Shell cwd was reset to /workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox
+[assistant] TEXT: The expected values are computed. Now I'll write `solve.py`, self-contained as the skill recommends, in the sandbox root.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox/solve.py", "content": "\"\"\"BaanKafe: คำนวณเงินคืนสมาชิก (cashback)\n\nหน่วยทั้งหมดเป็นสตางค์ (จำนวนเต็ม)\n- amount   : ยอดซื้อ (สตางค์, >= 0)\n- tier     : \"silver\" | \"gold\" | \"platinum\" (ตัวพิมพ์เล็กเป๊ะ)\n- birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)\n\nกติกา\n1. ยอดซื้อต่ำกว่า 100 บาท (10000 สตางค์) ไม่ได้เงินคืน\n2. อัตรา: silver 1.5%, gold 2.5%, platinum 4%\n3. เดือนเกิด ได้เงินคืน 2 เท่า\n4. เงินคืนสูงสุด 200 บาท (20000 สตางค์) ต่อบิล\n5. ผลลัพธ์เป็นจำนวนเต็มสตางค์\n\nลำดับการคำนวณ: ตรวจ input ทั้งหมด -> เกณฑ์ขั้นต่ำ -> คูณอัตรา -> คูณ 2 (เดือนเกิด)\n-> เพดาน 200 บาท -> ปัดลงครั้งเดียว (เงินที่ร้านจ่ายออกให้ลูกค้า)\n\"\"\"\n\nfrom fractions import Fraction\n\nMIN_AMOUNT = 10000        # 100 บาท\nMAX_CASHBACK = 20000      # 200 บาท\nBIRTHDAY_MULTIPLIER = 2\nRATES = {\n    \"silver\": Fraction(15, 1000),   # 1.5%\n    \"gold\": Fraction(25, 1000),     # 2.5%\n    \"platinum\": Fraction(4, 100),   # 4%\n}\n\n\ndef _need_int(value, name, low=None):\n    \"\"\"จำนวนเต็มจริง: ไม่รับ bool, float, str\"\"\"\n    if type(value) is not int:\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    return value\n\n\ndef _need_bool(value, name):\n    \"\"\"flag: ต้องเป็น True หรือ False จริง\"\"\"\n    if type(value) is not bool:\n        raise ValueError(f\"{name} ต้องเป็น True หรือ False\")\n    return value\n\n\ndef _need_choice(value, name, choices):\n    \"\"\"ค่า string ที่ต้องตรงตัวเลือกเป๊ะ (ไม่ strip, ไม่ lower)\"\"\"\n    if type(value) is not str or value not in choices:\n        raise ValueError(f\"{name} ต้องเป็นหนึ่งใน {sorted(choices)}\")\n    return value\n\n\ndef cashback(amount, tier, birthday):\n    \"\"\"คืนจำนวนเงินคืนเป็นสตางค์ (จำนวนเต็ม)\"\"\"\n    # 1) ตรวจ input ทุกตัวก่อนเข้าเงื่อนไขธุรกิจ\n    _need_int(amount, \"amount\", low=0)\n    _need_choice(tier, \"tier\", RATES)\n    _need_bool(birthday, \"birthday\")\n\n    # 2) เกณฑ์ขั้นต่ำ (ต่ำกว่า 100 บาท ไม่ได้เงินคืน)\n    if amount < MIN_AMOUNT:\n        return 0\n\n    # 3) คำนวณแบบ exact โดยยังไม่ปัด\n    value = amount * RATES[tier]\n    if birthday:\n        value *= BIRTHDAY_MULTIPLIER\n\n    # 4) เพดานต่อบิล\n    value = min(value, MAX_CASHBACK)\n\n    # 5) ปัดลงครั้งเดียวตอนท้าย (ร้านไม่จ่ายเกินให้ลูกค้า)\n    return int(value // 1)\n\n\nif __name__ == \"__main__\":\n  
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox/test_solve.py", "content": "\"\"\"ทดสอบ cashback() แยกหมวด Normal, Boundary, NoDrift, Reject\nexpected คำนวณด้วย Fraction แล้ว (ดู script ตรวจในบันทึกการทำงาน)\nรัน: python3 -m unittest -v test_solve\n\"\"\"\nimport unittest\n\nfrom solve import cashback\n\n\nclass Normal(unittest.TestCase):\n    def test_each_tier_no_birthday(self):\n        self.assertEqual(cashback(10000, \"silver\", False), 150)\n        self.assertEqual(cashback(10000, \"gold\", False), 250)\n        self.assertEqual(cashback(10000, \"platinum\", False), 400)\n\n    def test_birthday_doubles(self):\n        self.assertEqual(cashback(10000, \"gold\", True), 500)\n        self.assertEqual(cashback(10000, \"platinum\", True), 800)\n\n    def test_zero_amount(self):\n        self.assertEqual(cashback(0, \"platinum\", True), 0)\n\n\nclass Boundary(unittest.TestCase):\n    def test_at_minimum_threshold(self):\n        self.assertEqual(cashback(10000, \"silver\", False), 150)\n\n    def test_just_below_threshold(self):\n        self.assertEqual(cashback(9999, \"silver\", False), 0)\n        self.assertEqual(cashback(9999, \"gold\", True), 0)\n\n    def test_cap_exactly_reached(self):\n        self.assertEqual(cashback(800000, \"gold\", False), 20000)\n        self.assertEqual(cashback(500000, \"platinum\", False), 20000)\n\n    def test_just_below_cap(self):\n        self.assertEqual(cashback(499999, \"platinum\", False), 19999)\n\n    def test_cap_applies_after_birthday(self):\n        self.assertEqual(cashback(1000000, \"gold\", True), 20000)\n        self.assertEqual(cashback(600000, \"platinum\", False), 20000)\n\n\nclass NoDrift(unittest.TestCase):\n    def test_single_rounding_down_at_half(self):\n        # 40060 * 2.5% = 1001.5 -> ปัดลงครั้งเดียวได้ 1001\n        self.assertEqual(cashback(40060, \"gold\", False), 1001)\n\n    def test_birthday_before_rounding(self):\n        # 1001.5 * 2 = 2003 ต้องไม่ใช่ 2002 (ปัดก่อนคูณ)\n        self.assertEqual(cashback(40060, \"gold\", True), 2003)\n\n    def test_near_cap_not_rounded_up(self):\n        # 799999 * 2.5% = 19999.975 -> 19999 ไม่ปัดขึ้นเป็น 20000\n        self.assertEqual(cashback(799999, \"gold\", False), 19999)\n\n    def test_small_fraction_rounds_down(self):\n        # 66667 * 1.5% = 1000.005 -> 1000\n        self.assertEqual(cashback(66667, \"silver\", False), 1000)\n\n\nclass Reject(unittest.TestCase):\n    def test_bool_amount_rejected(se
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v2_train/trials/t4-cashback-r3/sandbox/test_solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"command": "python3 solve.py && python3 -m unittest -v test_solve 2>&1 | tail -n 40; grep -nE 'placeholder|TODO|if False|or True' solve.py test_solve.py; echo \"grep_exit=$?\"", "description": "Run solve.py self-check, unit tests, and placeholder grep"}
+[user] RESULT: 500
+1001
+test_at_minimum_threshold (test_solve.Boundary.test_at_minimum_threshold) ... ok
+test_cap_applies_after_birthday (test_solve.Boundary.test_cap_applies_after_birthday) ... ok
+test_cap_exactly_reached (test_solve.Boundary.test_cap_exactly_reached) ... ok
+test_just_below_cap (test_solve.Boundary.test_just_below_cap) ... ok
+test_just_below_threshold (test_solve.Boundary.test_just_below_threshold) ... ok
+test_birthday_before_rounding (test_solve.NoDrift.test_birthday_before_rounding) ... ok
+test_near_cap_not_rounded_up (test_solve.NoDrift.test_near_cap_not_rounded_up) ... ok
+test_single_rounding_down_at_half (test_solve.NoDrift.test_single_rounding_down_at_half) ... ok
+test_small_fraction_rounds_down (test_solve.NoDrift.test_small_fraction_rounds_down) ... ok
+test_birthday_doubles (tes
+[assistant] TEXT: เขียนฟังก์ชัน `cashback(amount, tier, birthday)` ใน `solve.py` และเทสต์ใน `test_solve.py` ไว้ที่โฟลเดอร์ `sandbox/` (root ของงาน) ผ่านครบ 19 ข้อ และ `python3 solve.py` ให้ผล 500 กับ 1001 ตามที่คำนวณไว้
+
+**วิธีทำงาน**
+- อ่าน skills ทั้ง 4 ใน `./skills` แล้วทำตาม: คิดเงินเป็นสตางค์แบบจำนวนเต็ม, ใช้ `Fraction` สำหรับอัตรา, ปัดครั้งเดียวตอนท้าย, ตรวจ input ก่อนเงื่อนไขธุรกิจ, และ raise เฉพาะ `ValueError`
+- ค่า expected ในเทสต์คำนวณด้วยสคริปต์ `Fraction` ก่อนใส่
+
+**การตีความที่โจทย์ไม่ได้ระบุ**
+1. **ปัดลง** (`floor`) เพราะเป็นเงินที่ร้านจ่ายออกให้ลูกค้า เช่น 40060 สตางค์ gold ที่ไม่ใช่เดือนเกิด ได้ 1001 ไม่ใช่ 1002 ถ้าต้องการปัดครึ่งขึ้น แก้บรรทัด `return int(value // 1)` ใน `solve.py`
+2. **เพดาน 200 บาทใช้หลังคูณ 2 เดือนเกิด** ดังนั้น gold เดือนเกิดยอด 10,000 บาทได้ 200 บาท ไม่ใช่ 400
+3. **เกณฑ์ 100 บาทดูจากยอดซื้อก่อนคูณเดือนเกิด** ยอด 9,999 สตางค์ไม่ได้เงินคืนแม้เป็นเดือนเกิด
+4. **ค่า `tier` ต้องตรงตัวพิมพ์เล็กเป๊ะ** `"Gold"` จะ raise `ValueError`
+5. **ค่าติดลบ raise `ValueError`** แม้จะอยู่ใต้เกณฑ์ 100 บาท ไม่คืน 0 เงียบ ๆ
+6. **ยอด 0 คืน 0** ถือว่าเป็น input ที่ถูกต้อง

@@ -1,0 +1,19 @@
+
+การรัน f2 · 3 epochs · 3 samples per task · Solver sonnet/medium · Evolver sonnet/high · เซสชันใหม่ทุก epoch
+Benchmark Adaptor: โจทย์ train 4 · validation 2 · test 3 · reference/ 12 ไฟล์ (เฉลยของ Training 8 ไฟล์) · ตรวจการรั่ว: สะอาด · $0.06
+
+| epoch | ชุดสกิลที่ Solver ใช้ | SKILL.md | ไฟล์อื่น | Training คะแนน (ผ่าน) | Validation คะแนน (ผ่าน) | ตาของ Evolver (นาที) | เครื่องมือ | Bash | รันสคริปต์เดิมซ้ำ | ย่อบริบท | ค่าใช้จ่าย |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | (ไม่มีสกิล) | - | - | 46.4% (0/12) | 43.3% (0/6) | - | - | - | - | - | - |
+| 1 | baankafe-house-policies, baankafe-money-function | 11.3 KB | 1 | 83.9% (0/12) | 80.0% (0/6) | 1.2 | 6 | 6 | 0 | 0 | $0.22 |
+| 2 | baankafe-house-policies, baankafe-money-function | 13.3 KB | 1 | 97.7% (9/12) | 85.0% (0/6) | 0.6 | 9 | 9 | 0 | 0 | $0.16 |
+| 3 | baankafe-house-policies, baankafe-money-function | 14.0 KB | 1 | - | 88.3% (2/6) | 0.8 | 10 | 10 | 0 | 0 | $0.18 |
+
+| Test Set (held-out) | คะแนน | pass@1 (rollout ที่ผ่าน) | pass@3 (ผ่านอย่างน้อย 1 ครั้ง) | all@3 (ผ่านทุกครั้ง) |
+|---|---|---|---|---|
+| ไม่มีสกิล | 43.3% | 0/9 | 0/3 | 0/3 |
+| skills_v3 (epoch สุดท้าย) | 85.6% | 2/9 | 2/3 | 0/3 |
+
+รวม: rollout ของ Solver 78 ครั้ง ($9.41) · Evolver 3 ตา ($0.56) · Benchmark Adaptor $0.06
+Test Set: คะแนนเพิ่ม +42.2 จุด · pass rate เพิ่ม +22.2 จุด · ต้นทุนของ Evolver ต่อ 1 จุดที่เพิ่ม: คะแนน $0.013 · pass rate $0.025
+สถานะ: จบแล้ว (วัด Test Set แล้ว)

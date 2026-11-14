@@ -1,4 +1,4 @@
-"""benchmark_plugin.py - BaanKafe: โจทย์เขียนฟังก์ชันคิดเงิน 9 ข้อ (train 4 · validation 2 · test 3)"""
+"""benchmark_plugin.py : BaanKafe (โจทย์คิดเงินของร้านกาแฟ 9 ข้อ)"""
 import json
 import os
 
@@ -19,17 +19,17 @@ SPLIT = {
 
 def list_tasks(root):
     tasks = []
-    for tid, split in SPLIT.items():
-        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
-            d = json.load(f)
+    for task_id, split in SPLIT.items():
+        with open(os.path.join(root, "tasks", task_id + ".json"), encoding="utf-8") as f:
+            data = json.load(f)
         tasks.append(Task(
-            id=tid,
+            id=task_id,
             split=split,
-            instruction=d["brief"],
+            instruction=data["brief"],
             inputs=[],
-            answer_files=[os.path.join("answers", tid, "solve.py"),
-                          os.path.join("answers", tid, "test_solve.py")],
-            grading={"key": tid, "function": d["function"]},
-            category="coding",
+            answer_files=["answers/%s/solve.py" % task_id,
+                          "answers/%s/test_solve.py" % task_id],
+            grading={"key": task_id, "function": data["function"]},
+            category="",
         ))
     return tasks

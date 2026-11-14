@@ -1,0 +1,21 @@
+[assistant] TOOL_USE: {"command": "ls -la ./skills 2>/dev/null && find ./skills -maxdepth 3 -type f | head -50; ls -la", "description": "Check for skills folder and list working directory"}
+[user] RESULT: total 8
+drwxr-xr-x 2 root root 4096 Nov 15 06:16 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:16 ..
+[assistant] TEXT: `./skills` is empty, so there are no skill instructions to follow. I'll write the solution and test it.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/base_train/trials/t2-split-bill-r2/sandbox/solve.py", "content": "def split_bill(total, people, tip_percent):\n    \"\"\"หารบิลของร้าน BaanKafe\n\n    total        : ยอดบิลเป็นสตางค์ (จำนวนเต็ม >= 0)\n    people       : จำนวนคน (จำนวนเต็ม >= 1)\n    tip_percent  : ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0-100)\n\n    คืน list ของยอดที่แต่ละคนจ่ายเป็นสตางค์ (จำนวนเต็ม) เรียงตามลำดับคน\n    ทิปที่เป็นเศษสตางค์จะปัดลง (ไม่เกินเปอร์เซ็นต์ที่กำหนด)\n    เศษสตางค์จากการหารจะให้คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์\n    \"\"\"\n    if not isinstance(total, int) or isinstance(total, bool) or total < 0:\n        raise ValueError(\"total ต้องเป็นจำนวนเต็มสตางค์ที่ >= 0\")\n    if not isinstance(people, int) or isinstance(people, bool) or people < 1:\n        raise ValueError(\"people ต้องเป็นจำนวนเต็มที่ >= 1\")\n    if (not isinstance(tip_percent, int) or isinstance(tip_percent, bool)\n            or not 0 <= tip_percent <= 100):\n        raise ValueError(\"tip_percent ต้องเป็นจำนวนเต็ม 0-100\")\n\n    amount = total + (total * tip_percent) // 100\n    base, remainder = divmod(amount, people)\n    return [base + 1 if i < remainder else base for i in range(people)]\n\n\nif __name__ == \"__main__\":\n    assert split_bill(10000, 3, 0) == [3334, 3333, 3333]\n    assert split_bill(10000, 4, 10) == [2750, 2750, 2750, 2750]\n    assert split_bill(0, 2, 50) == [0, 0]\n    assert split_bill(999, 1, 15) == [1148]\n    assert sum(split_bill(12345, 7, 13)) == 12345 + (12345 * 13) // 100\n    print(\"ผ่านทุกเคสทดสอบ\")\n"}
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/base_train/trials/t2-split-bill-r2/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"command": "python3 solve.py && python3 -c \"from solve import split_bill; print(split_bill(10000,3,0), split_bill(10000,3,15))\"", "description": "Run self-tests for solve.py"}
+[user] RESULT: ผ่านทุกเคสทดสอบ
+[3334, 3333, 3333] [3834, 3833, 3833]
+[assistant] TEXT: บันทึกฟังก์ชัน `split_bill` ไว้ที่ `solve.py` ในโฟลเดอร์ปัจจุบันแล้ว และทดสอบผ่านทุกเคส (`python3 solve.py` พิมพ์ "ผ่านทุกเคสทดสอบ")
+
+ตัวอย่างผลลัพธ์:
+- `split_bill(10000, 3, 0)` → `[3334, 3333, 3333]`
+- `split_bill(10000, 3, 15)` → `[3834, 3833, 3833]` (ยอดรวม 11500 สตางค์ หารได้ลงตัวตามเงื่อนไข)
+
+สิ่งที่ผมเลือกเองเพราะโจทย์ไม่ได้ระบุ:
+- **ทิปที่เป็นเศษสตางค์ปัดลง** เช่น `total * tip_percent / 100` ไม่เป็นจำนวนเต็ม จะตัดทิ้งส่วนเกิน ถ้าต้องการปัดเศษแบบอื่น (ปัดขึ้นหรือปัดครึ่ง) แก้บรรทัดคำนวณ `amount` ได้เลย
+- **ตรวจค่าที่ไม่ถูกต้องแล้ว raise `ValueError`** เมื่อ `total < 0`, `people < 1`, `tip_percent` อยู่นอก 0–100 หรือไม่ใช่จำนวนเต็ม
+
+ไฟล์ `./skills` ว่างเปล่า จึงไม่มีสกิลให้อ่านก่อนเริ่ม และไม่ได้ commit อะไร เพราะโฟลเดอร์นี้ไม่ใช่ git repository

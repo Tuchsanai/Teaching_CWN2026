@@ -1,0 +1,91 @@
+[assistant] TOOL_USE: {"command": "ls -la ./skills 2>/dev/null && find ./skills -maxdepth 3 -type f 2>/dev/null | head -50; echo \"---\"; ls -la", "description": "Check for skills folder and list working directory"}
+[user] RESULT: total 24
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 money-arithmetic-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 solver-selftest-workflow
+drwxr-xr-x 2 root root 4096 Nov 15 06:20 spec-reading-thai
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 strict-input-validation
+./skills/money-arithmetic-rounding/SKILL.md
+./skills/money-arithmetic-rounding/money_helpers.py
+./skills/spec-reading-thai/SKILL.md
+./skills/solver-selftest-workflow/SKILL.md
+./skills/solver-selftest-workflow/test_template.py
+./skills/strict-input-validation/validators.py
+./skills/strict-input-validation/SKILL.md
+---
+total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 6 root root 4096 Nov 
+[assistant] TEXT: There are four skills here. I'll read them before writing any code.
+[assistant] TOOL_USE: {"command": "cd ./skills && for f in spec-reading-thai/SKILL.md money-arithmetic-rounding/SKILL.md money-arithmetic-rounding/money_helpers.py strict-input-validation/SKILL.md strict-input-validation/validators.py solver-selftest-workflow/SKILL.md solver-selftest-workflow/test_template.py; do echo \"===== $f =====\"; cat \"$f\"; echo; done", "description": "Read all skill files in skills folder"}
+[user] RESULT: ===== spec-reading-thai/SKILL.md =====
+---
+name: spec-reading-thai
+description: อ่านโจทย์ข้อกำหนดภาษาไทยให้ครบก่อนเขียนโค้ด โดยแปลงคำเปรียบเทียบ (ตั้งแต่ เกิน ไม่เกิน ต่ำกว่า) แตกกฎเป็นรายข้อ ระบุลำดับการคิด และไล่ค่าขอบ ใช้เมื่อโจทย์เป็นภาษาไทยหรือมีกฎธุรกิจหลายข้อที่ต้องทำตามลำดับ
+---
+
+# การอ่านโจทย์ภาษาไทยให้ครบ
+
+## ขั้นตอน
+
+1. **แตกโจทย์เป็นรายการกฎ** ก่อนเขียนโค้ด. แต่ละข้อระบุ: input ที่เกี่ยวข้อง, เงื่อนไข, และผลลัพธ์. เขียนเป็นลิสต์ที่มีเลขกำกับ.
+2. **แปลงคำเปรียบเทียบให้ตรงตัวอักษร:**
+   - "ตั้งแต่ X ขึ้นไป", "X ขึ้นไป", "อย่างน้อย X" → `>= X`
+   - "เกิน X", "มากกว่า X" → `> X`
+   - "ไม่เกิน X", "สูงสุด X" → `<= X`
+   - "ต่ำกว่า X", "น้อยกว่า X" → `< X`
+   - "ถึง" ในช่วง เช่น "1–30,000" → รวมทั้งสองปลาย
+   
+   ค่าที่พอดีกับเกณฑ์มีผลต่อคำตอบเสมอ ให้ตรวจว่าตรงกับคำในโจทย์หรือไม่.
+3.
+[assistant] TEXT: The skills folder has four skills I need to follow: Thai spec reading, half-up rounding with integer satang, strict `ValueError` validation, and a Normal/Boundary/NoDrift/Reject test layout. The `cd` moved my working directory into `skills/`, so I'll write the files in the original sandbox root.
+[assistant] TOOL_USE: {"command": "cd /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t2-split-bill-r3/sandbox && python3 -c \"\nfrom fractions import Fraction as F\nimport math\ndef hu(x): return math.floor(F(x)+F(1,2))\ndef split(t,n):\n    b,r=divmod(t,n); return [b+1]*r+[b]*(n-r)\ncases=[(10000,3,10),(333,1,50),(12345,1,7),(0,1,0),(0,3,100),(1,1,0),(6,7,0),(1,4,25),(9999,2,100),(100,3,0)]\nfor t,n,p in cases:\n    amt=hu(F(t)*(100+p)/100)\n    print(t,n,p,'amount',amt,split(amt,n))\n\"", "description": "Compute expected test values with Fraction script"}
+[user] RESULT: 10000 3 10 amount 11000 [3667, 3667, 3666]
+333 1 50 amount 500 [500]
+12345 1 7 amount 13209 [13209]
+0 1 0 amount 0 [0]
+0 3 100 amount 0 [0, 0, 0]
+1 1 0 amount 1 [1]
+6 7 0 amount 6 [1, 1, 1, 1, 1, 1, 0]
+1 4 25 amount 1 [1, 0, 0, 0]
+9999 2 100 amount 19998 [9999, 9999]
+100 3 0 amount 100 [34, 33, 33]
+[assistant] TEXT: The script's values are the expected ones (12345 × 1.07 = 13209.15, so my mental estimate was wrong). Now I'll write the solver.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t2-split-bill-r3/sandbox/solve.py", "content": "\"\"\"BaanKafe: ฟังก์ชันหารบิล split_bill(total, people, tip_percent)\n\nกติกา\n- total        = ยอดบิล (สตางค์, จำนวนเต็ม >= 0)\n- people       = จำนวนคน (จำนวนเต็ม >= 1)\n- tip_percent  = ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0-100)\n- ยอดที่ต้องหาร = ยอดบิล + ทิป  (ทิปคิดจากยอดบิล แล้วปัดครึ่งขึ้นเป็นสตางค์ครั้งเดียวตอนท้าย)\n- หารเท่ากัน ถ้าไม่ลงตัว คนลำดับต้น ๆ จ่ายเพิ่มคนละ 1 สตางค์\n- คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน\n\nผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น\nไม่มี side effect ตอน import\n\"\"\"\n\nimport math\nfrom fractions import Fraction\n\n\n# ---------- ตรวจข้อมูลนำเข้า (ชนิดเข้มงวด: ไม่รับ bool/float/str) ----------\n\ndef _need_int(value, name, low=None, high=None):\n    if type(value) is not int:\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    if high is not None and value > high:\n        raise ValueError(f\"{name} ต้องไม่เกิน {high}\")\n    return value\n\n\n# ---------- ปัดเศษและหาร ----------\n\ndef _half_up(x):\n    \"\"\"ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ): 2.5 -> 3, 2.4 -> 2\"\"\"\n    return math.floor(Fraction(x) + Fraction(1, 2))\n\n\ndef _split_even(total, people):\n    \"\"\"หาร total ให้ people คน เศษให้คนลำดับต้น ๆ คนละ 1 สตางค์\"\"\"\n    base, rem = divmod(total, people)\n    return [base + 1] * rem + [base] * (people - rem)\n\n\n# ---------- ฟังก์ชันหลัก ----------\n\ndef split_bill(total, people, tip_percent):\n    \"\"\"คืน list ของยอดที่แต่ละคนจ่าย (สตางค์, จำนวนเต็ม) เรียงตามลำดับคน\"\"\"\n    total = _need_int(total, \"total\", low=0)\n    people = _need_int(people, \"people\", low=1)\n    tip_percent = _need_int(tip_percent, \"tip_percent\", low=0, high=100)\n\n    # ยอดบิล + ทิป = total * (100 + tip%) / 100 ; ปัดครั้งเดียวตอนท้ายแล้วค่อยหาร\n    amount_due = _half_up(Fraction(total) * (100 + tip_percent) / 100)\n    return _split_even(amount_due, people)\n\n\nif __name__ == \"__main__\":\n    assert split_bill(10000, 3, 10) == [3667, 3667, 3666]\n    assert split_bill(333, 1, 50) == [500]\n    print(\"solve ok:\", split_bill(10000, 3, 10))\n"}
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t2-split-bill-r3/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t2-split-bill-r3/sandbox/test_solve.py", "content": "\"\"\"ทดสอบ split_bill แยกหมวด Normal, Boundary, NoDrift, Reject\nexpected คำนวณด้วยสคริปต์ Fraction แล้ว (ดูผลจากการรันสคริปต์ก่อนเขียน test)\n\nรัน: python3 -m unittest -v test_solve\n\"\"\"\nimport unittest\n\nfrom solve import split_bill\n\n\nclass Normal(unittest.TestCase):\n    def test_tip_and_remainder(self):\n        # 10000 * 1.10 = 11000 ; 11000 / 3 = 3666 เหลือ 2 -> คนแรก 2 คนจ่ายเพิ่ม\n        self.assertEqual(split_bill(10000, 3, 10), [3667, 3667, 3666])\n\n    def test_no_tip_even_split(self):\n        self.assertEqual(split_bill(100, 3, 0), [34, 33, 33])\n\n    def test_sum_equals_amount_due(self):\n        # 9999 * 1.00 = 9999 ; 9999 / 2 ลงตัว\n        self.assertEqual(split_bill(9999, 2, 100), [9999, 9999])\n        self.assertEqual(sum(split_bill(12345, 7, 7)), 13209)\n\n\nclass Boundary(unittest.TestCase):\n    def test_zero_bill(self):\n        self.assertEqual(split_bill(0, 1, 0), [0])\n        self.assertEqual(split_bill(0, 3, 100), [0, 0, 0])\n\n    def test_one_satang(self):\n        self.assertEqual(split_bill(1, 1, 0), [1])\n        self.assertEqual(split_bill(1, 4, 25), [1, 0, 0, 0])\n\n    def test_more_people_than_satang(self):\n        self.assertEqual(split_bill(6, 7, 0), [1, 1, 1, 1, 1, 1, 0])\n\n    def test_tip_range_ends(self):\n        self.assertEqual(split_bill(100, 1, 0), [100])\n        self.assertEqual(split_bill(100, 1, 100), [200])\n\n\nclass NoDrift(unittest.TestCase):\n    def test_single_rounding_half_up(self):\n        # 333 * 1.50 = 499.5 -> ปัดครึ่งขึ้นครั้งเดียวได้ 500\n        self.assertEqual(split_bill(333, 1, 50), [500])\n\n    def test_no_intermediate_rounding(self):\n        # 12345 * 1.07 = 13209.15 -> 13209 (ถ้าปัดทิปก่อนก็ได้ผลเท่ากันในกรณีนี้)\n        self.assertEqual(split_bill(12345, 1, 7), [13209])\n\n\nclass Reject(unittest.TestCase):\n    def test_bool_total(self):\n        with self.assertRaises(ValueError):\n            split_bill(True, 2, 10)\n\n    def test_float_total(self):\n        with self.assertRaises(ValueError):\n            split_bill(4500.0, 2, 10)\n\n    def test_str_total(self):\n        with self.assertRaises(ValueError):\n            split_bill(\"4500\", 2, 10)\n\n    def test_negative_total(self):\n        with self.assertRaises(ValueError):\n            split_bill(-1, 2, 10)\n\n    def test_people_zero(self):\n        with self.assertRaises(ValueError):\
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t2-split-bill-r3/sandbox/test_solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"command": "python3 solve.py && python3 -m unittest -v test_solve 2>&1 | tail -40; echo \"---placeholder scan---\"; grep -nE \"placeholder|TODO|if False|or True\" solve.py test_solve.py || echo \"none\"", "description": "Run solve.py self-check, unit tests, and placeholder scan"}
+[user] RESULT: solve ok: [3667, 3667, 3666]
+test_more_people_than_satang (test_solve.Boundary.test_more_people_than_satang) ... ok
+test_one_satang (test_solve.Boundary.test_one_satang) ... ok
+test_tip_range_ends (test_solve.Boundary.test_tip_range_ends) ... ok
+test_zero_bill (test_solve.Boundary.test_zero_bill) ... ok
+test_no_intermediate_rounding (test_solve.NoDrift.test_no_intermediate_rounding) ... ok
+test_single_rounding_half_up (test_solve.NoDrift.test_single_rounding_half_up) ... ok
+test_no_tip_even_split (test_solve.Normal.test_no_tip_even_split) ... ok
+test_sum_equals_amount_due (test_solve.Normal.test_sum_equals_amount_due) ... ok
+test_tip_and_remainder (test_solve.Normal.test_tip_and_remainder) ... ok
+test_bool_total (test_solve.Reject.test_bool_total) ... ok
+test_float_total (test_solve.Reject
+[assistant] TEXT: I wrote `split_bill(total, people, tip_percent)` in `solve.py` in the sandbox root. All 18 tests in `test_solve.py` pass, and `python3 solve.py` runs cleanly.
+
+**How it works**
+- The amount to split is `total × (100 + tip_percent) / 100`, computed exactly with `Fraction`. It is rounded half-up to whole satang once, at the end.
+- The result is split evenly with `divmod`. The first `remainder` people each pay one extra satang.
+- Example: `split_bill(10000, 3, 10)` → `[3667, 3667, 3666]`.
+
+**Validation**
+- Any wrong type or out-of-range value raises `ValueError`. Booleans, floats and strings are rejected, even when they look like integers (e.g. `4500.0`, `"4500"`).
+- Valid ranges: `total >= 0`, `people >= 1`, `0 <= tip_percent <= 100`.
+
+**Interpretations the spec did not settle**
+1. **Tip rounding:** the tip is added to the bill exactly and the sum is rounded half-up once. Rounding the tip separately could give a different result by 1 satang in some cases. The rounding lives in `_half_up` inside `solve.py` if you want to change it.
+2. **Rounding direction:** I used half-up because the customer pays the amount. The skill's default for money the shop receives is half-up.
+3. **No upper limit** on `total` or `people`.
+
+**Files**
+- `solve.py`: the function, with the helpers copied in so it has no imports from `skills/`.
+- `test_solve.py`: tests grouped as Normal, Boundary, NoDrift and Reject. The expected values were calculated with a `Fraction` script before the tests were written.

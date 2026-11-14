@@ -1,9 +1,10 @@
-"""benchmark_plugin.py - BaanKafe: โจทย์เขียนฟังก์ชันคิดเงิน 9 ข้อ"""
+"""benchmark_plugin.py : BaanKafe (โจทย์เขียนฟังก์ชันคิดเงิน 9 ข้อ)"""
 import json
 import os
 
 from plugin_api import Task
 
+# การแบ่งชุด: train 4 · validation 2 · test 3 (ตรงกับ split.json ของผู้ใช้)
 SPLIT = {
     "t1-cafe-bill": "train",
     "t2-split-bill": "train",
@@ -19,16 +20,17 @@ SPLIT = {
 
 def list_tasks(root):
     tasks = []
-    for tid, split in SPLIT.items():
-        with open(os.path.join(root, "tasks", tid + ".json"), encoding="utf-8") as f:
-            d = json.load(f)
+    for task_id, split in SPLIT.items():
+        with open(os.path.join(root, "tasks", task_id + ".json"), encoding="utf-8") as f:
+            spec = json.load(f)
         tasks.append(Task(
-            id=tid,
+            id=task_id,
             split=split,
-            instruction=d["brief"],
+            instruction=spec["brief"],
             inputs=[],
-            answer_files=["answers/%s/solve.py" % tid, "answers/%s/test_solve.py" % tid],
-            grading={"key": tid},
-            category="coding",
+            answer_files=["answers/%s/solve.py" % task_id,
+                          "answers/%s/test_solve.py" % task_id],
+            grading={"key": task_id, "function": spec["function"]},
+            category="billing",
         ))
     return tasks

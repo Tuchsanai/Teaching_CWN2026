@@ -1,0 +1,19 @@
+
+การรัน h1 · 3 epochs · 3 samples per task · Solver haiku/medium · Evolver haiku/high · เซสชันเดียวตลอดการรัน
+Benchmark Adaptor: โจทย์ train 4 · validation 2 · test 3 · reference/ 12 ไฟล์ (เฉลยของ Training 8 ไฟล์) · ตรวจการรั่ว: สะอาด · $0.10
+
+| epoch | ชุดสกิลที่ Solver ใช้ | SKILL.md | ไฟล์อื่น | Training คะแนน (ผ่าน) | Validation คะแนน (ผ่าน) | ตาของ Evolver (นาที) | เครื่องมือ | Bash | รันสคริปต์เดิมซ้ำ | ย่อบริบท | ค่าใช้จ่าย |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | (ไม่มีสกิล) | - | - | 52.0% (0/12) | 53.3% (0/6) | - | - | - | - | - | - |
+| 1 | integer-money-rounding, solve-task-checklist, strict-input-validation | 16.0 KB | 0 | 65.9% (0/12) | 70.0% (0/6) | 2.4 | 19 | 15 | 0 | 0 | $0.04 |
+| 2 | integer-money-rounding, solve-task-checklist, strict-input-validation | 18.1 KB | 0 | 65.9% (0/12) | 60.0% (0/6) | 1.7 | 12 | 9 | 1 | 0 | $0.09 |
+| 3 | integer-money-rounding, solve-task-checklist, strict-input-validation | 18.7 KB | 0 | - | 60.0% (0/6) | 0.7 | 8 | 6 | 4 | 0 | $0.09 |
+
+| Test Set (held-out) | คะแนน | pass@1 (rollout ที่ผ่าน) | pass@3 (ผ่านอย่างน้อย 1 ครั้ง) | all@3 (ผ่านทุกครั้ง) |
+|---|---|---|---|---|
+| ไม่มีสกิล | 53.3% | 0/9 | 0/3 | 0/3 |
+| skills_v3 (epoch สุดท้าย) | 62.2% | 0/9 | 0/3 | 0/3 |
+
+รวม: rollout ของ Solver 78 ครั้ง ($0.69) · Evolver 3 ตา ($0.22) · Benchmark Adaptor $0.10
+Test Set: คะแนนเพิ่ม +8.9 จุด · pass rate เพิ่ม +0.0 จุด · ต้นทุนของ Evolver ต่อ 1 จุดที่เพิ่ม: คะแนน $0.024 · pass rate ไม่เพิ่ม
+สถานะ: จบแล้ว (วัด Test Set แล้ว)

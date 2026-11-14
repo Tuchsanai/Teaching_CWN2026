@@ -1,0 +1,215 @@
+[assistant] TOOL_USE: {"command": "pwd; ls -la; ls -la ./skills 2>/dev/null || echo \"NO_SKILLS_DIR\"", "description": "List working directory and check for skills folder"}
+[user] RESULT: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox
+total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 skills
+total 24
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 money-arithmetic-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 solver-selftest-workflow
+drwxr-xr-x 2 root root 4096 Nov 15 06:20 spec-reading-thai
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 strict-input-validation
+[assistant] TEXT: There's a `skills` folder with four skills. I'll read them before writing anything.
+[assistant] TOOL_USE: {"command": "cd /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills && for d in */; do echo \"=== $d\"; ls -la \"$d\"; done; for f in */*; do echo \"=================== $f\"; cat \"$f\"; echo; done", "description": "List and print all skill files"}
+[user] RESULT: <persisted-output>
+Output too large (30.1KB). Full output saved to: /root/ai-accounts/.Claude/yolo1/projects/-workspace-evlab-runs-h2-legs-runs-v1-train-trials-t3-shipping-fee-r3-sandbox/b516f22a-bf08-4914-84e0-1bc40e57798c/tool-results/bjeewv9qe.txt
+
+Preview (first 2KB):
+=== money-arithmetic-rounding/
+total 24
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 ..
+-rw-r--r-- 1 root root 5737 Nov 15 06:20 SKILL.md
+-rw-r--r-- 1 root root 4551 Nov 15 06:20 money_helpers.py
+=== solver-selftest-workflow/
+total 20
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 ..
+-rw-r--r-- 1 root root 5279 Nov 15 06:21 SKILL.md
+-rw-r--r-- 1 root root 2687 Nov 15 06:21 test_template.py
+=== spec-reading-thai/
+total 16
+drwxr-xr-x 2 root root 409
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/money-arithmetic-rounding/SKILL.md"}
+[user] RESULT: 1	---
+2	name: money-arithmetic-rounding
+3	description: คำนวณยอดเงิน ส่วนลด VAT ทิป ค่าส่ง เงินคืน และการหารบิลให้แม่นยำ โดยใช้จำนวนเต็มสตางค์/Fraction, ปัดเศษครั้งเดียวตอนท้าย และเรียงลำดับตัวคูณกับเพดานให้ถูก ใช้ทุกครั้งที่โจทย์เกี่ยวกับตัวเลขเงินหรือการปัดเศษ
+4	---
+5	
+6	# การคำนวณเงินและการปัดเศษ
+7	
+8	## หลักการ
+9	
+10	1. **เก็บเงินเป็นสตางค์ (จำนวนเต็ม)** ตั้งแต่รับ input. ถ้าโจทย์บอกหน่วยเป็นบาท ให้คูณ 100 ตอนเริ่มเท่านั้น. อัตราที่เป็นทศนิยม (เช่น 1.5%, 15 บาทต่อกิโลกรัม) ให้ใช้ `Fraction` ไม่ใช่ float.
+11	2. **ห้ามใช้ float ในการคำนวณเงิน** เช่น `0.07 * x`, `x * 0.9`. ใช้ `Fraction(7, 100)` หรือ `Fraction("1.5") / 100` แทน.
+12	3. **ปัดเศษครั้งเดียว ที่ขั้นสุดท้ายของผลที่ต้องการ.** อย่าปัดระหว่างทาง. ตัวอย่างที่ผิด: ปัดส่วนลด 5% เป็นสตางค์ก่อน แล้วค่อยคิดส่วนลดสมาชิก 10% ทำให้ยอดเบี่ยง
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/money-arithmetic-rounding/money_helpers.py"}
+[user] RESULT: 1	"""ตัวช่วยคำนวณเงินและตรวจข้อมูลนำเข้า
+2	
+3	ไม่มี side effect ตอน import. วิธีใช้: คัดลอกฟังก์ชันที่ต้องใช้ไปไว้ใน solve.py
+4	(ปลอดภัยที่สุด เพราะไม่ต้องพึ่ง sys.path) หรือ import จากไฟล์นี้ถ้าอยู่โฟลเดอร์เดียวกัน
+5	
+6	หลักการ: ผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น (ไม่ใช้ TypeError)
+7	"""
+8	
+9	import math
+10	from fractions import Fraction
+11	
+12	
+13	# ---------- ตรวจข้อมูลนำเข้า ----------
+14	
+15	def need_int(value, name, low=None, high=None):
+16	    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+17	    if type(value) is not int:
+18	        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+19	    if low is not None and value < low:
+20	        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+21	    if high is not None and value > high:
+22	        raise ValueError(f"{name} ต้องไม่เกิน {hig
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/solver-selftest-workflow/SKILL.md"}
+[user] RESULT: 1	---
+2	name: solver-selftest-workflow
+3	description: ขั้นตอนทำงานเขียนฟังก์ชันใน solve.py ให้จบถูกต้องและรวดเร็ว โดยเขียน test แยกหมวด Normal, Boundary, NoDrift และ Reject คำนวณ expected ด้วยสคริปต์ Fraction และรันคำสั่งให้ถูกวิธี ใช้กับทุกงานที่ต้องส่ง solve.py
+4	---
+5	
+6	# ขั้นตอนทำงานและตรวจสอบ solve.py
+7	
+8	## ลำดับการทำงาน
+9	
+10	1. อ่านโจทย์ทั้งหมดก่อน แล้วแตกเป็นกฎรายข้อ (ดู skill `spec-reading-thai`). ไม่มีโฟลเดอร์ `./skills` ก็ทำงานต่อได้.
+11	2. เขียน `solve.py` ไว้ที่ root ของ working directory. ฟังก์ชันต้อง import ได้โดยไม่มี side effect (ไม่มี print หรือ input ตอน import). ตัวอย่างหรือ self-test ให้อยู่ใน `if __name__ == "__main__":`.
+12	3. ใช้หลักการคำนวณเงินและการตรวจ input จาก skill `money-arithmetic-rounding` และ `strict-input-validation`.
+13	4. เขียน test ตามหมวดใน `test_t
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/solver-selftest-workflow/test_template.py"}
+[user] RESULT: 1	"""โครง test แยกหมวด: คัดลอกไปแก้ชื่อฟังก์ชันและกรณีทดสอบให้ตรงกับโจทย์
+2	
+3	รัน: python3 -m unittest -v test_template
+4	expected ทุกค่าต้องคำนวณด้วยสคริปต์ Fraction ก่อนใส่ (ดู SKILL.md)
+5	"""
+6	import unittest
+7	
+8	from solve import my_function  # <- แก้ชื่อฟังก์ชันให้ตรงกับโจทย์
+9	
+10	
+11	class Normal(unittest.TestCase):
+12	    def test_basic(self):
+13	        # ใส่กรณีปกติ 2–3 แบบ ให้ครอบคลุมทุกระดับ/ทุก flag
+14	        # expected ต้องมาจากสคริปต์ Fraction เท่านั้น ห้ามคัดลอกค่าตัวอย่างจากไฟล์นี้
+15	        # self.assertEqual(my_function(<args>), <expected จาก Fraction>)
+16	        pass
+17	
+18	    def test_flag_combinations(self):
+19	        # ผสมทุกค่า flag กับทุกกลุ่มที่เป็นไปได้
+20	        pass
+21	
+22	
+23	class Boundary(unittest.TestCase):
+24	    def test_at_threshold(self):
+25	  
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/spec-reading-thai/SKILL.md"}
+[user] RESULT: 1	---
+2	name: spec-reading-thai
+3	description: อ่านโจทย์ข้อกำหนดภาษาไทยให้ครบก่อนเขียนโค้ด โดยแปลงคำเปรียบเทียบ (ตั้งแต่ เกิน ไม่เกิน ต่ำกว่า) แตกกฎเป็นรายข้อ ระบุลำดับการคิด และไล่ค่าขอบ ใช้เมื่อโจทย์เป็นภาษาไทยหรือมีกฎธุรกิจหลายข้อที่ต้องทำตามลำดับ
+4	---
+5	
+6	# การอ่านโจทย์ภาษาไทยให้ครบ
+7	
+8	## ขั้นตอน
+9	
+10	1. **แตกโจทย์เป็นรายการกฎ** ก่อนเขียนโค้ด. แต่ละข้อระบุ: input ที่เกี่ยวข้อง, เงื่อนไข, และผลลัพธ์. เขียนเป็นลิสต์ที่มีเลขกำกับ.
+11	2. **แปลงคำเปรียบเทียบให้ตรงตัวอักษร:**
+12	   - "ตั้งแต่ X ขึ้นไป", "X ขึ้นไป", "อย่างน้อย X" → `>= X`
+13	   - "เกิน X", "มากกว่า X" → `> X`
+14	   - "ไม่เกิน X", "สูงสุด X" → `<= X`
+15	   - "ต่ำกว่า X", "น้อยกว่า X" → `< X`
+16	   - "ถึง" ในช่วง เช่น "1–30,000" → รวมทั้งสองปลาย
+17	   
+18	   ค่าที่พอดีกับเกณฑ์มีผลต่อคำตอบเสมอ ให้ตรวจว่าตรงกับคำในโจทย์หรือไ
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/strict-input-validation/SKILL.md"}
+[user] RESULT: 1	---
+2	name: strict-input-validation
+3	description: ตรวจข้อมูลนำเข้าของฟังก์ชันอย่างเข้มงวด โดยผิดชนิดหรือนอกช่วงให้ raise ValueError เสมอ ไม่รับ bool/float/str แทนจำนวนเต็ม และไม่แปลงค่าเอง ใช้เมื่อฟังก์ชันรับ parameter ที่โจทย์ระบุชนิด ช่วง หรือตัวเลือกไว้
+4	---
+5	
+6	# การตรวจข้อมูลนำเข้าอย่างเข้มงวด
+7	
+8	## กติกาหลัก
+9	
+10	1. **ผิดอะไรก็ตาม ให้ raise `ValueError`.** ไม่ใช้ `TypeError` สำหรับ input ที่ผิด. ชุดทดสอบแบบ Reject มักเขียนว่า `assertRaises(ValueError)` และ `TypeError` ไม่ใช่ subclass ของ `ValueError` จึงไม่ผ่าน. ผลจากการทดสอบซ้ำ ๆ พบว่าการใช้ `TypeError` ทำให้เสียคะแนนหมวด Reject ทุกครั้ง.
+11	2. **ตรวจชนิดด้วย `type(x) is int`** ไม่ใช่ `isinstance`. เหตุผล: `isinstance(True, int)` เป็น `True` ทำให้ bool หลุดเข้ามาเป็นจำนวนเต็ม. และต้องปฏิเสธ `float` (เช่น `4500.0`) และ `str` 
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/skills/strict-input-validation/validators.py"}
+[user] RESULT: 1	"""ตัวช่วยตรวจข้อมูลนำเข้า (ชุดเดียวกับ money_helpers.py ส่วน need_*). ไม่มี side effect ตอน import
+2	ผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น
+3	"""
+4	from fractions import Fraction
+5	
+6	
+7	def need_int(value, name, low=None, high=None):
+8	    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+9	    if type(value) is not int:
+10	        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+11	    if low is not None and value < low:
+12	        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+13	    if high is not None and value > high:
+14	        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+15	    return value
+16	
+17	
+18	def need_bool(value, name):
+19	    """flag: ต้องเป็น True หรือ False จริง"""
+20	    if type(value) is not bool:
+21	        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+22	 
+[assistant] TEXT: Skills read. Key points: store money as integer satang, use `Fraction` for rates, round once at the end (half-up, since the shop receives the payment), validate strictly with `ValueError`, and compute expected test values with a Fraction script rather than by hand. Writing `solve.py` in the sandbox root now.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/solve.py", "content": "\"\"\"คิดค่าส่งเมล็ดกาแฟของ BaanKafe (ผลลัพธ์เป็นสตางค์ จำนวนเต็ม)\n\nกติกา:\n1. ฐานตามน้ำหนัก (หน่วยสตางค์):\n   - 1 ถึง 1,000 กรัม            -> 4,000 (40 บาท)\n   - 1,001 ถึง 5,000 กรัม         -> 8,000 (80 บาท)\n   - มากกว่า 5,000 กรัม           -> 8,000 + (กรัมที่เกิน 5,000) x 15 บาท/กก. (คิดตามสัดส่วนกรัม)\n2. ระยะทางเกิน 100 กม. คูณ 1.20 (ระยะทาง 100 พอดี ไม่คิดเพิ่ม)\n3. ส่งด่วน คูณ 1.50 ต่อจากข้อ 2\n4. ปัดครั้งเดียวตอนท้าย เป็นจำนวนเต็มสตางค์ ด้วยการปัดครึ่งขึ้น\n   (เป็นค่าที่ลูกค้าจ่ายเข้าร้าน ตามแนวทางใน skill money-arithmetic-rounding)\n\nไม่มี side effect ตอน import. ตัวอย่างการรันอยู่ใน if __name__ == \"__main__\".\n\"\"\"\n\nimport math\nfrom fractions import Fraction\n\n\n# ---------- ตรวจข้อมูลนำเข้า (ผิดชนิดหรือนอกช่วง -> ValueError) ----------\n\ndef need_int(value, name, low=None, high=None):\n    \"\"\"จำนวนเต็มจริง: ไม่รับ bool, float, str\"\"\"\n    if type(value) is not int:\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    if high is not None and value > high:\n        raise ValueError(f\"{name} ต้องไม่เกิน {high}\")\n    return value\n\n\ndef need_bool(value, name):\n    \"\"\"flag: ต้องเป็น True หรือ False จริง\"\"\"\n    if type(value) is not bool:\n        raise ValueError(f\"{name} ต้องเป็น True หรือ False\")\n    return value\n\n\ndef need_number(value, name, low=None):\n    \"\"\"ตัวเลขที่ไม่ใช่ bool: รับ int หรือ float แล้วแปลงเป็น Fraction ผ่าน str\"\"\"\n    if type(value) not in (int, float):\n        raise ValueError(f\"{name} ต้องเป็นตัวเลข\")\n    try:\n        x = Fraction(str(value))\n    except (ValueError, OverflowError) as exc:  # เช่น nan, inf\n        raise ValueError(f\"{name} ไม่ใช่ตัวเลขที่ใช้ได้\") from exc\n    if low is not None and x < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    return x\n\n\n# ---------- ปัดเศษ ----------\n\ndef half_up(x):\n    \"\"\"ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ): 2.5 -> 3, 2.4 -> 2\"\"\"\n    return math.floor(Fraction(x) + Fraction(1, 2))\n\n\n# ---------- ฟังก์ชันหลัก ----------\n\ndef shipping_fee(weight_g, distance_km, express):\n    \"\"\"คืนค่าส่งเป็นจำนวนเต็มสตางค์\n\n    weight_g: จำนวนเต็ม 1–30,000 กรัม\n    distance_km: ตัวเลขตั้งแต่ 0 (กม.)\n    express: True = ส่งด่วน\n    \"\"\"\n    weight_g = need_int(weight
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant] TEXT: Next I'll compute the expected values with an independent Fraction script, not by hand and not from `solve.py`.
+[assistant] TOOL_USE: {"command": "cd /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox && python3 -c '\nfrom fractions import Fraction as F\nimport math\ndef exp(w, d, e):\n    if w <= 1000: v = F(4000)\n    elif w <= 5000: v = F(8000)\n    else: v = F(8000) + F(w-5000)*F(15*100, 1000)\n    if d > 100: v *= F(12,10)\n    if e: v *= F(3,2)\n    return v, math.floor(v + F(1,2))\ncases = [\n (\"min w=1 d=0 std\", 1, \"0\", False),\n (\"w=1000 d=0 std\", 1000, \"0\", False),\n (\"w=1001 d=0 std\", 1001, \"0\", False),\n (\"w=5000 d=0 std\", 5000, \"0\", False),\n (\"w=5001 d=0 std\", 5001, \"0\", False),\n (\"w=5001 d=0 express NoDrift\", 5001, \"0\", True),\n (\"w=1000 d=100 std\", 1000, \"100\", False),\n (\"w=1000 d=100.01 std\", 1000, \"100.01\", False),\n (\"w=1000 d=101 std\", 1000, \"101\", False),\n (\"w=1000 d=0 express\", 1000, \"0\", True),\n (\"w=5001 d=101 express\", 5001, \"101\", True),\n (\"max w=30000 d=150 express\", 30000, \"150\", True),\n (\"w=30000 d=0 std\", 30000, \"0\", False),\n (\"w=2000 d=0.5 std\", 2000, \"0.5\", False),\n (\"w=10001 d=0 std\", 10001, \"0\", False),\n]\nfor name,w,d,e in cases:\n    v, r = exp(w, F(d), e)\n    print(f\"{name:32s} exact={v} ({float(v)})  expected_int={r}\")\n'", "description": "Compute expected fee values with Fraction script"}
+[user] RESULT: min w=1 d=0 std                  exact=4000 (4000.0)  expected_int=4000
+w=1000 d=0 std                   exact=4000 (4000.0)  expected_int=4000
+w=1001 d=0 std                   exact=8000 (8000.0)  expected_int=8000
+w=5000 d=0 std                   exact=8000 (8000.0)  expected_int=8000
+w=5001 d=0 std                   exact=16003/2 (8001.5)  expected_int=8002
+w=5001 d=0 express NoDrift       exact=48009/4 (12002.25)  expected_int=12002
+w=1000 d=100 std                 exact=4000 (4000.0)  expected_int=4000
+w=1000 d=100.01 std              exact=4800 (4800.0)  expected_int=4800
+w=1000 d=101 std                 exact=4800 (4800.0)  expected_int=4800
+w=1000 d=0 express               exact=6000 (6000.0)  expected_int=6000
+w=5001 d=101 express             exact=144027/10 (14402.7)  expected_in
+[assistant] TEXT: The expected values are computed. Now the test file, following the Normal / Boundary / NoDrift / Reject layout from the skill template.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/test_shipping_fee.py", "content": "\"\"\"ทดสอบ shipping_fee แยกหมวด Normal, Boundary, NoDrift, Reject\nexpected ทุกค่าคำนวณด้วยสคริปต์ Fraction แยกต่างหาก (ไม่ได้ใช้ solve.py)\n\nรัน: python3 -m unittest -v test_shipping_fee\n\"\"\"\nimport unittest\n\nfrom solve import shipping_fee\n\n\nclass Normal(unittest.TestCase):\n    def test_basic_tiers(self):\n        self.assertEqual(shipping_fee(500, 10, False), 4000)     # 40 บาท\n        self.assertEqual(shipping_fee(3000, 10, False), 8000)    # 80 บาท\n        self.assertEqual(shipping_fee(30000, 10, False), 45500)  # 80 + 25 กก. x 15 = 455 บาท\n\n    def test_flag_combinations(self):\n        self.assertEqual(shipping_fee(1000, 0, True), 6000)      # ด่วนอย่างเดียว 40 x 1.5\n        self.assertEqual(shipping_fee(1000, 101, False), 4800)   # ไกลอย่างเดียว 40 x 1.2\n        self.assertEqual(shipping_fee(30000, 150, True), 81900)  # ไกล + ด่วน 455 x 1.2 x 1.5\n\n\nclass Boundary(unittest.TestCase):\n    def test_at_weight_threshold(self):\n        self.assertEqual(shipping_fee(1000, 0, False), 4000)     # พอดี 1,000 ยังอยู่ชั้น 40 บาท\n        self.assertEqual(shipping_fee(5000, 0, False), 8000)     # พอดี 5,000 ยังไม่มีส่วนเกิน\n\n    def test_just_above_weight_threshold(self):\n        self.assertEqual(shipping_fee(1001, 0, False), 8000)     # 1,001 เข้าชั้น 80 บาท\n        self.assertEqual(shipping_fee(5001, 0, False), 8002)     # 8001.5 -> ปัดครึ่งขึ้น\n\n    def test_at_distance_threshold(self):\n        self.assertEqual(shipping_fee(1000, 100, False), 4000)   # 100 พอดี ไม่คิดเพิ่ม\n        self.assertEqual(shipping_fee(1000, 100.01, False), 4800)  # เกิน 100 คิดเพิ่ม\n\n    def test_zero_and_max(self):\n        self.assertEqual(shipping_fee(1, 0, False), 4000)        # ค่าต่ำสุด\n        self.assertEqual(shipping_fee(1, 0, True), 6000)\n        self.assertEqual(shipping_fee(30000, 0, False), 45500)   # ค่าสูงสุดของน้ำหนัก\n\n\nclass NoDrift(unittest.TestCase):\n    def test_single_rounding_express(self):\n        # 8001.5 x 1.5 = 12002.25 -> 12002 (ถ้าปัดก่อนจะได้ 12003)\n        self.assertEqual(shipping_fee(5001, 0, True), 12002)\n\n    def test_single_rounding_with_distance(self):\n        # 8001.5 x 1.2 x 1.5 = 14402.7 -> 14403\n        self.assertEqual(shipping_fee(5001, 101, True), 14403)\n\n    def test_half_up_on_excess(self):\n        # 10001 g: 80 + 5001 x 1.5 = 15501.5 -> 15502 (ปัดครึ่งขึ้น)\n       
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t3-shipping-fee-r3/sandbox/test_shipping_fee.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"command": "python3 solve.py && python3 -m unittest -v test_shipping_fee 2>&1 | tail -n 40; echo \"--- placeholder scan:\"; grep -nE \"placeholder|TODO|if False|or True\" solve.py test_shipping_fee.py || echo \"none\"", "description": "Run solve.py self-check, unit tests, and placeholder scan"}
+[user] RESULT: 4000
+8002
+81900
+test_at_distance_threshold (test_shipping_fee.Boundary.test_at_distance_threshold) ... ok
+test_at_weight_threshold (test_shipping_fee.Boundary.test_at_weight_threshold) ... ok
+test_just_above_weight_threshold (test_shipping_fee.Boundary.test_just_above_weight_threshold) ... ok
+test_zero_and_max (test_shipping_fee.Boundary.test_zero_and_max) ... ok
+test_half_up_on_excess (test_shipping_fee.NoDrift.test_half_up_on_excess) ... ok
+test_single_rounding_express (test_shipping_fee.NoDrift.test_single_rounding_express) ... ok
+test_single_rounding_with_distance (test_shipping_fee.NoDrift.test_single_rounding_with_distance) ... ok
+test_basic_tiers (test_shipping_fee.Normal.test_basic_tiers) ... ok
+test_flag_combinations (test_shipping_fee.Normal.test_flag_combinations) ... ok
+test_di
+[assistant] TEXT: สร้าง `solve.py` ที่ root ของ sandbox แล้ว ฟังก์ชัน `shipping_fee(weight_g, distance_km, express)` คืนค่าส่งเป็นจำนวนเต็มสตางค์ และ test ผ่านทั้ง 17 ข้อ (`python3 -m unittest -v test_shipping_fee`)
+
+**ไฟล์**
+- `solve.py`: ฟังก์ชันหลัก พร้อมฟังก์ชันตรวจ input และปัดเศษ คัดลอกมาจาก `skills/` โดยตรง ไม่ import ข้ามโฟลเดอร์
+- `test_shipping_fee.py`: test แบ่งเป็น Normal, Boundary, NoDrift, Reject ตามที่ skill `solver-selftest-workflow` กำหนด ค่า expected คำนวณด้วยสคริปต์ Fraction แยกจาก `solve.py`
+
+**การตีความที่โจทย์ไม่ได้ระบุชัด**
+1. **ช่วง 1,001–5,000 กรัม** คิด 80 บาท ตามข้อความ "ไม่เกิน 5,000 กรัม 80 บาท" ส่วนเกิน 5,000 กรัมคิด 15 บาทต่อกิโลกรัม เป็น 1.5 สตางค์ต่อกรัม ตามสัดส่วน (`solve.py`, บรรทัดคำนวณฐานน้ำหนัก)
+2. **ระยะทาง "เกิน 100 กม."** ใช้ `> 100` ดังนั้น 100 พอดีไม่คิดเพิ่ม (`solve.py`, บรรทัด `if distance > 100`)
+3. **ลำดับตัวคูณ:** คูณ 1.2 ของระยะทางก่อน แล้วคูณ 1.5 ของส่งด่วนต่อจากนั้น ไม่ปัดระหว่างทาง
+4. **วิธีปัด:** ปัดครึ่งขึ้นครั้งเดียวตอนท้าย เพราะเป็นเงินที่ลูกค้าจ่ายเข้าร้าน ตามแนวทางของ skill `money-arithmetic-rounding` หากต้องการปัดลงให้เปลี่ยนบรรทัด `return half_up(fee)`
+5. **การตรวจ input** ใช้ `ValueError` เท่านั้น: `weight_g` ต้องเป็น `int` ในช่วง 1–30,000 (`True`, `4500.0`, `"4500"` ถูกปฏิเสธ) `distance_km` ต้องเป็น `int` หรือ `float` ที่ไม่ติดลบ และไม่เป็น nan/inf `express` ต้องเป็น `True` หรือ `False` เท่านั้น
+
+**ค่าตัวอย่างที่ยืนยันแล้ว**
+- 1,000 g, 50 km, ธรรมดา → 4,000 สตางค์ (40 บาท)
+- 5,001 g, 50 km, ธรรมดา → 8,002 สตางค์ (8,001.5 ปัดครึ่งขึ้น)
+- 5,001 g, ส่งด่วน → 12,002 สตางค์ (ถ้าปัดระหว่างทางจะได้ 12,003 ซึ่งผิด)
+- 30,000 g, 150 km, ส่งด่วน → 81,900 สตางค์ (819 บาท)

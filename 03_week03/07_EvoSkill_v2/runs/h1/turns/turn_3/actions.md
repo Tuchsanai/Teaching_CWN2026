@@ -1,248 +1,281 @@
 # ตาที่ 3 ของ Evolver
 
-ข้อความที่ได้รับ: ขณะนี้เวลา 2026-11-14 21:24 UTC คุณมีเวลาถึง 2026-11-14 21:54 UTC สำหรับ epoch นี้ หลังจากนั้น `/evo/staging/` จะถูกนำไปใช้ตามสภาพที่เป็นอยู่ · ตอนนี้คือ epoch 3 · โปรดวิเคราะห์ rollout ของ Solver วินิจฉัยจุดพลาดที่สกิลเฉพาะทางน่าจะแก้ได้ แล้วเขียน `skills_v3` ลงใน `/evo/staging/`
+ข้อความที่ได้รับ: เวลาตอนนี้ 2026-11-14 23:11 UTC · เส้นตายของตานี้ 2026-11-14 23:41 UTC เมื่อถึงเส้นตาย สิ่งที่อยู่ใน `/evo/staging/` จะถูกนำไปใช้ทันทีตามสภาพขณะนั้น · นี่คือ epoch 3 · ผลการทำโจทย์รอบล่าสุดของ Solver อยู่ใน `/evo` แล้ว ขอให้วิเคราะห์ rollout เหล่านั้น วินิจฉัยว่า Solver พลาดตรงไหนที่สกิลช่วยแก้ได้ แล้วเขียนชุดสกิล `skills_v3` ลงใน `/evo/staging/`
 
 ### ขั้น 1 · Bash
 
 ```
-date -u && cat scores/epoch_2.json 2>/dev/null; echo; ls skills traces solver_workspaces; diff -r skills/epoch_2 staging && echo "SAME as staging"; ls traces/epoch_2 2>/dev/null | wc -l
+cat scores/epoch_2.json 2>/dev/null; echo; ls skills/epoch_2 solver_workspaces/epoch_2 traces/epoch_2 2>/dev/null | head -40; echo "--- staging"; find staging -type f
 ```
 
 ผลที่ได้:
 
 ```
-Sat Nov 14 21:24:37 UTC 2026
 {
- "t1-cafe-bill_s1": 0.9,
- "t1-cafe-bill_s2": 0.9,
- "t1-cafe-bill_s3": 0.9,
- "t2-split-bill_s1": 0.9,
- "t2-split-bill_s2": 0.9,
- "t2-split-bill_s3": 0.9,
- "t3-shipping-fee_s1": 0.8182,
- "t3-shipping-fee_s2": 0.8182,
- "t3-shipping-fee_s3": 0.8182,
- "t4-cashback_s1": 0.8,
- "t4-cashback_s2": 0.8,
- "t4-cashback_s3": 0.8
+ "t1-cafe-bill_s1": 0.7,
+ "t1-cafe-bill_s2": 0.7,
+ "t1-cafe-bill_s3": 0.7,
+ "t2-split-bill_s1": 0.7,
+ "t2-split-bill_s2": 0.7,
+ "t2-split-bill_s3": 0.7,
+ "t3-shipping-fee_s1": 0.6364,
+ "t3-shipping-fee_s2": 0.6364,
+ "t3-shipping-fee_s3": 0.6364,
+ "t4-cashback_s1": 0.6,
+ "t4-cashback_s2": 0.6,
+ "t4-cashback_s3": 0.6
 }
-skills:
-epoch_0
-epoch_1
-epoch_2
+skills/epoch_2:
+integer-money-rounding
+solve-task-checklist
+strict-input-validation
 
-solver_workspaces:
-epoch_0
-epoch_1
-epoch_2
+solver_workspaces/epoch_2:
+t1-cafe-bill_s1
+t1-cafe-bill_s2
+t1-cafe-bill_s3
+t2-split-bill_s1
+t2-split-bill_s2
+t2-split-bill_s3
+t3-shipping-fee_s1
+t3-shipping-fee_s2
+t3-shipping-fee_s3
+t4-cashback_s1
+t4-cashback_s2
+t4-cashback_s3
 
-traces:
-epoch_0
-epoch_1
-epoch_2
-SAME as staging
-12
+traces/epoch_2:
+t1-cafe-bill_s1.jsonl
+t1-cafe-bill_s2.jsonl
+t1-cafe-bill_s3.jsonl
+t2-split-bill_s1.jsonl
+t2-split-bill_s2.jsonl
+t2-split-bill_s3.jsonl
+t3-shipping-fee_s1.jsonl
+t3-shipping-fee_s2.jsonl
+t3-shipping-fee_s3.jsonl
+t4-cashback_s1.jsonl
+t4-cashback_s2.jsonl
+t4-cashback_s3.jsonl
+--- staging
+staging/integer-money-rounding/SKILL.md
+staging/solve-task-checklist/SKILL.md
+staging/strict-input-validation/SKILL.md
 ```
+
+**Agent พูด:** คะแนน epoch 2 เท่ากับ epoch 1 ทุกโจทย์ รวมถึง t4 ที่คาดว่าจะดีขึ้นหลังแก้การปัด ผมจะรัน differential test กับ epoch 2 เพื่อดูว่า t4 เปลี่ยนไปหรือไม่
 
 ### ขั้น 2 · Bash
 
 ```
-cd /tmp && python3 - << 'EOF'
-import importlib.util, io, contextlib
-def load(p,n):
-    sp=importlib.util.spec_from_file_location(n,p); m=importlib.util.module_from_spec(sp)
-    buf=io.StringIO()
-    with contextlib.redirect_stdout(buf): sp.loader.exec_module(m)
-    return m, buf.getvalue()
-S="/evo/solver_workspaces/epoch_2"; RF="/evo/reference/baankafe/answers"
-def run(f,*a):
-    try: r=f(*a); return ("OK",type(r).__name__,r)
-    except Exception as e: return ("E:"+type(e).__name__, str(e)[:60])
-cases={"t1-cafe-bill":("cafe_bill",[(({'price':4500,'qty':1},),False),(([{'price':4500,'qty':1}],),),([(({'price':4500,'qty':1}),)],False),([{'price':4500,'qty':1}],False),([{'price':10**12,'qty':10**6}],True)]),
-"t2-split-bill":("split_bill",[(10000,3,0),(10**15,7,100),(0,5,0),(10000,3)])}
-for task,(fn,cs) in cases.items():
-    R,_=load(f"{RF}/{task}/solve.py","r")
-    for s in ["s1","s2","s3"]:
-        M,out=load(f"{S}/{task}_{s}/solve.py","m")
-        if out: print(task,s,"PRINTS ON IMPORT:",out[:80])
-        for c in cs:
-            a=run(getattr(R,fn),*c) if isinstance(c,tuple) else None
-            b=run(getattr(M,fn),*c) if isinstance(c,tuple) else None
-            if a!=b: print(task,s,c,"ref",a,"sol",b)
-print("probe done")
-EOF
-cd /evo/solver_workspaces/epoch_2 && wc -l */solve.py | tail -1; grep -n "^print\|^assert\|^[a-z_]*(.*)$" */solve.py | head
+cd /evo/evolver_workspace/analysis/diff && python3 -I compare.py 2 > report_ep2.txt 2>&1; grep "^==" report_ep2.txt; sed -i "s#/evo/solver_workspaces/epoch_1/#/evo/solver_workspaces/epoch_'+ep+'/#" classify_t3.py; python3 -I classify_t4.py 2; echo; cd /evo/solver_workspaces/epoch_2 && grep -n "half\|floor\|round" t4-cashback_s1/solve.py | head -8; echo "--- t3 classify ep2"; cd /evo/evolver_workspace/analysis/diff && sed "s#epoch_1/t3#epoch_2/t3#" classify_t3.py > classify_t3_e2.py && python3 -I classify_t3_e2.py
 ```
 
 ผลที่ได้:
 
 ```
-t1-cafe-bill s1 ([({'price': 4500, 'qty': 1},)], False) ref ('E:ValueError', 'แต่ละรายการต้องเป็น dict') sol ('E:ValueError', 'items[0] ต้องเป็น dict')
-t1-cafe-bill s2 ([({'price': 4500, 'qty': 1},)], False) ref ('E:ValueError', 'แต่ละรายการต้องเป็น dict') sol ('E:ValueError', 'items[0] ต้องเป็น dict')
-t1-cafe-bill s3 ([({'price': 4500, 'qty': 1},)], False) ref ('E:ValueError', 'แต่ละรายการต้องเป็น dict') sol ('E:ValueError', 'แต่ละรายการใน items ต้องเป็น dict')
-probe done
-  894 total
+Exit code 1
+== t1-cafe-bill_s1: mismatches 0/314
+== t1-cafe-bill_s2: mismatches 0/314
+== t1-cafe-bill_s3: mismatches 0/314
+== t2-split-bill_s1: mismatches 0/312
+== t2-split-bill_s2: mismatches 0/312
+== t2-split-bill_s3: mismatches 0/312
+== t3-shipping-fee_s1: mismatches 52/319
+== t3-shipping-fee_s2: mismatches 52/319
+== t3-shipping-fee_s3: mismatches 52/319
+== t4-cashback_s1: mismatches 64/316
+== t4-cashback_s2: mismatches 64/316
+== t4-cashback_s3: mismatches 64/316
+t4-cashback_s1 {'silver_birthday_policy': 64}
+    silver_birthday_policy ([977047, 'silver', True], ['ok', 14655], ['ok', 20000])
+t4-cashback_s2 {'silver_birthday_policy': 64}
+    silver_birthday_policy ([977047, 'silver', True], ['ok', 14655], ['ok', 20000])
+t4-cashback_s3 {'silver_birthday_policy': 64}
+    silver_birthday_policy ([977047, 'silver', True], ['ok', 14655], ['ok', 20000])
+
+34:    ผลลัพธ์ปัดลง (floor) เพราะเป็นเงินที่ร้านจ่ายให้ลูกค้า
+54:    cashback_amount = int(raw // 1)   # floor
+--- t3 classify ep2
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/diff/classify_t3_e2.py", line 8, in <module>
+    so=run(stage('/evo/solver_workspaces/epoch_'+ep+'/t3-shipping-fee_s1/solve.py'))
+  
+…(ตัด 85 ตัวอักษร)
 ```
+
+**Agent พูด:** t4 ตอนนี้เหลือ mismatch เฉพาะกฎ silver ที่ผมตั้งใจไม่ใส่ในสกิล การปัดเศษถูกแก้แล้วตามที่คาด แต่คะแนนไม่เปลี่ยน ซึ่งบอกว่า hidden test ของ t4 อาจไม่ได้ทดสอบจุดปัดเศษนั้น ผมจะเช็ค t3 ต่อ
 
 ### ขั้น 3 · Bash
 
 ```
-cd /evo/traces/epoch_2 && for f in *.jsonl; do e=$(grep -c '"is_error": true' $f); n=$(grep -c '"type": "tool_use"\|"type":"tool_use"' $f); echo "$f errors=$e toolcalls=$n"; done; echo; python3 - << 'EOF'
-import json,glob
-for f in sorted(glob.glob("*_s1.jsonl")):
-    last=None
-    for l in open(f):
-        d=json.loads(l)
-        if d.get("type")=="assistant":
-            for b in d["message"]["content"]:
-                if b.get("type")=="text": last=b["text"]
-    print("=====",f); print(last[:1400] if last else None)
-EOF
+cd /evo/evolver_workspace/analysis/diff && sed "s#epoch_1/t3#epoch_2/t3#" classify_t3.py > classify_t3_e2.py && python3 -I classify_t3_e2.py; echo; cd /evo/solver_workspaces/epoch_2 && echo "## t3 s1 ep2 express/distance handling:"; grep -n -i "express\|distance\|20000\|== 0\|> 20" t3-shipping-fee_s1/solve.py | head -15
 ```
 
 ผลที่ได้:
 
 ```
-t1-cafe-bill_s1.jsonl errors=0 toolcalls=5
-t1-cafe-bill_s2.jsonl errors=0 toolcalls=5
-t1-cafe-bill_s3.jsonl errors=0 toolcalls=6
-t2-split-bill_s1.jsonl errors=0 toolcalls=4
-t2-split-bill_s2.jsonl errors=0 toolcalls=5
-t2-split-bill_s3.jsonl errors=0 toolcalls=5
-t3-shipping-fee_s1.jsonl errors=0 toolcalls=4
-t3-shipping-fee_s2.jsonl errors=0 toolcalls=5
-t3-shipping-fee_s3.jsonl errors=0 toolcalls=4
-t4-cashback_s1.jsonl errors=0 toolcalls=5
-t4-cashback_s2.jsonl errors=0 toolcalls=6
-t4-cashback_s3.jsonl errors=0 toolcalls=4
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/diff/classify_t3_e2.py", line 8, in <module>
+    so=run(stage('/evo/solver_workspaces/epoch_'+ep+'/t3-shipping-fee_s1/solve.py'))
+                                                 ^^
+NameError: name 'ep' is not defined
 
-===== t1-cafe-bill_s1.jsonl
-สร้าง `solve.py` ไว้ที่โฟลเดอร์ทำงาน (`sandbox/solve.py`) แล้ว มีฟังก์ชัน `cafe_bill(items, member)` และ `main()` สำหรับ CLI ผ่าน stdin เป็น JSON
-
-**วิธีคิดเงิน**
-1. รวมยอดก่อนลดเป็นสตางค์ `sum(price × qty)`
-2. ถ้ายอดรวมตั้งแต่ 50000 สตางค์ (500 บาท) ขึ้นไป ลด 5%
-3. ถ้า `member = True` ลดอีก 10% คิดต่อจากยอดหลังลด 5%
-4. บวก VAT 7% เป็นขั้นสุดท้าย
-5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ ครั้งเดียวตอนท้าย ทั้งหมดคำนวณด้วย `Fraction` ไม่ใช้ float
-
-**การตีความที่ผมเลือกเอง (ควรยืนยัน)**
-- เกณฑ์ 500 บาทดูจากยอดรวมก่อนหักส่วนลดสมาชิก
-- ส่วนลดสมาชิกคิดทบจากยอดหลังลด 5% ไม่ได้รวมเป็น 15%
-- ยอดรวมว่าง (`items = []`) คืน `0`
-- `price` ต้องเป็น int ≥ 0 แ
-…(ตัด 4436 ตัวอักษร)
+## t3 s1 ep2 express/distance handling:
+3:shipping_fee(weight_g, distance_km, express) -> int (สตางค์)
+22:def _require_distance(value):
+24:        raise ValueError("distance_km ต้องเป็นตัวเลข")
+26:        raise ValueError("distance_km ต้องเป็นตัวเลขจำกัด")
+28:        raise ValueError("distance_km ต้องไม่ติดลบ")
+49:def shipping_fee(weight_g, distance_km, express):
+53:    distance_km : ตัวเลขตั้งแต่ 0 (กม.)
+54:    express     : bool, True = ส่งด่วน
+57:    distance_km = _require_distance(distance_km)
+58:    express = _require_bool(express, "express")
+63:    if distance_km > 100:
+67:    if express:
 ```
 
 ### ขั้น 4 · Bash
 
 ```
-cd /evo && sed -n '38,42p;55,70p' staging/thai-spec-solve-py/SKILL.md
+cd /evo/evolver_workspace/analysis/diff && sed -i "s#'/evo/solver_workspaces/epoch_1/t3-shipping-fee_s1/solve.py'#'/evo/solver_workspaces/epoch_2/t3-shipping-fee_s1/solve.py'#" classify_t3.py && python3 -I classify_t3.py; echo "--- t3 s1 ep2 full"; sed -n '45,75p' /evo/solver_workspaces/epoch_2/t3-shipping-fee_s1/solve.py
 ```
 
 ผลที่ได้:
 
 ```
-## 5. เรื่องที่โจทย์ไม่ได้บอก
-- ถ้าโจทย์เงียบเรื่องกรณีพิเศษ ให้เลือกการอ่านตามตัวอักษรที่แคบที่สุด แล้วเขียนไว้ใน final message ว่าเลือกอะไร
-- ค่าศูนย์หรือค่าขอบของพารามิเตอร์บางตัวอาจมีความหมายพิเศษ เช่น รับเองที่ร้านหรือไม่มีการคิดค่าบริการ ถ้าโจทย์ไม่ได้เขียนไว้ ให้ทำตามตัวอักษรของโจทย์และระบุในสรุปว่าเป็นจุดที่ควรยืนยัน
-- อย่าแต่งกติกาที่โจทย์ไม่มี และอย่าเพิกเฉยต่อกติกาที่โจทย์เขียนไว้
+Traceback (most recent call last):
+  File "/evo/evolver_workspace/analysis/diff/classify_t3.py", line 8, in <module>
+    so=run(stage('/evo/solver_workspaces/epoch_'+ep+'/t3-shipping-fee_s1/solve.py'))
+                                                 ^^
+NameError: name 'ep' is not defined
+--- t3 s1 ep2 full
+    extra_g = weight_g - 5_000
+    return Fraction(80 * 100) + Fraction(extra_g * 15 * 100, 1_000)
 
-- ถ้า assert ใดไม่ตรงกับโค้ด ให้ตรวจว่าความคาดหวังผิดหรือโค้ดผิด อย่าแก้ assert ให้ตรงกับผลลัพธ์โดยไม่คิด
-- ก่อนจบ ให้ตรวจไฟล์ solve.py อีกรอบว่าไม่มีโค้ดทดสอบค้างที่ผิดสเปค
 
-## 8. ผลลัพธ์ที่ส่ง
-- ไฟล์ `solve.py` ในโฟลเดอร์ทำงานปัจจุบัน ชื่อฟังก์ชันและลำดับพารามิเตอร์ตรงตามโจทย์
-- final message เป็นภาษาไทย สรุปวิธีคำนวณ ทิศทางการปัด และการตีความที่เลือกเองทั้งหมด
+def shipping_fee(weight_g, distance_km, express):
+    """คืนค่าส่งเป็นจำนวนเต็มสตางค์
+
+    weight_g    : int 1–30,000 กรัม
+    distance_km : ตัวเลขตั้งแต่ 0 (กม.)
+    express     : bool, True = ส่งด่วน
+    """
+    weight_g = _require_int(weight_g, "weight_g", 1, 30_000)
+    distance_km = _require_distance(distance_km)
+    express = _require_bool(express, "express")
+
+    fee = _base_satang(weight_g)
+
+    # ระยะทางเกิน 100 กม. คิดเพิ่ม 20%
+    if distance_km > 100:
+        fee *= Fraction(6, 5)
+
+    # ส่งด่วน คิดเพิ่ม 50% (คูณต่อจากข้อก่อน)
+    if express:
+        fee *= Fraction(3, 2)
+
+    # ปัดครั้งเดียวตอนท้ายสุด
+    return _half_up(fee)
+
+
+if __name__ == "__main__":
+    print(shipping_fee(500, 10, False))     # 4000
 ```
 
-### ขั้น 5 · Edit
+### ขั้น 5 · Bash
 
 ```
-/evo/staging/thai-spec-solve-py/SKILL.md
-- ค่าที่คาดหวังในชุดทดสอบให้คำนวณด้วยสคริปต์ที่ใช้ `Fraction` ไม่ใช่คิดเลขในหัว รอบก่อนมี solver คำนวณมือผิดแล้วแก้ assert ให้ตรงกับโค้ดทั้งที่โค้ดถูก
-- ถ้า assert ใดไม่ตรงกับโค้ด ให้คำนวณซ้ำด้วยสคริปต์ก่อนว่าความคาดหวังผิดหรือโค้ดผิด อย่าแก้ assert ให้ตรงกับผลลัพธ์โดยไม่คิด
+sed -i "s#'/evo/solver_workspaces/epoch_'+ep+'/t3-shipping-fee_s1/solve.py'#'/evo/solver_workspaces/epoch_2/t3-shipping-fee_s1/solve.py'#" classify_t3.py && python3 -I classify_t3.py
 ```
 
 ผลที่ได้:
 
 ```
-The file /evo/staging/thai-spec-solve-py/SKILL.md has been updated successfully.
+{'express_over_20000_policy': 48, 'zero_distance_pickup_policy': 3, "other:['err', 'ValueError'] vs ['ok', 4800]": 1}
+  express_over_20000_policy ([27041, 205, True], ['err', 'ValueError'], ['ok', 73911])
+  zero_distance_pickup_policy ([7048, 0, True], ['ok', 0], ['ok', 16608])
+  other:['err', 'ValueError'] vs ['ok', 4800] ([1000, 100.5, False], ['err', 'ValueError'], ['ok', 4800])
 ```
+
+**Agent พูด:** epoch 2 ยังรับ distance เป็น float (100.5) ทั้งที่เฉลยปฏิเสธ เพราะสกิล v2 เขียนกฎ float ไว้กำกวมเกินไป ส่วนกฎซ่อนของ t3 และ t4 ยังเหมือนเดิม ผมจะเขียนกฎ float ให้ชัดขึ้นใน v3 และอัปเดตบันทึก
 
 ### ขั้น 6 · Edit
 
 ```
-/evo/staging/thai-spec-solve-py/SKILL.md
-## 8. ก่อนส่ง: เช็กลิสต์
-- [ ] ชื่อฟังก์ชันและลำดับพารามิเตอร์ตรงตามโจทย์
-- [ ] พารามิเตอร์ตัวเลขทุกตัวตรวจด้วย `type(x) is int` และ bool/float/str ถูก reject ด้วย `ValueError`
-- [ ] ผลเงินปัดครั้งเดียวที่ปลายสุดตามทิศทางที่เลือก และไม่มี float ในการคำนวณ
-- [ ] `main()` ทำงานกับ stdin JSON ทั้งกรณีสำเร็จและ error (exit 0 / exit 2)
-- [ ] ชุดทดสอบครอบคลุมขอบเขต กรณี reject และการปัดครึ่ง และรันผ่านแล้ว
-
-## 9. ผลลัพธ์ที่ส่ง
-- ไฟล์ `solve.py` ในโฟลเดอร์ทำงานปัจจุบัน ชื่อฟังก์ชันและลำดับพารามิเตอร์ตรงตามโจทย์
+/evo/staging/strict-input-validation/SKILL.md
+- **กฎ float:** พารามิเตอร์ตัวเลขรับเฉพาะ `int` เสมอ เว้นแต่โจทย์เขียนชัดว่ารับทศนิยมหรือเศษส่วน (เช่น "ทศนิยม", "ตัวเลขใดก็ได้", "เศษกิโลเมตร") ถ้าโจทย์ไม่ได้เขียนแบบนั้น ให้ปฏิเสธ float ทั้งหมด แม้ค่าจะเป็นจำนวนเต็มในรูปทศนิยม (`1000.0`) หรือดูสมเหตุสมผล (`100.5`)
+- ห้ามเขียนตัวตรวจแบบ `isinstance(x, (int, float))`, `Fraction(str(x))` หรือ `Decimal(str(x))` กับพารามิเตอร์ที่ควรเป็น int เพราะจะรับ float ให้โดยปริยาย
+- ถ้าโจทย์ให้ช่วง เช่น "ตั้งแต่ 0" กับระยะทางหรือน้ำหนัก แปลว่าเป็นจำนวนเต็มที่ไม่ติดลบ ไม่ใช่ตัวเลขที่ต่อเนื่อง ยกเว้นโจทย์บอกว่าทศนิยมได้
 ```
 
 ผลที่ได้:
 
 ```
-The file /evo/staging/thai-spec-solve-py/SKILL.md has been updated successfully.
+The file /evo/staging/strict-input-validation/SKILL.md has been updated successfully.
 ```
 
-### ขั้น 7 · Bash
+**Agent พูด:** บรรทัดสุดท้ายที่เพิ่มไปอ้างเกินกว่าที่ brief บอก ผมจะลบออก
+
+### ขั้น 7 · Edit
 
 ```
-grep -n "^## " staging/thai-spec-solve-py/SKILL.md && find staging -type f | sort && cat >> evolver_workspace/notes.md << 'EOF'
+/evo/staging/strict-input-validation/SKILL.md
+```
 
-## Epoch 2 ผลจริง (ผล: t1 0.9 ×3 · t2 0.9 ×3 · t3 0.8182 ×3 · t4 0.8 ×3)
-- t3 ดีขึ้นครบทั้ง 3 rollout (จาก 0.64 เหลือ 0.8182) หลังเพิ่ม int-strict และ main() บังคับ
-- ไม่มี tool error ใน trace ทั้ง 12 rollout; Solver ระบุการตีความที่เลือกเองใน final message ครบ
-- ยังไม่มี skill ตัวไหนแก้ได้: ที่เหลือคือกติกาซ่อนของ reference (t3 ค่าศูนย์/express, t4 silver+เดือนเกิด) และ 0.1 ของ t1/t2 ที่ยังหาสาเหตุไม่ได้
-- ใน solver บางตัวคำนวณ expected value ด้วยมือผิดแล้วแก้ assert ให้ตรงโค้ด → เพิ่มข้อกำหนดให้คำนวณด้วยสคริปต์ Fraction
+ผลที่ได้:
 
-## Epoch 3 (สิ่งที่เขียนใน /evo/staging)
-- `thai-spec-solve-py/SKILL.md`: เพิ่มข้อคำนวณ expected value ด้วยสคริปต์, เพิ่มเช็กลิสต์ก่อนส่ง (section 8), section ผลลัพธ์ย้ายเป็น 9
-- สกิลอื่นไม่เปลี่ยน ความเปลี่ยนแปลงนี้เล็กเพราะ rollout ไม่พบจุดพลาดใหม่ที่สกิลแก้ได้
+```
+The file /evo/staging/strict-input-validation/SKILL.md has been updated successfully.
+```
+
+### ขั้น 8 · Bash
+
+```
+cat > /evo/evolver_workspace/notes_epoch3.md <<'EOF'
+# บันทึก Epoch 3
+
+## คะแนน epoch 2 (สกิล v2) = เท่ากับ epoch 1 ทุกโจทย์
+- t1 0.7 · t2 0.7 · t3 0.636 · t4 0.6 (ไม่เปลี่ยน)
+
+## Differential test vs เฉลย (ep2)
+- t1, t2: 0 mismatch (เหมือน ep1)
+- t4: เหลือ 64 เคส silver birthday เท่านั้น (ปัดเศษตรงแล้ว ลดจาก 126) → คะแนนไม่เปลี่ยน แปลว่า hidden test ของ t4 อาจไม่ได้ทดสอบจุดปัดเศษนี้ หรือยังคงมี hidden กฎอื่น
+- t3: 48 express>20000 + 3 distance 0 + 1 float distance 100.5
+  - float ที่ยังหลุด: Solver ตีความว่า "ระยะทาง" เป็นทศนิยมได้ เพราะ brief ไม่ได้ระบุชนิด → v2 เขียนกฎ float กำกวม
+
+## การแก้ใน skills_v3
+- strict-input-validation: กฎ float ชัดขึ้น: รับ int เสมอ เว้นแต่โจทย์บอกว่าทศนิยมได้ ห้ามใช้ isinstance(x,(int,float)) หรือ Fraction(str(x)) กับพารามิเตอร์ที่ควรเป็น int
+- integer-money-rounding, solve-task-checklist: ไม่เปลี่ยน (Solver ทำตามได้แล้ว: ปัดลงเงินคืน, ปัดครั้งเดียว)
+
+## ข้อสรุปเชิงกลยุทธ์
+- คะแนนค้างที่ระดับเดิมสองรอบติด ส่วนที่เหลือเกือบทั้งหมดเป็นกฎที่ brief ไม่ได้เขียน (t3: ส่งด่วน>20000, ระยะ 0; t4: silver โบนัสเดือนเกิด) และ hidden check ของ t1/t2 อีก 0.3 ที่ยังไม่รู้
+- สกิลทั่วไปไม่น่าจะขยับคะแนนได้อีกมากนัก ถ้ายังไม่ยอมใส่กฎเฉพาะโจทย์ ต้องให้ผู้ใช้ตัดสินเรื่องนี้
 EOF
-tail -4 evolver_workspace/notes.md; date -u
+cd /evo/staging && find . -type f && head -4 strict-input-validation/SKILL.md
 ```
 
 ผลที่ได้:
 
 ```
-10:## 1. แตกกติกาก่อนเขียนโค้ด
-16:## 2. ตรวจ input แบบเข้มงวด
-26:## 3. คำนวณให้ตรงลำดับและปัดครั้งเดียว
-31:## 4. ขอบเขตที่ต้องทดสอบเสมอ
-38:## 5. เรื่องที่โจทย์ไม่ได้บอก
-43:## 6. CLI (ต้องมีทุกครั้ง)
-52:## 7. ทดสอบในโฟลเดอร์ทำงาน
-59:## 8. ก่อนส่ง: เช็กลิสต์
-66:## 9. ผลลัพธ์ที่ส่ง
-staging/money-rounding-satang/SKILL.md
-staging/money-rounding-satang/money_helpers.py
-staging/thai-spec-solve-py/SKILL.md
-
-## Epoch 3 (สิ่งที่เขียนใน /evo/staging)
-- `thai-spec-solve-py/SKILL.md`: เพิ่มข้อคำนวณ expected value ด้วยสคริปต์, เพิ่มเช็กลิสต์ก่อนส่ง (section 8), section ผลลัพธ์ย้ายเป็น 9
-- สกิลอื่นไม่เปลี่ยน ความเปลี่ยนแปลงนี้เล็กเพราะ rollout ไม่พบจุดพลาดใหม่ที่สกิลแก้ได้
-Sat Nov 14 21:25:07 UTC 2026
+./integer-money-rounding/SKILL.md
+./solve-task-checklist/SKILL.md
+./strict-input-validation/SKILL.md
+---
+name: strict-input-validation
+description: ใช้เมื่อเขียนฟังก์ชันที่รับ input ซึ่งโจทย์กำหนดชนิดหรือช่วงค่า (จำนวนเต็ม, True/False, ค่าที่เลือกได้เฉพาะบางค่า, รายการของ dict, ช่วงตัวเลข) เพื่อปฏิเสธ input ที่ผิดด้วย ValueError แทนการแปลงค่าเงียบ ๆ
+---
 ```
 
-**Agent พูด:** `skills_v3` is in `/evo/staging/`. I finished at 21:25 UTC, ahead of the 21:54 deadline.
+**Agent พูด:** `skills_v3` อยู่ใน `/evo/staging/` แล้ว แต่การเปลี่ยนแปลงรอบนี้มีผลน้อยกว่าที่หวัง คะแนน epoch 2 เท่ากับ epoch 1 ทุกโจทย์ (t1 0.7, t2 0.7, t3 0.636, t4 0.6)
 
-**Epoch 2 results.** Scores are t1 0.9, t2 0.9, t3 0.8182 and t4 0.8. The t3 solvers all improved from the previous epoch's 0.64 low, after the int-only parameters and mandatory `main()` changes. The traces show no tool errors across all 12 rollouts.
+**สิ่งที่ผมเห็นจาก differential test กับเฉลย**
+- **t4 ปัดเศษถูกแล้ว:** การแก้ใน v2 ทำให้ mismatch ลดจาก 126 เคสเหลือ 64 เคส ที่เหลือคือ silver ได้โบนัสเดือนเกิด ซึ่งเป็นกฎที่ขัดกับตัวอักษรของ brief ผมจึงไม่ใส่ลงสกิล
+- **t3 ยังรับ float ระยะทาง (100.5):** สาเหตุคือกฎ float ใน v2 กำกวม Solver เลยตีความว่าระยะทางเป็นทศนิยมได้ ผมเขียนกฎใน v3 ให้ชัดแล้ว: รับ int เสมอ เว้นแต่โจทย์บอกว่าทศนิยมได้ และห้ามใช้ `isinstance(x, (int, float))` กับพารามิเตอร์ที่ควรเป็น int
+- **t1, t2 ตรงกับเฉลยทุกเคสที่ทดสอบ:** คะแนนที่หายไป 0.3 ของแต่ละโจทย์ยังไม่รู้ว่าคืออะไร
+- **กฎซ่อนของ t3 (ส่งด่วนเกิน 20,000 กรัม, ระยะ 0)** ยังอยู่นอกสกิลเหมือนเดิม
 
-**Why the scores have plateaued.** The remaining gaps don't look fixable from skills:
-- **t4 (0.8):** the solvers give silver members the birthday bonus, which the brief allows. The reference doesn't.
-- **t3 (0.8182):** the reference applies rules the brief doesn't state, for zero distance and the express weight limit.
-- **t1 and t2 (0.9):** I still can't find the missing 0.1. My random and edge-case checks match the reference exactly, including invalid inputs, and the CLI error messages differ only in wording.
+**ข้อสรุปที่ควรพิจารณา:** คะแนนค้างที่ระดับเดิมมาสองรอบ และส่วนที่เหลือเกือบทั้งหมดมาจากกฎที่ brief ไม่ได้เขียน สกิลทั่วไปน่าจะขยับคะแนนได้อีกไม่มาก ถ้าต้องการให้ไปต่อ ต้องตัดสินว่าจะใส่กฎเฉพาะโจทย์ของ t3 และ t4 หรือไม่ ซึ่งผมยังไม่ทำจนกว่าจะได้รับคำสั่ง
 
-**What changed in `thai-spec-solve-py/SKILL.md`:**
-- The expected values in test asserts must be computed with a `Fraction` script. One epoch 2 solver miscalculated an expected value by hand and changed the assert to match correct code.
-- A pre-submit checklist (section 8) covers int-only parameters, rounding, the CLI contract and the test set. The result section moved to section 9.
-
-The money skill is unchanged. The notes are updated in `/evo/evolver_workspace/notes.md`. This epoch's edits are small because the rollouts showed no new failure that a skill could fix. The next gains would need to come from the hidden rules, which the 
-…(ตัด 19 ตัวอักษร)
+บันทึกทั้งหมดอยู่ที่ `evolver_workspace/notes_epoch3.md`

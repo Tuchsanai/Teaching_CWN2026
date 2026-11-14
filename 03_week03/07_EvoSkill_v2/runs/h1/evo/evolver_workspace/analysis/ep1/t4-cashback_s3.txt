@@ -1,0 +1,269 @@
+[SYSTEM init]
+[THINK] 
+[assistant TOOL_USE Bash] {"command": "ls -la && ls -la ./skills 2>/dev/null || echo \"NO_SKILLS_DIR\"", "description": "List working directory and check for skills folder"}
+[RESULT] total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:08 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:08 ..
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 skills
+total 20
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:08 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 integer-money-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:07 solve-task-checklist
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 strict-input-validation
+[assistant TOOL_USE Bash] {"command": "cd /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t4-cashback-r3/sandbox/skills && for d in *; do echo \"=== $d ===\"; ls -la \"$d\"; done; echo; for f in */SKILL.md; do echo \"=== $f ===\"; cat \"$f\"; echo; done", "description": "List and read skill files"}
+[RESULT] === integer-money-rounding ===
+total 16
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 .
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 ..
+-rw-r--r-- 1 root root 6051 Nov 15 06:06 SKILL.md
+=== solve-task-checklist ===
+total 16
+drwxr-xr-x 2 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 ..
+-rw-r--r-- 1 root root 5258 Nov 15 06:07 SKILL.md
+=== strict-input-validation ===
+total 16
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 .
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 ..
+-rw-r--r-- 1 root root 5062 Nov 15 06:06 SKILL.md
+
+=== integer-money-rounding/SKILL.md ===
+---
+name: integer-money-rounding
+description: ใช้เมื่อโจทย์คำนวณเงิน ส่วนลด ภาษี ค่าส่ง ทิป หรือเงินคืนเป็นสตางค์ (จำนวนเต็ม) เพื่อหลีกเลี่ยงค่าคลาดเคลื่อนจาก float, การปัดเศษระหว่างขั้น และลำดับการคูณผิด
+---
+
+# คำนวณเงินเป็นสตางค์ให้ตรงทุกสตางค์
+
+## หลักการ
+
+1. **ห้าม float** ตลอดการคำนวณ เก็บค่าเป็น `int` (สตางค์) หรือ `fractions.Fraction`
+2. **ปัดเศษครั้งเดียว ตอนท้ายสุด** ห้ามปัดทุกขั้น การปัดทุกขั้นทำให้ผลเพี้ยน 1 สตางค์ได้ ซึ่งทำให้ test ที่เทียบทีละสตางค์ไม่ผ่าน
+3. **ตัวคูณต้องคูณก่อนปัด** ค่าที่ต้อง floor หรือ round ต้องเป็นผลรวมของทุกตัวคูณแล้ว ห้าม floor ค่าย่อยแล้วค่อยคูณ เช่น ถ้าได้ 250.5 แล้วต้อง ×2 ให้คูณได้ 501 ก่อนปัด ถ้า floor 250 ก่อนจะได้ 500 ซึ่งผิด
+4. **ลำดับตามที่โจทย์เขียน**
+   - "ลด X% แล้วลดอีก Y%" หรือ "คิดต่อจากข้อก่อน" = ตัวคูณทบกัน (คูณ `(1-X)` แล้วคูณ `(1-Y)`)
+   - "เพิ่ม Z% เป็นขั้นสุดท้าย" = คูณ `(1+Z)` ตอนท้าย
+   - เงื่อนไขขั้นต่ำ เช่น "ยอดตั้งแต่ N ลด X%" ให้ตรวจยอดตามที่โจทย์ระบุ (ยอดก่อนลด หรือยอดหลังลดขั้นก่อนหน้า) และเลือกความหมายที่ตรงตัวอักษรที่สุด
+5. **ทิศทางการปัด** ดูตามความหมายของโจทย์
+   - ถ้าโจทย์ไม่ระบุ ให้ใช้ **ปัดครึ่งขึ้น (half-up)**
+   - ถ้าโจทย์บอกให้ "ปัดลง" หรือ "ไม่จ่ายเกินสิทธิ์" ให้ใช้ floor
+   - ระบุทิศทางที่เลือกในคำตอบสุดท้าย
+6. **ขีดจำกัด (cap / floor / ขั้นต่ำ)** ใช้กับผลลัพธ์หลังคูณตัวคูณทั้งหมดแล้ว เช่น ถ้า "สูงสุดต่อบิล" ให้ `min(...)` หลังจากคูณทุกอย่างเสร็จ
+7. **อย่าใช้ `round()` ของ Python** เพราะเป็น banker's rounding (`round(0.5) == 0`, `round(2.5) == 2`) ใช้ helper ด้านล่างแทน
+
+## ตัวช่วยปัดเศษ (จำนวนเต็มล้วน ไม่มี float)
+
+```python
+from fractions import Fraction
+
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็น int, x ไม่ติดลบ (int หรือ Fraction)"""
+    return int((Fraction(x) * 2 + 1) // 2)
+
+def floor_int(x):
+    """ปัดลงเป็น int, x ไม่ติดลบ"""
+    return int(Fraction(x) // 1)
+
+def percent_of(amount, pct):
+    """amount * pct% โดยยังไม่ปัด คืนเป็น Fraction"""
+    return Fraction(amount) * Fraction(pct, 100)
+```
+
+ตัวอย่างรูปแบบการใช้ (ตัวเลขสมมติ):
+
+```python
+total = Fraction(subtotal)            # ยังไม่ปัด
+if subtotal >= 50_000:                # เงื่อนไขตามโจทย์
+    total -= percent_of(total, 5)
+if member:
+    total -= percent_of(total, 10)    # คิดต่อจากยอดที่ลดแล้ว
+total += percent_of(total, 7)         # ขั้นสุดท้าย
+return half_up(total)                 # ปัดครั้งเดียว
+```
+
+## วิธีตรวจว่าปัดถูก
+
+- คำนวณตัวอย่างด้วยมือด้วย `Fraction` แบบแยกขั้นตอน แล้วเทียบกับโค้ดทีละสตางค์
+- ถ้าผลต่างเป็น 1 สตางค์ ให้ตรวจก่อนว่าปัดเศษกี่ครั้ง และคูณตัวไหนก่อน
+- ทดสอบค่าที่เศษ .5 พอดี เช่น ยอดที่ทำให้ผลลัพธ์ลงท้าย .5 เพื่อดูทิศทางการปัด
+- ทดสอบค่าที่เศษ < .5 และ > .5 ทั้งสองด้าน เพื่อดูว่าไม่ได้ปัดเกิน
+
+## Checklist การเงิน
+
+- [ ] ไม่มี float ในการคำนวณ (ไม่มี `/` ที่ได้ float, ไม่มี `0.07` ฯลฯ)
+- [ ] ปัดเศษครั้งเดียวตอนท้าย
+- [ ] ตัวคูณพิเศษ (×2, ทิป, VAT) ถูกคูณก่อนปัด
+- [ ] ลำดับการลดและเพิ่มตรงตามที่โจทย์เขียน
+- [ ] cap/min ถูกใช้หลังคูณทั้งหมด
+- [ ] ผลลัพธ์เป็น `int` เสมอ
+
+=== solve-task-checklist/SKILL.md ===
+---
+name: solve-task-checklist
+description: ใช้ก่อนส่งงานเขียนไฟล์ solve.py ทุกครั้ง เพื่อแตกกฎจากโจทย์ ทดสอบขอบเขตและ input ผิด รันไฟล์จริง และสรุปจุดที่ตีความเอง
+---
+
+# Checklist ก่อนส่งงาน solve.py
+
+## 1. แตกโจทย์เป็นกฎ
+
+อ่านโจทย์ทุกบรรทัด แล้วเขียนกฎ 1 ข้อต่อ 1 บรรทัด ครอบคลุม:
+- พารามิเตอร์แต่ละตัว ชนิดและช่วงค่า
+- ลำดับการคำนวณ (ขั้นไหนมาก่อน)
+- เงื่อนไข ("ถ้า", "เฉพาะ", "ตั้งแต่", "เกิน", "ไม่เกิน")
+- กฎการปัดเศษ
+- รูปแบบผลลัพธ์ (ชนิด, ลำดับของ list)
+
+ทุกกฎต้องมีโค้ดที่สะท้อนมัน อย่าข้ามกฎที่ดูเล็กน้อย
+
+## 2. ทดสอบขอบเขตของทุกเงื่อนไข
+
+สำหรับทุกเงื่อนไขเชิงตัวเลข ทดสอบค่า `X-1`, `X`, `X+1` (จำนวนเต็ม) โดย X คือค่าขอบที่โจทย์พูดถึง รวมถึงค่า 0 และรายการว่างถ้าโจทย์อนุญาต ต้องรันได้โดยไม่พัง
+
+## 3. ทดสอบ input ที่ผิด
+
+ทุกพารามิเตอร์ที่มีข้อกำหนดชนิดหรือช่วง ต้องทดสอบ:
+- float ที่ค่าเป็นจำนวนเต็ม, string ที่เป็นตัวเลข, bool, None
+- ค่าต่ำกว่าช่วงและสูงกว่าช่วง
+- ค่าที่เลือกได้เฉพาะบางค่า แต่ป้อนค่าที่ไม่อยู่ในรายการ
+
+ทุกกรณีต้อง `raise ValueError` ไม่ใช่ TypeError, KeyError หรือผลลัพธ์ที่ไม่ error
+
+## 4. คำนวณตัวอย่างด้วยมือ แล้วเทียบ
+
+ใช้ `Fraction` คำนวณตามลำดับของโจทย์ทีละขั้น แล้วเทียบกับโค้ด ถ้าต่างกันเพียงสตางค์เดียว ให้ดูว่าปัดกี่ครั้งและคูณตัวไหนก่อน (ดู skill `integer-money-rounding`)
+
+## 5. รันไฟล์จริงด้วยคำสั่งที่ import ได้
+
+```bash
+python3 -c "import sys; sys.path.insert(0,'.'); from solve import ฟังก์ชัน; print(ฟังก์ชัน(...))"
+```
+
+**ห้ามใช้ `python3 -I` กับการ import ไฟล์ใน cwd** เพราะโหมด isolated จะไม่ใส่ cwd ใน sys.path ทำให้เกิด `ModuleNotFoundError` (เกิดขึ้นจริงในรอบนี้) ถ้าเขียน test ให้ใช้ `python3 -m unittest` จาก cwd โดยตรง
+
+## 6. ตรวจรูปแบบของไฟล์
+
+- มีฟังก์ชันชื่อและพารามิเตอร์ตรงกับโจทย์ทุกตัว ตามลำดับเดิม
+- ผลลัพธ์เป็นชนิดที่โจทย์กำหนด (เช่น `int` สตางค์, `list` ตามลำดับคน)
+- ไม่มี side effect ตอน import นอกจากบล็อก `if __name__ == "__main__":`
+- ใช้เฉพาะ standard library
+- ไม่มี dependency หรือไฟล์ภายนอกที่ไม่ได้ส่งมาด้วย
+
+## 7. สรุปการตีความ
+
+โจทย์ที่กำกวมหรือไม่ได้พูดถึงกรณีพิเศษ (เช่น ค่า 0, ทิศทางการปัด, ลำดับของเงื่อนไข) ให้:
+- เลือกการตีความที่ตรงตัวอักษรของโจทย์มากที่สุด
+- ระบุการตีความนั้นสั้น ๆ ในคำตอบสุดท้าย พร้อมวิธีแก้ถ้าต้องเปลี่ยน
+- อย่าเงียบ ๆ เพิ่มกฎที่โจทย์ไม่ได้บอก
+
+## 8. คำตอบสุดท้าย
+
+สั้น ๆ ระบุ: ไฟล์ที่เขียน, ผลตัวอย่างที่ตรวจแล้ว, การตีความที่เลือกเอง, และสิ่งที่ยังไม่ได้ทดสอบ
+
+=== strict-input-validation/SKILL.md ===
+---
+name: strict-input-validation
+description: ใช้เมื่อเขียนฟังก์ชันที่รับ input ซึ่งโจทย์กำหนดชนิดหรือช่วงค่า (จำนวนเต็ม, True/False, ค่าที่เลือกได้เฉพาะบางค่า, รายการของ dict, ช่วงตัวเลข) เพื่อปฏิเสธ input ที่ผิดด้วย ValueError แทนการแปลงค่าเงียบ ๆ
+---
+
+# ตรวจ input แบบเข้มงวด
+
+## หลักการ
+
+- ถ้า input ไม่ตรงกับที่โจทย์กำหนด ให้ **ปฏิเสธ** ไม่ใช่พยายามแปลงให้ใช้ได้
+- **ห้าม** แปลงค่าเพื่อความสะดวก: `int(x)`, `float(x)`, `str(x)`, `Fraction(str(x))`, `.strip()`, `.lower()` ทำให้ `4500.0`, `"2"`, `" Gold "` ผ่านไปเงียบ ๆ ซึ่งผิดสัญญาของฟังก์ชัน
+- ใช้ **ValueError** กับ input ผิดทุกกรณี รวมถึงชนิดผิด ไม่ใช้ TypeError เพราะผู้ตรวจคาดหวัง ValueError
+- `bool` เป็นลูกของ `int` ใน Python: `isinstance(True, int)` ได้ True จึงต้องใช้ `type(x) is int` และตรวจ bool แยกต่างหาก
+- ค่า key ที่ขาดหายใน dict ต้องกลายเป็น ValueError ไม่ใช่ KeyError: ใช้ `item.get("price")` แล้วให้ตัวตรวจ type จับ None
+- ตรวจ input **ก่อน** คำนวณ ไม่คืนผลลัพธ์บางส่วน
+
+## รูปแบบโค้ดตรวจ
+
+```python
+def require_int(value, name, low=None, high=None):
+    if type(value) is not int:          # ปฏิเสธ bool, float, str, None
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    if high is not None and value > high:
+        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+    return value
+
+def require_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+def require_choice(value, name, choices):
+    if type(value) is not str or value not in choices:   # ไม่ normalize
+        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+    return value
+
+def require_list_of_dicts(value, name):
+    if type(value) is not list:
+        raise ValueError(f"{name} ต้องเป็น list")
+    for entry in value:
+        if type(entry) is not dict:
+            raise ValueError(f"แต่ละรายการใน {name} ต้องเป็น dict")
+    return value
+```
+
+ใช้ตัวช่วยเหล่านี้กับทุกพารามิเตอร์ในฟังก์ชันหลัก ก่อนบรรทัดคำนวณแรก
+
+## การแปลงช่วงจากโจทย์เป็นเงื่อนไข
+
+| ข้อความในโจทย์ | เงื่อนไข |
+|---|---|
+| ตั้งแต่ X ขึ้นไป / ไม่น้อยกว่า X | `value >= X` |
+| เกิน X | `value > X` |
+| ไม่เกิน X | `value <= X` |
+| ต่ำกว่า X | `value < X` |
+| ช่วง A–B | `A <= value <= B` |
+
+ถ้าโจทย์ระบุว่า "ตั้งแต่ 0" ค่า 0 ต้องผ่าน ถ้า "ตั้งแต่ 1" ค่า 0 ต้องถูกปฏิเสธ
+
+## Checklist ของ input
+
+- [ ] ทุกพารามิเตอร์ตรวจ type ด้วย `type(x) is ...`
+- [ ] bool ถูกปฏิเสธในพารามิเตอร์ที่เป็นตัวเลข
+- [ ] float ที่ค่าเป็นจำนวนเต็ม (เช่น `1000.0`) ถูกปฏิเสธ ถ้าโจทย์บอกว่าเป็นจำนวนเต็ม
+- [ ] string ที่หน้าตาเป็นตัวเลข (เช่น `"2"`) ถูกปฏิเสธ
+- [ ] ค่าที่เลือกได้เฉพาะบางค่า ถูกเทียบแบบตรงตัว (ไม่ lower/strip)
+- [ ] ค่าที่ขอบของช่วง (min, max) ผ่าน และค่าที่ออกไปนอกช่วง (min-1, max+1) ถูกปฏิเสธ
+- [ ] ทุกกรณีผิดคือ `ValueError` (ไม่ใช่ TypeError, KeyError หรือ AttributeError)
+[THINK] 
+[assistant TEXT] Skills read: the checklist, integer money rounding, and strict input validation all apply. I'll write `solve.py` to follow them.
+[assistant TOOL_USE Write] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t4-cashback-r3/sandbox/solve.py", "content": "from fractions import Fraction\n\nMIN_AMOUNT = 10_000     # 100 บาท (สตางค์) ต่ำกว่านี้ไม่ได้เงินคืน\nMAX_CASHBACK = 20_000   # 200 บาท (สตางค์) เพดานต่อบิล\nBIRTHDAY_MULTIPLIER = 2\n\nRATES = {\n    \"silver\": Fraction(15, 1000),   # 1.5%\n    \"gold\": Fraction(25, 1000),     # 2.5%\n    \"platinum\": Fraction(4, 100),   # 4%\n}\n\n\ndef _require_int(value, name):\n    if type(value) is not int:          # ปฏิเสธ bool, float, str, None\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if value < 0:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า 0\")\n    return value\n\n\ndef _half_up(x):\n    \"\"\"ปัดครึ่งขึ้นเป็น int, x ไม่ติดลบ\"\"\"\n    return int((Fraction(x) * 2 + 1) // 2)\n\n\ndef cashback(amount, tier, birthday):\n    \"\"\"คืนเงินคืนสมาชิกเป็นสตางค์ (int)\n\n    amount   : ยอดซื้อเป็นสตางค์ (int, >= 0)\n    tier     : \"silver\" | \"gold\" | \"platinum\"\n    birthday : True ถ้าซื้อในเดือนเกิด (ได้เงินคืน 2 เท่า)\n    \"\"\"\n    _require_int(amount, \"amount\")\n    if type(tier) is not str or tier not in RATES:\n        raise ValueError(f\"tier ต้องเป็นหนึ่งใน {sorted(RATES)}\")\n    if type(birthday) is not bool:\n        raise ValueError(\"birthday ต้องเป็น True หรือ False\")\n\n    if amount < MIN_AMOUNT:\n        return 0\n\n    multiplier = BIRTHDAY_MULTIPLIER if birthday else 1\n    raw = Fraction(amount) * RATES[tier] * multiplier   # คูณทุกตัวก่อน ยังไม่ปัด\n    return min(_half_up(raw), MAX_CASHBACK)              # ปัดครั้งเดียว แล้วคิดเพดาน\n\n\nif __name__ == \"__main__\":\n    print(cashback(10_000, \"silver\", False))   # 150\n    print(cashback(10_000, \"gold\", True))      # 500\n    print(cashback(600_000, \"platinum\", True)) # 20000\n"}
+[RESULT] File created successfully at: /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t4-cashback-r3/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant TOOL_USE Bash] {"command": "cd /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t4-cashback-r3/sandbox && python3 -c \"\nimport sys; sys.path.insert(0,'.')\nfrom solve import cashback as c\nchecks = [\n (c(10000,'silver',False),150),\n (c(10000,'gold',False),250),\n (c(10000,'platinum',False),400),\n (c(9999,'platinum',False),0),\n (c(0,'gold',True),0),\n (c(10000,'gold',True),500),\n (c(10000,'silver',True),300),\n (c(10300,'silver',False),155),   # raw 154.5 -> half-up 155\n (c(500000,'platinum',False),16000),\n (c(600000,'platinum',False),20000),\n (c(600000,'platinum',True),20000),\n (c(500000,'gold',True),20000),\n (c(400000,'gold',False),10000),\n (c(9999,'gold',True),0),\n (c(10001,'silver',False),150),\n]\nbad=[(i,got,exp) for i,(got,exp) in enumerate(checks) if got!=exp or type(got) is not int]\nprint('checks', len(checks), 'failures', bad)\nerrs=[(1.0,'gold',False),(True,'gold',False),(-1,'gold',False),('100','gold',False),(None,'gold',False),\n      (10000,'Gold',False),(10000,' gold',False),(10000,'bronze',False),(10000,None,False),\n      (10000,'gold',1),(10000,'gold',None),(10000,'gold','True')]\nfor a in errs:\n    try: c(*a); print('NO ERROR', a)\n    except ValueError as e: pass\n    except Exception as e: print('WRONG EXC', a, type(e))\nprint('invalid-input checks done')\n\"\npython3 solve.py", "description": "Run boundary, rounding, cap, and invalid-input checks"}
+[RESULT] checks 15 failures [(8, 20000, 16000)]
+invalid-input checks done
+150
+500
+20000
+[THINK] 
+[assistant TEXT] The one "failure" was a mistake in my expected value, not in the code. Platinum on 500,000 satang is 500,000 × 4% = 20,000, which is exactly the cap, so the correct result is 20,000. I'm not changing the code.
+
+`solve.py` is written in the current directory, which is `sandbox/`. I followed the three skills in `./skills`: the checklist, integer money rounding, and strict input validation.
+
+**Behavior**
+- `amount` is in satang (int, ≥ 0). Anything under 10,000 satang (100 baht) returns 0.
+- The rate is applied as `amount × rate × (2 if birthday)`. Rates are exact fractions: silver 1.5%, gold 2.5%, platinum 4%.
+- The result is rounded once, half-up, to an integer satang. Then it is capped at 20,000 satang (200 baht) per bill.
+- Invalid input raises `ValueError`. That covers a non-int or bool amount, a negative amount, a tier outside the three exact strings (no case or whitespace normalization), and a non-bool birthday.
+
+**Checks run**
+- Boundaries: 9,999 gives 0, 10,000 gives 150 (silver), 250 (gold), or 400 (platinum).
+- Birthday doubling: gold 10,000 with birthday gives 500.
+- Rounding: 10,300 silver gives 155 (raw 154.5 rounds up).
+- Cap: platinum 600,000 gives 20,000, with or without birthday.
+- Invalid inputs (float, string, None, bool, wrong-case tier, bad birthday type) all raise `ValueError`.
+- `python3 solve.py` prints 150, 500, 20000.
+
+**Interpretations I chose**
+- "ต่ำกว่า 100 บาท" is read as strictly below 100 baht, so exactly 100 baht earns cashback.
+- The 200-baht cap applies after the birthday doubling.
+
+I did not write a separate test file; the checks above were run inline.
+[RESULT_FINAL] {"duration_api_ms": 20815, "stop_reason": "end_turn", "session_id": "237c5abb-a7ad-4be1-a386-da8e57e90731", "total_cost_usd": 0.009427409999999999, "usage": {"input_tokens": 8, "cache_creation_input_tokens": 29512, "cache_read_input_tokens": 108271, "output_tokens": 4883, "output_tokens_details": {"thinking_tokens": 2109}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 29512, "ephemeral_5m_input_

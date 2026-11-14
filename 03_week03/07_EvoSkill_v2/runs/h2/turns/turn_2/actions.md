@@ -1,44 +1,67 @@
 # ตาที่ 2 ของ Evolver
 
-ข้อความที่ได้รับ: ขณะนี้เวลา 2026-11-14 21:21 UTC คุณมีเวลาถึง 2026-11-14 21:51 UTC สำหรับ epoch นี้ หลังจากนั้น `/evo/staging/` จะถูกนำไปใช้ตามสภาพที่เป็นอยู่ · ตอนนี้คือ epoch 2 · โปรดวิเคราะห์ rollout ของ Solver วินิจฉัยจุดพลาดที่สกิลเฉพาะทางน่าจะแก้ได้ แล้วเขียน `skills_v2` ลงใน `/evo/staging/`
+ข้อความที่ได้รับ: เวลาตอนนี้ 2026-11-14 23:23 UTC · เส้นตายของตานี้ 2026-11-14 23:53 UTC เมื่อถึงเส้นตาย สิ่งที่อยู่ใน `/evo/staging/` จะถูกนำไปใช้ทันทีตามสภาพขณะนั้น · นี่คือ epoch 2 · ผลการทำโจทย์รอบล่าสุดของ Solver อยู่ใน `/evo` แล้ว ขอให้วิเคราะห์ rollout เหล่านั้น วินิจฉัยว่า Solver พลาดตรงไหนที่สกิลช่วยแก้ได้ แล้วเขียนชุดสกิล `skills_v2` ลงใน `/evo/staging/`
 
 ### ขั้น 1 · Bash
 
 ```
-date -u +%H:%M && ls traces/ scores/ skills/ && cat scores/epoch_1.json && find skills/epoch_1 -type f && ls traces/epoch_1 | head -20 && ls solver_workspaces/epoch_1 2>/dev/null | head -20
+ls traces skills scores solver_workspaces; echo ---; cat scores/epoch_1.json; echo ---; ls -R skills/epoch_1 | head -40; echo ---; ls traces/epoch_1 | head -40; echo; cat evolver_workspace/epoch1_notes.md | head -5
 ```
 
 ผลที่ได้:
 
 ```
-21:21
-scores/:
+scores:
 epoch_0.json
 epoch_1.json
 
-skills/:
+skills:
 epoch_0
 epoch_1
 
-traces/:
+solver_workspaces:
 epoch_0
 epoch_1
+
+traces:
+epoch_0
+epoch_1
+---
 {
- "t1-cafe-bill_s1": 0.6,
- "t1-cafe-bill_s2": 0.5,
- "t1-cafe-bill_s3": 0.6,
- "t2-split-bill_s1": 0.7,
- "t2-split-bill_s2": 0.7,
- "t2-split-bill_s3": 0.6,
- "t3-shipping-fee_s1": 0.5455,
- "t3-shipping-fee_s2": 0.5455,
- "t3-shipping-fee_s3": 0.5455,
- "t4-cashback_s1": 0.5,
- "t4-cashback_s2": 0.5,
- "t4-cashback_s3": 0.5
-}skills/epoch_1/thai-spec-reading/SKILL.md
-skills/epoch_1/satang-money-math/SKILL.md
-skills/epoch_1/solution-verification/SKILL.md
+ "t1-cafe-bill_s1": 0.8,
+ "t1-cafe-bill_s2": 0.7,
+ "t1-cafe-bill_s3": 0.8,
+ "t2-split-bill_s1": 0.8,
+ "t2-split-bill_s2": 0.8,
+ "t2-split-bill_s3": 0.8,
+ "t3-shipping-fee_s1": 0.7273,
+ "t3-shipping-fee_s2": 0.7273,
+ "t3-shipping-fee_s3": 0.6364,
+ "t4-cashback_s1": 0.7,
+ "t4-cashback_s2": 0.7,
+ "t4-cashback_s3": 0.6
+}---
+skills/epoch_1:
+money-arithmetic-rounding
+solver-selftest-workflow
+spec-reading-thai
+strict-input-validation
+
+skills/epoch_1/money-arithmetic-rounding:
+SKILL.md
+money_helpers.py
+
+skills/epoch_1/solver-selftest-workflow:
+SKILL.md
+test_template.py
+
+skills/epoch_1/spec-reading-thai:
+SKILL.md
+
+skills/epoch_1/strict-input-validation:
+SKILL.md
+validators.py
+---
 t1-cafe-bill_s1.jsonl
 t1-cafe-bill_s2.jsonl
 t1-cafe-bill_s3.jsonl
@@ -51,310 +74,555 @@ t3-shipping-fee_s3.jsonl
 t4-cashback_s1.jsonl
 t4-cashback_s2.jsonl
 t4-cashback_s3.jsonl
-t1-cafe-bill_s1
-t1-cafe-bill_s2
-t1-cafe-bill_s3
-t2-split-bill_s1
-t2-split-bill_s2
-t2-split-bill_s3
-t3-shipping-fee_s1
-t3-shipping-fee_s2
-t3-shipping-fee_s3
-t4-cashback_s1
-t4-cashback_s2
-t4-cashback_s3
+
+# Epoch 1 — บันทึกการวิเคราะห์และการตัดสินใจ
+
+## คะแนน epoch 0 (ไม่มีสกิล)
+- t1-cafe-bill: 0.6 / 0.5 / 0.5
+- t2-split-bi
+…(ตัด 19 ตัวอักษร)
 ```
+
+**Agent พูด:** Scores rose across the board (t1 0.8, t2 0.8, t3 ~0.73, t4 0.6–0.7). With about 30 minutes left, I'll replay the epoch 1 solutions against the reference tests and dump the traces to find what's still failing.
 
 ### ขั้น 2 · Bash
 
 ```
-cd /evo/traces/epoch_1 && for f in *.jsonl; do echo "##### $f"; python3 /evo/evolver_workspace/tools/summarize.py $f 160 | grep -e tool_use:Bash -e tool_use:Read -e 'skills' | head -6; python3 -c "
-import json
-last=None
-for l in open('$f',encoding='utf-8'):
-    d=json.loads(l)
-    if d.get('type')=='result': last=d.get('result','')
-print(str(last)[:1400])
-"; done 2>&1 | head -400
+cd /evo/evolver_workspace/analysis && sed -e "s#TRACES = '/evo/traces/epoch_0'#TRACES = sys.argv[1]#" -e "s#OUT = '/evo/evolver_workspace/analysis/replay'#OUT = sys.argv[2]#" replay.py > replay2.py && python3 -I replay2.py /evo/traces/epoch_1 /evo/evolver_workspace/analysis/replay_e1 2>&1 | head -60; for f in /evo/traces/epoch_1/*.jsonl; do python3 -I dump.py "$f" "/evo/evolver_workspace/analysis/e1_$(basename ${f%.jsonl}).txt"; done; wc -c e1_*.txt
 ```
 
 ผลที่ได้:
 
 ```
-<persisted-output>
-Output too large (32.5KB). Full output saved to: /root/ai-accounts/.Claude/yolo1/projects/-evo/954b36f6-4458-43e5-ad83-26e86f1f9688/tool-results/b4qlg3s14.txt
-
-Preview (first 2KB):
-##### t1-cafe-bill_s1.jsonl
-[tool_use:Bash] {"command": "ls -la ./skills 2>/dev/null && find ./skills -maxdepth 3 -type f 2>/dev/null | head -50; echo \"---\"; ls -la", "description": "Check for skills di
-[tool_use:Read] {"file_path": "/workspace/evlab/ws/h2/legs/runs/v1_train/t1-cafe-bill-r1/sandbox/skills/thai-spec-reading/SKILL.md"}
-[tool_use:Read] {"file_path": "/workspace/evlab/ws/h2/legs/runs/v1_train/t1-cafe-bill-r1/sandbox/skills/satang-money-math/SKILL.md"}
-[tool_use:Read] {"file_path": "/workspace/evlab/ws/h2/legs/runs/v1_train/t1-cafe-bill-r1/sandbox/skills/solution-verification/SKILL.md"}
-[tool_use:Bash] {"command": "python3 solve.py && python3 -c \"\nimport sys; sys.path.insert(0,'.')\nfrom fractions import Fraction\nimport math, random\nfrom solve import cafe_
-I wrote `cafe_bill(items, member)` in `solve.py` in this folder. It runs, and it matches an independent `Fraction` reference on 2,000 random carts.
-
-The calculation runs in satang and rounds once at the end:
-
-1. Sub
-…(ตัด 992 ตัวอักษร)
+t1-cafe-bill_s1 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t1-cafe-bill_s2 | testsRun/failures/errors = 12 0 0
+t1-cafe-bill_s3 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t2-split-bill_s1 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t2-split-bill_s2 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t2-split-bill_s3 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t3-shipping-fee_s1 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t3-shipping-fee_s2 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t3-shipping-fee_s3 | testsRun/failures/errors = 12 0 0
+t4-cashback_s1 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t4-cashback_s2 | testsRun/failures/errors = 1 0 1
+      test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
+t4-cashback_s3 
+…(ตัด 417 ตัวอักษร)
 ```
+
+**Agent พูด:** Many replays show an import error rather than real test failures. That likely means my reconstruction is wrong, not the Solver, so I'll check before drawing conclusions.
 
 ### ขั้น 3 · Bash
 
 ```
-for f in *.jsonl; do echo "##### $f"; python3 -c "
-import json
-last=None; turns=None
-for l in open('$f',encoding='utf-8'):
-    d=json.loads(l)
-    if d.get('type')=='result': last=d.get('result',''); turns=d.get('num_turns')
-print('turns',turns)
-print(str(last)[:1100])
-"; done > /evo/evolver_workspace/ep1_finals.txt 2>&1; wc -c /evo/evolver_workspace/ep1_finals.txt; sed -n 1,200p /evo/evolver_workspace/ep1_finals.txt | cut -c1-400
+cd /evo/evolver_workspace/analysis/replay_e1 && cat t2-split-bill_s1/run.log | head -20; echo ---; head -c 300 t2-split-bill_s1/solve.py; echo; echo ---; grep -n "TOOL_USE" /evo/evolver_workspace/analysis/e1_t2-split-bill_s1.txt | cut -c1-250
 ```
 
 ผลที่ได้:
 
 ```
-23370 /evo/evolver_workspace/ep1_finals.txt
-##### t1-cafe-bill_s1.jsonl
-turns 7
-I wrote `cafe_bill(items, member)` in `solve.py` in this folder. It runs, and it matches an independent `Fraction` reference on 2,000 random carts.
+test_solve (unittest.loader._FailedTest.test_solve) ... ERROR
 
-The calculation runs in satang and rounds once at the end:
+======================================================================
+ERROR: test_solve (unittest.loader._FailedTest.test_solve)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_solve
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/unittest/loader.py", line 394, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/loader.py", line 337, in _get_module_from_name
+    __import__(name)
+  File "/evo/evolver_workspace/analysis/replay_e1/t2-split-bill_s1/test_solve.py", line 4, in <module>
+    from solve import split_bill
+  File "/evo/evolver_workspace/analysis/replay_e1/t2-split-bill_s1/solve.py", line 3, in <module>
+    from solve import split_bill
+ImportError: cannot import name 'split_bill' from partially initialized module 'solve' (most likely due to a circular import) (/evo/evolver_workspace/analysis/replay_e1/t2-split-bill_s1/solve.py)
 
-1. Subtotal = sum of `price × qty`.
-2. If the subtotal is at least 50,000 satang (500 baht), take 5% off.
-3. If `member` is True, take a further 10% off the already-discounted amount.
-4. Add 7% VAT on the result.
-5. Round half-up to a whole satang and return it as an `int`.
 
-Interpretations I chose where the brief was open:
-- **"ลดอีก 10%" (further 10%)** is applied in sequence, so a member gets 0.95 × 0.90, not a flat 15%.
-- **The 500-baht threshold** is checked against the subtotal before any discount, including the member discount.
-- **Rounding** is half-up at the final step only. Rounding after each step would change the result by a satang in some cases.
+----------------------------------------------------------------------
+---
+import unittest
 
-Spot checks:
-- 2 × 150 + 2 × 250 = 800 baht, member: 800 × 0.95 × 0.90 × 1.07 = 457.43 baht (`45743`).
-- 500 baht exactly, non-member: 500 × 0.95 × 1.07 = 508.25 baht (`50825`).
-- Empty cart returns `0`.
-
-The function raise
-##### t1-cafe-bill_
-…(ตัด 9393 ตัวอักษร)
+from solve impo
+…(ตัด 2753 ตัวอักษร)
 ```
+
+**Agent พูด:** The bug is mine: `endswith('solve.py')` also matches `test_solve.py`, so the replay overwrote the solution with the test file. Fixing the basename match and rerunning.
 
 ### ขั้น 4 · Bash
 
 ```
-cd /evo/solver_workspaces/epoch_1 && ls t1-cafe-bill_s1 t2-split-bill_s1 && for t in t1-cafe-bill t2-split-bill; do for s in 1 2 3; do echo "=== $t s$s"; cat $t\_s$s/solve.py 2>/dev/null | grep -v '^\s*$' | head -120; done; done 2>&1 | head -400
+cd /evo/evolver_workspace/analysis && sed -i "s#str(inp.get('file_path', '')).endswith('solve.py')#os.path.basename(str(inp.get('file_path', ''))) == 'solve.py'#g" replay2.py && rm -rf replay_e1 && python3 -I replay2.py /evo/traces/epoch_1 /evo/evolver_workspace/analysis/replay_e1 2>&1 | head -60
 ```
 
 ผลที่ได้:
 
 ```
-t1-cafe-bill_s1:
-solve.py
-
-t2-split-bill_s1:
-solve.py
-=== t1-cafe-bill s1
-"""BaanKafe: คิดเงินหน้าร้าน
-ลำดับการคิด (ทำตามโจทย์ทุกข้อ):
-1. ยอดรวม = sum(price * qty)                         (หน่วยสตางค์, จำนวนเต็ม)
-2. ถ้ายอดรวม >= 50000 สตางค์ (500 บาท) ลด 5%         (เทียบกับยอดก่อนลดทุกข้อ)
-3. ถ้า member = True ลดอีก 10%                       (คิดต่อเนื่องจากยอดหลังข้อ 2)
-4. บวก VAT 7% เป็นขั้นสุดท้าย                         (คูณ 1.07 บนยอดหลังส่วนลดทั้งหมด)
-5. ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ ครั้งเดียวที่ขั้นสุดท้าย
-การตีความที่เลือก (กำกวม):
-- "ลดอีก 10%" อ่านเป็นลดต่อเนื่อง (x * 0.95 * 0.90) ไม่ใช่รวมเป็น 15%
-- เกณฑ์ 500 บาทตรวจจากยอดก่อนหักส่วนลดของสมาชิก
-- การปัดเศษ: ครึ่งขึ้น (ROUND_HALF_UP) ที่ขั้นสุดท้ายเท่านั้น
-"""
-from fractions import Fraction
-import math
-THRESHOLD_SATANG = 50_000      # 500 บาท
-DISCOUNT_BULK_PCT = 5          # ลด 5% เมื่อถึงเกณฑ์
-DISCOUNT_MEMBER_PCT = 10       # ลดอีก 10% สำหรับสมาชิก
-VAT_PCT = 7
-def _round_half_up(x):
-    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ค่าไม่ติดลบ)."""
-    return math.floor(Fraction(x) + Fraction(1, 2))
-def cafe_bill(items, member):
-    """คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์.
-    items: list ของ dict {"price": ราคาต่อชิ้น (สตางค
-…(ตัด 8002 ตัวอักษร)
+t1-cafe-bill_s1 | testsRun/failures/errors = 12 0 0
+t1-cafe-bill_s2 | testsRun/failures/errors = 12 0 0
+t1-cafe-bill_s3 | testsRun/failures/errors = 12 0 0
+t2-split-bill_s1 | testsRun/failures/errors = 12 0 0
+t2-split-bill_s2 | testsRun/failures/errors = 12 0 0
+t2-split-bill_s3 | testsRun/failures/errors = 12 0 0
+t3-shipping-fee_s1 | testsRun/failures/errors = 12 0 0
+t3-shipping-fee_s2 | testsRun/failures/errors = 12 0 0
+t3-shipping-fee_s3 | testsRun/failures/errors = 12 0 0
+t4-cashback_s1 | testsRun/failures/errors = 12 0 0
+t4-cashback_s2 | testsRun/failures/errors = 12 0 0
+t4-cashback_s3 | testsRun/failures/errors = 12 0 0
 ```
+
+**Agent พูด:** All 12 epoch 1 solutions now pass the visible reference tests, so the remaining gap is in hidden-test behavior. Next I'll compare the final `solve.py` files for t3 and t4, where scores are still below the others.
 
 ### ขั้น 5 · Bash
 
 ```
-cd /evo && date -u +%H:%M && ls -la staging/*/ && grep -n -i "ปัด\|half\|floor\|ลง" staging/*/SKILL.md
+cd /evo/evolver_workspace/analysis/replay_e1 && for t in t4-cashback_s1 t4-cashback_s2 t4-cashback_s3; do echo "######## $t"; cat $t/solve.py; echo; done
 ```
 
 ผลที่ได้:
 
 ```
-21:22
-staging/satang-money-math/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:19 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 5017 Nov 15 04:19 SKILL.md
+######## t4-cashback_s1
+"""BaanKafe: คิดเงินคืนสมาชิก
 
-staging/solution-verification/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:19 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 4695 Nov 15 04:19 SKILL.md
+cashback(amount, tier, birthday)
+- amount   : ยอดซื้อ หน่วยสตางค์ (จำนวนเต็ม >= 0)
+- tier     : "silver" | "gold" | "platinum" (ตรงตัวอักษร)
+- birthday : True = ซื้อในเดือนเกิด, False = ไม่ใช่
 
-staging/thai-spec-reading/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:19 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 6836 Nov 15 04:19 SKILL.md
-staging/thai-spec-reading/SKILL.md:3:description: วิธีอ่านโจทย์เขียนโค้ดภาษาไทยที่มีกติกาตัวเลข (ส่วนลด ค่าส่ง เงินคืน ทิป VAT) แล้วแปลงเป็นสูตรที่ตรวจได้ ใช้ทุกครั้งที่ brief มีเงื่อนไข ขอบเขต หรือลำดับการคิดก่อนเขียนฟังก์ชัน
-staging/thai-spec-reading/SKILL.md:15:4. **จุดกำกวม:** จดทุกจุดที่มีมากกว่าหนึ่งการอ่าน เลือกหนึ่งอ่าน ทำให้เปลี่ยนได้ในบรรทัดเดียว (เช่นฟังก์ชันปัดเศษ หรือค่าคงที่) และบอกในคำตอบสุดท้าย
-staging/thai-spec-reading/SKILL.md:35:- **คิดตามสัดส่วน** หรือ **เฉลี่ยตามกรัม/กิโล**: เป็นเส้นตรง ไม่ปัดเป็นหน่วยเต็มระหว่างทาง
-staging/satang-money-math/SKILL.md:3:description: วิธีคำนวณเงินไทยให้แม่นยำด้วยจำนวนเต็มสตางค์หรือ Fraction ปัดเศษครั้งเดีย
-…(ตัด 1819 ตัวอักษร)
+กติกา
+1. อัตราเงินคืน: silver 1.5%, gold 2.5%, platinum 4%
+2. ยอดซื้อต่ำกว่า 100 บาท (10000 สตางค์) ไม่ได้เงินคืน
+3. เดือนเกิด ได้เงินคืน 2 เท่า
+4. เงินคืนสูงสุด 200 บาท (20000 สตางค์) ต่อบิล
+5. ผลลัพธ์เป็นจำนวนเต็มสตางค์
+
+การปัด (ไม่ได้ระบุในโจทย์): เงินที่ร้านจ่ายคืนให้ลูกค้า จึงปัดลง
+ลำดับ: คูณอัตรา (ยังไม่ปัด) -> คูณ 2 ถ้าเดือนเกิด -> เพดาน -> ปัดลงครั้งเดียว
+"""
+
+import math
+from fractions import Fraction
+
+# อัตราเงินคืนแบบ exact (1.5% = 3/200 ฯลฯ)
+RATES = {
+    "silver": Fraction(3, 200),
+    "gold": Fraction(1, 40),
+    "platinum": Fraction(1, 25),
+}
+
+MIN_AMOUNT_SATANG = 10_000   # 100 บาท
+MAX_CASHBACK_SATANG = 20_000  # 200 บาท
+BIRTHDAY_MULTIPLIER = 2
+
+
+def _need_int(value, name, low=None):
+    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    return 
+…(ตัด 5818 ตัวอักษร)
 ```
 
-### ขั้น 6 · Read
+**Agent พูด:** All three t4 solutions apply the birthday multiplier to every tier, including silver. That's the same unstated-policy gap as before, and nothing in the brief settles it. Now the t3 solutions, where s3 scores lower than s1 and s2.
+
+### ขั้น 6 · Bash
 
 ```
-/evo/staging/satang-money-math/SKILL.md
+for t in t3-shipping-fee_s1 t3-shipping-fee_s3; do echo "######## $t"; grep -v '^\s*$' $t/solve.py | grep -v '^\s*#' | head -120; echo; done
+```
+
+ผลที่ได้:
+
+```
+######## t3-shipping-fee_s1
+"""คิดค่าส่งเมล็ดกาแฟของ BaanKafe
+shipping_fee(weight_g, distance_km, express) -> จำนวนเต็ม หน่วยเป็นสตางค์
+กฎ:
+  1. น้ำหนัก (weight_g, 1–30,000 กรัม):
+       ไม่เกิน 1,000 กรัม  -> 40 บาท
+       ไม่เกิน 5,000 กรัม  -> 80 บาท
+       เกิน 5,000 กรัม     -> 80 บาท + 15 บาทต่อกิโลกรัมของส่วนที่เกิน (คิดตามสัดส่วนกรัม)
+  2. ระยะทาง (distance_km, ตั้งแต่ 0): เกิน 100 กม. คิดเพิ่ม 20%
+  3. ส่งด่วน (express=True): คิดเพิ่ม 50% (คูณต่อจากข้อ 2)
+  4. ปัดผลสุดท้ายครั้งเดียว แบบครึ่งขึ้น (ค่าส่งเป็นเงินที่ลูกค้าจ่าย)
+การตีความที่โจทย์ไม่ได้ระบุ:
+  - ระยะทางเกิน 100 กม. หมายถึง > 100 (ที่ 100 พอดีไม่คิดเพิ่ม)
+  - ปัดครึ่งขึ้น เช่น 8001.5 สตางค์ -> 8002 สตางค์
+"""
+import math
+from fractions import Fraction
+def need_int(value, name, low=None, high=None):
+    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    if high is not None and value > high:
+        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+    return value
+def need_bool(value, name):
+    """flag: ต้องเป็น True หรือ False จริง"""
+ 
+…(ตัด 4836 ตัวอักษร)
+```
+
+**Agent พูด:** Both t3 solutions use the same logic and the same validators, so the 0.73 vs 0.64 gap doesn't show up in the code. I'll check whether t1-s2 (0.7, the lowest t1 run) and the t2 runs miss any input validation, since that's a gap the skills can address.
+
+### ขั้น 7 · Bash
+
+```
+for t in t1-cafe-bill_s1 t1-cafe-bill_s2 t1-cafe-bill_s3 t2-split-bill_s1 t2-split-bill_s2 t2-split-bill_s3; do echo "## $t"; grep -nE "need_bool|need_int|need_choice|need_number|raise |isinstance|half_up|floor|round|min\(|max\(" $t/solve.py | grep -v "def " | head -20; done
+```
+
+ผลที่ได้:
+
+```
+## t1-cafe-bill_s1
+25:        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+27:        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+34:        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+42:    return math.floor(Fraction(x) + Fraction(1, 2))
+54:        raise ValueError("items ต้องเป็น list")
+55:    _need_bool(member, "member")
+60:            raise ValueError(f"items[{i}] ต้องเป็น dict")
+62:            raise ValueError(f"items[{i}] ต้องมี key 'price' และ 'qty'")
+63:        price = _need_int(item["price"], f"items[{i}]['price']", low=0)
+64:        qty = _need_int(item["qty"], f"items[{i}]['qty']", low=1)
+75:    return _half_up(amount)               # ปัดครั้งเดียวตอนท้าย
+## t1-cafe-bill_s2
+23:        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+25:        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+27:        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+34:        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+42:    return math.floor(Fraction(x) + Fraction(1, 2))
+58:        raise ValueError("items ต้องเป็น list")
+59:    need_bool(member, "member")
+64:            raise ValueError(f"items[{i}] ต้องเป็น dict")
+66:            raise ValueError(f"items[{i}] ต้
+…(ตัด 2256 ตัวอักษร)
+```
+
+### ขั้น 8 · Bash
+
+```
+sed -n 66,82p t1-cafe-bill_s2/solve.py; echo ----; sed -n 66,76p t1-cafe-bill_s1/solve.py; echo ----; sed -n 52,68p t1-cafe-bill_s3/solve.py
+```
+
+ผลที่ได้:
+
+```
+            raise ValueError(f"items[{i}] ต้องมี key 'price' และ 'qty'")
+        price = need_int(item["price"], f"items[{i}]['price']", low=0)
+        qty = need_int(item["qty"], f"items[{i}]['qty']", low=1)
+        subtotal += price * qty
+
+    # คำนวณทั้งหมดแบบ exact ด้วย Fraction ยังไม่ปัด
+    total = Fraction(subtotal)
+    if subtotal >= DISCOUNT_THRESHOLD:
+        total *= Fraction(95, 100)          # ลด 5%
+    if member:
+        total *= Fraction(90, 100)          # ลดอีก 10% (คูณต่อ)
+    total *= Fraction(107, 100)             # VAT 7% ขั้นสุดท้าย
+
+    # ปัดครั้งเดียวตอนท้าย
+    return half_up(total)
+
+
+----
+
+    # ยังไม่ปัดระหว่างทาง ใช้ Fraction ทั้งหมด
+    amount = Fraction(subtotal)
+    if subtotal >= 50000:                 # ตั้งแต่ 500 บาทขึ้นไป
+        amount *= Fraction(95, 100)       # ลด 5%
+    if member:
+        amount *= Fraction(90, 100)       # สมาชิกลดอีก 10%
+    amount *= Fraction(107, 100)          # VAT 7% ขั้นสุดท้าย
+
+    return _half_up(amount)               # ปัดครั้งเดียวตอนท้าย
+
+----
+        if type(item) is not dict:
+            raise ValueError(f"items[{i}] ต้องเป็น dict")
+        if "price" not in item or "qty" not in item:
+            raise ValueErr
+…(ตัด 480 ตัวอักษร)
+```
+
+**Agent พูด:** The t1 runs share the same logic, so the 0.7 vs 0.8 gap doesn't trace to anything in the code. The one real gap I can see is in the validation order. Solvers check inputs before early returns, but the skills don't state that as a rule, and a bad input under the threshold could silently return 0. I'll add that rule, plus a matching test, and keep the other skills as they are.
+
+### ขั้น 9 · Read
+
+```
+/evo/staging/strict-input-validation/SKILL.md
 ```
 
 ผลที่ได้:
 
 ```
 1	---
-2	name: satang-money-math
-3	description: วิธีคำนวณเงินไทยให้แม่นยำด้วยจำนวนเต็มสตางค์หรือ Fraction ปัดเศษครั้งเดียวที่ขั้นสุดท้าย และแบ่งเงินให้ผลรวมตรงเป๊ะ ใช้เมื่อโค้ดมีส่วนลด ภาษี ทิป ค่าส่ง หรือการหารเงิน
+2	name: strict-input-validation
+3	description: ตรวจข้อมูลนำเข้าของฟังก์ชันอย่างเข้มงวด โดยผิดชนิดหรือนอกช่วงให้ raise ValueError เสมอ ไม่รับ bool/float/str แทนจำนวนเต็ม และไม่แปลงค่าเอง ใช้เมื่อฟังก์ชันรับ parameter ที่โจทย์ระบุชนิด ช่วง หรือตัวเลือกไว้
 4	---
 5	
-6	# คำนวณเงินด้วยสตางค์อย่างแม่นยำ
+6	# การตรวจข้อมูลนำเข้าอย่างเข้มงวด
 7	
-8	## หลักการ
+8	## กติกาหลัก
 9	
-10	1. **ทำงานในหน่วยสตางค์** (1 บาท = 100 สตางค์) ถ้า input เป็นสตางค์อยู่แล้ว อย่าแปลงเป็นบาททศนิยม
-11	2. **อย่าใช้ float** กับเงิน: `0.1 * 3 != 0.3` และค่าที่ควรลงตัวอาจคลาดไป 1 สตางค์
-12	3. **เก็บเปอร์เซ็นต์เป็นเศษส่วน:** `Fraction(p, 100)` แล้วคูณทุกขั้นแบบแม่นยำ
-13	4. **ปัดเศษครั้งเดียวที่ขั้นสุดท้าย** เว้นแต่โจทย์เขียนให้ปัดระหว่างทาง (เช่น "ปัดเป็นสตางค์ทุกขั้น") ปัดทีละขั้นทำให้ผลต่างจากการคิดรวมได้ 1 สตางค์
-14	5. **ระบุโหมดการปัดในคอมเมนต์และคำตอบ** เพราะโจทย์บางข้อไม่ได้บอกโหมดไว้
-15	
-16	## ตัวช่วยที่ควรใช้
+10	1. **ผิดอะไรก็ตาม ให้ raise `ValueError`.** ไม่ใช้ `TypeError` สำหรับ input ที่ผิด. ชุดทดสอบแบบ Reject มักเขียนว่า `assertRaises(ValueError)` และ `TypeError` ไม่ใช่ subclass ของ `ValueError` จึงไม่ผ่าน. ผลจากการทดสอบซ้ำ ๆ พบว่าการใช้ `TypeError` ทำให้เสียคะแนนหมวด Reject ทุกครั้ง.
+11	2. **ตรวจชนิดด้วย `type(x) is int`** ไม่ใช่ `isinstance`. เหตุผล: `isinstance(True, int)` เป็น `True` ทำให้ bool หลุดเข้ามาเป็นจำนวนเต็ม. และต้องปฏิเสธ `float` (เช่น `4500.0`) และ `str` (เช่น `'2'`) เมื่อโจทย์ระบุว่าเป็นจำนวนเต็ม.
+12	3. **ห้ามแปลงค่า input เอง.** อย่าใช้ `int(x)`, `float(x)`, `str(x).strip().lower()` กับ input. ค่า `"Gold"` ไม่ใช่ `"gold"` ถ้าโจทย์ไม่ได้บอกว่าไม่สนตัวพิมพ์ ให้ raise ValueError. การแปลงเงียบ ๆ ทำให้รับค่าที่ควรปฏิเสธ.
+13	4. **ตรวจทั้งขอบล่างและขอบบน** ตามข้อความของโจทย์เท่านั้น. "ตั้งแต่ 1" ไม่รับ 0. "ตั้งแต่ 0" รับ 0. "1–30,000" รับทั้งสองปลาย.
+1
+…(ตัด 1134 ตัวอักษร)
+```
+
+### ขั้น 10 · Read
+
+```
+/evo/staging/solver-selftest-workflow/test_template.py
+```
+
+ผลที่ได้:
+
+```
+1	"""โครง test แยกหมวด: คัดลอกไปแก้ชื่อฟังก์ชันและกรณีทดสอบให้ตรงกับโจทย์
+2	
+3	รัน: python3 -m unittest -v test_template
+4	expected ทุกค่าต้องคำนวณด้วยสคริปต์ Fraction ก่อนใส่ (ดู SKILL.md)
+5	"""
+6	import unittest
+7	
+8	from solve import my_function  # <- แก้ชื่อฟังก์ชันให้ตรงกับโจทย์
+9	
+10	
+11	class Normal(unittest.TestCase):
+12	    def test_basic(self):
+13	        # ใส่กรณีปกติ 2–3 แบบ ให้ครอบคลุมทุกระดับ/ทุก flag
+14	        # expected ต้องมาจากสคริปต์ Fraction เท่านั้น ห้ามคัดลอกค่าตัวอย่างจากไฟล์นี้
+15	        # self.assertEqual(my_function(<args>), <expected จาก Fraction>)
+16	        pass
 17	
-18	```python
-19	from fractions import Fraction
-20	import math
+18	    def test_flag_combinations(self):
+19	        # ผสมทุกค่า flag กับทุกกลุ่มที่เป็นไปได้
+20	        pass
 21	
-22	def pct(amount, p):
-23	    """amount × p% แบบแม่นยำ (คืนค่าเป็น Fraction)"""
-24	    return Fraction(amount) * Fraction(p, 100)
-25	
-26	def round_half_up(x):
-27	    """ปัดครึ่งขึ้นเป็นจำนวนเต็ม (ใช้กับค่าไม่ติดลบ): 8001.5 -> 8002, 8001.49 -> 8001"""
-28	    return math.floor(Fraction(x) + Fraction(1, 2))
-29	
-30	def round_down(x
-…(ตัด 1308 ตัวอักษร)
+22	
+23	class Boundary(unittest.TestCase):
+24	    def test_at_threshold(self):
+25	        # ค่าพอดีเกณฑ์ตามคำในโจทย์ (ตั้งแต่ = >=, เกิน = >)
+26	        pass
+27	
+28	    def test_just_below_and_above(self):
+29	        # เกณฑ์ -1 และ +1
+30	        pass
+31	
+32	    def test_zero_and_max(self):
+33	        # ค่า 0 และค่าสูงสุดของช่วง
+34	        pass
+35	
+36	
+37	class NoDrift(unittest.TestCase):
+38	    def test_single_rounding(self):
+39	        # กรณีที่ผลระหว่างทางเป็นทศนิยมใกล้ .5 ยืนย
+…(ตัด 882 ตัวอักษร)
 ```
 
-### ขั้น 7 · Edit
+### ขั้น 11 · Read
 
 ```
-/evo/staging/satang-money-math/SKILL.md
-- ถ้าโจทย์ไม่ระบุการปัดของทิป ค่าเริ่มต้นคือ **ปัดลง (ตัดเศษสตางค์ทิ้ง)** ที่ขั้นสุดท้ายของการคำนวณนั้น แล้วบอกในคำตอบว่าเปลี่ยนเป็นปัดครึ่งขึ้นได้ที่บรรทัดใด
-- ถ้าโจทย์บอกคำว่า "ปัดขึ้น", "ปัดครึ่ง" หรือ "ปัดเศษให้ใกล้ที่สุด" ให้ใช้โหมดนั้นตรงตัวแทนค่าเริ่มต้น
-```
-
-ผลที่ได้:
-
-```
-The file /evo/staging/satang-money-math/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
-```
-
-### ขั้น 8 · Edit
-
-```
-/evo/staging/satang-money-math/SKILL.md
-4. **ปัดเศษครั้งเดียวที่ขั้นสุดท้าย** เว้นแต่โจทย์เขียนให้ปัดระหว่างทาง (เช่น "ปัดเป็นสตางค์ทุกขั้น") ปัดทีละขั้นทำให้ผลต่างจากการคิดรวมได้ 1 สตางค์
-5. **ค่าเริ่มต้นของการปัดเมื่อโจทย์ไม่ระบุ: ปัดลง (ตัดเศษสตางค์ทิ้ง)** ใช้กับทุกค่าที่เป็นเงินของลูกค้า (ทิป ค่าส่ง เงินคืน และยอดรวม) ระบุโหมดที่ใช้ในคอมเมนต์และคำตอบเสมอ
-6. **ตรวจโหมดปัดกับโจทย์ก่อนส่ง:** คำว่า "ครึ่ง/ใกล้ที่สุด" ใช้ปัดครึ่งขึ้น, "ปัดขึ้น" ใช้ ceil, "ตัด/ปัดลง/เศษทิ้ง" ใช้ floor
+/evo/staging/spec-reading-thai/SKILL.md
 ```
 
 ผลที่ได้:
 
 ```
-The file /evo/staging/satang-money-math/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
+1	---
+2	name: spec-reading-thai
+3	description: อ่านโจทย์ข้อกำหนดภาษาไทยให้ครบก่อนเขียนโค้ด โดยแปลงคำเปรียบเทียบ (ตั้งแต่ เกิน ไม่เกิน ต่ำกว่า) แตกกฎเป็นรายข้อ ระบุลำดับการคิด และไล่ค่าขอบ ใช้เมื่อโจทย์เป็นภาษาไทยหรือมีกฎธุรกิจหลายข้อที่ต้องทำตามลำดับ
+4	---
+5	
+6	# การอ่านโจทย์ภาษาไทยให้ครบ
+7	
+8	## ขั้นตอน
+9	
+10	1. **แตกโจทย์เป็นรายการกฎ** ก่อนเขียนโค้ด. แต่ละข้อระบุ: input ที่เกี่ยวข้อง, เงื่อนไข, และผลลัพธ์. เขียนเป็นลิสต์ที่มีเลขกำกับ.
+11	2. **แปลงคำเปรียบเทียบให้ตรงตัวอักษร:**
+12	   - "ตั้งแต่ X ขึ้นไป", "X ขึ้นไป", "อย่างน้อย X" → `>= X`
+13	   - "เกิน X", "มากกว่า X" → `> X`
+14	   - "ไม่เกิน X", "สูงสุด X" → `<= X`
+15	   - "ต่ำกว่า X", "น้อยกว่า X" → `< X`
+16	   - "ถึง" ในช่วง เช่น "1–30,000" → รวมทั้งสองปลาย
+17	   
+18	   ค่าที่พอดีกับเกณฑ์มีผลต่อคำตอบเสมอ ให้ตรวจว่าตรงกับคำในโจทย์หรือไม่.
+19	3. **ลำดับการคิดและการคูณต่อกัน:**
+20	   - "คิดเพิ่ม X% (คูณต่อจากข้อก่อน)" หมายถึงคูณต่อเนื่องบนผลของขั้นก่อน.
+21	   - "ลดอีก X%" หมายถึงลดจากยอดที่เหลือ ไม่ใช่บวกเปอร์เซ็นต์รวม (5% กับ 10% ไม่เท่ากับ 15%).
+22	   - ลำดับมีผลเมื่อมีการปัดเศษหรือเพดาน ให้ยึดลำดับที่โจทย์เขียนไว้.
+23	4. **วิธีปัดเศษ:** ถ้าโจทย์ไม่ได้ระบุวิธี ดูหลักการใน skill `money-arithmetic-rounding`.
+24	5. **ค่าขอบและกรณี
+…(ตัด 671 ตัวอักษร)
 ```
 
-### ขั้น 9 · Bash
+### ขั้น 12 · Edit
 
 ```
-cat >> /evo/evolver_workspace/notes.md <<'EOF'
+/evo/staging/strict-input-validation/SKILL.md
+6. **ตรวจทุก input ก่อนคำนวณ และก่อน early return ทุกชนิด.** ห้ามให้ค่าผิดไหลไปถึงเงื่อนไขธุรกิจ เช่น `if amount < 10000: return 0` ต้องอยู่หลังการตรวจ input เสมอ มิฉะนั้น `amount=-1` จะคืน 0 แทนที่จะ raise ValueError. ลำดับที่ถูกต้อง: ตรวจชนิดและช่วงของทุก parameter → ค่อยเข้าเงื่อนไขธุรกิจ → คำนวณ.
+```
 
-## Epoch 1 (ใช้ skills_v1)
-คะแนน: t1 0.6 / 0.5 / 0.6 · t2 0.7 / 0.7 / 0.6 · t3 0.5455 ×3 · t4 0.5 ×3
-- Solver อ่านสกิลทั้งสามตัวทุก rollout ใช้ 5–7 turn
-- t3 และ t4 ไม่ขยับเลย ทั้งที่ปัดครึ่งขึ้นทุกรัน (t4 s1 ใช้ครึ่งขึ้นแต่ยังได้ 0.5)
-- t1 และ t2 ขยับขึ้นบ้าง แต่การตีความหลักเหมือนเดิม ความต่างอยู่ที่การตรวจ input (t1 s2 ไม่มี ValueError ได้ 0.5 ส่วนที่มีได้ 0.6) ยังสรุปไม่ได้ว่าเป็นสาเหตุจริง
-- ผลสรุป: ตรรกะที่ Solver ทำถูกตามสกิลแล้ว แต่สิ่งที่ทำให้คะแนนไม่เต็มยังไม่ถูกแตะ
+ผลที่ได้:
 
-## Epoch 2 (เขียน skills_v2)
-- ทดลองหนึ่งสมมติฐาน: ค่าเริ่มต้นการปัดเมื่อโจทย์ไม่ระบุเปลี่ยนจากปัดครึ่งขึ้นเป็น **ปัดลง**
-  - เหตุผล: ปัดครึ่งขึ้นถูกใช้ทุกรันแล้วใน epoch 0–1 แต่ t2/t3 ยังไม่เคยลองปัดลง
-  - ตรวจผล: ถ้า t2 และ t3 ขยับขึ้น แปลว่าการปัดลงน่าจะถูก ถ้าไม่ขยับ ตัดสมมติฐานนี้ทิ้ง
-  - ถ้า t1 ลดลง อาจเป็นเพราะยอดรวมที่ลูกค้าจ่ายถูกปัดลงด้วย ซึ่งเป็นการเปลี่ยนที่กว้างเกินไป
-- ยังไม่ทดสอบ H1 (ลดอีก = รวมเปอร์เซ็นต์) และ H3 (เพดานก่อน/หลังคูณ 2) เพื่อให้เห็นผลทีละตัว
-- ตรวจไฟล์: `/evo/solver_workspaces/epoch_1/<id>/solve.py` คือไฟล์ที่ Solver ส่งจริง ใช้เทียบข้อแตกต่างได้
+```
+The file /evo/staging/strict-input-validation/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+### ขั้น 13 · Edit
+
+```
+/evo/staging/strict-input-validation/SKILL.md
+- ส่งค่านอกช่วงทั้งสองฝั่ง ทั้งค่า 0 และค่าติดลบ
+- ส่งค่าติดลบ **ที่อยู่ใต้เกณฑ์ธุรกิจ** เช่น ยอดเงิน -1 ที่ต่ำกว่าขั้นต่ำ 100 บาท → ต้อง raise ValueError ไม่ใช่คืน 0
+- ส่งตัวเลือกที่ไม่รู้จัก และตัวพิมพ์ต่างจากที่ระบุ
+```
+
+ผลที่ได้:
+
+```
+The file /evo/staging/strict-input-validation/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+### ขั้น 14 · Edit
+
+```
+/evo/staging/solver-selftest-workflow/test_template.py
+    def test_unknown_choice(self):
+        with self.assertRaises(ValueError):
+            my_function(4500, "bronze", False)
+
+    def test_invalid_below_business_threshold(self):
+        # ค่าผิดที่อยู่ใต้เกณฑ์ธุรกิจต้อง raise ไม่ใช่คืน 0 เงียบ ๆ
+        with self.assertRaises(ValueError):
+            my_function(-1, "gold", False)  # <- ปรับให้เป็นค่าติดลบของ parameter ที่มีเกณฑ์ขั้นต่ำ
+```
+
+ผลที่ได้:
+
+```
+The file /evo/staging/solver-selftest-workflow/test_template.py has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+### ขั้น 15 · Edit
+
+```
+/evo/staging/spec-reading-thai/SKILL.md
+6. **เงื่อนไขที่ให้ผลเป็น 0 หรือไม่คิดเงิน** (เช่น "ต่ำกว่า X ไม่ได้", "รับเองไม่คิดค่าส่ง") ให้คืน 0 ตามที่โจทย์ระบุเท่านั้น และต้องอยู่หลังการตรวจ input (ดู skill `strict-input-validation`).
+7. **Checklist "กฎ → บรรทัดโค้ด → test"** เขียนก่อนเริ่ม ให้ทุกกฎมีโค้ดรองรับและมี test อย่างน้อยหนึ่งกรณี.
+```
+
+ผลที่ได้:
+
+```
+The file /evo/staging/spec-reading-thai/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+### ขั้น 16 · Edit
+
+```
+/evo/staging/spec-reading-thai/SKILL.md
+8. **คำที่บอกชื่อร้านหรือบริบท**
+```
+
+ผลที่ได้:
+
+```
+The file /evo/staging/spec-reading-thai/SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+**Agent พูด:** Edits are in. Last step: record the epoch 2 findings in the workspace notes and confirm the staging layout.
+
+### ขั้น 17 · Bash
+
+```
+cd /evo/evolver_workspace && cat >> epoch1_notes.md <<'EOF'
+
+---
+
+# Epoch 2 — ผลของ epoch 1 และการแก้ใน skills_v2
+
+## คะแนน epoch 1 (สกิล v1)
+- t1: 0.8 / 0.7 / 0.8 · t2: 0.8 / 0.8 / 0.8 · t3: 0.7273 / 0.7273 / 0.6364 · t4: 0.7 / 0.7 / 0.6
+- ดีขึ้นทุกโจทย์ จาก epoch 0 (ค่าเฉลี่ยต่อ task ประมาณ +0.2)
+
+## การวิเคราะห์ (replay ด้วย analysis/replay2.py ผ่าน reference tests ทั้ง 12 รอบ)
+- solve.py ทุกรอบ **ผ่าน reference tests ที่มองเห็นทั้งหมด (12/12)** ทั้งที่คะแนน hidden ยังไม่เต็ม
+  → สิ่งที่ยังขาดอยู่คือพฤติกรรมที่ test ที่มองเห็นไม่ครอบคลุม
+- ทุกรอบใช้ Fraction ปัดครั้งเดียว, ตรวจชนิดด้วย `type(x) is int`, raise ValueError ครบ
+- t4 ทุกรอบยังให้สิทธิ์เดือนเกิดกับ silver ด้วย (เหมือนกันหมด) → ความต่างจาก reference น่าจะเป็นกฎที่โจทย์ไม่ได้เขียน
+- t3 ทุกรอบไม่มีกฎค่าส่งกรณีระยะ 0 และจำกัดน้ำหนักส่งด่วน (เป็นกฎที่โจทย์ไม่ได้เขียนเช่นกัน)
+- t3 s1 กับ s3 ตรรกะเหมือนกันทุกจุดที่ตรวจได้ แต่คะแนนต่างกัน 0.09 → ไม่สามารถระบุสาเหตุจากโค้ดได้
+- t1 s1/s2/s3 ตรรกะเหมือนกัน คะแนน 0.8/0.7/0.8 → ไม่สามารถระบุสาเหตุจากโค้ดได้
+
+## สิ่งที่แก้ใน v2 (แก้ในที่เดิมของ staging ตามกติกา)
+1. `strict-input-validation`: เพิ่มกติกา "ตรวจ input ก่อน early return ทุกชนิด" เพราะ `if amount < 10000: return 0`
+   จะคืน 0 แทน ValueError เมื่อ amount=-1 (ยังไม่พบใน epoch 1 แต่เป็นช่องโหว่ที่เห็นได้จากโครงสร้าง)
+2. `solver-selftest-workflow/test_template.py`: เพิ่ม test "ค่าผิดใต้เกณฑ์ธุรกิจต้อง raise"
+3. `spec-reading-thai`: เพิ่มข้อ "เงื่อนไขที่ให้ผล 0 ต้องอยู่หลังการตรวจ input" และย้ายลำดับข้อ
+
+## ไม่ได้ทำ (ตั้งใจ)
+- ไม่เพิ่มกฎ policy ของ train (silver ไม่ได้เดือนเกิด, ระยะ 0 ไม่คิดค่าส่ง ฯลฯ) เพราะเป็นกฎเฉพาะของ train
+  และโจทย์ held-out จะมีกฎของตัวเอง; ไม่มีหลักทั่วไปที่ช่วยเดาได้จากโจทย์
+- ไม่เปลี่ยน money_helpers / validators เพราะทำงานถูกต้องตามการตรวจทั้งหมด
 EOF
-ls -la /evo/staging/*/ && date -u +%H:%M
+find /evo/staging -type f | sort; head -4 /evo/staging/*/SKILL.md | grep -E "^(name|==>)"
 ```
 
 ผลที่ได้:
 
 ```
-/evo/staging/satang-money-math/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:22 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 5934 Nov 15 04:22 SKILL.md
-
-/evo/staging/solution-verification/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:19 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 4695 Nov 15 04:19 SKILL.md
-
-/evo/staging/thai-spec-reading/:
-total 16
-drwxr-xr-x 2 root root 4096 Nov 15 04:19 .
-drwxr-xr-x 5 root root 4096 Nov 15 04:19 ..
--rw-r--r-- 1 root root 6836 Nov 15 04:19 SKILL.md
-21:22
+/evo/staging/money-arithmetic-rounding/SKILL.md
+/evo/staging/money-arithmetic-rounding/money_helpers.py
+/evo/staging/solver-selftest-workflow/SKILL.md
+/evo/staging/solver-selftest-workflow/test_template.py
+/evo/staging/spec-reading-thai/SKILL.md
+/evo/staging/strict-input-validation/SKILL.md
+/evo/staging/strict-input-validation/validators.py
+==> /evo/staging/money-arithmetic-rounding/SKILL.md <==
+name: money-arithmetic-rounding
+==> /evo/staging/solver-selftest-workflow/SKILL.md <==
+name: solver-selftest-workflow
+==> /evo/staging/spec-reading-thai/SKILL.md <==
+name: spec-reading-thai
+==> /evo/staging/strict-input-validation/SKILL.md <==
+name: strict-input-validation
 ```
 
-**Agent พูด:** `skills_v2` is in `/evo/staging/`. I changed one thing, the default rounding, so the next epoch tests a single hypothesis.
+**Agent พูด:** ชุดสกิล v2 อยู่ใน `/evo/staging/` แล้ว โดยแก้ในที่เดิมตามกติกา (ไม่ได้สร้างโฟลเดอร์ `skills_v2` แยก) การเปลี่ยนแปลงครั้งนี้เล็กมาก เพราะ Solver ทำได้ดีขึ้นแล้วและที่เหลือเป็นเรื่องที่สกิลทั่วไปแก้ไม่ได้
 
-**What epoch 1 showed**
-- The Solver read all three skills on every rollout and took 5–7 turns.
-- Scores barely moved. t3 (0.5455) and t4 (0.5) are unchanged across all six rollouts from both epochs. t1 went to 0.6/0.5/0.6 and t2 to 0.7/0.7/0.6.
-- The t1 and t2 solutions have the same arithmetic. The differences are in input validation: the 0.5 t1 rollout has no `ValueError` checks and the 0.6 ones do. That is one correlation, not a confirmed cause.
-- Rounding was half-up in every rollout of epochs 0 and 1. Floor was never tried on t2 or t3, so those scores still have an untested explanation.
+**ผล epoch 1 (สกิล v1):** คะแนนดีขึ้นทุกโจทย์ t1 ได้ 0.7–0.8, t2 ได้ 0.8, t3 ได้ 0.64–0.73 และ t4 ได้ 0.6–0.7 (ก่อนหน้านี้ 0.4–0.7)
 
-**What I changed in `satang-money-math`**
-- When the brief does not specify rounding, the default is now floor (truncate the satang). Words such as "ครึ่ง", "ขึ้น", and "ตัด" in the brief select half-up, ceil, or floor.
-- The other two skills are unchanged from v1.
+**การวินิจฉัย:** ผม replay solve.py ทั้ง 12 รอบกับ reference test ที่มองเห็นได้ ทุกรอบผ่าน 12/12 ทั้งที่คะแนน hidden ยังไม่เต็ม ดังนั้นสิ่งที่ยังพลาดอยู่คือพฤติกรรมที่ test ชุดนี้ไม่ได้ครอบคลุม
+- t4 ทุกรอบให้สิทธิ์เดือนเกิดกับ silver ด้วย และ t3 ไม่มีกฎระยะ 0 กม. กับการจำกัดน้ำหนักส่งด่วน ทั้งสองอย่างเป็นกฎที่โจทย์ไม่ได้เขียนไว้ สกิลทั่วไปจึงช่วยไม่ได้
+- t1 และ t3 บางรอบมีตรรกะเหมือนกันทุกจุดที่ตรวจได้ แต่คะแนนต่างกัน 0.1 ซึ่งผมไม่สามารถระบุสาเหตุจากโค้ดได้
 
-**How to read the next epoch**
-- If t2 or t3 rises, floor is probably right.
-- If they stay flat, I drop this hypothesis.
-- If t1 falls, floor may be too broad, since it also changes the customer's total.
+**การแก้ใน v2 (เล็กน้อย):**
+- `strict-input-validation`: เพิ่มกติกาว่าต้องตรวจ input ก่อน early return ทุกชนิด เช่น `if amount < 10000: return 0` ต้องอยู่หลังการตรวจ เพื่อให้ `amount=-1` raise ValueError ไม่ใช่คืน 0 เงียบ ๆ ผมยังไม่เห็นกรณีนี้ใน epoch 1 แต่โครงสร้างโค้ดที่ Solver เขียนเปิดช่องให้เกิดได้
+- `solver-selftest-workflow/test_template.py`: เพิ่ม test หมวดนี้
+- `spec-reading-thai`: เพิ่มข้อว่าเงื่อนไขที่ให้ผล 0 ต้องทำตามโจทย์และอยู่หลังการตรวจ input
 
-I did not test the other two open hypotheses this epoch (additive "ลดอีก", and cap before or after doubling for birthdays). Testing them together would hide which change moved a score. Both are in `/evo/evolver_workspace/notes.md`.
+**ที่ไม่ได้ทำ:** ไม่เพิ่มกฎ policy ของ train เช่น silver กับเดือนเกิด เพราะโจทย์ held-out จะมีกฎของตัวเอง และไม่มีหลักทั่วไปที่ช่วยเดากฎเหล่านี้จากโจทย์
 
-I also did not open `reference/answers/`, and I did not use the grade
-…(ตัด 96 ตัวอักษร)
+บันทึกทั้งหมดอยู่ที่ `/evo/evolver_workspace/epoch1_notes.md` (มีส่วน epoch 2 ต่อท
+…(ตัด 58 ตัวอักษร)

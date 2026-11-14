@@ -1,11 +1,11 @@
 # ตาที่ 1 ของ Evolver
 
-ข้อความที่ได้รับ: ขณะนี้เวลา 2026-11-14 21:03 UTC คุณมีเวลาถึง 2026-11-14 21:33 UTC สำหรับ epoch นี้ หลังจากนั้น `/evo/staging/` จะถูกนำไปใช้ตามสภาพที่เป็นอยู่ · ตอนนี้คือ epoch 1 · โปรดวิเคราะห์ rollout ของ Solver วินิจฉัยจุดพลาดที่สกิลเฉพาะทางน่าจะแก้ได้ แล้วเขียน `skills_v1` ลงใน `/evo/staging/`
+ข้อความที่ได้รับ: เวลาตอนนี้ 2026-11-14 23:21 UTC · เส้นตายของตานี้ 2026-11-14 23:51 UTC เมื่อถึงเส้นตาย สิ่งที่อยู่ใน `/evo/staging/` จะถูกนำไปใช้ทันทีตามสภาพขณะนั้น · นี่คือ epoch 1 · ผลการทำโจทย์รอบล่าสุดของ Solver อยู่ใน `/evo` แล้ว ขอให้วิเคราะห์ rollout เหล่านั้น วินิจฉัยว่า Solver พลาดตรงไหนที่สกิลช่วยแก้ได้ แล้วเขียนชุดสกิล `skills_v1` ลงใน `/evo/staging/`
 
 ### ขั้น 1 · Bash
 
 ```
-cd /evo; ls; ls evolver_workspace staging skills/* reference | head -50; cat scores/epoch_0.json | head -50; ls traces/epoch_0 | head -50
+cd /evo; ls; ls reference staging evolver_workspace skills/*; ls traces/*| head -50; cat scores/*.json | head -50
 ```
 
 ผลที่ได้:
@@ -21,25 +21,14 @@ traces
 evolver_workspace:
 
 reference:
-baankafe
+README.md
+answers
+tasks
 
 skills/epoch_0:
 
 staging:
-{
- "t1-cafe-bill_s1": 0.5,
- "t1-cafe-bill_s2": 0.5,
- "t1-cafe-bill_s3": 0.5,
- "t2-split-bill_s1": 0.5,
- "t2-split-bill_s2": 0.5,
- "t2-split-bill_s3": 0.5,
- "t3-shipping-fee_s1": 0.5455,
- "t3-shipping-fee_s2": 0.5455,
- "t3-shipping-fee_s3": 0.5455,
- "t4-cashback_s1": 0.4,
- "t4-cashback_s2": 0.4,
- "t4-cashback_s3": 0.4
-}t1-cafe-bill_s1.jsonl
+t1-cafe-bill_s1.jsonl
 t1-cafe-bill_s2.jsonl
 t1-cafe-bill_s3.jsonl
 t2-split-bill_s1.jsonl
@@ -51,161 +40,103 @@ t3-shipping-fee_s3.jsonl
 t4-cashback_s1.jsonl
 t4-cashback_s2.jsonl
 t4-cashback_s3.jsonl
+{
+ "t1-cafe-bill_s1": 0.5,
+ "t1-cafe-bill_s2": 0.5,
+ "t1-cafe-bill_s3": 0.5,
+ "t2-split-bill_s1": 0.5,
+ "t2-split-bill_s2": 0.5,
+ "t2-split-bill_s3": 0.5,
+ "t3-shipping-fee_s1": 0.4545,
+ "t3-shipping-fee_s2": 0.4545,
+ "t3-shipping-fee_s3": 0.4545,
+ "t4-cashback_s1": 0.4,
+ "t4-cashback_s2": 0.4,
+ "t4-cashback_s3": 0.4
+}
 ```
 
 ### ขั้น 2 · Bash
 
 ```
-cd /evo; find reference | head -50; ls solver_workspaces/epoch_0/*; 
+cd /evo/reference; cat README.md; find . -type f | head -50;
 ```
 
 ผลที่ได้:
 
 ```
-reference
-reference/baankafe
-reference/baankafe/answers
-reference/baankafe/tasks
-reference/baankafe/answers/t4-cashback
-reference/baankafe/answers/t1-cafe-bill
-reference/baankafe/answers/t2-split-bill
-reference/baankafe/answers/t3-shipping-fee
-reference/baankafe/tasks/t3-shipping-fee.json
-reference/baankafe/tasks/t4-cashback.json
-reference/baankafe/tasks/t1-cafe-bill.json
-reference/baankafe/tasks/t2-split-bill.json
-reference/baankafe/answers/t4-cashback/test_solve.py
-reference/baankafe/answers/t4-cashback/solve.py
-reference/baankafe/answers/t1-cafe-bill/test_solve.py
-reference/baankafe/answers/t1-cafe-bill/solve.py
-reference/baankafe/answers/t2-split-bill/test_solve.py
-reference/baankafe/answers/t2-split-bill/solve.py
-reference/baankafe/answers/t3-shipping-fee/test_solve.py
-reference/baankafe/answers/t3-shipping-fee/solve.py
-solver_workspaces/epoch_0/t1-cafe-bill_s1:
-solve.py
+# BaanKafe (ข้อมูลอ้างอิงสำหรับ Evolver)
 
-solver_workspaces/epoch_0/t1-cafe-bill_s2:
-solve.py
+โจทย์เขียนโค้ดคิดเงินของร้านกาแฟ BaanKafe: Solver ได้ข้อความโจทย์ (`brief`) แล้วเขียนฟังก์ชัน Python 1 ฟังก์ชัน
+ลงในไฟล์ `solve.py` ในโฟลเดอร์ทำงานที่ว่างเปล่า
 
-solver_workspaces/epoch_0/t1-cafe-bill_s3:
-solve.py
-
-solver_workspaces/epoch_0/t2-split-bill_s1:
-solve.py
-
-solver_workspaces/epoch_0/t2-split-bill_s2:
-solve.py
-
-solver_workspaces/epoch_0/t2-split-bill_s3:
-solve.py
-
-solver_workspaces/epoch_0/t3-shipping-fee_
-…(ตัด 280 ตัวอักษร)
+ในโฟลเดอร์นี้มีเฉพาะโจทย์ชุด train 4 ข้อ:
+- `tasks/<task id>.json` : `id`, `function` (ชื่อฟังก์ชัน), `brief` (ข้อความโจทย์ที่ Solver ได้รับ)
+- `answers/<task id>/` : เฉลยอ้างอิง `solve.py` และ `test_solve.py`
+./README.md
+./tasks/t3-shipping-fee.json
+./tasks/t4-cashback.json
+./tasks/t1-cafe-bill.json
+./tasks/t2-split-bill.json
+./answers/t4-cashback/test_solve.py
+./answers/t4-cashback/solve.py
+./answers/t1-cafe-bill/test_solve.py
+./answers/t1-cafe-bill/solve.py
+./answers/t2-split-bill/test_solve.py
+./answers/t2-split-bill/solve.py
+./answers/t3-shipping-fee/test_solve.py
+./answers/t3-shipping-fee/solve.py
 ```
 
 ### ขั้น 3 · Bash
 
 ```
-cd /evo/reference/baankafe; cat tasks/*.json; for t in answers/*; do echo "=== $t"; cat $t/solve.py; done
+cd /evo/reference; for t in t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback; do echo "=== $t"; cat tasks/$t.json; echo; cat answers/$t/solve.py; done
 ```
 
 ผลที่ได้:
 
 ```
+=== t1-cafe-bill
 {
  "id": "t1-cafe-bill",
  "function": "cafe_bill",
  "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `cafe_bill(items, member)` ในไฟล์ `solve.py` สำหรับคิดเงินหน้าร้าน\n- `items` = list ของ dict `{\"price\": ราคาต่อชิ้น (สตางค์), \"qty\": จำนวนชิ้น (ตั้งแต่ 1)}`\n- ยอดรวมตั้งแต่ 500 บาทขึ้นไป ลด 5%\n- `member` = True ลดอีก 10%\n- บวก VAT 7% เป็นขั้นสุดท้าย\n- คืนยอดที่ลูกค้าต้องจ่าย เป็นจำนวนเต็มสตางค์"
-}{
- "id": "t2-split-bill",
- "function": "split_bill",
- "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `split_bill(total, people, tip_percent)` ในไฟล์ `solve.py` สำหรับหารบิล\n- `total` = ยอดบิล (สตางค์ ตั้งแต่ 0) · `people` = จำนวนคน (ตั้งแต่ 1) · `tip_percent` = ทิปเป็นเปอร์เซ็นต์ (จำนวนเต็ม 0–100)\n- ยอดที่ต้องหาร = ยอดบิลบวกทิป\n- หารเท่ากันทุกคน ถ้าหารไม่ลงตัว ให้คนลำดับแรก ๆ จ่ายเพิ่มคนละ 1 สตางค์จนครบ\n- คืน list ของยอดที่แต่ละคนจ่าย (จำนวนเต็มสตางค์) เรียงตามลำดับคน"
-}{
- "id": "t3-shipping-fee",
- "function": "shipping_fee",
- "brief": "ร้านกาแฟ BaanKafe ต้องการฟังก์ชัน `shipping_fee(weight_g, distance_km, express)` ในไฟล์ `solve.py` สำหรับคิดค่าส่งเมล็ดกาแฟ\n- `weight_g` = น้ำหนัก 1–30,000 กรัม · `distance_km` = ระยะทาง (ตั้งแต่ 0) · `express` = True คือส่งด่วน\n- ไม่เกิน 1,000 กรัม 4
-…(ตัด 7553 ตัวอักษร)
+}
+"""คิดเงินหน้าร้าน · เฉลยอ้างอิงตามมาตรฐานคิดเงินของร้าน BaanKafe"""
+import json
+import sys
+from fractions import Fraction
+
+
+def half_up(x):
+    """ปัดครึ่งขึ้นเป็นจำนวนเต็มสตางค์ (x ไม่ติดลบ)"""
+    return int((Fraction(x) * 2 + 1) // 2)
+
+
+def need_int(value, name, low=None, high=None):
+    if type(value) is not int:  # bool และ float ไม่ใช่ int
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if (low is not None and value < low) or (high is not None and value > high):
+        raise ValueError(f"{name} อยู่นอกช่วงที่กำหนด")
+    return value
+
+
+def need_bool(value, name):
+    if type(value) is not bool:
+        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+    return value
+
+def cafe_bill(items, member):
+    if type(items) is not list:
+        raise Value
+…(ตัด 7525 ตัวอักษร)
 ```
 
 ### ขั้น 4 · Bash
 
 ```
-cd /evo/solver_workspaces/epoch_0; for t in t1-cafe-bill_s1 t2-split-bill_s1 t3-shipping-fee_s1 t4-cashback_s1; do echo "=== $t"; cat $t/solve.py; done
-```
-
-ผลที่ได้:
-
-```
-=== t1-cafe-bill_s1
-def cafe_bill(items, member):
-    subtotal = sum(i["price"] * i["qty"] for i in items)  # satang
-    num, den = 1, 1
-    if subtotal >= 50000:  # 500 baht
-        num, den = num * 95, den * 100
-    if member:
-        num, den = num * 90, den * 100
-    num, den = num * 107, den * 100  # VAT last
-    # exact integer arithmetic, round half up once at the end
-    return (subtotal * num * 2 + den) // (den * 2)
-=== t2-split-bill_s1
-def split_bill(total, people, tip_percent):
-    """หารบิล (หน่วยสตางค์) คืน list ยอดที่แต่ละคนจ่าย"""
-    # ยอดรวมทิป ปัดครึ่งขึ้นเป็นสตางค์ (ใช้จำนวนเต็มล้วน ไม่มีปัญหา float)
-    grand = (total * (100 + tip_percent) * 2 + 100) // 200
-    base, extra = divmod(grand, people)
-    return [base + 1 if i < extra else base for i in range(people)]
-=== t3-shipping-fee_s1
-from fractions import Fraction
-from math import floor
-
-
-def shipping_fee(weight_g, distance_km, express):
-    """คืนค่าส่งเป็นจำนวนเต็มสตางค์ (ปัดครึ่งขึ้น) ด้วยเลขคณิตแบบแม่นยำ"""
-    w = Fraction(weight_g)
-    if w < 1 or w > 30000:
-        raise ValueError("weight_g must be between 1 and 30000")
-    if distance_km < 0:
-        raise ValueError("distance_km must be >= 0")
-
-    i
-…(ตัด 856 ตัวอักษร)
-```
-
-### ขั้น 5 · Bash
-
-```
-cd /evo/traces/epoch_0; wc -c *; python3 -c "
-import json
-for l in open('t3-shipping-fee_s1.jsonl'):
-    d=json.loads(l); print(json.dumps(d,ensure_ascii=False)[:1500]); print()
-"
-```
-
-ผลที่ได้:
-
-```
- 26777 t1-cafe-bill_s1.jsonl
- 26756 t1-cafe-bill_s2.jsonl
- 33120 t1-cafe-bill_s3.jsonl
- 28596 t2-split-bill_s1.jsonl
- 26135 t2-split-bill_s2.jsonl
- 37971 t2-split-bill_s3.jsonl
- 35272 t3-shipping-fee_s1.jsonl
- 28410 t3-shipping-fee_s2.jsonl
- 29311 t3-shipping-fee_s3.jsonl
- 28116 t4-cashback_s1.jsonl
- 25904 t4-cashback_s2.jsonl
- 26810 t4-cashback_s3.jsonl
-353178 total
-{"type": "system", "subtype": "init", "cwd": "/workspace/evlab/ws/v1/legs/runs/base_train/t3-shipping-fee-r1/sandbox", "session_id": "9526de2f-d426-4df0-911f-ac6b9993a414", "tools": ["Task", "Bash", "CronCreate", "CronDelete", "CronList", "DesignSync", "Edit", "EnterWorktree", "ExitWorktree", "ListAgents", "Monitor", "NotebookEdit", "PublishPlugin", "PushNotification", "Read", "RemoteTrigger", "ReportFindings", "ScheduleWakeup", "SendMessage", "ShareOnboardingGuide", "Skill", "TaskStop", "ToolSearch", "WebSearch", "Workflow", "Write", "mcp__playwright__browser_click", "mcp__playwright__browser_close", "mcp__playwright__browser_console_messages", "mcp__playwright__browser_drag", "mcp__playwright__browser_drop", "mcp__playwright__browser_emulate_media", "mcp__playwright__browser_evaluate", "mcp__playwright__browser_file_
-…(ตัด 16996 ตัวอักษร)
-```
-
-### ขั้น 6 · Bash
-
-```
-cd /evo/reference/baankafe/answers; cat t3-shipping-fee/test_solve.py; cat t4-cashback/test_solve.py | head -80
+cd /evo/reference; cat answers/t1-cafe-bill/test_solve.py | head -80
 ```
 
 ผลที่ได้:
@@ -214,149 +145,216 @@ cd /evo/reference/baankafe/answers; cat t3-shipping-fee/test_solve.py; cat t4-ca
 """เทสต์ของเฉลยอ้างอิง: python3 -m unittest -q test_solve"""
 import unittest
 
-from solve import shipping_fee
+from solve import cafe_bill
 
 
 class Normal(unittest.TestCase):
     def test_normal_1(self):
-        self.assertEqual(shipping_fee(500, 20, False), 4000)
+        self.assertEqual(cafe_bill([{'price': 4500, 'qty': 2}], False), 9630)
 
     def test_normal_2(self):
-        self.assertEqual(shipping_fee(3000, 20, False), 8000)
+        self.assertEqual(cafe_bill([{'price': 4500, 'qty': 2}], True), 8667)
 
     def test_normal_3(self):
-        self.assertEqual(shipping_fee(3000, 150, False), 9600)
+        self.assertEqual(cafe_bill([{'price': 12000, 'qty': 1}, {'price': 6500, 'qty': 2}], False), 26750)
 
 
 class Boundary(unittest.TestCase):
     def test_boundary_1(self):
-        self.assertEqual(shipping_fee(1000, 10, False), 4000)
+        self.assertEqual(cafe_bill([{'price': 50000, 'qty': 1}], False), 50825)
 
     def test_boundary_2(self):
-        self.assertEqual(shipping_fee(1001, 10, False), 8000)
+        self.assertEqual(cafe_bill([{'price': 49999, 'qty': 1}], False), 53499)
 
     def test_boundary_3(self):
-        self.assertEqual(shipping_fee(5000, 10, False), 8000)
+        self.assertEqual(cafe_bill([{'price': 0, 'qty': 1}, {'price': 4500, 'qty': 1}], False), 4815)
 
 
 class NoDrift(unittest.TestCase):
     def test_no_drift_1(self):
-        self.assertEqual(shipping_fee(5106, 150, True), 14686)
+        self.assertEqual(cafe_bill([{'price': 4505, 'qty': 1}], True), 4338)
 
     def test_no_drift_2(self):
-        self.assertEqual(shipping_fee(5217, 50, True), 12488)
+        self.assertEqual(cafe_bill([{'price': 25075, 'qty': 2}], True), 45880)
 
 
 class Reject(unittest.TestCase):
-    def test_reject_1(self):
-        with self.assertRaises(ValueError):
-            shipping_fee(0, 10, False)
+    def test_reject_1(se
+…(ตัด 556 ตัวอักษร)
+```
 
-    def test_reject_2(self):
-        with self.assertRaises(ValueError):
-            shippi
-…(ตัด 1830 ตัวอักษร)
+### ขั้น 5 · Bash
+
+```
+cd /evo; ls solver_workspaces/epoch_1 2>/dev/null| head; ls traces; ls scores; cat scores/epoch_1.json | head -3; ls solver_workspaces/*;
+```
+
+ผลที่ได้:
+
+```
+epoch_0
+epoch_0.json
+cat: scores/epoch_1.json: No such file or directory
+t1-cafe-bill_s1
+t1-cafe-bill_s2
+t1-cafe-bill_s3
+t2-split-bill_s1
+t2-split-bill_s2
+t2-split-bill_s3
+t3-shipping-fee_s1
+t3-shipping-fee_s2
+t3-shipping-fee_s3
+t4-cashback_s1
+t4-cashback_s2
+t4-cashback_s3
+```
+
+### ขั้น 6 · Bash
+
+```
+cd /evo; ls traces/epoch_0 | head -3; for t in t1-cafe-bill t2-split-bill t3-shipping-fee t4-cashback; do echo "=== $t"; cat solver_workspaces/epoch_0/${t}_s1/solve.py; done; ls solver_workspaces/epoch_0/t1-cafe-bill_s1
+```
+
+ผลที่ได้:
+
+```
+t1-cafe-bill_s1.jsonl
+t1-cafe-bill_s2.jsonl
+t1-cafe-bill_s3.jsonl
+=== t1-cafe-bill
+def cafe_bill(items, member):
+    total = sum(i["price"] * i["qty"] for i in items)  # สตางค์
+    num, den = total, 1
+    if total >= 50000:          # 500 บาทขึ้นไป ลด 5%
+        num, den = num * 95, den * 100
+    if member:                  # สมาชิกลดอีก 10%
+        num, den = num * 90, den * 100
+    num, den = num * 107, den * 100  # VAT 7%
+    return (2 * num + den) // (2 * den)  # ปัดครึ่งขึ้น ครั้งเดียวตอนท้าย
+=== t2-split-bill
+def split_bill(total, people, tip_percent):
+    # ทิปเป็นสตางค์ ปัดเศษครึ่งขึ้น (ใช้เลขจำนวนเต็มล้วน ไม่มี float)
+    tip = (total * tip_percent + 50) // 100
+    grand = total + tip
+    base, extra = divmod(grand, people)
+    return [base + 1 if i < extra else base for i in range(people)]
+=== t3-shipping-fee
+from fractions import Fraction
+import math
+
+
+def shipping_fee(weight_g, distance_km, express):
+    """Return shipping fee in integer satang (1 baht = 100 satang)."""
+    w = Fraction(weight_g)
+    if w <= 1000:
+        fee = Fraction(4000)
+    elif w <= 5000:
+        fee = Fraction(8000)
+    else:
+        fee = Fraction(8000) + (w - 5000) * Fraction(3, 2)  # 15 baht/
+…(ตัด 674 ตัวอักษร)
 ```
 
 ### ขั้น 7 · Bash
 
 ```
-cd /evo/reference/baankafe/answers; grep -A3 "def test_\(reject\|boundary\|normal\)" t1-cafe-bill/test_solve.py t2-split-bill/test_solve.py | grep -v "^--" | grep -E "assert|cafe_bill\(|split_bill\(" 
+cd /evo/reference/answers; for t in t2-split-bill t3-shipping-fee t4-cashback; do echo "== $t"; grep -v "^$" $t/test_solve.py | sed -n 1,200p; done
 ```
 
 ผลที่ได้:
 
 ```
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(30000, 3, 0), [10000, 10000, 10000])
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(30000, 4, 10), [8250, 8250, 8250, 8250])
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(12000, 2, 5), [6300, 6300])
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(0, 3, 10), [0, 0, 0])
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(2, 3, 0), [1, 1, 0])
-t2-split-bill/test_solve.py-        self.assertEqual(split_bill(9999, 1, 0), [9999])
-t2-split-bill/test_solve.py-        with self.assertRaises(ValueError):
-t2-split-bill/test_solve.py-            split_bill(10000, 0, 0)
-t2-split-bill/test_solve.py-        with self.assertRaises(ValueError):
-t2-split-bill/test_solve.py-            split_bill(10000, -2, 0)
-t2-split-bill/test_solve.py-        with self.assertRaises(ValueError):
-t2-split-bill/test_solve.py-            split_bill(10000.0, 2, 0)
-t2-split-bill/test_solve.py-        with self.assertRaises(ValueError):
-t2-split-bill/test_solve.py-            split_bill(10000, '3', 0)
-t1-cafe-bill/test_solve.py-        self.assertEqual(cafe_bill([{'price': 4500, 'qty': 2}], False)
-…(ตัด 1217 ตัวอักษร)
+== t2-split-bill
+"""เทสต์ของเฉลยอ้างอิง: python3 -m unittest -q test_solve"""
+import unittest
+from solve import split_bill
+class Normal(unittest.TestCase):
+    def test_normal_1(self):
+        self.assertEqual(split_bill(30000, 3, 0), [10000, 10000, 10000])
+    def test_normal_2(self):
+        self.assertEqual(split_bill(30000, 4, 10), [8250, 8250, 8250, 8250])
+    def test_normal_3(self):
+        self.assertEqual(split_bill(12000, 2, 5), [6300, 6300])
+class Boundary(unittest.TestCase):
+    def test_boundary_1(self):
+        self.assertEqual(split_bill(0, 3, 10), [0, 0, 0])
+    def test_boundary_2(self):
+        self.assertEqual(split_bill(2, 3, 0), [1, 1, 0])
+    def test_boundary_3(self):
+        self.assertEqual(split_bill(9999, 1, 0), [9999])
+class NoDrift(unittest.TestCase):
+    def test_no_drift_1(self):
+        self.assertEqual(split_bill(10000, 3, 0), [3334, 3333, 3333])
+    def test_no_drift_2(self):
+        self.assertEqual(split_bill(10000, 7, 10), [1572, 1572, 1572, 1571, 1571, 1571, 1571])
+class Reject(unittest.TestCase):
+    def test_reject_1(self):
+        with self.assertRaises(ValueError):
+            split_bill(10000, 0, 0)
+    def test_reject_2(self):
+        wit
+…(ตัด 3365 ตัวอักษร)
 ```
 
 ### ขั้น 8 · Bash
 
 ```
-mkdir -p /evo/staging/baankafe-strict-validation /evo/staging/baankafe-money-rules
-cat > /evo/staging/baankafe-strict-validation/SKILL.md <<'EOF'
+mkdir -p /evo/staging/baankafe-solve && cd /evo/staging/baankafe-solve && cat > SKILL.md <<'EOF'
 ---
-name: baankafe-strict-validation
-description: ใช้ทุกครั้งที่เขียนฟังก์ชันคิดเงิน/ราคา/ค่าส่ง/ส่วนลด/หารบิล/เงินคืนใน solve.py ตัวตรวจจะลองส่งอินพุตผิดชนิดและนอกช่วงเข้ามา ฟังก์ชันต้อง raise ValueError ให้ครบ
+name: baankafe-solve
+description: ใช้ทุกครั้งที่ได้โจทย์เขียนฟังก์ชันคิดเงิน/ค่าส่ง/ส่วนลด/เงินคืน/หารบิลของร้าน BaanKafe ลงใน solve.py — มีขั้นตอน เช็กลิสต์การตรวจอินพุต (ValueError) กติกาปัดเศษ และนโยบายร้านที่โจทย์มักไม่เขียนไว้
 ---
 
-# ตรวจอินพุตให้เข้มก่อนคำนวณ (จุดที่เสียคะแนนมากที่สุด)
+# เขียน solve.py สำหรับโจทย์คิดเงิน BaanKafe
 
-ใน epoch 0 สูตรคำนวณถูกเกือบทุกข้อ แต่ได้คะแนนแค่ ~0.5 เพราะ **ไม่มีการตรวจอินพุต** ตัวตรวจมีกลุ่มเทสต์ "reject" ที่คาดหวัง `ValueError` เสมอ แม้โจทย์ไม่ได้สั่งให้ตรวจก็ตาม
+คะแนนมาจากชุดเทสต์ลับ 4 กลุ่ม: **Normal, Boundary, NoDrift (เศษสตางค์/ปัดเศษ), Reject (อินพุตผิดต้อง raise ValueError)**
+ที่ผ่านมา Solver ทำ Normal/Boundary/NoDrift ถูก แต่ **ได้ราว 40–50% เพราะไม่ทำ Reject เลย** และพลาดกติกาที่ซ่อนอยู่ ดังนั้นต้องทำครบทุกข้อด้านล่าง
 
-## กฎ
-1. **ตรวจทุกพารามิเตอร์ ก่อนคำนวณอะไรทั้งสิ้น** และ raise `ValueError` (ไม่ใช่ TypeError/AssertionError/คืน None/คืน 0)
-2. **ชนิดต้องเป๊ะ**: จำนวนเต็มให้ตรวจ `type(v) is int` — ห้ามใช้ `isinstance(v, int)` เพราะ `True`/`False` จะผ่าน
-   - ปฏิเสธ `float` (แม้ `1000.0`), `str` (`'3'`), `None`, `bool` ในช่องที่ต้องเป็น int
-   - ช่อง True/False ให้ตรวจ `type(v) is bool` (ปฏิเสธ 0/1/'yes')
-   - ช่อง enum (เช่น tier) ให้ตรวจ `type(v) is str and v in ALLOWED` — ค่าที่ไม่อยู่ในรายการ (เช่น `'bronze'`, ตัวพิมพ์ใหญ่ผิด) = ValueError
-3. **ช่วงค่า** ตามที่โจทย์เขียน เช่น "ตั้งแต่ 0" → `>= 0`, "ตั้งแต่ 1" → `>= 1`, "0–100" → `0 <= v <= 100`, "1–30,000" → ปฏิเสธ 0 และ 30001 ระวังให้ครบทั้งขอบล่างและบน
-4. **โครงสร้างซ้อน** (เช่น list ของ dict): ตรวจว่า `type(items) is list`, แต่ละตัว `type(it) is dict`, มี key ครบ (ขาด key = ValueError ไม่ใช่ KeyError), ตรวจ field แต่ละตัวด้วยกฎข้อ 2–3 ในทุกรายการ
-   - list ว่างให้ถือว่าถูกต้อง (ยอด 0) เว้นแต่โจทย์ห้าม
-5. ตรวจ**ก่อน**ทุกกรณีพิเศษ/early return (เช่น ยอดต่ำกว่าเกณฑ์แล้วคืน 0) — อินพุตผิดต้อง error แม้อยู่ในเงื่อนไขที่จะคืน 0
+## ขั้นตอน
+1. อ่านโจทย์ทีละบรรทัด แปลงเป็นลำดับการคำนวณ (ลำดับสำคัญ: ลดก่อนแล้วค่อย VAT, คูณต่อกันตามที่โจทย์เขียน)
+2. เขียน `solve.py` โดยมีฟังก์ชันชื่อตามโจทย์ (ดูไฟล์ `template.py` ในโฟลเดอร์สกิลนี้ — คัดลอกตัวช่วย `need_int`, `need_bool`, `half_up` ไปใช้)
+3. รันทดสอบเองด้วยกรณี Normal / ขอบเขต (เท่ากับเกณฑ์พอดี, ต่ำกว่า 1 หน่วย) / เศษสตางค์ / อินพุตผิด
+4. ตรวจเช็กลิสต์ท้ายไฟล์นี้ก่อนจบ
 
-## แม่แบบ helper (วางไว้ใน solve.py)
-```python
-def need_int(v, name, low=None, high=None):
-    if type(v) is not int:
-        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
-    if (low is not None and v < low) or (high is not None and v > high):
-        raise ValueError(f"{name} อยู่นอกช่วง")
-    return v
+## 1) ตรวจอินพุตอย่างเข้มงวด (กลุ่ม Reject — ห้ามข้าม)
+ทุกพารามิเตอร์ต้องตรวจ แล้ว `raise ValueError(...)` เมื่อผิด (ไม่ใช่ TypeError/KeyError/คืนค่า None/0)
+- จำนวนเต็ม: ใช้ `type(v) is int` เท่านั้น — **ปฏิเสธ float (4500.0), str ('3'), bool (True), None**
+- ช่วงค่าตามโจทย์: ถ้าโจทย์บอก "ตั้งแต่ 1" → `>= 1`, "ตั้งแต่ 0" → `>= 0`, "1–30,000" → ช่วงนั้นพอดี, "จำนวนเต็ม 0–100" → 0..100 ค่าติดลบ/0 ที่ไม่อนุญาตต้อง raise
+- boolean (member, express, birthday): `type(v) is bool` เท่านั้น ปฏิเสธ 0/1/"true"
+- ค่าที่เป็นตัวเลือก (เช่น tier): ต้องเป็น `str` และอยู่ในชุดที่กำหนดเป๊ะ ๆ (ตัวพิมพ์เล็ก) มิฉะนั้น raise
+- โครงสร้าง: `items` ต้องเป็น `list`; แต่ละ item ต้องเป็น `dict` มีคีย์ครบ (ขาดคีย์ → ValueError ไม่ใช่ KeyError); ตรวจ price/qty ของทุก item
+- ตรวจ **ก่อน** คำนวณ และตรวจทุกอาร์กิวเมนต์แม้ว่าเส้นทางลัด (เช่น คืน 0) จะไม่ได้ใช้มัน
 
-def need_bool(v, name):
-    if type(v) is not bool:
-        raise ValueError(f"{name} ต้องเป็น True/False")
-    return v
-```
-
-## ก่อนส่งงาน ทดสอบเอง
-รัน (ใช้ `PYTHONPATH=.` — `python3 -I` จะ import solve ไม่เจอ) ด้วยอินพุตเหล่านี้แล้วยืนยันว่าได้ ValueError: ค่าติดลบ, 0 ในช่องที่ต้อง ≥1, เกินขอบบน, `1000.0`, `'1000'`, `True` ในช่อง int, `1` ในช่อง bool, enum แปลก, item ขาด key
-EOF
-cat > /evo/staging/baankafe-money-rules/SKILL.md <<'EOF'
----
-name: baankafe-money-rules
-description: ใช้เมื่อเขียนสูตรเงินของร้าน Baa
-…(ตัด 2468 ตัวอักษร)
+## 2) เลขทางการเงิน — ห้ามใช้ float
+- ใช้ `fractions.Fraction` หรือจำนวนเต็มล้วนตลอดสาย; ไม่มี `round()`, ไม่มี `/` ที่ได้ float
+- **ปัดเศษครั้งเดียวตอนท้ายสุด** ห้ามปัดผลกลางทาง (ยกเว้นโจทย์สั่งชัด) ผลลัพธ์เป็น `int` สตางค์
+- ปัดครึ่งขึ้น (half-up) สำหรับยอดที่ลูกค้าจ่าย (บิล, ค่าส่ง, ยอดรวมทิป):
+  `int((Fraction(x)*2 + 1) // 2)` (x ไม่ติดลบ)
+- **เงินที่ร้านจ่ายออกให้ลูกค้า (เงินคืน/cashback/rebate) ปัดลง (floor)** — ร้านไม่จ่ายเกินสิทธิ์ ใช้ `int(Fraction(x) // 1)`
+  ถ้าโจทย์ไม่บอกวิธีปัด: ยอดที่เก็บจากลูกค้า → half-up, เงินที่ร้านจ่ายออก → ปัดลง
+- เพดาน/ขั้นต่ำ (เช่น "สูงสุด 200 บาทต่อบิล") ใช้กับค่
+…(ตัด 3917 ตัวอักษร)
 ```
 
 ผลที่ได้:
 
 ```
-/evo/staging/baankafe-money-rules:
 SKILL.md
-
-/evo/staging/baankafe-strict-validation:
-SKILL.md
+template.py
 ```
 
-**Agent พูด:** เขียน `skills_v1` ลง `/evo/staging/` แล้ว มี 2 สกิล ยังไม่ได้ทดสอบกับ Solver จริง
+**Agent พูด:** เขียนสกิล `baankafe-solve` ลงใน `/evo/staging/` แล้ว ยังไม่ได้ทดสอบกับ Solver เพราะต้องรอผลของ epoch 1
 
-**สิ่งที่พบใน epoch 0:** คะแนนอยู่ที่ 0.4–0.55 ทุกข้อ และเท่ากันทั้ง 3 rollout สูตรคำนวณหลักถูกเกือบหมด ที่เสียคะแนนมี 3 เรื่อง
-- **ไม่มีการตรวจอินพุต:** ตัวตรวจมีเทสต์ที่คาดหวัง `ValueError` เมื่อได้ค่าติดลบ, 0 ในช่องที่ต้องมากกว่า 0, `float`, `str` หรือ enum ที่ไม่อยู่ในรายการ ซึ่ง Solver ไม่ได้เขียนไว้เลย บางข้อรับ `bool` เป็นตัวเลขได้ด้วย
-- **ทิศการปัดเศษ:** เงินคืนที่ร้านจ่ายออกต้องปัดลง Solver ปัดไม่ตรงกับเฉลยทุกกรณี
-- **กฎแฝงที่โจทย์ไม่เขียน:** เฉลยมีกฎพวกนี้อยู่ แต่ Solver ไม่ได้ใส่
-  - ระยะทาง 0 กม. ค่าส่งเป็น 0
-  - ส่งด่วนรับน้ำหนักไม่เกิน 20,000 กรัม
-  - silver ไม่ได้โบนัสเดือนเกิด
+**สิ่งที่พบใน epoch 0:** ทั้ง 4 ข้อได้ 0.4–0.5 ทุกครั้ง และทั้ง 3 ครั้งของแต่ละข้อได้คะแนนเท่ากัน ผมไม่ได้เปิด trace ดูการไล่เหตุผลของ Solver แต่เทียบ `solve.py` ของ Solver กับเฉลยและไฟล์เทสต์อ้างอิง ได้ 2 สาเหตุ:
+- **ไม่ตรวจอินพุตเลย:** เทสต์กลุ่ม Reject ต้องการ `ValueError` เมื่อรับ float, str, bool, ค่าติดลบหรือนอกช่วง และ tier ที่ไม่รู้จัก แต่ Solver ไม่ตรวจอะไรสักอย่าง
+- **พลาดนโยบายที่โจทย์ไม่ได้เขียน:** ค่าส่ง 0 เมื่อระยะทาง 0 กม., ส่งด่วนรับไม่เกิน 20,000 กรัม และเงินคืนเดือนเกิดไม่ใช้กับ silver ทั้งสามข้อนี้อยู่ในเฉลย แต่ไม่อยู่ในโจทย์ ไฟล์เทสต์ที่ผมเห็นก็ไม่ได้ทดสอบ จึงเดาว่าเทสต์ลับน่าจะทดสอบ
 
-**สกิลที่เขียน** (ชื่อโฟลเดอร์ตั้งให้เกี่ยวกับร้าน BaanKafe โดยเฉพาะ):
-- `baankafe-strict-validation` สอนให้ตรวจชนิดด้วย `type(v) is int` และ `type(v) is bool` ตรวจช่วงค่า ตรวจโครงสร้าง list ของ dict ตรวจก่อน early return และ raise `ValueError` ทุกกรณี มี helper สำเร็จรูปและรายการอินพุตผิดให้ทดสอบ
-- `baankafe-money-rules` สอนให้ใช้ `Fraction` หรือเลขจำนวนเต็ม ปัดครั้งเดียวตอนท้าย ปัดครึ่งขึ้นกับเงินที่ลูกค้าจ่าย ปัดลงกับเงินที่ร้านจ่ายออก และแปลงบาทเป็นสตางค์ให้ครบ รวมถึงเช็กลิสต์ค่าขอบ
+**สิ่งที่สกิลสอน** (ไฟล์ `SKILL.md` เขียนเป็นภาษาไทย):
+- **ตรวจอินพุต:** ใช้ `type(v) is int` หรือ `is bool` และ raise `ValueError` เสมอ ไม่ปล่อยให้เป็น `KeyError` หรือ `TypeError`
+- **ตัวเลข:** ใช้ `Fraction` ไม่ใช้ float และปัดครั้งเดียวตอนท้าย ยอดที่ลูกค้าจ่ายปัดครึ่งขึ้น เงินที่ร้านจ่ายออก (เงินคืน) ปัดลง
+- **นโยบายที่ซ่อนอยู่:** รวบรวมกติกาที่ซ่อนอยู่ไว้เป็นรายการให้ตรวจ เช่น ระยะทาง 0, เพดานของบริการด่วน, สิทธิ์ที่ไม่ครอบคลุมทุกระดับสมาชิก
+- **ตัวอย่างโค้ด:** `template.py` มีตัวช่วย `need_int`, `need_bool`, `half_up`, `round_down` ให้คัดลอก
+- **เช็กลิสต์ก่อนจบ** ให้ Solver ไล่ตรวจเอง
 
-**ข้อจำกัด:** กฎแฝงเขียนเป็นหลักคิดทั่วไป (ศูนย์ ขอบของบริการพิเศษ สิทธิ์ตามระดับสมาชิก) ไม่ได้ระบุเป็นกฎของโจทย์ใด ถ้าโจทย์ใหม่มีกฎแฝงแบบอื่น สกิลนี้ช่วยได้แค่เตือนให้คิด ส่วนถูกหรือผิดยังขึ้นกับการเดาของ Solver
+**ข้อควรระวัง:** กฎเรื่อง silver และเพดานบริการด่วนผมเอามาจากเฉลยของโจทย์ train ถ้าโจทย์ในชุดที่ไม่เคยเห็นมีกฎคนละแบบ ข้อ 3 อาจทำให้ Solver เดาผิดได้ ผมจึงเขียนให้เป็นการตั้งข้อสงสัยตามธ
+…(ตัด 136 ตัวอักษร)

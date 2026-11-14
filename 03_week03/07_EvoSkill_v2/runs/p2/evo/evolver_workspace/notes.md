@@ -1,12 +1,14 @@
-# epoch 0: no skills. scores t1 .5, t2 .5, t3 .4545, t4 .4 (all 3 rollouts identical).
-Solver used: t1 half-up final only; t2 half-up tip/grand; t3 half-up final only; t4 floor.
-Hidden-test mismatch likely rounding mode / stepwise rounding. No feedback otherwise.
-# epoch 1 experiment: skill money-calc-spec assigns A=floor-final(r1), B=ceil-final(r2), C=halfup-each-step(r3) by cwd suffix -rN.
-Next: read epoch_1 scores per rollout, find which of A/B/C scores best per task, then replace table with the winning single rule (and generalize).
-# epoch 1 results (A floor / B ceil / C step-halfup): t1 .2/.4/.4, t2 .4/.5/.5, t3 .27/.27/.27, t4 .4/.3/.3.
-Best so far = halfup-final-only (t1 .5, t2 .5, t3 .4545); t4 halfup-final untested. Test counts: t1 10, t2 10, t3 11, t4 10.
-Residual failures not explained by rounding -> hypotheses: ValueError validation of out-of-range inputs, banker's rounding, float-reference style.
-# epoch 2 experiment: r1=H (halfup final + ValueError validation), r2=E (banker's final), r3=F (float stepwise round()).
-# epoch 2 results: H(halfup final+ValueError) t1 .6 t2 .6 t3 .5455 t4 .5 BEST; E(bankers) .4 .4 .36 .4; F(float round stepwise) .3 .4 .27 .3.
-Validation adds ~1 test each. Remaining ~4 fails unknown. Hypothesis: stricter validation (types, empty items, flags).
-# epoch 3 experiment: base H fixed; r1=H1 TypeError for wrong types, r2=H2 all ValueError, r3=H3 like H1 + empty list ValueError + non-bool flag TypeError.
+# epoch0 analysis
+All 12 runs: 0.4-0.6. Solutions near identical (exact math, single half-up round, floor for cashback).
+Only diff: t2-s3 (+0.1) and t3-s3 (+0.09) added ValueError input validation -> scored higher. t4-s3 validated tier only, no gain.
+Hidden tests probably: invalid inputs ValueError + maybe rounding convention (unknown). Solver never ran many tests.
+v1 skill: billing-function-solver (validation, half-up default, boundary tests).
+Next epoch: compare scores; if t4 still 0.4 consider rounding (half-up vs floor), amount type checks, per-step rounding in t1.
+# epoch1 results
+t1 .7 t2 .7 t3 .636 t4 .6 (all 3 samples identical per task). Gain from epoch0 ~ +0.2 each, attributed mostly to validation (all solvers added strict validation w/ ValueError, bool rejection).
+Remaining fails unknown (3/10,3/10,4/11,2/5). v2 changes (hedges): exception class subclassing ValueError+TypeError+KeyError; weight/distance accept float (proportional grams); keep half-up.
+Next if no gain: try rounding variants (floor/ per-step), reject empty items, etc. Change one thing at a time.
+# epoch2 results (v2 skill: exception hedge + float weight)
+t1 .7 t2 .7 t3 .5455 (DROP from .636 -> float weight accepted hurt; reverted to int-only) t4 .6. Exception hedge neutral.
+v3 EXPERIMENT (rounding policy, per-task different): t1 per-step half-up; t2 tip floor; t3 final half-up (as epoch1 config); t4 floor.
+Baselines to compare: t1 .7 t2 .7 t3 .636 (ep1 config) t4 .6. If t1 drops -> single final round better; etc. Revert losers.

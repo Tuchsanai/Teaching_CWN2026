@@ -1,0 +1,156 @@
+[assistant] TOOL_USE: {"command": "pwd && ls -la && ls -la ./skills 2>/dev/null || echo \"no skills dir\"", "description": "List working directory and check for skills folder"}
+[user] RESULT: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox
+total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 skills
+total 24
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:22 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 money-arithmetic-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 solver-selftest-workflow
+drwxr-xr-x 2 root root 4096 Nov 15 06:20 spec-reading-thai
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 strict-input-validation
+[assistant] TOOL_USE: {"command": "cd /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/skills && for d in *; do echo \"=== $d ===\"; ls -la \"$d\"; for f in \"$d\"/*; do echo \"--- $f ---\"; cat \"$f\"; echo; done; done", "description": "Read all skill files in skills folder"}
+[user] RESULT: <persisted-output>
+Output too large (30KB). Full output saved to: /root/ai-accounts/.Claude/yolo1/projects/-workspace-evlab-runs-h2-legs-runs-v1-train-trials-t1-cafe-bill-r1-sandbox/93b2994b-cd7f-4ed3-8f9b-aa825f31b98c/tool-results/bkf59m0ed.txt
+
+Preview (first 2KB):
+=== money-arithmetic-rounding ===
+total 24
+drwxr-xr-x 2 root root 4096 Nov 15 06:21 .
+drwxr-xr-x 6 root root 4096 Nov 15 06:21 ..
+-rw-r--r-- 1 root root 5737 Nov 15 06:20 SKILL.md
+-rw-r--r-- 1 root root 4551 Nov 15 06:20 money_helpers.py
+--- money-arithmetic-rounding/SKILL.md ---
+---
+name: money-arithmetic-rounding
+description: คำนวณยอดเงิน ส่วนลด VAT ทิป ค่าส่ง เงินคืน และการหารบิลให้แม่นยำ โดยใช้จำนวนเต็มสตางค์/Fraction, ปัดเศษครั้งเดียวตอนท้าย และเรียงลำดับตัวคูณกับเพดานให้ถูก ใช้ทุกครั้งที่โจทย์เกี่ยวกับตัวเลขเงินหรือการปั
+[assistant] TOOL_USE: {"command": "cat money-arithmetic-rounding/SKILL.md | tail -n +40; echo ======; cat money-arithmetic-rounding/money_helpers.py", "description": "Read money-arithmetic skill and helpers"}
+[user] RESULT: ======
+"""ตัวช่วยคำนวณเงินและตรวจข้อมูลนำเข้า
+
+ไม่มี side effect ตอน import. วิธีใช้: คัดลอกฟังก์ชันที่ต้องใช้ไปไว้ใน solve.py
+(ปลอดภัยที่สุด เพราะไม่ต้องพึ่ง sys.path) หรือ import จากไฟล์นี้ถ้าอยู่โฟลเดอร์เดียวกัน
+
+หลักการ: ผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น (ไม่ใช้ TypeError)
+"""
+
+import math
+from fractions import Fraction
+
+
+# ---------- ตรวจข้อมูลนำเข้า ----------
+
+def need_int(value, name, low=None, high=None):
+    """จำนวนเต็มจริง: ไม่รับ bool, float, str"""
+    if type(value) is not int:
+        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+    if low is not None and value < low:
+        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+    if high is not None and value > high:
+        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+    return value
+
+
+def need_bool(value, name)
+[assistant] TOOL_USE: {"command": "cat strict-input-validation/SKILL.md; echo ======; cat spec-reading-thai/SKILL.md", "description": "Read strict-input-validation and spec-reading skills"}
+[user] RESULT: ---
+name: strict-input-validation
+description: ตรวจข้อมูลนำเข้าของฟังก์ชันอย่างเข้มงวด โดยผิดชนิดหรือนอกช่วงให้ raise ValueError เสมอ ไม่รับ bool/float/str แทนจำนวนเต็ม และไม่แปลงค่าเอง ใช้เมื่อฟังก์ชันรับ parameter ที่โจทย์ระบุชนิด ช่วง หรือตัวเลือกไว้
+---
+
+# การตรวจข้อมูลนำเข้าอย่างเข้มงวด
+
+## กติกาหลัก
+
+1. **ผิดอะไรก็ตาม ให้ raise `ValueError`.** ไม่ใช้ `TypeError` สำหรับ input ที่ผิด. ชุดทดสอบแบบ Reject มักเขียนว่า `assertRaises(ValueError)` และ `TypeError` ไม่ใช่ subclass ของ `ValueError` จึงไม่ผ่าน. ผลจากการทดสอบซ้ำ ๆ พบว่าการใช้ `TypeError` ทำให้เสียคะแนนหมวด Reject ทุกครั้ง.
+2. **ตรวจชนิดด้วย `type(x) is int`** ไม่ใช่ `isinstance`. เหตุผล: `isinstance(True, int)` เป็น `True` ทำให้ bool หลุดเข้ามาเป็นจำนวนเต็ม. และต้องปฏิเสธ `float` (เช่น `4500.0`) และ `str` (เช่น `'2'`) เมื่อโจทย์ร
+[assistant] TOOL_USE: {"command": "cat solver-selftest-workflow/SKILL.md; ls -la strict-input-validation spec-reading-thai solver-selftest-workflow", "description": "Read solver-selftest-workflow skill and list files"}
+[user] RESULT: ---
+name: solver-selftest-workflow
+description: ขั้นตอนทำงานเขียนฟังก์ชันใน solve.py ให้จบถูกต้องและรวดเร็ว โดยเขียน test แยกหมวด Normal, Boundary, NoDrift และ Reject คำนวณ expected ด้วยสคริปต์ Fraction และรันคำสั่งให้ถูกวิธี ใช้กับทุกงานที่ต้องส่ง solve.py
+---
+
+# ขั้นตอนทำงานและตรวจสอบ solve.py
+
+## ลำดับการทำงาน
+
+1. อ่านโจทย์ทั้งหมดก่อน แล้วแตกเป็นกฎรายข้อ (ดู skill `spec-reading-thai`). ไม่มีโฟลเดอร์ `./skills` ก็ทำงานต่อได้.
+2. เขียน `solve.py` ไว้ที่ root ของ working directory. ฟังก์ชันต้อง import ได้โดยไม่มี side effect (ไม่มี print หรือ input ตอน import). ตัวอย่างหรือ self-test ให้อยู่ใน `if __name__ == "__main__":`.
+3. ใช้หลักการคำนวณเงินและการตรวจ input จาก skill `money-arithmetic-rounding` และ `strict-input-validation`.
+4. เขียน test ตามหมวดใน `test_template.py` ข้างไฟล์นี้:
+   - 
+[assistant] TOOL_USE: {"command": "sed -n '20,200p' money-arithmetic-rounding/SKILL.md; echo =====; cat solver-selftest-workflow/test_template.py; echo =====; cat strict-input-validation/validators.py", "description": "Read remaining money skill, test template, validators"}
+[user] RESULT: 6. **การหารให้เท่ากัน:** `base, rem = divmod(total, n)` แล้วคืน `[base+1]*rem + [base]*(n-rem)`. ตรวจว่าผลรวมเท่ากับยอดต้นทางเสมอ.
+7. **ตรวจ expected value ด้วยการคำนวณ ไม่ใช่ในใจ.** ก่อนใส่ค่าใน test ให้รันสคริปต์ Fraction ก่อน. พบว่าการคำนวณในใจผิดบ่อยมาก.
+
+## ตัวช่วย
+
+`money_helpers.py` ในโฟลเดอร์นี้มี `half_up`, `round_down`, `percent`, `split_even`, และฟังก์ชันตรวจข้อมูล (`need_int`, `need_bool`, `need_choice`, `need_number`). แนะนำให้คัดลอกฟังก์ชันที่ใช้ลงใน `solve.py` โดยตรง เพื่อไม่ต้องพึ่ง sys.path.
+
+## จุดที่มักพลาด (พบจากการทดสอบจริง)
+
+- ปัดลงก่อนคูณตัวคูณพิเศษ → ยอดผิดในกรณีเศษ ≥ 0.5.
+- ปัดทุกขั้นตอน → ยอดเบี่ยง 1 สตางค์ในกรณีที่มีหลายส่วนลด/ภาษี.
+- ใช้ `floor` กับทิปหรือค่าส่ง ทั้งที่ควรเป็นครึ่งขึ้น.
+- แปลงค่า input ด้วย `int()` หรือ `float()` ทำให้ `'2'` หรือ `4500.0` ผ่านไป
+[assistant] TEXT: Skills found: `money-arithmetic-rounding`, `strict-input-validation`, `spec-reading-thai`, and `solver-selftest-workflow`. I'll compute the expected values with `Fraction` first, as the workflow requires, and look for a NoDrift case where per-step rounding would differ.
+[assistant] TOOL_USE: {"command": "cd /tmp && python3 -c \"\nfrom fractions import Fraction as F\nimport math\ndef hu(x): return math.floor(F(x)+F(1,2))\ndef bill(S, member):\n    a=F(S)\n    if S>=50000: a*=F(95,100)\n    if member: a*=F(90,100)\n    a*=F(107,100)\n    return a, hu(a)\ndef stepwise(S, member):\n    # per-step rounding (wrong approach) for comparison\n    a=hu(F(S)*F(95,100)) if S>=50000 else S\n    if member: a=hu(F(a)*F(90,100))\n    return hu(F(a)*F(107,100))\nfor S,m in [(60000,False),(60000,True),(49999,False),(50000,False),(49999,True),(50000,True),(0,False),(0,True),(50010,True),(50010,False),(12345,False),(100000,True),(55555,True)]:\n    a,r=bill(S,m); print(S,m,a,float(a),r,'stepwise=',stepwise(S,m))\n\"", "description": "Compute expected bill values with Fraction"}
+[user] RESULT: 60000 False 60990 60990.0 60990 stepwise= 60990
+60000 True 54891 54891.0 54891 stepwise= 54891
+49999 False 5349893/100 53498.93 53499 stepwise= 53499
+50000 False 50825 50825.0 50825 stepwise= 50825
+49999 True 48149037/1000 48149.037 48149 stepwise= 48149
+50000 True 91485/2 45742.5 45743 stepwise= 45743
+0 False 0 0.0 0 stepwise= 0
+0 True 0 0.0 0 stepwise= 0
+50010 True 91503297/2000 45751.6485 45752 stepwise= 45752
+50010 False 10167033/200 50835.165 50835 stepwise= 50836
+12345 False 264183/20 13209.15 13209 stepwise= 13209
+100000 True 91485 91485.0 91485 stepwise= 91485
+55555 True 203297967/4000 50824.49175 50824 stepwise= 50824
+Shell cwd was reset to /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox
+[assistant] TEXT: The expected values are computed. The NoDrift case is `50010, False`: single rounding gives 50835, while per-step rounding gives 50836. Now I'll write `solve.py` with the helpers copied in, so it doesn't depend on `sys.path`.
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/solve.py", "content": "\"\"\"BaanKafe: คิดเงินหน้าร้าน\n\ncafe_bill(items, member) -> จำนวนเต็มสตางค์ที่ลูกค้าต้องจ่าย\n\nกฎ (ตามลำดับ):\n1. ยอดรวม S = ผลรวม price * qty (สตางค์, จำนวนเต็ม)\n2. ถ้า S >= 50000 สตางค์ (500 บาทขึ้นไป) ลด 5%\n3. ถ้า member เป็น True ลดอีก 10% (คูณต่อจากยอดหลังข้อ 2)\n4. บวก VAT 7% เป็นขั้นสุดท้าย\n5. ปัดครั้งเดียวตอนท้าย แบบปัดครึ่งขึ้น (เงินที่ลูกค้าจ่ายเข้าร้าน)\n\nไม่ใช้ float ในการคำนวณเงิน ใช้ Fraction ทั้งหมด\nผิดชนิดหรือนอกช่วง -> ValueError เท่านั้น\n\"\"\"\n\nimport math\nfrom fractions import Fraction\n\n\n# ---------- ตรวจข้อมูลนำเข้า ----------\n\ndef _need_int(value, name, low=None):\n    \"\"\"จำนวนเต็มจริง: ไม่รับ bool, float, str\"\"\"\n    if type(value) is not int:\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    return value\n\n\ndef _need_bool(value, name):\n    \"\"\"flag: ต้องเป็น True หรือ False จริง\"\"\"\n    if type(value) is not bool:\n        raise ValueError(f\"{name} ต้องเป็น True หรือ False\")\n    return value\n\n\n# ---------- ปัดเศษ ----------\n\ndef _half_up(x):\n    \"\"\"ปัดครึ่งขึ้นเป็นจำนวนเต็ม (x ไม่ติดลบ): 2.5 -> 3, 2.4 -> 2\"\"\"\n    return math.floor(Fraction(x) + Fraction(1, 2))\n\n\n# ---------- ฟังก์ชันหลัก ----------\n\ndef cafe_bill(items, member):\n    \"\"\"คืนยอดที่ลูกค้าต้องจ่าย (สตางค์, จำนวนเต็ม)\n\n    items: list ของ dict {\"price\": ราคาต่อชิ้น (สตางค์, >= 0), \"qty\": จำนวนชิ้น (>= 1)}\n    member: True ถ้าเป็นสมาชิก (ลด 10% เพิ่ม)\n    \"\"\"\n    if type(items) is not list:\n        raise ValueError(\"items ต้องเป็น list\")\n    _need_bool(member, \"member\")\n\n    subtotal = 0\n    for i, item in enumerate(items):\n        if type(item) is not dict:\n            raise ValueError(f\"items[{i}] ต้องเป็น dict\")\n        if \"price\" not in item or \"qty\" not in item:\n            raise ValueError(f\"items[{i}] ต้องมี key 'price' และ 'qty'\")\n        price = _need_int(item[\"price\"], f\"items[{i}]['price']\", low=0)\n        qty = _need_int(item[\"qty\"], f\"items[{i}]['qty']\", low=1)\n        subtotal += price * qty\n\n    # ยังไม่ปัดระหว่างทาง ใช้ Fraction ทั้งหมด\n    amount = Fraction(subtotal)\n    if subtotal >= 50000:                 # ตั้งแต่ 500 บาทขึ้นไป\n        amount *= Fraction(95, 100)       # ลด 5%\n    if member:\n        amount *= Fraction(90, 1
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/test_solve.py", "content": "\"\"\"ทดสอบ cafe_bill. expected คำนวณด้วยสคริปต์ Fraction แล้ว (ดูค่าในคอมเมนต์)\"\"\"\nimport unittest\n\nfrom solve import cafe_bill\n\n\ndef one(price, qty=1):\n    return [{\"price\": price, \"qty\": qty}]\n\n\nclass Normal(unittest.TestCase):\n    def test_discount_no_member(self):\n        # 60000 * 0.95 * 1.07 = 60990\n        self.assertEqual(cafe_bill(one(20000, 3), False), 60990)\n\n    def test_discount_and_member(self):\n        # 60000 * 0.95 * 0.90 * 1.07 = 54891\n        self.assertEqual(cafe_bill(one(20000, 3), True), 54891)\n\n    def test_member_below_threshold(self):\n        # 49999 * 0.90 * 1.07 = 48149.037 -> 48149\n        self.assertEqual(cafe_bill(one(49999), True), 48149)\n\n    def test_multiple_items_sum(self):\n        items = [{\"price\": 15000, \"qty\": 2}, {\"price\": 7000, \"qty\": 3}]  # 30000+21000=51000\n        # 51000 * 0.95 * 1.07 = 51815.15 -> 51815\n        self.assertEqual(cafe_bill(items, False), 51815)\n\n    def test_empty_items(self):\n        self.assertEqual(cafe_bill([], False), 0)\n        self.assertEqual(cafe_bill([], True), 0)\n\n\nclass Boundary(unittest.TestCase):\n    def test_at_threshold_gets_discount(self):\n        # 50000 * 0.95 * 1.07 = 50825 (ลดเพราะ >= 500 บาท)\n        self.assertEqual(cafe_bill(one(50000), False), 50825)\n\n    def test_just_below_threshold_no_discount(self):\n        # 49999 * 1.07 = 53498.93 -> 53499 (ไม่ลด)\n        self.assertEqual(cafe_bill(one(49999), False), 53499)\n\n    def test_zero_price_and_zero_qty_threshold(self):\n        self.assertEqual(cafe_bill(one(0, 5), True), 0)\n\n    def test_qty_one_is_minimum(self):\n        # 1 * 1.07 = 1.07 -> 1\n        self.assertEqual(cafe_bill(one(1, 1), False), 1)\n\n\nclass NoDrift(unittest.TestCase):\n    def test_single_rounding_differs_from_stepwise(self):\n        # 50010 * 0.95 * 1.07 = 50835.165 -> 50835\n        # (ปัดทุกขั้นจะได้ 50836 ซึ่งผิด)\n        self.assertEqual(cafe_bill(one(50010), False), 50835)\n\n    def test_half_up_at_exact_half(self):\n        # 50000 * 0.95 * 0.90 * 1.07 = 45742.5 -> 45743 (ปัดครึ่งขึ้น)\n        self.assertEqual(cafe_bill(one(50000), True), 45743)\n\n\nclass Reject(unittest.TestCase):\n    def test_member_must_be_bool(self):\n        with self.assertRaises(ValueError):\n            cafe_bill(one(1000), 1)\n        with self.assertRaises(ValueError):\n            cafe
+[user] RESULT: File created successfully at: /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/test_solve.py (file state is current in your context — no need to Read it back)
+[assistant] TEXT: I wrote the multi-item expected value by hand, and it looks wrong (51000 × 0.95 × 1.07 is 51841.5, not 51815.15). I'll run the tests and recheck every expected value with `Fraction` before trusting them.
+[assistant] TOOL_USE: {"command": "python3 -c \"\nfrom fractions import Fraction as F\nimport math\nprint('multi 51000*0.95*1.07 =', F(51000)*F(95,100)*F(107,100), '->', math.floor(F(51000)*F(95,100)*F(107,100)+F(1,2)))\nprint('zero', 0)\nprint('1*1.07 =', F(107,100), '->', math.floor(F(107,100)+F(1,2)))\n\" && python3 solve.py && python3 -m unittest -v test_solve 2>&1 | tail -n 40", "description": "Recheck expected values and run solve.py and tests"}
+[user] RESULT: multi 51000*0.95*1.07 = 103683/2 -> 51842
+zero 0
+1*1.07 = 107/100 -> 1
+ยอดที่ต้องจ่าย (สตางค์): 60990
+สมาชิก (สตางค์): 54891
+test_at_threshold_gets_discount (test_solve.Boundary.test_at_threshold_gets_discount) ... ok
+test_just_below_threshold_no_discount (test_solve.Boundary.test_just_below_threshold_no_discount) ... ok
+test_qty_one_is_minimum (test_solve.Boundary.test_qty_one_is_minimum) ... ok
+test_zero_price_and_zero_qty_threshold (test_solve.Boundary.test_zero_price_and_zero_qty_threshold) ... ok
+test_half_up_at_exact_half (test_solve.NoDrift.test_half_up_at_exact_half) ... ok
+test_single_rounding_differs_from_stepwise (test_solve.NoDrift.test_single_rounding_differs_from_stepwise) ... ok
+test_discount_and_member (test_solve.Normal.test_discount_and_member) ... ok
+test_discount_no_mem
+[assistant] TEXT: The code is right and my hand-written expectation was wrong: 51841.5 rounds half-up to 51842, matching the `Fraction` check. I'll correct the test and its comment, then rerun.
+[assistant] TOOL_USE: {"replace_all": false, "file_path": "/workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/test_solve.py", "old_string": "        # 51000 * 0.95 * 1.07 = 51815.15 -> 51815\n        self.assertEqual(cafe_bill(items, False), 51815)", "new_string": "        # 51000 * 0.95 * 1.07 = 51841.5 -> 51842 (ปัดครึ่งขึ้น)\n        self.assertEqual(cafe_bill(items, False), 51842)"}
+[user] RESULT: The file /workspace/evlab/runs/h2/legs/runs/v1_train/trials/t1-cafe-bill-r1/sandbox/test_solve.py has been updated successfully. (file state is current in your context — no need to Read it back)
+[assistant] TOOL_USE: {"command": "python3 -m unittest test_solve 2>&1 | tail -n 4 && grep -nE 'placeholder|TODO|if False|or True' solve.py test_solve.py || echo \"no placeholder markers\"", "description": "Rerun tests and scan for placeholder markers"}
+[user] RESULT: ----------------------------------------------------------------------
+Ran 21 tests in 0.001s
+
+OK
+no placeholder markers
+[assistant] TEXT: I wrote `cafe_bill(items, member)` in `solve.py` in the sandbox root, plus `test_solve.py` with 21 tests. All 21 pass, and `python3 solve.py` runs.
+
+The function applies the rules in order: subtotal in satang, then 5% off if the subtotal is at least 50000 satang, then 10% off for members, then 7% VAT. It rounds once at the end. All arithmetic uses `Fraction`, with no floats.
+
+I followed the skills in `./skills`: the rounding and input-validation rules came from `money-arithmetic-rounding` and `strict-input-validation`, and the test layout came from `solver-selftest-workflow`. I copied the helper functions into `solve.py` so it doesn't depend on `sys.path`. Every expected value in the tests was checked with a `Fraction` script. One hand-written expectation was wrong, and the script caught it.
+
+Interpretations the spec didn't settle:
+- **Rounding mode:** half-up, because this is money the customer pays to the shop. For example, 45742.5 becomes 45743.
+- **Threshold:** checked on the subtotal before any discount, and "500 บาทขึ้นไป" is treated as `>=`.
+- **Empty `items`:** returns 0.
+- **Price 0:** allowed. Prices must be ≥ 0 and `qty` must be ≥ 1.
+- **Invalid input:** a `ValueError` is raised for a non-list `items`, a non-dict item, missing `price` or `qty` keys, a bool/float/string where an integer is expected, a `qty` below 1, a negative price, or a non-bool `member`.
+
+To change the rounding to floor, edit the `_half_up` call at the end of `cafe_bill`. To change the discount threshold, edit the `50000` comparison.

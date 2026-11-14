@@ -1,0 +1,282 @@
+[SYSTEM init]
+[THINK] 
+[assistant TOOL_USE Bash] {"command": "ls -la ./skills 2>/dev/null && find ./skills -maxdepth 3 -type f | head -50; echo \"---\"; pwd; ls -la", "description": "Check for skills directory and list working directory"}
+[RESULT] total 20
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 ..
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 integer-money-rounding
+drwxr-xr-x 2 root root 4096 Nov 15 06:07 solve-task-checklist
+drwxr-xr-x 2 root root 4096 Nov 15 06:06 strict-input-validation
+./skills/integer-money-rounding/SKILL.md
+./skills/solve-task-checklist/SKILL.md
+./skills/strict-input-validation/SKILL.md
+---
+/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox
+total 12
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 .
+drwxr-xr-x 3 root root 4096 Nov 15 06:07 ..
+drwxr-xr-x 5 root root 4096 Nov 15 06:07 skills
+[assistant TEXT] There are three skills in `./skills`. I'll read them before writing anything.
+[assistant TOOL_USE Read] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox/skills/integer-money-rounding/SKILL.md"}
+[RESULT] 1	---
+2	name: integer-money-rounding
+3	description: ใช้เมื่อโจทย์คำนวณเงิน ส่วนลด ภาษี ค่าส่ง ทิป หรือเงินคืนเป็นสตางค์ (จำนวนเต็ม) เพื่อหลีกเลี่ยงค่าคลาดเคลื่อนจาก float, การปัดเศษระหว่างขั้น และลำดับการคูณผิด
+4	---
+5	
+6	# คำนวณเงินเป็นสตางค์ให้ตรงทุกสตางค์
+7	
+8	## หลักการ
+9	
+10	1. **ห้าม float** ตลอดการคำนวณ เก็บค่าเป็น `int` (สตางค์) หรือ `fractions.Fraction`
+11	2. **ปัดเศษครั้งเดียว ตอนท้ายสุด** ห้ามปัดทุกขั้น การปัดทุกขั้นทำให้ผลเพี้ยน 1 สตางค์ได้ ซึ่งทำให้ test ที่เทียบทีละสตางค์ไม่ผ่าน
+12	3. **ตัวคูณต้องคูณก่อนปัด** ค่าที่ต้อง floor หรือ round ต้องเป็นผลรวมของทุกตัวคูณแล้ว ห้าม floor ค่าย่อยแล้วค่อยคูณ เช่น ถ้าได้ 250.5 แล้วต้อง ×2 ให้คูณได้ 501 ก่อนปัด ถ้า floor 250 ก่อนจะได้ 500 ซึ่งผิด
+13	4. **ลำดับตามที่โจทย์เขียน**
+14	   - "ลด X% แล้วลดอีก Y%" หรือ "คิดต่อจากข้อก่อน" = ตัวคูณทบกัน (คูณ `(1-X)` แล้วคูณ `(1-Y)`)
+15	   - "เพิ่ม Z% เป็นขั้นสุดท้าย" = คูณ `(1+Z)` ตอนท้าย
+16	   - เงื่อนไขขั้นต่ำ เช่น "ยอดตั้งแต่ N ลด X%" ให้ตรวจยอดตามที่โจทย์ระบุ (ยอดก่อนลด หรือยอดหลังลดขั้นก่อนหน้า) และเลือกความหมายที่ตรงตัวอักษรที่สุด
+17	5. **ทิศทางการปัด** ดูตามความหมายของโจทย์
+18	   - ถ้าโจทย์ไม่ระบุ ให้ใช้ **ปัดครึ่งขึ้น (half-up)**
+19	   - ถ้าโจทย์บอกให้ "ปัดลง" หรือ "ไม่จ่ายเกินสิทธิ์" ให้ใช้ floor
+20	   - ระบุทิศทางที่เลือกในคำตอบสุดท้าย
+21	6. **ขีดจำกัด (cap / floor / ขั้นต่ำ)** ใช้กับผลลัพธ์หลังคูณตัวคูณทั้งหมดแล้ว เช่น ถ้า "สูงสุดต่อบิล" ให้ `min(...)` หลังจากคูณทุกอย่างเสร็จ
+22	7. **อย่าใช้ `round()` ของ Python** เพราะเป็น banker's rounding (`round(0.5) == 0`, `round(2.5) == 2`) ใช้ helper ด้านล่างแทน
+23	
+24	## ตัวช่วยปัดเศษ (จำนวนเต็มล้วน ไม่มี float)
+25	
+26	```python
+27	from fractions import Fraction
+28	
+29	def half_up(x):
+30	    """ปัดครึ่งขึ้นเป็น int, x ไม่ติดลบ (int หรือ Fraction)"""
+31	    return int((Fraction(x) * 2 + 1) // 2)
+32	
+33	def floor_int(x):
+34	    """ปัดลงเป็น int, x ไม่ติดลบ"""
+35	    return int(Fraction(x) // 1)
+36	
+37	def percent_of(amount, pct):
+38	    """amount * pct% โดยยังไม่ปัด คืนเป็น Fraction"""
+39	    return Fraction(amount) * Fraction(pct, 100)
+40	```
+41	
+42	ตัวอย่างรูปแบบการใช้ (ตัวเลขสมมติ):
+43	
+44	```python
+45	total = Fraction(subtotal)            # ยังไม่ปัด
+46	if subtotal >= 50_000:                # เงื่อนไขตามโจทย์
+47	    total -= percent_of(total, 5)
+48	if member:
+49	    total -= percent_of(total, 10)    # คิดต่อจากยอดที่ลดแล้ว
+50	total += percent_of(total, 7)         # ขั้นสุดท้าย
+51	return half_up(total)                 # ปัดครั้งเดียว
+52	```
+53	
+54	## วิธีตรวจว่าปัดถูก
+55	
+56	- คำนวณตัวอย่างด้วยมือด้วย `Fraction` แบบแยกขั้นตอน แล้วเทียบกับโค้ดทีละสตางค์
+57	- ถ้าผลต่างเป็น 1 สตางค์ ให้ตรวจก่อนว่าปัดเศษกี่ครั้ง และคูณตัวไหนก่อน
+58	- ทดสอบค่าที่เศษ .5 พอดี เช่น ยอดที่ทำให้ผลลัพธ์ลงท้าย .5 เพื่อดูทิศทางการปัด
+59	- ทดสอบค่าที่เศษ < .5 และ > .5 ทั้งสองด้าน เพื่อดูว่าไม่ได้ปัดเกิน
+60	
+61	## Checklist การเงิน
+62	
+63	- [ ] ไม่มี float ในการคำนวณ (ไม่มี `/` ที่ได้ float, ไม่มี `0.07` ฯลฯ)
+64	- [ ] ปัดเศษครั้งเดียวตอนท้าย
+65	- [ ] ตัวคูณพิเศษ (×2, ทิป, VAT) ถูกคูณก่อนปัด
+66	- [ ] ลำดับการลดและเพิ่มตรงตามที่โจทย์เขียน
+67	- [ ] cap/min ถูกใช้หลังคูณทั้งหมด
+68	- [ ] ผลลัพธ์เป็น `int` เสมอ
+69	
+[assistant TOOL_USE Read] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox/skills/solve-task-checklist/SKILL.md"}
+[RESULT] 1	---
+2	name: solve-task-checklist
+3	description: ใช้ก่อนส่งงานเขียนไฟล์ solve.py ทุกครั้ง เพื่อแตกกฎจากโจทย์ ทดสอบขอบเขตและ input ผิด รันไฟล์จริง และสรุปจุดที่ตีความเอง
+4	---
+5	
+6	# Checklist ก่อนส่งงาน solve.py
+7	
+8	## 1. แตกโจทย์เป็นกฎ
+9	
+10	อ่านโจทย์ทุกบรรทัด แล้วเขียนกฎ 1 ข้อต่อ 1 บรรทัด ครอบคลุม:
+11	- พารามิเตอร์แต่ละตัว ชนิดและช่วงค่า
+12	- ลำดับการคำนวณ (ขั้นไหนมาก่อน)
+13	- เงื่อนไข ("ถ้า", "เฉพาะ", "ตั้งแต่", "เกิน", "ไม่เกิน")
+14	- กฎการปัดเศษ
+15	- รูปแบบผลลัพธ์ (ชนิด, ลำดับของ list)
+16	
+17	ทุกกฎต้องมีโค้ดที่สะท้อนมัน อย่าข้ามกฎที่ดูเล็กน้อย
+18	
+19	## 2. ทดสอบขอบเขตของทุกเงื่อนไข
+20	
+21	สำหรับทุกเงื่อนไขเชิงตัวเลข ทดสอบค่า `X-1`, `X`, `X+1` (จำนวนเต็ม) โดย X คือค่าขอบที่โจทย์พูดถึง รวมถึงค่า 0 และรายการว่างถ้าโจทย์อนุญาต ต้องรันได้โดยไม่พัง
+22	
+23	## 3. ทดสอบ input ที่ผิด
+24	
+25	ทุกพารามิเตอร์ที่มีข้อกำหนดชนิดหรือช่วง ต้องทดสอบ:
+26	- float ที่ค่าเป็นจำนวนเต็ม, string ที่เป็นตัวเลข, bool, None
+27	- ค่าต่ำกว่าช่วงและสูงกว่าช่วง
+28	- ค่าที่เลือกได้เฉพาะบางค่า แต่ป้อนค่าที่ไม่อยู่ในรายการ
+29	
+30	ทุกกรณีต้อง `raise ValueError` ไม่ใช่ TypeError, KeyError หรือผลลัพธ์ที่ไม่ error
+31	
+32	## 4. คำนวณตัวอย่างด้วยมือ แล้วเทียบ
+33	
+34	ใช้ `Fraction` คำนวณตามลำดับของโจทย์ทีละขั้น แล้วเทียบกับโค้ด ถ้าต่างกันเพียงสตางค์เดียว ให้ดูว่าปัดกี่ครั้งและคูณตัวไหนก่อน (ดู skill `integer-money-rounding`)
+35	
+36	## 5. รันไฟล์จริงด้วยคำสั่งที่ import ได้
+37	
+38	```bash
+39	python3 -c "import sys; sys.path.insert(0,'.'); from solve import ฟังก์ชัน; print(ฟังก์ชัน(...))"
+40	```
+41	
+42	**ห้ามใช้ `python3 -I` กับการ import ไฟล์ใน cwd** เพราะโหมด isolated จะไม่ใส่ cwd ใน sys.path ทำให้เกิด `ModuleNotFoundError` (เกิดขึ้นจริงในรอบนี้) ถ้าเขียน test ให้ใช้ `python3 -m unittest` จาก cwd โดยตรง
+43	
+44	## 6. ตรวจรูปแบบของไฟล์
+45	
+46	- มีฟังก์ชันชื่อและพารามิเตอร์ตรงกับโจทย์ทุกตัว ตามลำดับเดิม
+47	- ผลลัพธ์เป็นชนิดที่โจทย์กำหนด (เช่น `int` สตางค์, `list` ตามลำดับคน)
+48	- ไม่มี side effect ตอน import นอกจากบล็อก `if __name__ == "__main__":`
+49	- ใช้เฉพาะ standard library
+50	- ไม่มี dependency หรือไฟล์ภายนอกที่ไม่ได้ส่งมาด้วย
+51	
+52	## 7. สรุปการตีความ
+53	
+54	โจทย์ที่กำกวมหรือไม่ได้พูดถึงกรณีพิเศษ (เช่น ค่า 0, ทิศทางการปัด, ลำดับของเงื่อนไข) ให้:
+55	- เลือกการตีความที่ตรงตัวอักษรของโจทย์มากที่สุด
+56	- ระบุการตีความนั้นสั้น ๆ ในคำตอบสุดท้าย พร้อมวิธีแก้ถ้าต้องเปลี่ยน
+57	- อย่าเงียบ ๆ เพิ่มกฎที่โจทย์ไม่ได้บอก
+58	
+59	## 8. คำตอบสุดท้าย
+60	
+61	สั้น ๆ ระบุ: ไฟล์ที่เขียน, ผลตัวอย่างที่ตรวจแล้ว, การตีความที่เลือกเอง, และสิ่งที่ยังไม่ได้ทดสอบ
+62	
+[assistant TOOL_USE Read] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox/skills/strict-input-validation/SKILL.md"}
+[RESULT] 1	---
+2	name: strict-input-validation
+3	description: ใช้เมื่อเขียนฟังก์ชันที่รับ input ซึ่งโจทย์กำหนดชนิดหรือช่วงค่า (จำนวนเต็ม, True/False, ค่าที่เลือกได้เฉพาะบางค่า, รายการของ dict, ช่วงตัวเลข) เพื่อปฏิเสธ input ที่ผิดด้วย ValueError แทนการแปลงค่าเงียบ ๆ
+4	---
+5	
+6	# ตรวจ input แบบเข้มงวด
+7	
+8	## หลักการ
+9	
+10	- ถ้า input ไม่ตรงกับที่โจทย์กำหนด ให้ **ปฏิเสธ** ไม่ใช่พยายามแปลงให้ใช้ได้
+11	- **ห้าม** แปลงค่าเพื่อความสะดวก: `int(x)`, `float(x)`, `str(x)`, `Fraction(str(x))`, `.strip()`, `.lower()` ทำให้ `4500.0`, `"2"`, `" Gold "` ผ่านไปเงียบ ๆ ซึ่งผิดสัญญาของฟังก์ชัน
+12	- ใช้ **ValueError** กับ input ผิดทุกกรณี รวมถึงชนิดผิด ไม่ใช้ TypeError เพราะผู้ตรวจคาดหวัง ValueError
+13	- `bool` เป็นลูกของ `int` ใน Python: `isinstance(True, int)` ได้ True จึงต้องใช้ `type(x) is int` และตรวจ bool แยกต่างหาก
+14	- ค่า key ที่ขาดหายใน dict ต้องกลายเป็น ValueError ไม่ใช่ KeyError: ใช้ `item.get("price")` แล้วให้ตัวตรวจ type จับ None
+15	- ตรวจ input **ก่อน** คำนวณ ไม่คืนผลลัพธ์บางส่วน
+16	
+17	## รูปแบบโค้ดตรวจ
+18	
+19	```python
+20	def require_int(value, name, low=None, high=None):
+21	    if type(value) is not int:          # ปฏิเสธ bool, float, str, None
+22	        raise ValueError(f"{name} ต้องเป็นจำนวนเต็ม")
+23	    if low is not None and value < low:
+24	        raise ValueError(f"{name} ต้องไม่น้อยกว่า {low}")
+25	    if high is not None and value > high:
+26	        raise ValueError(f"{name} ต้องไม่เกิน {high}")
+27	    return value
+28	
+29	def require_bool(value, name):
+30	    if type(value) is not bool:
+31	        raise ValueError(f"{name} ต้องเป็น True หรือ False")
+32	    return value
+33	
+34	def require_choice(value, name, choices):
+35	    if type(value) is not str or value not in choices:   # ไม่ normalize
+36	        raise ValueError(f"{name} ต้องเป็นหนึ่งใน {sorted(choices)}")
+37	    return value
+38	
+39	def require_list_of_dicts(value, name):
+40	    if type(value) is not list:
+41	        raise ValueError(f"{name} ต้องเป็น list")
+42	    for entry in value:
+43	        if type(entry) is not dict:
+44	            raise ValueError(f"แต่ละรายการใน {name} ต้องเป็น dict")
+45	    return value
+46	```
+47	
+48	ใช้ตัวช่วยเหล่านี้กับทุกพารามิเตอร์ในฟังก์ชันหลัก ก่อนบรรทัดคำนวณแรก
+49	
+50	## การแปลงช่วงจากโจทย์เป็นเงื่อนไข
+51	
+52	| ข้อความในโจทย์ | เงื่อนไข |
+53	|---|---|
+54	| ตั้งแต่ X ขึ้นไป / ไม่น้อยกว่า X | `value >= X` |
+55	| เกิน X | `value > X` |
+56	| ไม่เกิน X | `value <= X` |
+57	| ต่ำกว่า X | `value < X` |
+58	| ช่วง A–B | `A <= value <= B` |
+59	
+60	ถ้าโจทย์ระบุว่า "ตั้งแต่ 0" ค่า 0 ต้องผ่าน ถ้า "ตั้งแต่ 1" ค่า 0 ต้องถูกปฏิเสธ
+61	
+62	## Checklist ของ input
+63	
+64	- [ ] ทุกพารามิเตอร์ตรวจ type ด้วย `type(x) is ...`
+65	- [ ] bool ถูกปฏิเสธในพารามิเตอร์ที่เป็นตัวเลข
+66	- [ ] float ที่ค่าเป็นจำนวนเต็ม (เช่น `1000.0`) ถูกปฏิเสธ ถ้าโจทย์บอกว่าเป็นจำนวนเต็ม
+67	- [ ] string ที่หน้าตาเป็นตัวเลข (เช่น `"2"`) ถูกปฏิเสธ
+68	- [ ] ค่าที่เลือกได้เฉพาะบางค่า ถูกเทียบแบบตรงตัว (ไม่ lower/strip)
+69	- [ ] ค่าที่ขอบของช่วง (min, max) ผ่าน และค่าที่ออกไปนอกช่วง (min-1, max+1) ถูกปฏิเสธ
+70	- [ ] ทุกกรณีผิดคือ `ValueError` (ไม่ใช่ TypeError, KeyError หรือ AttributeError)
+71	
+[THINK] 
+[assistant TEXT] Skills read. Writing `solve.py` now: integers only, validation before any math, and one half-up rounding at the end.
+[assistant TOOL_USE Write] {"file_path": "/workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox/solve.py", "content": "from fractions import Fraction\n\nTHRESHOLD_SATANG = 50_000            # 500 บาท (หน่วยสตางค์)\nBULK_DISCOUNT = Fraction(5, 100)     # ลด 5% เมื่อยอดตั้งแต่ 500 บาท\nMEMBER_DISCOUNT = Fraction(10, 100)  # ลดอีก 10% สำหรับสมาชิก\nVAT = Fraction(7, 100)               # VAT 7% ขั้นสุดท้าย\n\n\ndef _require_int(value, name, low=None):\n    if type(value) is not int:  # ปฏิเสธ bool, float, str, None\n        raise ValueError(f\"{name} ต้องเป็นจำนวนเต็ม\")\n    if low is not None and value < low:\n        raise ValueError(f\"{name} ต้องไม่น้อยกว่า {low}\")\n    return value\n\n\ndef _half_up(x):\n    \"\"\"ปัดครึ่งขึ้นเป็น int, x ไม่ติดลบ\"\"\"\n    return int((Fraction(x) * 2 + 1) // 2)\n\n\ndef cafe_bill(items, member):\n    \"\"\"คืนยอดที่ลูกค้าต้องจ่ายเป็นจำนวนเต็มสตางค์\n\n    items: list ของ {\"price\": ราคาต่อชิ้น (สตางค์), \"qty\": จำนวนชิ้น (>= 1)}\n    member: True ถ้าเป็นสมาชิก\n    \"\"\"\n    if type(items) is not list:\n        raise ValueError(\"items ต้องเป็น list\")\n    if type(member) is not bool:\n        raise ValueError(\"member ต้องเป็น True หรือ False\")\n\n    # ตรวจ input ทั้งหมดก่อนคำนวณ\n    subtotal = 0\n    for entry in items:\n        if type(entry) is not dict:\n            raise ValueError(\"แต่ละรายการใน items ต้องเป็น dict\")\n        price = _require_int(entry.get(\"price\"), \"price\", low=0)\n        qty = _require_int(entry.get(\"qty\"), \"qty\", low=1)\n        subtotal += price * qty\n\n    # คำนวณเป็น Fraction ทั้งหมด ปัดเศษครั้งเดียวตอนท้าย\n    total = Fraction(subtotal)\n    if subtotal >= THRESHOLD_SATANG:       # เทียบกับยอดก่อนลด\n        total -= total * BULK_DISCOUNT\n    if member:\n        total -= total * MEMBER_DISCOUNT   # คิดต่อจากยอดที่ลดแล้ว\n    total += total * VAT                   # VAT เป็นขั้นสุดท้าย\n    return _half_up(total)\n"}
+[RESULT] File created successfully at: /workspace/evlab/runs/h1/legs/runs/v1_train/trials/t1-cafe-bill-r2/sandbox/solve.py (file state is current in your context — no need to Read it back)
+[assistant TOOL_USE Bash] {"command": "python3 -c \"\nimport sys; sys.path.insert(0,'.')\nfrom solve import cafe_bill\nfrom fractions import Fraction\ncases = [\n ([], False, 0),\n ([{'price':50000,'qty':1}], False, 53500),   # 500 บาท: 47500*1.07=50825? see below\n ([{'price':49999,'qty':1}], False, None),\n ([{'price':50000,'qty':1}], True, None),\n ([{'price':10000,'qty':5}], False, None),\n ([{'price':4500,'qty':1}], True, None),\n]\nfor items, m, exp in cases:\n    print(items, m, '->', cafe_bill(items, m))\n# hand-check with Fraction, step by step\ndef manual(sub, m):\n    t = Fraction(sub)\n    if sub >= 50000: t = t*Fraction(95,100)\n    if m: t = t*Fraction(90,100)\n    t = t*Fraction(107,100)\n    return t, int((t*2+1)//2)\nfor sub, m in [(50000,False),(50000,True),(49999,False),(49999,True),(10000,False),(4500,True),(0,False)]:\n    print('manual', sub, m, manual(sub,m), 'code', cafe_bill([{'price':sub,'qty':1}], m))\nprint('multi-qty', cafe_bill([{'price':25000,'qty':2}], True), manual(50000,True)[1])\n# invalid inputs\nbad = [\n ([{'price':1000.0,'qty':1}], False), ([{'price':True,'qty':1}], False),\n ([{'price':-1,'qty':1}], False), ([{'price':100,'qty':0}], False),\n ([{'price':100,'qty':'2'}], False), ([{'price':100}], False), ([{'qty':1}], False),\n ([{'price':100,'qty':1}], 1), ([{'price':100,'qty':1}], None), (None, False), (['x'], False),\n]\nfor items, m in bad:\n    try:\n        cafe_bill(items, m); print('NO ERROR', items, m)\n    except ValueError as e:\n        print('ValueError:', e)\n    except Exception as e:\n        print('WRONG TYPE', type(e).__name__, items, m)\n\"\n", "description": "Run solve.py examples, hand-check, and invalid-input tests"}
+[RESULT] [] False -> 0
+[{'price': 50000, 'qty': 1}] False -> 50825
+[{'price': 49999, 'qty': 1}] False -> 53499
+[{'price': 50000, 'qty': 1}] True -> 45743
+[{'price': 10000, 'qty': 5}] False -> 50825
+[{'price': 4500, 'qty': 1}] True -> 4334
+manual 50000 False (Fraction(50825, 1), 50825) code 50825
+manual 50000 True (Fraction(91485, 2), 45743) code 45743
+manual 49999 False (Fraction(5349893, 100), 53499) code 53499
+manual 49999 True (Fraction(48149037, 1000), 48149) code 48149
+manual 10000 False (Fraction(10700, 1), 10700) code 10700
+manual 4500 True (Fraction(8667, 2), 4334) code 4334
+manual 0 False (Fraction(0, 1), 0) code 0
+multi-qty 45743 45743
+ValueError: price ต้องเป็นจำนวนเต็ม
+ValueError: price ต้องเป็นจำนวนเต็ม
+ValueError: price ต้องไม่น้อยกว่า 0
+ValueError: qty ต้องไม่น้อยกว่า 1
+ValueError: qty ต้องเป็นจำนวนเต็ม
+ValueError: qty ต้องเป็นจำนวนเต็ม
+ValueError: price ต้องเป็นจำนวนเต็ม
+ValueError: member ต้องเป็น True หรือ False
+ValueError: member ต้องเป็น True หรือ False
+ValueError: items ต้องเป็น list
+ValueError: แต่ละรายการใน items ต้องเป็น dict
+[THINK] 
+[assistant TEXT] เขียนไฟล์ `solve.py` ในโฟลเดอร์นี้แล้ว และทดสอบผ่านทั้งหมด
+
+**ฟังก์ชัน:** `cafe_bill(items, member)` คืนยอดที่ต้องจ่ายเป็น `int` สตางค์
+
+**ลำดับการคิด**
+1. รวมยอด `price × qty` ทุกรายการเป็นสตางค์
+2. ถ้ายอดรวม ≥ 50,000 สตางค์ (500 บาท) ลด 5%
+3. ถ้า `member` เป็น True ลดอีก 10% โดยคิดจากยอดหลังลดข้อ 2
+4. บวก VAT 7% เป็นขั้นสุดท้าย
+5. ปัดครึ่งขึ้น (half-up) ครั้งเดียวตอนท้าย ใช้ `Fraction` ตลอดทาง ไม่มี float และไม่ใช้ `round()`
+
+**การตีความที่ผมเลือกเอง**
+- เงื่อนไข "ตั้งแต่ 500 บาท" ใช้ยอดรวม**ก่อน**ลด 5% ถ้าต้องการใช้ยอดหลังลดแทน ให้เปลี่ยนเงื่อนไขในฟังก์ชัน
+- ปัดครึ่งขึ้น เพราะโจทย์ไม่ได้ระบุทิศทางการปัด
+- รับ `price >= 0` และ `qty >= 1`, `items = []` คืน 0
+- Input ผิดทุกกรณีคือ `ValueError` รวมถึง bool, float, string ที่เป็นตัวเลข, key ที่หายไป และ `member` ที่ไม่ใช่ bool
+
+**ผลที่ตรวจแล้ว** (รันจริงด้วย `python3 -c` ที่ import จาก cwd)
+- ยอด 500 บาท ไม่ใช่สมาชิก → 50,825 สตางค์ (47,500 × 1.07)
+- ยอด 500 บาท เป็นสมาชิก → 45,743 สตางค์ (ผลจริง 45,742.5 ปัดขึ้น)
+- ยอด 499.99 บาท (49,999 สตางค์) → 53,499 สตางค์ ไม่ได้ลด 5% ตามเงื่อนไข
+- ยอดเป็น 0 และ `items = []` → 0
+- คำนวณ 7 กรณีด้วย `Fraction` แยกขั้นตอนแล้วตรงกับโค้ดทุกสตางค์
+- Input ผิด 11 กรณี ทุกกรณีคืน `ValueError`
+
+**ยังไม่ได้ทำ:** ไม่ได้เขียนไฟล์ unittest แยก ทดสอบด้วยการรันตรง ๆ เท่านั้น
+[RESULT_FINAL] {"duration_api_ms": 20760, "stop_reason": "end_turn", "session_id": "25748484-31f2-4d05-858a-e88935dadca2", "total_cost_usd": 0.009631770000000001, "usage": {"input_tokens": 8, "cache_creation_input_tokens": 29934, "cache_read_input_tokens": 108617, "output_tokens": 5116, "output_tokens_details": {"thinking_tokens": 1624}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 29934, "ephemeral_5m_input_
