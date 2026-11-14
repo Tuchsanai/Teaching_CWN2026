@@ -4,7 +4,7 @@
   python 01_theory/diagrams_results.py        (รันบนเครื่อง จากโฟลเดอร์ของบท)
 
 ตัวเลขของเปเปอร์คัดจาก Table 1 และ Table 3 ของ arXiv:2605.23904 (ค่าอยู่ใน PAPER ด้านล่าง)
-ตัวเลขของ LAB อ่านจาก results/results.json และ results/gate-*.txt
+ตัวเลขของ LAB อ่านจาก runs/results.json และ runs/<รุ่น>/gate.txt
 """
 import glob, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -109,11 +109,10 @@ def ablation():
 
 
 def lab_descent():
-    R = json.load(open(os.path.join(ROOT, "results", "results.json"), encoding="utf-8"))
+    R = json.load(open(os.path.join(ROOT, "runs", "results.json"), encoding="utf-8"))
     G = {}
-    for f in glob.glob(os.path.join(ROOT, "results", "gate-*.txt")):
-        m = re.match(r"gate-(.+)-([^-]+)\.txt", os.path.basename(f))
-        G[m.group(2)] = "ACCEPT" in open(f, encoding="utf-8").read()
+    for f in glob.glob(os.path.join(ROOT, "runs", "*", "gate.txt")):   # runs/<รุ่นใหม่>/gate.txt
+        G[os.path.basename(os.path.dirname(f))] = "ACCEPT" in open(f, encoding="utf-8").read()
     labs = [("noskill", "ไม่มีสกิล"), ("v0", "v0"), ("v1", "v1"), ("v2", "v2"), ("v3", "v3"), ("v4", "v4")]
     cols, cur = "", None
     for lab, nm in labs:

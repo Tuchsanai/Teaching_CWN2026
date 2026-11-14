@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""วาดกราฟผลจริงจาก results/ เป็น PNG (HTML -> Chrome headless เพื่อให้ตัวอักษรไทยถูกต้อง)
+"""วาดกราฟผลจริงจาก runs/ เป็น PNG (HTML -> Chrome headless เพื่อให้ตัวอักษรไทยถูกต้อง)
 
   python tools/charts.py noskill,v0,v1,v2,v3        (รันบนเครื่อง จากโฟลเดอร์ของบท)
 
-ตัวเลขทุกตัวอ่านจาก results/results.json และ results/gate-<ฐาน>-<ใหม่>.txt ไม่มีค่าที่พิมพ์เอง
+ตัวเลขทุกตัวอ่านจาก runs/results.json และ runs/<รุ่นใหม่>/gate.txt ไม่มีค่าที่พิมพ์เอง
 """
 import glob, html, json, os, re, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RES = os.path.join(ROOT, "results")
+RES = os.path.join(ROOT, "runs")
 OUT = os.path.join(ROOT, "img")
 CHROME = [p for p in (os.environ.get("CHROME", ""), r"C:\Program Files\Google\Chrome\Application\chrome.exe",
                       r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
@@ -32,10 +32,10 @@ h1{font-size:46px;margin:0 0 6px;color:#4A2F1F} .sub{font-size:25px;color:#7A655
 
 def gates():
     g = {}
-    for f in glob.glob(os.path.join(RES, "gate-*.txt")):
-        m = re.match(r"gate-(.+)-([^-]+)\.txt", os.path.basename(f))
+    for f in glob.glob(os.path.join(RES, "*", "gate.txt")):       # runs/<รุ่นใหม่>/gate.txt
         txt = open(f, encoding="utf-8").read()
-        d = {"base": m.group(1), "cand": m.group(2), "accept": "ACCEPT" in txt, "text": txt}
+        m = re.search(r"(\S+) แทน (\S+)\s*$", txt)                # บรรทัดสุดท้าย: ผล: ... <ใหม่> แทน <ฐาน>
+        d = {"base": m.group(2), "cand": m.group(1), "accept": "ACCEPT" in txt, "text": txt}
         for key, pat in (("train", r"^train: ([\d.]+)% → ([\d.]+)% \(([+-][\d.]+)\) · เกณฑ์ ([\d.]+)"),
                          ("val", r"^val: ([\d.]+)% → ([\d.]+)% \(([+-][\d.]+)\) · เกณฑ์ ([\d.]+)"),
                          ("all", r"^รวม: ([\d.]+)% → ([\d.]+)% \(([+-][\d.]+)\) · เกณฑ์ ([\d.]+)")):

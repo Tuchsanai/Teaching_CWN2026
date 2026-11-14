@@ -18,7 +18,7 @@
 
 สกิลไม่ใช่โปรแกรมพิเศษ เป็น **โฟลเดอร์ 1 โฟลเดอร์** ที่ AI เปิดอ่านเมื่อได้งานที่ตรงกับคำอธิบายของสกิล
 
-โฟลเดอร์จริง: [`skill-optimizer/`](../skill-optimizer/) ในบทนี้ (สำเนาเดียวกับ [`00_resource/skills/skill-optimizer/`](../../../00_resource/skills/skill-optimizer/) ไม่รวม `examples/`)
+หน้านี้อธิบาย **ฉบับอ้างอิง** ที่ [`00_resource/skills/skill-optimizer/`](../../../00_resource/skills/skill-optimizer/) · ฉบับที่ผู้เรียนสร้างเองใน LAB 0.1 ทำตาม [`skillopt_format.md`](../skillopt_format.md) ซึ่งเก็บผลไว้ใน `runs/<รุ่น>/` แทน `suite/runs/`
 
 ```text
 skill-optimizer/
@@ -29,7 +29,7 @@ skill-optimizer/
 └── examples/web-fixer/    ชุดโจทย์ตัวอย่าง (ใช้ในบท 03 · มีเฉพาะใน 00_resource)
 ```
 
-**ได้โฟลเดอร์นี้มาอย่างไร:** ฉบับของผู้สอนอยู่ใน repo นี้แล้ว · อยากสร้างเอง ใช้พรอมต์ใน [LAB 0 ขั้น 0.1](../README.md#ขั้น-01--สร้างโฟลเดอร์-skill-optimizer) · LAB 0 ขั้น 0.2 ติดตั้งเป็น global skill ของบัญชี yolo ใน container (`/root/ai-accounts/.Claude/shared/skills/skill-optimizer`) แล้ว Claude เปิดอ่าน `SKILL.md` จากตรงนั้น
+**ได้โฟลเดอร์นี้มาอย่างไร:** สร้างเองด้วยพรอมต์ใน [LAB 0 ขั้น 0.1](../README.md#ขั้น-01--สร้างโฟลเดอร์-skill-optimizer) แล้วขั้น 0.2 ติดตั้งเป็น global skill ของบัญชี yolo ใน container (`/root/ai-accounts/.Claude/shared/skills/skill-optimizer`)
 
 ---
 
@@ -74,7 +74,7 @@ skill-optimizer/
 | 4 ประตูรับตัดสินอย่างไร | เกณฑ์ที่ AI ต้องอธิบายให้ผู้ใช้ได้ | "คะแนนชุด train ขึ้นแต่ชุด val ลง = สกิลจำโจทย์ → ไม่รับ" |
 | 5 ข้อห้าม | สิ่งที่ห้ามทำ | "ห้ามแก้ตัวตรวจหรือโจทย์เพื่อให้ผ่าน" |
 
-อ่านไฟล์เต็ม: [`SKILL.md`](../skill-optimizer/SKILL.md)
+อ่านไฟล์เต็ม: [`SKILL.md`](../../../00_resource/skills/skill-optimizer/SKILL.md)
 
 ## 3.2 `skillopt.py` มี 7 คำสั่ง
 
@@ -90,7 +90,7 @@ skill-optimizer/
 | `null` | `cmd_null()` → `noise_of()` | `grade.json` | ความแกว่งของรุ่นนั้น |
 | `gate` | `cmd_gate()` → `se_diff()` | ผลของสองรุ่น | ACCEPT (exit 0) หรือ REJECT (exit 1) |
 
-อ่านโค้ดเต็ม: [`scripts/skillopt.py`](../skill-optimizer/scripts/skillopt.py)
+อ่านโค้ดเต็ม: [`scripts/skillopt.py`](../../../00_resource/skills/skill-optimizer/scripts/skillopt.py)
 
 ## 3.3 ข้างในคำสั่ง `run`
 

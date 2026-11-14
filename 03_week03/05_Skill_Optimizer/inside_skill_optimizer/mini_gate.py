@@ -3,19 +3,19 @@
 
   python inside_skill_optimizer/mini_gate.py v0 v1        (รันบนเครื่อง จากโฟลเดอร์ของบท)
 
-อ่านผลการวัดจริงใน results/runs/ แล้วตัดสินด้วยสูตรเดียวกับ skillopt.py
+อ่านผลการวัดจริงใน runs/<รุ่น>/trials/ แล้วตัดสินด้วยสูตรเดียวกับ skillopt.py
 ไม่เรียก AI ไม่ใช้โทเคน · ใช้ Python มาตรฐานเท่านั้น
 """
 import glob, json, os, statistics, sys
 
-RUNS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "runs")
+RUNS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "runs")
 EPS, Z = 2.0, 1.5          # เกณฑ์ขั้นต่ำ 2 จุด · ต้องดีขึ้น 1.5 เท่าของความแกว่ง
 
 
 def load(label):
     """1 แถว = 1 Trial: โจทย์ ชุด คะแนน (0-100) และโทเคนขาเข้า"""
     rows = []
-    for d in sorted(glob.glob(os.path.join(RUNS, label, "*"))):
+    for d in sorted(glob.glob(os.path.join(RUNS, label, "trials", "*"))):
         m = json.load(open(os.path.join(d, "metrics.json"), encoding="utf-8"))
         g = json.load(open(os.path.join(d, "grade.json"), encoding="utf-8"))
         rows.append({"task": m["task"], "split": m["split"], "score": g["score"] * 100,

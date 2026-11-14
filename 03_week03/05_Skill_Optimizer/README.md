@@ -468,7 +468,7 @@ TASKS = {"t4-cashback": {
 
 #### ตัวอย่างผลตรวจ
 
-โค้ด `cashback` ที่สกิล `v0` เขียนในการรันรอบก่อน ([ไฟล์](results/runs/v0/t4-cashback-r1/sandbox/solve.py)) ตรวจด้วยตัวตรวจฉบับปัจจุบัน ได้ 6/10
+โค้ด `cashback` ที่สกิล `v0` เขียนในการรันรอบก่อน ([ไฟล์](runs/v0/trials/t4-cashback-r1/sandbox/solve.py)) ตรวจด้วยตัวตรวจฉบับปัจจุบัน ได้ 6/10
 
 ```text
 score 0.6
@@ -613,9 +613,9 @@ score 0.6
 | ใคร | ทำอะไร | ไฟล์ |
 |---|---|---|
 | คน (ครั้งเดียว) | เขียนโจทย์ 6 ข้อ และตัวตรวจ | [`suite/`](suite/) |
-| คน แล้ว Claude Code ปรับต่อ | เขียนสกิล รุ่นละ 1 โฟลเดอร์ | [`skills/money-coder/`](skills/money-coder/) |
-| `skill-optimizer` คำสั่ง `run` | ให้ Agent เขียนโค้ด 18 Trial แล้วให้ตัวตรวจให้คะแนน | `results/runs/` |
-| `skill-optimizer` คำสั่ง `report` `failures` `gate` | เฉลี่ยคะแนน · แสดงข้อที่ผิดข้อกำหนด · ตัดสินรับหรือไม่รับ | [`results/`](results/) |
+| คน แล้ว Claude Code ปรับต่อ | เขียนสกิล รุ่นละ 1 โฟลเดอร์ | `runs/<รุ่น>/skills/` |
+| `skill-optimizer` คำสั่ง `run` | ให้ Agent เขียนโค้ด 18 Trial แล้วให้ตัวตรวจให้คะแนน | `runs/<รุ่น>/trials/` |
+| `skill-optimizer` คำสั่ง `report` `failures` `gate` | เฉลี่ยคะแนน · แสดงข้อที่ผิดข้อกำหนด · ตัดสินรับหรือไม่รับ | [`runs/`](runs/) |
 
 **การเทียบที่ยุติธรรม:** ทุกรุ่นใช้โจทย์ ตัวตรวจ โมเดล และจำนวนรอบชุดเดียวกัน สิ่งเดียวที่ต่างคือ `SKILL.md` ผลต่างของคะแนนจึงมาจากสกิล
 
@@ -715,14 +715,16 @@ score 0.6
 ![โฟลเดอร์ v0 v1 v2 v3 วางข้างกัน](img/g12-folders.png)
 
 ```text
-skills/money-coder/
-├── v0/SKILL.md      รุ่นแรก
-├── v1/SKILL.md      คัดลอกจาก v0 แล้วแก้
-├── v2/SKILL.md      คัดลอกจาก v1 แล้วแก้
-├── v3/SKILL.md      คัดลอกจาก v2 แล้วแก้   ← รุ่นที่ใช้ต่อ
-├── v4/SKILL.md      คัดลอกจาก v3 แล้วแก้   (REJECT)
-└── ISSUES.md        บันทึกปัญหา สาเหตุ จุดที่แก้ และผล ของทุกรุ่น
+runs/
+├── v0/skills/money-coder/SKILL.md   รุ่นแรก
+├── v1/skills/money-coder/SKILL.md   คัดลอกจาก v0 แล้วแก้
+├── v2/skills/money-coder/SKILL.md   คัดลอกจาก v1 แล้วแก้
+├── v3/skills/money-coder/SKILL.md   คัดลอกจาก v2 แล้วแก้   ← รุ่นที่ใช้ต่อ
+├── v4/skills/money-coder/SKILL.md   คัดลอกจาก v3 แล้วแก้   (REJECT)
+└── ISSUES.md                        บันทึกปัญหา สาเหตุ จุดที่แก้ และผล ของทุกรุ่น
 ```
+
+ผลการวัดของแต่ละรุ่นอยู่ในโฟลเดอร์ของรุ่นนั้น (`runs/<รุ่น>/trials/`) · โครงสร้างเต็มอยู่ในภาค LAB
 
 | กติกา | เหตุผล |
 |---|---|
@@ -730,7 +732,7 @@ skills/money-coder/
 | ห้ามแก้รุ่นเดิม | คะแนนที่วัดไว้ต้องตรงกับไฟล์ที่วัด |
 | เก็บรุ่นที่ REJECT ไว้ด้วย | เป็นหลักฐานว่าลองแล้วไม่ได้ผลเพราะอะไร |
 
-ทุกรุ่นอยู่ใน [`skills/money-coder/`](skills/money-coder/) ของบทนี้ ไม่ใช้สกิล global
+ทุกรุ่นอยู่ใน [`runs/`](runs/) ของบทนี้ ไม่ติดตั้งเป็นสกิล global
 
 ### 2.11 อัลกอริทึมทั้งหมด
 
@@ -756,107 +758,91 @@ skills/money-coder/
 # ภาค LAB
 
 > [!TIP]
-> **ภาคนี้ลงมือทำ: คัดลอกพรอมต์ แล้วให้ Claude Code รันใน container (ใช้โทเคน)**
+> **ภาคนี้ลงมือทำ: คัดลอกพรอมต์ → วางใน Claude Code → อ่านผล**
 >
-> - ส่วนที่ 3 คือ LAB 0–5 · ส่วนที่ 4 คือผลของทุกรุ่น สรุป และแบบฝึกหัด
-> - คำว่า Trial · ตัวตรวจ · Training Set · Validation Set · ประตูรับ อธิบายไว้ใน [ภาคทฤษฎี](#ภาคทฤษฎี) ควรอ่านก่อน
-> - ผลจริงในภาคนี้วัดเมื่อ 12–13 พ.ย. 2026 · ผลดิบอยู่ใน [`results/`](results/)
+> ส่วนที่ 3 คือ LAB 0–5 · ส่วนที่ 4 คือผลของทุกรุ่น สรุป และแบบฝึกหัด · คำศัพท์อธิบายไว้ใน [ภาคทฤษฎี](#ภาคทฤษฎี)
 
 > [!WARNING]
-> ผลจริงในภาคนี้วัดด้วยตัวตรวจฉบับ **ก่อน** เพิ่มข้อตรวจ `policy` (นโยบายธุรกิจ C1 C2 S1 S2 ในข้อ 1.7) · ยังไม่ได้รัน LAB ใหม่ด้วยตัวตรวจฉบับปัจจุบัน ตัวเลขของงาน 3 และงาน 4 จะเปลี่ยนเมื่อรันใหม่
->
-> ขั้น 0.1 ของ LAB 0 (สร้างโฟลเดอร์ `skill-optimizer`) เป็นพรอมต์ฉบับร่าง **ยังไม่ได้รันจริง** จึงยังไม่มีผลจริงแสดง
+> **ผลจริงในภาคนี้เป็นของรอบวันที่ 12–13 พ.ย. 2026** วัดด้วยเครื่องมือและตัวตรวจฉบับก่อนหน้า (ก่อนเพิ่มข้อตรวจ `policy` และก่อนย้ายทุกอย่างเข้า `runs/`) · พรอมต์ของ LAB 0 ถึง LAB 5 ปรับตามโครงโฟลเดอร์ใหม่แล้ว แต่ **ยังไม่ได้รันซ้ำ**
 
 ## 3 · ลงมือทำ (Copy & Paste)
 
-**วิธีใช้:** เปิดโฟลเดอร์ `Teaching` ใน Claude Code Desktop → คัดลอกกล่อง **📋 IMPORTANT** ของแต่ละ LAB → วาง → รอผล · กล่องอื่นเป็นผลจริงหรือคำอธิบาย ไม่ต้องคัดลอก
-ต้องมี container `multi-account` และบัญชี `yolo` ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี
+![ภาค LAB ลงมือทำ 6 ขั้น: 0 สร้างเครื่องมือและเตรียม 1 วัดรุ่นฐาน v0 2 แก้สกิลเป็น v1 3 แก้สกิลเป็น v2 4 ลดต้นทุน v3 5 ทดลองย่อ v4](img/g23-lab-map.png)
 
-**ของในบทนี้ไปอยู่ตรงไหนใน container** (LAB 0 ขั้น 0.2 คัดลอกให้ครั้งเดียว)
-
-| บนเครื่อง (โฟลเดอร์นี้) | คืออะไร | ใน container `multi-account` |
-|---|---|---|
-| `my-skill-optimizer/` | เครื่องมือปรับสกิลที่สร้างเองใน LAB 0 ขั้น 0.1 | **global skill** ของบัญชี yolo · `/root/ai-accounts/.Claude/shared/skills/skill-optimizer` |
-| [`skill-optimizer/`](skill-optimizer/SKILL.md) | เครื่องมือปรับสกิลฉบับของผู้สอน (ฉบับอ้างอิง) | ที่เดียวกัน · ใช้แทนได้ถ้าข้ามขั้น 0.1 |
-| [`suite/`](suite/) | โจทย์ 6 ข้อ และ Grader | `/workspace/sklab/suite` |
-| [`skills/money-coder/`](skills/money-coder/) | สกิลที่ถูกปรับ ทุกรุ่น และ `ISSUES.md` | `/workspace/sklab/skills/money-coder` |
-| [`results/`](results/) | ผลการวัด | `/workspace/sklab/suite/runs` |
-
-| คำถาม | คำตอบ |
-|---|---|
-| ทำไม `skill-optimizer` เป็น global skill ได้ | เป็นเครื่องมือของคนปรับ ใช้ได้กับทุกบท |
-| ทำไม `money-coder` ห้ามเป็น global skill | `skill-optimizer` ใส่สกิลให้ Agent เองทีละ Trial · ถ้าเป็น global ทุก Trial จะเห็นสกิลนี้ รวมถึง Trial แบบไม่มีสกิล ผลเทียบระหว่างรุ่นใช้ไม่ได้ |
-| สร้างสกิลรุ่นใหม่ที่ไหน | ใน container แล้วดึงกลับเครื่องพร้อมผลการวัดด้วย `tools/pull.sh` ตอนจบแต่ละ LAB |
-
-LAB 1–5 ขึ้นต้นด้วย 2 บรรทัดเดียวกัน: ทำงานที่ไหน ใช้สกิลอะไร และห้ามเปิดอะไร (Grader กับเฉลย และรายละเอียดของ Validation Set)
+**วิธีใช้:** เปิดโฟลเดอร์ `Teaching` ใน Claude Code Desktop → คัดลอกกล่อง **📋 IMPORTANT** → วาง → รอผล
+**ต้องมี:** container `multi-account` และบัญชี `yolo` ที่ล็อกอินแล้วอย่างน้อย 1 บัญชี
 
 | LAB | ทำอะไร | Trial | เวลาจริง |
 |---|---|---|---|
-| [0](#lab-0--เตรียม) | ขั้น 0.1 สร้างโฟลเดอร์ `skill-optimizer` บนเครื่อง · ขั้น 0.2 ติดตั้งสกิล คัดลอกโจทย์เข้า container ตรวจ Grader | – | 0.1 ยังไม่ได้วัด · 0.2 ใช้ 1 นาที |
+| [0](#lab-0--เตรียม) | สร้างเครื่องมือ `skill-optimizer` แล้วส่งเข้า container พร้อมโจทย์ | – | 0.1 ประมาณ 10 นาที · 0.2 ใช้ 1 นาที |
 | [1](#lab-1--วัดรุ่นฐาน-v0) | วัด `v0` และวัดแบบไม่มีสกิล | 36 | 2 นาที |
 | [2](#lab-2--สร้าง-v1) | วิเคราะห์ข้อที่พลาด สร้าง `v1` | 18 | 5 นาที |
 | [3](#lab-3--สร้าง-v2) | สร้าง `v2` | 18 | 6 นาที |
 | [4](#lab-4--ลอง-v3-ที่ถูกลง) | ลอง `v3` ที่ถูกลง | 18 | 7 นาที |
 | [5](#lab-5--ทดลอง-รุ่นที่สั้นและดูดี-v4) | ทดลองรุ่นที่สั้นและดูดี `v4` | 18 | 4 นาที |
 
+### โครงสร้างโฟลเดอร์
+
+ของที่ป้อนเข้าอยู่ใน `suite/` · ผลลัพธ์ทั้งหมดอยู่ใน `runs/` · **1 รุ่น = 1 โฟลเดอร์**
+
+```text
+05_Skill_Optimizer/
+├── README.md               บทเรียนนี้
+├── skillopt_format.md      รูปแบบที่เครื่องมือ skill-optimizer ต้องทำตาม
+├── suite/                  ของที่ป้อนเข้า: โจทย์ 6 ข้อ (suite.json) และตัวตรวจ (grade.py)
+├── runs/                   ผลลัพธ์: 1 รุ่น = 1 โฟลเดอร์
+│   ├── noskill/            วัดแบบไม่มีสกิล (มีแต่ trials/)
+│   ├── v0/
+│   │   ├── skills/money-coder/SKILL.md   สกิลของรุ่นนี้
+│   │   ├── trials/<โจทย์>-r<รอบ>/        ผลของแต่ละ Trial (คะแนน ต้นทุน โค้ดที่ Agent เขียน)
+│   │   └── gate.txt failures.txt …       ผลตัดสินและข้อที่พลาดของรุ่นนี้
+│   ├── v1/ … v4/           รุ่นถัดไป โครงเดียวกัน
+│   ├── ISSUES.md           บันทึกปัญหา สาเหตุ จุดที่แก้ และผล ของทุกรุ่น
+│   └── report.md results.json            ตารางเทียบทุกรุ่น
+├── tools/                  pull.sh ดึง runs/ จาก container · charts.py diagrams.py วาดภาพ
+├── 01_theory/              ทฤษฎีจากเปเปอร์ SkillOpt
+└── inside_skill_optimizer/ หลักการออกแบบเครื่องมือ และ mini_gate.py
+```
+
+| ที่ | โฟลเดอร์ |
+|---|---|
+| เครื่องมือที่สร้างใน LAB 0.1 | `Teaching/my-skill-optimizer/` → ติดตั้งใน container เป็น global skill ชื่อ `skill-optimizer` |
+| ที่ทำงานใน container | `/workspace/sklab/` มี `suite/` และ `runs/` โครงเดียวกับข้างบน |
+| `money-coder` | อยู่ใน `runs/<รุ่น>/skills/` เท่านั้น ห้ามเป็น global skill (ไม่เช่นนั้น Trial แบบไม่มีสกิลจะเห็นสกิลด้วย) |
+
 ### LAB 0 · เตรียม
-
-LAB 0 มี 2 ขั้น ทำตามลำดับ
-
-| ขั้น | ทำอะไร | ทำที่ไหน | ได้อะไร |
-|---|---|---|---|
-| 0.1 | สร้างโฟลเดอร์ `skill-optimizer` (เครื่องมือปรับสกิล) | บนเครื่อง | โฟลเดอร์ `my-skill-optimizer/` |
-| 0.2 | ส่งเครื่องมือและโจทย์เข้า container แล้วตรวจ Grader | container `multi-account` | พร้อมเริ่ม LAB 1 |
 
 #### ขั้น 0.1 · สร้างโฟลเดอร์ `skill-optimizer`
 
-LAB 1–5 สั่งงานผ่านสกิล `skill-optimizer` ขั้นนี้สร้างสกิลนั้นขึ้นมาเอง · สกิล 1 ตัว = โฟลเดอร์ 1 โฟลเดอร์
-
-```text
-my-skill-optimizer/
-├── SKILL.md               ขั้นตอนที่ AI ทำตาม (ใช้เมื่อไร · ตารางคำสั่ง · ขั้นตอน 0–8 · ข้อห้าม)
-├── scripts/skillopt.py    โปรแกรม 7 คำสั่ง: lint run grade report failures null gate
-├── references/suite.md    รูปแบบของชุดโจทย์และตัวตรวจ
-└── references/issues.md   รูปแบบของ ISSUES.md
-```
-
-| คำถาม | คำตอบ |
-|---|---|
-| ทำไมสร้างที่ `my-skill-optimizer/` | เพื่อไม่ทับ [`skill-optimizer/`](skill-optimizer/SKILL.md) ฉบับของผู้สอน ซึ่งเป็นฉบับที่ใช้วัดผลทั้งหมดในบทนี้ |
-| ไม่อยากสร้างเอง | ข้ามไปขั้น 0.2 แล้วใช้ฉบับของผู้สอน |
-| อยากรู้เหตุผลของการออกแบบ | อ่าน [ข้างใน skill-optimizer](inside_skill_optimizer/README.md) |
+![สร้างสกิล skill-optimizer ใน 6 ขั้น: ศึกษา ออกแบบ สร้าง เขียนคู่มือ ทดสอบ รายงาน จากที่มาคือเปเปอร์ SkillOpt ได้โฟลเดอร์ my-skill-optimizer](img/g24-build-skill.png)
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
 >
 > ```text
-> สร้างสกิลชื่อ skill-optimizer ไว้ที่ 03_week03/05_Skill_Optimizer/my-skill-optimizer (สร้างบนเครื่องนี้ ยังไม่ใช้ container)
-> ระหว่างสร้าง ห้ามเปิด 03_week03/05_Skill_Optimizer/skill-optimizer และ 00_resource/skills/skill-optimizer
-> สกิลนี้ใช้ปรับสกิลอื่นให้ดีขึ้นแบบมีหลักฐาน: วัดสกิลกับชุดโจทย์ → หาสาเหตุจากข้อที่ผิด → แก้ไม่เกิน 3 จุด → วัดซ้ำ → ให้โปรแกรมตัดสินรับหรือไม่รับ
-> หลักการ: งานที่เป็นตัวเลขหรือทำซ้ำอยู่ในสคริปต์ · งานที่ต้องใช้ความเข้าใจ (หาสาเหตุ เขียนกติกา) เป็นของ AI
-> 1. scripts/skillopt.py · Python มาตรฐานไฟล์เดียว มี 7 คำสั่ง: lint run grade report failures null gate
->    - run <suite> --skill <โฟลเดอร์สกิล|none> --label v0 --reps 3 --model sonnet --effort medium --par 6 --accounts yolo1,yolo2
->      1 Trial = โฟลเดอร์ว่าง <suite>/runs/<label>/<โจทย์>-r<รอบ>/sandbox ที่วางสกิลไว้ใน skills/ → เรียก yoloN -p ด้วยพรอมต์ใน suite.json แล้วเก็บ Trace → ให้ grade.py ของ suite ให้คะแนน
->    - failures แสดงเฉพาะชุด train · report ไม่แสดงผลรายข้อของชุด val
->    - gate --base v0 --cand v1 --cost-metric context_tokens: คะแนน train และ val ต้องไม่ลดเกินเกณฑ์ และคะแนนรวมต้องดีขึ้นเกินเกณฑ์ หรือคะแนนเท่าเดิมแต่ต้นทุนลดอย่างน้อย 10% · เกณฑ์ = ค่าที่มากกว่าระหว่าง 2 จุด กับ 1.5 × ความแกว่งของผลต่างสองรุ่น
->    - ไฟล์ผล metrics.json grade.json results.json ใช้รูปแบบเดียวกับตัวอย่างใน 03_week03/05_Skill_Optimizer/results/
-> 2. SKILL.md ไม่เกิน 80 บรรทัด: ใช้เมื่อไร · ตารางคำสั่ง · ขั้นตอน 0–8 ที่ห้ามข้าม (ตรวจตัวตรวจ → วัดรุ่นฐาน → ความแกว่ง → หาสาเหตุเฉพาะชุด train → จด ISSUES.md → แก้ในโฟลเดอร์รุ่นใหม่ → วัดซ้ำด้วยค่าเดิม → gate → รายงาน) · ข้อห้าม
-> 3. references/suite.md และ references/issues.md: รูปแบบของชุดโจทย์ ตัวตรวจ และ ISSUES.md
-> ยังไม่ต้องเรียกโมเดล · ตรวจว่า --help แสดงครบ 7 คำสั่ง และ lint ใช้กับ 03_week03/05_Skill_Optimizer/skills/money-coder/v0 ได้
-> สร้างเสร็จแล้วจึงเปิด 03_week03/05_Skill_Optimizer/skill-optimizer เพื่อเทียบ ว่าคำสั่งและตัวเลือกตรงกันหรือไม่
-> ตอบเป็นตาราง ไฟล์ | จำนวนบรรทัด | ทำหน้าที่อะไร และรายการที่ต่างจากฉบับของผู้สอน
+> งาน: สร้างสกิล skill-optimizer ไว้ในโฟลเดอร์ใหม่ ./my-skill-optimizer (ทำบนเครื่องนี้ ไม่ใช้ container)
+>
+> ที่มา    : เปเปอร์ SkillOpt (arXiv:2605.23904 · github.com/microsoft/SkillOpt) · สรุปภาษาไทย 03_week03/05_Skill_Optimizer/01_theory/README.md
+> รูปแบบ   : 03_week03/05_Skill_Optimizer/skillopt_format.md
+> เงื่อนไข : ห้ามเปิดฉบับสำเร็จที่ 00_resource/skills/skill-optimizer
+>
+> ทำตามลำดับ:
+> 1. ศึกษา       อ่านที่มา แล้วสรุปวงรอบของ SkillOpt
+> 2. ออกแบบ      จด references/source.md: ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง
+> 3. สร้าง        scripts/skillopt.py 7 คำสั่ง (lint run grade report failures null gate) ตามรูปแบบ
+> 4. เขียนคู่มือ   SKILL.md และ references/suite.md references/issues.md
+> 5. ทดสอบ       gate กับ 03_week03/05_Skill_Optimizer ทั้ง 5 คู่ ต้องตัดสินตรงกับ runs/<รุ่นใหม่>/gate.txt
+> 6. รายงาน      ตาราง ไฟล์ | หน้าที่ และผลทดสอบ 5 คู่
 > ```
 
-สิ่งที่ต้องได้ (ขั้นนี้ยังไม่ได้รันจริง จึงเป็นรายการตรวจ ไม่ใช่ผลจริง)
-
-| รายการ | ต้องได้ |
+<!-- lab01-result -->
+| ตรวจ | ต้องได้ |
 |---|---|
-| โฟลเดอร์ `my-skill-optimizer/` | มี `SKILL.md` · `scripts/skillopt.py` · `references/suite.md` · `references/issues.md` |
-| `python my-skill-optimizer/scripts/skillopt.py --help` | แสดงครบ 7 คำสั่ง |
-| `python my-skill-optimizer/scripts/skillopt.py lint skills/money-coder/v0` | ได้ขนาดของ `SKILL.md` เป็น JSON |
-| เทียบกับฉบับของผู้สอน | คำสั่งและตัวเลือกที่ LAB 1–5 ใช้ ตรงกันทุกตัว |
+| โฟลเดอร์ `my-skill-optimizer/` | `SKILL.md` · `scripts/skillopt.py` · `references/` (`suite.md` `issues.md` `source.md`) |
+| `gate` 5 คู่ | ตัดสินตรงกับ `runs/<รุ่นใหม่>/gate.txt`: ACCEPT 4 คู่ · REJECT 1 คู่ (`v3` → `v4`) |
 
-👀 ฉบับของผู้สอนมี `SKILL.md` 60 บรรทัด และ `skillopt.py` 439 บรรทัด ฉบับที่สร้างเองไม่จำเป็นต้องเหมือนทุกบรรทัด แต่คำสั่ง ตัวเลือก และรูปแบบไฟล์ผลต้องตรงกัน เพราะ `tools/pull.sh` และ `tools/charts.py` อ่านไฟล์ผลรูปแบบนั้น
+👀 `references/source.md` คือตารางตรวจย้อนกลับ: เครื่องมือแต่ละส่วนมาจากข้อไหนของเปเปอร์ และต่างจากเปเปอร์ตรงไหน
+<!-- /lab01-result -->
 
 #### ขั้น 0.2 · ส่งเข้า container และตรวจ Grader
 
@@ -865,35 +851,19 @@ my-skill-optimizer/
 >
 > ```text
 > เตรียม LAB ใน container multi-account:
-> - ติดตั้ง 03_week03/05_Skill_Optimizer/my-skill-optimizer เป็น global skill ชื่อ skill-optimizer ของบัญชี yolo (ถ้าไม่มีโฟลเดอร์นี้ ใช้ 03_week03/05_Skill_Optimizer/skill-optimizer แทน)
-> - คัดลอกโฟลเดอร์ suite และ skills/money-coder ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab
+> - ติดตั้ง my-skill-optimizer เป็น global skill ชื่อ skill-optimizer ของบัญชี yolo
+> - คัดลอก suite และ runs/v0/skills ของ 03_week03/05_Skill_Optimizer ไปไว้ที่ /workspace/sklab (คงโครงโฟลเดอร์เดิม)
 > - ตรวจ Grader ด้วย suite/check_grader.py · ดูว่าบัญชี yolo1–yolo5 ตัวไหนล็อกอินแล้ว
 > ยังไม่ต้องวัดอะไร · ตอบเป็นตาราง รายการ | ผล
 > ```
 
-ผลจริง (รันด้วยฉบับของผู้สอน ก่อนมีขั้น 0.1)
-
-| รายการ | ผล |
-|---|---|
-| ติดตั้ง `skill-optimizer` เป็น global skill | ✅ `/root/ai-accounts/.Claude/shared/skills/skill-optimizer` · บัญชี yolo1–5 เห็นทุกบัญชี |
-| คัดลอก `suite` และ `skills/money-coder` | ✅ อยู่ใน `/workspace/sklab` (`money-coder` มี `v0`–`v4` และ `ISSUES.md`) |
-| Grader กับเฉลยอ้างอิง | ✅ ผ่าน 10/10 ทั้ง 6 โจทย์ |
-| Grader กับเฉลยที่จงใจใส่ความผิด 1 จุด | ✅ ไม่ผ่านเฉพาะข้อนั้น (`half_up` · `reject_type` · `cli_error`) |
-| บัญชี | ✅ `yolo1` `yolo2` `yolo3` · ❌ `yolo4` `yolo5` ยังไม่ล็อกอิน |
+**ผลจริง:** ติดตั้งสกิล ✅ · คัดลอกโจทย์ ✅ · Grader ผ่าน ✅ · บัญชีที่ใช้ได้ `yolo1` `yolo2` `yolo3`
 
 👀 ตรวจ Grader ก่อนเสมอ ถ้าเครื่องวัดผิด ตัวเลขหลังจากนี้ใช้ไม่ได้ทั้งหมด
 
 ### LAB 1 · วัดรุ่นฐาน (v0)
 
-สกิลรุ่นแรก เขียนจากความจำใน 5 นาที ([`v0/SKILL.md`](skills/money-coder/v0/SKILL.md))
-
-```markdown
-- เงินทุกค่าเป็นจำนวนเต็มสตางค์ ห้ามใช้ float
-- ปัดเศษสตางค์ให้ถูกต้อง
-- ตรวจ input ทุกตัว ถ้าผิดให้แจ้ง error
-- ต้องเรียกใช้จาก command line ได้ รับ JSON และตอบเป็น JSON
-- เขียนเทสต์มาด้วยทุกครั้ง
-```
+วัดสกิลรุ่นแรก [`v0`](runs/v0/skills/money-coder/SKILL.md) (5 บรรทัด เขียนจากความจำ) เทียบกับแบบไม่มีสกิล
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
@@ -901,39 +871,34 @@ my-skill-optimizer/
 > ```text
 > ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
 > ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> วัดสกิล skills/money-coder/v0 และวัดแบบไม่มีสกิล ด้วย --reps 3 --model sonnet --effort medium --par 6 ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว (รวม 36 Trial)
-> gate ใช้ต้นทุนเป็น context_tokens · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: ตาราง report · ความแกว่งของ v0 (null) · ผล gate ไม่มีสกิล → v0
+> วัดรุ่น v0 และวัดแบบไม่มีสกิล (รุ่น noskill) ด้วย --reps 3 --model sonnet --effort medium --par 6 ใช้ทุกบัญชี yolo ที่ล็อกอินแล้ว (รวม 36 Trial)
+> gate noskill → v0 ใช้ต้นทุนเป็น context_tokens บันทึกไว้ที่ runs/v0/gate.txt · บันทึก report ไว้ที่ runs/report.md
+> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: ตาราง report · ความแกว่งของ v0 (null) · ผล gate
 > ```
 
-ผลจริง ([report.md](results/report.md) · [gate](results/gate-noskill-v0.txt))
+| รุ่น | Training | Validation | รวม | ผ่านครบ 10 ข้อ | Gate |
+|---|---|---|---|---|---|
+| ไม่มีสกิล | 48.3% | 40.0% | **45.6%** | 0/18 | – |
+| `v0` | 71.7% | 68.3% | **70.6%** | 0/18 | **ACCEPT** |
 
-| รุ่น | Training | Validation | รวม | ผ่านครบ 10 ข้อ |
-|---|---|---|---|---|
-| ไม่มีสกิล | 48.3% | 40.0% | **45.6%** | 0/18 |
-| `v0` | 71.7% | 68.3% | **70.6%** | 0/18 |
+👀 สกิล 5 บรรทัดช่วยได้ +25 จุด แต่ยังไม่มี Trial ไหนผ่านครบ 10 ข้อ
 
-```text
-รวม: 45.6% → 70.6% (+25.0) · เกณฑ์ 2.0 จุด
-ผล: ACCEPT ✅ รับ v0 แทน noskill
-```
+<details><summary>รายละเอียด: <code>v0</code> เขียนอะไร และทำตามความรู้แฝงข้อไหนได้</summary>
 
-**`v0` ทำตามความรู้แฝงข้อไหนได้** · `v0` เขียนไว้ข้อละ 1 บรรทัด (Training Set 12 Trial)
+ผลดิบ: [report.md](runs/report.md) · [gate.txt](runs/v0/gate.txt)
 
-| ความรู้แฝง | `v0` เขียนว่า | Agent ทำอะไร | ผ่าน |
+| ความรู้แฝง | `v0` เขียนว่า | Agent ทำอะไร | ผ่าน (Training 12 Trial) |
 |---|---|---|---|
 | 1 เงินเป็นจำนวนเต็มสตางค์ | "เงินทุกค่าเป็นจำนวนเต็มสตางค์ ห้ามใช้ float" | ทำตามได้ | 12/12 |
 | 2 ปัดครึ่งขึ้น ครั้งเดียว | "ปัดเศษสตางค์ให้ถูกต้อง" | ส่วนใหญ่ถูก มี 1 ครั้งปัดทุกขั้น | 11/12 |
-| 3 ปฏิเสธข้อมูลที่ผิด | "ถ้าผิดให้แจ้ง error" | บางครั้งใช้ `TypeError` บางครั้งรับเลขทศนิยม | 8/12 |
+| 3 ปฏิเสธข้อมูลที่ผิด | "ตรวจ input ทุกตัว ถ้าผิดให้แจ้ง error" | บางครั้งใช้ `TypeError` บางครั้งรับเลขทศนิยม | 8/12 |
 | 4 ใช้เป็นโปรแกรมได้ | "รับ JSON และตอบเป็น JSON" | เดารูปแบบเอง เช่น `{"cashback": 500}` | 0/12 |
 | 5 มีเทสต์มาด้วย | "เขียนเทสต์มาด้วยทุกครั้ง" | บางครั้งมีแค่ 5 เทสต์ | 7/12 |
 
-| สังเกต | ตัวอย่าง |
-|---|---|
-| ข้อกำหนดที่เขียน **ชัด** Agent ทำตามได้ | "ห้ามใช้ float" → 12/12 |
-| ข้อกำหนดที่เขียน **กว้าง** Agent ต้องเดา และเดาไม่เหมือนกันทุกครั้ง | "ตอบเป็น JSON" ไม่ได้บอกว่า JSON หน้าตาแบบไหน → 0/12 |
+ข้อกำหนดที่เขียน **ชัด** Agent ทำตามได้ ("ห้ามใช้ float" → 12/12) · ข้อกำหนดที่เขียน **กว้าง** Agent ต้องเดา และเดาไม่เหมือนกันทุกครั้ง ("ตอบเป็น JSON" → 0/12)
 
-👀 สกิล 5 บรรทัดช่วยได้ +25 จุด แต่ยังไม่มี Trial ไหนผ่านครบ 10 ข้อ
+</details>
 
 ### LAB 2 · สร้าง v1
 
@@ -943,38 +908,30 @@ my-skill-optimizer/
 > ```text
 > ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
 > ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> ดูข้อที่พลาดของ v0 แล้วเปิด Trace และโค้ดของ Trial ที่พลาด หาสาเหตุที่พบมากกว่า 1 Trial เขียน skills/money-coder/ISSUES.md
-> สร้าง v1 จาก v0 แก้ไม่เกิน 3 จุด · วัด v1 ด้วยค่าเดียวกับ v0 · gate v0 → v1 · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
-> ตอบ: ตารางปัญหา | พบกี่ Trial | สาเหตุ · จุดที่แก้ใน v1 · ตาราง report (noskill,v0,v1) · ผล gate
+> ดูข้อที่พลาดของ v0 แล้วเปิด Trace และโค้ดของ Trial ที่พลาด หาสาเหตุที่พบมากกว่า 1 Trial เขียน runs/ISSUES.md
+> สร้าง v1 จาก v0 แก้ไม่เกิน 3 จุด · วัด v1 ด้วยค่าเดียวกับ v0 · gate v0 → v1 บันทึกไว้ที่ runs/v1/gate.txt · บันทึก report ใหม่
+> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ตอบ: ตารางปัญหา | พบกี่ Trial | สาเหตุ · จุดที่แก้ใน v1 · ตาราง report · ผล gate
 > ```
-
-ผลจริง: สาเหตุที่ Claude พบจาก Trace ([ISSUES.md](skills/money-coder/ISSUES.md) · [failures-v0.txt](results/failures-v0.txt))
-
-| โค้ดผิดความรู้แฝงข้อ | อาการ | พบ | `v0` เขียนข้อนี้ว่า |
-|---|---|---|---|
-| 4 ใช้เป็นโปรแกรมได้ | ตอบคนละรูปแบบ เช่น `{"total": …}` `{"cashback": …}` | 12/12 | "รับ JSON และตอบเป็น JSON" |
-| 5 มีเทสต์มาด้วย | เทสต์ไม่ครบ หรือรันด้วย unittest ไม่ได้ | 5/12 | "เขียนเทสต์มาด้วยทุกครั้ง" |
-| 3 ปฏิเสธข้อมูลที่ผิด | รับเลขทศนิยม หรือใช้ `TypeError` | 4/12 | "ถ้าผิดให้แจ้ง error" |
-| 2 ปัดครั้งเดียว | ปัดเศษทุกขั้น คลาด 1 สตางค์ | 1/12 | พบครั้งเดียว ยังไม่แก้ |
-
-`v1` แทนกติกากว้าง 3 ข้อ ด้วย **กติกาที่ตรวจได้** ([`v1/SKILL.md`](skills/money-coder/v1/SKILL.md))
-
-| ความรู้แฝง | `v0` | `v1` |
-|---|---|---|
-| 3 | ถ้าผิดให้แจ้ง error | ผิดชนิดหรือผิดช่วง → `raise ValueError` เท่านั้น · ไม่รับ `float` `bool` `str` `None` |
-| 4 | รับ JSON และตอบเป็น JSON | สำเร็จ `{"ok": true, "result": …}` exit 0 · ผิด `{"ok": false, "error": "…"}` exit 2 |
-| 5 | เขียนเทสต์มาด้วย | `unittest.TestCase` อย่างน้อย 6 เทสต์ และ `python3 -m unittest -q` ต้องผ่าน |
-
-```text
-train: 71.7% → 100.0% (+28.3) · เกณฑ์ 2.0 จุด
-val: 68.3% → 90.0% (+21.7) · เกณฑ์ 2.5 จุด
-รวม: 70.6% → 96.7% (+26.1) · เกณฑ์ 2.0 จุด
-ผล: ACCEPT ✅ รับ v1 แทน v0
-```
 
 ![Gate ตัดสิน v0 → v1 อย่างไร](img/r03-threshold-v0-v1.png)
 
+**ผลจริง:** รวม 70.6% → 96.7% (+26.1) · **ACCEPT**
+
 👀 Training เต็ม 100% แต่ Validation ได้ 90% → ยังมีปัญหาที่ Training Set มองไม่เห็น
+
+<details><summary>รายละเอียด: สาเหตุที่ Claude พบ และจุดที่แก้ใน <code>v1</code></summary>
+
+ผลดิบ: [ISSUES.md](runs/ISSUES.md) · [failures.txt ของ v0](runs/v0/failures.txt) · [gate.txt](runs/v1/gate.txt) · [สกิล v1](runs/v1/skills/money-coder/SKILL.md)
+
+| โค้ดผิดความรู้แฝงข้อ | อาการ | พบ | `v0` เขียนว่า | `v1` เขียนว่า |
+|---|---|---|---|---|
+| 4 ใช้เป็นโปรแกรมได้ | ตอบคนละรูปแบบ เช่น `{"total": …}` | 12/12 | รับ JSON และตอบเป็น JSON | สำเร็จ `{"ok": true, "result": …}` exit 0 · ผิด `{"ok": false, "error": "…"}` exit 2 |
+| 5 มีเทสต์มาด้วย | เทสต์ไม่ครบ หรือรันด้วย unittest ไม่ได้ | 5/12 | เขียนเทสต์มาด้วย | `unittest.TestCase` อย่างน้อย 6 เทสต์ และต้องรันผ่าน |
+| 3 ปฏิเสธข้อมูลที่ผิด | รับเลขทศนิยม หรือใช้ `TypeError` | 4/12 | ถ้าผิดให้แจ้ง error | `raise ValueError` เท่านั้น · ไม่รับ `float` `bool` `str` `None` |
+| 2 ปัดครั้งเดียว | ปัดเศษทุกขั้น คลาด 1 สตางค์ | 1/12 | ปัดเศษให้ถูกต้อง | ยังไม่แก้ (พบครั้งเดียว) |
+
+</details>
 
 ### LAB 3 · สร้าง v2
 
@@ -984,30 +941,32 @@ val: 68.3% → 90.0% (+21.7) · เกณฑ์ 2.5 จุด
 > ```text
 > ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
 > ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
-> ทำ v2 จากรุ่นฐานล่าสุด โดยดู 3 อย่าง: ข้อที่พลาดของรุ่นฐาน · ปัญหาที่ยังเปิดใน ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
-> แก้ไม่เกิน 3 จุด · วัด v2 ด้วยค่าเดียวกับ v0 · gate v1 → v2 · อัปเดต ISSUES.md · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
+> ทำ v2 จากรุ่นฐานล่าสุด โดยดู 3 อย่าง: ข้อที่พลาดของรุ่นฐาน · ปัญหาที่ยังเปิดใน runs/ISSUES.md · กติกาในสกิลที่ยังกว้างจนตรวจไม่ได้
+> แก้ไม่เกิน 3 จุด · วัด v2 ด้วยค่าเดียวกับ v0 · gate v1 → v2 บันทึกไว้ที่ runs/v2/gate.txt · อัปเดต ISSUES.md และ report
+> เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
 > ตอบ: จุดที่แก้ใน v2 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
 > ```
 
-ผลจริง: Training ไม่มีข้อที่พลาดแล้ว Claude จึงแก้กติกาที่ยังกว้าง 2 ข้อ ([`v2/SKILL.md`](skills/money-coder/v2/SKILL.md))
+**ผลจริง:** Validation 90.0% → 100.0% · รวม 96.7% → 100.0% (+3.3) · **ACCEPT**
+
+👀 ส่วนที่ดีขึ้นมาจาก Validation ทั้งหมด = กติกาใหม่ใช้ได้กับโจทย์ที่ไม่เคยเห็น (**Generalization**)
+
+<details><summary>รายละเอียด: จุดที่แก้ใน <code>v2</code></summary>
+
+ผลดิบ: [gate.txt](runs/v2/gate.txt) · [สกิล v2](runs/v2/skills/money-coder/SKILL.md)
+
+Training ไม่มีข้อที่พลาดแล้ว Claude จึงแก้กติกาที่ยังกว้าง 2 ข้อ
 
 | ความรู้แฝง | `v1` | `v2` |
 |---|---|---|
 | 2 | ปัดเศษสตางค์ให้ถูกต้อง | ปัดครั้งเดียวที่ขั้นสุดท้าย แบบครึ่งปัดขึ้น · ขั้นก่อนหน้าเก็บเป็นเศษส่วน ห้ามปัดทีละขั้น |
 | 1 | ห้ามใช้ float | ในโค้ดห้ามมี `float` `round(` เลขทศนิยม และการหารด้วย `/` |
 
-```text
-train: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด
-val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
-รวม: 96.7% → 100.0% (+3.3) · เกณฑ์ 2.0 จุด
-ผล: ACCEPT ✅ รับ v2 แทน v1
-```
-
-👀 ส่วนที่ดีขึ้นมาจาก Validation ทั้งหมด = กติกาใหม่ใช้ได้กับโจทย์ที่ไม่เคยเห็น (**Generalization**)
+</details>
 
 ### LAB 4 · ลอง v3 ที่ถูกลง
 
-คะแนนเต็มแล้ว ยังปรับได้อีกทางหนึ่งคือ **ต้นทุน** (เงื่อนไขข้อ 3 ของประตูรับ)
+คะแนนเต็มแล้ว ยังปรับได้อีกทางหนึ่งคือ **ต้นทุน**
 
 > [!IMPORTANT]
 > **📋 คัดลอกกล่องนี้ → Claude Code Desktop แล้วกด Enter**
@@ -1016,27 +975,27 @@ val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
 > ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
 > ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
 > รุ่นฐานได้คะแนนเต็มแล้ว ลองทำ v3 ที่ถูกลง: ลดโทเคนขาเข้า (context_tokens) อย่างน้อย 10% โดยคะแนนไม่ลด
-> เปิด Trace ดูว่า Agent ใช้คำสั่งไปกับอะไร แล้วแก้ไม่เกิน 3 จุด · วัด v3 ด้วยค่าเดียวกับ v0 · gate v2 → v3 · อัปเดต ISSUES.md
+> เปิด Trace ดูว่า Agent ใช้คำสั่งไปกับอะไร แล้วแก้ไม่เกิน 3 จุด · วัด v3 ด้วยค่าเดียวกับ v0 · gate v2 → v3 บันทึกไว้ที่ runs/v3/gate.txt · อัปเดต ISSUES.md และ report
 > ถ้า REJECT ให้ใช้ v2 ต่อ ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
 > ตอบ: จุดที่แก้ใน v3 และเหตุผล · ตาราง report ทุกรุ่น · ผล gate
 > ```
 
-ผลจริง: Claude นับจาก Trace ว่า Agent เสียคำสั่งไปกับอะไร แล้วแก้ 2 จุด ([`v3/SKILL.md`](skills/money-coder/v3/SKILL.md))
+![Gate ตัดสิน v2 → v3 ด้วยต้นทุน](img/r03-threshold-v2-v3.png)
+
+**ผลจริง:** คะแนนเท่าเดิม 100.0% · โทเคนขาเข้า −17% · **ACCEPT**
+
+👀 สกิลยาวขึ้นแต่ต้นทุนรวมลดลง เพราะ Agent ใช้คำสั่งน้อยลง (3.4 → 2.7 คำสั่งต่อ Trial)
+
+<details><summary>รายละเอียด: สิ่งที่พบใน Trace และจุดที่แก้ใน <code>v3</code></summary>
+
+ผลดิบ: [gate.txt](runs/v3/gate.txt) · [สกิล v3](runs/v3/skills/money-coder/SKILL.md)
 
 | สิ่งที่พบใน Trace ของ `v2` | พบ | จุดที่แก้ใน `v3` |
 |---|---|---|
 | เรียกเครื่องมือผิดชื่อ ต้องส่งคำสั่งเดิมซ้ำ | 4/12 | เขียนโค้ด เขียนเทสต์ รันเทสต์ ในคำสั่งเดียว แล้วตอบทันที |
 | คิดค่าที่คาดหวังในเทสต์ผิด ต้องแก้แล้วรันใหม่ | 1/12 | เทสต์ที่มีการปัดเศษ ใช้ input ที่ผลเป็นจำนวนเต็มหรือ .5 พอดี |
 
-```text
-รวม: 100.0% → 100.0% (+0.0) · เกณฑ์ 2.0 จุด
-  ✓ คะแนนเท่าเดิม และโทเคนขาเข้าลดลงอย่างน้อย 10% [128,725 → 106,704 (-17%)]
-ผล: ACCEPT ✅ รับ v3 แทน v2
-```
-
-![Gate ตัดสิน v2 → v3 ด้วยต้นทุน](img/r03-threshold-v2-v3.png)
-
-👀 คำสั่งต่อ Trial ลดจาก 3.4 เหลือ 2.7 สกิลยาวขึ้นแต่ต้นทุนรวมลดลง เพราะ Agent ทำงานน้อยรอบลง
+</details>
 
 ### LAB 5 · ทดลอง: รุ่นที่สั้นและดูดี (v4)
 
@@ -1049,12 +1008,20 @@ val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
 > ทำงานใน container multi-account ที่ /workspace/sklab ด้วยสกิล skill-optimizer
 > ห้ามเปิด suite/grade.py และ suite/ref/ · โจทย์ที่ขึ้นต้นด้วย v ดูได้แค่คะแนน
 > ทดลอง: สร้าง v4 จากรุ่นฐาน โดยย่อ SKILL.md ให้สั้นและอ่านง่าย กติกาละ 1 บรรทัด ไม่เกิน 60 ตัวอักษร (การย่อทั้งไฟล์นับเป็น 1 จุด ไม่แก้อย่างอื่น)
-> วัด v4 ด้วยค่าเดียวกับ v0 · gate v3 → v4 · อัปเดต ISSUES.md
+> วัด v4 ด้วยค่าเดียวกับ v0 · gate v3 → v4 บันทึกไว้ที่ runs/v4/gate.txt · อัปเดต ISSUES.md และ report
 > ถ้า REJECT ให้ใช้รุ่นฐานต่อ ห้ามแก้ v4 เพิ่ม ห้ามวัดซ้ำเพื่อให้ผ่าน · เสร็จแล้วรัน bash 03_week03/05_Skill_Optimizer/tools/pull.sh
 > ตอบ: SKILL.md ของ v4 · ตาราง report ทุกรุ่น · ผล gate · ข้อตรวจของ Training Set ที่เปลี่ยนไป
 > ```
 
-ผลจริง: `v4` อ่านง่ายกว่าทุกรุ่น ([`v4/SKILL.md`](skills/money-coder/v4/SKILL.md))
+![Gate ตัดสิน v3 → v4](img/r03-threshold-v3-v4.png)
+
+**ผลจริง:** รวม 100.0% → 91.7% (−8.3) · **REJECT** · รุ่นที่ใช้ต่อคือ **`v3`**
+
+👀 ตอนย่อ วลี "อ่าน JSON จาก stdin" หายไป → `cli_ok` เหลือ 3/12 เพราะ Agent รับค่าทาง argument แทน · โทเคนก็ไม่ลด
+
+<details><summary>รายละเอียด: สกิล <code>v4</code> ที่ย่อแล้ว</summary>
+
+ผลดิบ: [gate.txt](runs/v4/gate.txt) · [สกิล v4](runs/v4/skills/money-coder/SKILL.md)
 
 ```markdown
 - เงินเป็น `int` สตางค์ ห้าม `float` `round(` ทศนิยม และ `/`
@@ -1065,17 +1032,7 @@ val: 90.0% → 100.0% (+10.0) · เกณฑ์ 2.0 จุด
 - เขียนโค้ด เทสต์ รันเทสต์ ใน `Bash` ครั้งเดียว แล้วตอบ
 ```
 
-```text
-train: 100.0% → 92.5% (-7.5) · เกณฑ์ 2.0 จุด
-  ✗ คะแนนชุด train ลดลงเกิน 2.0 จุด → การแก้ไม่ได้ผล
-val: 100.0% → 90.0% (-10.0) · เกณฑ์ 2.0 จุด
-  ✗ คะแนนชุด val ลดลงเกิน 2.0 จุด
-ผล: REJECT ❌ ไม่รับ v4 แทน v3
-```
-
-![Gate ตัดสิน v3 → v4](img/r03-threshold-v3-v4.png)
-
-👀 ตอนย่อ คำว่า "อ่าน JSON จาก stdin" หายไป 1 วลี → `cli_ok` เหลือ 3/12 เพราะ Agent รับค่าทาง argument แทน · โทเคนก็ไม่ลด (106,704 → 117,405) → รุ่นที่ใช้ต่อคือ **`v3`**
+</details>
 
 ---
 
@@ -1125,7 +1082,7 @@ val: 100.0% → 90.0% (-10.0) · เกณฑ์ 2.0 จุด
 
 <details><summary>เปิดซอง Validation Set หลังตัดสินครบทุกรุ่น: <code>v1</code> พลาดอะไร</summary>
 
-`v1` พลาดที่ `net_pay` ทั้ง 3 รอบ ([validation-unsealed.txt](results/validation-unsealed.txt)) เพราะปัดเศษ 3 ครั้ง (ค่าแรงรวม ภาษี ประกันสังคม) แทนที่จะปัดครั้งเดียว
+`v1` พลาดที่ `net_pay` ทั้ง 3 รอบ ([validation-unsealed.txt](runs/validation-unsealed.txt)) เพราะปัดเศษ 3 ครั้ง (ค่าแรงรวม ภาษี ประกันสังคม) แทนที่จะปัดครั้งเดียว
 
 ```text
 ✗ half_up:  net_pay(41, 5100, false) คาด 205301 ได้ 205300
@@ -1138,7 +1095,7 @@ val: 100.0% → 90.0% (-10.0) · เกณฑ์ 2.0 จุด
 
 <details><summary>โค้ดที่ AI เขียนจริง: ไม่มีสกิล เทียบกับ <code>v3</code> (ฟังก์ชัน <code>cashback</code>)</summary>
 
-ไม่มีสกิล · ผ่าน 3/10 ([ไฟล์](results/runs/noskill/t4-cashback-r1/sandbox/solve.py))
+ไม่มีสกิล · ผ่าน 3/10 ([ไฟล์](runs/noskill/trials/t4-cashback-r1/sandbox/solve.py))
 
 ```python
 def cashback(amount, tier, birthday):
@@ -1151,7 +1108,7 @@ def cashback(amount, tier, birthday):
     return min(result, MAX_CASHBACK)
 ```
 
-`v3` · ผ่าน 10/10 ([ไฟล์](results/runs/v3/t4-cashback-r1/sandbox/solve.py)) มีการตรวจ input ปัดครึ่งขึ้น CLI และเทสต์ครบ
+`v3` · ผ่าน 10/10 ([ไฟล์](runs/v3/trials/t4-cashback-r1/sandbox/solve.py)) มีการตรวจ input ปัดครึ่งขึ้น CLI และเทสต์ครบ
 
 </details>
 
@@ -1176,16 +1133,6 @@ def cashback(amount, tier, birthday):
 
 ### 4.5 ไฟล์ในโฟลเดอร์นี้
 
-| ที่อยู่ | คืออะไร |
-|---|---|
-| [`skills/money-coder/`](skills/money-coder/) | สกิล 5 รุ่น `v0`–`v4` และ [`ISSUES.md`](skills/money-coder/ISSUES.md) |
-| [`suite/`](suite/) | โจทย์ 6 ข้อ · Grader · เฉลยอ้างอิง (`ref/`) · `check_grader.py` |
-| [`results/`](results/) | ผลจริง: `report.md` · `gate-*.txt` · `failures-*.txt` · โค้ดที่ Agent เขียนทุก Trial (`runs/`) |
-| [`skill-optimizer/`](skill-optimizer/SKILL.md) | เครื่องมือปรับสกิล (สำเนาเดียวกับ `00_resource/skills/skill-optimizer` ไม่รวม `examples/`) · LAB 0 ติดตั้งเป็น global skill ใน container |
-| [`tools/`](tools/) | `pull.sh` ดึงผลและสกิลทุกรุ่นจาก container ลงเครื่อง · `charts.py` `diagrams.py` วาดกราฟและแผนภาพ |
-| [`01_theory/`](01_theory/README.md) | ทฤษฎีจากเปเปอร์ SkillOpt: เทียบการปรับสกิลกับการเทรนโมเดล · Algorithm 1 · ผลในเปเปอร์ · เทียบกับ LAB ของบทนี้ |
-| [`inside_skill_optimizer/`](inside_skill_optimizer/README.md) | อธิบายเครื่องมือ `skill-optimizer`: ข้างในมีอะไร ทำงานอย่างไร สร้างอย่างไร · `mini_gate.py` ประตูรับฉบับย่อ |
-
-LAB 0 ขั้น 0.2 และ LAB 2 3 4 5 รันผ่าน Claude ด้วยพรอมต์ตามตัวอักษร · LAB 1 ผู้สอนรันคำสั่งชุดเดียวกันโดยตรง · LAB 0 ขั้น 0.1 ยังไม่ได้รันจริง
+ดู [โครงสร้างโฟลเดอร์](#โครงสร้างโฟลเดอร์) ในส่วนที่ 3
 
 **ถัดไป:** [WikiSkill · ให้ AI จดสมุดความรู้ แล้วเขียนสกิลจากสมุด](../06_WikiSkill/README.md) ใช้งาน `money-coder` เดิม เทียบกับ Skill Optimizer

@@ -3,7 +3,7 @@
 
   python 01_theory/diagrams_eq.py            (รันบนเครื่อง จากโฟลเดอร์ของบท)
 
-คะแนน Validation ในภาพอ่านจาก results/runs/<รุ่น>/<งาน>-r<รอบ>/grade.json ไม่มีค่าที่พิมพ์เอง
+คะแนน Validation ในภาพอ่านจาก runs/<รุ่น>/trials/<งาน>-r<รอบ>/grade.json ไม่มีค่าที่พิมพ์เอง
 """
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -24,7 +24,7 @@ VAL = ["v1-parking-fee", "v2-net-pay"]
 def val_scores():
     out = {}
     for lab, _ in VERS:
-        out[lab] = [json.load(open(os.path.join(ROOT, "results", "runs", lab, "%s-r%d" % (t, r), "grade.json"), encoding="utf-8"))["score"]
+        out[lab] = [json.load(open(os.path.join(ROOT, "runs", lab, "trials", "%s-r%d" % (t, r), "grade.json"), encoding="utf-8"))["score"]
                     for t in VAL for r in (1, 2, 3)]
     return out
 

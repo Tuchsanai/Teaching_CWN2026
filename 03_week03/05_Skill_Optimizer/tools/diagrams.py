@@ -26,7 +26,7 @@ def pipeline():
     row1 = "".join([
         card("#6F4E37", "โจทย์ 6 ข้อ", "suite/suite.json", "กติกาธุรกิจของแต่ละฟังก์ชัน<br>แบ่ง Training 4 · Validation 2", "flex:1"),
         card("#6F4E37", "ตัวตรวจ (Grader)", "suite/grade.py", "โค้ด Python ที่เราเขียนเอง<br>ตรวจข้อกำหนดของร้าน 10–11 ข้อ", "flex:1"),
-        card("#6F4E37", "สกิล 1 รุ่น", "skills/money-coder/v0/SKILL.md", "มาตรฐานของร้านที่เขียนให้ AI อ่าน<br>สิ่งเดียวที่เปลี่ยนในแต่ละรุ่น", "flex:1")])
+        card("#6F4E37", "สกิล 1 รุ่น", "runs/v0/skills/money-coder/SKILL.md", "มาตรฐานของร้านที่เขียนให้ AI อ่าน<br>สิ่งเดียวที่เปลี่ยนในแต่ละรุ่น", "flex:1")])
     row2 = arrow("").join([]) + "".join([
         card("#2A9D8F", "1 เตรียมโฟลเดอร์ว่าง", "sandbox/", "วางสกิลไว้ใน<br>./skills", "flex:1"), arrow(),
         card("#2A9D8F", "2 Agent เขียนโค้ด", "solve.py · test_solve.py", "อ่านโจทย์และสกิล<br>แล้วเขียนเอง", "flex:1.15"), arrow(),

@@ -830,7 +830,7 @@ LAB `money-coder` ใน [README หลัก](../README.md) คือ SkillOpt 
 
 | ชิ้นส่วนของ SkillOpt | สิ่งที่ทำหน้าที่เดียวกันใน LAB | ไฟล์หรือคำสั่ง |
 |---|---|---|
-| สกิล $s$ | `SKILL.md` ของ `money-coder` | `skills/money-coder/v*/SKILL.md` |
+| สกิล $s$ | `SKILL.md` ของ `money-coder` | `runs/v*/skills/money-coder/SKILL.md` |
 | โมเดลเป้าหมาย $M$ และ Harness $h$ | Agent (sonnet) ใน container | คำสั่ง `run` |
 | $D_{\text{tr}}$ | Training Set 4 งาน | `suite/suite.json` |
 | $D_{\text{sel}}$ | Validation Set 2 งาน | `suite/suite.json` |
@@ -838,8 +838,8 @@ LAB `money-coder` ใน [README หลัก](../README.md) คือ SkillOpt 
 | Backward Pass | ดูข้อที่ผิด หาสาเหตุ แก้สกิล | คำสั่ง `failures` และ Claude Code |
 | Learning Rate $L_t$ | แก้ไม่เกิน 3 จุดต่อรุ่น | ขั้นที่ 5 ของ `skill-optimizer` |
 | Validation Gate | ประตูรับ | คำสั่ง `gate` |
-| Rejected-Edit Buffer และ Meta Skill | บันทึกปัญหาและผลของการแก้ | `skills/money-coder/ISSUES.md` |
-| $s_{\text{best}}$ | รุ่นฐานล่าสุด = `v3` | `skills/money-coder/v3/` |
+| Rejected-Edit Buffer และ Meta Skill | บันทึกปัญหาและผลของการแก้ | `runs/ISSUES.md` |
+| $s_{\text{best}}$ | รุ่นฐานล่าสุด = `v3` | `runs/v3/skills/money-coder/` |
 
 ## 9.2 ผลของ LAB อ่านด้วยภาษาของเปเปอร์
 
