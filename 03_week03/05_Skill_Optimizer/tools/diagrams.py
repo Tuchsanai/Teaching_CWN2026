@@ -140,64 +140,116 @@ def algorithm():
 
 
 def trial_example(label="v0", trial="t4-cashback-r1"):
-    """1 Trial จริงตั้งแต่โจทย์ถึงคะแนน · ตัวเลขทุกตัวอ่านจาก runs/<รุ่น>/trials/<Trial>/ ไม่มีค่าที่พิมพ์เอง"""
+    """1 Trial จริงตั้งแต่โจทย์ถึงคะแนน · ทุกอย่างอ่านจาก suite/suite.json และ runs/<รุ่น>/trials/<Trial>/ ไม่มีค่าที่พิมพ์เอง"""
     import html, json, re
+    esc = html.escape
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     d = os.path.join(root, "runs", label, "trials", trial)
+    task_id, rep = trial.rsplit("-r", 1)
+    suite = json.load(open(os.path.join(root, "suite", "suite.json"), encoding="utf-8"))
+    task = [x for x in suite["tasks"] if x["id"] == task_id][0]
+    message = suite["prompt"].replace("{brief}", task["brief"]).replace("`", "")
     m = json.load(open(os.path.join(d, "metrics.json"), encoding="utf-8"))
     g = json.load(open(os.path.join(d, "grade.json"), encoding="utf-8"))
     code = open(os.path.join(d, "sandbox", "solve.py"), encoding="utf-8").read()
-    tests = open(os.path.join(d, "sandbox", "test_solve.py"), encoding="utf-8").read()
-    n_code, n_tests = code.count("\n"), len(re.findall(r"^\s+def test_", tests, re.M))
+    tp = os.path.join(d, "sandbox", "test_solve.py")
+    tests = open(tp, encoding="utf-8").read() if os.path.isfile(tp) else ""
+    n_tests = len(re.findall(r"^\s*def test_", tests, re.M))
     tokens = m["input_tokens"] + m["cache_read"] + m["cache_write"]
     ok = [c["id"] for c in g["checks"] if c["pass"]]
     bad = {c["id"]: c["note"] for c in g["checks"] if not c["pass"]}
-    pol = re.search(r"(\w+\(.*?\)) คาด (\S+) ได้ (\S+)", bad.get("policy", ""))
-    cli = re.search(r'ต้องได้ (\{.*?\}) exit 0 แต่ได้ exit \d+ stdout (\{.*\})', bad.get("cli_ok", ""))
 
-    def col(color, num, title, sub, inner, flex="1"):
-        return """<div style='flex:%s;background:#fff;border:3px solid #E5D9CC;border-top:14px solid %s;border-radius:22px;padding:14px 16px'>
-          <div style='font-size:30px;font-weight:800;color:#4A2F1F'><span style='color:%s'>%s</span> %s</div>
-          <div style='font-size:21px;color:#7A6557;margin:2px 0 10px'>%s</div>%s</div>""" % (flex, color, color, num, title, sub, inner)
+    def col(color, num, title, sub, inner, flex):
+        return """<div style='flex:%s;min-width:0;background:#fff;border:3px solid #E5D9CC;border-top:14px solid %s;border-radius:22px;padding:12px 14px'>
+          <div style='font-size:29px;font-weight:800;color:#4A2F1F'><span style='color:%s'>%s</span> %s</div>
+          <div style='font-size:20px;color:#7A6557;margin:0 0 8px'>%s</div>%s</div>""" % (flex, color, color, num, title, sub, inner)
 
-    def box(txt, size=19):
-        return "<div style='%s;font-size:%dpx;background:#F6EFE6;border-radius:12px;padding:9px 11px;color:#2A6F68;line-height:1.45;margin-bottom:8px'>%s</div>" % (MONO, size, txt)
+    def box(txt, size=16, color="#2A6F68"):
+        return ("<div style='%s;font-size:%dpx;background:#F6EFE6;border-radius:12px;padding:8px 10px;color:%s;line-height:1.42;"
+                "margin-bottom:7px;overflow-wrap:anywhere'>%s</div>" % (MONO, size, color, txt))
 
-    def way(name, got, want, passed):
-        mark = "<span style='color:#2F6B22;font-weight:800'>✓ ผ่าน</span>" if passed else "<span style='color:#A63D25;font-weight:800'>✗ ไม่ผ่าน</span>"
-        return """<div style='border:2px solid %s;border-radius:12px;padding:7px 10px;margin-bottom:8px;background:%s'>
-          <div style='font-size:19px;font-weight:700;color:#4A2F1F;white-space:nowrap'>%s</div><div style='font-size:19px'>%s</div>
-          <div style='%s;font-size:16px;color:#4A2F1F;line-height:1.4;white-space:nowrap'>%s</div><div style='%s;font-size:16px;color:#7A6557;white-space:nowrap'>%s</div></div>""" % (
-            "#6BBF59" if passed else "#E76F51", "#EEF8EA" if passed else "#FDEDE8", name, mark, MONO, got, MONO, want)
+    def way(name, lines, passed):
+        mark = "<span style='color:#2F6B22'>✓ ผ่าน</span>" if passed else "<span style='color:#A63D25'>✗ ไม่ผ่าน</span>"
+        return """<div style='border:2px solid %s;border-radius:12px;padding:6px 10px;margin-bottom:7px;background:%s'>
+          <div style='font-size:18px;font-weight:800;color:#4A2F1F;white-space:nowrap'>%s &nbsp;%s</div>
+          <div style='%s;font-size:15px;color:#4A2F1F;line-height:1.4;overflow-wrap:anywhere'>%s</div></div>""" % (
+            "#6BBF59" if passed else "#E76F51", "#EEF8EA" if passed else "#FDEDE8", name, mark, MONO, "<br>".join(lines))
 
-    c1 = col("#6F4E37", "①", "Input", "โจทย์ 1 ข้อ + สกิล 1 รุ่น",
-             box("ต้องการฟังก์ชัน cashback<br>ในไฟล์ solve.py<br>· silver 1.5%<br>· gold 2.5%<br>· เดือนเกิด ได้ 2 เท่า<br>…", 17)
-             + box("./skills/money-coder/<br>SKILL.md (สกิลรุ่น %s)" % label, 17))
-    cmds = ["ls ./skills", "cat ./skills/…/SKILL.md", "เขียน solve.py<br>&nbsp;&nbsp;&nbsp;เขียน test_solve.py<br>&nbsp;&nbsp;&nbsp;รันเทสต์"]
-    c2 = col("#2A9D8F", "②", "Generate", "Agent เขียนโค้ดเอง",
-             "".join(box("%d&nbsp; %s" % (i + 1, c), 17) for i, c in enumerate(cmds[:m["tool_calls"]]))
-             + "<div style='font-size:20px;color:#4A2F1F'>%d คำสั่ง · %.1f วินาที<br>%s โทเคนขาเข้า</div>" % (m["tool_calls"], m["wall_s"], format(tokens, ",")))
+    # ① Input: ข้อความเต็มที่ Agent ได้รับ
+    msg_html = "<br>".join(esc(l) for l in message.split("\n"))
+    c1 = col("#6F4E37", "①", "Input", "ข้อความที่ Agent ได้รับ (โจทย์ %s) และสกิลที่วางไว้ให้" % task_id,
+             box(msg_html, 15, "#4A2F1F") + box("./skills/money-coder/SKILL.md &nbsp;← สกิลรุ่น %s" % label if label != "noskill" else "(ไม่มีโฟลเดอร์ ./skills)", 15), "2.25")
+
+    # ② Generate: คำสั่งจริงของ Agent
+    cmds = []
+    for c in m.get("commands", []):
+        try:
+            name, arg = c.split(" ", 1)
+            inp = json.loads(arg)
+            s = inp.get("command") or inp.get("file_path") or arg
+        except ValueError:                      # คำสั่งยาวถูกตัดที่ 400 ตัวอักษร จึงไม่ใช่ JSON ครบ
+            mm = re.search(r'"command": "(.*)', c, re.S)
+            s = mm.group(1).replace("\\n", "\n").replace('\\"', '"') if mm else c
+        first = s.split("\n")[0].strip()
+        more = " …" if ("\n" in s or len(first) > 40) else ""
+        cmds.append(esc(first[:40]) + more)
+    c2 = col("#2A9D8F", "②", "Generate", "คำสั่งที่ Agent ใช้",
+             "".join(box("%d&nbsp; %s" % (i + 1, c), 15) for i, c in enumerate(cmds[:5]))
+             + "<div style='font-size:19px;color:#4A2F1F;line-height:1.4'>%d คำสั่ง · %.1f วินาที<br>%s โทเคนขาเข้า</div>" % (
+                 m["tool_calls"], m["wall_s"], format(tokens, ",")), "1.25")
+
+    # ③ Output: ไฟล์ และบรรทัดสำคัญของโค้ด
+    sig = (re.search(r"^def %s\(.*$" % re.escape(task_id.split("-", 1)[1].replace("-", "_")), code, re.M) or re.search(r"^def \w+\(.*$", code, re.M)).group(0)
+    prints = [l.strip() for l in code.split("\n") if "print(" in l][:2]
+    files = "solve.py · %d บรรทัด" % code.count("\n") + ("<br>test_solve.py · %d เทสต์" % n_tests if tests else "<br>(ไม่มี test_solve.py)")
     c3 = col("#2A9D8F", "③", "Output", "ไฟล์ที่ Agent ส่ง",
-             box("solve.py<br>&nbsp;&nbsp;%d บรรทัด<br>test_solve.py<br>&nbsp;&nbsp;%d เทสต์" % (n_code, n_tests), 17)
-             + box("out = {\"cashback\": …}<br>print(json.dumps(out))", 16))
-    c4 = col("#F4A261", "④", "Grade", "ตัวตรวจรันโค้ดที่ได้ 3 วิธี",
-             way("เรียกฟังก์ชันด้วย Input ที่ซ่อน", html.escape(pol.group(1)) + " → ได้ " + pol.group(3), "ต้องได้ " + pol.group(2) + " (นโยบายของร้าน)", False)
-             + way("รันเป็นโปรแกรม ส่ง JSON ทาง stdin", "ได้ " + html.escape(cli.group(2)), "ต้องได้ " + html.escape(cli.group(1)), False)
-             + way("รันเทสต์ที่ Agent เขียน", "python3 -m unittest → %d เทสต์" % n_tests, "ต้องมีอย่างน้อย 6 และรันผ่าน", "tests" in ok), "2.1")
-    chips = "".join("<span style='%s;font-size:20px;background:#E3F3DE;border:2px solid #6BBF59;color:#2F6B22;border-radius:10px;padding:3px 9px;margin-right:6px'>✓ %s</span>" % (MONO, c) for c in ok) \
-        + "".join("<span style='%s;font-size:20px;background:#FBE3DC;border:2px solid #E76F51;color:#A63D25;border-radius:10px;padding:3px 9px;margin-right:6px'>✗ %s</span>" % (MONO, c) for c in bad)
-    body = """<h1>1 Trial: จากโจทย์ สู่โค้ด สู่คะแนน</h1>
-    <div class='sub' style='margin-bottom:12px'>ตัวอย่างจริง: รุ่น %s · โจทย์ %s · รอบที่ %s · บัญชี %s · โมเดล %s</div>
-    <div style='display:flex;gap:6px;align-items:stretch'>%s%s%s%s%s%s%s</div>
-    <div style='margin-top:14px;background:#fff;border:3px solid #E5D9CC;border-radius:18px;padding:12px 16px'>
-      <span style='font-size:30px;font-weight:800;color:#4A2F1F'>⑤ Score = ข้อที่ผ่าน ÷ ข้อตรวจทั้งหมด = %d ÷ %d = %s</span>
-      <div style='margin-top:8px;line-height:2.1'>%s</div></div>""" % (
-        label, trial.rsplit("-r", 1)[0], trial.rsplit("-r", 1)[1], m["account"], m["model"],
-        c1, arrow(), c2, arrow(), c3, arrow(), c4, len(ok), len(g["checks"]), g["score"], chips)
-    shot("d05-trial-example", body, 800)
+             box(files, 16) + box(esc(sig[:60]) + "<br>&nbsp;&nbsp;…<br>" + "<br>".join(esc(l[:60]) for l in prints), 14), "1.3")
+
+    # ④ Grade: 3 วิธี
+    def split_note(n):
+        head, _, tail = n.partition(" · พลาด")
+        return [esc(head)] + (["พลาด" + esc(tail)] if tail else [])
+    fn_bad = [k for k in ("policy", "reject_type", "reject_value", "no_drift", "half_up", "boundary", "basic", "contract") if k in bad]
+    fn_checks = [c["id"] for c in g["checks"] if c["id"] not in ("cli_ok", "cli_error", "tests")]
+    w1 = way("เรียกฟังก์ชันด้วย Input ที่ซ่อน", ["<b>%s</b>: " % fn_bad[0] + split_note(bad[fn_bad[0]])[0]] + split_note(bad[fn_bad[0]])[1:]
+             + (["และไม่ผ่านอีก: " + " ".join(fn_bad[1:])] if fn_bad[1:] else []), False) if fn_bad else \
+        way("เรียกฟังก์ชันด้วย Input ที่ซ่อน", ["ผ่านทุกข้อ: " + " ".join(fn_checks)], True)
+    cli_bad = [k for k in ("cli_ok", "cli_error") if k in bad]
+    if cli_bad:
+        mm = re.match(r"stdin (.*) ต้องได้ (.*?) แต่ได้ (.*)$", bad[cli_bad[0]])
+        lines = ["<b>%s</b> ส่ง: %s" % (cli_bad[0], esc(mm.group(1)[:90])), "ต้องได้: " + esc(mm.group(2)), "ได้: " + esc(mm.group(3)[:90])] if mm else [esc(bad[cli_bad[0]][:200])]
+        w2 = way("รันเป็นโปรแกรม (JSON ทาง stdin)", lines + (["และไม่ผ่านอีก: " + " ".join(cli_bad[1:])] if cli_bad[1:] else []), False)
+    else:
+        w2 = way("รันเป็นโปรแกรม (JSON ทาง stdin)", ["ผ่านทั้ง cli_ok และ cli_error"], True)
+    w3 = way("รันเทสต์ที่ Agent เขียน", ["python3 -m unittest → %d เทสต์ ผ่าน (ต้องมีอย่างน้อย 6)" % n_tests], True) if "tests" in ok else \
+        way("รันเทสต์ที่ Agent เขียน", [esc(bad["tests"][:170])], False)
+    c4 = col("#F4A261", "④", "Grade", "ตัวตรวจรันโค้ดที่ได้ 3 วิธี", w1 + w2 + w3, "2.2")
+
+    chips = "".join("<span style='%s;font-size:19px;background:#E3F3DE;border:2px solid #6BBF59;color:#2F6B22;border-radius:10px;padding:2px 8px;margin-right:5px'>✓ %s</span>" % (MONO, c) for c in ok) \
+        + "".join("<span style='%s;font-size:19px;background:#FBE3DC;border:2px solid #E76F51;color:#A63D25;border-radius:10px;padding:2px 8px;margin-right:5px'>✗ %s</span>" % (MONO, c) for c in bad)
+    sm = "font-size:34px;color:#6F4E37;align-self:center;font-weight:800"
+    ar = "<div style='%s'>➜</div>" % sm
+    body = """<h1 style='font-size:42px'>1 Trial: จากโจทย์ สู่โค้ด สู่คะแนน</h1>
+    <div class='sub' style='margin-bottom:10px'>ตัวอย่างจริง: รุ่น %s · โจทย์ %s · รอบที่ %s · บัญชี %s · โมเดล %s</div>
+    <div style='display:flex;gap:5px;align-items:stretch'>%s%s%s%s%s%s%s</div>
+    <div style='margin-top:10px;background:#fff;border:3px solid #E5D9CC;border-radius:18px;padding:10px 16px'>
+      <span style='font-size:28px;font-weight:800;color:#4A2F1F'>⑤ Score = ข้อที่ผ่าน ÷ ข้อตรวจทั้งหมด = %d ÷ %d = %s</span>
+      <div style='margin-top:6px;line-height:2'>%s</div></div>""" % (
+        label, task_id, rep, m["account"], m["model"], c1, ar, c2, ar, c3, ar, c4, len(ok), len(g["checks"]), g["score"], chips)
+    shot("d05-trial-" + task_id, body, 900)
+
+
+def trial_examples(label="v0"):
+    """ภาพ 1 Trial ของโจทย์ Training ทุกข้อ (รอบที่ 1) · โจทย์ Validation ถูกปิดผลรายข้อ จึงไม่มีภาพ"""
+    import json
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    suite = json.load(open(os.path.join(root, "suite", "suite.json"), encoding="utf-8"))
+    for x in suite["tasks"]:
+        if x["split"] == "train":
+            trial_example(label, x["id"] + "-r1")
 
 
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_example"]
+    which = sys.argv[1:] or ["pipeline", "grader", "examples", "algorithm", "trial_examples"]
     for w in which:
         globals()[w]()

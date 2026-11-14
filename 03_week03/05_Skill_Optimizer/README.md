@@ -574,7 +574,7 @@ score 0.6
 
 ### 2.4 ไพป์ไลน์ของ 1 Trial: Generate → Grade
 
-![1 Trial จากโจทย์ สู่โค้ด สู่คะแนน: Input โจทย์และสกิล, Generate Agent เขียนโค้ดเอง, Output ไฟล์ที่ส่ง, Grade ตัวตรวจรันโค้ด 3 วิธี, Score ข้อที่ผ่านหารข้อตรวจทั้งหมด](img/d05-trial-example.png)
+![1 Trial จากโจทย์ สู่โค้ด สู่คะแนน: Input โจทย์และสกิล, Generate Agent เขียนโค้ดเอง, Output ไฟล์ที่ส่ง, Grade ตัวตรวจรันโค้ด 3 วิธี, Score ข้อที่ผ่านหารข้อตรวจทั้งหมด](img/d05-trial-t4-cashback.png)
 
 | ขั้น | เกิดอะไรขึ้น | ตัวอย่างจริงในภาพ (รุ่น `v0` · โจทย์ `t4-cashback` · รอบที่ 1) |
 |---|---|---|
@@ -591,6 +591,18 @@ score 0.6
 | เรียกฟังก์ชัน | ส่ง Input ที่ซ่อนไว้เข้าฟังก์ชัน แล้วเทียบค่าที่คืนกับคำตอบที่ตัวตรวจคำนวณเอง | `contract` `basic` `half_up` `no_drift` `boundary` `reject_value` `reject_type` `policy` |
 | รันเป็นโปรแกรม | รัน `python3 solve.py` ส่ง JSON ทาง stdin แล้วอ่านข้อความที่พิมพ์และ exit code | `cli_ok` `cli_error` |
 | รันเทสต์ | รัน `python3 -m unittest` กับเทสต์ที่ Agent เขียน | `tests` |
+
+<details><summary>ภาพเดียวกันของโจทย์ Training อีก 3 ข้อ (รุ่น <code>v0</code> · รอบที่ 1)</summary>
+
+![1 Trial ของโจทย์ t1-cafe-bill](img/d05-trial-t1-cafe-bill.png)
+
+![1 Trial ของโจทย์ t2-split-bill](img/d05-trial-t2-split-bill.png)
+
+![1 Trial ของโจทย์ t3-shipping-fee](img/d05-trial-t3-shipping-fee.png)
+
+โจทย์ Validation 2 ข้อ (`v1-parking-fee` `v2-net-pay`) ไม่มีภาพแบบนี้ เพราะผลรายข้อและโค้ดถูกปิดไว้ เปิดดูได้แค่คะแนน
+
+</details>
 
 <details><summary>ของจริงของ Trial นี้: ข้อความที่ Agent ได้รับ · คำสั่งที่ Agent ใช้ · ผลตรวจ</summary>
 
