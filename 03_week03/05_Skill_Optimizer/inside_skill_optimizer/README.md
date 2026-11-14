@@ -124,9 +124,14 @@ suite/runs/v1/t4-cashback-r1/
 
 อ่านสูตรทั้งหมดได้ใน [`mini_gate.py`](mini_gate.py) ฉบับย่อ 70 บรรทัด ให้ผลตรงกับคำสั่ง `gate` จริงทั้ง 5 ครั้งของบทนี้
 
-```bash
-python inside_skill_optimizer/mini_gate.py v0 v1
-```
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Terminal ที่โฟลเดอร์ `05_Skill_Optimizer` แล้วกด Enter**
+>
+> ```bash
+> python inside_skill_optimizer/mini_gate.py v0 v1
+> ```
+
+ผลจริง
 
 ```text
 train 71.7% -> 100.0% (+28.3) เกณฑ์ 2.0 จุด
@@ -178,6 +183,14 @@ val   68.3% -> 90.0% (+21.7) เกณฑ์ 2.5 จุด
 # 5 · ลองเอง
 
 ทุกข้อรันบนเครื่อง จากโฟลเดอร์ `05_Skill_Optimizer` ไม่ใช้โทเคน
+
+> [!IMPORTANT]
+> **📋 คัดลอกกล่องนี้ → Terminal ที่โฟลเดอร์ `05_Skill_Optimizer` แล้วกด Enter** (ข้อ 1 และ 2)
+>
+> ```bash
+> python inside_skill_optimizer/mini_gate.py v3 v4
+> python inside_skill_optimizer/mini_gate.py v2 v3
+> ```
 
 | # | ทำ | ได้เห็นอะไร |
 |---|---|---|
