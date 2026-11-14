@@ -76,15 +76,15 @@ def grader():
 def examples():
     """ตัวอย่าง input -> output ที่ถูกและผิดของฟังก์ชัน cashback (ค่าที่ผิดมาจาก Trial จริงใน results/runs)"""
     rows = [  # (ทดสอบเพื่อดูอะไร, input, ความหมายของ input, ถูก, ผิด, ที่มาของค่าที่ผิด, ข้อตรวจ)
-        ("กฎเฉพาะ + กฎกลาง 1<br>กรณีธรรมดา คิดถูกไหม", "cashback(20000, \"gold\", False)", "ซื้อ 200 บาท · สมาชิก gold · ไม่ใช่เดือนเกิด", "500", "", "ทุก Trial ทำถูก", "contract basic"),
-        ("กฎเฉพาะ<br>ขอบของเงื่อนไข 100 บาท", "cashback(9999, \"gold\", False)", "ซื้อ 99.99 บาท (ต่ำกว่า 100 บาท)", "0", "", "ทุก Trial ทำถูก", "boundary"),
-        ("กฎกลาง 2<br>ได้ .5 สตางค์ ปัดขึ้นไหม", "cashback(10020, \"gold\", False)", "ซื้อ 100.20 บาท → เงินคืน 250.5 สตางค์", "251", "250", "ไม่มีสกิล", "half_up"),
-        ("กฎกลาง 2<br>ปัดครั้งเดียวตอนท้ายไหม", "cashback(10020, \"silver\", True)", "silver เดือนเกิด → 150.3 × 2 = 300.6 สตางค์", "301", "300", "ไม่มีสกิล", "no_drift"),
-        ("กฎกลาง 3<br>ค่านอกช่วง ปฏิเสธไหม", "cashback(-1, \"gold\", False)", "ยอดซื้อติดลบ", "ValueError", "0", "ไม่มีสกิล", "reject_value"),
-        ("กฎกลาง 3<br>ชนิดข้อมูลผิด ปฏิเสธไหม", "cashback(20000.0, \"gold\", False)", "ยอดซื้อเป็นเลขทศนิยม ไม่ใช่จำนวนเต็ม", "ValueError", "500.0 · TypeError", "ไม่มีสกิล · v0", "reject_type"),
-        ("กฎกลาง 4<br>รันเป็นโปรแกรม ตอบถูกไหม", "stdin {\"tier\": \"gold\", …}", "ข้อมูลเดียวกับแถวแรก ส่งเป็นข้อความ JSON", "{\"ok\": true, \"result\": 500}", "{\"cashback\": 500}", "v0", "cli_ok"),
-        ("กฎกลาง 4<br>ข้อมูลผิด แจ้งถูกรูปแบบไหม", "stdin {\"tier\": \"bronze\", …}", "bronze = ระดับสมาชิกที่ร้านไม่มี", "{\"ok\": false, …} exit 2", "{\"error\": …} exit 1", "v0", "cli_error"),
-        ("กฎกลาง 5<br>มีเทสต์มาด้วยไหม", "python3 -m unittest -q test_solve", "รันเทสต์ที่ AI เขียนมาพร้อมโค้ด", "6 เทสต์ขึ้นไป ผ่าน", "ไม่มีไฟล์เทสต์", "ไม่มีสกิล", "tests"),
+        ("ระบุชัด + ความรู้แฝง 1<br>กรณีธรรมดา คิดถูกไหม", "cashback(20000, \"gold\", False)", "ซื้อ 200 บาท · สมาชิก gold · ไม่ใช่เดือนเกิด", "500", "", "ทุก Trial ทำถูก", "contract basic"),
+        ("ข้อกำหนดที่ระบุชัด<br>ขอบของเงื่อนไข 100 บาท", "cashback(9999, \"gold\", False)", "ซื้อ 99.99 บาท (ต่ำกว่า 100 บาท)", "0", "", "ทุก Trial ทำถูก", "boundary"),
+        ("ความรู้แฝงข้อ 2<br>ได้ .5 สตางค์ ปัดขึ้นไหม", "cashback(10020, \"gold\", False)", "ซื้อ 100.20 บาท → เงินคืน 250.5 สตางค์", "251", "250", "ไม่มีสกิล", "half_up"),
+        ("ความรู้แฝงข้อ 2<br>ปัดครั้งเดียวตอนท้ายไหม", "cashback(10020, \"silver\", True)", "silver เดือนเกิด → 150.3 × 2 = 300.6 สตางค์", "301", "300", "ไม่มีสกิล", "no_drift"),
+        ("ความรู้แฝงข้อ 3<br>ค่านอกช่วง ปฏิเสธไหม", "cashback(-1, \"gold\", False)", "ยอดซื้อติดลบ", "ValueError", "0", "ไม่มีสกิล", "reject_value"),
+        ("ความรู้แฝงข้อ 3<br>ชนิดข้อมูลผิด ปฏิเสธไหม", "cashback(20000.0, \"gold\", False)", "ยอดซื้อเป็นเลขทศนิยม ไม่ใช่จำนวนเต็ม", "ValueError", "500.0 · TypeError", "ไม่มีสกิล · v0", "reject_type"),
+        ("ความรู้แฝงข้อ 4<br>รันเป็นโปรแกรม ตอบถูกไหม", "stdin {\"tier\": \"gold\", …}", "ข้อมูลเดียวกับแถวแรก ส่งเป็นข้อความ JSON", "{\"ok\": true, \"result\": 500}", "{\"cashback\": 500}", "v0", "cli_ok"),
+        ("ความรู้แฝงข้อ 4<br>ข้อมูลผิด แจ้งถูกรูปแบบไหม", "stdin {\"tier\": \"bronze\", …}", "bronze = ระดับสมาชิกที่ร้านไม่มี", "{\"ok\": false, …} exit 2", "{\"error\": …} exit 1", "v0", "cli_error"),
+        ("ความรู้แฝงข้อ 5<br>มีเทสต์มาด้วยไหม", "python3 -m unittest -q test_solve", "รันเทสต์ที่ AI เขียนมาพร้อมโค้ด", "6 เทสต์ขึ้นไป ผ่าน", "ไม่มีไฟล์เทสต์", "ไม่มีสกิล", "tests"),
     ]
     th = "font-size:23px;color:#7A6557;text-align:left;padding:0 10px 4px;font-weight:400"
     chip = "display:inline-block;border-radius:12px;padding:4px 9px;%s;font-size:19px;white-space:nowrap" % MONO
@@ -105,7 +105,7 @@ def examples():
     <div class='sub' style='margin-bottom:8px'>cashback(ยอดซื้อเป็นสตางค์, ระดับสมาชิก, ซื้อในเดือนเกิดหรือไม่) → เงินคืนเป็นสตางค์ · Output ที่ผิดทุกค่ามาจาก Trial จริง</div>
     <table style='border-collapse:separate;border-spacing:0 6px;width:100%%;table-layout:fixed'>
       <colgroup><col style='width:275px'><col style='width:415px'><col style='width:350px'><col style='width:262px'><col style='width:178px'></colgroup>
-      <tr><th style='%s'>ทดสอบกฎข้อไหน</th><th style='%s'>Input และความหมาย</th><th style='%s'>Output ที่ถูก</th><th style='%s'>Output ที่ผิด</th><th style='%s'>ข้อตรวจ</th></tr>%s</table>""" % (
+      <tr><th style='%s'>ทดสอบข้อกำหนดข้อไหน</th><th style='%s'>Input และความหมาย</th><th style='%s'>Output ที่ถูก</th><th style='%s'>Output ที่ผิด</th><th style='%s'>ข้อตรวจ</th></tr>%s</table>""" % (
         th, th, th, th, th, h)
     shot("d03-examples", body, 940)
 
