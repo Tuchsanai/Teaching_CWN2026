@@ -1,0 +1,96 @@
+---
+name: billing-function-contract
+description: ขั้นตอนเขียน solve.py สำหรับฟังก์ชันคิดเงินของ BaanKafe ให้ครบทั้งฟังก์ชัน การตรวจอินพุต CLI JSON และ test_solve.py ใช้ทุกครั้งที่ได้โจทย์เขียนฟังก์ชันคิดเงินหรือคำนวณเงินเป็นสตางค์
+---
+
+# สัญญาของงานคิดเงิน (solve.py + CLI + tests)
+
+ใช้เมื่อโจทย์ให้เขียนฟังก์ชัน Python ใน `solve.py` ที่รับค่าเป็นสตางค์และคืนจำนวนเต็มสตางค์
+ตัวตรวจให้คะแนนหลายด้าน ไม่ใช่แค่สูตรให้ตัวเลขถูก ต้องทำให้ครบทุกข้อด้านล่างก่อนส่งงาน
+
+## 1. ตรวจอินพุตก่อนคำนวณเสมอ (ValueError)
+
+เขียนฟังก์ชันตรวจค่าไว้ต้นฟังก์ชัน แล้ว `raise ValueError(...)` เมื่อพบค่าที่ไม่ถูกต้อง อย่าปล่อยให้เกิด ZeroDivisionError, TypeError, KeyError หรือคืนค่า 0 เงียบ ๆ
+
+- **ชนิดข้อมูล (type)**: ค่าที่ควรเป็นจำนวนเต็ม (สตางค์ จำนวนชิ้น จำนวนคน เปอร์เซ็นต์ น้ำหนัก ระยะทาง) ต้องเป็น `int` จริง ๆ
+  - `float` เช่น `4500.0` ต้อง raise ValueError ไม่ใช่ปัดหรือแปลงให้
+  - `bool` เป็น subclass ของ `int` ต้องกันเอง: `isinstance(x, bool)` ให้ปฏิเสธในช่องที่ควรเป็นตัวเลข
+  - ช่อง flag (เช่น member, express, birthday) ต้องเป็น `bool` จริง ๆ
+  - ช่อง string (เช่น tier) ต้องเป็น `str` และอยู่ในรายการที่โจทย์อนุญาต
+  - ถ้า items เป็น list ของ dict ต้องตรวจว่าเป็น list, แต่ละตัวเป็น dict, มี key ครบ และค่าของแต่ละ key ผ่านกฎชนิด/ช่วง
+- **ช่วงค่า (value)**: ตรวจตามช่วงที่โจทย์ระบุทุกตัว เช่น "ตั้งแต่ 1", "ตั้งแต่ 0", "0–100", "1–30,000" ค่าที่ต่ำกว่าหรือสูงกว่าช่วง (รวมค่า 0 และค่าติดลบ) ต้อง raise ValueError
+  - ทำกับทุกพารามิเตอร์ ไม่ใช่แค่ตัวที่ดูสำคัญ และตรวจก่อนการหารทุกครั้ง
+
+แม่แบบ:
+
+```python
+def _int(x, name, lo=None, hi=None):
+    if isinstance(x, bool) or not isinstance(x, int):
+        raise ValueError(f"{name} must be an integer")
+    if lo is not None and x < lo:
+        raise ValueError(f"{name} must be >= {lo}")
+    if hi is not None and x > hi:
+        raise ValueError(f"{name} must be <= {hi}")
+    return x
+
+def _flag(x, name):
+    if not isinstance(x, bool):
+        raise ValueError(f"{name} must be a bool")
+    return x
+```
+
+## 2. เลขเงินใช้จำนวนเต็มล้วน และปัดครึ่งขึ้น (half up)
+
+- ห้ามใช้ float คำนวณเงิน ใช้ `int` หรือ `fractions.Fraction`
+- ปัดเศษ **ครั้งเดียวตอนท้ายสุด** แบบ half up (0.5 ปัดขึ้น) ห้ามใช้ `round()` (เป็น banker's rounding) และห้ามปัดลง (floor) เว้นแต่โจทย์สั่งชัด
+- สูตรปัดครึ่งขึ้นของเศษส่วน `num/den` (den > 0): `(2 * num + den) // (2 * den)`
+- ถ้ามีเปอร์เซ็นต์หลายขั้น ให้คูณเป็นเศษส่วนต่อกันแล้วปัดทีเดียว ถ้ามีทิป/ส่วนลดที่เกิดเศษสตางค์ ก็ปัดแบบ half up เช่นกัน ไม่ใช่ floor
+- ขอบเขต "ตั้งแต่ / ไม่เกิน / เกิน / ต่ำกว่า" ต้องอ่านให้ตรงว่า `>=` หรือ `>` และทดสอบที่ค่าขอบพอดี
+- เมื่อโจทย์ระบุกฎหลายข้อ ให้ทำตามทุกข้อและตามลำดับที่เขียน ห้ามตัดข้อใดทิ้งหรือเพิ่มกฎที่ไม่ได้ระบุ แล้วลองคำนวณตัวอย่างด้วยมือเทียบกับโค้ดทุกข้อ (รวมกรณีค่า 0 ที่ผ่านการตรวจแล้ว)
+
+## 3. CLI ใน solve.py (อ่าน JSON จาก stdin)
+
+ต่อท้าย `solve.py` ให้รันเป็นสคริปต์ได้: อ่าน JSON object จาก stdin ชื่อ key ตรงกับชื่อพารามิเตอร์ของฟังก์ชัน แล้วพิมพ์ JSON หนึ่งบรรทัดลง stdout
+
+- สำเร็จ: พิมพ์ `{"ok": true, "result": <ค่าที่ฟังก์ชันคืน>}` และ exit 0
+- ผิดพลาด (ValueError, JSON เสีย, key ขาด, TypeError): พิมพ์ `{"ok": false, "error": "<ข้อความ>"}` และ exit 2 โดยห้ามมี traceback ออกมา
+
+```python
+import json
+import sys
+
+def main():
+    try:
+        data = json.loads(sys.stdin.read())
+        if not isinstance(data, dict):
+            raise ValueError("input must be a JSON object")
+        result = NAME(**data)   # แทน NAME ด้วยชื่อฟังก์ชันของโจทย์
+    except (ValueError, TypeError, KeyError) as e:
+        print(json.dumps({"ok": False, "error": str(e)}))
+        sys.exit(2)
+    print(json.dumps({"ok": True, "result": result}))
+
+if __name__ == "__main__":
+    main()
+```
+
+ข้อควรระวัง: JSON `4500.0` ถูก parse เป็น float และจะต้องถูกปฏิเสธโดยฟังก์ชัน ส่วน `4500` เป็น int ต้องผ่าน อย่าแปลงชนิดก่อนส่งเข้าฟังก์ชัน
+
+## 4. เขียน test_solve.py ไว้ข้าง solve.py
+
+ต้องมีไฟล์ `test_solve.py` ในโฟลเดอร์เดียวกับ `solve.py` (ใช้ `unittest` หรือ `pytest` ก็ได้ แต่แนะนำ plain `unittest` เพราะไม่ต้องติดตั้งอะไร) ครอบคลุมอย่างน้อย:
+
+- กรณีปกติที่คำนวณมือแล้ว
+- ค่าขอบของทุกเงื่อนไข (ก่อน/พอดี/หลังขอบ)
+- กรณีปัดครึ่งขึ้น
+- กรณี ValueError: ค่านอกช่วง, ค่า 0/ติดลบ, float, bool, ชนิดผิด
+- กรณี CLI: ใช้ `subprocess.run([sys.executable, "solve.py"], input=..., capture_output=True, text=True)` ตรวจ exit code และ JSON ของทั้งกรณี ok และ error
+
+## 5. ขั้นตอนก่อนส่งงาน
+
+1. เขียน `solve.py` (ฟังก์ชัน + ตรวจอินพุต + CLI) และ `test_solve.py`
+2. **รันจริง**: `python3 -m unittest -v test_solve` ต้องผ่านทั้งหมด
+3. ทดลอง CLI ด้วยมือสองกรณี:
+   - `echo '<json ที่ถูกต้อง>' | python3 solve.py` ต้องได้ `{"ok": true, ...}` และ exit 0
+   - `echo '<json ที่ค่าผิด>' | python3 solve.py; echo $?` ต้องได้ `{"ok": false, ...}` และ exit 2 ไม่มี traceback
+4. ตรวจซ้ำว่าครบ: ValueError ทุกพารามิเตอร์ · half up ครั้งเดียวตอนท้าย · ไม่มี float · CLI · test_solve.py

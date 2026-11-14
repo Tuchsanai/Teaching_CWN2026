@@ -1,0 +1,28 @@
+{
+ "ok": true,
+ "tool_calls": 3,
+ "tool_errors": 0,
+ "num_turns": 4,
+ "cost_usd": 0.125,
+ "input_tokens": 8,
+ "cache_read": 101394,
+ "cache_write": 22837,
+ "output_tokens": 2345,
+ "skill_read": true,
+ "credential_touch": 0,
+ "result": "สร้าง `solve.py` และ `test_solve.py` ในโฟลเดอร์ปัจจุบันแล้ว เทสผ่านทั้ง 5 ข้อ และลองรัน CLI ด้วยค่าติดลบ ได้ `{\"ok\": false, ...}` กับ exit 2 ตามที่สกิลกำหนด\n\n- **ตรวจอินพุต:** `paid` ต้องเป็น `int` ตั้งแต่ 0, `used_percent` ต้องเป็น `int` 0–100, `restock` ต้องเป็น `bool`. ค่าที่ผิดช่วงหรือผิดชนิด (รวม `float` และ `bool` ในช่องตัวเลข) จะ raise `ValueError`.\n- **เรียนเกิน 80%:** ถ้า `used_percent > 80` คืน 0. ที่พอดี 80% ยังคืนเงินปกติ.\n- **การคำนวณ:** เงินคืนคิดตามสัดส่วนที่ยังไม่ได้เรียน คือ `paid × (100 − used) / 100`. ถ้า `restock` เป็น True จะคูณ 7/8 เพิ่ม (หัก 12.5%). ทั้งหมดใช้จำนวนเต็ม และปัดครึ่งขึ้นครั้งเดียวตอนท้าย.\n- **CLI:** `python solve.py` อ่าน JSON จาก stdin แล้วพิมพ์ `{\"ok\": true, \"result\": ...}` เมื่อสำเร็จ.\n\nตัวอย่าง: `refund(10000, 50, True)` ได้ 4375 และ `refund(101, 50, True)` ได้ 44 (จาก 44.1875).",
+ "commands": [
+  "Bash {\"command\": \"ls ./skills 2>&1 | head\"}",
+  "Bash {\"command\": \"cat ./skills/solve-py-deliverable/* 2>&1 | head -100\"}",
+  "Bash {\"command\": \"cat > solve.py <<'EOF'\\ndef _int(name, v, lo=None, hi=None):\\n    if isinstance(v, bool) or not isinstance(v, int):\\n        raise ValueError(f\\\"{name} ต้องเป็นจำนวนเต็ม\\\")\\n    if lo is not None and v < lo:\\n        raise ValueError(f\\\"{name} ต้อง >= {lo}\\\")\\n    if hi is not None and v > hi:\\n        raise ValueError(f\\\"{name} ต้อง <= {hi}\\\")\\n    return v\\n\\n\\ndef _bool(name, "
+ ],
+ "task": "x2-refund",
+ "split": "test",
+ "rep": 3,
+ "label": "w2",
+ "account": "yolo1",
+ "model": "sonnet",
+ "effort": "medium",
+ "wall_s": 18.8,
+ "timed_out": false
+}

@@ -289,22 +289,49 @@ def ablation():
     shot(D + "t12-ablation.png", body, 660)
 
 
-# ------------------------------------------------------------------ t13 แผนที่โค้ด
-def code_map():
-    rows = [(INK, "init", "cmd_init()", "สร้าง raw/ wiki/ skills/ ว่าง และ state.json", "บรรทัด 2"),
-            (GATE, "baseline", "cmd_baseline() → rollouts()", "วัด Validation ด้วยชุดสกิลว่าง → R_best", "บรรทัด 3"),
-            (RAW, "rollout", "cmd_rollout() → rollouts() → render_trace()", "Agent ทำโจทย์ Training · เขียน Trace ลง raw/iter-k/", "บรรทัด 8"),
-            (WIKI, "maintain", "cmd_maintain() → sample_traces() → llm() → apply_edits()", "prompts/maintainer.md · แก้ wiki/patterns index log", "บรรทัด 9–10"),
-            (SKILL, "propose", "cmd_propose() → llm(tools=Read) → build_candidate()", "prompts/proposer.md · ได้ proposal.json + candidate/skills", "บรรทัด 11–12"),
-            (GATE, "gate", "cmd_gate() → rollouts()", "วัด Validation · รับ/ย้อนกลับ · เขียน wiki/skill-impact.md", "บรรทัด 13–19"),
-            (INK, "loop", "cmd_loop()", "เรียก rollout → maintain → propose → gate ซ้ำจนจบ", "บรรทัด 4–20")]
-    tr = "".join("""<tr><td style='border-left:14px solid %s;width:170px' class='mono'><b style='font-size:27px'>%s</b></td>
-        <td class='mono' style='font-size:22px;color:#2A6F68;width:610px'>%s</td><td>%s</td><td style='width:170px;color:%s'>%s</td></tr>""" % (
-        c, cmd, fn, what, MUTE, line) for c, cmd, fn, what, line in rows)
-    body = """<h1>จากอัลกอริทึมสู่โค้ด: wikiskill.py</h1>
-    <div class='sub'>1 คำสั่ง = 1 ขั้นของ Algorithm 1 · สถานะของวงรอบเก็บใน <span class='mono'>state.json</span> จึงรันทีละขั้นหรือรันต่อจากที่ค้างได้</div>
-    <table class='t'><tr><th>คำสั่ง</th><th>ฟังก์ชันใน wikiskill.py</th><th>ทำอะไร</th><th>Algorithm 1</th></tr>%s</table>""" % tr
-    shot(D + "t13-code-map.png", body, 850)
+# ------------------------------------------------------------------ t14 กรณีศึกษาของเปเปอร์ (Figure 3 วาดใหม่)
+def case_study():
+    def step(color, it, title, wiki, skill, out, outc):
+        return """<div class='card' style='flex:1;border-top:14px solid %s'>
+          <div style='font-size:24px;color:%s'>%s</div>
+          <div style='font-size:28px;font-weight:800;line-height:1.25'>%s</div>
+          <div style='margin-top:10px;font-size:22px;line-height:1.4'><span class='badge wiki' style='font-size:19px'>Wiki</span> %s</div>
+          <div style='margin-top:8px;font-size:22px;line-height:1.4'><span class='badge skill' style='font-size:19px'>Skill</span> %s</div>
+          <div style='margin-top:12px'><span class='badge' style='background:%s'>%s</span></div></div>""" % (color, MUTE, it, title, wiki, skill, outc, out)
+    cards = arrow().join([
+        step(BAD, "รอบแรก", "เสนอสกิลกว้าง ๆ", "พบ pattern: Agent หยิบของ ดู แล้ววางคืน วนไม่จบ",
+             "เสนอ <span class='mono'>goal-directed-action</span><br>(ให้ทำตามเป้าหมาย)", "REJECTED", BAD),
+        step(GATE, "รอบถัดมา", "เห็นว่าเคยลองแล้วไม่ผ่าน", "<span class='mono'>skill-impact.md</span> มี diff และผลของข้อเสนอแรก",
+             "เสนอ <span class='mono'>break-repetition-loop</span><br>กฎเจาะจง: ห้ามวางของคืนที่เดิม", "ACCEPTED", GATE),
+        step(GATE, "รอบหลัง", "หลักฐานใหม่สะสมเพิ่ม", "pattern ใหม่: วนซ้ำแบบทำหลายอย่างกับของชิ้นเดียว",
+             "แก้สกิลเดิม เพิ่มกฎ:<br>ทำแต่ละอย่างกับของ 1 ชิ้นครั้งเดียว", "ACCEPTED", GATE)])
+    body = """<h1>กรณีศึกษาในเปเปอร์: Wiki ทำให้ข้อเสนอรอบถัดไปดีขึ้นอย่างไร</h1>
+    <div class='sub'>งานบ้านจำลอง ALFWorld · โมเดล Qwen-3.6-27B · วาดใหม่จาก Figure 3 ของเปเปอร์ (ย่อ)</div>
+    <div class='row' style='gap:10px'>%s</div>
+    <div class='card' style='margin-top:18px;border:4px dashed %s;background:#F1FAF8'>
+      <div style='font-size:27px;line-height:1.45'>ข้อเสนอที่ถูกปฏิเสธ <b>ไม่สูญเปล่า</b>: บันทึกของมันทำให้รอบถัดไปเสนอ <b>กฎที่เจาะจงกว่า</b> · pattern ที่สะสมทำให้สกิลถูกปรับต่อได้อีกหลายรอบ</div></div>""" % (cards, WIKI)
+    shot(D + "t14-case-study.png", body, 640)
+
+
+# ------------------------------------------------------------------ t15 พลวัตของสกิลและ Wiki ในเปเปอร์ (Table 4)
+def dynamics():
+    rows = [("Qwen-3.5-4B", 3.1, 1.6, 4.9, 1.3, 126.2, 8.8, 18.4), ("Qwen-3.5-9B", 4.6, 1.4, 3.4, 0.7, 128.6, 7.3, 10.9),
+            ("Qwen-3.6-27B", 4.4, 1.5, 3.6, 0.8, 118.9, 6.5, 17.9), ("Gemma-4-31B", 4.8, 1.3, 3.2, 0.8, 45.1, 6.3, 13.7),
+            ("Gemini-3.5-Flash", 2.3, 1.2, 5.7, 1.1, 81.2, 8.9, 7.0)]
+    tr = ""
+    for m, cp, ca, ep, ea, ln, wc, we in rows:
+        prop, acc = cp + ep, ca + ea
+        bar = "<div style='width:%dpx;height:26px;background:%s;border-radius:6px;position:relative'><div style='width:%dpx;height:26px;background:%s;border-radius:6px'></div></div>" % (
+            prop * 34, "#F3C9BE", acc * 34, GATE)
+        tr += """<tr><td style='border-left:14px solid %s;font-weight:800;width:250px'>%s</td>
+          <td style='width:330px'>%s</td><td style='width:230px'>เสนอ <b>%.1f</b> · รับ <b>%.1f</b></td>
+          <td style='width:170px'>%.0f บรรทัด</td><td>สร้าง <b>%.1f</b> · แก้ <b>%.1f</b> (เก็บทั้งหมด)</td></tr>""" % (INK, m, bar, prop, acc, ln, wc, we)
+    body = """<h1>ในเปเปอร์: ข้อเสนอส่วนใหญ่ถูกปฏิเสธ แต่ Wiki โตทุกรอบ</h1>
+    <div class='sub'>ค่าเฉลี่ยต่อการรัน 8 รอบ ของแต่ละโมเดล (ทุก Benchmark) · คัดจาก Table 4 ของเปเปอร์ ·
+      <span class='badge' style='background:#F3C9BE;color:#4A2F1F'>ข้อเสนอทั้งหมด</span> <span class='badge gate'>ที่ผ่าน Gate</span></div>
+    <table class='t'><tr><th>โมเดลที่ทำโจทย์</th><th>ข้อเสนอแก้สกิล (สร้าง + แก้)</th><th></th><th>ความยาวสกิล</th><th>pattern ใน Wiki</th></tr>%s</table>
+    <div class='note' style='margin-top:10px'>ข้อเสนอ 8 ครั้งผ่าน Gate ราว 2–3 ครั้ง · ส่วนที่เหลือถูกย้อนกลับ แต่ความรู้ของทุกรอบยังอยู่ใน Wiki</div>""" % tr
+    shot(D + "t15-dynamics.png", body, 640)
 
 
 # ------------------------------------------------------------------ d00 เรื่องทั้งหมดในภาพเดียว (README หลัก)
@@ -323,6 +350,6 @@ def story():
 
 if __name__ == "__main__":
     which = sys.argv[1:] or ["story", "loop", "problem", "layers", "roles", "iteration", "algorithm", "no_wiki_for_agent", "disclosure",
-                             "methods", "paper_results", "ablation", "code_map"]
+                             "methods", "paper_results", "ablation"]
     for w in which:
         globals()[w]()

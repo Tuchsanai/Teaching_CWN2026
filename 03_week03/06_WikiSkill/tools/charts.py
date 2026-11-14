@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """วาดกราฟผลจริงของบทนี้เป็น PNG ลง img/
 
-  python tools/charts.py            (รันบนเครื่อง จากโฟลเดอร์ของบท หลัง bash tools/pull.sh)
+  python tools/charts.py            (รันบนเครื่อง จากโฟลเดอร์ของบท หลังเก็บผลของ LAB ลง runs/)
 
-ตัวเลขทุกตัวอ่านจาก runs/<workspace>/state.json และ results/results.json ไม่มีค่าที่พิมพ์เอง
+ตัวเลขทุกตัวอ่านจาก runs/<workspace>/state.json และ runs/results.json (คำสั่ง report ของ skill-optimizer) ไม่มีค่าที่พิมพ์เอง
 """
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from draw import ROOT, RAW, WIKI, SKILL, GATE, BAD, INK, MUTE, LINE, shot
 
-R = json.load(open(os.path.join(ROOT, "results", "results.json"), encoding="utf-8"))
+R = json.load(open(os.path.join(ROOT, "runs", "results.json"), encoding="utf-8"))
 
 
 def state(ws):
@@ -74,24 +74,27 @@ def path(ws, out, title, sub):
 def compare(labels, out, title, sub):
     """labels = [(ป้ายใน results.json, ชื่อที่แสดง, คำอธิบาย, สี)]"""
     cols = ""
+    many = len(labels) > 5                              # หลายชุด: แท่งแคบลงและตัวอักษรเล็กลงให้พอดีความกว้าง
+    bw, fs = (46, 19) if many else (78, 23)
     for lb, name, note, color in labels:
         r = R[lb]
         bars = ""
         for sp, c in (("train", RAW), ("val", SKILL), ("test", WIKI)):
             s = r[sp]
             if not s["n"]:
-                bars += "<div style='width:78px'></div>"
+                bars += "<div style='width:%dpx'></div>" % bw
                 continue
-            bars += """<div style='width:78px;height:%.0fpx;background:%s;border-radius:10px 10px 0 0;position:relative'>
-              <span style='position:absolute;top:-32px;left:-6px;width:90px;text-align:center;font-size:23px;font-weight:700;color:%s'>%.1f</span></div>""" % (
-                s["score"] * 330, c, INK, s["score"] * 100)
+            bars += """<div style='width:%dpx;height:%.0fpx;background:%s;border-radius:10px 10px 0 0;position:relative'>
+              <span style='position:absolute;top:-30px;left:-8px;width:%dpx;text-align:center;font-size:%dpx;font-weight:700;color:%s'>%s</span></div>""" % (
+                bw, s["score"] * 330, c, bw + 16, fs, INK, ("%.0f" if many and s["score"] >= 0.9995 else "%.1f") % (s["score"] * 100))
         a = r["all"]
         cols += """<div style='flex:1;display:flex;flex-direction:column;align-items:center'>
-          <div style='height:380px;display:flex;align-items:flex-end;gap:10px;border-bottom:4px solid %s;padding:0 8px'>%s</div>
+          <div style='height:380px;display:flex;align-items:flex-end;gap:%dpx;border-bottom:4px solid %s;padding:0 6px'>%s</div>
           <div style='font-size:26px;font-weight:800;color:%s;margin-top:10px;border-bottom:8px solid %s;padding-bottom:2px;white-space:nowrap'>%s</div>
-          <div style='font-size:21px;color:%s;margin-top:6px;text-align:center;line-height:1.3;white-space:nowrap'>%s</div>
-          <div style='font-size:23px;margin-top:8px;text-align:center;line-height:1.4;white-space:nowrap'>ผ่านครบ <b>%d/%d</b> Trial<br><b>%s</b> โทเคนต่อ Trial</div></div>""" % (
-            INK, bars, INK, color, name, MUTE, note, a["perfect"], a["n"], format(a["context_tokens"], ","))
+          <div style='font-size:%dpx;color:%s;margin-top:6px;text-align:center;line-height:1.3;white-space:nowrap'>%s</div>
+          <div style='font-size:%dpx;margin-top:8px;text-align:center;line-height:1.4;white-space:nowrap'>ผ่านครบ <b>%d/%d</b>%s<br><b>%s</b> โทเคน%s</div></div>""" % (
+            16 if many else 10, INK, bars, INK, color, name, 18 if many else 21, MUTE, note, 20 if many else 23, a["perfect"], a["n"],
+            "" if many else " Trial", format(a["context_tokens"], ","), "" if many else "ต่อ Trial")
     body = """<h1>%s</h1><div class='sub'>%s ·
       <span class='badge raw'>Training</span> <span class='badge skill'>Validation</span> <span class='badge wiki'>Test (ไม่เคยถูกใช้ปรับสกิล)</span></div>
     <div class='row' style='gap:12px;margin-top:36px'>%s</div>""" % (title, sub, cols)

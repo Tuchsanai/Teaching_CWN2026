@@ -1,0 +1,95 @@
+{
+ "cfg": {
+  "name": "n1",
+  "skillopt": "/root/ai-accounts/.Claude/shared/skills/skill-optimizer/scripts/skillopt.py",
+  "accounts": [
+   "yolo1",
+   "yolo2",
+   "yolo3"
+  ],
+  "iters": 8,
+  "reps": 3,
+  "par": 6,
+  "model": "sonnet",
+  "effort": "medium",
+  "opt_model": "sonnet",
+  "opt_effort": "high",
+  "task_desc": "เขียนฟังก์ชัน Python สำหรับคิดเงินของร้านกาแฟ BaanKafe (ตัวตรวจอัตโนมัติให้คะแนนผลงาน)",
+  "use_wiki": false
+ },
+ "k": 1,
+ "phase": "gate",
+ "r_best": 1.0,
+ "history": [
+  {
+   "k": 1,
+   "skills_in": [],
+   "train_score": 0.462875,
+   "train_perfect": 0,
+   "train_n": 12,
+   "train_checks": {
+    "contract": "12/12",
+    "basic": "12/12",
+    "half_up": "8/9",
+    "no_drift": "12/12",
+    "boundary": "12/12",
+    "reject_value": "1/12",
+    "reject_type": "0/12",
+    "cli_ok": "0/12",
+    "cli_error": "0/12",
+    "tests": "0/12",
+    "policy": "0/6"
+   },
+   "train": {
+    "trials": 12,
+    "cost_usd": 1.037,
+    "context_tokens": 86925,
+    "tool_calls": 2.08,
+    "skill_read": 7
+   },
+   "proposal": {
+    "action": "create",
+    "name": "billing-function-contract",
+    "rationale": "ทั้ง 12 Trace (เปิดดู t1-cafe-bill-r1, t2-split-bill-r3, t3-shipping-fee-r3, t4-cashback-r1) ตกซ้ำที่ reject_type, reject_value, cli_ok, cli_error และ tests เพราะไม่มีสกิลและ Agent เขียนแค่ฟังก์ชันสูตรโดยไม่ทำ input validation, CLI JSON หรือ test_solve.py; สกิลใหม่นี้ระบุสัญญาทั้งหมดและขั้นตอนรันตรวจก่อนส่ง รวมทั้งกำหนด half up เพื่อแก้ half_up ที่ตกใน t2-split-bill-r3"
+   },
+   "proposer": {
+    "attempts": 1,
+    "reads": [
+     "traces/t1-cafe-bill-r1.md",
+     "traces/t2-split-bill-r3.md",
+     "traces/t3-shipping-fee-r3.md",
+     "traces/t4-cashback-r1.md"
+    ],
+    "traces_read": 4,
+    "patterns_read": 0,
+    "calls": 5,
+    "cost_usd": 0.1476,
+    "wall_s": 39.4,
+    "context_tokens": 34468
+   },
+   "val_score": 1.0,
+   "r_best_before": 0.43333333333333335,
+   "accepted": true,
+   "outcome": "ACCEPTED",
+   "r_best_after": 1.0,
+   "skills_out": [
+    "billing-function-contract"
+   ],
+   "val": {
+    "trials": 6,
+    "cost_usd": 0.767,
+    "context_tokens": 130688,
+    "tool_calls": 3.17,
+    "skill_read": 6
+   }
+  }
+ ],
+ "baseline": {
+  "trials": 6,
+  "cost_usd": 0.546,
+  "context_tokens": 94376,
+  "tool_calls": 2.83,
+  "skill_read": 4,
+  "val_score": 0.43333333333333335
+ }
+}

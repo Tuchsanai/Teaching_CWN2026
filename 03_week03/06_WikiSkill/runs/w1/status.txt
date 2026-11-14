@@ -1,0 +1,11 @@
+
+workspace w1 · โมเดลที่ทำโจทย์ sonnet/medium · โมเดลของ Maintainer และ Proposer sonnet/high · wiki: ใช้
+Baseline Validation (ชุดสกิลว่าง): 45.0% · R_best ตอนนี้: 100.0% · สกิลที่ใช้งาน: solve-py-contract
+
+| รอบ | Training (สกิลก่อนแก้) | pattern ใหม่ | pattern ที่แก้ | pattern รวม | Proposer อ่าน (pattern/Trace) | ข้อเสนอ | Validation | R_best ก่อน | ผล |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 46.4% (0/12) | 6 | 0 | 6 | 2/4 | create `solve-py-contract` | 93.3% | 45.0% | ACCEPTED |
+| 2 | 89.5% (2/12) | 1 | 6 | 7 | 1/4 | patch `solve-py-contract` | 100.0% | 93.3% | ACCEPTED |
+
+รวม: Trial ของ Inference Agent 42 ครั้ง ($4.73) · การเรียกโมเดลของ Maintainer + Proposer 16 ครั้ง ($1.14)
+สถานะ: หยุดแล้ว เพราะ R_best = 100% ที่รอบ 2 (หยุดก่อนครบ 8 รอบ)
