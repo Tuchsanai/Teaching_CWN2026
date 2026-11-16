@@ -302,7 +302,7 @@ def build():
         "lab" if "LAB" in p["name"] else "", p["name"], md(p["do"]),
         "".join('<div class="secbox"><b>%s</b><span>%s</span></div>' % (md(a), md(b)) for a, b in p["secs"])) for p in parts)
     add(S("บทนี้แบ่งเป็น 2 ภาค 4 ส่วน", '<div class="road">%s</div>' % road + note(
-        "ทฤษฎีจากงานวิจัยต้นทาง (SkillOpt) อ่านเพิ่มได้ที่ [`01_theory/README.md`](01_theory/README.md) · รายละเอียดเต็มของทุกหัวข้ออยู่ใน [`README.md`](README.md)",
+        "รายละเอียดเต็มของทุกหัวข้ออยู่ใน [`README.md`](README.md)",
         "info"), cls="mid"))
     add(S("วิธีใช้สไลด์นี้", cards([
         ("ไปหน้าถัดไป / ก่อนหน้า", '<p><span class="kbd">→</span> <span class="kbd">Space</span> / <span class="kbd">←</span> หรือปุ่มมุมขวาล่าง</p>'),
@@ -315,8 +315,8 @@ def build():
 
     # ===== ภาคทฤษฎี
     CTX.update(kicker="", group="ภาคทฤษฎี")
-    alert = next(b for b in sec("ภาคทฤษฎี") if b["t"] == "alert")
-    add(E.divider("ภาคทฤษฎี", "โจทย์ และวิธีปรับสกิล", "".join(E.render(x) for x in alert["blocks"]), "img/s01-theory.jpg"))
+    add(E.divider("ภาคทฤษฎี", "โจทย์ และวิธีปรับสกิล",
+                  "<p>1 · โจทย์และข้อกำหนดของร้าน · 2 · วิธีปรับสกิล</p>", "img/s01-theory.jpg"))
 
     # ----- 1 · โจทย์
     CTX.update(kicker="ภาคทฤษฎี · 1 · โจทย์และข้อกำหนดของร้าน", group="ภาคทฤษฎี · 1 · โจทย์และข้อกำหนดของร้าน")
@@ -552,7 +552,7 @@ def build():
                   '<a href="../06_WikiSkill/README.md" target="_blank">../06_WikiSkill/README.md</a></p>'
                   '<p>รายละเอียดเต็มของบทนี้: <a href="README.md" target="_blank">README.md</a> · รูปแบบของเครื่องมือ: '
                   '<a href="skillopt_format.md" target="_blank">skillopt_format.md</a> · ทฤษฎีต้นทาง (SkillOpt): '
-                  '<a href="01_theory/README.md" target="_blank">01_theory/README.md</a> · <a href="01_theory/SkillOpt_Theory_Slides.html" target="_blank">สไลด์ของทฤษฎี</a></p>', "img/s05-summary.jpg"))
+                  '<a href="01_theory/README.md" target="_blank">01_theory/README.md</a></p>', "img/s05-summary.jpg"))
     return E.SL
 
 
