@@ -150,10 +150,8 @@ CHECKS = {
         "items": [
             "มีโฟลเดอร์ `Teaching/my-skill-optimizer/` และมีไฟล์ครบ: `SKILL.md` · `scripts/skillopt.py` · `references/source.md` · `references/suite.md` · `references/issues.md`",
             "`scripts/skillopt.py` มีครบ 7 คำสั่ง: `lint` `run` `grade` `report` `failures` `null` `gate`",
-            "`references/source.md` มีตาราง ส่วนของสกิล | มาจากข้อไหนของเปเปอร์ | เหมือนหรือต่าง",
-            "รายงานมีผลทดสอบ `gate` 5 คู่ (`noskill` → `v0` → `v1` → `v2` → `v3` → `v4`) และตัดสินตรงกับ `runs/<รุ่นใหม่>/gate.txt` ทุกคู่",
         ],
-        "ref": "ผลของผู้สอน: ใช้ 14 นาที · ไม่เรียกโมเดล · `gate` ตรงทุกตัวอักษร (ACCEPT 4 คู่ · REJECT 1 คู่) · `null` `lint` `report` ตรงกับไฟล์ที่เก็บไว้",
+        "ref": "ผลของผู้สอน: ใช้ 14 นาที · ได้โฟลเดอร์ `my-skill-optimizer/` 5 ไฟล์",
         "note": "เครื่องมือที่สร้างเองไม่ต้องเหมือนใครทุกบรรทัด สิ่งที่ต้องตรงคือ **รูปแบบ** และ **ผลตัดสิน**",
     },
     "ขั้น 0.2": {
@@ -473,10 +471,11 @@ def build():
             "ทำบนเครื่อง ไม่ใช้ container · ที่มา: เปเปอร์ SkillOpt · รูปแบบ: [`skillopt_format.md`](skillopt_format.md)"))
     add(E.prompt_slides(prompt("ขั้น 0.1"), CTX["kicker"], t01))
     add(check("ขั้น 0.1", t01))
-    ft, tt = table("ขั้น 0.1", "ไฟล์ที่ได้ใน"), table("ขั้น 0.1", "ทดสอบกับผลเดิม")
-    add(S("ผลจริงขั้น 0.1: ได้เครื่องมือ 5 ไฟล์", cards(
-        [("%s · %s บรรทัด" % (r[0], r[1]), r[2]) for r in ft["rows"]] +
-        [("ทดสอบกับผลเดิมใน `runs/`", "<ul>%s</ul>" % "".join("<li>%s: %s</li>" % (md(r[0]), md(r[1])) for r in tt["rows"]), "ok")], 3) +
+    ft = table("ขั้น 0.1", "ไฟล์ที่ได้ใน")
+    add(fig("ผลจริงขั้น 0.1: ได้โฟลเดอร์ `my-skill-optimizer/`", "img/d10-lab0-folder.png",
+            "ซ้าย: ไฟล์ 5 ไฟล์ที่ได้ · ขวา: ต้นไฟล์ `SKILL.md` ที่ AI ใช้ทำตาม"))
+    add(S("ผลจริงขั้น 0.1: ไฟล์ 5 ไฟล์ทำหน้าที่อะไร", cards(
+        [("%s · %s บรรทัด" % (r[0], r[1]), r[2]) for r in ft["rows"]], 3) +
         note(eye("ขั้น 0.1")), tag="ผลของผู้สอน"))
     t02 = "ขั้น 0.2 · ติดตั้งเครื่องมือ และตรวจตัวตรวจ"
     add(nfig("n14-lab0-setup"))
