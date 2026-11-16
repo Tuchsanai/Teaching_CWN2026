@@ -14,26 +14,18 @@
 import os, sys
 
 FIGS = [
-    {"img": "n01-glossary", "at": ("details", "คำที่ใช้ตลอดบท"), "title": "คำที่ใช้ตลอดบท",
-     "labels": ["1 สกิล", "SKILL.md", "2 Agent", "AI ที่เขียนโค้ด", "3 ตัวตรวจ", "Grader", "4 Trial", "เขียน 1 ครั้ง + ตรวจ 1 ครั้ง", "5 รุ่น", "v0 → v1 → v2"],
-     "scene": "Five numbered panels in a row connected by arrows: (1) a paper document; (2) the small AI robot typing on a laptop; "
-              "(3) a second robot with a magnifying glass and a checklist; (4) a stopwatch-like badge showing one write plus one check; "
-              "(5) three folders in a row.",
-     "steps": ["**สกิล** (`SKILL.md`): ไฟล์ข้อความ 1 ไฟล์ เขียนข้อกำหนดของร้านเป็นภาษาคน",
-               "**Agent**: AI ที่ได้โจทย์ 1 ข้อกับสกิล แล้วเขียน `solve.py` เอง",
-               "**ตัวตรวจ** (Grader): โปรแกรมที่รันโค้ดของ Agent แล้วตรวจทีละข้อ",
-               "**Trial**: Agent เขียนโค้ด 1 ครั้ง และตัวตรวจให้คะแนน 1 ครั้ง",
-               "**รุ่น**: แก้สกิล 1 ครั้ง ได้สกิลรุ่นใหม่ 1 รุ่น ชื่อ `v0` `v1` `v2` …"]},
-    {"img": "n02-rules", "at": ("lead", "กติกาของโจทย์"), "title": "กติกาของโจทย์",
-     "labels": ["ทำได้", "แก้ SKILL.md", "ให้ Claude Code ช่วยหาสาเหตุ", "ดูข้อที่ผิดของงาน 1–4",
-                "ห้ามทำ", "แก้โค้ดของ Agent", "แก้โจทย์หรือตัวตรวจ", "ดูข้อที่ผิดของงาน 5–6"],
-     "scene": "Two columns. Left column with a green header and three green check-mark rows. Right column with a red header and three "
-              "red cross rows. A barista points to the left column; the AI robot stands between the columns.",
-     "steps": ["แก้ได้อย่างเดียวคือ `SKILL.md` · ให้ Claude Code ช่วยหาสาเหตุและเสนอจุดแก้ได้",
-               "ห้ามแก้โค้ดที่ Agent เขียน: แก้โค้ดได้ผลกับงานนั้นงานเดียว · แก้สกิลได้ผลกับทุกงานที่ AI จะเขียนต่อไป",
-               "ห้ามแก้โจทย์ หรือแก้ตัวตรวจ",
-               "งาน 1–4 เปิดดูข้อที่ผิดได้ · งาน 5–6 ดูได้แค่คะแนนรวม",
-               "เป้าหมาย: ทุกงานผ่านครบทุกข้อตรวจ ทุกครั้งที่ให้ Agent เขียน"]},
+    {"img": "n23-three-parts", "at": ("section", "1.1"), "title": "3 ส่วนของโจทย์",
+     "labels": ["1 ร้าน", "บอกโจทย์ (Requirement)", "2 AI (Agent)", "อ่านโจทย์ → เขียน solve.py",
+                "3 ตัวตรวจ (Grader)", "suite/grade.py", "ข้อกำหนดที่ระบุชัด", "ความรู้แฝงของทีม", "คะแนน 0–1"],
+     "scene": "Three numbered stations from left to right, joined by thick arrows. (1) A barista at the counter holds up a paper "
+              "requirement sheet. (2) The small AI robot reads the sheet and types on a laptop; a code file comes out. "
+              "(3) A grader machine (a desk computer with a magnifying glass and a checklist) takes the code file in. Above the "
+              "grader, two labelled folders feed into it: one shows the same requirement sheet, the other a team notebook with a "
+              "lock. A score badge comes out of the grader on the right.",
+     "steps": ["**ร้าน** บอกโจทย์ (Requirement): ต้องการให้คิดเงินอย่างไร",
+               "**AI** (Agent) อ่านโจทย์ แล้วเขียนโค้ด 1 ฟังก์ชันในไฟล์ `solve.py`",
+               "**ตัวตรวจ** (Grader) คือโปรแกรม `suite/grade.py` รู้ข้อกำหนดของร้านครบทั้ง 2 ประเภท",
+               "ตัวตรวจรันโค้ดที่ AI เขียนกับ Input ที่ซ่อนไว้ แล้วให้คะแนนตามจำนวนข้อที่ผ่าน"]},
     {"img": "n03-std1-integer", "at": ("h5", "ข้อ 1"), "title": "ข้อ 1 · ค่าเงินเป็นจำนวนเต็ม",
      "labels": ["ราคา 45.30 บาท", "ถูก", "4530 สตางค์", "int", "ผิด", "45.3", "float", "100 สตางค์ = 1 บาท"],
      "scene": "A latte with a price tag in the centre. An arrow to the left leads to a green card with a neat stack of coins. "
