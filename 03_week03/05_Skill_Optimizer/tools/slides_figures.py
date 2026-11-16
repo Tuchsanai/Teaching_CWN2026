@@ -83,7 +83,21 @@ FIGS = [
                "สกิล `money-coder` เปลี่ยนความรู้แฝงของทีมให้เป็นข้อกำหนดที่ระบุชัด (Externalization)",
                "AI อ่านสกิลก่อนเขียนโค้ดทุกครั้ง",
                "ตัวตรวจแปลงข้อกำหนดทั้ง 2 ประเภทเป็นข้อตรวจ 11 แบบ · ผ่านครบทุกข้อ = โค้ดถูกทั้งสองประเภท"]},
-    {"img": "n10-cashback-steps", "at": ("lead", "ค · ลองคิดด้วยมือ"), "title": "cashback คิดอย่างไร",
+    {"img": "n24-cashback-task", "at": ("lead", "ก · ใบโจทย์"), "title": "ใบโจทย์ · เงินคืนสมาชิก",
+     "labels": ["cashback(amount, tier, birthday)", "Input", "amount = ยอดซื้อ (สตางค์)", "tier = silver · gold · platinum",
+                "birthday = ซื้อในเดือนเกิด", "1 อัตรา 1.5% · 2.5% · 4%", "2 ต่ำกว่า 100 บาท ได้ 0", "3 เดือนเกิด × 2",
+                "4 สูงสุด 200 บาท", "Output", "เงินคืน (สตางค์)"],
+     "scene": "One large paper task sheet pinned on the coffee-shop counter, laid out top to bottom like a form. Top: the function "
+              "name in a monospace code strip. Middle-left: an 'Input' box with three rows, each with a small icon (a receipt, three "
+              "member cards in silver, gold and platinum colours, a birthday cake). Middle-right: four numbered condition rows, each "
+              "with a small icon (a percent tag, a small coin with a stop sign, a x2 badge, a ceiling bar). Bottom: an 'Output' box "
+              "with a coin purse. The small AI robot reads the sheet from the side.",
+     "steps": ["**Input** 3 ตัว: `amount` ยอดซื้อ (สตางค์) · `tier` ระดับบัตร · `birthday` ซื้อในเดือนเกิดหรือไม่",
+               "อัตราเงินคืน: silver 1.5% · gold 2.5% · platinum 4%",
+               "ยอดซื้อต่ำกว่า 100 บาท ไม่ได้เงินคืน · เดือนเกิดได้ 2 เท่า · สูงสุด 200 บาทต่อบิล",
+               "**Output**: เงินคืนเป็นจำนวนเต็มสตางค์ เช่น `500` = 5 บาท",
+               "ทั้งหมดนี้คือข้อกำหนดที่ระบุชัด · ไม่มีความรู้แฝงของทีมอยู่ในใบโจทย์"]},
+    {"img": "n10-cashback-steps", "at": ("lead", "ข · ลองคิดด้วยมือ"), "title": "cashback คิดอย่างไร",
      "labels": ["1 ยอดซื้อถึง 100 บาท?", "2 × อัตราตามระดับ", "silver 1.5% · gold 2.5% · platinum 4%", "3 เดือนเกิด × 2",
                 "เฉพาะ gold และ platinum", "4 ปัดลงเป็นสตางค์", "5 ไม่เกิน 200 บาท", "ความรู้แฝง"],
      "scene": "Five numbered steps along a winding path from a receipt to a coin purse. Steps 3 and 4 each carry a small orange tag "

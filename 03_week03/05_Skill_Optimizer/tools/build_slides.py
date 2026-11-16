@@ -344,10 +344,12 @@ def build():
     add(nfig("n09-skill-role"))
     add(fig("วิธีทำ: ทดลองเป็นรอบ", "img/g21-one-round.png",
             "เราไม่รู้ล่วงหน้าว่าเขียนสกิลแบบไหน Agent จึงจะทำตาม จึงต้อง **แก้สกิล ให้ Agent เขียนจริง แล้ววัด**"))
-    add(code("ตัวอย่างงาน 1 ชิ้น: โจทย์ `cashback` ที่ Agent ได้รับ", codes("1.3")[0]["text"],
+    add(nfig("n24-cashback-task"))
+    add(code("ข้อความจริงที่ Agent ได้รับ (ตรงตัวอักษรจาก `suite/suite.json`)", codes("1.3")[0]["text"],
              post=note("นี่คือข้อกำหนดที่ระบุชัดทั้งหมดของงานนี้ · ไม่มีความรู้แฝงของทีมอยู่ในนี้")))
     add(nfig("n10-cashback-steps"))
-    add(tbl("ลองคิดด้วยมือ 5 กรณี", table("1.3", "#"),
+    hand = next(b for b in E.walk(sec("1.3")) if b["t"] == "table" and len(b["head"]) > 1 and E.plain(b["head"][1]).startswith("เรียกฟังก์ชัน"))
+    add(tbl("ลองคิดด้วยมือ 5 กรณี", hand,
             post=note("กรณี 1–2 ตอบได้จากโจทย์อย่างเดียว · กรณี 3–5 โจทย์ไม่ได้บอก ต้องรู้ความรู้แฝงของทีม")))
     add(nfig("n11-deliverables"))
     add(code("งานที่ถูกข้อกำหนด ใช้ได้ครบ 3 แบบ", codes("1.4")[0]["text"],
