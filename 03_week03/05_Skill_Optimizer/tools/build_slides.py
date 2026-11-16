@@ -344,13 +344,13 @@ def build():
     add(nfig("n09-skill-role"))
     add(fig("วิธีทำ: ทดลองเป็นรอบ", "img/g21-one-round.png",
             "เราไม่รู้ล่วงหน้าว่าเขียนสกิลแบบไหน Agent จึงจะทำตาม จึงต้อง **แก้สกิล ให้ Agent เขียนจริง แล้ววัด**"))
-    add(code("ตัวอย่างงาน 1 ชิ้น: โจทย์ `cashback` ที่ Agent ได้รับ", codes("1.4")[0]["text"],
+    add(code("ตัวอย่างงาน 1 ชิ้น: โจทย์ `cashback` ที่ Agent ได้รับ", codes("1.3")[0]["text"],
              post=note("นี่คือข้อกำหนดที่ระบุชัดทั้งหมดของงานนี้ · ไม่มีความรู้แฝงของทีมอยู่ในนี้")))
     add(nfig("n10-cashback-steps"))
-    add(tbl("ลองคิดด้วยมือ 5 กรณี", table("1.4", "#"),
+    add(tbl("ลองคิดด้วยมือ 5 กรณี", table("1.3", "#"),
             post=note("กรณี 1–2 ตอบได้จากโจทย์อย่างเดียว · กรณี 3–5 โจทย์ไม่ได้บอก ต้องรู้ความรู้แฝงของทีม")))
     add(nfig("n11-deliverables"))
-    add(code("งานที่ถูกข้อกำหนด ใช้ได้ครบ 3 แบบ", codes("1.5")[0]["text"],
+    add(code("งานที่ถูกข้อกำหนด ใช้ได้ครบ 3 แบบ", codes("1.4")[0]["text"],
              post='<p class="cap">ผลข้างบนรันจากเฉลยอ้างอิง <a href="suite/ref/t4-cashback/solve.py" target="_blank"><code>suite/ref/t4-cashback/</code></a></p>'))
     add(fig("แบบไหนถูก แบบไหนผิด: ทุกกรณีของ `cashback`", "img/d03-examples.png",
             "ช่อง \"Output ที่ผิด\" คือคำตอบที่ Agent เคยตอบจริง · คลิกภาพเพื่อขยาย"))

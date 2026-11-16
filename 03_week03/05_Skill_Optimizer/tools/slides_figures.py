@@ -93,7 +93,7 @@ FIGS = [
                "เดือนเกิดได้ 2 เท่า **เฉพาะ gold และ platinum** (นโยบาย C1 · โจทย์ไม่ได้บอก)",
                "เศษสตางค์ **ปัดลง** เพราะเป็นเงินที่ร้านจ่ายออก (นโยบาย C2 · โจทย์ไม่ได้บอก)",
                "เงินคืนสูงสุด 200 บาทต่อบิล"]},
-    {"img": "n11-deliverables", "at": ("section", "1.5 Agent ต้องส่งอะไร"), "title": "Agent ต้องส่งอะไร",
+    {"img": "n11-deliverables", "at": ("section", "1.4 Agent ต้องส่งอะไร"), "title": "Agent ต้องส่งอะไร",
      "labels": ["ส่ง 2 ไฟล์", "solve.py", "test_solve.py", "ใช้ได้ 3 แบบ", "1 เรียกจากโค้ด Python", "2 รันเป็นโปรแกรม",
                 "JSON เข้า → JSON ออก", "3 รันเทสต์", "unittest"],
      "scene": "Left: the AI robot hands over two file cards. Right: three numbered cards stacked vertically, each with an icon "
