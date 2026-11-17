@@ -36,6 +36,18 @@
 
 ![เว็บ Next.js และ PostgreSQL บนเครื่องเรา ส่งรูปหน้างานพร้อม API key ไปยัง AI server บนเครื่องเช่า แล้วรับกรอบ คลาส และ Confidence กลับมา](image/lab1-system.png)
 
+## รู้จักโมเดลที่ใช้
+
+![รู้จักโมเดล YOLO11s: Input คือภาพ 1 รูป Output คือกรอบ คลาส และ Confidence เป็นโมเดล Object Detection ขนาด 9.4 ล้าน parameter ของ Ultralytics ที่เทรนมาก่อนบน COCO 80 คลาส](image/model-yolo11s.png)
+
+| หัวข้อ | YOLO11s |
+|---|---|
+| ประเภท | Object Detection |
+| Input | ภาพ 1 รูป (ย่อเป็น 640 × 640) |
+| Output | รายการกรอบ แต่ละกรอบมีพิกัด คลาส และ Confidence |
+| ขนาด | 9.4 ล้าน parameter · ไฟล์ประมาณ 19 MB |
+| ที่มา | [Ultralytics](https://docs.ultralytics.com/models/yolo11/) · เทรนมาก่อนบน COCO 80 คลาส · ตัว `s` คือรุ่น small |
+
 ## การทดลอง
 
 | หัวข้อ | รายละเอียด |

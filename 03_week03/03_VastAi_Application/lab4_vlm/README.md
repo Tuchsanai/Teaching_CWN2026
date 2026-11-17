@@ -32,6 +32,19 @@
 
 ![เว็บ Next.js และ PostgreSQL บนเครื่องเรา ส่งภาพใบเสร็จพร้อม API key ไปยัง vLLM บนเครื่องเช่า แล้วรับ JSON กลับมา](image/lab4-system.png)
 
+## รู้จักโมเดลที่ใช้
+
+![รู้จักโมเดล Qwen3-VL-2B-Instruct: Input คือภาพและคำสั่ง ผ่าน Vision Encoder และ Language Model ได้ Output เป็นข้อความเช่น JSON ขนาด 2.1 พันล้าน parameter ของ Alibaba](image/model-qwen3vl.png)
+
+| หัวข้อ | Qwen3-VL-2B-Instruct |
+|---|---|
+| ประเภท | Vision-Language Model (VLM) |
+| Input | ภาพ + คำสั่ง (Prompt) |
+| Output | ข้อความ · LAB นี้สั่งให้ตอบเป็น JSON |
+| โครงสร้าง | Vision Encoder แปลงภาพเป็นตัวเลข → Language Model เขียนคำตอบ |
+| ขนาด | 2.1 พันล้าน parameter · ไฟล์ประมาณ 4.3 GB · รันบน GPU 1 ใบได้ |
+| ที่มา | [Qwen (Alibaba)](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct) · `Instruct` คือรุ่นที่ฝึกมาให้ทำตามคำสั่ง |
+
 ## การทดลอง
 
 | หัวข้อ | รายละเอียด |
