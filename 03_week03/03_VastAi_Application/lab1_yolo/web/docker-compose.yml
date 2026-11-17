@@ -1,0 +1,46 @@
+# เว็บตรวจความปลอดภัยหน้างาน (LAB 1)
+# ทดสอบแบบ mock (ไม่ต้องมี GPU):  docker compose --profile mock up -d --build
+# ต่อ AI server บน Vast.ai จริง:   คัดลอก yolo.env มาเป็นไฟล์ .env ในโฟลเดอร์นี้ แล้ว docker compose up -d --build
+
+name: vapp-lab1
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ppe
+      POSTGRES_PASSWORD: ppe_pw
+      POSTGRES_DB: ppe_inspect
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ppe -d ppe_inspect"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://ppe:ppe_pw@db:5432/ppe_inspect
+      YOLO_BASE_URL: ${YOLO_BASE_URL:-http://mock-yolo:8000}
+      YOLO_API_KEY: ${YOLO_API_KEY:-mock-key}
+      YOLO_MODEL: ${YOLO_MODEL:-mock-ppe}
+      TZ: Asia/Bangkok
+    ports:
+      - "3401:3000"
+
+  mock-yolo:
+    build: ./mock-yolo
+    profiles: ["mock"]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
