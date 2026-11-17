@@ -1,0 +1,260 @@
+{
+  "dataset": {
+    "name": "construction-site-safety v28 (Roboflow Universe, CC BY 4.0)",
+    "train": 2605,
+    "valid": 114,
+    "test": 82,
+    "classes": [
+      "Hardhat",
+      "Mask",
+      "NO-Hardhat",
+      "NO-Mask",
+      "NO-Safety Vest",
+      "Person",
+      "Safety Cone",
+      "Safety Vest",
+      "machinery",
+      "vehicle"
+    ]
+  },
+  "train": {
+    "base_model": "yolo11s.pt",
+    "epochs": 10,
+    "imgsz": 640,
+    "batch": 32,
+    "train_seconds": 116.2,
+    "gpu": "NVIDIA GeForce RTX 4090"
+  },
+  "epochs_run": 10,
+  "history": {
+    "epoch": [
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      7.0,
+      8.0,
+      9.0,
+      10.0
+    ],
+    "time": [
+      27.2139,
+      34.6237,
+      42.2068,
+      49.6282,
+      57.0461,
+      64.4505,
+      71.7778,
+      79.1584,
+      86.6596,
+      94.0795
+    ],
+    "train/box_loss": [
+      1.419,
+      1.3174,
+      1.2901,
+      1.2746,
+      1.223,
+      1.17,
+      1.1185,
+      1.0723,
+      1.0219,
+      0.9695
+    ],
+    "val/box_loss": [
+      1.9622,
+      1.9672,
+      1.9292,
+      1.9782,
+      1.7755,
+      1.7659,
+      1.6047,
+      1.6564,
+      1.5824,
+      1.4447
+    ],
+    "metrics/mAP50(B)": [
+      0.483,
+      0.5077,
+      0.4151,
+      0.5429,
+      0.6135,
+      0.6471,
+      0.6501,
+      0.7305,
+      0.74,
+      0.7624
+    ],
+    "metrics/mAP50-95(B)": [
+      0.2135,
+      0.2082,
+      0.1936,
+      0.2491,
+      0.3115,
+      0.3234,
+      0.3542,
+      0.3719,
+      0.3974,
+      0.445
+    ]
+  },
+  "test_official_ultralytics": {
+    "mAP50": 0.7222,
+    "mAP50_95": 0.4074,
+    "precision": 0.8401,
+    "recall": 0.6552
+  },
+  "before": {
+    "mAP50": 0.0902,
+    "mAP50_95": 0.0657,
+    "ms_per_image": 7.9,
+    "per_class": {
+      "Hardhat": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 110
+      },
+      "Mask": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 28
+      },
+      "NO-Hardhat": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 41
+      },
+      "NO-Mask": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 79
+      },
+      "NO-Safety Vest": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 90
+      },
+      "Person": {
+        "ap50": 0.7526,
+        "ap50_95": 0.565,
+        "instances": 174
+      },
+      "Safety Cone": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 92
+      },
+      "Safety Vest": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 61
+      },
+      "machinery": {
+        "ap50": 0.0,
+        "ap50_95": 0.0,
+        "instances": 44
+      },
+      "vehicle": {
+        "ap50": 0.1492,
+        "ap50_95": 0.092,
+        "instances": 41
+      }
+    }
+  },
+  "after": {
+    "mAP50": 0.7163,
+    "mAP50_95": 0.3982,
+    "ms_per_image": 7.9,
+    "per_class": {
+      "Hardhat": {
+        "ap50": 0.8733,
+        "ap50_95": 0.5306,
+        "instances": 110
+      },
+      "Mask": {
+        "ap50": 0.8139,
+        "ap50_95": 0.4511,
+        "instances": 28
+      },
+      "NO-Hardhat": {
+        "ap50": 0.5358,
+        "ap50_95": 0.2396,
+        "instances": 41
+      },
+      "NO-Mask": {
+        "ap50": 0.6402,
+        "ap50_95": 0.267,
+        "instances": 79
+      },
+      "NO-Safety Vest": {
+        "ap50": 0.7419,
+        "ap50_95": 0.3872,
+        "instances": 90
+      },
+      "Person": {
+        "ap50": 0.7366,
+        "ap50_95": 0.4312,
+        "instances": 174
+      },
+      "Safety Cone": {
+        "ap50": 0.4449,
+        "ap50_95": 0.1828,
+        "instances": 92
+      },
+      "Safety Vest": {
+        "ap50": 0.8488,
+        "ap50_95": 0.5088,
+        "instances": 61
+      },
+      "machinery": {
+        "ap50": 0.8484,
+        "ap50_95": 0.6109,
+        "instances": 44
+      },
+      "vehicle": {
+        "ap50": 0.6794,
+        "ap50_95": 0.3732,
+        "instances": 41
+      }
+    }
+  },
+  "before_after_images": [
+    {
+      "file": "before_after_1.jpg",
+      "image": "NX_img_177_jpg.rf.c03709e5fadfe2109411f05a9e9bc25f.jpg",
+      "after_hardhat": 1,
+      "after_no_hardhat": 2,
+      "before_person": 3
+    },
+    {
+      "file": "before_after_2.jpg",
+      "image": "004063_jpg.rf.1b7cdc4035bcb24ef69b8798b444053e.jpg",
+      "after_hardhat": 6,
+      "after_no_hardhat": 0,
+      "before_person": 5
+    },
+    {
+      "file": "before_after_3.jpg",
+      "image": "youtube-186_jpg.rf.1f1d93447d4be3233c22c4ce9f6e0601.jpg",
+      "after_hardhat": 1,
+      "after_no_hardhat": 0,
+      "before_person": 1
+    },
+    {
+      "file": "before_after_4.jpg",
+      "image": "class1_150_jpg.rf.5995dce34d38deb9eb0b6e36cae78f17.jpg",
+      "after_hardhat": 1,
+      "after_no_hardhat": 1,
+      "before_person": 2
+    },
+    {
+      "file": "before_after_5.jpg",
+      "image": "youtube-840_jpg.rf.974a83a7c5aee7c16e83435b043c6d96.jpg",
+      "after_hardhat": 1,
+      "after_no_hardhat": 0,
+      "before_person": 1
+    }
+  ]
+}
