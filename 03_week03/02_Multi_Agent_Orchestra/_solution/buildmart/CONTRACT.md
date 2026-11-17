@@ -105,7 +105,7 @@ seed = ข้อมูลร้านข้อ 1–2 ของ BUILDMART คร�
 - context: ① ค้นสินค้าที่เกี่ยวข้อง (คำไทย/SKU ในคำถาม + ประวัติ 6 ข้อความล่าสุด) ใส่ตาราง sku/name/price/unit/stock 3 สาขา · ② `rag-search.js` Hybrid RAG (ข้อ 4.3) top 4 → ใส่หัวข้อ "เอกสารอ้างอิง" ในรูป `[1] BM-DS-CEM.pdf หน้า 1: ...` · ③ ข้อมูลร้านข้อ 1 + กฎ + รูปแบบ tag
 - `rag-search.js` export `hybridSearch(pool, query, k=4)` → `[{filename,page,content,score,vecSim}]` (ใช้ embedder `query: ` prefix, เอกสาร `passage: `)
 - cites ที่ส่งให้ web: chunk ที่โมเดลอ้าง `[n]` ในคำตอบ ถ้าโมเดลไม่ใส่ `[n]` → ใช้ chunk อันดับ 1–2 ที่ vecSim ≥ เกณฑ์ (ปรับเกณฑ์ให้ R01–R07 ได้ไฟล์ถูก และคำถามทั่วไปเช่น C01 ไม่มี cite) · ตัด `[n]` ออกจากข้อความที่แสดง
-- LLM: OpenAI-compatible stream (ดูตัวอย่าง `01_VastAi_Skill/_solution/ex2_chatbot/frontend/lib/llm.ts`) ส่ง `"enable_thinking": false` และ `chat_template_kwargs: {enable_thinking:false}` · ตัด `<think>` · timeout 90 วิ
+- LLM: OpenAI-compatible stream (ดูตัวอย่าง `01_VastAi_Skill/chatbot/frontend/lib/llm.ts`) ส่ง `"enable_thinking": false` และ `chat_template_kwargs: {enable_thinking:false}` · ตัด `<think>` · timeout 90 วิ
 - tag `[CALC]` `[ADD_TO_CART]` `[QUOTE]` ตามข้อ 4.4 · ใช้ shared/calc.js + shared/pricing.js · ADD_TO_CART เขียน cart_items ของ session ตรง (DB) แล้วส่ง `cartCount` · QUOTE สร้าง quote แบบเดียวกับ /api/quotes (ฟังก์ชันใน workers/lib/quote.js) — **รหัสเลข QT/BM ใช้ sequence ใน DB เดียวกับ web** (ฟังก์ชัน SQL `next_doc_no(prefix)` ที่ A สร้างใน schema)
 - ภาษา: ถ้าคำถามไม่มีอักษรไทย → สั่งให้ตอบอังกฤษ
 - บันทึก chat_messages ทั้ง user และ assistant (พร้อม cites)

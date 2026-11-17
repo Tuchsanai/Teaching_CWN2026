@@ -4,7 +4,7 @@
 
 | บท | หัวข้อ | สิ่งที่ได้ |
 |---|---|---|
-| [01_VastAi_Skill](01_VastAi_Skill/readme.md) | เช่า GPU บน Vast.ai ด้วย skill `vastai` | เช่า RTX 4090 แล้วลบเครื่อง · แชทบอทที่ใช้ AI บน RTX 5090 |
+| [01_VastAi_Skill](01_VastAi_Skill/readme.md) | เช่า GPU บน Vast.ai ด้วยสกิล `vastai` ของ Vast.ai | ติดตั้งสกิลใน container · เทียบราคาเครื่อง · เช่า RTX 4090 แล้วลบ · แชทบอทที่ใช้ AI บน RTX 5090 ผ่าน 26/26 เคส |
 | [02_Multi_Agent_Orchestra](02_Multi_Agent_Orchestra/readme.md) | ทีม AI หลายบัญชีสร้างร้าน "บ้านช่าง BuildMart" v3 | เว็บที่ฟังได้ พูดได้ และตอบจากเอกสาร บน GPU 3 ใบ |
 | [04_REA](#บท-04--reverse-engineer-anything-rea) | Reverse Engineer ANYTHING: สืบเว็บจริงแล้วสร้างแอปของเราเอง (7 บทย่อย) | แอปจองตั๋ว SkyThai v1–v6 พร้อมผลวัดด้วย Playwright |
 | [05_Skill_Optimizer](05_Skill_Optimizer/README.md) | Skill Optimizer: คนเขียนสกิลรุ่นแรก แล้วปรับทีละรุ่นด้วยการวัด | สกิล `money-coder` จาก 45.3% เป็น 100.0% |
