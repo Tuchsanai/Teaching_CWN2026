@@ -1,9 +1,10 @@
-# วัดผลบน Test Set: โมเดล COCO เดิม (ก่อนเทรน) เทียบกับโมเดลที่เทรนแล้ว (หลังเทรน)
-# ผลลัพธ์: metrics.json, ภาพก่อน/หลัง, กราฟ loss/mAP ต่อ epoch
-# ใช้: python eval.py --out /workspace/results
+# Evaluation บน Test Set: โมเดล COCO เดิม (ก่อนเทรน) เทียบกับโมเดลที่เทรนแล้ว (หลังเทรน)
+# ผลลัพธ์ทั้งหมดรวมไว้ในโฟลเดอร์เดียว: metrics.json · images/ (ภาพก่อน/หลัง กราฟ) · train/ · weights/best.pt
+# ใช้: python eval.py        (รันหลัง train.py · ผลอยู่ที่ /workspace/results)
 import argparse
 import csv
 import json
+import shutil
 from pathlib import Path
 
 import cv2
@@ -17,7 +18,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 p = argparse.ArgumentParser()
-p.add_argument("--data", default="/workspace/data/ppe/data.yaml")
+p.add_argument("--data", default="")  # เว้นว่าง = ใช้ Dataset ชุดเดียวกับที่เทรน
 p.add_argument("--run", default="/workspace/runs/ppe")
 p.add_argument("--base", default="yolo11s.pt")
 p.add_argument("--out", default="/workspace/results")
@@ -26,7 +27,11 @@ a = p.parse_args()
 
 out = Path(a.out)
 (out / "images").mkdir(parents=True, exist_ok=True)
-cfg = yaml.safe_load(Path(a.data).read_text())
+if a.data:
+    data_yaml = Path(a.data).resolve() / "data.yaml"
+else:  # อ่านที่อยู่ Dataset จากบันทึกการเทรน (train.py เขียน path เต็มไว้แล้ว)
+    data_yaml = Path(yaml.safe_load((Path(a.run) / "args.yaml").read_text())["data"])
+cfg = yaml.safe_load(data_yaml.read_text())
 names = cfg["names"]
 test_dir = Path(cfg["test"])
 images = sorted(test_dir.glob("*.jpg")) + sorted(test_dir.glob("*.png"))
@@ -106,7 +111,7 @@ base = YOLO(a.base)
 tuned = YOLO(str(Path(a.run) / "weights" / "best.pt"))
 
 # 1) ผลทางการของ Ultralytics บน Test Set (โมเดลหลังเทรน)
-v = tuned.val(data=a.data, split="test", imgsz=640, batch=16, plots=False, verbose=False)
+v = tuned.val(data=str(data_yaml), split="test", imgsz=640, batch=16, plots=False, verbose=False)
 official = {"mAP50": round(float(v.box.map50), 4), "mAP50_95": round(float(v.box.map), 4),
             "precision": round(float(v.box.mp), 4), "recall": round(float(v.box.mr), 4)}
 
@@ -187,5 +192,25 @@ metrics = {
     "before": before, "after": after, "before_after_images": pairs,
 }
 (out / "metrics.json").write_text(json.dumps(metrics, indent=2, ensure_ascii=False))
-print(json.dumps({"official": official, "before_mAP50": before["mAP50"], "after_mAP50": after["mAP50"],
-                  "after_ms": after["ms_per_image"]}, indent=2))
+
+# 6) รวมไฟล์จากการเทรนและโมเดลไว้ในโฟลเดอร์ผล จะได้คัดลอกกลับทีเดียว
+run = Path(a.run)
+(out / "train").mkdir(exist_ok=True)
+(out / "weights").mkdir(exist_ok=True)
+for f in ["results.csv", "args.yaml", "train_info.json"]:
+    if (run / f).exists():
+        shutil.copy(run / f, out / "train" / f)
+if (run / "confusion_matrix_normalized.png").exists():
+    shutil.copy(run / "confusion_matrix_normalized.png", out / "images")
+shutil.copy(run / "weights" / "best.pt", out / "weights" / "best.pt")
+
+# ตารางสรุป ก่อน vs หลัง
+print(f"Test Set {len(images)} ภาพ")
+print(f"{'':16}{'ก่อนเทรน':>10}{'หลังเทรน':>10}")
+print(f"{'mAP50':16}{before['mAP50']:>10.3f}{after['mAP50']:>10.3f}")
+print(f"{'mAP50-95':16}{before['mAP50_95']:>10.3f}{after['mAP50_95']:>10.3f}")
+print(f"{'ms ต่อรูป':16}{before['ms_per_image']:>10.1f}{after['ms_per_image']:>10.1f}")
+for n in names:
+    print(f"AP50 {n:11}{before['per_class'][n]['ap50']:>10.3f}{after['per_class'][n]['ap50']:>10.3f}")
+print("Ultralytics (หลังเทรน):", json.dumps(official))
+print("ผลทั้งหมดอยู่ที่", out)

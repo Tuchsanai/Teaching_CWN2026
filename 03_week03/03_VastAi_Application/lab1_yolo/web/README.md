@@ -10,10 +10,7 @@ Next.js + PostgreSQL รันบน Docker ของเครื่องนี
 
 ## ต่อกับ AI server บน Vast.ai
 
-1. คัดลอกไฟล์ค่าเชื่อมต่อ `yolo.env` (ขั้นเปิด AI server เขียนไว้) มาเป็นไฟล์ `.env` ในโฟลเดอร์นี้
-   ```bash
-   docker cp multi-account:/workspace/vastapp_lab/lab1_yolo/yolo.env .env
-   ```
+1. ไฟล์ค่าเชื่อมต่อ `.env` ในโฟลเดอร์นี้ ถูกเขียนให้ในขั้นเปิด AI server ของ LAB (พรอมต์ขั้นที่ 5)
 2. เปิดเว็บ
    ```bash
    docker compose up -d --build

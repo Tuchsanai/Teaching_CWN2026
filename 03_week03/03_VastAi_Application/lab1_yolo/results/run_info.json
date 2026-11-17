@@ -1,20 +1,85 @@
 {
-  "date": "2026-11-18",
-  "label": "vapp-v-lab1",
-  "gpu": "1x RTX 4090 (24 GB)",
-  "price_usd_per_hour": 0.419,
-  "max_dph": 0.70,
-  "location": "Romania, RO",
-  "cpu_cores_effective": 14,
-  "image": "pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime",
-  "disk_gb": 40,
-  "epochs": 50,
-  "timing": {
-    "rent_to_running": "~1 min (the first offer, Florida $0.451/hr, could not start: 'Required resources are currently unavailable', deleted and rented again; ~2.5 min in total)",
-    "install_and_dataset": "59 s",
-    "train_50_epochs": "385.6 s (6.4 min) training loop; ~8 min including final validation and ONNX export",
-    "evaluate_test_set": "~6 s",
-    "start_server": "4 s"
+  "round": "official round 2 (prompts ขั้นที่ 1-9 ตาม PROMPTS.md)",
+  "machine": {
+    "gpu": "1x RTX 4090 24 GB",
+    "location": "Ukraine",
+    "cpu_cores": 16,
+    "dph_total": 0.411,
+    "image": "pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime",
+    "inet_down_mbps": 935,
+    "inet_up_mbps": 699
   },
-  "notes": "Downloading weights (best.pt + best.onnx, ~57 MB) from this host was slow (~8 min for best.pt)."
+  "step_seconds": {
+    "1_rent": 560,
+    "2_dataset": 169,
+    "3_training": 604,
+    "4_evaluation": 125,
+    "5_server": 117,
+    "6_web": 62,
+    "7_close": 87,
+    "8_skill_v0_create": 107,
+    "9_skill_v0_run": 713
+  },
+  "train_seconds": 418.3,
+  "val_mAP50": {
+    "epoch10": 0.661,
+    "epoch25": 0.767,
+    "epoch35": 0.805,
+    "epoch50": 0.819
+  },
+  "server_test": {
+    "health": 200,
+    "detect_boxes": 4,
+    "no_key": 401,
+    "inference_ms": 8,
+    "roundtrip_ms_from_container": 900
+  },
+  "web_test": [
+    {
+      "image": "sample-1.jpg",
+      "passed": false,
+      "no_hardhat": 1,
+      "inference_ms": 11.1,
+      "roundtrip_ms": 906.5
+    },
+    {
+      "image": "sample-2.jpg",
+      "passed": false,
+      "no_hardhat": 1,
+      "inference_ms": 7.9,
+      "roundtrip_ms": 462.3
+    },
+    {
+      "image": "sample-5.jpg",
+      "passed": true,
+      "no_hardhat": 0,
+      "inference_ms": 7.8,
+      "roundtrip_ms": 242.5
+    }
+  ],
+  "cost_usd": {
+    "main_machine": {
+      "gpu": 0.159,
+      "disk": 0.004,
+      "download": 0.001,
+      "total": 0.164,
+      "gpu_hours": 0.398
+    },
+    "first_machine_failed_to_start": 0.047,
+    "lab_total": 0.211,
+    "skill_v0_run": {
+      "machine": 0.045,
+      "first_machine_failed_to_start": 0.026,
+      "total": 0.071
+    }
+  },
+  "skill_v0_run": {
+    "epochs": 10,
+    "train_seconds": 116,
+    "before_mAP50": 0.09,
+    "after_mAP50": 0.716,
+    "after_mAP50_95": 0.398,
+    "machine": "1x RTX 4090, British Columbia CA, $0.394/h",
+    "wall_seconds": 713
+  }
 }

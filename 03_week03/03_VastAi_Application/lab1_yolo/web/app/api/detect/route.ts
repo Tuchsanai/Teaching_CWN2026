@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       signal: AbortSignal.timeout(30_000),
     });
   } catch {
-    return NextResponse.json({ error: "เชื่อมต่อ AI server ไม่ได้ — ตรวจค่าใน yolo.env และสถานะเครื่องบน Vast.ai" }, { status: 502 });
+    return NextResponse.json({ error: "เชื่อมต่อ AI server ไม่ได้ — ตรวจค่าในไฟล์ .env และสถานะเครื่องบน Vast.ai" }, { status: 502 });
   }
   const roundtrip_ms = Math.round((performance.now() - t0) * 10) / 10;
   if (res.status === 401) return NextResponse.json({ error: "API key ของ AI server ไม่ถูกต้อง" }, { status: 502 });
