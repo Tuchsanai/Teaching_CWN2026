@@ -4,6 +4,8 @@
 
 บทนี้ให้ Claude Code **เช่า GPU จริงบน Vast.ai แทนเรา** โดยสั่งเป็นภาษาไทย แล้วใช้ GPU นั้นรันโมเดลภาษาให้แชทบอทของร้านค้า
 
+สไลด์ประกอบการสอน: [VastAi_Skill_Slides.html](VastAi_Skill_Slides.html)
+
 สกิลที่ใช้คือสกิล **`vastai` ที่ Vast.ai ทำเอง** ติดตั้งตามคู่มือ [Using Vast.ai with Agents](https://docs.vast.ai/guides/get-started/agents) · ทุกขั้นทำด้วยพรอมต์ Copy & Paste ใน **Claude Code** และงานทั้งหมดเกิดใน container `multi-account` ตัวเดียวกับบทก่อน
 
 | LAB | ทำอะไร | ค่าใช้จ่าย |
@@ -941,3 +943,4 @@ MODEL=qwen3.8-27b-nvfp4 LABEL=lab-5090 MAX_DPH=1.20
 | `chatbot/NINFER_RECIPE.md` | สูตรของ LAB 5 ให้ AI อ่าน |
 | `chatbot/frontend/` · `chatbot/e2e/` | โค้ดแชทบอทร้านค้า และชุดทดสอบ 26 เคส สำหรับ LAB 6 |
 | `image/` | ภาพประกอบและภาพหน้าจอจริง |
+| `VastAi_Skill_Slides.html` | สไลด์ประกอบการสอน เปิดในเบราว์เซอร์ · สร้างใหม่ด้วย `python tools/build_slides.py` |
