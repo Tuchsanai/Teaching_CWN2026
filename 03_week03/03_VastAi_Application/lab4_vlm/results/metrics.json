@@ -1,0 +1,57 @@
+{
+ "dataset": "naver-clova-ix/cord-v2",
+ "n_train": 800,
+ "n_val": 100,
+ "n_test": 100,
+ "model": "Qwen/Qwen3-VL-2B-Instruct",
+ "base": {
+  "n": 100,
+  "json_ok_pct": 100.0,
+  "total_exact_pct": 89.5,
+  "item_precision_pct": 74.0,
+  "item_recall_pct": 70.4,
+  "item_f1_pct": 72.1,
+  "sec_per_receipt": 0.71,
+  "model": "receipt-base",
+  "split": "test"
+ },
+ "finetuned": {
+  "n": 100,
+  "json_ok_pct": 100.0,
+  "total_exact_pct": 96.8,
+  "item_precision_pct": 86.7,
+  "item_recall_pct": 88.5,
+  "item_f1_pct": 87.6,
+  "sec_per_receipt": 0.54,
+  "model": "receipt-ft",
+  "split": "test"
+ },
+ "train": {
+  "train_seconds": 351.1,
+  "peak_vram_gb": 11.29,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "trainable_params": 8716288,
+  "total_params": 2136248320,
+  "epochs": 2,
+  "batch": 4,
+  "lr": 0.0002,
+  "lora_rank": 8,
+  "val_loss": [
+   {
+    "epoch": 0,
+    "step": 0,
+    "val_loss": 0.2743
+   },
+   {
+    "epoch": 1,
+    "step": 200,
+    "val_loss": 0.026
+   },
+   {
+    "epoch": 2,
+    "step": 400,
+    "val_loss": 0.021
+   }
+  ]
+ }
+}

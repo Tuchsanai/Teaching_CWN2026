@@ -1,0 +1,41 @@
+# สมุดรายจ่ายจากใบเสร็จ — เว็บ Next.js + PostgreSQL บน Docker ของเครื่องนี้
+# ค่าเชื่อมต่อ AI server อยู่ในไฟล์ receipt.env (ขั้นเปิด AI server เขียนให้)
+# เปิด:  docker compose up -d --build     แล้วเข้า http://localhost:3404
+# ปิด:   docker compose down -v
+
+name: vapp-lab4
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: receipt
+      POSTGRES_PASSWORD: receipt_pw
+      POSTGRES_DB: expenses
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U receipt -d expenses"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./receipt.env
+    environment:
+      DATABASE_URL: postgres://receipt:receipt_pw@db:5432/expenses
+      TZ: Asia/Bangkok
+    ports:
+      - "3404:3000"
+
+volumes:
+  pgdata:
