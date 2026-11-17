@@ -88,15 +88,18 @@ function buildReply(messages) {
   if (startIdx >= 0) {
     const convo = users.slice(startIdx).join(" \n ");
     const phone = (convo.match(/0\d{1,2}[- ]?\d{3}[- ]?\d{3,4}/) || [])[0];
-    const nameM = convo.match(/ชื่อ\s*(?:คุณ)?\s*([^\s,]+)/);
-    const name = nameM ? nameM[1].replace(/(เบอร์|โทร).*$/, "").trim() : null;
-    const service = findService(convo, services);
+    // ชื่อ = ข้อความหลังคำว่า "ชื่อ" จนถึงคำลงท้าย/เบอร์โทร (รองรับชื่อ + นามสกุล)
+    const nameM = convo.match(/ชื่อ\s*(?:คุณ)?\s*([^\n,]+?)\s*(?:ค่ะ|คะ|ครับ|เบอร์|โทร|,|\n|$)/);
+    const name = nameM ? nameM[1].trim() : null;
+    // ถ้าลูกค้าพิมพ์ "เปลี่ยนเป็น..." ให้ใช้บริการที่พูดหลังคำว่าเปลี่ยน
+    const changed = convo.lastIndexOf("เปลี่ยน");
+    const service = (changed >= 0 && findService(convo.slice(changed), services)) || findService(convo, services);
     const { date, time } = findDateTime(convo, today);
     const missing = [];
     if (!name) missing.push("ชื่อ");
     if (!phone) missing.push("เบอร์โทรศัพท์");
     if (!service) missing.push("บริการที่ต้องการ");
-    if (!date || !time) missing.push("วันและเวลา (เช่น 2026-10-20 14:00)");
+    if (!date || !time) missing.push("วันและเวลา (เช่น 2026-12-20 14:00)");
     if (missing.length === 0) {
       const tag = JSON.stringify({
         customer_name: name,
@@ -106,10 +109,39 @@ function buildReply(messages) {
       });
       return `ได้เลยค่ะ คุณ${name} 🙏 ทางร้านบันทึกการจอง "${service}" วันที่ ${date} เวลา ${time} น. เรียบร้อยแล้วค่ะ กรุณามาก่อนเวลานัด 10 นาทีนะคะ\n[BOOKING]${tag}`;
     }
-    return `ยินดีรับจองค่ะ 😊 รบกวนขอข้อมูลเพิ่มเติม: ${missing.join(", ")}\n(ตัวอย่าง: จอง นวดไทย ชื่อสมชาย เบอร์ 081-234-5678 วันที่ 2026-10-20 เวลา 14:00)`;
+    return `ยินดีรับจองค่ะ 😊 รบกวนขอข้อมูลเพิ่มเติม: ${missing.join(", ")}\n(ตัวอย่าง: จอง นวดไทย ชื่อสมชาย เบอร์ 081-234-5678 วันที่ 2026-12-20 เวลา 14:00)`;
   }
 
-  // ---------- คำถามทั่วไป ----------
+  // ---------- คำถามทั่วไป (ดูเฉพาะข้อความล่าสุด — mock ไม่มีความจำ) ----------
+  if (!/[ก-๙]/.test(last)) {
+    // ลูกค้าพิมพ์ภาษาอังกฤษ -> ตอบภาษาอังกฤษ
+    if (/aroma|oil/i.test(last)) return "The aroma oil massage is 600 baht for 60 minutes.";
+    if (/massage|price|how much/i.test(last)) return "A 60-minute traditional Thai massage is 350 baht.";
+    return "Hello! Welcome to Sabaijai Thai Massage. Ask me about prices, opening hours or booking.";
+  }
+  if (/สูตร|ต้มยำ|การบ้าน|ข่าว/.test(last)) {
+    return "ขออภัยค่ะ น้องสบายใจตอบได้เฉพาะเรื่องบริการนวดของร้านนะคะ สนใจดูราคาหรือจองคิวไหมคะ";
+  }
+  if (/เล็บ|ตัดผม|สักคิ้ว/.test(last)) {
+    return "ขออภัยค่ะ ร้านไม่มีบริการนี้นะคะ ร้านเรามีแต่บริการนวดค่ะ";
+  }
+  if (/ตั้งครรภ์|ท้อง/.test(last)) {
+    return "ไม่แนะนำให้นวดช่วงตั้งครรภ์ไตรมาสแรกนะคะ ควรปรึกษาแพทย์ก่อนค่ะ";
+  }
+  if (/จอด/.test(last)) return `${lineAfter(system, "ที่จอดรถ") || "ไม่มีข้อมูลที่จอดรถ"}ค่ะ`;
+  if (/บัตรเครดิต|จ่าย|ชำระ|พร้อมเพย์/.test(last)) {
+    return `ได้ค่ะ ชำระได้ทั้ง${(lineAfter(system, "การชำระเงิน") || "เงินสด").replace(/^จ่าย/, "")}ค่ะ`;
+  }
+  if (/ยกเลิก|เลื่อน/.test(last)) return `${lineAfter(system, "การยกเลิกหรือเลื่อนนัด") || "กรุณาโทรแจ้งร้าน"}ค่ะ`;
+  if (/เบอร์|โทร|ไลน์|line/i.test(last)) return `ติดต่อร้านได้ที่ ${lineAfter(system, "โทรศัพท์") || "-"} ค่ะ`;
+  if (/ถูกที่สุด|ถูกสุด/.test(last) && services.length) {
+    const c = [...services].sort((a, b) => a.price - b.price)[0];
+    return `บริการที่ถูกที่สุดคือ ${c.name} ${c.min} นาที ${c.price} บาทค่ะ`;
+  }
+  if (/ราคา|เท่าไหร่|เท่าไร|กี่บาท/.test(last)) {
+    const one = services.find((s) => s.name === findService(last, services));
+    if (one) return `${one.name} ${one.min} นาที ${one.price} บาทค่ะ`;
+  }
   if (/ปวดหลัง|แนะนำ/.test(last)) {
     return 'ถ้าปวดหลัง แนะนำ "นวดแก้ปวดหลัง" (60 นาที) หรือ "ประคบสมุนไพร" (60 นาที) ช่วยคลายกล้ามเนื้อได้ดีค่ะ หากปวดมากหรือมีอาการชา ควรปรึกษาแพทย์ก่อนนะคะ';
   }
@@ -124,7 +156,7 @@ function buildReply(messages) {
     const h = lineAfter(system, "เวลาเปิด-ปิด");
     return `ร้าน${h || "เปิดทุกวัน"} ค่ะ 🕙`;
   }
-  if (/ที่อยู่|ที่ไหน|แผนที่/.test(last)) {
+  if (/ที่อยู่|ที่ไหน|แผนที่|จังหวัด/.test(last)) {
     return `ร้านตั้งอยู่ที่ ${lineAfter(system, "ที่อยู่") || "-"} ค่ะ โทร ${lineAfter(system, "โทรศัพท์") || "-"}`;
   }
   if (/โปร|ส่วนลด/.test(last)) {

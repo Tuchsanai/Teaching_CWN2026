@@ -1,46 +1,39 @@
-# แชทบอทร้าน "สบายใจ นวดแผนไทย" 🌿
+# แชทบอทร้าน "สบายใจ นวดแผนไทย"
 
-Next.js + PostgreSQL ทำงานใน Docker (เปิด Docker Desktop ไว้ก่อน แล้วใช้ Git Bash ในโฟลเดอร์นี้)
+หน้าแชท + หน้ารายการจอง (Next.js) กับฐานข้อมูล PostgreSQL รันด้วย `docker compose`
+บอทอ่านข้อมูลร้านจากฐานข้อมูล แล้วส่งไปถาม LLM แบบ OpenAI-compatible (ตั้งค่าใน `.env`)
 
-## 1) รันแบบทดสอบ (mock ไม่ต้องใช้ GPU)
+## เริ่มใช้งานกับ LLM จริง
 
 ```bash
 cp .env.example .env
+# แก้ 3 บรรทัดใน .env: LLM_BASE_URL, LLM_MODEL, LLM_API_KEY (ไม่ใส่เครื่องหมายคำพูด ไม่เขียน comment ต่อท้ายค่า)
+docker compose up -d --build
+```
+
+เปิด http://localhost:3300 (หน้าแชท) และ http://localhost:3300/bookings (รายการจอง)
+
+## เริ่มใช้งานแบบ mock (ไม่ต้องมี LLM)
+
+```bash
 docker compose --profile mock up -d --build
 ```
 
-เปิดเว็บ: http://localhost:3300 → ลองกดปุ่ม "📅 จองคิว" หรือพิมพ์
+ไม่ต้องมี `.env` — ค่าเริ่มต้นชี้ไปที่ `mock-llm` ซึ่งตอบตามคำสำคัญและไม่มีความจำ ใช้ตรวจว่าระบบทำงานครบเท่านั้น
 
-```
-จอง นวดไทย ชื่อสมชาย เบอร์ 081-234-5678 วันที่ 2026-10-20 เวลา 14:00
-```
-
-## 2) ดูว่าการจองเข้า Database จริง
-
-เปิด http://localhost:3300/bookings หรือ
+## ทดสอบ
 
 ```bash
-docker compose exec db psql -U massage -d massage_shop -c "SELECT * FROM bookings;"
+bash ../e2e/run-all.sh
 ```
 
-## 3) เปลี่ยนไปใช้ AI จริงบน Vast.ai
+รัน 26 เคส ได้ GIF ทุกเคสและรายงานที่ `../e2e/out/TEST_REPORT.md` (รายละเอียดใน `../e2e/README.md`)
 
-แก้ไฟล์ `.env` สองบรรทัดนี้ (ใส่ IP:PORT และชื่อโมเดลของเครื่อง Vast)
-
-```
-LLM_BASE_URL=http://<VAST_IP>:<VAST_PORT>
-LLM_MODEL=<ชื่อโมเดล>
-```
-
-แล้วรัน
-
-```bash
-docker compose up -d --build web
-```
-
-## 4) ปิด / ล้างข้อมูล
+## ปิด
 
 ```bash
 docker compose --profile mock down        # ปิด (ข้อมูลยังอยู่)
-docker compose --profile mock down -v     # ปิดและลบข้อมูลทั้งหมด
+docker compose --profile mock down -v     # ปิดและลบข้อมูล (จำเป็นเมื่อแก้ db/init.sql)
 ```
+
+แก้ `.env` แล้วให้รัน `docker compose up -d` อีกครั้งเพื่อให้เว็บอ่านค่าใหม่

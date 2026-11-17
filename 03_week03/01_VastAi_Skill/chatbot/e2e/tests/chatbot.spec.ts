@@ -1,97 +1,108 @@
-import { ask, clickChip, expect, openChat, test } from "./helpers";
+// รัน 26 เคสจาก cases.json — 1 เคส = 1 วิดีโอ + 1 ไฟล์ผล (out/answers/case<N>.json)
+import fs from "node:fs";
+import path from "node:path";
+import type { Page } from "@playwright/test";
+import { runChecks, type Check } from "./check";
+import { ask, clickChip, expect, FINAL_HOLD, OUT_DIR, openChat, test } from "./helpers";
 
-// ข้อความตรวจคำตอบแบบ "หลวม ๆ" เพราะ LLM จริงตอบไม่เหมือนเดิมทุกครั้ง
+type Step = { type?: string; chip?: string };
+type Booking = { name: string; phone: string; service: string; time: string };
+type Case = {
+  id: number;
+  slug: string;
+  action: string;
+  steps: Step[];
+  confirm?: string[];
+  checks: Check[];
+  booking?: Booking;
+};
+type Turn = { user: string; bot: string };
 
-test("case1-hours: ทักทาย + ถามเวลาเปิดปิด", async ({ page }) => {
-  await openChat(page);
-  const hi = await ask(page, "สวัสดีค่ะ");
-  expect(hi).toMatch(/สวัสดี|ยินดี|ค่ะ|คะ/);
+const cases: Case[] = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "cases.json"), "utf8")).cases;
 
-  const hours = await ask(page, "ร้านเปิดกี่โมงถึงกี่โมงคะ");
-  expect(hours).toMatch(/10/);
-  expect(hours).toMatch(/22/);
-});
-
-test("case2-price: ถามราคาด้วยปุ่ม ดูราคา", async ({ page }) => {
-  await openChat(page);
-  const price = await clickChip(page, "price");
-  expect(price).toMatch(/บาท|฿/);
-  expect(price).toMatch(/\d{3}/); // มีตัวเลขราคา เช่น 350
-  expect(price).toMatch(/นวด/);
-});
-
-test("case3-backpain: ขอคำแนะนำนวดแก้ปวดหลัง ออฟฟิศซินโดรม", async ({ page }) => {
-  await openChat(page);
-  const tip = await ask(page, "ทำงานออฟฟิศนั่งหน้าคอมทั้งวัน ปวดหลังกับบ่ามากเลยค่ะ แนะนำนวดแบบไหนดีคะ");
-  expect(tip).toMatch(/นวด/);
-  expect(tip).toMatch(/หลัง|บ่า|ไหล่|ประคบ/);
-});
-
-test("case4-promo: ถามโปรโมชั่น", async ({ page }) => {
-  await openChat(page);
-  const promo = await ask(page, "ตอนนี้มีโปรโมชั่นอะไรบ้างคะ");
-  expect(promo).toMatch(/ลด|%|แถม|ฟรี/);
-
-  const student = await ask(page, "เป็นนักศึกษา ได้ส่วนลดไหมคะ");
-  expect(student).toMatch(/นักศึกษา|15|ลด/);
-});
-
-test("case5-booking: จองคิวหลายขั้น แล้วเห็นในหน้ารายการจอง", async ({ page }) => {
-  await openChat(page);
-  const card = page.getByTestId("booking-card");
-
-  // เริ่มด้วยปุ่ม "จองคิว" แล้วค่อย ๆ ให้ข้อมูลทีละอย่าง (บอทควรถามสิ่งที่ยังขาด)
-  const first = await clickChip(page, "book");
-  expect(first).toMatch(/ชื่อ|เบอร์|บริการ|วัน|เวลา|จอง/);
-
-  const steps = [
-    "ชื่อ มานี ใจดี ค่ะ",
-    "เบอร์ 089-555-1234 ค่ะ",
-    "ขอนวดไทยแผนโบราณ 60 นาทีค่ะ",
-    "วันที่ 2026-10-25 เวลา 15:00 ค่ะ",
-    // ถ้า LLM จริงขอให้ยืนยันก่อน จะส่งข้อความนี้ (mock จะจองเสร็จก่อนถึงตรงนี้)
-    "ข้อมูลถูกต้องค่ะ ยืนยันเลยค่ะ",
-    "ถูกต้องทั้งหมดค่ะ ยืนยันได้เลยค่ะ",
-  ];
-  for (const msg of steps) {
-    if (await card.isVisible()) break;
-    await ask(page, msg);
+/** ตรวจการ์ดจองสำเร็จ + แถวในหน้า /bookings — คืนเหตุผลที่ไม่ผ่าน และข้อมูลบนการ์ด */
+async function checkBooking(page: Page, want: Booking) {
+  const fails: string[] = [];
+  const card = page.getByTestId("booking-card").last();
+  if ((await page.getByTestId("booking-card").count()) === 0) {
+    const err = page.getByTestId("booking-error").last();
+    const why = (await err.count()) ? (await err.innerText()).trim() : "บอทไม่ได้ส่งข้อมูลการจองที่ครบ";
+    await page.waitForTimeout(FINAL_HOLD);
+    return { fails: [`ไม่เห็นการ์ดจองสำเร็จ (${why})`], shown: null };
   }
 
-  await expect(card).toBeVisible();
-  await expect(page.getByTestId("booking-error")).toHaveCount(0);
-  await expect(page.getByTestId("booking-card-name")).toContainText("มานี");
-  expect((await page.getByTestId("booking-card-phone").innerText()).replace(/\D/g, "")).toContain("0895551234");
-  await expect(page.getByTestId("booking-card-service")).toContainText("นวดไทย");
-  await expect(page.getByTestId("booking-card-time")).toContainText("2026-10-25 15:00");
-  const bookingId = await card.getAttribute("data-booking-id");
+  const read = (id: string) => card.getByTestId(id).innerText();
+  const shown = {
+    id: await card.getAttribute("data-booking-id"),
+    name: await read("booking-card-name"),
+    phone: await read("booking-card-phone"),
+    service: await read("booking-card-service"),
+    time: await read("booking-card-time"),
+  };
+  if (!shown.name.includes(want.name)) fails.push(`การ์ด: ชื่อไม่ใช่ ${want.name}`);
+  if (!shown.phone.replace(/\D/g, "").includes(want.phone)) fails.push(`การ์ด: เบอร์ไม่ใช่ ${want.phone}`);
+  if (!shown.service.includes(want.service)) fails.push(`การ์ด: บริการไม่ใช่ ${want.service}`);
+  if (!shown.time.includes(want.time)) fails.push(`การ์ด: วันเวลาไม่ใช่ ${want.time}`);
   await card.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(FINAL_HOLD); // ค้างให้อ่านการ์ด
 
-  // ไปหน้า /bookings -> ต้องเห็นแถวใหม่ที่ดึงมาจาก PostgreSQL
+  // หน้า /bookings ต้องมีแถวเดียวกัน (อ่านจาก PostgreSQL)
   await page.getByTestId("nav-bookings").click();
-  await expect(page).toHaveURL(/\/bookings/);
-  await expect(page.getByTestId("bookings-table")).toBeVisible();
-  const row = page.locator(`[data-testid="booking-row"][data-booking-id="${bookingId}"]`);
-  await expect(row).toBeVisible();
-  await expect(row.getByTestId("booking-row-name")).toContainText("มานี");
-  await expect(row.getByTestId("booking-row-service")).toContainText("นวดไทย");
-  await expect(row.getByTestId("booking-row-time")).toHaveText("2026-10-25 15:00");
-  await row.hover();
+  const row = page.locator(`[data-testid="booking-row"][data-booking-id="${shown.id}"]`);
+  if ((await row.count()) === 0) {
+    await row.waitFor({ timeout: 15_000 }).catch(() => {});
+  }
+  if ((await row.count()) === 0) {
+    fails.push("หน้ารายการจอง: ไม่มีแถวของการจองนี้");
+  } else {
+    const rowText = await row.innerText();
+    if (!rowText.includes(want.name)) fails.push(`หน้ารายการจอง: แถวไม่มีชื่อ ${want.name}`);
+    if (!rowText.includes(want.service)) fails.push(`หน้ารายการจอง: แถวไม่ใช่ ${want.service}`);
+    if (!rowText.includes(want.time)) fails.push(`หน้ารายการจอง: แถวไม่ใช่เวลา ${want.time}`);
+    await row.hover();
+  }
   await page.waitForTimeout(2500);
-});
+  return { fails, shown };
+}
 
-test("case6-offtopic: ถามนอกเรื่อง บอทตอบสุภาพและวกกลับเรื่องร้าน", async ({ page }) => {
-  await openChat(page);
-  const reply = await ask(page, "ขอสูตรทำต้มยำกุ้งหน่อยได้ไหมคะ");
-  expect(reply).toMatch(/ค่ะ|คะ|ขออภัย|ขอโทษ/); // สุภาพ
-  expect(reply).toMatch(/นวด|ร้าน|บริการ|ราคา|จอง/); // พากลับมาเรื่องร้าน
-  expect(reply).not.toMatch(/น้ำพริกเผา|ข่า.*ตะไคร้.*มะนาว/); // ไม่ควรให้สูตรอาหาร
-});
+for (const c of cases) {
+  const name = `case${c.id}-${c.slug}`;
 
-test("case7-english: ลูกค้าพิมพ์ภาษาอังกฤษ", async ({ page }) => {
-  await openChat(page);
-  const reply = await ask(page, "Hello! How much is a 1 hour Thai massage?");
-  expect(reply.length).toBeGreaterThan(5);
-  expect(reply).toMatch(/\d|ค่ะ|massage|นวด|สวัสดี/i);
-});
+  test(`${name}: ${c.action}`, async ({ page }) => {
+    const turns: Turn[] = [];
+    const result = { id: c.id, name, passed: false, failures: [] as string[], turns, booking: null as unknown };
+
+    const doStep = async (s: Step) => {
+      const bot = s.chip ? await clickChip(page, s.chip) : await ask(page, s.type!);
+      turns.push({ user: s.chip ? `[กดปุ่ม ${s.chip}]` : s.type!, bot });
+    };
+
+    try {
+      await openChat(page);
+      for (const s of c.steps) await doStep(s);
+
+      if (c.booking) {
+        // LLM จริงบางตัวขอให้ยืนยันก่อน -> ส่งข้อความยืนยันเพิ่มจนกว่าการ์ดจะขึ้น
+        for (const msg of c.confirm ?? []) {
+          if (await page.getByTestId("booking-card").count()) break;
+          await doStep({ type: msg });
+        }
+        const b = await checkBooking(page, c.booking);
+        result.booking = b.shown;
+        result.failures.push(...b.fails);
+      } else {
+        await page.waitForTimeout(FINAL_HOLD); // ค้างให้อ่านคำตอบสุดท้าย
+      }
+      result.failures.push(...runChecks(c.checks, turns.map((t) => t.bot)));
+    } catch (e) {
+      result.failures.push("เทสต์หยุดกลางทาง: " + String((e as Error).message).split("\n")[0]);
+    } finally {
+      // บันทึกคำตอบจริงทุกข้อความ (ใช้ทำรายงาน) แม้เคสจะไม่ผ่าน
+      result.passed = result.failures.length === 0;
+      const dir = path.join(OUT_DIR, "answers");
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, `case${c.id}.json`), JSON.stringify(result, null, 2));
+    }
+    expect(result.failures, "เงื่อนไขที่ไม่ผ่าน").toEqual([]);
+  });
+}

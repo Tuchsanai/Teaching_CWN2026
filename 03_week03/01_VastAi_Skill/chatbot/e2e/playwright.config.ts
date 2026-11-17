@@ -5,22 +5,21 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:3300";
 
 export default defineConfig({
   testDir: "./tests",
-  workers: 1, // รันทีละเคส (ให้วิดีโออ่านง่าย และไม่ยิง LLM พร้อมกัน)
-  fullyParallel: false,
+  workers: Number(process.env.WORKERS || 2), // รันพร้อมกันน้อย ๆ ไม่ให้ LLM ตัวเดียวรับงานหนักเกิน
+  fullyParallel: true, // ทุกเคสเป็นอิสระต่อกัน (แชทใหม่ทุกเคส) จึงรันพร้อมกันได้
   retries: 0,
-  timeout: 6 * 60 * 1000, // ต่อ 1 เคส (LLM จริงอาจตอบช้า)
-  expect: { timeout: 90_000 }, // รอคำตอบแต่ละครั้งได้ถึง 90 วินาที
-  reporter: [["list"], ["html", { open: "never" }]],
+  timeout: 15 * 60 * 1000, // ต่อ 1 เคส (เคสจองมีหลายข้อความ และ LLM จริงอาจตอบช้า)
+  reporter: [["list"]],
   use: {
     baseURL: BASE_URL,
     viewport: { width: 1000, height: 720 },
     video: { mode: "on", size: { width: 1000, height: 720 } },
-    screenshot: "only-on-failure",
-    trace: "retain-on-failure",
     locale: "th-TH",
     timezoneId: "Asia/Bangkok",
     actionTimeout: 30_000,
-    launchOptions: { slowMo: 40 }, // หน่วงทุก action นิดหน่อย ให้คนดูตามทัน
+    // slowMo: หน่วงทุก action นิดหน่อยให้คนดูตามทัน · ปิด smooth scroll: หน้าจอเลื่อนทีเดียวจบ GIF จึงเล็กลงมาก
+    launchOptions: { slowMo: 40, args: ["--disable-smooth-scrolling"] },
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1000, height: 720 } } }],
 });

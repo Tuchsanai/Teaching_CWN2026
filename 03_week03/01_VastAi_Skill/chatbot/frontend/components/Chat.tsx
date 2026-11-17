@@ -157,7 +157,7 @@ export default function Chat() {
       </header>
 
       <section className="card chatcard">
-        <div className="messages" ref={listRef} data-testid="message-list">
+        <div className="messages" ref={listRef} data-testid="message-list" data-busy={busy ? "true" : "false"}>
           {messages.map((m) => (
             <div key={m.id} className={`row ${m.role}`}>
               {m.role === "assistant" && <div className="avatar">🙏</div>}
