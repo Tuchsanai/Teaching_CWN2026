@@ -46,20 +46,25 @@ skill `vastai` เช่า 1 เครื่อง ตามเงื่อน�
 export DEBIAN_FRONTEND=noninteractive
 mkdir -p /workspace/ninfer/models && cd /workspace
 apt-get update -qq && apt-get install -y -qq git cmake ninja-build pkg-config build-essential python3-pip \
-  libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libcurl4-openssl-dev
+  libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libcurl4-openssl-dev \
+  libjpeg-dev libhwloc-dev liburing-dev
 pip install -q --break-system-packages -U "huggingface_hub[hf_xet]"
 
 # โหลดโมเดล (เบื้องหลัง) — ข้ามถ้ามีไฟล์แล้ว
 HF_XET_HIGH_PERFORMANCE=1 hf download <REPO> <FILE> --local-dir /workspace/ninfer/models > /workspace/download.log 2>&1 &
 
-# clone + build (ข้ามถ้ามี build/apps/ninfer-serve แล้ว)
+# clone + build (ข้ามถ้ามี build/rtx5090-release/apps/ninfer-serve แล้ว)
 git clone -q https://github.com/Neroued/ninfer.git /tmp/n && cp -a /tmp/n/. /workspace/ninfer/
-cd /workspace/ninfer && cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release > /workspace/build.log 2>&1 \
-  && cmake --build build -j"$(nproc)" >> /workspace/build.log 2>&1
+cd /workspace/ninfer && cmake --preset rtx5090-release > /workspace/build.log 2>&1 \
+  && cmake --build build/rtx5090-release -j"$(nproc)" >> /workspace/build.log 2>&1
 wait   # รอโหลดโมเดลเสร็จ
 ```
 
-ตรวจผ่าน: มีไฟล์ `/workspace/ninfer/build/apps/ninfer-serve` และ `/workspace/ninfer/models/<FILE>` ขนาดตรงตาราง
+ตรวจผ่าน: มีไฟล์ `/workspace/ninfer/build/rtx5090-release/apps/ninfer-serve` และ `/workspace/ninfer/models/<FILE>` ขนาดตรงตาราง
+
+> **คำสั่งอ้างอิงปรับตามเอกสารของ repo ต้นทางเมื่อ 18 พ.ย. 2026 (ยังไม่ได้รันซ้ำบน GPU จริง)** — ผลจริงใน README วัดเมื่อ 15 ต.ค. 2026 ด้วยคำสั่งรุ่นก่อน (`cmake -S . -B build`, `build/apps/ninfer-serve`)
+> ก่อน build ให้ AI อ่าน `README.md` และ `docs/serving.md` ของ repo ที่ clone มา และก่อนเปิด server ให้รัน `ninfer-serve --help` · ถ้าคำสั่งหรือ flag ในไฟล์นี้ไม่ตรงกับต้นทาง **ให้ยึดต้นทาง** แล้วรายงานจุดที่ต่างในสรุปตอนจบ
+> ต้นทางใช้ CUDA 13.4 เป็นชุดพัฒนา · ถ้า build ไม่ผ่านเพราะรุ่น CUDA ของ image `13.1.2` ให้หยุดและถามผู้ใช้ก่อนเปลี่ยน image (ต้องเช่าเครื่องใหม่)
 
 ### 2.3 เปิด server (~15 วินาที)
 - API key: สุ่มเอง 48 ตัวอักษร hex เก็บไว้ที่ `/workspace/ninfer_api_key.txt` บนเครื่องที่เช่า (มีแล้วใช้ของเดิม) — **ห้ามพิมพ์ key บนจอ**
@@ -69,10 +74,10 @@ wait   # รอโหลดโมเดลเสร็จ
 # คำสั่งอ้างอิง
 cd /workspace/ninfer
 pkill -f ninfer-serve; sleep 3
-setsid nohup ./build/apps/ninfer-serve models/<FILE> \
+setsid nohup ./build/rtx5090-release/apps/ninfer-serve models/<FILE> \
   --host 0.0.0.0 --port 8080 \
-  --max-context 16384 --kv-capacity auto --max-concurrency 4 --kv-dtype fp8 \
-  --spec mtp --draft-tokens 3 --lm-head-draft \
+  --max-context 16384 --max-concurrency 4 --kv-dtype fp8 \
+  --spec mtp --draft-tokens 3 --proposal-head optimized \
   --no-thinking --cors --api-key "$(cat /workspace/ninfer_api_key.txt)" \
   > /workspace/ninfer.log 2>&1 < /dev/null &
 ```
@@ -81,7 +86,7 @@ setsid nohup ./build/apps/ninfer-serve models/<FILE> \
 |---|---|
 | `--max-context 16384` | แชทบอทร้านนวดไม่ต้องใช้ context ยาว → ประหยัด VRAM |
 | `--max-concurrency 4` | รับลูกค้าพร้อมกันได้ 4 คน |
-| `--spec mtp --draft-tokens 3 --lm-head-draft` | เดาคำล่วงหน้า → ตอบเร็วขึ้น ~2–3 เท่า |
+| `--spec mtp --draft-tokens 3 --proposal-head optimized` | เดาคำล่วงหน้า → ตอบเร็วขึ้น ~2–3 เท่า (รุ่นก่อนใช้ `--lm-head-draft` · ถ้าไฟล์โมเดลไม่มี head นี้ให้ตัด `--proposal-head optimized` ออก) |
 | `--no-thinking` | ไม่ต้องให้โมเดล "คิดยาว" ก่อนตอบ → ตอบไวเหมาะกับแชท |
 | `--cors --api-key` | ให้เว็บเรียกได้ แต่ต้องมี key |
 
@@ -91,7 +96,7 @@ setsid nohup ./build/apps/ninfer-serve models/<FILE> \
 - รายงาน: เวลาตอบ, token/วินาที, VRAM จริงจาก `nvidia-smi --query-gpu=memory.used,memory.total --format=csv`
 
 ### 2.5 เขียนค่าเชื่อมต่อ
-เขียนทับไฟล์ `00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/.env.vast` ให้มี **3 บรรทัด ไม่มีเครื่องหมายคำพูด ไม่มี comment**:
+เขียนทับไฟล์ `03_week03/01_VastAi_Skill/_solution/ex2_chatbot/backend/.env.vast` ให้มี **3 บรรทัด ไม่มีเครื่องหมายคำพูด ไม่มี comment**:
 
 ```text
 LLM_BASE_URL=http://<ip>:<port>

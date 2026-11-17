@@ -11,7 +11,7 @@
 ## พรอมต์ (วางใน `yolo1` ที่ `/workspace`)
 
 ```text
-ใช้ skill vastai ทำตาม 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
+ใช้ skill vastai ทำตาม 03_week03/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
 MODEL=qwen3.8-27b-nvfp4 LABEL=ex2-ninfer-5090 MAX_DPH=1.20
 ```
 

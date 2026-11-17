@@ -4,8 +4,8 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
 แบบฝึกหัด 1 เช่า RTX 4090 → ssh เข้าไปดู GPU → ลบเครื่อง · แบบฝึกหัด 2 ทำแชทบอทร้านนวดแผนไทยที่ใช้ AI บน RTX 5090
 
 **ต้องมีก่อน:**
-- [LAB 03](../../03_MultiAccount_Container/README.md) — container `multi-account-devtool` ใช้งานได้ และล็อกอิน `yolo1` แล้ว
-- [LAB 04](../00_Setup_Skill/readme.md) — ติดตั้ง skill `vastai` `yolo` `cyolo` ใน `shared` แล้ว
+- [LAB 03](../../01_week02/03_MultiAccount_Container/README.md) — ล็อกอิน `yolo1` แล้ว (การล็อกอินเก็บใน volume `ai-accounts` ซึ่ง container `multi-account-devtool` ของบทนี้ใช้ร่วมกัน)
+- [LAB 04](../../01_week02/04_MultiAccount_Skill/README.md) — ติดตั้ง skill `yolo` `cyolo` ใน `shared` แล้ว · skill `vastai` ติดตั้งในขั้นที่ 4 ของบทนี้ (ต้นฉบับอยู่ที่ [`00_resource/skills/vastai`](../../00_resource/skills/vastai/SKILL.md))
 - บัญชี [Vast.ai](https://cloud.vast.ai/) ที่เติมเครดิตแล้ว (แนะนำ $5–10 พอสำหรับทั้ง LAB)
 - Docker Desktop (Engine running) และ Git Bash บน Windows
 
@@ -45,13 +45,17 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
 
 ### ขั้นที่ 2 · ใส่ SSH Key (public key)
 
-1. 🖥️ เปิด Git Bash ที่โฟลเดอร์ repo (`Teaching` หรือ `Teaching_CWN2026`) แล้วแสดง **public key** (`.pub` แชร์ได้ ไม่ใช่ความลับ):
+1. 🖥️ เปิด Git Bash ที่โฟลเดอร์ repo (`Teaching` หรือ `Teaching_CWN2026`) คัดลอกโฟลเดอร์ key ของ LAB มาไว้ที่โฟลเดอร์ repo (ทำครั้งเดียว) แล้วแสดง **public key** (`.pub` แชร์ได้ ไม่ใช่ความลับ):
+
+   ```bash
+   cp -r 03_week03/01_VastAi_Skill/image/Devtool_SSH Devtool_SSH
+   ```
 
    ```bash
    cat Devtool_SSH/devtoolSSH.pub
    ```
 
-   คัดลอกทั้งบรรทัดที่ขึ้นต้นด้วย `ssh-ed25519 AAAA…` (ไฟล์เดียวกันมีสำเนาใน `01_VastAi_Skill/image/Devtool_SSH/` ด้วย)
+   คัดลอกทั้งบรรทัดที่ขึ้นต้นด้วย `ssh-ed25519 AAAA…` · ทุกขั้นหลังจากนี้ใช้ key จาก `Devtool_SSH/` ที่โฟลเดอร์ repo
 2. เปิด https://cloud.vast.ai/manage-keys/ → ทำตามเลข **①–⑤** ในภาพ
 
 ![หน้า Manage Keys: วงกลม 1 เมนู Keys ด้านซ้าย, วงกลม 2 แท็บ SSH Keys, วงกลม 3 ปุ่ม + New มุมขวา](image/vast-03-keys-ssh-before.png)
@@ -83,7 +87,7 @@ LAB นี้ให้ AI (`yolo1`) **เช่า GPU จริงบน Vast.a
 🖥️ Git Bash ที่โฟลเดอร์ repo:
 
 ```bash
-cp .env_example .env
+cp 00_resource/.env_example .env
 notepad .env
 ```
 
@@ -161,6 +165,14 @@ docker run -dit --name multi-account-devtool --hostname multi-account-devtool --
 </details>
 
 **ผลที่ควรได้:** skill `OK` ครบ 6 บรรทัด · `/workspace` เห็น `.env` กับ `Devtool_SSH` · `VAST_API_KEY OK` และ `VAST_SSH_KEY_FILE OK`
+
+ถ้าขึ้น `vastai MISSING` → 🖥️ Git Bash ที่โฟลเดอร์ repo คัดลอก skill เข้า `shared` ทั้งฝั่ง Claude และ Codex (skill อยู่ใน volume `ai-accounts` จึงทำครั้งเดียว) แล้วรันคำสั่งตรวจ skill ในข้อ 6 ของพรอมต์อีกครั้ง:
+
+```bash
+for d in .Claude .Codex; do docker cp 00_resource/skills/vastai multi-account-devtool:/root/ai-accounts/$d/shared/skills/; done
+```
+
+ถ้า `yolo` หรือ `cyolo` ขึ้น `MISSING` ให้กลับไปทำ [LAB 04](../../01_week02/04_MultiAccount_Skill/README.md) ขั้นที่ 2
 
 ### ขั้นที่ 5 · เปิด Terminal ใน JupyterLab แล้วติดตั้ง vastai SDK
 
@@ -382,7 +394,7 @@ Wed Oct 14 14:38:31 2026
 | **IFBench** | ทำตามคำสั่งได้เป๊ะไหม เช่น "ตอบไม่เกิน 3 บรรทัด" — สำคัญกับแชทบอท |
 | **ความเร็ว** | token/วินาที ตอนตอบลูกค้า 1 คน (งานเขียนโค้ด, เปิด MTP=3) · "–" = ไม่มีใน model card |
 
-- VRAM "~" = ประมาณจากค่าจริงของตัวเริ่มต้น (ไฟล์ 22.1 GiB → ใช้จริง 20.7–24.4 GB รวม KV cache · `--kv-capacity auto` จองไม่เท่ากันทุกเครื่อง) ยังไม่ได้วัดตัวอื่น · RTX 5090 มี 32 GB **ใส่ได้ทุกตัว** · AI จะรายงานค่าจริงจาก `nvidia-smi` ตอนจบ
+- VRAM "~" = ประมาณจากค่าจริงของตัวเริ่มต้น (ไฟล์ 22.1 GiB → ใช้จริง 20.7–24.4 GB รวม KV cache ซึ่ง NInfer จองไม่เท่ากันทุกเครื่อง) ยังไม่ได้วัดตัวอื่น · RTX 5090 มี 32 GB **ใส่ได้ทุกตัว** · AI จะรายงานค่าจริงจาก `nvidia-smi` ตอนจบ
 - **ค่าเริ่มต้นใช้ `qwen3.8-27b-nvfp4`** เพราะแม่นที่สุดและทดสอบใน LAB แล้ว · อยากได้ตอบไวสุด → `qwen3.6-35b-a3b` · อยากโหลดไวสุด → `qwen3.6-27b`
 - ในแชทจริงเราวัดได้ ~113 tok/s (`qwen3.8-27b-nvfp4`) — ต่ำกว่าตาราง เพราะคำตอบสั้นและรวมเวลาเริ่มต้น
 
@@ -409,7 +421,7 @@ Wed Oct 14 14:38:31 2026
 🖥️ Terminal ที่ `/workspace` → `yolo1` → 💬 วาง (อยากใช้โมเดลอื่น แก้แค่ `MODEL=` ตามตารางข้อ 4.0 ⑤):
 
 ```text
-ใช้ skill vastai ทำตาม 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
+ใช้ skill vastai ทำตาม 03_week03/01_VastAi_Skill/_solution/ex2_chatbot/backend/NINFER_RECIPE.md
 MODEL=qwen3.8-27b-nvfp4 LABEL=ex2-ninfer-5090 MAX_DPH=1.20
 ```
 
@@ -444,7 +456,7 @@ MODEL=qwen3.8-27b-nvfp4 LABEL=ex2-ninfer-5090 MAX_DPH=1.20
 💬 เปิด **Claude Code บน Windows ที่โฟลเดอร์ repo** (`Teaching` — ตัวเดียวกับขั้นที่ 4 เพราะต้องใช้ Docker Desktop บน Windows) แล้ววางทั้งกรอบ (แก้ข้อมูลร้าน/เงื่อนไขเป็นร้านของคุณเองได้):
 
 ```text
-สร้างหน้าแชทบอทร้านค้าตาม 00_setup/04_Skill_Setup/01_VastAi_Skill/_solution/ex2_chatbot/FRONTEND_RECIPE.md
+สร้างหน้าแชทบอทร้านค้าตาม 03_week03/01_VastAi_Skill/_solution/ex2_chatbot/FRONTEND_RECIPE.md
 MODE=ai
 
 สถาปัตยกรรม (frontend รันใน Docker บนเครื่องเรา):
@@ -529,7 +541,7 @@ AI ใช้เวลา ~30–45 นาที แล้วสรุปผลเ
 - รายการจอง: **http://localhost:3300/bookings** (ดึงจาก PostgreSQL จริง)
 - โค้ดที่ AI สร้าง: `01_VastAi_Skill/my_chatbot/` · GIF ผลทดสอบ: `my_chatbot/test-gifs/`
 
-> 📂 **เฉลย:** โค้ดที่ผู้สอนเขียนไว้อยู่ที่ [`_solution/ex2_chatbot/frontend/`](_solution/ex2_chatbot/frontend/) และเทสต์ที่ [`_solution/ex2_chatbot/e2e/`](_solution/ex2_chatbot/e2e/) — ใช้เทียบกับของที่ AI สร้างได้ (ในพรอมต์ AI ถูกห้ามเปิดดูเฉลย)
+> 📂 **เฉลย:** โค้ดที่ผู้สอนเขียนไว้อยู่ที่ [`_solution/ex2_chatbot/frontend/`](_solution/ex2_chatbot/frontend/) และเทสต์ชุดพื้นฐาน 7 เคสที่ [`_solution/ex2_chatbot/e2e/`](_solution/ex2_chatbot/e2e/) — ใช้เทียบกับของที่ AI สร้างได้ (ในพรอมต์ AI ถูกห้ามเปิดดูเฉลย) · เทสต์ 26 เคสในข้อ 4.3 AI สร้างจากเงื่อนไขในพรอมต์ ไม่มีในโฟลเดอร์เฉลย
 
 ### 4.3 · ผลทดสอบจริง 26 เคส (เทียบ baseline กับคำตอบจริง)
 
@@ -958,7 +970,7 @@ AI แปลง "เงื่อนไขทดสอบ" 26 ข้อในพ�
 อยากดูเบราว์เซอร์ทำงานเองอีกรอบ 💬 วางใน Claude Code เดิม:
 
 ```text
-รันเทสต์ใน 00_setup/04_Skill_Setup/01_VastAi_Skill/my_chatbot/e2e อีกครั้งแบบเห็นหน้าจอเบราว์เซอร์
+รันเทสต์ใน 03_week03/01_VastAi_Skill/my_chatbot/e2e อีกครั้งแบบเห็นหน้าจอเบราว์เซอร์
 แล้วสรุปผลเทียบ baseline กับคำตอบจริงเป็นตารางภาษาไทย
 ```
 
@@ -973,7 +985,7 @@ AI แปลง "เงื่อนไขทดสอบ" 26 ข้อในพ�
 💬 ใน Claude Code บน Windows (ปิดหน้าแชทบอท):
 
 ```text
-ปิดหน้าแชทบอทที่สร้างไว้ใน 00_setup/04_Skill_Setup/01_VastAi_Skill/my_chatbot (เก็บข้อมูลการจองไว้)
+ปิดหน้าแชทบอทที่สร้างไว้ใน 03_week03/01_VastAi_Skill/my_chatbot (เก็บข้อมูลการจองไว้)
 ```
 
 แล้วเช็คหน้าเว็บ Instances ว่า**ว่าง**
@@ -1021,7 +1033,8 @@ AI แปลง "เงื่อนไขทดสอบ" 26 ข้อในพ�
 | เครื่องค้าง `loading` นาน / status `Failed to connect to cloud.vast.ai` | host ของเครื่องนั้นเน็ตมีปัญหา → ให้ AI ลบแล้วเช่าเครื่องใหม่ (เจอจริงตอนทดสอบ) |
 | `ไม่มี offer <= $…/hr` | เพดานราคาต่ำไป → ตอบ skill ให้ยอมเพดานสูงขึ้น หรือเปลี่ยน GPU (เช่น RTX 3090) |
 | ssh `Connection refused` หลังเช่า | เครื่องยังบูตไม่เสร็จ รอ 1–2 นาที หรือใช้คำสั่ง proxy |
-| skill หา SSH key ไม่เจอ | เปิด Terminal ไม่ใช่ที่ `/workspace` → `cd /workspace` แล้วเปิด `yolo1` ใหม่ |
+| skill หา SSH key ไม่เจอ | เปิด Terminal ไม่ใช่ที่ `/workspace` → `cd /workspace` แล้วเปิด `yolo1` ใหม่ · หรือยังไม่ได้คัดลอก `Devtool_SSH/` มาไว้ที่โฟลเดอร์ repo (ขั้นที่ 2 ข้อ 1) |
+| `vastai MISSING` (ขั้นที่ 4) | ยังไม่ได้คัดลอก skill `vastai` เข้า `shared` → ใช้คำสั่ง `docker cp` ใต้ผลของขั้นที่ 4 |
 | แชทบอทขึ้น error | เครื่อง 5090 ถูกลบ/หยุดไปแล้ว หรือ `.env.vast` เปลี่ยน → 💬 บอก Claude Code ว่า "หน้าแชทต่อ AI ไม่ได้ ช่วยตรวจ my_chatbot กับ backend/.env.vast แล้วแก้ให้" |
 | ลืมลบเครื่อง | เปิด https://cloud.vast.ai/instances/ → กด 🗑️ (destroy) ทุกเครื่องที่ไม่ใช้ · **stop ยังเสียค่า disk** |
 
