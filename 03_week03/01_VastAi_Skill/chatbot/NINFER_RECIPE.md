@@ -27,7 +27,8 @@ AI สร้างคำสั่งจาก "คำสั่งอ้างอ
 
 ### 2.1 เช่าเครื่อง
 
-- GPU `RTX_5090` 1 ใบ · verified · ราคารวมไม่เกิน `MAX_DPH` · ป้าย `LABEL`
+- GPU `RTX_5090` 1 ใบ · verified · ราคารวม (GPU + disk 90 GB) ไม่เกิน `MAX_DPH` · ป้าย `LABEL`
+- driver ของเครื่องต้องรองรับ CUDA 13.1 ขึ้นไป (`cuda_max_good>=13.1`) เพราะ image ใช้ CUDA 13.1
 - ความเร็วดาวน์โหลดของเครื่องมากกว่า 2500 Mbps (ไฟล์โมเดล ~20 GiB) · เลือกเครื่องที่ค่าดาวน์โหลดต่อ GB ต่ำ
 - image `nvidia/cuda:13.1.2-devel-ubuntu24.04` (image เดียวกับ Dockerfile ของ NInfer) · disk 90 GB · ssh แบบ direct · เปิดพอร์ต `-p 8080:8080`
 - เครื่องค้าง `loading` เกิน 10 นาที หรือสถานะเป็น `exited` `offline` `unknown` → ลบแล้วเช่าเครื่องจาก host อื่น
