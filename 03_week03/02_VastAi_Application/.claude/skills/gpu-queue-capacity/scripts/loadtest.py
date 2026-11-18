@@ -1,4 +1,4 @@
-"""LAB 8: load test for the synchronous image API - how many concurrent users fit on 1 GPU?
+"""LAB 9: load test for the synchronous image API - how many concurrent users fit on 1 GPU?
 
 Runs on the same rented machine as the API. Each simulated user: send a prompt -> wait for the
 JPEG (give up after 30 s = failed) -> look at it for 2.5-7.5 s (mean 5) -> send again.
@@ -38,7 +38,7 @@ REFINE_STEPS = 2
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--url", default="http://127.0.0.1:8000")
-ap.add_argument("--key-file", default="/workspace/lab8/api_key.txt")
+ap.add_argument("--key-file", default="/workspace/lab9/api_key.txt")
 ap.add_argument("--prompts", default=str(Path(__file__).with_name("prompts.txt")))
 ap.add_argument("--out", default="loadtest.json")
 ap.add_argument("--mode", choices=["sync", "hybrid"], default="sync",

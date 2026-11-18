@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# gpu-queue-capacity: start/stop the parts of the LAB 8 system on the rented Vast.ai machine.
-# Built from the commands that ran in LAB 8 (image vastai/pytorch, Python in /venv/main, no Docker on the machine).
+# gpu-queue-capacity: start/stop the parts of the LAB 9 system on the rented Vast.ai machine.
+# Built from the commands that ran in LAB 9 (image vastai/pytorch, Python in /venv/main, no Docker on the machine).
 #   bash stack.sh setup            pip packages into /venv/main + apt rabbitmq-server, then start RabbitMQ
 #   bash stack.sh rabbit           start RabbitMQ (as user rabbitmq, HOME=/var/lib/rabbitmq) if it is not up
 #   bash stack.sh sync [PORT]      synchronous API (sync_server.py) on GPU 0, default port 8001 (internal)
@@ -8,11 +8,11 @@
 #   bash stack.sh worker GPU       worker.py on GPU <GPU>, name gpu<GPU>
 #   bash stack.sh stop sync|gateway|worker GPU|all
 #   bash stack.sh status
-# Code lives in /workspace/lab8/code, logs and results in /workspace/lab8. Every server runs with
+# Code lives in /workspace/lab9/code, logs and results in /workspace/lab9. Every server runs with
 # setsid nohup, so a dropped SSH session does not stop it. The API key is made once in
-# /workspace/lab8/api_key.txt (mode 600) and is never printed.
+# /workspace/lab9/api_key.txt (mode 600) and is never printed.
 set -u
-W=/workspace/lab8; C=$W/code; PY=/venv/main/bin
+W=/workspace/lab9; C=$W/code; PY=/venv/main/bin
 mkdir -p "$W" "$W/images"
 
 ensure_key() {

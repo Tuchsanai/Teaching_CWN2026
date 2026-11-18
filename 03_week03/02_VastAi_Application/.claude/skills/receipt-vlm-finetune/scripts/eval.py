@@ -1,4 +1,4 @@
-"""LAB 4 · Evaluation: receipt-base vs receipt-ft on the CORD-v2 Test Set (100 receipts).
+"""LAB 2 · Evaluation: receipt-base vs receipt-ft on the CORD-v2 Test Set (100 receipts).
 
 Sends every Test Set receipt, one at a time, to both models on the AI server from step 4
 (OpenAI-compatible, vLLM) with the same PROMPT used in training, temperature 0, then scores:
@@ -10,8 +10,8 @@ Sends every Test Set receipt, one at a time, to both models on the AI server fro
   - Seconds / receipt  : mean wall-clock time of one request
 
 Usage (on the rented machine, server running):
-    python eval.py --data /workspace/lab4/data --out /workspace/lab4/eval \
-                   --train-info /workspace/lab4/out/train_info.json
+    python eval.py --data /workspace/lab2/data --out /workspace/lab2/eval \
+                   --train-info /workspace/lab2/out/train_info.json
 Re-running resumes: receipts already in predictions_<model>.jsonl are skipped.
 The API key is read from a file on the machine (never printed).
 """
@@ -261,11 +261,11 @@ def pick_examples(test, res, n=4):
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", default="/workspace/lab4/data")
-    ap.add_argument("--out", default="/workspace/lab4/eval")
+    ap.add_argument("--data", default="/workspace/lab2/data")
+    ap.add_argument("--out", default="/workspace/lab2/eval")
     ap.add_argument("--url", default="http://127.0.0.1:8000/v1")
-    ap.add_argument("--key-file", default="/workspace/lab4/secret/api_key")
-    ap.add_argument("--train-info", default="/workspace/lab4/out/train_info.json")
+    ap.add_argument("--key-file", default="/workspace/lab2/secret/api_key")
+    ap.add_argument("--train-info", default="/workspace/lab2/out/train_info.json")
     a = ap.parse_args()
     os.makedirs(f"{a.out}/images", exist_ok=True)
     with open(a.key_file) as f:

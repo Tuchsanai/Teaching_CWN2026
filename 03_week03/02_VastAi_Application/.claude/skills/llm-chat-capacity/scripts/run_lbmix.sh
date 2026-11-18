@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd /workspace/lab6
+cd /workspace/lab7
 for lb in round_robin least_conn; do
   bash cluster.sh lb $lb
   sleep 5

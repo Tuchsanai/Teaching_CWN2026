@@ -1,12 +1,12 @@
-"""LAB 4 · CORD-v2 receipt data.
+"""LAB 2 · CORD-v2 receipt data.
 
 Loads naver-clova-ix/cord-v2 (official train / validation / test split), resizes every
 receipt so its long side is at most 1280 px, converts each ground truth into the JSON
 the model must answer, and keeps the one PROMPT shared by training, evaluation and the web.
 
 Usage (on the rented machine):
-    python receipt_data.py prepare --out /workspace/lab4/data
-    python receipt_data.py samples --out /workspace/lab4/data --save dataset_samples.jpg
+    python receipt_data.py prepare --out /workspace/lab2/data
+    python receipt_data.py samples --out /workspace/lab2/data --save dataset_samples.jpg
 HF_TOKEN is read from the environment only (never written to disk).
 """
 import argparse
@@ -185,7 +185,7 @@ def samples(out, save, n=6, seed=0):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["prepare", "samples"])
-    ap.add_argument("--out", default="/workspace/lab4/data")
-    ap.add_argument("--save", default="/workspace/lab4/dataset_samples.jpg")
+    ap.add_argument("--out", default="/workspace/lab2/data")
+    ap.add_argument("--save", default="/workspace/lab2/dataset_samples.jpg")
     a = ap.parse_args()
     prepare(a.out) if a.cmd == "prepare" else samples(a.out, a.save)

@@ -1,4 +1,4 @@
-"""LAB 8: GPU worker of the hybrid system (RabbitMQ "jobs" -> SDXL-Turbo -> JPEG for gateway.py).
+"""LAB 9: GPU worker of the hybrid system (RabbitMQ "jobs" -> SDXL-Turbo -> JPEG for gateway.py).
 
 One process = one GPU. Takes up to 4 waiting jobs at once (prefetch 4) and draws them as one batch,
 with the same model and settings as the baseline (SDXL-Turbo, 512x512, 4 steps, guidance 0).
@@ -17,7 +17,7 @@ from diffusers import AutoPipelineForText2Image
 
 MODEL, SIZE, STEPS = "stabilityai/sdxl-turbo", 512, 4          # same as baseline (sync_server.py)
 AMQP_URL = os.environ.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/")
-IMAGE_DIR = Path(os.environ.get("IMAGE_DIR", "/workspace/lab8/images"))
+IMAGE_DIR = Path(os.environ.get("IMAGE_DIR", "/workspace/lab9/images"))
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--gpu", type=int, required=True, help="GPU index, e.g. 0")

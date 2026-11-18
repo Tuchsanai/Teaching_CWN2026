@@ -1,7 +1,7 @@
 # ทดสอบแชทบอท shop-bot ผ่าน NGINX: 2 คำถามพร้อม key (streaming) + เรียกแบบไม่มี key
 import json, time, urllib.request, urllib.error
 URL = "http://127.0.0.1:8000/v1/chat/completions"
-KEY = open("/workspace/lab6/secrets/api_key").read().strip()
+KEY = open("/workspace/lab7/secrets/api_key").read().strip()
 SYS = "คุณคือพนักงานร้านขายของใช้ในบ้าน ตอบลูกค้าเป็นภาษาไทย สุภาพ กระชับ"
 QS = ["น้ำยาล้างจานแบบไหนอ่อนโยนต่อมือ เหมาะกับคนผิวแพ้ง่ายคะ",
       "ไม้ถูพื้นแบบสเปรย์กับแบบถังปั่น ต่างกันอย่างไร ควรเลือกแบบไหนดีครับ"]

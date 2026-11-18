@@ -1,4 +1,4 @@
-"""LAB 8: kill a GPU worker in the middle of the work and prove no job is lost.
+"""LAB 9: kill a GPU worker in the middle of the work and prove no job is lost.
 
 Runs on the rented machine next to gateway.py while 2 workers (gpu0, gpu1) are up.
   1. 90 jobs arrive at the gateway within 3 s; one of them is a bad job (prompt = blank text)
@@ -15,7 +15,7 @@ from pathlib import Path
 ap = argparse.ArgumentParser()
 ap.add_argument("--host", default="127.0.0.1")
 ap.add_argument("--port", type=int, default=8000)
-ap.add_argument("--key-file", default="/workspace/lab8/api_key.txt")
+ap.add_argument("--key-file", default="/workspace/lab9/api_key.txt")
 ap.add_argument("--prompts", default=str(Path(__file__).with_name("prompts.txt")))
 ap.add_argument("--amqp", default=os.environ.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/"))
 ap.add_argument("--jobs", type=int, default=90)
@@ -23,8 +23,8 @@ ap.add_argument("--within", type=float, default=3.0, help="all jobs arrive withi
 ap.add_argument("--bad-index", type=int, default=45, help="which job is the bad one (blank prompt)")
 ap.add_argument("--kill-at", type=float, default=4.0)
 ap.add_argument("--kill-gpu", type=int, default=1)
-ap.add_argument("--restart-cmd", default="cd /workspace/lab8/code && exec /venv/main/bin/python worker.py "
-                                         "--gpu {gpu} --name gpu{gpu} >> /workspace/lab8/worker_gpu{gpu}.log 2>&1")
+ap.add_argument("--restart-cmd", default="cd /workspace/lab9/code && exec /venv/main/bin/python worker.py "
+                                         "--gpu {gpu} --name gpu{gpu} >> /workspace/lab9/worker_gpu{gpu}.log 2>&1")
 ap.add_argument("--out", default="killtest.json")
 args = ap.parse_args()
 

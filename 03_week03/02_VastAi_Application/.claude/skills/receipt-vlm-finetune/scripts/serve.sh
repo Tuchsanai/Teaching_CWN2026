@@ -1,7 +1,7 @@
 #!/bin/bash
-# LAB 4 · OpenAI-compatible receipt server (vLLM, port 8000) on the rented machine.
+# LAB 2 · OpenAI-compatible receipt server (vLLM, port 8000) on the rented machine.
 #   receipt-base = Qwen/Qwen3-VL-2B-Instruct
-#   receipt-ft   = the same base + LoRA adapter from step 3 (/workspace/lab4/out/adapter)
+#   receipt-ft   = the same base + LoRA adapter from step 3 (/workspace/lab2/out/adapter)
 # Both models share one GPU: vLLM loads the base once and applies the adapter per request.
 #
 # Usage (on the rented machine):
@@ -11,10 +11,10 @@
 #   MAX_LORA_RANK=16 bash serve.sh start   # only when the adapter was trained with rank > 8
 #
 # The API key is generated once with openssl and kept only on this machine
-# (/workspace/lab4/secret/api_key, mode 600). It is passed to vLLM through the
+# (/workspace/lab2/secret/api_key, mode 600). It is passed to vLLM through the
 # VLLM_API_KEY environment variable so it never shows up in `ps` or in the logs.
 set -u
-LAB=/workspace/lab4
+LAB=/workspace/lab2
 VENV=$LAB/venv
 ADAPTER=$LAB/out/adapter
 BASE=Qwen/Qwen3-VL-2B-Instruct

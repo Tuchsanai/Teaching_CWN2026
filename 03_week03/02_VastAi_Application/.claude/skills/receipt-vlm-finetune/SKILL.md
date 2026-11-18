@@ -1,13 +1,13 @@
 ---
 name: receipt-vlm-finetune
-description: Fine-tune โมเดล Vision-Language Qwen3-VL-2B-Instruct ด้วย LoRA ให้อ่านใบเสร็จ (Dataset CORD-v2) แล้วตอบเป็น JSON บนเครื่อง GPU ที่เช่าจาก Vast.ai ครบวงจรในคำสั่งเดียว — เช่าเครื่อง → เตรียม Dataset → Training → เปิด AI server vLLM สองโมเดล (receipt-base / receipt-ft) → Evaluation Base vs Fine-tuned บน Test Set → (เลือกได้) เว็บสมุดรายจ่าย → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล receipt-vlm-finetune", "fine-tune โมเดลอ่านใบเสร็จ", "ทำ LAB 4 ซ้ำ", "เทรน VLM/Qwen-VL อ่านใบเสร็จบน Vast.ai" หรือขอทำซ้ำด้วยจำนวน Epoch / learning rate / LoRA rank / GPU / งบที่ต่างไปจากเดิม
+description: Fine-tune โมเดล Vision-Language Qwen3-VL-2B-Instruct ด้วย LoRA ให้อ่านใบเสร็จ (Dataset CORD-v2) แล้วตอบเป็น JSON บนเครื่อง GPU ที่เช่าจาก Vast.ai ครบวงจรในคำสั่งเดียว — เช่าเครื่อง → เตรียม Dataset → Training → เปิด AI server vLLM สองโมเดล (receipt-base / receipt-ft) → Evaluation Base vs Fine-tuned บน Test Set → (เลือกได้) เว็บสมุดรายจ่าย → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล receipt-vlm-finetune", "fine-tune โมเดลอ่านใบเสร็จ", "ทำ LAB 2 ซ้ำ", "เทรน VLM/Qwen-VL อ่านใบเสร็จบน Vast.ai" หรือขอทำซ้ำด้วยจำนวน Epoch / learning rate / LoRA rank / GPU / งบที่ต่างไปจากเดิม
 ---
 
 # receipt-vlm-finetune (เวอร์ชัน 0)
 
-ทำซ้ำงานของ LAB 4 ทั้งหมดในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหา เช่า SSH คัดลอกไฟล์ ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) — อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่สอนวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร
+ทำซ้ำงานของ LAB 2 ทั้งหมดในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหา เช่า SSH คัดลอกไฟล์ ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) — อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่สอนวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร
 
-โค้ดทั้งหมดใช้ชุดที่ทดสอบจริงแล้วในโฟลเดอร์ `scripts/` ข้างไฟล์นี้ **ห้ามเขียนใหม่** คัดลอกขึ้นเครื่องเช่าที่ `/workspace/lab4/code/` แล้วรันตามขั้นตอน
+โค้ดทั้งหมดใช้ชุดที่ทดสอบจริงแล้วในโฟลเดอร์ `scripts/` ข้างไฟล์นี้ **ห้ามเขียนใหม่** คัดลอกขึ้นเครื่องเช่าที่ `/workspace/lab2/code/` แล้วรันตามขั้นตอน
 
 | สคริปต์ | หน้าที่ |
 |---|---|
@@ -21,7 +21,7 @@ description: Fine-tune โมเดล Vision-Language Qwen3-VL-2B-Instruct ด�
 
 | ค่า | ค่าเริ่มต้น | ความหมาย |
 |---|---|---|
-| `label` | `vapp-lab4` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
+| `label` | `vapp-lab2` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
 | `gpu` | RTX 4090 × 1 | รุ่นและจำนวน GPU (ต้องมี VRAM ≥ 24 GB) |
 | `max_price` | $0.80/ชม. | ราคารวมสูงสุด (GPU + disk) |
 | `offer_filter` | verified · เน็ตลง ≥ 500 Mbps · ค่าดาวน์โหลด ≤ $0.01/GB · driver รองรับ CUDA 13 · เลือกถูกสุด | เกณฑ์เลือกเครื่อง (งานนี้โหลดราว 11–15 GB) |
@@ -36,8 +36,8 @@ description: Fine-tune โมเดล Vision-Language Qwen3-VL-2B-Instruct ด�
 | `lora_rank` / `lora_alpha` | 8 / 16 | LoRA → `--rank` `--alpha` (rank > 8 ต้องเปิด server ด้วย `MAX_LORA_RANK=<rank>`) |
 | `grad_accum` | 4 | ป้อนทีละ 1 ใบ สะสม gradient กี่ใบก่อนปรับน้ำหนัก → `--grad-accum` |
 | `seed` | 0 | → `--seed` |
-| `out_dir` | `lab4_vlm/results` | โฟลเดอร์เก็บผลบนเครื่องนี้ (มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ย่อยใหม่ เช่น `lab4_vlm/results/skill_v0_run`) |
-| `web` | เปิด | เปิดเว็บสมุดรายจ่าย `lab4_vlm/code/web` ที่ http://localhost:3404 และทดสอบ test_092 test_051 test_020 |
+| `out_dir` | `lab2_vlm/results` | โฟลเดอร์เก็บผลบนเครื่องนี้ (มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ย่อยใหม่ เช่น `lab2_vlm/results/skill_v0_run`) |
+| `web` | เปิด | เปิดเว็บสมุดรายจ่าย `lab2_vlm/code/web` ที่ http://localhost:3404 และทดสอบ test_092 test_051 test_020 |
 | `keep_machine` | ไม่ | `ใช่` = ไม่ลบเครื่องตอนจบ (ต้องบอกผู้ใช้ชัดว่ายังคิดเงิน) |
 | `container` | `multi-account` · `/workspace/vastapp_lab` | ที่ทำงานของสกิล vastai |
 | `ssh_key` | `/workspace/vastai_lab/Devtool_SSH/devtoolSSH` | กุญแจ SSH ใน container |
@@ -49,18 +49,18 @@ description: Fine-tune โมเดล Vision-Language Qwen3-VL-2B-Instruct ด�
 1. **เช่าเครื่อง** — ด้วยสกิล vastai ค้นหาตาม `gpu` `max_price` `offer_filter` เช่าด้วย `image` `disk_gb` ตั้งป้าย `label` **เปิดพอร์ต 8000** รอจน SSH เข้าได้และ `nvidia-smi` เห็น GPU
    - ทดสอบความเร็วโหลดจาก Hugging Face (โหลด `base_model` ไปเลยเพื่อไม่ต้องโหลดซ้ำ) ช้ากว่า `min_hf_speed` หรือเกิน `ready_timeout` → ลบทันทีแล้วเช่าเครื่องถัดไป
    - เครื่องที่ถูกที่สุดอาจถูกคนอื่นเช่าไปแล้ว (สร้างไม่ได้) → ข้ามไปเครื่องถัดไป
-2. **เตรียมเครื่องและ Dataset** — บนเครื่องเช่าสร้าง venv `/workspace/lab4/venv` ติดตั้ง `vllm peft datasets matplotlib` (vllm ดึง torch ที่ตรงกับตัวเองมาให้) คัดลอก `scripts/*` ขึ้นไปที่ `/workspace/lab4/code/` แล้วรัน
-   `python receipt_data.py prepare --out /workspace/lab4/data` และ `python receipt_data.py samples --out /workspace/lab4/data --save /workspace/lab4/dataset_samples.jpg`
+2. **เตรียมเครื่องและ Dataset** — บนเครื่องเช่าสร้าง venv `/workspace/lab2/venv` ติดตั้ง `vllm peft datasets matplotlib` (vllm ดึง torch ที่ตรงกับตัวเองมาให้) คัดลอก `scripts/*` ขึ้นไปที่ `/workspace/lab2/code/` แล้วรัน
+   `python receipt_data.py prepare --out /workspace/lab2/data` และ `python receipt_data.py samples --out /workspace/lab2/data --save /workspace/lab2/dataset_samples.jpg`
    - `HF_TOKEN` อ่านจาก `.env` ของโฟลเดอร์บท ส่งผ่าน stdin ของ SSH ใช้แค่ในคำสั่งนั้น ห้ามใส่ในบรรทัดคำสั่ง ห้ามเขียนลงไฟล์ เสร็จแล้วตรวจว่าไม่มี `~/.cache/huggingface/token` และตัวแปร `HF_TOKEN` ค้าง
-3. **Training** — `cd /workspace/lab4/code && setsid nohup bash run_train.sh --epochs <epochs> --lr <lr> --rank <lora_rank> --alpha <lora_alpha> --grad-accum <grad_accum> --seed <seed> &` (แยกจาก SSH)
-   รายงานความคืบหน้าทุก ~2 นาทีจาก `/workspace/lab4/out/train.log` (ขึ้นทุก 10 step) จนเจอบรรทัด `DONE`
-   ผล: `/workspace/lab4/out/adapter/` · `loss_curve.png` · `train_info.json` · `history.json` · `train.log`
+3. **Training** — `cd /workspace/lab2/code && setsid nohup bash run_train.sh --epochs <epochs> --lr <lr> --rank <lora_rank> --alpha <lora_alpha> --grad-accum <grad_accum> --seed <seed> &` (แยกจาก SSH)
+   รายงานความคืบหน้าทุก ~2 นาทีจาก `/workspace/lab2/out/train.log` (ขึ้นทุก 10 step) จนเจอบรรทัด `DONE`
+   ผล: `/workspace/lab2/out/adapter/` · `loss_curve.png` · `train_info.json` · `history.json` · `train.log`
 4. **AI server** — `bash serve.sh start` (รอจนพร้อม ปกติ ~3 นาที) หาพอร์ตภายนอกที่แมปกับ 8000 แล้วทดสอบจากนอกเครื่อง 3 ข้อ: `GET /v1/models` เห็น `receipt-base` และ `receipt-ft` · ส่ง `test_020` ให้ `receipt-ft` พร้อม key ได้ JSON · ไม่มี key ได้ 401
-   - ถ้า `web` เปิด: เขียน `lab4_vlm/code/receipt.env` (`RECEIPT_BASE_URL=http://<ip>:<port>/v1` `RECEIPT_API_KEY` `RECEIPT_MODEL_BASE=receipt-base` `RECEIPT_MODEL_FT=receipt-ft`) อ่าน key จาก `/workspace/lab4/secret/api_key` ผ่าน SSH โดยไม่พิมพ์ค่าออกมา
-5. **Evaluation** — บนเครื่องเช่า `cd /workspace/lab4/code && /workspace/lab4/venv/bin/python eval.py --data /workspace/lab4/data --out /workspace/lab4/eval --train-info /workspace/lab4/out/train_info.json` (รันแยกจาก SSH, ~3–5 นาที)
+   - ถ้า `web` เปิด: เขียน `lab2_vlm/code/receipt.env` (`RECEIPT_BASE_URL=http://<ip>:<port>/v1` `RECEIPT_API_KEY` `RECEIPT_MODEL_BASE=receipt-base` `RECEIPT_MODEL_FT=receipt-ft`) อ่าน key จาก `/workspace/lab2/secret/api_key` ผ่าน SSH โดยไม่พิมพ์ค่าออกมา
+5. **Evaluation** — บนเครื่องเช่า `cd /workspace/lab2/code && /workspace/lab2/venv/bin/python eval.py --data /workspace/lab2/data --out /workspace/lab2/eval --train-info /workspace/lab2/out/train_info.json` (รันแยกจาก SSH, ~3–5 นาที)
    ดึงผลกลับมาที่ `out_dir`: `eval/` (metrics.json · predictions_*.jsonl · images/) · `adapter/` · `train/` (loss_curve.png · train_info.json · history.json · train.log) · `dataset_samples.jpg` เปิดดู `eval/images/examples.jpg` อย่างน้อย 1 รูป
-6. **เว็บ** (ถ้า `web`) — `docker compose up -d --build` ใน `lab4_vlm/code/web` (project `vapp-lab4`) รอ http://localhost:3404 ได้ 200 แล้วอ่าน test_092 test_051 test_020 ผ่านเว็บด้วยทั้งสองโมเดล จด รายการที่อ่านถูก · ยอดรวมถูก/ผิด · เวลา
-7. **ปิดทุกอย่าง (ห้ามข้าม เว้นแต่ `keep_machine`)** — ตรวจว่าผลใน `out_dir` ครบก่อน แล้วด้วยสกิล vastai ลบเครื่องป้าย `label` และตรวจซ้ำว่าไม่เหลือในบัญชี · ถ้าเปิดเว็บ `docker compose down` **ไม่ใส่ `-v`** (เก็บรายจ่ายใน volume `vapp-lab4_dbdata`) · ดูบิลจริง (invoices): อายุเครื่อง ราคาต่อชั่วโมง ยอด GPU · disk · รับส่งข้อมูล
+6. **เว็บ** (ถ้า `web`) — `docker compose up -d --build` ใน `lab2_vlm/code/web` (project `vapp-lab2`) รอ http://localhost:3404 ได้ 200 แล้วอ่าน test_092 test_051 test_020 ผ่านเว็บด้วยทั้งสองโมเดล จด รายการที่อ่านถูก · ยอดรวมถูก/ผิด · เวลา
+7. **ปิดทุกอย่าง (ห้ามข้าม เว้นแต่ `keep_machine`)** — ตรวจว่าผลใน `out_dir` ครบก่อน แล้วด้วยสกิล vastai ลบเครื่องป้าย `label` และตรวจซ้ำว่าไม่เหลือในบัญชี · ถ้าเปิดเว็บ `docker compose down` **ไม่ใส่ `-v`** (เก็บรายจ่ายใน volume `vapp-lab2_dbdata`) · ดูบิลจริง (invoices): อายุเครื่อง ราคาต่อชั่วโมง ยอด GPU · disk · รับส่งข้อมูล
 
 ## เกณฑ์ตรวจผ่าน
 

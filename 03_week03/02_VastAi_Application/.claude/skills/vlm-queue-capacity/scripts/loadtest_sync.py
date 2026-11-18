@@ -1,4 +1,4 @@
-"""LAB 7 load generator (runs on the same machine as the server).
+"""LAB 8 load generator (runs on the same machine as the server).
 
 Closed-loop users: each simulated user picks 4 random receipts from the samples
 folder -> sends one job -> waits for the answer (gives up after 30 s = failed)
@@ -244,7 +244,7 @@ async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["level", "sweep", "burst"])
     ap.add_argument("--url", default="http://127.0.0.1:8000")
-    ap.add_argument("--key-file", default=os.environ.get("LAB7_KEY_FILE", "/workspace/lab7/.api_key"))
+    ap.add_argument("--key-file", default=os.environ.get("LAB8_KEY_FILE", "/workspace/lab8/.api_key"))
     ap.add_argument("--samples", default=str(HERE.parent / "samples"))
     ap.add_argument("--out", default=str(HERE.parent / "results" / "baseline"))
     ap.add_argument("--users", type=int, default=1)

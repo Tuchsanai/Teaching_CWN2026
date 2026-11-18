@@ -434,7 +434,7 @@ def run_samples(a, key, url):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default="http://127.0.0.1:8000/v1/chat/completions")
-    ap.add_argument("--key-file", default="/workspace/lab6/secrets/api_key")
+    ap.add_argument("--key-file", default="/workspace/lab7/secrets/api_key")
     ap.add_argument("--levels", default="1,2,3,4,6,8")
     ap.add_argument("--duration", type=float, default=30)
     ap.add_argument("--warmup", type=float, default=5)
@@ -445,7 +445,7 @@ def main():
     ap.add_argument("--long-max-tokens", type=int, default=600, help="max_tokens ของคำถามยาว")
     ap.add_argument("--procs", type=int, default=0, help="จำนวน process ของตัวยิง (0 = ครึ่งหนึ่งของ CPU)")
     ap.add_argument("--vllm-ports", default="8001", help="พอร์ต vLLM ที่อ่าน /metrics (คั่นด้วย ,)")
-    ap.add_argument("--state-file", default="/workspace/lab6/run/state.env")
+    ap.add_argument("--state-file", default="/workspace/lab7/run/state.env")
     ap.add_argument("--label", default="run")
     ap.add_argument("--out", default="results")
     ap.add_argument("--seed", type=int, default=6)

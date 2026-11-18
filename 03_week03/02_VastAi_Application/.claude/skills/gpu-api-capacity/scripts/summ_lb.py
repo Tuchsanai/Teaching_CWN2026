@@ -1,6 +1,6 @@
 import json, sys, os
 for name in sys.argv[1:]:
-    p = f"/workspace/lab5/results/{name}.json"
+    p = f"/workspace/lab6/results/{name}.json"
     if not os.path.exists(p): print(name, "missing"); continue
     d = json.load(open(p))
     rows = sorted(d["levels"] + d["bisect"], key=lambda r: r["users"])

@@ -1,0 +1,15 @@
+// คำบรรยายภาพ 12 ข้อชุดเดียวกับ lab9_hybrid/code/prompts.txt ใช้กับปุ่มส่งงานเป็นชุด
+export const PROMPTS = [
+  "a white lighthouse on a rocky coast at sunset, photo",
+  "a vintage red bicycle leaning against a brick wall, photo",
+  "a steaming bowl of ramen with egg and green onions, top view, photo",
+  "a golden retriever running on a sandy beach, photo",
+  "a cup of latte with heart latte art on a wooden table, photo",
+  "a snowy mountain peak above a calm blue lake, photo",
+  "a yellow taxi on a rainy city street at night, photo",
+  "a basket of fresh strawberries at a farmers market, photo",
+  "an old wooden sailboat docked in a small harbor, photo",
+  "a cozy reading corner with an armchair and a bookshelf, photo",
+  "a field of sunflowers under a clear summer sky, photo",
+  "a tabby cat sleeping on a windowsill in morning light, photo",
+];

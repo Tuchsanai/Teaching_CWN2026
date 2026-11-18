@@ -1,5 +1,5 @@
 import json, time, urllib.request, subprocess, threading
-key = open('/workspace/lab6/secrets/api_key').read().strip()
+key = open('/workspace/lab7/secrets/api_key').read().strip()
 def gpu():
     return subprocess.check_output(['nvidia-smi','-i','0','--query-gpu=temperature.gpu,clocks.sm,clocks.max.sm,utilization.gpu','--format=csv,noheader,nounits']).decode().strip()
 print('idle GPU0 (temp,clock,maxclock,util):', gpu())

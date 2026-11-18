@@ -1,0 +1,12 @@
+# PixelQueue — ห้องสร้างภาพของ LAB 9 (เปิด: docker compose up -d --build → http://localhost:3408)
+# T2I_BASE_URL กับ T2I_API_KEY อ่านจาก .env ตอนรัน (ไม่ฝังใน image และไม่ส่งไปเบราว์เซอร์)
+name: vapp-lab9
+
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3408:3000"

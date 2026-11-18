@@ -1,4 +1,4 @@
-"""LAB 7 API gateway: accepts receipt jobs, puts them on RabbitMQ, keeps every job in SQLite.
+"""LAB 8 API gateway: accepts receipt jobs, puts them on RabbitMQ, keeps every job in SQLite.
 
 POST /jobs       (X-API-Key, multipart "files" = 1..8 receipt images) -> 202 {"job_id"} at once
                  503 when the queue already holds 1000 jobs
@@ -12,7 +12,7 @@ Workers never talk to the gateway over HTTP: they publish events (started / done
 heartbeat) to the durable queue receipts.events and this process writes them into SQLite.
 
 Run (keeps going after SSH drops):
-  LAB7_KEY_FILE=/workspace/lab7/.api_key setsid nohup python gateway.py > gateway.log 2>&1 &
+  LAB8_KEY_FILE=/workspace/lab8/.api_key setsid nohup python gateway.py > gateway.log 2>&1 &
 """
 import base64
 import json
@@ -29,9 +29,9 @@ from fastapi.responses import JSONResponse
 
 from common import DLQ, EVENT_QUEUE, JOB_QUEUE, MAX_QUEUE, PERSISTENT, connect, declare
 
-KEY_FILE = os.environ.get("LAB7_KEY_FILE", "/workspace/lab7/.api_key")
-DB_PATH = os.environ.get("LAB7_DB", "/workspace/lab7/jobs.db")
-PORT = int(os.environ.get("LAB7_PORT", "8000"))
+KEY_FILE = os.environ.get("LAB8_KEY_FILE", "/workspace/lab8/.api_key")
+DB_PATH = os.environ.get("LAB8_DB", "/workspace/lab8/jobs.db")
+PORT = int(os.environ.get("LAB8_PORT", "8000"))
 MAX_FILES = 8
 WORKER_ALIVE_S = 20  # a worker that sent no heartbeat for this long counts as disconnected
 
@@ -172,7 +172,7 @@ def event_loop():
 threading.Thread(target=event_loop, daemon=True).start()
 
 # ------------------------------------------------------------------ API
-app = FastAPI(title="LAB7 receipt job gateway")
+app = FastAPI(title="LAB8 receipt job gateway")
 
 
 def check_key(key):

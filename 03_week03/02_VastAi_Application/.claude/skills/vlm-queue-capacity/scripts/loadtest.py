@@ -1,4 +1,4 @@
-"""LAB 7 load generator for the JOB QUEUE (gateway.py + worker.py), same machine as the gateway.
+"""LAB 8 load generator for the JOB QUEUE (gateway.py + worker.py), same machine as the gateway.
 
 Closed-loop users, same as the baseline: each simulated user picks 4 random receipts ->
 POST /jobs (gets a job_id at once) -> asks GET /jobs/{id} every 0.5 s until done/failed
@@ -319,11 +319,11 @@ async def run_burst(cli, args):
 
 
 def find_worker_pid(gpu):
-    """PID of the python worker.py process started with LAB7_GPU=<gpu> (same machine)."""
+    """PID of the python worker.py process started with LAB8_GPU=<gpu> (same machine)."""
     for p in psutil.process_iter(["pid", "cmdline"]):
         try:
             if "worker.py" in (p.info["cmdline"] or []) and \
-                    p.environ().get("LAB7_GPU") == str(gpu):
+                    p.environ().get("LAB8_GPU") == str(gpu):
                 return p.info["pid"]
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
@@ -336,7 +336,7 @@ async def run_killtest(cli, args):
     before = await cli.stats()
     pid = find_worker_pid(args.kill_gpu)
     if pid is None:
-        raise SystemExit(f"no worker.py with LAB7_GPU={args.kill_gpu} is running")
+        raise SystemExit(f"no worker.py with LAB8_GPU={args.kill_gpu} is running")
     sampler = Sampler(args.gpu_list).start()
     t0 = time.time()
     qs = QueueSampler(cli).start(t0)
@@ -425,7 +425,7 @@ async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["level", "sweep", "burst", "killtest"])
     ap.add_argument("--url", default="http://127.0.0.1:8000")
-    ap.add_argument("--key-file", default=os.environ.get("LAB7_KEY_FILE", "/workspace/lab7/.api_key"))
+    ap.add_argument("--key-file", default=os.environ.get("LAB8_KEY_FILE", "/workspace/lab8/.api_key"))
     ap.add_argument("--samples", default=str(HERE.parent / "samples"))
     ap.add_argument("--out", default=str(HERE.parent / "results" / "queue_1worker"))
     ap.add_argument("--users", type=int, default=1)

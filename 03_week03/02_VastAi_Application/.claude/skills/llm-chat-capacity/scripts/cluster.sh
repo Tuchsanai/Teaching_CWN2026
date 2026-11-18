@@ -11,7 +11,7 @@
 # ทุกคำตอบมี header X-Served-By: vllm-1 | vllm-2  บอกว่าไป vLLM ตัวไหน
 set -euo pipefail
 
-BASE=${BASE:-/workspace/lab6}
+BASE=${BASE:-/workspace/lab7}
 MODEL_PATH=${MODEL_PATH:-/workspace/models/Qwen3-4B-Instruct-2507}
 SERVED_NAME=${SERVED_NAME:-shop-bot}
 MAX_LEN=${MAX_LEN:-4096}
@@ -57,8 +57,8 @@ pid $RUN/nginx.pid;
 error_log $LOGS/nginx_error.log warn;
 events { worker_connections 4096; }
 http {
-    log_format lab6 '\$time_local "\$request" \$status backend=\$upstream_addr rt=\$request_time';
-    access_log $LOGS/nginx_access.log lab6;
+    log_format lab7 '\$time_local "\$request" \$status backend=\$upstream_addr rt=\$request_time';
+    access_log $LOGS/nginx_access.log lab7;
     map_hash_bucket_size 256;
     map \$http_authorization \$key_ok {
         "Bearer ${key}" 1;

@@ -1,6 +1,6 @@
-"""LAB 8: read every result file of the lab -> metrics.json + 6 charts (English labels).
+"""LAB 9: read every result file of the lab -> metrics.json + 6 charts (English labels).
 
-Inputs (in --results, default /workspace/lab8):
+Inputs (in --results, default /workspace/lab9):
   loadtest.json               step 3  ladder, synchronous API, 1 GPU (baseline)
   loadtest_hybrid.json        step 6  ladder, hybrid (gateway + queue + 1 worker)
   loadtest_hybrid_2gpu.json   step 8  ladder, hybrid with 2 workers
@@ -9,7 +9,7 @@ Inputs (in --results, default /workspace/lab8):
 Outputs (in --out): metrics.json and
   1_latency_vs_users.png  2_throughput_vs_users.png  3_scaling_vs_gpus.png
   4_burst_sync_vs_hybrid.png  5_express_vs_normal.png  6_kill_worker_timeline.png
-Run: python report.py [--results /workspace/lab8] [--out /workspace/lab8/report]
+Run: python report.py [--results /workspace/lab9] [--out /workspace/lab9/report]
 Skill v0: only loadtest.json is required. Missing ladders / burst / kill test files are skipped,
 together with the charts that need them (chart 3 needs both hybrid ladders).
 """
@@ -21,8 +21,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--results", default="/workspace/lab8")
-ap.add_argument("--out", default="/workspace/lab8/report")
+ap.add_argument("--results", default="/workspace/lab9")
+ap.add_argument("--out", default="/workspace/lab9/report")
 args = ap.parse_args()
 R, OUT = Path(args.results), Path(args.out)
 OUT.mkdir(parents=True, exist_ok=True)

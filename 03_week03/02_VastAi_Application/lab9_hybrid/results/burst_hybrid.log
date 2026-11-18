@@ -1,0 +1,72 @@
+burst hybrid: 200 jobs in 10.0 s (20 express), stats before: {'waiting': {'normal': 0, 'express': 0, 'in_rabbitmq': 0}, 'running': 0, 'done': 961, 'rejected_429': 0, 'redelivered': 0, 'dead': {'jobs': 0, 'in_dead_letter_queue': 0}, 'cap_normal_now': 100, 'live_workers': 1, 'sec_per_image': 0.255}
+{"t": 0.0, "backlog": 0, "normal": 0, "express": 0, "running": 0, "users_waiting": 0, "users_done_ok": 0}
+{"t": 5.0, "backlog": 176, "normal": 85, "express": 1, "running": 4, "users_waiting": 90, "users_done_ok": 17}
+{"t": 10.0, "backlog": 208, "normal": 100, "express": 2, "running": 4, "users_waiting": 167, "users_done_ok": 33}
+{"t": 15.0, "backlog": 204, "normal": 100, "express": 0, "running": 4, "users_waiting": 147, "users_done_ok": 53}
+{"t": 20.0, "backlog": 204, "normal": 100, "express": 0, "running": 4, "users_waiting": 127, "users_done_ok": 73}
+{"t": 25.0, "backlog": 204, "normal": 100, "express": 0, "running": 4, "users_waiting": 111, "users_done_ok": 89}
+{"t": 30.0, "backlog": 178, "normal": 87, "express": 0, "running": 4, "users_waiting": 91, "users_done_ok": 109}
+{"t": 35.0, "backlog": 138, "normal": 67, "express": 0, "running": 4, "users_waiting": 71, "users_done_ok": 129}
+{"t": 40.0, "backlog": 98, "normal": 47, "express": 0, "running": 4, "users_waiting": 51, "users_done_ok": 149}
+{"t": 45.0, "backlog": 66, "normal": 31, "express": 0, "running": 4, "users_waiting": 35, "users_done_ok": 165}
+{"t": 50.0, "backlog": 26, "normal": 11, "express": 0, "running": 4, "users_waiting": 15, "users_done_ok": 185}
+{
+ "summary": {
+  "jobs": 200,
+  "ok": 200,
+  "ok_pct": 100.0,
+  "gave_up": 0,
+  "errors": 0,
+  "wait_p50_sec": 23.079,
+  "wait_p95_sec": 43.343,
+  "wait_max_sec": 46.332,
+  "first_answer_p50_sec": 0.007,
+  "first_answer_p95_sec": 0.012,
+  "jobs_got_429": 66,
+  "answers_429": 621
+ },
+ "by_priority": {
+  "express": {
+   "jobs": 20,
+   "ok": 20,
+   "ok_pct": 100.0,
+   "gave_up": 0,
+   "errors": 0,
+   "wait_p50_sec": 1.507,
+   "wait_p95_sec": 2.083,
+   "wait_max_sec": 2.433,
+   "first_answer_p50_sec": 0.007,
+   "first_answer_p95_sec": 0.011,
+   "jobs_got_429": 0,
+   "answers_429": 0
+  },
+  "normal": {
+   "jobs": 180,
+   "ok": 180,
+   "ok_pct": 100.0,
+   "gave_up": 0,
+   "errors": 0,
+   "wait_p50_sec": 25.479,
+   "wait_p95_sec": 43.363,
+   "wait_max_sec": 46.332,
+   "first_answer_p50_sec": 0.007,
+   "first_answer_p95_sec": 0.012,
+   "jobs_got_429": 66,
+   "answers_429": 621
+  }
+ },
+ "first_answer_after_burst_start_sec": 0.037,
+ "first_image_after_burst_start_sec": 0.57,
+ "last_image_after_burst_start_sec": 53.643,
+ "images_drawn_by_server": 200,
+ "images_wasted": 0,
+ "server_429_counter_delta": 621,
+ "peak_backlog": 208,
+ "drained_after_sec": 54.0,
+ "gpu_util_mean_pct": [
+  91.2,
+  0.0
+ ],
+ "avg_images_per_batch": 3.92
+}
+-> /workspace/lab9/burst_hybrid.json

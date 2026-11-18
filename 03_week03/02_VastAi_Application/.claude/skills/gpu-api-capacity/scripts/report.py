@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LAB 5 report: read every result file, write metrics.json and PNG charts.
+"""LAB 6 report: read every result file, write metrics.json and PNG charts.
 
 usage: python report.py [results_dir]   (default: ../results next to this file)
 

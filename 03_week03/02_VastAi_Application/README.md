@@ -12,13 +12,13 @@
 |---|---|---|---|---|
 | [LAB 0](#lab-0--เตรียม-key-3-ตัว) | — | เตรียม key 3 ตัวในไฟล์ `.env` | — | ฟรี |
 | [LAB 1](lab1_yolo/README.md) | [lab1_yolo](lab1_yolo/README.md) | เทรน YOLO ตรวจหมวกนิรภัย ด้วย Dataset จาก Roboflow → เว็บตรวจความปลอดภัยหน้างาน | เทรนต่อด้วยข้อมูลของเราแล้วดีขึ้นแค่ไหน | $0.38 |
-| [LAB 2](lab2_multigpu/README.md) | [lab2_multigpu](lab2_multigpu/README.md) | เทรนงานเดิมบน 1 GPU เทียบ 2 GPU | เพิ่ม GPU แล้วเร็วขึ้นกี่เท่า คุ้มเงินไหม | $0.51 |
+| [LAB 2](lab2_vlm/README.md) | [lab2_vlm](lab2_vlm/README.md) | Fine-tune VLM อ่านใบเสร็จ → เว็บสมุดรายจ่าย | เทรนด้วยใบเสร็จ 800 ใบ แล้วอ่านแม่นขึ้นเท่าไร | $0.58 |
 | [LAB 3](lab3_qlora/README.md) | [lab3_qlora](lab3_qlora/README.md) | QLoRA โมเดลเล็กให้แชทบอทร้านนวด (ข้อมูลฝึกจากโมเดลครู) | โมเดลเล็กที่เทรนเพิ่ม แทนโมเดลใหญ่ได้ไหม | $0.69 |
-| [LAB 4](lab4_vlm/README.md) | [lab4_vlm](lab4_vlm/README.md) | Fine-tune VLM อ่านใบเสร็จ → เว็บสมุดรายจ่าย | เทรนด้วยใบเสร็จ 800 ใบ แล้วอ่านแม่นขึ้นเท่าไร | $0.58 |
-| [LAB 5](lab5_image_api/README.md) | [lab5_image_api](lab5_image_api/README.md) | API ตรวจภาพ YOLO: Micro-batching + หลาย process + Load Balancer 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และคอขวดอยู่ที่ไหน | $1.02 |
-| [LAB 6](lab6_llm_chat/README.md) | [lab6_llm_chat](lab6_llm_chat/README.md) | แชทบอท LLM: Continuous Batching + Load Balancer 1 → 2 ใบ | GPU 1 ใบคุยพร้อมกันได้กี่คน และเพิ่ม GPU แล้วรับได้เพิ่มเท่าไร | $0.60 |
-| [LAB 7](lab7_job_queue/README.md) | [lab7_job_queue](lab7_job_queue/README.md) | อ่านใบเสร็จด้วย VLM เป็นงานคิว: RabbitMQ + GPU Worker 1 → 2 ใบ | งานหนักเข้าพร้อมกันเกินความจุ ระบบคิวช่วยอะไร และเพิ่ม Worker แล้วรับได้เพิ่มเท่าไร | $0.78 |
-| [LAB 8](lab8_hybrid/README.md) | [lab8_hybrid](lab8_hybrid/README.md) | บริการสร้างภาพ: API gateway + RabbitMQ + GPU Worker 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และออกแบบระบบอย่างไรให้รับได้มากขึ้น | $0.57 |
+| [LAB 4](lab4_multigpu/README.md) | [lab4_multigpu](lab4_multigpu/README.md) | เทรนงานเดิมบน 1 GPU เทียบ 2 GPU | เพิ่ม GPU แล้วเร็วขึ้นกี่เท่า คุ้มเงินไหม | $0.51 |
+| [LAB 6](lab6_image_api/README.md) | [lab6_image_api](lab6_image_api/README.md) | API ตรวจภาพ YOLO: Micro-batching + หลาย process + Load Balancer 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และคอขวดอยู่ที่ไหน | $1.02 |
+| [LAB 7](lab7_llm_chat/README.md) | [lab7_llm_chat](lab7_llm_chat/README.md) | แชทบอท LLM: Continuous Batching + Load Balancer 1 → 2 ใบ | GPU 1 ใบคุยพร้อมกันได้กี่คน และเพิ่ม GPU แล้วรับได้เพิ่มเท่าไร | $0.60 |
+| [LAB 8](lab8_job_queue/README.md) | [lab8_job_queue](lab8_job_queue/README.md) | อ่านใบเสร็จด้วย VLM เป็นงานคิว: RabbitMQ + GPU Worker 1 → 2 ใบ | งานหนักเข้าพร้อมกันเกินความจุ ระบบคิวช่วยอะไร และเพิ่ม Worker แล้วรับได้เพิ่มเท่าไร | $0.78 |
+| [LAB 9](lab9_hybrid/README.md) | [lab9_hybrid](lab9_hybrid/README.md) | บริการสร้างภาพ: API gateway + RabbitMQ + GPU Worker 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และออกแบบระบบอย่างไรให้รับได้มากขึ้น | $0.57 |
 
 **ต้องมีก่อน**
 - ทำ [บท 01](../01_VastAi_Skill/readme.md) ถึง LAB 2 แล้ว: container `multi-account` รันอยู่ · มีสกิล `vastai` · ตั้ง API key และกุญแจ SSH ของ Vast.ai แล้ว
@@ -36,8 +36,8 @@
 | บรรทัดใน `.env` | ใช้ทำอะไร | เอามาจากไหน |
 |---|---|---|
 | `VAST_API_KEY` | เช่าเครื่อง | ตัวเดียวกับ [บท 01 LAB 0](../01_VastAi_Skill/readme.md#lab-0--เตรียมบัญชี-vastai-และกุญแจ-2-ดอก) |
-| `ROBOFLOW_API_KEY` | ดาวน์โหลด Dataset ของ LAB 1–2 | 2 ขั้นข้างล่าง |
-| `HF_TOKEN` | ดาวน์โหลดโมเดลและ Dataset ของ LAB 3–4 | [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) → Create new token → ชนิด Read |
+| `ROBOFLOW_API_KEY` | ดาวน์โหลด Dataset ของ LAB 1 และ LAB 4 | 2 ขั้นข้างล่าง |
+| `HF_TOKEN` | ดาวน์โหลดโมเดลและ Dataset ของ LAB 2–3 และ LAB 7–9 | [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) → Create new token → ชนิด Read |
 
 ### API key ของ Roboflow
 
@@ -61,11 +61,11 @@
 |---|---|
 | `.env_example` | ตัวอย่างไฟล์ `.env` (key 3 ตัว) |
 | `lab1_yolo/` | LAB 1 · เทรน YOLO ตรวจหมวกนิรภัย + เว็บตรวจความปลอดภัยหน้างาน |
-| `lab2_multigpu/` | LAB 2 · เทรนงานเดิมบน 1 GPU เทียบ 2 GPU |
+| `lab2_vlm/` | LAB 2 · Fine-tune VLM อ่านใบเสร็จ + เว็บสมุดรายจ่าย |
 | `lab3_qlora/` | LAB 3 · QLoRA โมเดลเล็กให้แชทบอทร้านนวด |
-| `lab4_vlm/` | LAB 4 · Fine-tune VLM อ่านใบเสร็จ + เว็บสมุดรายจ่าย |
-| `lab5_image_api/` | LAB 5 · API ตรวจภาพ: วัดความจุ GPU 1 ใบ แล้วเพิ่มด้วย Micro-batching และ Load Balancer |
-| `lab6_llm_chat/` | LAB 6 · แชทบอท LLM: Continuous Batching + Load Balancer |
-| `lab7_job_queue/` | LAB 7 · งานคิวอ่านใบเสร็จด้วย RabbitMQ + GPU Worker |
-| `lab8_hybrid/` | LAB 8 · ระบบผสมสำหรับบริการสร้างภาพ (RabbitMQ) + เว็บ PixelQueue |
+| `lab4_multigpu/` | LAB 4 · เทรนงานเดิมบน 1 GPU เทียบ 2 GPU |
+| `lab6_image_api/` | LAB 6 · API ตรวจภาพ: วัดความจุ GPU 1 ใบ แล้วเพิ่มด้วย Micro-batching และ Load Balancer |
+| `lab7_llm_chat/` | LAB 7 · แชทบอท LLM: Continuous Batching + Load Balancer |
+| `lab8_job_queue/` | LAB 8 · งานคิวอ่านใบเสร็จด้วย RabbitMQ + GPU Worker |
+| `lab9_hybrid/` | LAB 9 · ระบบผสมสำหรับบริการสร้างภาพ (RabbitMQ) + เว็บ PixelQueue |
 | `image/` | ภาพประกอบของหน้ารวม |

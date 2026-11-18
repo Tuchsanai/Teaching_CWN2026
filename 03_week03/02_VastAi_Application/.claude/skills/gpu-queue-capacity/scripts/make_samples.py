@@ -1,4 +1,4 @@
-"""LAB 8 step 4: generate the first 6 prompts and lay them out as one captioned grid (3 x 2)."""
+"""LAB 9 step 4: generate the first 6 prompts and lay them out as one captioned grid (3 x 2)."""
 import io, json, sys, textwrap, time
 import torch
 from diffusers import AutoPipelineForText2Image

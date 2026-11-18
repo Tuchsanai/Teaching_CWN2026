@@ -1,4 +1,4 @@
-"""Report for LAB 2: 1 GPU vs 2 GPU training speed and money per epoch.
+"""Report for LAB 4: 1 GPU vs 2 GPU training speed and money per epoch.
 
 Reads   results/raw/bench/bench_1gpu.json, bench_2gpu.json  (one per run, from bench.py)
         results/raw/bench/bench_<N>gpu/gpu_util.csv, cpu.csv (raw per-second samples)

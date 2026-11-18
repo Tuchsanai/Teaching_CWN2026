@@ -1,4 +1,4 @@
-"""LAB 8 step 3: time SDXL-Turbo text-to-image on one GPU (512x512, 4 steps) for batch sizes 1, 2, 4, 8."""
+"""LAB 9 step 3: time SDXL-Turbo text-to-image on one GPU (512x512, 4 steps) for batch sizes 1, 2, 4, 8."""
 import json, os, sys, time
 import torch
 from diffusers import AutoPipelineForText2Image

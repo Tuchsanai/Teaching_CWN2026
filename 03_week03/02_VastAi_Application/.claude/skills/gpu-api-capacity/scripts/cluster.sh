@@ -1,5 +1,5 @@
 #!/bin/bash
-# LAB 5 · เปิด/ดู/ปิด ระบบ AI server ตรวจภาพ หลัง NGINX Load Balancer (พอร์ต 8080 จุดเดียว)
+# LAB 6 · เปิด/ดู/ปิด ระบบ AI server ตรวจภาพ หลัง NGINX Load Balancer (พอร์ต 8080 จุดเดียว)
 #
 #   cluster.sh up <replica 1-2> <process ต่อ replica> <batch สูงสุด> [--lb round_robin|least_conn] [--slow <replica>:<ms>]
 #                                                                      เปิดระบบใหม่ (ปิดของเดิมก่อน)
@@ -16,12 +16,12 @@
 # NGINX ฟัง 0.0.0.0:8080 แล้วแจกคำขอให้ทุก process ตามวิธีที่เลือก (round-robin หรือ least_conn)
 set -euo pipefail
 
-BASE=/workspace/lab5
+BASE=/workspace/lab6
 CODE=$BASE/code
 RUN=$BASE/run                       # pid · log · ค่าที่ตั้งไว้
 ENV_FILE=$BASE/.env                 # เก็บ API_KEY (สุ่มครั้งแรก ใช้ค่าเดิมทุกครั้ง)
 CONF=$RUN/cluster.conf
-NGINX_CONF=/etc/nginx/conf.d/lab5_lb.conf
+NGINX_CONF=/etc/nginx/conf.d/lab6_lb.conf
 LB_PORT=8080
 PY_BIN=$(dirname "$(command -v python)")
 mkdir -p "$RUN"
@@ -59,8 +59,8 @@ write_nginx() {  # $1 = รายการพอร์ต server · $2 = round_r
         proxy_connect_timeout 2s;"
   fi
   {
-    echo "upstream lab5_servers {"
-    echo "    zone lab5_servers 64k;   # ทุก worker ของ NGINX ใช้ตัวนับร่วมกัน (least_conn ต้องเห็นงานค้างรวม)"
+    echo "upstream lab6_servers {"
+    echo "    zone lab6_servers 64k;   # ทุก worker ของ NGINX ใช้ตัวนับร่วมกัน (least_conn ต้องเห็นงานค้างรวม)"
     if [ "$2" = least_conn ]; then
       echo "    least_conn;              # ส่งให้ตัวที่มีคำขอค้างอยู่น้อยที่สุด"
     else
@@ -74,7 +74,7 @@ server {
     listen $LB_PORT;
     client_max_body_size 20m;
     location / {
-        proxy_pass http://lab5_servers;
+        proxy_pass http://lab6_servers;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
         proxy_set_header Host \$host;

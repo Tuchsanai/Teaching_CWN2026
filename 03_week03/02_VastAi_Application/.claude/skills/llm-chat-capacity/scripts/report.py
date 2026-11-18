@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""report.py — สรุปผล LAB 6 จากทุกชุดในโฟลเดอร์ results/
+"""report.py — สรุปผล LAB 7 จากทุกชุดในโฟลเดอร์ results/
 
 อ่าน   results/loadtest_*.json  (ผลยิงโหลดแต่ละชุด)  และ  results/precheck_*.json|txt  (ผลตรวจ GPU ก่อนวัด)
 สร้าง  results/metrics.json  และกราฟ 4 รูปในโฟลเดอร์เดียวกัน
@@ -15,7 +15,7 @@
 กติกาความจุ: ระดับ N สูงสุดที่ผ่าน SLO และทุกระดับที่ต่ำกว่า (ที่วัด) ก็ผ่าน · ระดับที่วัดซ้ำใช้ค่ากลาง (median)
 SLO: TTFT p95 ≤ 2 s · ความเร็วต่อผู้ใช้ p5 ≥ 15 token/s · error < 1%
 
-ใช้:  python code/report.py [--results lab6_llm_chat/results]
+ใช้:  python code/report.py [--results lab7_llm_chat/results]
 """
 import argparse, glob, json, os, re, statistics, sys
 

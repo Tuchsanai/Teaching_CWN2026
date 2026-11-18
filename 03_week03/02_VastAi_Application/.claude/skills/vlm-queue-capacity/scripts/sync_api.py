@@ -1,4 +1,4 @@
-"""LAB 7 baseline: synchronous receipt-reading API on ONE GPU (no job queue service).
+"""LAB 8 baseline: synchronous receipt-reading API on ONE GPU (no job queue service).
 
 POST /v1/jobs  (header X-API-Key, multipart field "files" = receipt images)
   -> the request waits on the same HTTP connection until the job is done and
@@ -14,7 +14,7 @@ Design
   the job is still read and counted as "read after the client left".
 
 Run (keep it alive after SSH drops):
-  LAB7_KEY_FILE=/workspace/lab7/.api_key setsid nohup python sync_api.py > server.log 2>&1 &
+  LAB8_KEY_FILE=/workspace/lab8/.api_key setsid nohup python sync_api.py > server.log 2>&1 &
 """
 import asyncio
 import io
@@ -35,10 +35,10 @@ from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
 from PIL import Image
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
-MODEL_DIR = os.environ.get("LAB7_MODEL", "/workspace/models/Qwen3-VL-2B-Instruct")
-KEY_FILE = os.environ.get("LAB7_KEY_FILE", "/workspace/lab7/.api_key")
-PORT = int(os.environ.get("LAB7_PORT", "8000"))
-MAX_NEW_TOKENS = int(os.environ.get("LAB7_MAX_NEW_TOKENS", "512"))
+MODEL_DIR = os.environ.get("LAB8_MODEL", "/workspace/models/Qwen3-VL-2B-Instruct")
+KEY_FILE = os.environ.get("LAB8_KEY_FILE", "/workspace/lab8/.api_key")
+PORT = int(os.environ.get("LAB8_PORT", "8000"))
+MAX_NEW_TOKENS = int(os.environ.get("LAB8_MAX_NEW_TOKENS", "512"))
 MAX_FILES = 8
 
 PROMPT = (
@@ -175,7 +175,7 @@ def worker():
 threading.Thread(target=worker, daemon=True).start()
 
 # ------------------------------------------------------------------ API
-app = FastAPI(title="LAB7 sync receipt API")
+app = FastAPI(title="LAB8 sync receipt API")
 
 
 def check_key(key):

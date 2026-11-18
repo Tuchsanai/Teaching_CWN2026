@@ -1,0 +1,14 @@
+# docker compose up -d --build   ->  http://localhost:3407
+name: vapp-lab8
+services:
+  web:
+    build: .
+    container_name: vapp-lab8-web
+    env_file: .env            # GATEWAY_URL + GATEWAY_API_KEY (read only by the Next.js server)
+    environment:
+      SAMPLES_DIR: /samples
+    volumes:
+      - ../../samples:/samples:ro
+    ports:
+      - "3407:3000"
+    restart: unless-stopped

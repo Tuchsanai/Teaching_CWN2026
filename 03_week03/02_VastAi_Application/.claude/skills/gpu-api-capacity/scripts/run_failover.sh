@@ -1,10 +1,10 @@
 #!/bin/bash
-# LAB 5 · replica ล่มกลางทาง: 2 replica x 4 process · batch 32 · round-robin
+# LAB 6 · replica ล่มกลางทาง: 2 replica x 4 process · batch 32 · round-robin
 # ยิงผู้ใช้ N คน 45 วินาที · ปิด replica 1 กะทันหันที่วินาที 15 · เปิดคืนที่วินาที 30
 # (start --wait = คำสั่งจบเมื่อ replica 1 อุ่นโมเดลเสร็จครบทุก process → เวลาที่ใช้จนพร้อมรับงาน)
 # ทำ 2 รอบ: NGINX ไม่ส่งซ้ำ (fo_noretry) กับ NGINX ส่งคำขอที่ล้มไป replica อื่น (fo_retry)
 #   bash code/run_failover.sh <ผู้ใช้ N>
-cd /workspace/lab5
+cd /workspace/lab6
 N=${1:?ใส่จำนวนผู้ใช้}
 C=code/cluster.sh
 run() { # name, retry

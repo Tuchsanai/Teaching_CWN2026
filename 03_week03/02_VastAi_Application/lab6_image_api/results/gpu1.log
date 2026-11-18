@@ -1,0 +1,13 @@
+อุ่นระบบ 5 วินาที (N=4 ไม่นับผล)...
+N=1     PASS  thr=17.4 req/s  p50=38 p95=46 p99=48 ms  err=0.00%  | gpu0=6% gpu1=0% | CPU cores server=0.59 nginx=0.01 loadgen=-0.00 | replica {'gpu0-p0': 65, 'gpu0-p1': 65, 'gpu0-p2': 66, 'gpu0-p3': 65} | server=33.6 ms (infer 22.5) batch=1
+N=4     PASS  thr=68.3 req/s  p50=38 p95=50 p99=61 ms  err=0.00%  | gpu0=46% gpu1=0% | CPU cores server=2.18 nginx=0.04 loadgen=-0.02 | replica {'gpu0-p0': 257, 'gpu0-p1': 256, 'gpu0-p2': 255, 'gpu0-p3': 256} | server=33.7 ms (infer 22.1) batch=1.04
+N=16    PASS  thr=236.8 req/s  p50=67 p95=84 p99=97 ms  err=0.00%  | gpu0=80% gpu1=0% | CPU cores server=4.98 nginx=0.12 loadgen=0.14 | replica {'gpu0-p0': 886, 'gpu0-p1': 888, 'gpu0-p2': 889, 'gpu0-p3': 889} | server=58.4 ms (infer 26.0) batch=2.29
+N=32    PASS  thr=290.1 req/s  p50=110 p95=136 p99=166 ms  err=0.00%  | gpu0=82% gpu1=0% | CPU cores server=5.61 nginx=0.17 loadgen=0.18 | replica {'gpu0-p0': 1087, 'gpu0-p1': 1088, 'gpu0-p2': 1090, 'gpu0-p3': 1086} | server=93.8 ms (infer 42.3) batch=4.4
+N=64    PASS  thr=306.0 req/s  p50=208 p95=275 p99=503 ms  err=0.00%  | gpu0=83% gpu1=0% | CPU cores server=5.88 nginx=0.20 loadgen=0.21 | replica {'gpu0-p0': 1150, 'gpu0-p1': 1141, 'gpu0-p2': 1154, 'gpu0-p3': 1145} | server=175.7 ms (infer 79.5) batch=8.85
+N=128   FAIL  thr=311.3 req/s  p50=424 p95=548 p99=602 ms  err=0.00%  | gpu0=81% gpu1=0% | CPU cores server=6.16 nginx=0.22 loadgen=0.22 | replica {'gpu0-p0': 1156, 'gpu0-p1': 1155, 'gpu0-p2': 1178, 'gpu0-p3': 1180} | server=344.9 ms (infer 156.4) batch=17.61
+N=256   FAIL  thr=325.1 req/s  p50=794 p95=1132 p99=1259 ms  err=0.00%  | gpu0=89% gpu1=0% | CPU cores server=6.29 nginx=0.24 loadgen=0.22 | replica {'gpu0-p0': 1196, 'gpu0-p1': 1227, 'gpu0-p2': 1211, 'gpu0-p3': 1242} | server=614.4 ms (infer 249.8) batch=29.44
+ซอยรอบ 1: N=96    PASS  thr=310.8 req/s  p50=321 p95=424 p99=540 ms  err=0.00%  | gpu0=82% gpu1=0% | CPU cores server=5.97 nginx=0.22 loadgen=0.22 | replica {'gpu0-p0': 1161, 'gpu0-p1': 1169, 'gpu0-p2': 1166, 'gpu0-p3': 1166} | server=259.4 ms (infer 115.5) batch=12.92
+ซอยรอบ 2: N=112   FAIL  thr=310.7 req/s  p50=367 p95=573 p99=686 ms  err=0.00%  | gpu0=80% gpu1=0% | CPU cores server=6.04 nginx=0.22 loadgen=0.22 | replica {'gpu0-p0': 1170, 'gpu0-p1': 1165, 'gpu0-p2': 1163, 'gpu0-p3': 1162} | server=302.8 ms (infer 137.8) batch=15.3
+ซอยรอบ 3: N=104   PASS  thr=303.6 req/s  p50=340 p95=497 p99=588 ms  err=0.00%  | gpu0=78% gpu1=0% | CPU cores server=6.13 nginx=0.22 loadgen=0.21 | replica {'gpu0-p0': 1137, 'gpu0-p1': 1140, 'gpu0-p2': 1139, 'gpu0-p3': 1138} | server=292.0 ms (infer 146.8) batch=15.05
+ความจุ: รองรับผู้ใช้พร้อมกันได้ 104 คน ที่ p95 ≤ 500 ms และ error < 1% · ผล /workspace/lab6/results/gpu1.json
+DONE

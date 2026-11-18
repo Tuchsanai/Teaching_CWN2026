@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-"""LAB 5 · ตัวยิงโหลดแบบ closed-loop: ผู้ใช้ N คนส่งรูปวนไป (ไม่มี think time) ผ่าน NGINX :8080
+"""LAB 6 · ตัวยิงโหลดแบบ closed-loop: ผู้ใช้ N คนส่งรูปวนไป (ไม่มี think time) ผ่าน NGINX :8080
 ไล่ N ตามขั้นบันได หยุดเมื่อไม่ผ่าน SLO 2 ระดับติดกัน แล้วซอยครึ่งหา N ที่พอดีเกณฑ์
 
-    python loadgen.py --name base1            # ผล → /workspace/lab5/results/base1.json
+    python loadgen.py --name base1            # ผล → /workspace/lab6/results/base1.json
 
-ปรับได้ (ค่าเริ่มเท่ารอบ LAB 5): --levels 1,4,16,32,64,128,256,512,1024 · --level-s 20 · --warmup 5
+ปรับได้ (ค่าเริ่มเท่ารอบ LAB 6): --levels 1,4,16,32,64,128,256,512,1024 · --level-s 20 · --warmup 5
     --slo-p95 500 · --slo-err 0.01 · --bisect 3 (รอบซอยครึ่ง) · --timeout 10 (วินาที รอเกิน = error)
 
 โหมดยิงระดับเดียว (--users) เก็บผลรายวินาที และสั่งคำสั่งตามวินาทีที่กำหนดระหว่างยิงได้ (--at วินาที:คำสั่ง)
@@ -17,7 +17,7 @@ import argparse, glob, http.client, json, multiprocessing as mp, os, statistics,
 import psutil
 import pynvml
 
-BASE = "/workspace/lab5"
+BASE = "/workspace/lab6"
 LEVELS = [1, 4, 16, 32, 64, 128, 256, 512, 1024]
 DURATION, WARMUP = 20.0, 5.0                      # วินาทีต่อระดับ · ช่วงไม่นับ
 TIMEOUT = float(os.environ.get("LOADGEN_TIMEOUT", "10"))  # รอเกินนี้ = error (ส่งผ่าน env ให้ process ลูกเห็นค่าเดียวกัน)

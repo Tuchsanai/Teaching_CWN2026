@@ -1,4 +1,4 @@
-"""LAB 8 step: test the worker from outside the machine (old job + 8 jobs at once)."""
+"""LAB 9 step: test the worker from outside the machine (old job + 8 jobs at once)."""
 import json, sys, threading, time, requests
 from concurrent.futures import ThreadPoolExecutor
 BASE, KEY, OLD, OUT = sys.argv[1], open(sys.argv[2]).read().strip(), sys.argv[3], sys.argv[4]

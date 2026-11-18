@@ -1,17 +1,17 @@
 ---
 name: gpu-api-capacity
-description: วัดว่า API ตรวจภาพ (FastAPI + โมเดล YOLO ตรวจอุปกรณ์ความปลอดภัย best.pt จาก LAB 1 · POST /v1/detect พร้อม API key หลัง NGINX Load Balancer) บนเครื่อง GPU ที่เช่าจาก Vast.ai รองรับผู้ใช้พร้อมกันได้กี่คนภายใต้เกณฑ์ SLO (p95 ≤ 500 ms · error < 1%) ครบวงจรในคำสั่งเดียว — เช่าเครื่อง 2 GPU → ติดตั้ง + เปิด server → ทดสอบจากนอกเครื่อง → ยิงโหลดแบบไล่ระดับ N ของ GPU 1 ใบแบบทีละคำขอ / Micro-batching / Micro-batching + 4 process / 2 GPU หลัง Load Balancer → (เลือกได้) round-robin เทียบ least_conn เมื่อ replica เท่ากันและมีตัวช้า · replica ล่มกลางการยิงโหลด (NGINX ส่งซ้ำหรือไม่) → metrics.json และกราฟ → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล gpu-api-capacity", "วัดความจุ API ตรวจภาพ", "API บน GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน", "Micro-batching ช่วยได้กี่เท่า", "เพิ่ม GPU หลัง Load Balancer แล้วรับได้กี่เท่า", "round-robin เทียบ least_conn", "replica ล่มแล้วผู้ใช้เจอ error ไหม", "ทำ LAB 5 ซ้ำ" หรือขอทำซ้ำด้วยรุ่น GPU / จำนวน GPU / ราคา / ป้ายเครื่อง / เกณฑ์ SLO / ระดับ N / เวลาต่อระดับ / ชุดการวัด / โฟลเดอร์ผลที่ต่างไปจากเดิม
+description: วัดว่า API ตรวจภาพ (FastAPI + โมเดล YOLO ตรวจอุปกรณ์ความปลอดภัย best.pt จาก LAB 1 · POST /v1/detect พร้อม API key หลัง NGINX Load Balancer) บนเครื่อง GPU ที่เช่าจาก Vast.ai รองรับผู้ใช้พร้อมกันได้กี่คนภายใต้เกณฑ์ SLO (p95 ≤ 500 ms · error < 1%) ครบวงจรในคำสั่งเดียว — เช่าเครื่อง 2 GPU → ติดตั้ง + เปิด server → ทดสอบจากนอกเครื่อง → ยิงโหลดแบบไล่ระดับ N ของ GPU 1 ใบแบบทีละคำขอ / Micro-batching / Micro-batching + 4 process / 2 GPU หลัง Load Balancer → (เลือกได้) round-robin เทียบ least_conn เมื่อ replica เท่ากันและมีตัวช้า · replica ล่มกลางการยิงโหลด (NGINX ส่งซ้ำหรือไม่) → metrics.json และกราฟ → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล gpu-api-capacity", "วัดความจุ API ตรวจภาพ", "API บน GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน", "Micro-batching ช่วยได้กี่เท่า", "เพิ่ม GPU หลัง Load Balancer แล้วรับได้กี่เท่า", "round-robin เทียบ least_conn", "replica ล่มแล้วผู้ใช้เจอ error ไหม", "ทำ LAB 6 ซ้ำ" หรือขอทำซ้ำด้วยรุ่น GPU / จำนวน GPU / ราคา / ป้ายเครื่อง / เกณฑ์ SLO / ระดับ N / เวลาต่อระดับ / ชุดการวัด / โฟลเดอร์ผลที่ต่างไปจากเดิม
 ---
 
 # gpu-api-capacity (เวอร์ชัน 0)
 
-ทำซ้ำงานของ LAB 5 ในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหาเครื่อง เช่า SSH คัดลอกไฟล์ ดูพอร์ตที่เปิด ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่อธิบายวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร และห้ามแก้ไฟล์ของสกิล vastai
+ทำซ้ำงานของ LAB 6 ในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหาเครื่อง เช่า SSH คัดลอกไฟล์ ดูพอร์ตที่เปิด ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่อธิบายวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร และห้ามแก้ไฟล์ของสกิล vastai
 
 โค้ดทั้งหมดใช้ชุดที่ผ่านการรันจริงแล้วในโฟลเดอร์ `scripts/` ข้างไฟล์นี้ **ห้ามเขียนใหม่** โครงบนเครื่องเช่าต้องเป็นแบบนี้ (สคริปต์อ้างพาธนี้ตรง ๆ):
 
 ```
-/workspace/lab5/
-├── code/        ← scripts/* ทุกไฟล์ (แล้ว sed -i 's/\r$//' /workspace/lab5/code/*)
+/workspace/lab6/
+├── code/        ← scripts/* ทุกไฟล์ (แล้ว sed -i 's/\r$//' /workspace/lab6/code/*)
 ├── best.pt      ← model
 ├── samples/     ← samples/*.jpg
 ├── results/     ← ผลของ loadgen.py
@@ -41,11 +41,11 @@ description: วัดว่า API ตรวจภาพ (FastAPI + โมเ�
 |---|---|---|
 | `gpu` / `num_gpus` | RTX 3090 / 2 | GPU ในเครื่องเดียว · `num_gpus` = 1 → ตัดชุด `gpu2` `lb` `failover` อัตโนมัติ (`cluster.sh` รับ replica ได้ 1–2 เท่านั้น) |
 | `max_price` | $0.60/ชม. (2 ใบ) · $0.30/ชม. (1 ใบ) | ราคารวมทั้งเครื่อง (รวม disk) สูงสุด |
-| `label` | `vapp-lab5` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
+| `label` | `vapp-lab6` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
 | `offer_filter` | `verified=true rentable=true direct_port_count>=1 reliability>=0.95 inet_down>=500 cpu_cores_effective>=24 geolocation notin [CN]` เรียงตาม `dph_total` เอาถูกสุด | ใช้ **`cpu_cores_effective`** ไม่ใช่จำนวน core ที่เครื่องมี: รอบจริงเครื่องโชว์ 192 core แต่ container ได้จริง ~27 core และ 2 GPU × 4 process ใช้ CPU ของ server ~12.4 core ที่ความจุ |
 | `image` / `disk_gb` / `ports` | image PyTorch 2.8 + CUDA 12.8 / 40 / เปิดพอร์ต 8080 | พอร์ต 8080 ให้ทดสอบ API จากนอกเครื่อง (Vast แมปเป็นพอร์ตภายนอกอื่น ดูด้วยสกิล vastai) |
 | `ready_timeout` | 10 นาที | เกินแล้วยังไม่พร้อม / GPU ไม่ครบ → ลบแล้วเช่าเครื่องถัดไป |
-| `model` / `samples` | `lab5_image_api/best.pt` / `lab5_image_api/samples/*.jpg` (6 รูป 640×640) | โมเดล YOLO และรูปที่ใช้ยิง · เปลี่ยนรูปได้ แต่ความจุจะเทียบกับรอบอ้างอิงไม่ได้ |
+| `model` / `samples` | `lab6_image_api/best.pt` / `lab6_image_api/samples/*.jpg` (6 รูป 640×640) | โมเดล YOLO และรูปที่ใช้ยิง · เปลี่ยนรูปได้ แต่ความจุจะเทียบกับรอบอ้างอิงไม่ได้ |
 | `slo_p95_ms` / `slo_error` | 500 / 0.01 | เกณฑ์ SLO → `--slo-p95` `--slo-err` ทุกครั้งที่เรียก `loadgen.py` |
 | `levels` | 1,4,16,32,64,128,256,512,1024 | ระดับ N (`--levels`) · ซอยครึ่ง `bisect` = 3 รอบ |
 | `level_s` / `warmup` / `timeout` | 20 / 5 / 10 วินาที | เวลาต่อระดับ · ช่วงแรกที่ไม่นับ · รอเกินนี้ = error |
@@ -53,11 +53,11 @@ description: วัดว่า API ตรวจภาพ (FastAPI + โมเ�
 | `runs` | `base1` `batch1` `gpu1` `gpu2` `lb` `failover` | ชุดที่จะวัด (ตารางถัดไป) · ผู้ใช้สั่ง "ไม่ต้องทำการทดลองเสริม" → ตัด `lb` `failover` |
 | `fo_users` / `fo_duration` | 1/3 ของความจุ `gpu2` (รอบอ้างอิงใช้ 11 คน) / 45 วินาที | ชุด `failover` · replica ที่เปิดคืนใช้ ~92 วินาทีกว่าจะพร้อม ถ้าอยากเห็นตอนกลับมารับงานต้องยิงนานกว่า ~130 วินาที (สั่ง `loadgen.py --users` เองด้วย `--duration`) |
 | `samples_grid` | ใช่ | ทำ `dataset_samples.jpg` |
-| `out_dir` | `lab5_image_api/results` | โฟลเดอร์ผลบนเครื่องนี้ · มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ใหม่ เช่น `lab5_image_api/results_skill` |
+| `out_dir` | `lab6_image_api/results` | โฟลเดอร์ผลบนเครื่องนี้ · มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ใหม่ เช่น `lab6_image_api/results_skill` |
 | `keep_machine` | ไม่ | `ใช่` = ไม่ลบเครื่องตอนจบ (ต้องบอกผู้ใช้ชัดว่ายังคิดเงิน) |
 | `container` / `ssh_key` | `multi-account` · `/workspace/vastapp_lab` / `/workspace/vastai_lab/Devtool_SSH/devtoolSSH` | ที่ทำงานของสกิล vastai และกุญแจ SSH |
 
-ชุดที่วัด (`runs`) ตามลำดับ — ทุกชุดใช้เครื่องเดียวกัน · `cluster.sh up` ปิดของเดิมให้เอง · ทุกคำสั่งที่นานรันแยกจาก SSH: `cd /workspace/lab5 && setsid nohup <คำสั่ง> > results/<ชุด>.log 2>&1 < /dev/null &` แล้วอ่าน log เป็นระยะจนเห็น `DONE` (หรือ `ALL DONE`) · `<L>` = `--levels <levels> --level-s <level_s> --warmup <warmup> --timeout <timeout> --slo-p95 <slo_p95_ms> --slo-err <slo_error>`
+ชุดที่วัด (`runs`) ตามลำดับ — ทุกชุดใช้เครื่องเดียวกัน · `cluster.sh up` ปิดของเดิมให้เอง · ทุกคำสั่งที่นานรันแยกจาก SSH: `cd /workspace/lab6 && setsid nohup <คำสั่ง> > results/<ชุด>.log 2>&1 < /dev/null &` แล้วอ่าน log เป็นระยะจนเห็น `DONE` (หรือ `ALL DONE`) · `<L>` = `--levels <levels> --level-s <level_s> --warmup <warmup> --timeout <timeout> --slo-p95 <slo_p95_ms> --slo-err <slo_error>`
 
 | ชุด | `cluster.sh up` | คำสั่งวัด | ไฟล์ผล | เวลาอ้างอิง |
 |---|---|---|---|---|
@@ -73,11 +73,11 @@ description: วัดว่า API ตรวจภาพ (FastAPI + โมเ�
 จับเวลาทุกขั้นไว้ใช้ในสรุป · **ห้ามแสดงค่า key ใด ๆ** (Vast · API key ของ server) ในคำตอบหรือไฟล์ผล
 
 1. **เช่าเครื่อง**: ใช้สกิล vastai ค้นหา `gpu` × `num_gpus` ตาม `max_price` และ `offer_filter` เลือกถูกที่สุด เช่าด้วย `image` `disk_gb` เปิด `ports` ตั้งป้าย `label` รอจน SSH เข้าได้และ `nvidia-smi` เห็น GPU ครบ · ดู CPU ที่ container ได้จริง (`cat /sys/fs/cgroup/cpu.max` หาร 100000) · จด GPU · ราคาจริงต่อชั่วโมง · ที่ตั้ง · CPU ที่ได้จริง · เวลาที่รอ
-2. **ติดตั้ง + ทดสอบ**: สร้างโครง `/workspace/lab5/` ตามด้านบน คัดลอก `scripts/*` `model` `samples` ขึ้นเครื่อง ตัด `\r` · `setsid nohup bash code/install.sh` จนเห็น `DONE` · `bash code/cluster.sh up 1 1 1` (สร้าง key + เปิด NGINX) · ดึง key มาไว้ในไฟล์ชั่วคราว **นอก repo** (สิทธิ์ 600) แล้วรัน `test_api.py` กับ IP + พอร์ตภายนอกของ 8080 ต้องได้ 200 ทุกรูป และ 401 ทั้งไม่มี key / key ผิด · ถ้า `samples_grid` รัน `make_grid.py` · ลบไฟล์ key ชั่วคราวทันทีหลังทดสอบ
+2. **ติดตั้ง + ทดสอบ**: สร้างโครง `/workspace/lab6/` ตามด้านบน คัดลอก `scripts/*` `model` `samples` ขึ้นเครื่อง ตัด `\r` · `setsid nohup bash code/install.sh` จนเห็น `DONE` · `bash code/cluster.sh up 1 1 1` (สร้าง key + เปิด NGINX) · ดึง key มาไว้ในไฟล์ชั่วคราว **นอก repo** (สิทธิ์ 600) แล้วรัน `test_api.py` กับ IP + พอร์ตภายนอกของ 8080 ต้องได้ 200 ทุกรูป และ 401 ทั้งไม่มี key / key ผิด · ถ้า `samples_grid` รัน `make_grid.py` · ลบไฟล์ key ชั่วคราวทันทีหลังทดสอบ
 3. **ยิงโหลดทีละชุดตาม `runs`** ตามตารางด้านบน รายงานความคืบหน้าทุก 2–3 นาทีจาก log · ก่อนแต่ละชุดดู `cluster.sh status` ว่าตั้งค่าถูก
    - ระดับใดไม่ผ่านครั้งเดียวแต่ระดับที่สูงกว่าผ่าน (อาการชั่วคราว) → `python code/loadgen.py --name <ชุด> --recheck <N> --times 3 <L>` แล้วรายงานทั้งความจุแบบเข้ม (`capacity_users_strict`) และแบบนับรอบวัดซ้ำ (`capacity_users`) · รอบอ้างอิง `gpu2` ที่ N=64 p95 พุ่ง 1,752 ms ครั้งเดียว วัดซ้ำ 3 รอบผ่านหมด (~147 ms)
    - ผลแปลก เช่น error > 0 ในชุดปกติ · CPU ของตัวยิงโหลดเกิน ~1 core · GPU ใบหนึ่ง util 0 · 2 ใบได้ไม่ถึง 1.5 เท่าของ `gpu1` → ดู `run/server_*.log` และ `/var/log/nginx/error.log` ก่อนวัดซ้ำ · การวัดเพื่อวินิจฉัยใช้ชื่อ `diag_*` แล้วไม่ดึงกลับมาใน `out_dir`
-4. **รวมผล**: ดึง `/workspace/lab5/results/*` (json · log) + `install_time.txt` + `run/cluster.conf` มาไว้ที่ `out_dir` (ไม่ดึง `.env`) แล้วรัน `python <โฟลเดอร์สกิล>/scripts/report.py <out_dir>` **บนเครื่องนี้** (ต้องมี matplotlib) · เปิดดูกราฟทุกรูปอย่างน้อย 1 ครั้ง · `grep` ค่า key ใน `out_dir` ต้องไม่พบ
+4. **รวมผล**: ดึง `/workspace/lab6/results/*` (json · log) + `install_time.txt` + `run/cluster.conf` มาไว้ที่ `out_dir` (ไม่ดึง `.env`) แล้วรัน `python <โฟลเดอร์สกิล>/scripts/report.py <out_dir>` **บนเครื่องนี้** (ต้องมี matplotlib) · เปิดดูกราฟทุกรูปอย่างน้อย 1 ครั้ง · `grep` ค่า key ใน `out_dir` ต้องไม่พบ
 5. **ปิดทุกอย่าง (ห้ามข้าม เว้นแต่ `keep_machine`)**: ตรวจว่าผลใน `out_dir` ครบก่อน แล้วใช้สกิล vastai ลบเครื่องป้าย `label` ตรวจซ้ำว่าไม่เหลือในบัญชี · ดูบิลจริง (invoices): อายุเครื่อง · ราคาต่อชั่วโมง · ยอด GPU · disk · รับส่งข้อมูล
 
 ## เกณฑ์ตรวจผ่าน
@@ -88,7 +88,7 @@ description: วัดว่า API ตรวจภาพ (FastAPI + โมเ�
   - อ้างอิง (2 × RTX 3090 · SLO p95 ≤ 500 ms): `base1` **22 คน** 63 req/s (GPU ~20% · คอขวดคือเรียกโมเดลทีละรูป) · `batch1` **52 คน** 157 req/s (2.4 เท่า) · `gpu1` **104 คน** 325 req/s (4.7 เท่า) · `gpu2` **176 คน** 651 req/s (1.69 เท่าของ `gpu1` · Efficiency 85% · Throughput 2.00 เท่า · ความจุแบบเข้ม 32 เพราะ spike ที่ N=64)
 - [ ] `lb` (ถ้าวัด): replica เท่ากัน least_conn ≥ round-robin (อ้างอิง 256 vs 176) · replica ช้า 40 ms: least_conn > round-robin ชัดเจน (อ้างอิง 72 vs 32 · least_conn ย้ายงาน ~79% ไป GPU0)
 - [ ] `failover` (ถ้าวัด): `fo_noretry` มี error (อ้างอิง 5,474 / 14,822 = 36.9% · 502/503) · `fo_retry` error 0 (อ้างอิง 0 / 9,601) · เปิด replica คืนใช้ ~92 วินาทีจนพร้อม
-- [ ] `out_dir` มี `metrics.json` + กราฟตามชุดที่วัด และไม่มีค่า key ในไฟล์ใดเลย · ผลเดิมใน `lab5_image_api/results` ไม่ถูกเขียนทับ (ถ้าใช้ `out_dir` อื่น)
+- [ ] `out_dir` มี `metrics.json` + กราฟตามชุดที่วัด และไม่มีค่า key ในไฟล์ใดเลย · ผลเดิมใน `lab6_image_api/results` ไม่ถูกเขียนทับ (ถ้าใช้ `out_dir` อื่น)
 - [ ] ไม่มีเครื่องป้าย `label` ค้างในบัญชี (ยกเว้น `keep_machine`)
 
 ## กติกาเรื่องเงิน

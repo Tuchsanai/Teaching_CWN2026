@@ -1,13 +1,13 @@
 ---
 name: multigpu-speedup
-description: ทดสอบว่าเพิ่ม GPU จาก 1 เป็น 2 ใบในเครื่องเดียวแล้วเทรนเร็วขึ้นกี่เท่าและคุ้มเงินไหม บนเครื่องที่เช่าจาก Vast.ai ครบวงจรในคำสั่งเดียว — เช่าเครื่อง 2 GPU → เตรียม Dataset hard-hat-workers → เทรน YOLO11m ด้วย 1 GPU แล้ว 2 GPU (ค่าเดิมทุกอย่าง) → วัดวินาทีต่อ Epoch / step · GPU util · CPU ที่ใช้ · เวลา all-reduce → ค้นราคาตลาด คิด speedup · efficiency · เงินต่อ Epoch พร้อมกราฟ 4 รูป → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล multigpu-speedup", "เทียบความเร็ว 1 กับ 2 GPU", "ทดสอบความเร็วหลาย GPU", "ทำ LAB 2 ซ้ำ", "multi-GPU / DDP คุ้มไหม" หรือขอทำซ้ำด้วยรุ่น GPU / ราคา / จำนวน Epoch / ป้ายเครื่องที่ต่างไปจากเดิม
+description: ทดสอบว่าเพิ่ม GPU จาก 1 เป็น 2 ใบในเครื่องเดียวแล้วเทรนเร็วขึ้นกี่เท่าและคุ้มเงินไหม บนเครื่องที่เช่าจาก Vast.ai ครบวงจรในคำสั่งเดียว — เช่าเครื่อง 2 GPU → เตรียม Dataset hard-hat-workers → เทรน YOLO11m ด้วย 1 GPU แล้ว 2 GPU (ค่าเดิมทุกอย่าง) → วัดวินาทีต่อ Epoch / step · GPU util · CPU ที่ใช้ · เวลา all-reduce → ค้นราคาตลาด คิด speedup · efficiency · เงินต่อ Epoch พร้อมกราฟ 4 รูป → ลบเครื่องและสรุปค่าใช้จ่าย ใช้เมื่อผู้ใช้สั่ง "ใช้สกิล multigpu-speedup", "เทียบความเร็ว 1 กับ 2 GPU", "ทดสอบความเร็วหลาย GPU", "ทำ LAB 4 ซ้ำ", "multi-GPU / DDP คุ้มไหม" หรือขอทำซ้ำด้วยรุ่น GPU / ราคา / จำนวน Epoch / ป้ายเครื่องที่ต่างไปจากเดิม
 ---
 
 # multigpu-speedup (เวอร์ชัน 0)
 
-ทำซ้ำงานของ LAB 2 ทั้งหมดในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหาเครื่อง ค้นราคา เช่า SSH คัดลอกไฟล์ ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่อธิบายวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร
+ทำซ้ำงานของ LAB 4 ทั้งหมดในคำสั่งเดียว ทุกงานที่แตะ Vast.ai (ค้นหาเครื่อง ค้นราคา เช่า SSH คัดลอกไฟล์ ดูบิล ลบเครื่อง) **ให้ใช้สกิล `vastai`** ใน container `multi-account` (`/root/ai-accounts/.Claude/shared/skills/vastai/SKILL.md`) อ่านสกิลนั้นก่อนเริ่ม สกิลนี้ไม่อธิบายวิธีใช้ Vast.ai ซ้ำ บอกแค่ว่าต้องทำอะไร
 
-โค้ดทั้งหมดใช้ชุดที่ผ่านการรันจริงแล้วในโฟลเดอร์ `scripts/` ข้างไฟล์นี้ **ห้ามเขียนใหม่** สคริปต์ที่รันบนเครื่องเช่าให้คัดลอกขึ้นไปที่ `/workspace/lab2/code/` ส่วน `report.py` ให้รันบนเครื่องนี้
+โค้ดทั้งหมดใช้ชุดที่ผ่านการรันจริงแล้วในโฟลเดอร์ `scripts/` ข้างไฟล์นี้ **ห้ามเขียนใหม่** สคริปต์ที่รันบนเครื่องเช่าให้คัดลอกขึ้นไปที่ `/workspace/lab4/code/` ส่วน `report.py` ให้รันบนเครื่องนี้
 
 | สคริปต์ | รันที่ | หน้าที่ |
 |---|---|---|
@@ -25,13 +25,13 @@ description: ทดสอบว่าเพิ่ม GPU จาก 1 เป็�
 | `num_gpus` | 2 | จำนวน GPU ในเครื่อง **ไม่เกิน 2 ใบ** · 2 = เทรน 1 GPU แล้ว 2 GPU บนเครื่องเดียวกันแล้วเทียบ · 1 = วัดเส้นฐาน 1 GPU อย่างเดียว ไม่มี speedup และข้าม `report.py` |
 | `max_price` | $0.60/ชม. | ราคารวมของทั้งเครื่องสูงสุด (GPU + disk) |
 | `epochs` | 5 | Epoch ต่อรอบ → `bench.py --epochs` **ต้อง ≥ 3** (ค่าเฉลี่ยไม่นับ Epoch แรกกับ Epoch สุดท้าย) |
-| `label` | `vapp-lab2` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
+| `label` | `vapp-lab4` | ป้ายเครื่องบน Vast.ai (แตะเฉพาะเครื่องป้ายนี้) |
 | `offer_filter` | verified · ต่อ SSH ได้ตรง (direct port) · เน็ตเร็ว · CPU ≥ 16 cores · ไม่อยู่ในจีน · เลือกถูกสุด | เกณฑ์เลือกเครื่อง |
 | `image` | PyTorch 2.8 + CUDA 12.8 (เช่น `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel`) | image ของเครื่อง |
 | `disk_gb` | 60 | ขนาด disk |
 | `ready_timeout` | 10 นาที | รอเครื่องพร้อมเกินนี้ → ลบแล้วเช่าเครื่องอื่น |
 | `model` / `imgsz` / `batch_per_gpu` / `seed` | `yolo11m.pt` / 640 / 32 / 0 | ค่าการเทรน → `--model` `--imgsz` `--batch-per-gpu` `--seed` (ต้องเท่ากันทั้ง 2 รอบ) |
-| `out_dir` | `lab2_multigpu/results` | โฟลเดอร์เก็บผลบนเครื่องนี้ (มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ย่อยใหม่ เช่น `lab2_multigpu/results/skill_v0_run`) |
+| `out_dir` | `lab4_multigpu/results` | โฟลเดอร์เก็บผลบนเครื่องนี้ (มีผลเดิมอยู่และผู้ใช้ไม่ได้สั่งให้ทับ → ใช้โฟลเดอร์ย่อยใหม่ เช่น `lab4_multigpu/results/skill_v0_run`) |
 | `keep_machine` | ไม่ | `ใช่` = ไม่ลบเครื่องตอนจบ (ต้องบอกผู้ใช้ชัดว่ายังคิดเงิน) |
 | `container` | `multi-account` · `/workspace/vastapp_lab` | ที่ทำงานของสกิล vastai |
 | `ssh_key` | `/workspace/vastai_lab/Devtool_SSH/devtoolSSH` | กุญแจ SSH ใน container |
@@ -43,11 +43,11 @@ description: ทดสอบว่าเพิ่ม GPU จาก 1 เป็�
 1. **เช่าเครื่อง**: ใช้สกิล vastai ค้นหาเครื่องที่มี `gpu` × `num_gpus` **ในเครื่องเดียว** ตาม `max_price` และ `offer_filter` แล้วเช่าด้วย `image` และ `disk_gb` ตั้งป้าย `label` รอจน SSH เข้าได้และ `nvidia-smi` เห็น GPU ครบ
    - เกิน `ready_timeout` หรือเห็น GPU ไม่ครบ → ลบทันทีแล้วเช่าเครื่องถัดไป · เครื่องที่ถูกที่สุดอาจถูกคนอื่นเช่าไปแล้ว → ข้ามไปเครื่องถัดไป
    - จด `nvidia-smi topo -m` (GPU ต่อกันแบบ NVLink หรือ PCIe: PIX/PXB/PHB/NODE/SYS · ข้าม CPU socket ไหม) ราคาจริงต่อชั่วโมง ที่ตั้ง จำนวน CPU
-2. **เตรียมเครื่องและ Dataset**: `pip install ultralytics roboflow` (ใช้ Python ของ image) คัดลอก `scripts/*.py` ขึ้นไปที่ `/workspace/lab2/code/`
+2. **เตรียมเครื่องและ Dataset**: `pip install ultralytics roboflow` (ใช้ Python ของ image) คัดลอก `scripts/*.py` ขึ้นไปที่ `/workspace/lab4/code/`
    - `ROBOFLOW_API_KEY` อ่านจาก `.env` ของโฟลเดอร์บท ส่งผ่าน stdin ของ SSH ไปที่ `python download_dataset.py` ห้ามใส่ในบรรทัดคำสั่ง ห้ามเขียนลงไฟล์ เสร็จแล้วตรวจว่าไม่มี key ค้างบนเครื่อง (`grep -r` ใน `/workspace` และ `~/.config/roboflow`)
    - `python dataset_stats.py /workspace/hardhat` · `python show_samples.py /workspace/hardhat /workspace/dataset_samples.jpg` แล้วดึงภาพกลับมาที่ `out_dir/dataset_samples.jpg` เปิดดู 1 ครั้ง
 3. **ทดสอบสั้น**: `python bench.py --gpus 1 --fraction 0.05 --epochs 2 --tag smoke` และ (ถ้า `num_gpus` = 2) `--gpus 2` ค่าเดียวกัน ต้องจบได้และมีไฟล์ JSON (รอบสั้น mAP50 = 0 ถือว่าปกติ) รวม ~3 นาที
-4. **รอบจริง 1 GPU**: `cd /workspace/lab2/code && setsid nohup python bench.py --gpus 1 --epochs <epochs> [ค่าการเทรนอื่น] > /workspace/bench_1gpu.log 2>&1 &` (แยกจาก SSH) รายงานทุก 2–3 นาทีว่าถึง Epoch ไหน (นับแถวใน `/workspace/bench/bench_1gpu/train/results.csv`) รอจนมีบรรทัด `saved /workspace/bench/bench_1gpu.json`
+4. **รอบจริง 1 GPU**: `cd /workspace/lab4/code && setsid nohup python bench.py --gpus 1 --epochs <epochs> [ค่าการเทรนอื่น] > /workspace/bench_1gpu.log 2>&1 &` (แยกจาก SSH) รายงานทุก 2–3 นาทีว่าถึง Epoch ไหน (นับแถวใน `/workspace/bench/bench_1gpu/train/results.csv`) รอจนมีบรรทัด `saved /workspace/bench/bench_1gpu.json`
    - อ้างอิง RTX 3090: ~128 วินาทีต่อ Epoch · 5 Epoch ใช้ ~12 นาที
 5. **รอบจริง 2 GPU** (ข้ามถ้า `num_gpus` = 1): เหมือนขั้น 4 แต่ `--gpus 2` ค่าอื่นเท่าเดิม log ที่ `/workspace/bench_2gpu.log` รอบนี้ต้องเริ่มหลังรอบ 1 GPU จบแล้วเท่านั้น (สคริปต์จะหยุดเองถ้า GPU ไม่ว่าง) · ถ้าต้องแก้สคริปต์ ให้รันรอบ 1 GPU ใหม่ด้วยเพื่อให้เทียบกันได้
    - อ้างอิง: ~74 วินาทีต่อ Epoch · 5 Epoch ใช้ ~8 นาที

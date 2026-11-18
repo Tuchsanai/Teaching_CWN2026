@@ -1,4 +1,4 @@
-"""LAB 8: synchronous text-to-image API (caller waits until the JPEG is ready).
+"""LAB 9: synchronous text-to-image API (caller waits until the JPEG is ready).
 
 POST /generate {"prompt": "..."} + header X-API-Key -> image/jpeg
 GET  /health, GET /stats  (stats: requests received, images done)
@@ -16,7 +16,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 MODEL, SIZE, STEPS, DEVICE = "stabilityai/sdxl-turbo", 512, 4, "cuda:0"
-KEY_FILE = Path(os.environ.get("API_KEY_FILE", "/workspace/lab8/api_key.txt"))
+KEY_FILE = Path(os.environ.get("API_KEY_FILE", "/workspace/lab9/api_key.txt"))
 
 # --- 1) API key: random once, kept in a file only the owner can read ---
 if not KEY_FILE.exists():
@@ -44,7 +44,7 @@ def make_jpeg(prompt: str) -> bytes:
     return buf.getvalue()
 
 # --- 4) HTTP endpoints ---
-app = FastAPI(title="LAB 8 sync image API")
+app = FastAPI(title="LAB 9 sync image API")
 
 class GenReq(BaseModel):
     prompt: str = Field(min_length=1, max_length=500)

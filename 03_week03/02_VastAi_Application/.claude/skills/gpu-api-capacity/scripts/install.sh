@@ -1,10 +1,10 @@
 #!/bin/bash
 # skill v0 · ติดตั้งสิ่งที่ server / ตัวเปิดระบบ / ตัวยิงโหลดใช้ บนเครื่องเช่า (image PyTorch 2.8 + CUDA 12.8 มี torch อยู่แล้ว)
-#   bash /workspace/lab5/code/install.sh   → /workspace/lab5/install_time.txt จบด้วย DONE
+#   bash /workspace/lab6/code/install.sh   → /workspace/lab6/install_time.txt จบด้วย DONE
 # รายการแพ็กเกจรวบรวมจาก import ของ server.py · loadgen.py · report.py และ NGINX ที่ cluster.sh ต้องใช้
 set -euo pipefail
-LOG=/workspace/lab5/install_time.txt
-mkdir -p /workspace/lab5/results /workspace/lab5/run
+LOG=/workspace/lab6/install_time.txt
+mkdir -p /workspace/lab6/results /workspace/lab6/run
 t0=$(date +%s)
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq

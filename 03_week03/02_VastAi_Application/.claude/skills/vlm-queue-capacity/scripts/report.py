@@ -1,4 +1,4 @@
-"""LAB 7 report: read every experiment JSON in results/ -> metrics.json + charts (English labels).
+"""LAB 8 report: read every experiment JSON in results/ -> metrics.json + charts (English labels).
 
   python report.py                       # reads ../results, writes ../results/metrics.json + ../results/charts/*.png
   python report.py --results /path/to/results

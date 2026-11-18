@@ -2,10 +2,10 @@
 """precheck2.py — ตรวจ GPU ทั้ง 2 ใบก่อนวัด: อุณหภูมิ/clock ตอนว่างและตอนทำงาน + ความเร็วตอบผู้ใช้ 1 คนของ vLLM แต่ละตัว
 ยิงตรงเข้า vLLM แต่ละพอร์ต (ไม่ผ่าน NGINX) เพื่อแยกวัดทีละใบ · บันทึก JSON ไม่มีค่า key"""
 import json, statistics, subprocess, sys, threading, time, urllib.request
-sys.path.insert(0, "/workspace/lab6")
+sys.path.insert(0, "/workspace/lab7")
 from loadtest import QUESTIONS, SYSTEM
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else "/workspace/lab6/results/precheck_batch_2gpu.json"
+OUT = sys.argv[1] if len(sys.argv) > 1 else "/workspace/lab7/results/precheck_batch_2gpu.json"
 BACKENDS = [("vllm-1", 0, 8001), ("vllm-2", 1, 8002)]
 QS = QUESTIONS[:5]
 

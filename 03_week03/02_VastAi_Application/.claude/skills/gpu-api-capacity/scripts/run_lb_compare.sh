@@ -1,6 +1,6 @@
 #!/bin/bash
-# LAB 5 · เทียบวิธีแจกงาน round-robin vs least_conn (2 replica x 4 process, batch 32)
-cd /workspace/lab5
+# LAB 6 · เทียบวิธีแจกงาน round-robin vs least_conn (2 replica x 4 process, batch 32)
+cd /workspace/lab6
 C=code/cluster.sh
 run() { # name, up-args...
   local name=$1; shift

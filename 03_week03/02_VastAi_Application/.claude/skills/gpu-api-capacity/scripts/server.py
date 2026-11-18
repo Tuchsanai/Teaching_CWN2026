@@ -1,4 +1,4 @@
-"""LAB 5 · AI server ตรวจภาพ (YOLO PPE) ด้วย FastAPI
+"""LAB 6 · AI server ตรวจภาพ (YOLO PPE) ด้วย FastAPI
 
 ตั้งค่าด้วย environment variable
   API_KEY      key สำหรับ Bearer (จำเป็น)

@@ -1,4 +1,4 @@
-"""LAB 7 GPU worker: one process per GPU, reads receipts exactly like sync_api.py.
+"""LAB 8 GPU worker: one process per GPU, reads receipts exactly like sync_api.py.
 
 - Takes one job at a time from the durable RabbitMQ queue (prefetch = 1).
 - Acks only after the whole job has been read; a crash before that -> RabbitMQ gives the
@@ -8,7 +8,7 @@
 - Reconnects to RabbitMQ by itself when the connection drops.
 
 Run (one per GPU, keeps going after SSH drops):
-  LAB7_GPU=0 setsid nohup python worker.py > worker_gpu0.log 2>&1 &
+  LAB8_GPU=0 setsid nohup python worker.py > worker_gpu0.log 2>&1 &
 """
 import base64
 import io
@@ -19,7 +19,7 @@ import socket
 import threading
 import time
 
-GPU = os.environ.get("LAB7_GPU", "0")
+GPU = os.environ.get("LAB8_GPU", "0")
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU          # this process only sees its own GPU
 
 import pika
@@ -29,9 +29,9 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 
 from common import EVENT_QUEUE, JOB_QUEUE, PERSISTENT, connect, declare
 
-MODEL_DIR = os.environ.get("LAB7_MODEL", "/workspace/models/Qwen3-VL-2B-Instruct")
-MAX_NEW_TOKENS = int(os.environ.get("LAB7_MAX_NEW_TOKENS", "512"))
-NAME = os.environ.get("LAB7_WORKER_NAME", f"{socket.gethostname()}-gpu{GPU}")
+MODEL_DIR = os.environ.get("LAB8_MODEL", "/workspace/models/Qwen3-VL-2B-Instruct")
+MAX_NEW_TOKENS = int(os.environ.get("LAB8_MAX_NEW_TOKENS", "512"))
+NAME = os.environ.get("LAB8_WORKER_NAME", f"{socket.gethostname()}-gpu{GPU}")
 HEARTBEAT_S = 5
 
 # same prompt / parsing / decoding as sync_api.py

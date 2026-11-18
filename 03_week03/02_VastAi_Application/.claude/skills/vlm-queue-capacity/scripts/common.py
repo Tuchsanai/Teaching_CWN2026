@@ -1,13 +1,13 @@
-"""LAB 7 shared RabbitMQ settings (gateway.py and worker.py must declare queues the same way)."""
+"""LAB 8 shared RabbitMQ settings (gateway.py and worker.py must declare queues the same way)."""
 import os
 
 import pika
 
-AMQP_URL = os.environ.get("LAB7_AMQP_URL", "amqp://guest:guest@127.0.0.1:5672/%2F")
+AMQP_URL = os.environ.get("LAB8_AMQP_URL", "amqp://guest:guest@127.0.0.1:5672/%2F")
 JOB_QUEUE = "receipts.jobs"          # work queue (durable, max 1000 jobs)
 DLQ = "receipts.jobs.dlq"            # jobs that crashed a worker
 EVENT_QUEUE = "receipts.events"      # worker -> gateway: started / done / failed / heartbeat
-MAX_QUEUE = int(os.environ.get("LAB7_MAX_QUEUE", "1000"))
+MAX_QUEUE = int(os.environ.get("LAB8_MAX_QUEUE", "1000"))
 
 JOB_QUEUE_ARGS = {
     "x-max-length": MAX_QUEUE,

@@ -1,4 +1,4 @@
-"""LAB 8: async front door of the hybrid system (accept job -> RabbitMQ -> answer at once).
+"""LAB 9: async front door of the hybrid system (accept job -> RabbitMQ -> answer at once).
 
 Endpoints (every one needs header X-API-Key, same key file as sync_server.py):
   POST /jobs {"prompt": "...", "priority": "normal"|"express"} -> 202 {job_id, status, eta_seconds}
@@ -12,7 +12,7 @@ RabbitMQ layout (declared here, workers must use the same arguments):
   queue  "jobs.dead"  durable, bound to fanout exchange "jobs.dlx" (worker nack requeue=False lands here)
   exchange "jobs.events" (topic, durable): workers publish JSON events, gateway keeps job state from them
      {"type":"started","job_id","worker","redelivered":bool}
-     {"type":"done","job_id","worker","seconds","image":"/workspace/lab8/images/<id>.jpg"}
+     {"type":"done","job_id","worker","seconds","image":"/workspace/lab9/images/<id>.jpg"}
      {"type":"failed","job_id","worker","error","requeue":bool}
      {"type":"heartbeat","worker","state":"idle"|"busy","job_id","working","done"}   (every 1 s)
 Run: uvicorn gateway:app --host 0.0.0.0 --port 8000
@@ -27,8 +27,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 AMQP_URL = os.environ.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/")
-KEY_FILE = Path(os.environ.get("API_KEY_FILE", "/workspace/lab8/api_key.txt"))
-DB_FILE = Path(os.environ.get("JOBS_DB", "/workspace/lab8/jobs.db"))
+KEY_FILE = Path(os.environ.get("API_KEY_FILE", "/workspace/lab9/api_key.txt"))
+DB_FILE = Path(os.environ.get("JOBS_DB", "/workspace/lab9/jobs.db"))
 PER_WORKER_CAP = 100          # normal jobs allowed to wait per live worker
 WORKER_TIMEOUT = 15           # seconds without heartbeat -> worker counted as gone
 DEFAULT_SEC_PER_IMAGE = 0.47  # single-image time measured in step 3 (RTX 3090, 4 steps)
@@ -103,7 +103,7 @@ async def on_event(msg: aio_pika.abc.AbstractIncomingMessage):
             waiters.pop(jid).set()
 
 # --- 3) app start: connect, declare durable queues, consume events ---
-app = FastAPI(title="LAB 8 job gateway")
+app = FastAPI(title="LAB 9 job gateway")
 
 @app.on_event("startup")
 async def startup():

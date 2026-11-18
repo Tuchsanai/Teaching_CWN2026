@@ -1,4 +1,4 @@
-"""LAB 4 · Fine-tune Qwen3-VL-2B-Instruct with LoRA to read receipts and answer JSON.
+"""LAB 2 · Fine-tune Qwen3-VL-2B-Instruct with LoRA to read receipts and answer JSON.
 
 - LoRA rank 8, alpha 16 on the Linear layers of the language model only
   (q/k/v/o_proj + gate/up/down_proj); the vision encoder (model.visual) and lm_head stay frozen.
@@ -9,7 +9,7 @@
   --ckpt-every optimizer steps; rerunning the same command continues from it.
 
 Usage (on the rented machine):
-    python train.py --data /workspace/lab4/data --out /workspace/lab4/out
+    python train.py --data /workspace/lab2/data --out /workspace/lab2/out
 Outputs in --out: adapter/ · loss_curve.png · train_info.json · history.json · train.log
 """
 import argparse
@@ -121,8 +121,8 @@ def plot(history, epochs, steps_per_epoch, save):
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", default="/workspace/lab4/data")
-    ap.add_argument("--out", default="/workspace/lab4/out")
+    ap.add_argument("--data", default="/workspace/lab2/data")
+    ap.add_argument("--out", default="/workspace/lab2/out")
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--rank", type=int, default=8)
