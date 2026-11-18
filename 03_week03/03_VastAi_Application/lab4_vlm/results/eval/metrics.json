@@ -1,0 +1,83 @@
+{
+  "dataset": "naver-clova-ix/cord-v2 · test split",
+  "settings": {
+    "temperature": 0,
+    "max_tokens": 2048,
+    "requests": "one receipt at a time",
+    "server": "vLLM OpenAI-compatible, receipt-base / receipt-ft"
+  },
+  "scoring": {
+    "json_readable": "reply parses as a JSON object (a ```json fence is allowed)",
+    "total_exact": "predicted total equals ground-truth total in every digit; receipts without a ground-truth total are skipped",
+    "item_f1": "micro F1; item correct when name (lower-case, no spaces/symbols) and price both match a ground-truth item, each GT item used once"
+  },
+  "base": {
+    "model": "receipt-base",
+    "receipts": 100,
+    "json_readable_pct": 100.0,
+    "total_exact_pct": 88.4,
+    "total_receipts_scored": 95,
+    "item_precision_pct": 69.0,
+    "item_recall_pct": 70.7,
+    "item_f1_pct": 69.9,
+    "items_correct": 203,
+    "items_predicted": 294,
+    "items_ground_truth": 287,
+    "sec_per_receipt": 0.76
+  },
+  "fine_tuned": {
+    "model": "receipt-ft",
+    "receipts": 100,
+    "json_readable_pct": 100.0,
+    "total_exact_pct": 100.0,
+    "total_receipts_scored": 95,
+    "item_precision_pct": 87.9,
+    "item_recall_pct": 88.9,
+    "item_f1_pct": 88.4,
+    "items_correct": 255,
+    "items_predicted": 290,
+    "items_ground_truth": 287,
+    "sec_per_receipt": 0.56
+  },
+  "improvement_points": {
+    "json_readable_pct": 0.0,
+    "total_exact_pct": 11.6,
+    "item_f1_pct": 18.5
+  },
+  "training": {
+    "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target": "language model Linear layers (q/k/v/o_proj, gate/up/down_proj); vision frozen"
+    },
+    "train_receipts": 800,
+    "val_receipts": 100,
+    "epochs": 2,
+    "lr": 0.0002,
+    "seed": 0,
+    "batch_size": 1,
+    "grad_accum": 4,
+    "optimizer_steps": 400,
+    "warmup_steps": 10,
+    "trainable_params": 8716288,
+    "total_params": 2127532032,
+    "trainable_pct": 0.4097,
+    "val_loss": {
+      "epoch_0": 0.2992,
+      "epoch_1": 0.0253,
+      "epoch_2": 0.0218
+    },
+    "train_time_min": 9.2,
+    "peak_vram_gb": 8.55,
+    "adapter_size_mb": 34.9,
+    "gpu": "NVIDIA GeForce RTX 4090"
+  },
+  "examples": [
+    "test_040",
+    "test_051",
+    "test_086",
+    "test_091"
+  ]
+}

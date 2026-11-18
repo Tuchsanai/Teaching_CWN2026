@@ -1,0 +1,30 @@
+{
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "lora": {
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "target": "language model Linear layers (q/k/v/o_proj, gate/up/down_proj); vision frozen"
+  },
+  "train_receipts": 800,
+  "val_receipts": 100,
+  "epochs": 2,
+  "lr": 0.0002,
+  "seed": 0,
+  "batch_size": 1,
+  "grad_accum": 4,
+  "optimizer_steps": 400,
+  "warmup_steps": 10,
+  "trainable_params": 8716288,
+  "total_params": 2127532032,
+  "trainable_pct": 0.4097,
+  "val_loss": {
+    "epoch_0": 0.2992,
+    "epoch_1": 0.0253,
+    "epoch_2": 0.0218
+  },
+  "train_time_min": 9.2,
+  "peak_vram_gb": 8.55,
+  "adapter_size_mb": 34.9,
+  "gpu": "NVIDIA GeForce RTX 4090"
+}
