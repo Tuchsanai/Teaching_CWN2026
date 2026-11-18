@@ -23,7 +23,7 @@
 **ต้องมีก่อน**
 - ทำ [บท 01](../01_VastAi_Skill/readme.md) ถึง LAB 2 แล้ว: container `multi-account` รันอยู่ · มีสกิล `vastai` · ตั้ง API key และกุญแจ SSH ของ Vast.ai แล้ว
 - Docker Desktop บนเครื่องนี้ (เว็บของทุก LAB รันด้วย `docker compose` บนเครื่องเรา)
-- Claude Code เปิดที่โฟลเดอร์ของบทนี้ (`03_week03/03_VastAi_Application`) · "โฟลเดอร์ปัจจุบัน" ในทุกพรอมต์หมายถึงโฟลเดอร์นี้
+- Claude Code เปิดที่โฟลเดอร์ของบทนี้ (`03_week03/02_VastAi_Application`) · "โฟลเดอร์ปัจจุบัน" ในทุกพรอมต์หมายถึงโฟลเดอร์นี้
 
 > ⚠️ **เสียเงินจริง** — ทุก LAB จบด้วยพรอมต์ **ลบเครื่อง** ห้ามข้าม แล้วดูหน้า [Instances](https://cloud.vast.ai/instances/) ว่าว่าง
 
