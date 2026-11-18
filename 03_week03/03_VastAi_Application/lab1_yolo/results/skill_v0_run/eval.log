@@ -1,25 +1,107 @@
-Ultralytics 8.4.215 🚀 Python-3.11.13 torch-2.8.0+cu128 CUDA:0 (NVIDIA GeForce RTX 4090, 24081MiB)
-YOLO11s summary (fused): 100 layers, 9,416,670 parameters, 0 gradients, 21.4 GFLOPs
-[34m[1mval: [0mFast image access ✅ (ping: 0.0±0.0 ms, read: 1684.5±421.4 MB/s, size: 51.2 KB)
-[K[34m[1mval: [0mScanning /workspace/construction-site-safety-28/test/labels... 82 images, 8 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 82/82 950.8it/s 0.1s
-[34m[1mval: [0mNew cache created: /workspace/construction-site-safety-28/test/labels.cache
-[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 16% ━━────────── 1/6 1.8s/it 0.5s<8.8s[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 50% ━━━━━━────── 3/6 5.1it/s 0.7s<0.6s[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 83% ━━━━━━━━━━── 5/6 9.2it/s 0.8s<0.1s[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 6/6 7.3it/s 0.8s
-                   all         82        760       0.84      0.655      0.722      0.407
-Speed: 0.7ms preprocess, 2.7ms inference, 0.0ms loss, 0.8ms postprocess per image
-Test Set 82 ภาพ
-                  ก่อนเทรน  หลังเทรน
-mAP50                0.090     0.716
-mAP50-95             0.066     0.398
-ms ต่อรูป              7.9       7.9
-AP50 Hardhat         0.000     0.873
-AP50 Mask            0.000     0.814
-AP50 NO-Hardhat      0.000     0.536
-AP50 NO-Mask         0.000     0.640
-AP50 NO-Safety Vest     0.000     0.742
-AP50 Person          0.753     0.737
-AP50 Safety Cone     0.000     0.445
-AP50 Safety Vest     0.000     0.849
-AP50 machinery       0.000     0.848
-AP50 vehicle         0.149     0.679
-Ultralytics (หลังเทรน): {"mAP50": 0.7222, "mAP50_95": 0.4074, "precision": 0.8401, "recall": 0.6552}
-ผลทั้งหมดอยู่ที่ /workspace/results
+{
+  "before": {
+    "model": "yolo11s.pt (COCO-pretrained)",
+    "mAP50": 0.09018669290560066,
+    "mAP50-95": 0.0656972015875105,
+    "AP50_per_class": {
+      "Hardhat": 0.0,
+      "Mask": 0.0,
+      "NO-Hardhat": 0.0,
+      "NO-Mask": 0.0,
+      "NO-Safety Vest": 0.0,
+      "Person": 0.7526369168082616,
+      "Safety Cone": 0.0,
+      "Safety Vest": 0.0,
+      "machinery": 0.0,
+      "vehicle": 0.14923001224774507
+    },
+    "AP50-95_per_class": {
+      "Hardhat": 0.0,
+      "Mask": 0.0,
+      "NO-Hardhat": 0.0,
+      "NO-Mask": 0.0,
+      "NO-Safety Vest": 0.0,
+      "Person": 0.5650186430620301,
+      "Safety Cone": 0.0,
+      "Safety Vest": 0.0,
+      "machinery": 0.0,
+      "vehicle": 0.09195337281307486
+    },
+    "ms_per_image": 8.27
+  },
+  "after": {
+    "model": "best.pt (fine-tuned 10 epochs)",
+    "mAP50": 0.7163220957269976,
+    "mAP50-95": 0.39824958287700485,
+    "AP50_per_class": {
+      "Hardhat": 0.8733234871137229,
+      "Mask": 0.8139275362318841,
+      "NO-Hardhat": 0.5357849058773266,
+      "NO-Mask": 0.6401679700595913,
+      "NO-Safety Vest": 0.7418565676725477,
+      "Person": 0.7366106902958136,
+      "Safety Cone": 0.4448689508301681,
+      "Safety Vest": 0.8488475307415025,
+      "machinery": 0.8483867762788002,
+      "vehicle": 0.6794465421686187
+    },
+    "AP50-95_per_class": {
+      "Hardhat": 0.5306177078685657,
+      "Mask": 0.4511208123060431,
+      "NO-Hardhat": 0.23961811917145304,
+      "NO-Mask": 0.2669914929028455,
+      "NO-Safety Vest": 0.3871855480590517,
+      "Person": 0.43123467547083144,
+      "Safety Cone": 0.18277131332576127,
+      "Safety Vest": 0.5088007551773117,
+      "machinery": 0.6109356466078709,
+      "vehicle": 0.37321975788031414
+    },
+    "ms_per_image": 8.14
+  }
+}
+samples: [
+  {
+    "file": "no_hardhat_1.jpg",
+    "source": "thumbnail-ba5c72edb320b49a69e86b05775c49b2-scaled-1_jpeg_jpg.rf.3bb460e284098219861b894fb0db13d5.jpg",
+    "hardhat": 0,
+    "no_hardhat": 7,
+    "person": 10
+  },
+  {
+    "file": "no_hardhat_2.jpg",
+    "source": "NX_img_177_jpg.rf.c03709e5fadfe2109411f05a9e9bc25f.jpg",
+    "hardhat": 1,
+    "no_hardhat": 2,
+    "person": 4
+  },
+  {
+    "file": "no_hardhat_3.jpg",
+    "source": "class2_145_jpg.rf.b8ed5a5357ee41f8fb1aa9b01a400d51.jpg",
+    "hardhat": 0,
+    "no_hardhat": 2,
+    "person": 2
+  },
+  {
+    "file": "all_hardhat_1.jpg",
+    "source": "ppe_1073_jpg.rf.72ea8a293a4f3e1135219e33701b1099.jpg",
+    "hardhat": 10,
+    "no_hardhat": 0,
+    "person": 8
+  },
+  {
+    "file": "all_hardhat_2.jpg",
+    "source": "Image36_jpg.rf.8704f3450f736cdd01a61dcee588f2c2.jpg",
+    "hardhat": 10,
+    "no_hardhat": 0,
+    "person": 7
+  },
+  {
+    "file": "all_hardhat_3.jpg",
+    "source": "006672_jpg.rf.87d5978c486feb53177408cf00a0d87f.jpg",
+    "hardhat": 6,
+    "no_hardhat": 0,
+    "person": 6
+  }
+]
+[done] /workspace/eval_out

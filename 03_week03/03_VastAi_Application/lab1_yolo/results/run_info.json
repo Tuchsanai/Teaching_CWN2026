@@ -1,85 +1,132 @@
 {
-  "round": "official round 2 (prompts ขั้นที่ 1-9 ตาม PROMPTS.md)",
+  "round": "รอบ vibe coding รอบที่ 2 (พรอมต์ขั้นที่ 1-10 ตาม PROMPTS.md · โค้ดทุกไฟล์ AI เขียน)",
   "machine": {
     "gpu": "1x RTX 4090 24 GB",
-    "location": "Ukraine",
-    "cpu_cores": 16,
-    "dph_total": 0.411,
+    "location": "California, US",
+    "cpu_cores": 32,
+    "dph_total": 0.408,
+    "dph_gpu": 0.36,
+    "dph_disk_40gb": 0.048,
     "image": "pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime",
-    "inet_down_mbps": 935,
-    "inet_up_mbps": 699
+    "inet_down_mbps": 2008,
+    "inet_up_mbps": 1681
   },
   "step_seconds": {
-    "1_rent": 560,
-    "2_dataset": 169,
-    "3_training": 604,
-    "4_evaluation": 125,
-    "5_server": 117,
-    "6_web": 62,
-    "7_close": 87,
-    "8_skill_v0_create": 107,
-    "9_skill_v0_run": 713
+    "1_rent": 2309,
+    "2_dataset": 256,
+    "3_training": 866,
+    "4_evaluation": 318,
+    "5_server": 395,
+    "6_web_build": 271,
+    "7_web_test": 48,
+    "8_close": 93,
+    "9_skill_v0_create": 162,
+    "10_skill_v0_run": 603
   },
-  "train_seconds": 418.3,
+  "dataset": {
+    "train_images": 2605,
+    "valid_images": 114,
+    "test_images": 82,
+    "train_boxes": 36895,
+    "valid_boxes": 697,
+    "test_boxes": 760,
+    "train_boxes_per_class": {
+      "Hardhat": 3145,
+      "Mask": 1651,
+      "NO-Hardhat": 2317,
+      "NO-Mask": 3097,
+      "NO-Safety Vest": 3962,
+      "Person": 9532,
+      "Safety Cone": 3366,
+      "Safety Vest": 3033,
+      "machinery": 5247,
+      "vehicle": 1545
+    }
+  },
+  "train_seconds": 507.9,
   "val_mAP50": {
     "epoch10": 0.661,
     "epoch25": 0.767,
-    "epoch35": 0.805,
     "epoch50": 0.819
+  },
+  "ultralytics_val_test": {
+    "mAP50": 0.787,
+    "mAP50_95": 0.512
   },
   "server_test": {
     "health": 200,
-    "detect_boxes": 4,
+    "detect_boxes": 6,
     "no_key": 401,
-    "inference_ms": 8,
-    "roundtrip_ms_from_container": 900
+    "inference_ms_first": 63,
+    "inference_ms_typical": 20
   },
   "web_test": [
     {
-      "image": "sample-1.jpg",
-      "passed": false,
-      "no_hardhat": 1,
-      "inference_ms": 11.1,
-      "roundtrip_ms": 906.5
-    },
-    {
-      "image": "sample-2.jpg",
-      "passed": false,
-      "no_hardhat": 1,
-      "inference_ms": 7.9,
-      "roundtrip_ms": 462.3
-    },
-    {
-      "image": "sample-5.jpg",
+      "image": "all_hardhat_1.jpg",
       "passed": true,
       "no_hardhat": 0,
-      "inference_ms": 7.8,
-      "roundtrip_ms": 242.5
+      "inference_ms": 37.2,
+      "roundtrip_ms": 2076.5
+    },
+    {
+      "image": "all_hardhat_2.jpg",
+      "passed": true,
+      "no_hardhat": 0,
+      "inference_ms": 22.1,
+      "roundtrip_ms": 955.3
+    },
+    {
+      "image": "all_hardhat_3.jpg",
+      "passed": true,
+      "no_hardhat": 0,
+      "inference_ms": 20.5,
+      "roundtrip_ms": 585.5
+    },
+    {
+      "image": "no_hardhat_1.jpg",
+      "passed": false,
+      "no_hardhat": 8,
+      "inference_ms": 28.4,
+      "roundtrip_ms": 654.0
+    },
+    {
+      "image": "no_hardhat_2.jpg",
+      "passed": false,
+      "no_hardhat": 2,
+      "inference_ms": 22.6,
+      "roundtrip_ms": 616.3
+    },
+    {
+      "image": "no_hardhat_3.jpg",
+      "passed": false,
+      "no_hardhat": 2,
+      "inference_ms": 23.4,
+      "roundtrip_ms": 539.6
     }
   ],
   "cost_usd": {
     "main_machine": {
-      "gpu": 0.159,
-      "disk": 0.004,
-      "download": 0.001,
-      "total": 0.164,
-      "gpu_hours": 0.398
+      "gpu": 0.266,
+      "disk": 0.041,
+      "download": 0.007,
+      "total": 0.314,
+      "gpu_hours": 0.739,
+      "age_hours": 0.861
     },
-    "first_machine_failed_to_start": 0.047,
-    "lab_total": 0.211,
+    "machines_failed_to_start": 0.067,
+    "lab_total": 0.381,
     "skill_v0_run": {
-      "machine": 0.045,
-      "first_machine_failed_to_start": 0.026,
-      "total": 0.071
+      "total": 0.066,
+      "gpu_hours": 0.147
     }
   },
   "skill_v0_run": {
     "epochs": 10,
-    "train_seconds": 116,
     "before_mAP50": 0.09,
     "after_mAP50": 0.716,
     "after_mAP50_95": 0.398,
-    "machine": "1x RTX 4090, British Columbia CA, $0.394/h",
-    "wall_seconds": 713
+    "machine": "1x RTX 4090, California US, 0.408 USD/h",
+    "machine_age_minutes": 8.6,
+    "wall_seconds": 603
   }
 }

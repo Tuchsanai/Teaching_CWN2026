@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolo11s.pt
-data: /workspace/construction-site-safety-28/data.yaml
+data: /workspace/runs/data_abs.yaml
 epochs: 50
 time: null
 patience: 100
@@ -10,10 +10,10 @@ imgsz: 640
 save: true
 save_period: -1
 cache: false
-device: "0"
+device: ""
 workers: 8
 project: /workspace/runs
-name: ppe
+name: ppe_yolo11s
 exist_ok: true
 pretrained: true
 cls_remap: true
@@ -112,4 +112,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: tracktrack.yaml
-save_dir: /workspace/runs/ppe
+save_dir: /workspace/runs/ppe_yolo11s

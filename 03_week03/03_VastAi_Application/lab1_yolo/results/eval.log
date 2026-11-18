@@ -1,0 +1,107 @@
+{
+  "before": {
+    "model": "yolo11s.pt (COCO-pretrained)",
+    "mAP50": 0.09018669290560066,
+    "mAP50-95": 0.0656972015875105,
+    "AP50_per_class": {
+      "Hardhat": 0.0,
+      "Mask": 0.0,
+      "NO-Hardhat": 0.0,
+      "NO-Mask": 0.0,
+      "NO-Safety Vest": 0.0,
+      "Person": 0.7526369168082616,
+      "Safety Cone": 0.0,
+      "Safety Vest": 0.0,
+      "machinery": 0.0,
+      "vehicle": 0.14923001224774507
+    },
+    "AP50-95_per_class": {
+      "Hardhat": 0.0,
+      "Mask": 0.0,
+      "NO-Hardhat": 0.0,
+      "NO-Mask": 0.0,
+      "NO-Safety Vest": 0.0,
+      "Person": 0.5650186430620301,
+      "Safety Cone": 0.0,
+      "Safety Vest": 0.0,
+      "machinery": 0.0,
+      "vehicle": 0.09195337281307486
+    },
+    "ms_per_image": 8.56
+  },
+  "after": {
+    "model": "best.pt (fine-tuned 50 epochs)",
+    "mAP50": 0.7819321492399757,
+    "mAP50-95": 0.5040598937986499,
+    "AP50_per_class": {
+      "Hardhat": 0.9395359591926089,
+      "Mask": 0.745,
+      "NO-Hardhat": 0.5778249188284871,
+      "NO-Mask": 0.7936007790541284,
+      "NO-Safety Vest": 0.8385946216220614,
+      "Person": 0.8802887022636465,
+      "Safety Cone": 0.4851719171990082,
+      "Safety Vest": 0.887851078990456,
+      "machinery": 0.9136755861043684,
+      "vehicle": 0.757777929144992
+    },
+    "AP50-95_per_class": {
+      "Hardhat": 0.6165241923468326,
+      "Mask": 0.5388526395173454,
+      "NO-Hardhat": 0.3248971802473254,
+      "NO-Mask": 0.4094029106654905,
+      "NO-Safety Vest": 0.5496836432620313,
+      "Person": 0.5749228831858086,
+      "Safety Cone": 0.22631092972075323,
+      "Safety Vest": 0.6229276509982244,
+      "machinery": 0.6917295759541426,
+      "vehicle": 0.4853473320885452
+    },
+    "ms_per_image": 8.54
+  }
+}
+samples: [
+  {
+    "file": "no_hardhat_1.jpg",
+    "source": "thumbnail-ba5c72edb320b49a69e86b05775c49b2-scaled-1_jpeg_jpg.rf.3bb460e284098219861b894fb0db13d5.jpg",
+    "hardhat": 0,
+    "no_hardhat": 8,
+    "person": 11
+  },
+  {
+    "file": "no_hardhat_2.jpg",
+    "source": "class2_145_jpg.rf.b8ed5a5357ee41f8fb1aa9b01a400d51.jpg",
+    "hardhat": 0,
+    "no_hardhat": 2,
+    "person": 2
+  },
+  {
+    "file": "no_hardhat_3.jpg",
+    "source": "youtube-126_jpg.rf.786824e90daf3276130ca73ca610a8da.jpg",
+    "hardhat": 0,
+    "no_hardhat": 2,
+    "person": 2
+  },
+  {
+    "file": "all_hardhat_1.jpg",
+    "source": "006672_jpg.rf.87d5978c486feb53177408cf00a0d87f.jpg",
+    "hardhat": 6,
+    "no_hardhat": 0,
+    "person": 5
+  },
+  {
+    "file": "all_hardhat_2.jpg",
+    "source": "004763_jpg.rf.46484e6ca73caeaa9de45822cf1085a9.jpg",
+    "hardhat": 3,
+    "no_hardhat": 0,
+    "person": 3
+  },
+  {
+    "file": "all_hardhat_3.jpg",
+    "source": "youtube-631_jpg.rf.7c6ecf859c1b0a659f8ea057ad27aebd.jpg",
+    "hardhat": 3,
+    "no_hardhat": 0,
+    "person": 1
+  }
+]
+[done] /workspace/eval_out

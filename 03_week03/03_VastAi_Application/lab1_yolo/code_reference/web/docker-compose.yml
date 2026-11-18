@@ -1,0 +1,38 @@
+# SiteSafe — เว็บตรวจความปลอดภัยหน้างาน (LAB 1)
+# เปิด: docker compose up -d --build   →  http://localhost:3401
+# YOLO_BASE_URL / YOLO_API_KEY อ่านจากไฟล์ .env ข้างไฟล์นี้ (ห้าม commit, key อยู่ฝั่ง server เท่านั้น)
+name: vapp-lab1
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sitesafe
+      POSTGRES_PASSWORD: sitesafe_pw
+      POSTGRES_DB: sitesafe
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sitesafe -d sitesafe"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://sitesafe:sitesafe_pw@db:5432/sitesafe
+      TZ: Asia/Bangkok
+    ports:
+      - "3401:3000"
+
+volumes:
+  pgdata:
