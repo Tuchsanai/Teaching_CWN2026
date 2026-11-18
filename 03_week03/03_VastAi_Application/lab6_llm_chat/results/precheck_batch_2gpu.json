@@ -1,0 +1,124 @@
+{
+ "created": "2026-11-18 03:43:17",
+ "method": "ผู้ใช้ 1 คน ถามทีละข้อ 5 ข้อ ตรงเข้า vLLM แต่ละตัว (ไม่ผ่าน NGINX) max_tokens 150",
+ "gpus": [
+  {
+   "backend": "vllm-1",
+   "gpu_index": 0,
+   "port": 8001,
+   "name": "NVIDIA GeForce RTX 3090",
+   "idle": {
+    "temp_c": 51.0,
+    "clock_mhz": 1755.0,
+    "clock_max_mhz": 2115.0
+   },
+   "load": {
+    "temp_max_c": 61.0,
+    "clock_mhz_mean": 1872,
+    "clock_mhz_min": 1755.0,
+    "power_w_mean": 310.4
+   },
+   "single_user": {
+    "speed_tok_s_median": 84.0,
+    "ttft_s_median": 0.032,
+    "questions": [
+     {
+      "q": "น้ำยาล้างจานแบบไหนอ่อนโยนต่อมือคะ",
+      "ttft_s": 0.032,
+      "tokens": 73,
+      "speed_tok_s": 84.1,
+      "total_s": 0.89
+     },
+     {
+      "q": "ผงซักฟอกกับน้ำยาซักผ้า อันไหนดีกว่ากันครับ",
+      "ttft_s": 0.032,
+      "tokens": 86,
+      "speed_tok_s": 84.1,
+      "total_s": 1.04
+     },
+     {
+      "q": "ไม้ถูพื้นแบบสเปรย์กับแบบถังปั่น ต่างกันยังไงคะ",
+      "ttft_s": 0.032,
+      "tokens": 84,
+      "speed_tok_s": 84.0,
+      "total_s": 1.02
+     },
+     {
+      "q": "มีถุงขยะแบบย่อยสลายได้ไหมครับ",
+      "ttft_s": 0.032,
+      "tokens": 83,
+      "speed_tok_s": 84.0,
+      "total_s": 1.01
+     },
+     {
+      "q": "น้ำยาปรับผ้านุ่มกลิ่นไหนหอมติดทนที่สุดคะ",
+      "ttft_s": 0.032,
+      "tokens": 121,
+      "speed_tok_s": 83.9,
+      "total_s": 1.46
+     }
+    ]
+   }
+  },
+  {
+   "backend": "vllm-2",
+   "gpu_index": 1,
+   "port": 8002,
+   "name": "NVIDIA GeForce RTX 3090",
+   "idle": {
+    "temp_c": 58.0,
+    "clock_mhz": 210.0,
+    "clock_max_mhz": 2100.0
+   },
+   "load": {
+    "temp_max_c": 66.0,
+    "clock_mhz_mean": 1848,
+    "clock_mhz_min": 1695.0,
+    "power_w_mean": 285.0
+   },
+   "single_user": {
+    "speed_tok_s_median": 84.4,
+    "ttft_s_median": 0.032,
+    "questions": [
+     {
+      "q": "น้ำยาล้างจานแบบไหนอ่อนโยนต่อมือคะ",
+      "ttft_s": 0.032,
+      "tokens": 73,
+      "speed_tok_s": 84.7,
+      "total_s": 0.88
+     },
+     {
+      "q": "ผงซักฟอกกับน้ำยาซักผ้า อันไหนดีกว่ากันครับ",
+      "ttft_s": 0.032,
+      "tokens": 86,
+      "speed_tok_s": 84.4,
+      "total_s": 1.04
+     },
+     {
+      "q": "ไม้ถูพื้นแบบสเปรย์กับแบบถังปั่น ต่างกันยังไงคะ",
+      "ttft_s": 0.033,
+      "tokens": 84,
+      "speed_tok_s": 84.4,
+      "total_s": 1.02
+     },
+     {
+      "q": "มีถุงขยะแบบย่อยสลายได้ไหมครับ",
+      "ttft_s": 0.032,
+      "tokens": 83,
+      "speed_tok_s": 84.4,
+      "total_s": 1.0
+     },
+     {
+      "q": "น้ำยาปรับผ้านุ่มกลิ่นไหนหอมติดทนที่สุดคะ",
+      "ttft_s": 0.031,
+      "tokens": 121,
+      "speed_tok_s": 84.2,
+      "total_s": 1.46
+     }
+    ]
+   }
+  }
+ ],
+ "speed_diff_pct": 0.47,
+ "speed_diff_over_10pct": false
+}

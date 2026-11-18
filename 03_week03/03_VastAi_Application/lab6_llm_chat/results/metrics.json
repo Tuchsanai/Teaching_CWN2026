@@ -1,0 +1,1176 @@
+{
+ "slo": {
+  "ttft_p95_max_s": 2.0,
+  "speed_p5_min_tok_s": 15.0,
+  "error_rate_max": 0.01
+ },
+ "capacity_rule": "ระดับ N สูงสุดที่ผ่าน SLO และทุกระดับที่ต่ำกว่าที่วัดก็ผ่าน · ระดับที่วัดซ้ำใช้ค่ากลาง (median)",
+ "capacity_by_set": {
+  "single_1gpu": 2,
+  "batch_1gpu": 192,
+  "batch_2gpu": 384
+ },
+ "table_by_gpus": [
+  {
+   "label": "single_1gpu",
+   "gpus": 1,
+   "mode": "single",
+   "architecture": "ตอบทีละคำถาม",
+   "capacity_users": 2,
+   "agg_tok_s_at_capacity": 81.779,
+   "ttft_p95_at_capacity_s": 1.605,
+   "speed_p5_at_capacity": 83.936,
+   "speedup_vs_1gpu": 1.0,
+   "efficiency_pct": 100.0,
+   "tok_s_ratio_vs_1gpu": 1.0,
+   "vs_single_1gpu_x": 1.0
+  },
+  {
+   "label": "batch_1gpu",
+   "gpus": 1,
+   "mode": "batch",
+   "architecture": "Continuous Batching",
+   "capacity_users": 192,
+   "agg_tok_s_at_capacity": 3096.831,
+   "ttft_p95_at_capacity_s": 0.228,
+   "speed_p5_at_capacity": 16.283,
+   "speedup_vs_1gpu": 1.0,
+   "efficiency_pct": 100.0,
+   "tok_s_ratio_vs_1gpu": 1.0,
+   "vs_single_1gpu_x": 96.0
+  },
+  {
+   "label": "batch_2gpu",
+   "gpus": 2,
+   "mode": "batch",
+   "architecture": "Continuous Batching · vLLM 2 ตัว หลัง NGINX least_conn",
+   "capacity_users": 384,
+   "agg_tok_s_at_capacity": 6156.909,
+   "ttft_p95_at_capacity_s": 0.23,
+   "speed_p5_at_capacity": 16.016,
+   "speedup_vs_1gpu": 2.0,
+   "efficiency_pct": 100.0,
+   "tok_s_ratio_vs_1gpu": 1.988,
+   "vs_single_1gpu_x": 192.0
+  }
+ ],
+ "estimate_3gpu": {
+  "users": 576,
+  "users_raw": 576.0,
+  "step_64_floor": 576,
+  "assumption": "ความจุ 1 ใบ 192 × 3 × efficiency ของ 2 ใบ 100.0% (สมมติ NGINX/CPU ไม่เป็นคอขวด) — เป็นการคำนวณ ไม่ใช่ผลวัด"
+ },
+ "repeated_levels": {
+  "single_1gpu": [],
+  "batch_1gpu": [],
+  "batch_2gpu": []
+ },
+ "precheck": {
+  "batch_2gpu": {
+   "created": "2026-11-18 03:43:17",
+   "method": "ผู้ใช้ 1 คน ถามทีละข้อ 5 ข้อ ตรงเข้า vLLM แต่ละตัว (ไม่ผ่าน NGINX) max_tokens 150",
+   "gpus": [
+    {
+     "backend": "vllm-1",
+     "gpu_index": 0,
+     "port": 8001,
+     "name": "NVIDIA GeForce RTX 3090",
+     "idle": {
+      "temp_c": 51.0,
+      "clock_mhz": 1755.0,
+      "clock_max_mhz": 2115.0
+     },
+     "load": {
+      "temp_max_c": 61.0,
+      "clock_mhz_mean": 1872,
+      "clock_mhz_min": 1755.0,
+      "power_w_mean": 310.4
+     },
+     "single_user": {
+      "speed_tok_s_median": 84.0,
+      "ttft_s_median": 0.032,
+      "questions": [
+       {
+        "q": "น้ำยาล้างจานแบบไหนอ่อนโยนต่อมือคะ",
+        "ttft_s": 0.032,
+        "tokens": 73,
+        "speed_tok_s": 84.1,
+        "total_s": 0.89
+       },
+       {
+        "q": "ผงซักฟอกกับน้ำยาซักผ้า อันไหนดีกว่ากันครับ",
+        "ttft_s": 0.032,
+        "tokens": 86,
+        "speed_tok_s": 84.1,
+        "total_s": 1.04
+       },
+       {
+        "q": "ไม้ถูพื้นแบบสเปรย์กับแบบถังปั่น ต่างกันยังไงคะ",
+        "ttft_s": 0.032,
+        "tokens": 84,
+        "speed_tok_s": 84.0,
+        "total_s": 1.02
+       },
+       {
+        "q": "มีถุงขยะแบบย่อยสลายได้ไหมครับ",
+        "ttft_s": 0.032,
+        "tokens": 83,
+        "speed_tok_s": 84.0,
+        "total_s": 1.01
+       },
+       {
+        "q": "น้ำยาปรับผ้านุ่มกลิ่นไหนหอมติดทนที่สุดคะ",
+        "ttft_s": 0.032,
+        "tokens": 121,
+        "speed_tok_s": 83.9,
+        "total_s": 1.46
+       }
+      ]
+     }
+    },
+    {
+     "backend": "vllm-2",
+     "gpu_index": 1,
+     "port": 8002,
+     "name": "NVIDIA GeForce RTX 3090",
+     "idle": {
+      "temp_c": 58.0,
+      "clock_mhz": 210.0,
+      "clock_max_mhz": 2100.0
+     },
+     "load": {
+      "temp_max_c": 66.0,
+      "clock_mhz_mean": 1848,
+      "clock_mhz_min": 1695.0,
+      "power_w_mean": 285.0
+     },
+     "single_user": {
+      "speed_tok_s_median": 84.4,
+      "ttft_s_median": 0.032,
+      "questions": [
+       {
+        "q": "น้ำยาล้างจานแบบไหนอ่อนโยนต่อมือคะ",
+        "ttft_s": 0.032,
+        "tokens": 73,
+        "speed_tok_s": 84.7,
+        "total_s": 0.88
+       },
+       {
+        "q": "ผงซักฟอกกับน้ำยาซักผ้า อันไหนดีกว่ากันครับ",
+        "ttft_s": 0.032,
+        "tokens": 86,
+        "speed_tok_s": 84.4,
+        "total_s": 1.04
+       },
+       {
+        "q": "ไม้ถูพื้นแบบสเปรย์กับแบบถังปั่น ต่างกันยังไงคะ",
+        "ttft_s": 0.033,
+        "tokens": 84,
+        "speed_tok_s": 84.4,
+        "total_s": 1.02
+       },
+       {
+        "q": "มีถุงขยะแบบย่อยสลายได้ไหมครับ",
+        "ttft_s": 0.032,
+        "tokens": 83,
+        "speed_tok_s": 84.4,
+        "total_s": 1.0
+       },
+       {
+        "q": "น้ำยาปรับผ้านุ่มกลิ่นไหนหอมติดทนที่สุดคะ",
+        "ttft_s": 0.031,
+        "tokens": 121,
+        "speed_tok_s": 84.2,
+        "total_s": 1.46
+       }
+      ]
+     }
+    }
+   ],
+   "speed_diff_pct": 0.47,
+   "speed_diff_over_10pct": false
+  },
+  "batch_1gpu": {
+   "source": "precheck_batch_1gpu.txt",
+   "gpus": [
+    {
+     "gpu_index": 0,
+     "idle": {
+      "temp_c": 44.0,
+      "clock_mhz": 210.0,
+      "clock_max_mhz": 2115.0
+     },
+     "load": {
+      "temp_max_c": 59.0,
+      "clock_mhz_mean": 1908.0
+     },
+     "single_user": {
+      "speed_tok_s_median": 84.3
+     }
+    }
+   ]
+  }
+ },
+ "sets": [
+  {
+   "label": "single_1gpu",
+   "file": "loadtest_single_1gpu.json",
+   "gpus": 1,
+   "mode": "single",
+   "lb": "least_conn",
+   "architecture": "ตอบทีละคำถาม",
+   "architecture_en": "one request at a time",
+   "started": "2026-11-18 03:28:35",
+   "config": {
+    "levels": "1,2,3,4,6,8",
+    "duration_s": 30,
+    "warmup_s": 5,
+    "max_tokens": 150,
+    "n_questions": 40,
+    "system_prompt": "คุณคือพนักงานร้านขายของใช้ในบ้าน ตอบลูกค้าเป็นภาษาไทย สุภาพ กระชับ ไม่เกิน 3 ประโยค",
+    "url": "http://127.0.0.1:8000/v1/chat/completions",
+    "slo": {
+     "ttft_p95_max_s": 2.0,
+     "speed_p5_min_tok_s": 15.0,
+     "error_rate_max": 0.01,
+     "borderline": 0.05
+    },
+    "cpu_count": 16
+   },
+   "levels_measured": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "capacity_users": 2,
+   "capacity_agg_tok_s": 81.779,
+   "capacity_ttft_p95": 1.605,
+   "capacity_speed_p5": 83.936,
+   "max_agg_tok_s": 82.398,
+   "first_fail_N": 3,
+   "repeated_levels": [],
+   "levels": [
+    {
+     "N": 1,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.046,
+     "ttft_p95": 0.05,
+     "ttft_p99": 0.051,
+     "speed_p50": 84.245,
+     "speed_p5": 83.931,
+     "agg_tok_s": 81.286,
+     "error_rate": 0.0,
+     "requests": 25,
+     "requests_per_backend": {
+      "vllm-1": 25
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 96.6,
+       "temp_max": 64.0,
+       "clock_mhz_mean": 1881,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 1.3,
+     "fail_reasons": []
+    },
+    {
+     "N": 2,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.855,
+     "ttft_p95": 1.605,
+     "ttft_p99": 1.794,
+     "speed_p50": 84.028,
+     "speed_p5": 83.936,
+     "agg_tok_s": 81.779,
+     "error_rate": 0.0,
+     "requests": 28,
+     "requests_per_backend": {
+      "vllm-1": 28
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 99.8,
+       "temp_max": 66.0,
+       "clock_mhz_mean": 1868,
+       "clock_mhz_min": 1845.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 1.4,
+     "fail_reasons": []
+    },
+    {
+     "N": 3,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 2.063,
+     "ttft_p95": 2.916,
+     "ttft_p99": 3.028,
+     "speed_p50": 83.947,
+     "speed_p5": 83.876,
+     "agg_tok_s": 82.164,
+     "error_rate": 0.0,
+     "requests": 24,
+     "requests_per_backend": {
+      "vllm-1": 24
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 99.1,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1873,
+       "clock_mhz_min": 1860.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 1.5,
+     "fail_reasons": [
+      "ttft_p95"
+     ]
+    },
+    {
+     "N": 4,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 3.316,
+     "ttft_p95": 4.168,
+     "ttft_p99": 4.179,
+     "speed_p50": 83.905,
+     "speed_p5": 83.87,
+     "agg_tok_s": 82.398,
+     "error_rate": 0.0,
+     "requests": 22,
+     "requests_per_backend": {
+      "vllm-1": 22
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 99.1,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1859,
+       "clock_mhz_min": 1845.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 1.4,
+     "fail_reasons": [
+      "ttft_p95"
+     ]
+    }
+   ]
+  },
+  {
+   "label": "batch_1gpu",
+   "file": "loadtest_batch_1gpu.json",
+   "gpus": 1,
+   "mode": "batch",
+   "lb": "least_conn",
+   "architecture": "Continuous Batching",
+   "architecture_en": "Continuous Batching",
+   "started": "2026-11-18 03:34:25",
+   "config": {
+    "levels": "1,32,64,96,128,160,192,224,256",
+    "duration_s": 30,
+    "warmup_s": 5,
+    "max_tokens": 150,
+    "n_questions": 40,
+    "system_prompt": "คุณคือพนักงานร้านขายของใช้ในบ้าน ตอบลูกค้าเป็นภาษาไทย สุภาพ กระชับ ไม่เกิน 3 ประโยค",
+    "url": "http://127.0.0.1:8000/v1/chat/completions",
+    "slo": {
+     "ttft_p95_max_s": 2.0,
+     "speed_p5_min_tok_s": 15.0,
+     "error_rate_max": 0.01,
+     "borderline": 0.05
+    },
+    "cpu_count": 16
+   },
+   "levels_measured": [
+    1,
+    32,
+    64,
+    96,
+    128,
+    160,
+    192,
+    224,
+    256
+   ],
+   "capacity_users": 192,
+   "capacity_agg_tok_s": 3096.831,
+   "capacity_ttft_p95": 0.228,
+   "capacity_speed_p5": 16.283,
+   "max_agg_tok_s": 3096.831,
+   "first_fail_N": 224,
+   "repeated_levels": [],
+   "levels": [
+    {
+     "N": 1,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.031,
+     "ttft_p95": 0.032,
+     "ttft_p99": 0.035,
+     "speed_p50": 84.091,
+     "speed_p5": 83.95,
+     "agg_tok_s": 82.353,
+     "error_rate": 0.0,
+     "requests": 27,
+     "requests_per_backend": {
+      "vllm-1": 27
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 99.4,
+       "temp_max": 64.0,
+       "clock_mhz_mean": 1887,
+       "clock_mhz_min": 1860.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 55.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 1.4,
+     "fail_reasons": []
+    },
+    {
+     "N": 32,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.051,
+     "ttft_p95": 0.057,
+     "ttft_p99": 0.066,
+     "speed_p50": 65.622,
+     "speed_p5": 64.536,
+     "agg_tok_s": 2041.099,
+     "error_rate": 0.0,
+     "requests": 599,
+     "requests_per_backend": {
+      "vllm-1": 599
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 66.0,
+       "clock_mhz_mean": 1864,
+       "clock_mhz_min": 1860.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 34.1,
+     "fail_reasons": []
+    },
+    {
+     "N": 64,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.075,
+     "ttft_p95": 0.087,
+     "ttft_p99": 0.096,
+     "speed_p50": 46.376,
+     "speed_p5": 44.854,
+     "agg_tok_s": 2880.795,
+     "error_rate": 0.0,
+     "requests": 849,
+     "requests_per_backend": {
+      "vllm-1": 849
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1826,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 46.4,
+     "fail_reasons": []
+    },
+    {
+     "N": 96,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.107,
+     "ttft_p95": 0.127,
+     "ttft_p99": 0.134,
+     "speed_p50": 32.078,
+     "speed_p5": 31.242,
+     "agg_tok_s": 2993.483,
+     "error_rate": 0.0,
+     "requests": 882,
+     "requests_per_backend": {
+      "vllm-1": 882
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 68.0,
+       "clock_mhz_mean": 1831,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 48.9,
+     "fail_reasons": []
+    },
+    {
+     "N": 128,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.143,
+     "ttft_p95": 0.151,
+     "ttft_p99": 0.155,
+     "speed_p50": 24.259,
+     "speed_p5": 23.648,
+     "agg_tok_s": 3015.871,
+     "error_rate": 0.0,
+     "requests": 904,
+     "requests_per_backend": {
+      "vllm-1": 904
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 68.0,
+       "clock_mhz_mean": 1822,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 53.9,
+     "fail_reasons": []
+    },
+    {
+     "N": 160,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.172,
+     "ttft_p95": 0.181,
+     "ttft_p99": 0.187,
+     "speed_p50": 19.804,
+     "speed_p5": 19.481,
+     "agg_tok_s": 3083.431,
+     "error_rate": 0.0,
+     "requests": 902,
+     "requests_per_backend": {
+      "vllm-1": 902
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 68.0,
+       "clock_mhz_mean": 1816,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 53.9,
+     "fail_reasons": []
+    },
+    {
+     "N": 192,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.2,
+     "ttft_p95": 0.228,
+     "ttft_p99": 0.236,
+     "speed_p50": 16.666,
+     "speed_p5": 16.283,
+     "agg_tok_s": 3096.831,
+     "error_rate": 0.0,
+     "requests": 936,
+     "requests_per_backend": {
+      "vllm-1": 936
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 68.0,
+       "clock_mhz_mean": 1831,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 54.6,
+     "fail_reasons": []
+    },
+    {
+     "N": 224,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.249,
+     "ttft_p95": 0.273,
+     "ttft_p99": 0.276,
+     "speed_p50": 13.654,
+     "speed_p5": 13.332,
+     "agg_tok_s": 2967.532,
+     "error_rate": 0.0,
+     "requests": 877,
+     "requests_per_backend": {
+      "vllm-1": 877
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 68.0,
+       "clock_mhz_mean": 1832,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 52.8,
+     "fail_reasons": [
+      "speed_p5"
+     ]
+    },
+    {
+     "N": 256,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.288,
+     "ttft_p95": 0.299,
+     "ttft_p99": 0.307,
+     "speed_p50": 11.563,
+     "speed_p5": 11.395,
+     "agg_tok_s": 2868.98,
+     "error_rate": 0.0,
+     "requests": 866,
+     "requests_per_backend": {
+      "vllm-1": 866
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1848,
+       "clock_mhz_min": 1830.0
+      },
+      "1": {
+       "util_mean": 0.0,
+       "temp_max": 54.0,
+       "clock_mhz_mean": 210,
+       "clock_mhz_min": 210.0
+      }
+     },
+     "loadgen_cpu_pct_total": 50.6,
+     "fail_reasons": [
+      "speed_p5"
+     ]
+    }
+   ]
+  },
+  {
+   "label": "batch_2gpu",
+   "file": "loadtest_batch_2gpu.json",
+   "gpus": 2,
+   "mode": "batch",
+   "lb": "least_conn",
+   "architecture": "Continuous Batching · vLLM 2 ตัว หลัง NGINX least_conn",
+   "architecture_en": "Continuous Batching (2 vLLM, NGINX least_conn)",
+   "started": "2026-11-18 03:43:37",
+   "config": {
+    "levels": "128,192,256,320,384,448,512",
+    "duration_s": 30,
+    "warmup_s": 5,
+    "max_tokens": 150,
+    "n_questions": 40,
+    "system_prompt": "คุณคือพนักงานร้านขายของใช้ในบ้าน ตอบลูกค้าเป็นภาษาไทย สุภาพ กระชับ ไม่เกิน 3 ประโยค",
+    "url": "http://127.0.0.1:8000/v1/chat/completions",
+    "slo": {
+     "ttft_p95_max_s": 2.0,
+     "speed_p5_min_tok_s": 15.0,
+     "error_rate_max": 0.01,
+     "borderline": 0.05
+    },
+    "cpu_count": 16
+   },
+   "levels_measured": [
+    128,
+    192,
+    256,
+    320,
+    384,
+    448,
+    512
+   ],
+   "capacity_users": 384,
+   "capacity_agg_tok_s": 6156.909,
+   "capacity_ttft_p95": 0.23,
+   "capacity_speed_p5": 16.016,
+   "max_agg_tok_s": 6261.147,
+   "first_fail_N": 448,
+   "repeated_levels": [],
+   "levels": [
+    {
+     "N": 128,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.075,
+     "ttft_p95": 0.089,
+     "ttft_p99": 0.097,
+     "speed_p50": 45.726,
+     "speed_p5": 44.116,
+     "agg_tok_s": 5677.068,
+     "error_rate": 0.0,
+     "requests": 1690,
+     "requests_per_backend": {
+      "vllm-2": 836,
+      "vllm-1": 854
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 64.0,
+       "clock_mhz_mean": 1850,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 73.0,
+       "clock_mhz_mean": 1829,
+       "clock_mhz_min": 1800.0
+      }
+     },
+     "loadgen_cpu_pct_total": 91.8,
+     "fail_reasons": []
+    },
+    {
+     "N": 192,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.105,
+     "ttft_p95": 0.125,
+     "ttft_p99": 0.131,
+     "speed_p50": 32.016,
+     "speed_p5": 30.964,
+     "agg_tok_s": 5968.823,
+     "error_rate": 0.0,
+     "requests": 1790,
+     "requests_per_backend": {
+      "vllm-1": 898,
+      "vllm-2": 892
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 66.0,
+       "clock_mhz_mean": 1847,
+       "clock_mhz_min": 1830.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 76.0,
+       "clock_mhz_mean": 1820,
+       "clock_mhz_min": 1785.0
+      }
+     },
+     "loadgen_cpu_pct_total": 100.7,
+     "fail_reasons": []
+    },
+    {
+     "N": 256,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.137,
+     "ttft_p95": 0.158,
+     "ttft_p99": 0.167,
+     "speed_p50": 24.401,
+     "speed_p5": 23.389,
+     "agg_tok_s": 6049.64,
+     "error_rate": 0.0,
+     "requests": 1803,
+     "requests_per_backend": {
+      "vllm-1": 910,
+      "vllm-2": 893
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 66.0,
+       "clock_mhz_mean": 1831,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 78.0,
+       "clock_mhz_mean": 1807,
+       "clock_mhz_min": 1785.0
+      }
+     },
+     "loadgen_cpu_pct_total": 102.8,
+     "fail_reasons": []
+    },
+    {
+     "N": 320,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.168,
+     "ttft_p95": 0.187,
+     "ttft_p99": 0.199,
+     "speed_p50": 20.159,
+     "speed_p5": 19.53,
+     "agg_tok_s": 6261.147,
+     "error_rate": 0.0,
+     "requests": 1817,
+     "requests_per_backend": {
+      "vllm-1": 925,
+      "vllm-2": 892
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1820,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 79.0,
+       "clock_mhz_mean": 1795,
+       "clock_mhz_min": 1755.0
+      }
+     },
+     "loadgen_cpu_pct_total": 106.5,
+     "fail_reasons": []
+    },
+    {
+     "N": 384,
+     "pass": true,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.199,
+     "ttft_p95": 0.23,
+     "ttft_p99": 0.239,
+     "speed_p50": 16.578,
+     "speed_p5": 16.016,
+     "agg_tok_s": 6156.909,
+     "error_rate": 0.0,
+     "requests": 1832,
+     "requests_per_backend": {
+      "vllm-2": 905,
+      "vllm-1": 927
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1840,
+       "clock_mhz_min": 1815.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 80.0,
+       "clock_mhz_mean": 1801,
+       "clock_mhz_min": 1785.0
+      }
+     },
+     "loadgen_cpu_pct_total": 103.4,
+     "fail_reasons": []
+    },
+    {
+     "N": 448,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.242,
+     "ttft_p95": 0.277,
+     "ttft_p99": 0.286,
+     "speed_p50": 13.917,
+     "speed_p5": 13.367,
+     "agg_tok_s": 5996.123,
+     "error_rate": 0.0,
+     "requests": 1754,
+     "requests_per_backend": {
+      "vllm-2": 860,
+      "vllm-1": 894
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1841,
+       "clock_mhz_min": 1800.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 80.0,
+       "clock_mhz_mean": 1801,
+       "clock_mhz_min": 1770.0
+      }
+     },
+     "loadgen_cpu_pct_total": 102.0,
+     "fail_reasons": [
+      "speed_p5"
+     ]
+    },
+    {
+     "N": 512,
+     "pass": false,
+     "repeated": false,
+     "n_runs": 1,
+     "borderline": [],
+     "ttft_p50": 0.29,
+     "ttft_p95": 0.308,
+     "ttft_p99": 0.321,
+     "speed_p50": 11.59,
+     "speed_p5": 11.108,
+     "agg_tok_s": 5717.721,
+     "error_rate": 0.0,
+     "requests": 1700,
+     "requests_per_backend": {
+      "vllm-1": 850,
+      "vllm-2": 850
+     },
+     "gpu": {
+      "0": {
+       "util_mean": 100.0,
+       "temp_max": 67.0,
+       "clock_mhz_mean": 1849,
+       "clock_mhz_min": 1785.0
+      },
+      "1": {
+       "util_mean": 100.0,
+       "temp_max": 80.0,
+       "clock_mhz_mean": 1786,
+       "clock_mhz_min": 1695.0
+      }
+     },
+     "loadgen_cpu_pct_total": 99.7,
+     "fail_reasons": [
+      "speed_p5"
+     ]
+    }
+   ]
+  }
+ ],
+ "lb_compare": [
+  {
+   "lb": "round_robin",
+   "name": "Round Robin",
+   "file": "loadtest_mix_round_robin.json",
+   "users": 448,
+   "long_frac": 0.2,
+   "long_max_tokens": 600,
+   "short_max_tokens": 150,
+   "measure_s": 90.0,
+   "warmup_s": 30.0,
+   "requests": 2402,
+   "error_rate": 0.0,
+   "ttft_p50": 0.282,
+   "ttft_p95": 1.55,
+   "ttft_p99": 1.999,
+   "speed_p5": 9.304,
+   "speed_p50": 12.3,
+   "agg_tok_s": 5017.255,
+   "pass_slo": false,
+   "per_gpu": {
+    "GPU 0": {
+     "running_mean": 197.2,
+     "running_max": 221.0,
+     "waiting_mean": 0.32,
+     "waiting_max": 27.0
+    },
+    "GPU 1": {
+     "running_mean": 243.01,
+     "running_max": 256.0,
+     "waiting_mean": 3.02,
+     "waiting_max": 66.0
+    }
+   },
+   "requests_per_backend": {
+    "vllm-1": 1201,
+    "vllm-2": 1201
+   },
+   "gpu_util": {
+    "GPU 0": 100.0,
+    "GPU 1": 100.0
+   },
+   "short": {
+    "requests": 1947,
+    "ok": 1947,
+    "ttft_p95": 1.558,
+    "speed_p5": 9.271,
+    "completion_tokens_mean": 84.0,
+    "per_backend": {
+     "vllm-1": 973,
+     "vllm-2": 974
+    }
+   },
+   "long": {
+    "requests": 455,
+    "ok": 455,
+    "ttft_p95": 1.404,
+    "speed_p5": 9.538,
+    "completion_tokens_mean": 600,
+    "per_backend": {
+     "vllm-1": 228,
+     "vllm-2": 227
+    }
+   }
+  },
+  {
+   "lb": "least_conn",
+   "name": "least_conn",
+   "file": "loadtest_mix_least_conn.json",
+   "users": 448,
+   "long_frac": 0.2,
+   "long_max_tokens": 600,
+   "short_max_tokens": 150,
+   "measure_s": 90.0,
+   "warmup_s": 30.0,
+   "requests": 2521,
+   "error_rate": 0.0,
+   "ttft_p50": 0.283,
+   "ttft_p95": 0.359,
+   "ttft_p99": 0.61,
+   "speed_p5": 11.169,
+   "speed_p50": 11.975,
+   "agg_tok_s": 5247.084,
+   "pass_slo": false,
+   "per_gpu": {
+    "GPU 0": {
+     "running_mean": 220.09,
+     "running_max": 225.0,
+     "waiting_mean": 1.38,
+     "waiting_max": 55.0
+    },
+    "GPU 1": {
+     "running_mean": 221.72,
+     "running_max": 225.0,
+     "waiting_mean": 0,
+     "waiting_max": 0
+    }
+   },
+   "requests_per_backend": {
+    "vllm-1": 1257,
+    "vllm-2": 1264
+   },
+   "gpu_util": {
+    "GPU 0": 100.0,
+    "GPU 1": 100.0
+   },
+   "short": {
+    "requests": 2031,
+    "ok": 2031,
+    "ttft_p95": 0.358,
+    "speed_p5": 11.101,
+    "completion_tokens_mean": 84.0,
+    "per_backend": {
+     "vllm-1": 1011,
+     "vllm-2": 1020
+    }
+   },
+   "long": {
+    "requests": 490,
+    "ok": 490,
+    "ttft_p95": 0.368,
+    "speed_p5": 11.685,
+    "completion_tokens_mean": 600,
+    "per_backend": {
+     "vllm-1": 246,
+     "vllm-2": 244
+    }
+   }
+  }
+ ]
+}

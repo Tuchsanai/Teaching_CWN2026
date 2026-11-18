@@ -15,6 +15,7 @@
 | [LAB 2](lab2_multigpu/README.md) | [lab2_multigpu](lab2_multigpu/README.md) | เทรนงานเดิมบน 1 GPU เทียบ 2 GPU | เพิ่ม GPU แล้วเร็วขึ้นกี่เท่า คุ้มเงินไหม | $0.51 |
 | [LAB 3](lab3_qlora/README.md) | [lab3_qlora](lab3_qlora/README.md) | QLoRA โมเดลเล็กให้แชทบอทร้านนวด (ข้อมูลฝึกจากโมเดลครู) | โมเดลเล็กที่เทรนเพิ่ม แทนโมเดลใหญ่ได้ไหม | $0.69 |
 | [LAB 4](lab4_vlm/README.md) | [lab4_vlm](lab4_vlm/README.md) | Fine-tune VLM อ่านใบเสร็จ → เว็บสมุดรายจ่าย | เทรนด้วยใบเสร็จ 800 ใบ แล้วอ่านแม่นขึ้นเท่าไร | $0.58 |
+| [LAB 6](lab6_llm_chat/README.md) | [lab6_llm_chat](lab6_llm_chat/README.md) | แชทบอท LLM: Continuous Batching + Load Balancer 1 → 2 ใบ | GPU 1 ใบคุยพร้อมกันได้กี่คน และเพิ่ม GPU แล้วรับได้เพิ่มเท่าไร | $0.60 |
 | [LAB 7](lab7_job_queue/README.md) | [lab7_job_queue](lab7_job_queue/README.md) | อ่านใบเสร็จด้วย VLM เป็นงานคิว: RabbitMQ + GPU Worker 1 → 2 ใบ | งานหนักเข้าพร้อมกันเกินความจุ ระบบคิวช่วยอะไร และเพิ่ม Worker แล้วรับได้เพิ่มเท่าไร | $0.78 |
 | [LAB 8](lab8_hybrid/README.md) | [lab8_hybrid](lab8_hybrid/README.md) | บริการสร้างภาพ: API gateway + RabbitMQ + GPU Worker 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และออกแบบระบบอย่างไรให้รับได้มากขึ้น | $0.57 |
 
@@ -62,6 +63,7 @@
 | `lab2_multigpu/` | LAB 2 · เทรนงานเดิมบน 1 GPU เทียบ 2 GPU |
 | `lab3_qlora/` | LAB 3 · QLoRA โมเดลเล็กให้แชทบอทร้านนวด |
 | `lab4_vlm/` | LAB 4 · Fine-tune VLM อ่านใบเสร็จ + เว็บสมุดรายจ่าย |
+| `lab6_llm_chat/` | LAB 6 · แชทบอท LLM: Continuous Batching + Load Balancer |
 | `lab7_job_queue/` | LAB 7 · งานคิวอ่านใบเสร็จด้วย RabbitMQ + GPU Worker |
 | `lab8_hybrid/` | LAB 8 · ระบบผสมสำหรับบริการสร้างภาพ (RabbitMQ) + เว็บ PixelQueue |
 | `image/` | ภาพประกอบของหน้ารวม |
