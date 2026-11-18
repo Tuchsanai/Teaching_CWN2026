@@ -1,0 +1,51 @@
+{
+  "mode": "sweep",
+  "system": "queue",
+  "gpus": [
+    0,
+    1
+  ],
+  "slo": {
+    "p95_s_max": 20,
+    "fail_pct_below": 1
+  },
+  "max_users_meeting_slo": 4,
+  "levels": [
+    {
+      "users": 4,
+      "jobs_per_min": 11.0,
+      "latency_p50_s": 12.095,
+      "latency_p95_s": 13.851,
+      "latency_p99_s": 14.054,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 44.7,
+      "loadgen_cpu_avg_pct": 0.8,
+      "queue_length_max": 2,
+      "slo_pass": true
+    },
+    {
+      "users": 6,
+      "jobs_per_min": 11.0,
+      "latency_p50_s": 22.145,
+      "latency_p95_s": 25.171,
+      "latency_p99_s": 25.175,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 46.0,
+      "loadgen_cpu_avg_pct": 1.3,
+      "queue_length_max": 4,
+      "slo_pass": false
+    },
+    {
+      "users": 8,
+      "jobs_per_min": 11.0,
+      "latency_p50_s": 32.719,
+      "latency_p95_s": 39.757,
+      "latency_p99_s": 40.149,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 46.0,
+      "loadgen_cpu_avg_pct": 1.7,
+      "queue_length_max": 6,
+      "slo_pass": false
+    }
+  ]
+}

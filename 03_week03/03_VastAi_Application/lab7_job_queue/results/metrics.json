@@ -1,0 +1,421 @@
+{
+  "workload": {
+    "receipts_per_job": 4,
+    "think_s": 10,
+    "level_s": 75,
+    "warmup_s": 15,
+    "burst": "60 jobs within 10 s",
+    "model": "Qwen/Qwen3-VL-2B-Instruct",
+    "gpu": "RTX 3090"
+  },
+  "slo": {
+    "p95_s_max": 20,
+    "fail_pct_below": 1
+  },
+  "systems": {
+    "baseline": {
+      "label": "Sync API, 1 GPU (no queue)",
+      "gpus": 1,
+      "levels": [
+        {
+          "users": 1,
+          "jobs_per_min": 3.0,
+          "latency_p50_s": 12.149,
+          "latency_p95_s": 12.234,
+          "latency_p99_s": 12.242,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 24.9,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.1,
+          "queue_length_max": null,
+          "server_wait_p95_s": null,
+          "server_gpu_p50_s": 12.143,
+          "timeout_s": 30,
+          "workers": null,
+          "slo_pass": true
+        },
+        {
+          "users": 2,
+          "jobs_per_min": 6.0,
+          "latency_p50_s": 9.599,
+          "latency_p95_s": 11.752,
+          "latency_p99_s": 11.782,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 45.5,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.1,
+          "queue_length_max": null,
+          "server_wait_p95_s": null,
+          "server_gpu_p50_s": 9.593,
+          "timeout_s": 30,
+          "workers": null,
+          "slo_pass": true
+        },
+        {
+          "users": 4,
+          "jobs_per_min": 0.0,
+          "latency_p50_s": 30.011,
+          "latency_p95_s": 30.018,
+          "latency_p99_s": 30.02,
+          "fail_pct": 100.0,
+          "gpu_util_avg_pct": 47.0,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.1,
+          "queue_length_max": null,
+          "server_wait_p95_s": null,
+          "server_gpu_p50_s": null,
+          "timeout_s": 30,
+          "workers": null,
+          "slo_pass": false
+        },
+        {
+          "users": 6,
+          "jobs_per_min": 0.0,
+          "latency_p50_s": 30.013,
+          "latency_p95_s": 30.02,
+          "latency_p99_s": 30.022,
+          "fail_pct": 100.0,
+          "gpu_util_avg_pct": 47,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.1,
+          "queue_length_max": null,
+          "server_wait_p95_s": null,
+          "server_gpu_p50_s": null,
+          "timeout_s": 30,
+          "workers": null,
+          "slo_pass": false
+        }
+      ],
+      "slo": {
+        "p95_s_max": 20,
+        "fail_pct_below": 1
+      },
+      "capacity_users": 2,
+      "p95_at_capacity_s": 11.752,
+      "jobs_per_min_at_capacity": 6.0,
+      "max_jobs_per_min": 6.0,
+      "max_jobs_per_min_at_users": 2,
+      "first_n_tested": 1,
+      "burst": {
+        "jobs": 60,
+        "within_s": 10,
+        "succeeded": 2,
+        "failed": 58,
+        "fail_pct": 96.67,
+        "latency_p50_s": 30.003,
+        "latency_p95_s": 30.003,
+        "queue_length_max": null,
+        "queue_peak_at_s": null,
+        "queue_empty_at_s": null,
+        "server_drained_after_s": 621.0,
+        "server_jobs_redelivered": null,
+        "workers": null,
+        "drain_s": 621.0,
+        "burst_jobs_per_min": 0.19
+      }
+    },
+    "queue_1worker": {
+      "label": "Queue, 1 worker (1 GPU)",
+      "gpus": 1,
+      "levels": [
+        {
+          "users": 1,
+          "jobs_per_min": 3.0,
+          "latency_p50_s": 12.109,
+          "latency_p95_s": 13.018,
+          "latency_p99_s": 13.099,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 22.2,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.4,
+          "queue_length_max": 0,
+          "server_wait_p95_s": 0.124,
+          "server_gpu_p50_s": 12.014,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0"
+          ],
+          "slo_pass": true
+        },
+        {
+          "users": 2,
+          "jobs_per_min": 6.0,
+          "latency_p50_s": 12.204,
+          "latency_p95_s": 15.761,
+          "latency_p99_s": 16.202,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 45.2,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 0.5,
+          "queue_length_max": 1,
+          "server_wait_p95_s": 4.045,
+          "server_gpu_p50_s": 11.013,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0"
+          ],
+          "slo_pass": true
+        },
+        {
+          "users": 4,
+          "jobs_per_min": 5.0,
+          "latency_p50_s": 34.252,
+          "latency_p95_s": 36.668,
+          "latency_p99_s": 37.15,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 44.2,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 1.0,
+          "queue_length_max": 3,
+          "server_wait_p95_s": 24.784,
+          "server_gpu_p50_s": 10.012,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0"
+          ],
+          "slo_pass": false
+        },
+        {
+          "users": 6,
+          "jobs_per_min": 5.0,
+          "latency_p50_s": 55.324,
+          "latency_p95_s": 57.747,
+          "latency_p99_s": 57.91,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 47.6,
+          "gpu_util_per_gpu_pct": null,
+          "loadgen_cpu_avg_pct": 1.4,
+          "queue_length_max": 5,
+          "server_wait_p95_s": 45.047,
+          "server_gpu_p50_s": 10.013,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0"
+          ],
+          "slo_pass": false
+        }
+      ],
+      "slo": {
+        "p95_s_max": 20,
+        "fail_pct_below": 1
+      },
+      "capacity_users": 2,
+      "p95_at_capacity_s": 15.761,
+      "jobs_per_min_at_capacity": 6.0,
+      "max_jobs_per_min": 6.0,
+      "max_jobs_per_min_at_users": 2,
+      "first_n_tested": 1,
+      "burst": {
+        "jobs": 60,
+        "within_s": 10,
+        "succeeded": 60,
+        "failed": 0,
+        "fail_pct": 0.0,
+        "latency_p50_s": 336.371,
+        "latency_p95_s": 624.486,
+        "queue_length_max": 58,
+        "queue_peak_at_s": 10.13,
+        "queue_empty_at_s": 651.42,
+        "server_drained_after_s": 661.6,
+        "server_jobs_redelivered": 0,
+        "workers": [
+          "61793fa30c18-gpu0"
+        ],
+        "drain_s": 651.42,
+        "burst_jobs_per_min": 5.44
+      }
+    },
+    "queue_2worker": {
+      "label": "Queue, 2 workers (2 GPUs)",
+      "gpus": 2,
+      "levels": [
+        {
+          "users": 4,
+          "jobs_per_min": 11.0,
+          "latency_p50_s": 12.095,
+          "latency_p95_s": 13.851,
+          "latency_p99_s": 14.054,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 44.7,
+          "gpu_util_per_gpu_pct": [
+            44.1,
+            45.4
+          ],
+          "loadgen_cpu_avg_pct": 0.8,
+          "queue_length_max": 2,
+          "server_wait_p95_s": 2.963,
+          "server_gpu_p50_s": 10.013,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0",
+            "61793fa30c18-gpu1"
+          ],
+          "slo_pass": true
+        },
+        {
+          "users": 6,
+          "jobs_per_min": 11.0,
+          "latency_p50_s": 22.145,
+          "latency_p95_s": 25.171,
+          "latency_p99_s": 25.175,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 46.0,
+          "gpu_util_per_gpu_pct": [
+            48.0,
+            43.9
+          ],
+          "loadgen_cpu_avg_pct": 1.3,
+          "queue_length_max": 4,
+          "server_wait_p95_s": 13.919,
+          "server_gpu_p50_s": 10.012,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0",
+            "61793fa30c18-gpu1"
+          ],
+          "slo_pass": false
+        },
+        {
+          "users": 8,
+          "jobs_per_min": 11.0,
+          "latency_p50_s": 32.719,
+          "latency_p95_s": 39.757,
+          "latency_p99_s": 40.149,
+          "fail_pct": 0.0,
+          "gpu_util_avg_pct": 46.0,
+          "gpu_util_per_gpu_pct": [
+            42.4,
+            49.6
+          ],
+          "loadgen_cpu_avg_pct": 1.7,
+          "queue_length_max": 6,
+          "server_wait_p95_s": 26.544,
+          "server_gpu_p50_s": 10.013,
+          "timeout_s": null,
+          "workers": [
+            "61793fa30c18-gpu0",
+            "61793fa30c18-gpu1"
+          ],
+          "slo_pass": false
+        }
+      ],
+      "slo": {
+        "p95_s_max": 20,
+        "fail_pct_below": 1
+      },
+      "capacity_users": 4,
+      "p95_at_capacity_s": 13.851,
+      "jobs_per_min_at_capacity": 11.0,
+      "max_jobs_per_min": 11.0,
+      "max_jobs_per_min_at_users": 4,
+      "first_n_tested": 4,
+      "burst": {
+        "jobs": 60,
+        "within_s": 10,
+        "succeeded": 60,
+        "failed": 0,
+        "fail_pct": 0.0,
+        "latency_p50_s": 166.578,
+        "latency_p95_s": 301.89,
+        "queue_length_max": 58,
+        "queue_peak_at_s": 10.11,
+        "queue_empty_at_s": 319.34,
+        "server_drained_after_s": 330.8,
+        "server_jobs_redelivered": 0,
+        "workers": [
+          "61793fa30c18-gpu0",
+          "61793fa30c18-gpu1"
+        ],
+        "drain_s": 319.34,
+        "burst_jobs_per_min": 10.88
+      }
+    }
+  },
+  "scaling": {
+    "gpus": [
+      1,
+      2
+    ],
+    "capacity": {
+      "1_gpu": 2,
+      "2_gpu": 4,
+      "speedup_x": 2.0,
+      "efficiency_pct": 100.0
+    },
+    "max_throughput": {
+      "1_gpu": 6.0,
+      "2_gpu": 11.0,
+      "speedup_x": 1.83,
+      "efficiency_pct": 91.7
+    },
+    "burst_throughput": {
+      "1_gpu": 5.44,
+      "2_gpu": 10.88,
+      "speedup_x": 2.0,
+      "efficiency_pct": 100.0
+    }
+  },
+  "estimate_3gpu": {
+    "is_measured": false,
+    "method": "value_1gpu x 3 x efficiency_measured_at_2gpu (assumes each added GPU helps as much as the 2nd one did, and that the gateway, RabbitMQ and CPU are not the bottleneck)",
+    "capacity_users_raw": 6.0,
+    "capacity_users": 6,
+    "max_jobs_per_min": 16.51,
+    "burst_jobs_per_min": 16.32,
+    "burst_60_drain_s": 220.6,
+    "ideal_capacity_users": 6
+  },
+  "worker_kill": {
+    "jobs": 60,
+    "within_s": 10.0,
+    "workers": [
+      "61793fa30c18-gpu0",
+      "61793fa30c18-gpu1"
+    ],
+    "kill": {
+      "gpu": 1,
+      "pid": 76319,
+      "signal": "SIGKILL",
+      "planned_at_s": 20.0,
+      "worker": "61793fa30c18-gpu1",
+      "job_in_hand": "d8a6166ead19",
+      "jobs_done_before_kill": 2,
+      "at_s": 20.0,
+      "queue_length_at_kill": 55,
+      "process_gone": true
+    },
+    "sent": 60,
+    "accepted": 60,
+    "succeeded": 60,
+    "failed": 0,
+    "lost": 0,
+    "done_by_worker": {
+      "61793fa30c18-gpu1": 2,
+      "61793fa30c18-gpu0": 58
+    },
+    "redelivered_jobs": [
+      {
+        "job_id": "d8a6166ead19",
+        "deliveries": 2,
+        "finished_by": "61793fa30c18-gpu0",
+        "finished_at_s": 33.23
+      }
+    ],
+    "latency_p50_s": 324.182,
+    "latency_p95_s": 615.415,
+    "ok_latency_max_s": 646.51,
+    "errors": {},
+    "server_drained_after_s": 656.4,
+    "server_jobs_done": 60,
+    "server_jobs_failed": 0,
+    "server_jobs_redelivered": 1,
+    "dead_letter_queue": 0,
+    "queue_length_max": 58,
+    "gpu_util_per_gpu_pct": [
+      44.8,
+      1.4
+    ],
+    "redelivered_count": 1,
+    "no_job_lost": true
+  }
+}

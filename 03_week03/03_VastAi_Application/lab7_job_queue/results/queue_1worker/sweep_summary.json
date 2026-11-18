@@ -1,0 +1,59 @@
+{
+  "mode": "sweep",
+  "system": "queue",
+  "slo": {
+    "p95_s_max": 20,
+    "fail_pct_below": 1
+  },
+  "max_users_meeting_slo": 2,
+  "levels": [
+    {
+      "users": 1,
+      "jobs_per_min": 3.0,
+      "latency_p50_s": 12.109,
+      "latency_p95_s": 13.018,
+      "latency_p99_s": 13.099,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 22.2,
+      "loadgen_cpu_avg_pct": 0.4,
+      "queue_length_max": 0,
+      "slo_pass": true
+    },
+    {
+      "users": 2,
+      "jobs_per_min": 6.0,
+      "latency_p50_s": 12.204,
+      "latency_p95_s": 15.761,
+      "latency_p99_s": 16.202,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 45.2,
+      "loadgen_cpu_avg_pct": 0.5,
+      "queue_length_max": 1,
+      "slo_pass": true
+    },
+    {
+      "users": 4,
+      "jobs_per_min": 5.0,
+      "latency_p50_s": 34.252,
+      "latency_p95_s": 36.668,
+      "latency_p99_s": 37.15,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 44.2,
+      "loadgen_cpu_avg_pct": 1.0,
+      "queue_length_max": 3,
+      "slo_pass": false
+    },
+    {
+      "users": 6,
+      "jobs_per_min": 5.0,
+      "latency_p50_s": 55.324,
+      "latency_p95_s": 57.747,
+      "latency_p99_s": 57.91,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 47.6,
+      "loadgen_cpu_avg_pct": 1.4,
+      "queue_length_max": 5,
+      "slo_pass": false
+    }
+  ]
+}

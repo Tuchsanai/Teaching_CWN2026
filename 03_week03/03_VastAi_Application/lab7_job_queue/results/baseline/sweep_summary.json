@@ -1,0 +1,54 @@
+{
+  "mode": "sweep",
+  "slo": {
+    "p95_s_max": 20,
+    "fail_pct_below": 1
+  },
+  "max_users_meeting_slo": 2,
+  "levels": [
+    {
+      "users": 1,
+      "jobs_per_min": 3.0,
+      "latency_p50_s": 12.149,
+      "latency_p95_s": 12.234,
+      "latency_p99_s": 12.242,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 24.9,
+      "loadgen_cpu_avg_pct": 0.1,
+      "slo_pass": true
+    },
+    {
+      "users": 2,
+      "jobs_per_min": 6.0,
+      "latency_p50_s": 9.599,
+      "latency_p95_s": 11.752,
+      "latency_p99_s": 11.782,
+      "fail_pct": 0.0,
+      "gpu_util_avg_pct": 45.5,
+      "loadgen_cpu_avg_pct": 0.1,
+      "slo_pass": true
+    },
+    {
+      "users": 4,
+      "jobs_per_min": 0.0,
+      "latency_p50_s": 30.011,
+      "latency_p95_s": 30.018,
+      "latency_p99_s": 30.02,
+      "fail_pct": 100.0,
+      "gpu_util_avg_pct": 47.0,
+      "loadgen_cpu_avg_pct": 0.1,
+      "slo_pass": false
+    },
+    {
+      "users": 6,
+      "jobs_per_min": 0.0,
+      "latency_p50_s": 30.013,
+      "latency_p95_s": 30.02,
+      "latency_p99_s": 30.022,
+      "fail_pct": 100.0,
+      "gpu_util_avg_pct": 47,
+      "loadgen_cpu_avg_pct": 0.1,
+      "slo_pass": false
+    }
+  ]
+}
