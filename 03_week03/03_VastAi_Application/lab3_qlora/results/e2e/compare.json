@@ -1,0 +1,553 @@
+{
+  "summary": {
+    "big_27b": {
+      "label": "โมเดลใหญ่ Qwen3.8 27B บน RTX 5090 (บทที่แล้ว)",
+      "passed": 26,
+      "total": 26
+    },
+    "base": {
+      "label": "Base",
+      "model": "qwen3-4b-base",
+      "passed": 25,
+      "total": 26,
+      "failed_cases": [
+        21
+      ],
+      "repeat": {
+        "scores": [
+          25,
+          25,
+          25,
+          25,
+          25
+        ],
+        "mean": 25,
+        "sd": 0,
+        "min": 25,
+        "max": 25,
+        "always_fail": [
+          21
+        ],
+        "flaky": []
+      }
+    },
+    "ft": {
+      "label": "Fine-tuned",
+      "model": "qwen3-4b-sabaijai",
+      "passed": 25,
+      "total": 26,
+      "failed_cases": [
+        19
+      ],
+      "repeat": {
+        "scores": [
+          25,
+          25,
+          25,
+          25,
+          25
+        ],
+        "mean": 25,
+        "sd": 0,
+        "min": 25,
+        "max": 25,
+        "always_fail": [
+          19
+        ],
+        "flaky": []
+      }
+    }
+  },
+  "differing_cases": [
+    19,
+    21
+  ],
+  "gifs": [
+    "diff-gifs/case19-followup-2h-base.gif",
+    "diff-gifs/case19-followup-2h-ft.gif",
+    "diff-gifs/case21-late-time-base.gif",
+    "diff-gifs/case21-late-time-ft.gif"
+  ],
+  "cases": [
+    {
+      "id": 1,
+      "name": "case1-hours",
+      "group": "เวลา · ที่ตั้ง · ติดต่อ",
+      "action": "พิมพ์ \"ร้านเปิดกี่โมงถึงกี่โมงคะ\"",
+      "must": "ต้องมี 10 และ 22",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 2,
+      "name": "case2-lastcall",
+      "group": "เวลา · ที่ตั้ง · ติดต่อ",
+      "action": "พิมพ์ \"รับลูกค้ารอบสุดท้ายกี่โมงคะ\"",
+      "must": "ต้องมี 21",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 3,
+      "name": "case3-prices",
+      "group": "ราคาและบริการ",
+      "action": "กดปุ่ม \"ดูราคา\"",
+      "must": "ต้องมี บาท และ 350",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 4,
+      "name": "case4-aroma-price",
+      "group": "ราคาและบริการ",
+      "action": "พิมพ์ \"นวดน้ำมันอโรมาราคาเท่าไหร่คะ\"",
+      "must": "ต้องมี 600",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 5,
+      "name": "case5-cheapest",
+      "group": "ราคาและบริการ",
+      "action": "พิมพ์ \"บริการที่ถูกที่สุดคืออะไรคะ\"",
+      "must": "ต้องมี นวดคอบ่าไหล่ และ 250",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 6,
+      "name": "case6-office-pain",
+      "group": "ราคาและบริการ",
+      "action": "พิมพ์ \"ทำงานออฟฟิศ ปวดหลังกับบ่ามาก แนะนำนวดแบบไหนดีคะ\"",
+      "must": "ต้องมี นวดแก้ปวดหลัง หรือ นวดคอบ่าไหล่",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 7,
+      "name": "case7-promo",
+      "group": "โปรโมชันและนโยบายร้าน",
+      "action": "กดปุ่ม \"โปรโมชัน\"",
+      "must": "ต้องมี 10%",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 8,
+      "name": "case8-student",
+      "group": "โปรโมชันและนโยบายร้าน",
+      "action": "พิมพ์ \"เป็นนักศึกษา ได้ส่วนลดไหมคะ\"",
+      "must": "ต้องมี 15%",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 9,
+      "name": "case9-address",
+      "group": "เวลา · ที่ตั้ง · ติดต่อ",
+      "action": "พิมพ์ \"ร้านอยู่ที่ไหนคะ\"",
+      "must": "ต้องมี นิมมาน และ เชียงใหม่",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 10,
+      "name": "case10-phone",
+      "group": "เวลา · ที่ตั้ง · ติดต่อ",
+      "action": "พิมพ์ \"ขอเบอร์โทรร้านหน่อยค่ะ\"",
+      "must": "ต้องมี 053-123-456",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 11,
+      "name": "case11-parking",
+      "group": "เวลา · ที่ตั้ง · ติดต่อ",
+      "action": "พิมพ์ \"มีที่จอดรถไหมคะ\"",
+      "must": "ต้องมี 4",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 12,
+      "name": "case12-credit",
+      "group": "โปรโมชันและนโยบายร้าน",
+      "action": "พิมพ์ \"จ่ายด้วยบัตรเครดิตได้ไหมคะ\"",
+      "must": "ต้องมี บัตรเครดิต และไม่มีคำว่า ไม่ได้",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 13,
+      "name": "case13-cancel",
+      "group": "โปรโมชันและนโยบายร้าน",
+      "action": "พิมพ์ \"ถ้าจะยกเลิกนัดต้องแจ้งล่วงหน้ากี่ชั่วโมงคะ\"",
+      "must": "ต้องมี 3",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 14,
+      "name": "case14-pregnant",
+      "group": "โปรโมชันและนโยบายร้าน",
+      "action": "พิมพ์ \"ตั้งครรภ์ได้ 2 เดือน นวดได้ไหมคะ\"",
+      "must": "ต้องมี ไม่แนะนำ หรือ แพทย์",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 15,
+      "name": "case15-nails",
+      "group": "ราคาและบริการ",
+      "action": "พิมพ์ \"มีบริการทำเล็บไหมคะ\"",
+      "must": "ต้องมี ไม่มี และห้ามมีราคาบริการทำเล็บ",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 16,
+      "name": "case16-booking",
+      "group": "จองคิว",
+      "action": "กดปุ่ม \"จองคิว\" แล้วให้ข้อมูลทีละอย่าง: ชื่อ มานี ใจดี / เบอร์ 089-555-1234 / นวดไทยแผนโบราณ / วันที่ 2026-12-25 เวลา 15:00",
+      "must": "เห็นการ์ดจองสำเร็จ และหน้ารายการจองมีแถวของ มานี",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 17,
+      "name": "case17-offtopic",
+      "group": "ขอบเขตของบอท",
+      "action": "พิมพ์ \"ขอสูตรต้มยำกุ้งหน่อยได้ไหมคะ\"",
+      "must": "ต้องมี ขออภัย หรือ ค่ะ และ นวด หรือ ร้าน และห้ามมีสูตรอาหาร",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 18,
+      "name": "case18-english",
+      "group": "ขอบเขตของบอท",
+      "action": "พิมพ์ \"How much is a 1 hour Thai massage?\"",
+      "must": "ต้องเป็นภาษาอังกฤษ และมี 350",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 19,
+      "name": "case19-followup-2h",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"นวดไทยกับนวดน้ำมันอโรมาต่างกันยังไงคะ\" → พิมพ์ \"แล้วอันที่ถูกกว่าใช้เวลากี่นาทีคะ\" → พิมพ์ \"ถ้าเอาอันนั้นแบบ 2 ชั่วโมงล่ะคะ\"",
+      "must": "คำตอบสุดท้ายต้องมี 600",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": false,
+        "failures": [
+          "คำตอบสุดท้าย: ไม่มี 600"
+        ],
+        "repeat_pass": 0
+      },
+      "differs": true,
+      "answers": {
+        "base": "1) นวดไทยแผนโบราณ ใช้แรงกดและยืดเส้นเพื่อคลายกล้ามเนื้อ ขณะที่นวดน้ำมันอโรมาใช้น้ำมันหอมระเหย เช่น ลาเวนเดอร์ ตะไคร้ มะลิ ช่วยผ่อนคลาย ลดความเครียด และช่วยให้หลับสบายมากขึ้นค่ะ\n2) นวดไทยแผนโบราณ 60 นาที ราคา 350 บาท ถูกกว่าและใช้เวลา 60 นาทีค่ะ\n3) นวดไทยแผนโบราณ 2 ชั่วโมง ใช้เวลา 120 นาที ราคา 600 บาทค่ะ",
+        "ft": "1) นวดไทยแผนโบราณเน้นกดจุดและยืดเส้นแบบแผนไทยดั้งเดิม คลายกล้ามเนื้อโดยทั่วไปค่ะ\nส่วนนวดน้ำมันอโรมาใช้น้ำมันหอมระเหย เช่น ลาเวนเดอร์ ตะไคร้ มะลิ ช่วยผ่อนคลายและทำให้หลับสบายมากขึ้นค่ะ\n2) นวดเท้าสะท้อนจุด ราคา 300 บาท ใช้เวลา 45 นาทีค่ะ\n3) ร้านไม่มีบริการนวดเท้าสะท้อนจุดแบบ 2 ชั่วโมงนะคะ"
+      }
+    },
+    {
+      "id": 20,
+      "name": "case20-student-discount",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"นวดแก้ปวดหลังราคาเท่าไหร่คะ\" → พิมพ์ \"หนูเป็นนักศึกษา แล้วจะเหลือเท่าไหร่คะ\"",
+      "must": "คำตอบสุดท้ายต้องมี 382 หรือ 383",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 21,
+      "name": "case21-late-time",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"พรุ่งนี้ 5 ทุ่มยังว่างไหมคะ\" → พิมพ์ \"งั้น 3 ทุ่มล่ะคะ ทันไหม\"",
+      "must": "คำตอบแรกต้องบอกว่าไม่ได้หรือปิดแล้ว และคำตอบสุดท้ายต้องมี 21",
+      "base": {
+        "passed": false,
+        "failures": [
+          "คำตอบสุดท้าย: ไม่มี 21"
+        ],
+        "repeat_pass": 0
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": true,
+      "answers": {
+        "base": "1) ไม่ว่างค่ะ ร้านปิดที่ 22:00 น. รอบสุดท้ายคือ 21:00 น. ค่ะ\n2) ทันค่ะ ร้านเปิดถึง 22:00 น. สามารถนัด 3 ทุ่มได้ค่ะ",
+        "ft": "1) ไม่ได้ค่ะ ร้านปิดเวลา 22:00 น. และรับลูกค้ารอบสุดท้ายเวลา 21:00 น. ค่ะ\n2) ได้ค่ะ ร้านเปิดถึง 22:00 น. และรับลูกค้ารอบสุดท้ายเวลา 21:00 น. ค่ะ คุณลูกค้าสามารถจองได้เลยนะคะ"
+      }
+    },
+    {
+      "id": 22,
+      "name": "case22-parking-memory",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"ร้านอยู่จังหวัดอะไรคะ\" → พิมพ์ \"แถวนั้นหาที่จอดยากไหม\" → พิมพ์ \"ที่บอกเมื่อกี้ จอดได้กี่คันนะคะ\"",
+      "must": "คำตอบสุดท้ายต้องมี 4",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 23,
+      "name": "case23-name-memory",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"สวัสดีค่ะ ชื่อสมศรีนะคะ ช่วงนี้ปวดคอมากเลย\" → พิมพ์ \"มีอะไรแนะนำไหมคะ\" → พิมพ์ \"จำได้ไหมคะว่าหนูชื่ออะไร\"",
+      "must": "คำตอบที่ 2 ต้องมี นวดคอบ่าไหล่ และคำตอบสุดท้ายต้องมี สมศรี",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 24,
+      "name": "case24-budget-no-oil",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"อยากได้นวดผ่อนคลายสักอย่างค่ะ\" → พิมพ์ \"ไม่เอาแบบน้ำมันนะ แพ้กลิ่น\" → พิมพ์ \"งบไม่เกิน 300 บาท มีอะไรบ้าง\"",
+      "must": "คำตอบสุดท้ายต้องมี นวดคอบ่าไหล่ หรือ นวดเท้า หรือ นวดหน้า และห้ามมี อโรมา",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 25,
+      "name": "case25-lang-switch",
+      "group": "ถามต่อเนื่อง",
+      "action": "พิมพ์ \"How much is the aroma oil massage?\" → พิมพ์ \"แล้วร้านเปิดกี่โมงคะ\"",
+      "must": "คำตอบแรกเป็นภาษาอังกฤษมี 600 และคำตอบสุดท้ายเป็นภาษาไทยมี 10 และ 22",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    },
+    {
+      "id": 26,
+      "name": "case26-booking-change",
+      "group": "ถามต่อเนื่อง",
+      "action": "กดปุ่ม \"จองคิว\" แล้วให้ข้อมูลทีละอย่าง: ชื่อ ปิติ รักดี / เบอร์ 081-222-3333 / นวดไทยแผนโบราณ / แล้วเปลี่ยนใจพิมพ์ \"เดี๋ยวค่ะ ขอเปลี่ยนเป็นนวดเท้าแทนนะคะ\" / วันที่ 2026-12-26 เวลา 11:00",
+      "must": "การ์ดจองสำเร็จต้องเป็น นวดเท้าสะท้อนจุด และหน้ารายการจองมีแถวของ ปิติ เป็นนวดเท้า",
+      "base": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "ft": {
+        "passed": true,
+        "failures": [],
+        "repeat_pass": 5
+      },
+      "differs": false
+    }
+  ]
+}

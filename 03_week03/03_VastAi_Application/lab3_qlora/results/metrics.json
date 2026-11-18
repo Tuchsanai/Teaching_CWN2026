@@ -1,0 +1,351 @@
+{
+  "question": "โมเดลเล็ก ~4B บน GPU ราคาถูก ผ่านชุดทดสอบ 26 เคสได้กี่เคส และ QLoRA fine-tune ช่วยให้ดีขึ้นไหม",
+  "source": "รอบทางการ: รันพรอมต์ขั้นที่ 1-8 ใน PROMPTS.md ตามตัวอักษรด้วย Claude ตัวใหม่ทุกขั้น โค้ดทุกไฟล์ AI เขียนในรอบนี้",
+  "e2e_26_cases": {
+    "A_teacher_27B_on_RTX5090": {
+      "passed": 26,
+      "total": 26,
+      "note": "ผลจากบท 01_VastAi_Skill ไม่ได้รันซ้ำ"
+    },
+    "B_base": {
+      "label": "Base",
+      "model": "qwen3-4b-base",
+      "passed": 25,
+      "total": 26,
+      "failed_cases": [
+        21
+      ],
+      "repeat": {
+        "scores": [
+          25,
+          25,
+          25,
+          25,
+          25
+        ],
+        "mean": 25,
+        "sd": 0,
+        "min": 25,
+        "max": 25,
+        "always_fail": [
+          21
+        ],
+        "flaky": []
+      }
+    },
+    "C_finetuned": {
+      "label": "Fine-tuned",
+      "model": "qwen3-4b-sabaijai",
+      "passed": 25,
+      "total": 26,
+      "failed_cases": [
+        19
+      ],
+      "repeat": {
+        "scores": [
+          25,
+          25,
+          25,
+          25,
+          25
+        ],
+        "mean": 25,
+        "sd": 0,
+        "min": 25,
+        "max": 25,
+        "always_fail": [
+          19
+        ],
+        "flaky": []
+      }
+    },
+    "differing_cases": [
+      19,
+      21
+    ]
+  },
+  "validation_set": {
+    "conversations": 48,
+    "base": {
+      "model": "qwen3-4b-base",
+      "n_turns": 85,
+      "correct_pct": 87.1,
+      "booking_tag_format_pct": 100.0,
+      "booking_tag_values_pct": 100.0,
+      "booking_tag_too_early_pct": 6.5,
+      "ends_with_krub_pct": 3.6,
+      "thai_in_english_pct": 100.0,
+      "tokens_per_s_overall": 55.0,
+      "denominators": {
+        "all": 85,
+        "booking_ready": 8,
+        "booking_not_ready": 77,
+        "thai": 83,
+        "english": 2
+      }
+    },
+    "finetuned": {
+      "model": "qwen3-4b-sabaijai",
+      "n_turns": 85,
+      "correct_pct": 94.1,
+      "booking_tag_format_pct": 100.0,
+      "booking_tag_values_pct": 100.0,
+      "booking_tag_too_early_pct": 1.3,
+      "ends_with_krub_pct": 0.0,
+      "thai_in_english_pct": 0.0,
+      "tokens_per_s_overall": 50.6,
+      "denominators": {
+        "all": 85,
+        "booking_ready": 8,
+        "booking_not_ready": 77,
+        "thai": 83,
+        "english": 2
+      }
+    },
+    "server_vram_peak_mib": 21934,
+    "gpu_total_mib": 24576
+  },
+  "dataset": {
+    "teacher_model": "qwen3.8-27b",
+    "dialogs_total": 570,
+    "user_messages_total": 998,
+    "passed": 485,
+    "passed_first_try": 466,
+    "passed_after_retry": 19,
+    "dropped": 85,
+    "train": 437,
+    "val": 48,
+    "train_assistant_turns": 747,
+    "val_assistant_turns": 85,
+    "drop_main_reason": {
+      "ตอบผิดภาษา": 39,
+      "ไม่ใส่แท็กจองทั้งที่ข้อมูลครบ": 29,
+      "ไม่มีตัวเลข/คำที่ต้องมี": 9,
+      "ข้อมูลในแท็กจองผิด": 4,
+      "ใส่แท็กจองทั้งที่ข้อมูลไม่ครบ": 3,
+      "มีคำที่ห้ามมี": 1
+    },
+    "teacher_calls": 1200,
+    "elapsed_sec": 407.2,
+    "per_kind": {
+      "booking_incomplete": {
+        "kind_th": "จองคิว · ให้ข้อมูลไม่ครบ",
+        "total": 30,
+        "passed": 28,
+        "first_try": 26,
+        "train": 25,
+        "val": 3
+      },
+      "booking_closed": {
+        "kind_th": "จองคิว · ขอเวลานอกเวลาเปิดร้าน",
+        "total": 30,
+        "passed": 26,
+        "first_try": 22,
+        "train": 24,
+        "val": 2
+      },
+      "english": {
+        "kind_th": "ภาษาอังกฤษ",
+        "total": 50,
+        "passed": 25,
+        "first_try": 23,
+        "train": 23,
+        "val": 2
+      },
+      "booking_full": {
+        "kind_th": "จองคิว · ครบในข้อความเดียว",
+        "total": 40,
+        "passed": 17,
+        "first_try": 16,
+        "train": 16,
+        "val": 1
+      },
+      "discount": {
+        "kind_th": "ส่วนลดและโปรโมชัน",
+        "total": 55,
+        "passed": 55,
+        "first_try": 55,
+        "train": 46,
+        "val": 9
+      },
+      "followup": {
+        "kind_th": "ถามต่อเนื่องหลายข้อความ",
+        "total": 70,
+        "passed": 61,
+        "first_try": 59,
+        "train": 54,
+        "val": 7
+      },
+      "price": {
+        "kind_th": "ราคาและบริการ",
+        "total": 70,
+        "passed": 69,
+        "first_try": 69,
+        "train": 64,
+        "val": 5
+      },
+      "booking_step": {
+        "kind_th": "จองคิว · ให้ข้อมูลทีละอย่าง",
+        "total": 40,
+        "passed": 31,
+        "first_try": 29,
+        "train": 29,
+        "val": 2
+      },
+      "offtopic": {
+        "kind_th": "เรื่องนอกร้าน",
+        "total": 40,
+        "passed": 40,
+        "first_try": 40,
+        "train": 35,
+        "val": 5
+      },
+      "info": {
+        "kind_th": "ข้อมูลร้าน (เวลา ที่อยู่ ติดต่อ นโยบาย)",
+        "total": 70,
+        "passed": 68,
+        "first_try": 68,
+        "train": 60,
+        "val": 8
+      },
+      "not_offered": {
+        "kind_th": "บริการที่ร้านไม่มี",
+        "total": 40,
+        "passed": 38,
+        "first_try": 36,
+        "train": 37,
+        "val": 1
+      },
+      "booking_change": {
+        "kind_th": "จองคิว · เปลี่ยนใจกลางทาง",
+        "total": 35,
+        "passed": 27,
+        "first_try": 23,
+        "train": 24,
+        "val": 3
+      }
+    }
+  },
+  "training": {
+    "model": "Qwen/Qwen3-4B-Instruct-2507",
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "config": {
+      "quant": "4-bit NF4 (double quant), bf16 compute",
+      "lora_r": 8,
+      "lora_alpha": 16,
+      "lora_dropout": 0.05,
+      "target_modules": [
+        "down_proj",
+        "gate_proj",
+        "k_proj",
+        "o_proj",
+        "q_proj",
+        "up_proj",
+        "v_proj"
+      ],
+      "epochs": 3,
+      "lr": 0.0002,
+      "batch_size": 1,
+      "grad_accum": 8,
+      "seed": 0,
+      "loss_on": "assistant tokens only",
+      "eval_steps": 20
+    },
+    "n_train": 437,
+    "n_val": 48,
+    "total_steps": 165,
+    "val_loss_before": 1.004128336906433,
+    "best_step": 120,
+    "best_val_loss": 0.3070281445980072,
+    "final_val_loss": 0.3073596656322479,
+    "train_seconds": 2133.3,
+    "peak_vram_gb": 22.9,
+    "adapter_mb": 63.06,
+    "val_loss_curve": [
+      {
+        "step": 0,
+        "val_loss": 1.004128336906433
+      },
+      {
+        "step": 20,
+        "val_loss": 0.4432504177093506
+      },
+      {
+        "step": 40,
+        "val_loss": 0.37607693672180176
+      },
+      {
+        "step": 60,
+        "val_loss": 0.34015989303588867
+      },
+      {
+        "step": 80,
+        "val_loss": 0.33376994729042053
+      },
+      {
+        "step": 100,
+        "val_loss": 0.3129037618637085
+      },
+      {
+        "step": 120,
+        "val_loss": 0.3070281445980072
+      },
+      {
+        "step": 140,
+        "val_loss": 0.3088699281215668
+      },
+      {
+        "step": 160,
+        "val_loss": 0.3073596656322479
+      }
+    ]
+  },
+  "minutes_per_step": {
+    "1": 7.7,
+    "2": 10.1,
+    "3": 14.2,
+    "4": 41.8,
+    "5": 11.2,
+    "6": 15.8,
+    "7": 13.3,
+    "8": 4.2,
+    "9": 3.5,
+    "10": 75.7
+  },
+  "minutes_total_steps_1_to_8": 118.3,
+  "machines_and_cost_usd": {
+    "teacher_RTX5090": {
+      "label": "vapp-lab3-teacher",
+      "gpu": "1x RTX 5090",
+      "location": "Texas, US",
+      "usd_per_hour": 0.745,
+      "hours_open": 0.352,
+      "download_gb": 25.3,
+      "upload_gb": 0.12,
+      "rent_usd": 0.262,
+      "download_usd": 0.066,
+      "upload_usd": 0.0005,
+      "total_usd_est": 0.329,
+      "destroyed_at": "2026-11-18 07:36 (เวลาไทย)",
+      "verified_gone": true
+    },
+    "student_RTX3090": {
+      "id": "<id>",
+      "label": "vapp-lab3",
+      "gpu": "1x RTX 3090",
+      "status": "running",
+      "dph_total": 0.2411111111111111,
+      "start_th": "2026-11-18 07:44",
+      "recorded_th": "2026-11-18 09:09",
+      "hours": 1.406,
+      "down_GB": 8.36,
+      "up_GB": 0.21,
+      "down_usd_per_GB": 0.0026041666666666665,
+      "up_usd_per_GB": 0.00390625,
+      "compute_usd": 0.339,
+      "net_usd": 0.0226,
+      "total_usd": 0.3616
+    },
+    "total_official_round": 0.69
+  }
+}

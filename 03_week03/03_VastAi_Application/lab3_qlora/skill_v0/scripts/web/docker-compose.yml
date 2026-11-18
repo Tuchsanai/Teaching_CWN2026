@@ -1,0 +1,46 @@
+# สบายใจ นวดแผนไทย — Chatbot (LAB 3: เลือกคุยกับโมเดล Base หรือ Fine-tuned)
+# เปิดทั้งชุด (เว็บ + PostgreSQL) ด้วยคำสั่งเดียว:   docker compose up -d --build
+# ที่อยู่ AI server, key และชื่อโมเดลทั้ง 2 อ่านจาก lab3_qlora/chatbot.env (ห้าม commit ไฟล์นั้น)
+# สลับโมเดลเริ่มต้นขณะเว็บเปิดอยู่:  curl -X PUT localhost:3403/api/model -H 'Content-Type: application/json' -d '{"model":"base"}'
+
+name: vapp-lab3
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-massage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-massage_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-massage_shop}
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # ไม่ expose port ออก host (ใช้ภายใน network ของ compose เท่านั้น)
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # OPENAI_BASE_URL, OPENAI_API_KEY, BASE_MODEL, FT_MODEL
+    env_file:
+      - ../../chatbot.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-massage}:${POSTGRES_PASSWORD:-massage_pw}@db:5432/${POSTGRES_DB:-massage_shop}
+      # โมเดลเริ่มต้นตอนเปิดเว็บครั้งแรก (base | ft) — หลังจากนั้นสลับผ่าน /api/model
+      DEFAULT_MODEL: ${DEFAULT_MODEL:-ft}
+      LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-120000}
+      TZ: Asia/Bangkok
+    ports:
+      - "3403:3000"
+
+volumes:
+  pgdata:

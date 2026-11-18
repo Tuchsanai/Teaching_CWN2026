@@ -13,7 +13,7 @@
 | [LAB 0](#lab-0--เตรียม-key-3-ตัว) | — | เตรียม key 3 ตัวในไฟล์ `.env` | — | ฟรี |
 | [LAB 1](lab1_yolo/README.md) | [lab1_yolo](lab1_yolo/README.md) | เทรน YOLO ตรวจหมวกนิรภัย ด้วย Dataset จาก Roboflow → เว็บตรวจความปลอดภัยหน้างาน | เทรนต่อด้วยข้อมูลของเราแล้วดีขึ้นแค่ไหน | $0.38 |
 | [LAB 2](lab2_multigpu/README.md) | [lab2_multigpu](lab2_multigpu/README.md) | เทรนงานเดิมบน 1 GPU เทียบ 2 GPU | เพิ่ม GPU แล้วเร็วขึ้นกี่เท่า คุ้มเงินไหม | $0.51 |
-| LAB 3 | `lab3_qlora` | QLoRA โมเดลเล็กให้แชทบอทร้านนวด | โมเดลเล็กที่เทรนเพิ่ม แทนโมเดลใหญ่ได้ไหม | |
+| [LAB 3](lab3_qlora/README.md) | [lab3_qlora](lab3_qlora/README.md) | QLoRA โมเดลเล็กให้แชทบอทร้านนวด (ข้อมูลฝึกจากโมเดลครู) | โมเดลเล็กที่เทรนเพิ่ม แทนโมเดลใหญ่ได้ไหม | $0.69 |
 | [LAB 4](lab4_vlm/README.md) | [lab4_vlm](lab4_vlm/README.md) | Fine-tune VLM อ่านใบเสร็จ → เว็บสมุดรายจ่าย | เทรนด้วยใบเสร็จ 800 ใบ แล้วอ่านแม่นขึ้นเท่าไร | $0.58 |
 | [LAB 8](lab8_hybrid/README.md) | [lab8_hybrid](lab8_hybrid/README.md) | บริการสร้างภาพ: API gateway + RabbitMQ + GPU Worker 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และออกแบบระบบอย่างไรให้รับได้มากขึ้น | $0.57 |
 

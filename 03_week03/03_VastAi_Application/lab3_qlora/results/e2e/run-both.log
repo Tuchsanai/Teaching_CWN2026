@@ -1,0 +1,258 @@
+
+######## รอบเบราว์เซอร์ · โมเดล base ########
+โมเดลเริ่มต้นของเว็บ = base
+{"ok":true,"bookings":0,"chat_messages":0}
+
+== 1/6 ติดตั้งเครื่องมือ (ครั้งแรกเท่านั้น) ==
+
+added 3 packages, and audited 4 packages in 704ms
+
+found 0 vulnerabilities
+npm notice run sabaijai-chatbot-e2e@1.0.0 npx
+npm notice run 'playwright' --version
+พร้อม: playwright Version 1.64.1, ffmpeg version 6.1.1-3ubuntu5
+
+== 2/6 ตรวจว่าเว็บแชทบอทเปิดอยู่ที่ http://host.docker.internal:3403 ==
+เว็บพร้อม
+
+== 3/6 ล้างตารางการจองและประวัติแชท ==
+run-all.sh: line 50: cd: ../frontend: No such file or directory
+ข้าม: ล้างตารางไม่ได้ (ฐานข้อมูลไม่ได้รันจากโฟลเดอร์ ../frontend) — เทสต์ยังรันต่อได้
+
+== 4/6 รันเทสต์ 26 เคส (workers=2) ==
+npm notice run sabaijai-chatbot-e2e@1.0.0 npx
+npm notice run 'playwright' test
+
+Running 26 tests using 2 workers
+
+  ✓   2 [chromium] › tests/chatbot.spec.ts:71:7 › case2-lastcall: พิมพ์ "รับลูกค้ารอบสุดท้ายกี่โมงคะ" (8.2s)
+  ✓   1 [chromium] › tests/chatbot.spec.ts:71:7 › case1-hours: พิมพ์ "ร้านเปิดกี่โมงถึงกี่โมงคะ" (8.6s)
+  ✓   4 [chromium] › tests/chatbot.spec.ts:71:7 › case4-aroma-price: พิมพ์ "นวดน้ำมันอโรมาราคาเท่าไหร่คะ" (8.0s)
+  ✓   3 [chromium] › tests/chatbot.spec.ts:71:7 › case3-prices: กดปุ่ม "ดูราคา" (11.0s)
+  ✓   5 [chromium] › tests/chatbot.spec.ts:71:7 › case5-cheapest: พิมพ์ "บริการที่ถูกที่สุดคืออะไรคะ" (8.0s)
+  ✓   6 [chromium] › tests/chatbot.spec.ts:71:7 › case6-office-pain: พิมพ์ "ทำงานออฟฟิศ ปวดหลังกับบ่ามาก แนะนำนวดแบบไหนดีคะ" (9.0s)
+  ✓   7 [chromium] › tests/chatbot.spec.ts:71:7 › case7-promo: กดปุ่ม "โปรโมชัน" (8.4s)
+  ✓   8 [chromium] › tests/chatbot.spec.ts:71:7 › case8-student: พิมพ์ "เป็นนักศึกษา ได้ส่วนลดไหมคะ" (8.0s)
+  ✓   9 [chromium] › tests/chatbot.spec.ts:71:7 › case9-address: พิมพ์ "ร้านอยู่ที่ไหนคะ" (8.2s)
+  ✓  10 [chromium] › tests/chatbot.spec.ts:71:7 › case10-phone: พิมพ์ "ขอเบอร์โทรร้านหน่อยค่ะ" (7.9s)
+  ✓  11 [chromium] › tests/chatbot.spec.ts:71:7 › case11-parking: พิมพ์ "มีที่จอดรถไหมคะ" (7.7s)
+  ✓  12 [chromium] › tests/chatbot.spec.ts:71:7 › case12-credit: พิมพ์ "จ่ายด้วยบัตรเครดิตได้ไหมคะ" (8.0s)
+  ✓  13 [chromium] › tests/chatbot.spec.ts:71:7 › case13-cancel: พิมพ์ "ถ้าจะยกเลิกนัดต้องแจ้งล่วงหน้ากี่ชั่วโมงคะ" (8.4s)
+  ✓  14 [chromium] › tests/chatbot.spec.ts:71:7 › case14-pregnant: พิมพ์ "ตั้งครรภ์ได้ 2 เดือน นวดได้ไหมคะ" (8.2s)
+  ✓  15 [chromium] › tests/chatbot.spec.ts:71:7 › case15-nails: พิมพ์ "มีบริการทำเล็บไหมคะ" (7.8s)
+  ✓  17 [chromium] › tests/chatbot.spec.ts:71:7 › case17-offtopic: พิมพ์ "ขอสูตรต้มยำกุ้งหน่อยได้ไหมคะ" (8.5s)
+  ✓  18 [chromium] › tests/chatbot.spec.ts:71:7 › case18-english: พิมพ์ "How much is a 1 hour Thai massage?" (8.2s)
+  ✓  16 [chromium] › tests/chatbot.spec.ts:71:7 › case16-booking: กดปุ่ม "จองคิว" แล้วให้ข้อมูลทีละอย่าง: ชื่อ มานี ใจดี / เบอร์ 089-555-1234 / นวดไทยแผนโบราณ / วันที่ 2026-12-25 เวลา 15:00 (27.2s)
+  ✓  19 [chromium] › tests/chatbot.spec.ts:71:7 › case19-followup-2h: พิมพ์ "นวดไทยกับนวดน้ำมันอโรมาต่างกันยังไงคะ" → พิมพ์ "แล้วอันที่ถูกกว่าใช้เวลากี่นาทีคะ" → พิมพ์ "ถ้าเอาอันนั้นแบบ 2 ชั่วโมงล่ะคะ" (15.9s)
+  ✓  20 [chromium] › tests/chatbot.spec.ts:71:7 › case20-student-discount: พิมพ์ "นวดแก้ปวดหลังราคาเท่าไหร่คะ" → พิมพ์ "หนูเป็นนักศึกษา แล้วจะเหลือเท่าไหร่คะ" (11.5s)
+  ✘  21 [chromium] › tests/chatbot.spec.ts:71:7 › case21-late-time: พิมพ์ "พรุ่งนี้ 5 ทุ่มยังว่างไหมคะ" → พิมพ์ "งั้น 3 ทุ่มล่ะคะ ทันไหม" (11.6s)
+  ✓  22 [chromium] › tests/chatbot.spec.ts:71:7 › case22-parking-memory: พิมพ์ "ร้านอยู่จังหวัดอะไรคะ" → พิมพ์ "แถวนั้นหาที่จอดยากไหม" → พิมพ์ "ที่บอกเมื่อกี้ จอดได้กี่คันนะคะ" (13.7s)
+  ✓  23 [chromium] › tests/chatbot.spec.ts:71:7 › case23-name-memory: พิมพ์ "สวัสดีค่ะ ชื่อสมศรีนะคะ ช่วงนี้ปวดคอมากเลย" → พิมพ์ "มีอะไรแนะนำไหมคะ" → พิมพ์ "จำได้ไหมคะว่าหนูชื่ออะไร" (17.0s)
+  ✓  24 [chromium] › tests/chatbot.spec.ts:71:7 › case24-budget-no-oil: พิมพ์ "อยากได้นวดผ่อนคลายสักอย่างค่ะ" → พิมพ์ "ไม่เอาแบบน้ำมันนะ แพ้กลิ่น" → พิมพ์ "งบไม่เกิน 300 บาท มีอะไรบ้าง" (15.5s)
+  ✓  25 [chromium] › tests/chatbot.spec.ts:71:7 › case25-lang-switch: พิมพ์ "How much is the aroma oil massage?" → พิมพ์ "แล้วร้านเปิดกี่โมงคะ" (11.3s)
+  ✓  26 [chromium] › tests/chatbot.spec.ts:71:7 › case26-booking-change: กดปุ่ม "จองคิว" แล้วให้ข้อมูลทีละอย่าง: ชื่อ ปิติ รักดี / เบอร์ 081-222-3333 / นวดไทยแผนโบราณ / แล้วเปลี่ยนใจพิมพ์ "เดี๋ยวค่ะ ขอเปลี่ยนเป็นนวดเท้าแทนนะคะ" / วันที่ 2026-12-26 เวลา 11:00 (31.1s)
+
+
+  1) [chromium] › tests/chatbot.spec.ts:71:7 › case21-late-time: พิมพ์ "พรุ่งนี้ 5 ทุ่มยังว่างไหมคะ" → พิมพ์ "งั้น 3 ทุ่มล่ะคะ ทันไหม" 
+
+    Error: เงื่อนไขที่ไม่ผ่าน
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "คำตอบสุดท้าย: ไม่มี 21",
+    + ]
+
+      104 |       fs.writeFileSync(path.join(dir, `case${c.id}.json`), JSON.stringify(result, null, 2));
+      105 |     }
+    > 106 |     expect(result.failures, "เงื่อนไขที่ไม่ผ่าน").toEqual([]);
+          |                                                   ^
+      107 |   });
+      108 | }
+      109 |
+        at /workspace/vastapp_lab/lab3_qlora/code/e2e/tests/chatbot.spec.ts:106:51
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/chatbot-case21-late-time-พ-ce00a-พ์-งั้น-3-ทุ่มล่ะคะ-ทันไหม--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/chatbot-case21-late-time-พ-ce00a-พ์-งั้น-3-ทุ่มล่ะคะ-ทันไหม--chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/chatbot.spec.ts:71:7 › case21-late-time: พิมพ์ "พรุ่งนี้ 5 ทุ่มยังว่างไหมคะ" → พิมพ์ "งั้น 3 ทุ่มล่ะคะ ทันไหม" 
+  25 passed (2.7m)
+ใช้เวลารันเทสต์ 160 วินาที
+
+== 5/6 ทำ GIF ของแต่ละเคส ==
+case1-hours.gif  0.14 MB
+case2-lastcall.gif  0.13 MB
+case3-prices.gif  0.39 MB
+case4-aroma-price.gif  0.13 MB
+case5-cheapest.gif  0.13 MB
+case6-office-pain.gif  0.14 MB
+case7-promo.gif  0.14 MB
+case8-student.gif  0.14 MB
+case9-address.gif  0.13 MB
+case10-phone.gif  0.13 MB
+case11-parking.gif  0.13 MB
+case12-credit.gif  0.13 MB
+case13-cancel.gif  0.13 MB
+case14-pregnant.gif  0.14 MB
+case15-nails.gif  0.14 MB
+case16-booking.gif  1.29 MB
+case17-offtopic.gif  0.14 MB
+case18-english.gif  0.15 MB
+case19-followup-2h.gif  0.42 MB
+case20-student-discount.gif  0.19 MB
+case21-late-time.gif  0.19 MB
+case22-parking-memory.gif  0.34 MB
+case23-name-memory.gif  0.67 MB
+case24-budget-no-oil.gif  0.43 MB
+case25-lang-switch.gif  0.19 MB
+case26-booking-change.gif  1.40 MB
+
+ได้ GIF 26 ไฟล์ที่ /workspace/vastapp_lab/lab3_qlora/code/e2e/out/gifs
+
+== 6/6 เขียนรายงาน ==
+ผ่าน 25/26 เคส (โมเดล qwen3-4b-base)
+  ไม่ผ่าน เคส 21: คำตอบสุดท้าย: ไม่มี 21
+รายงาน: /workspace/vastapp_lab/lab3_qlora/code/e2e/out/TEST_REPORT.md
+รายงาน: out-base/TEST_REPORT.md · 25/26 ผ่าน
+
+######## รอบเบราว์เซอร์ · โมเดล ft ########
+โมเดลเริ่มต้นของเว็บ = ft
+{"ok":true,"bookings":0,"chat_messages":0}
+
+== 1/6 ติดตั้งเครื่องมือ (ครั้งแรกเท่านั้น) ==
+npm notice run sabaijai-chatbot-e2e@1.0.0 npx
+npm notice run 'playwright' --version
+พร้อม: playwright Version 1.64.1, ffmpeg version 6.1.1-3ubuntu5
+
+== 2/6 ตรวจว่าเว็บแชทบอทเปิดอยู่ที่ http://host.docker.internal:3403 ==
+เว็บพร้อม
+
+== 3/6 ล้างตารางการจองและประวัติแชท ==
+run-all.sh: line 50: cd: ../frontend: No such file or directory
+ข้าม: ล้างตารางไม่ได้ (ฐานข้อมูลไม่ได้รันจากโฟลเดอร์ ../frontend) — เทสต์ยังรันต่อได้
+
+== 4/6 รันเทสต์ 26 เคส (workers=2) ==
+npm notice run sabaijai-chatbot-e2e@1.0.0 npx
+npm notice run 'playwright' test
+
+Running 26 tests using 2 workers
+
+  ✓   2 [chromium] › tests/chatbot.spec.ts:71:7 › case2-lastcall: พิมพ์ "รับลูกค้ารอบสุดท้ายกี่โมงคะ" (8.0s)
+  ✓   1 [chromium] › tests/chatbot.spec.ts:71:7 › case1-hours: พิมพ์ "ร้านเปิดกี่โมงถึงกี่โมงคะ" (8.5s)
+  ✓   4 [chromium] › tests/chatbot.spec.ts:71:7 › case4-aroma-price: พิมพ์ "นวดน้ำมันอโรมาราคาเท่าไหร่คะ" (8.0s)
+  ✓   3 [chromium] › tests/chatbot.spec.ts:71:7 › case3-prices: กดปุ่ม "ดูราคา" (11.0s)
+  ✓   5 [chromium] › tests/chatbot.spec.ts:71:7 › case5-cheapest: พิมพ์ "บริการที่ถูกที่สุดคืออะไรคะ" (8.0s)
+  ✓   6 [chromium] › tests/chatbot.spec.ts:71:7 › case6-office-pain: พิมพ์ "ทำงานออฟฟิศ ปวดหลังกับบ่ามาก แนะนำนวดแบบไหนดีคะ" (9.6s)
+  ✓   7 [chromium] › tests/chatbot.spec.ts:71:7 › case7-promo: กดปุ่ม "โปรโมชัน" (9.5s)
+  ✓   8 [chromium] › tests/chatbot.spec.ts:71:7 › case8-student: พิมพ์ "เป็นนักศึกษา ได้ส่วนลดไหมคะ" (8.0s)
+  ✓   9 [chromium] › tests/chatbot.spec.ts:71:7 › case9-address: พิมพ์ "ร้านอยู่ที่ไหนคะ" (8.2s)
+  ✓  10 [chromium] › tests/chatbot.spec.ts:71:7 › case10-phone: พิมพ์ "ขอเบอร์โทรร้านหน่อยค่ะ" (7.9s)
+  ✓  11 [chromium] › tests/chatbot.spec.ts:71:7 › case11-parking: พิมพ์ "มีที่จอดรถไหมคะ" (7.7s)
+  ✓  12 [chromium] › tests/chatbot.spec.ts:71:7 › case12-credit: พิมพ์ "จ่ายด้วยบัตรเครดิตได้ไหมคะ" (8.0s)
+  ✓  13 [chromium] › tests/chatbot.spec.ts:71:7 › case13-cancel: พิมพ์ "ถ้าจะยกเลิกนัดต้องแจ้งล่วงหน้ากี่ชั่วโมงคะ" (8.4s)
+  ✓  14 [chromium] › tests/chatbot.spec.ts:71:7 › case14-pregnant: พิมพ์ "ตั้งครรภ์ได้ 2 เดือน นวดได้ไหมคะ" (8.7s)
+  ✓  15 [chromium] › tests/chatbot.spec.ts:71:7 › case15-nails: พิมพ์ "มีบริการทำเล็บไหมคะ" (8.3s)
+  ✓  17 [chromium] › tests/chatbot.spec.ts:71:7 › case17-offtopic: พิมพ์ "ขอสูตรต้มยำกุ้งหน่อยได้ไหมคะ" (9.1s)
+  ✓  18 [chromium] › tests/chatbot.spec.ts:71:7 › case18-english: พิมพ์ "How much is a 1 hour Thai massage?" (8.2s)
+  ✓  16 [chromium] › tests/chatbot.spec.ts:71:7 › case16-booking: กดปุ่ม "จองคิว" แล้วให้ข้อมูลทีละอย่าง: ชื่อ มานี ใจดี / เบอร์ 089-555-1234 / นวดไทยแผนโบราณ / วันที่ 2026-12-25 เวลา 15:00 (30.8s)
+  ✘  19 [chromium] › tests/chatbot.spec.ts:71:7 › case19-followup-2h: พิมพ์ "นวดไทยกับนวดน้ำมันอโรมาต่างกันยังไงคะ" → พิมพ์ "แล้วอันที่ถูกกว่าใช้เวลากี่นาทีคะ" → พิมพ์ "ถ้าเอาอันนั้นแบบ 2 ชั่วโมงล่ะคะ" (15.9s)
+  ✓  20 [chromium] › tests/chatbot.spec.ts:71:7 › case20-student-discount: พิมพ์ "นวดแก้ปวดหลังราคาเท่าไหร่คะ" → พิมพ์ "หนูเป็นนักศึกษา แล้วจะเหลือเท่าไหร่คะ" (11.5s)
+  ✓  21 [chromium] › tests/chatbot.spec.ts:71:7 › case21-late-time: พิมพ์ "พรุ่งนี้ 5 ทุ่มยังว่างไหมคะ" → พิมพ์ "งั้น 3 ทุ่มล่ะคะ ทันไหม" (12.2s)
+  ✓  22 [chromium] › tests/chatbot.spec.ts:71:7 › case22-parking-memory: พิมพ์ "ร้านอยู่จังหวัดอะไรคะ" → พิมพ์ "แถวนั้นหาที่จอดยากไหม" → พิมพ์ "ที่บอกเมื่อกี้ จอดได้กี่คันนะคะ" (14.2s)
+  ✓  23 [chromium] › tests/chatbot.spec.ts:71:7 › case23-name-memory: พิมพ์ "สวัสดีค่ะ ชื่อสมศรีนะคะ ช่วงนี้ปวดคอมากเลย" → พิมพ์ "มีอะไรแนะนำไหมคะ" → พิมพ์ "จำได้ไหมคะว่าหนูชื่ออะไร" (17.0s)
+  ✓  24 [chromium] › tests/chatbot.spec.ts:71:7 › case24-budget-no-oil: พิมพ์ "อยากได้นวดผ่อนคลายสักอย่างค่ะ" → พิมพ์ "ไม่เอาแบบน้ำมันนะ แพ้กลิ่น" → พิมพ์ "งบไม่เกิน 300 บาท มีอะไรบ้าง" (20.0s)
+  ✓  25 [chromium] › tests/chatbot.spec.ts:71:7 › case25-lang-switch: พิมพ์ "How much is the aroma oil massage?" → พิมพ์ "แล้วร้านเปิดกี่โมงคะ" (12.3s)
+  ✓  26 [chromium] › tests/chatbot.spec.ts:71:7 › case26-booking-change: กดปุ่ม "จองคิว" แล้วให้ข้อมูลทีละอย่าง: ชื่อ ปิติ รักดี / เบอร์ 081-222-3333 / นวดไทยแผนโบราณ / แล้วเปลี่ยนใจพิมพ์ "เดี๋ยวค่ะ ขอเปลี่ยนเป็นนวดเท้าแทนนะคะ" / วันที่ 2026-12-26 เวลา 11:00 (34.0s)
+
+
+  1) [chromium] › tests/chatbot.spec.ts:71:7 › case19-followup-2h: พิมพ์ "นวดไทยกับนวดน้ำมันอโรมาต่างกันยังไงคะ" → พิมพ์ "แล้วอันที่ถูกกว่าใช้เวลากี่นาทีคะ" → พิมพ์ "ถ้าเอาอันนั้นแบบ 2 ชั่วโมงล่ะคะ" 
+
+    Error: เงื่อนไขที่ไม่ผ่าน
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "คำตอบสุดท้าย: ไม่มี 600",
+    + ]
+
+      104 |       fs.writeFileSync(path.join(dir, `case${c.id}.json`), JSON.stringify(result, null, 2));
+      105 |     }
+    > 106 |     expect(result.failures, "เงื่อนไขที่ไม่ผ่าน").toEqual([]);
+          |                                                   ^
+      107 |   });
+      108 | }
+      109 |
+        at /workspace/vastapp_lab/lab3_qlora/code/e2e/tests/chatbot.spec.ts:106:51
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/chatbot-case19-followup-2h-f7e4e-าอันนั้นแบบ-2-ชั่วโมงล่ะคะ--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/chatbot-case19-followup-2h-f7e4e-าอันนั้นแบบ-2-ชั่วโมงล่ะคะ--chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/chatbot.spec.ts:71:7 › case19-followup-2h: พิมพ์ "นวดไทยกับนวดน้ำมันอโรมาต่างกันยังไงคะ" → พิมพ์ "แล้วอันที่ถูกกว่าใช้เวลากี่นาทีคะ" → พิมพ์ "ถ้าเอาอันนั้นแบบ 2 ชั่วโมงล่ะคะ" 
+  25 passed (2.9m)
+ใช้เวลารันเทสต์ 172 วินาที
+
+== 5/6 ทำ GIF ของแต่ละเคส ==
+case1-hours.gif  0.13 MB
+case2-lastcall.gif  0.13 MB
+case3-prices.gif  0.28 MB
+case4-aroma-price.gif  0.13 MB
+case5-cheapest.gif  0.14 MB
+case6-office-pain.gif  0.16 MB
+case7-promo.gif  0.15 MB
+case8-student.gif  0.13 MB
+case9-address.gif  0.14 MB
+case10-phone.gif  0.13 MB
+case11-parking.gif  0.13 MB
+case12-credit.gif  0.13 MB
+case13-cancel.gif  0.14 MB
+case14-pregnant.gif  0.14 MB
+case15-nails.gif  0.14 MB
+case16-booking.gif  1.48 MB
+case17-offtopic.gif  0.15 MB
+case18-english.gif  0.14 MB
+case19-followup-2h.gif  0.42 MB
+case20-student-discount.gif  0.20 MB
+case21-late-time.gif  0.20 MB
+case22-parking-memory.gif  0.35 MB
+case23-name-memory.gif  0.70 MB
+case24-budget-no-oil.gif  0.98 MB
+case25-lang-switch.gif  0.22 MB
+case26-booking-change.gif  1.46 MB
+
+ได้ GIF 26 ไฟล์ที่ /workspace/vastapp_lab/lab3_qlora/code/e2e/out/gifs
+
+== 6/6 เขียนรายงาน ==
+ผ่าน 25/26 เคส (โมเดล qwen3-4b-sabaijai)
+  ไม่ผ่าน เคส 19: คำตอบสุดท้าย: ไม่มี 600
+รายงาน: /workspace/vastapp_lab/lab3_qlora/code/e2e/out/TEST_REPORT.md
+รายงาน: out-ft/TEST_REPORT.md · 25/26 ผ่าน
+
+######## รันซ้ำ 5 รอบต่อโมเดล ผ่าน API ของเว็บ (ไม่เปิดเบราว์เซอร์) ########
+(node:20236) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/vastapp_lab/lab3_qlora/code/e2e/tests/check.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/vastapp_lab/lab3_qlora/code/e2e/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+1/260 งาน2/260 งาน3/260 งาน4/260 งาน5/260 งาน6/260 งาน7/260 งาน8/260 งาน9/260 งาน10/260 งาน11/260 งาน12/260 งาน13/260 งาน14/260 งาน15/260 งาน16/260 งาน17/260 งาน18/260 งาน19/260 งาน20/260 งาน21/260 งาน22/260 งาน23/260 งาน24/260 งาน25/260 งาน26/260 งาน27/260 งาน28/260 งาน29/260 งาน30/260 งาน31/260 งาน32/260 งาน33/260 งาน34/260 งาน35/260 งาน36/260 งาน37/260 งาน38/260 งาน39/260 งาน40/260 งาน41/260 งาน42/260 งาน43/260 งาน44/260 งาน45/260 งาน46/260 งาน47/260 งาน48/260 งาน49/260 งาน50/260 งาน51/260 งาน52/260 งาน53/260 งาน54/260 งาน55/260 งาน56/260 งาน57/260 งาน58/260 งาน59/260 งาน60/260 งาน61/260 งาน62/260 งาน63/260 งาน64/260 งาน65/260 งาน66/260 งาน67/260 งาน68/260 งาน69/260 งาน70/260 งาน71/260 งาน72/260 งาน73/260 งาน74/260 งาน75/260 งาน76/260 งาน77/260 งาน78/260 งาน79/260 งาน80/260 งาน81/260 งาน82/260 งาน83/260 งาน84/260 งาน85/260 งาน86/260 งาน87/260 งาน88/260 งาน89/260 งาน90/260 งาน91/260 งาน92/260 งาน93/260 งาน94/260 งาน95/260 งาน96/260 งาน97/260 งาน98/260 งาน99/260 งาน100/260 งาน101/260 งาน102/260 งาน103/260 งาน104/260 งาน105/260 งาน106/260 งาน107/260 งาน108/260 งาน109/260 งาน110/260 งาน111/260 งาน112/260 งาน113/260 งาน114/260 งาน115/260 งาน116/260 งาน117/260 งาน118/260 งาน119/260 งาน120/260 งาน121/260 งาน122/260 งาน123/260 งาน124/260 งาน125/260 งาน126/260 งาน127/260 งาน128/260 งาน129/260 งาน130/260 งาน131/260 งาน132/260 งาน133/260 งาน134/260 งาน135/260 งาน136/260 งาน137/260 งาน138/260 งาน139/260 งาน140/260 งาน141/260 งาน142/260 งาน143/260 งาน144/260 งาน145/260 งาน146/260 งาน147/260 งาน148/260 งาน149/260 งาน150/260 งาน151/260 งาน152/260 งาน153/260 งาน154/260 งาน155/260 งาน156/260 งาน157/260 งาน158/260 งาน159/260 งาน160/260 งาน161/260 งาน162/260 งาน163/260 งาน164/260 งาน165/260 งาน166/260 งาน167/260 งาน168/260 งาน169/260 งาน170/260 งาน171/260 งาน172/260 งาน173/260 งาน174/260 งาน175/260 งาน176/260 งาน177/260 งาน178/260 งาน179/260 งาน180/260 งาน181/260 งาน182/260 งาน183/260 งาน184/260 งาน185/260 งาน186/260 งาน187/260 งาน188/260 งาน189/260 งาน190/260 งาน191/260 งาน192/260 งาน193/260 งาน194/260 งาน195/260 งาน196/260 งาน197/260 งาน198/260 งาน199/260 งาน200/260 งาน201/260 งาน202/260 งาน203/260 งาน204/260 งาน205/260 งาน206/260 งาน207/260 งาน208/260 งาน209/260 งาน210/260 งาน211/260 งาน212/260 งาน213/260 งาน214/260 งาน215/260 งาน216/260 งาน217/260 งาน218/260 งาน219/260 งาน220/260 งาน221/260 งาน222/260 งาน223/260 งาน224/260 งาน225/260 งาน226/260 งาน227/260 งาน228/260 งาน229/260 งาน230/260 งาน231/260 งาน232/260 งาน233/260 งาน234/260 งาน235/260 งาน236/260 งาน237/260 งาน238/260 งาน239/260 งาน240/260 งาน241/260 งาน242/260 งาน243/260 งาน244/260 งาน245/260 งาน246/260 งาน247/260 งาน248/260 งาน249/260 งาน250/260 งาน251/260 งาน252/260 งาน253/260 งาน254/260 งาน255/260 งาน256/260 งาน257/260 งาน258/260 งาน259/260 งาน260/260 งาน · 157 วินาที
+base: 25, 25, 25, 25, 25 / 26 · เฉลี่ย 25.00 ± 0.00
+ft: 25, 25, 25, 25, 25 / 26 · เฉลี่ย 25.00 ± 0.00
+เขียน repeat.json แล้ว
+
+######## เทียบผล ########
+Base 25/26 · Fine-tuned 25/26 · ผลต่างกัน 2 เคส (19, 21) · GIF 4 ไฟล์
+โมเดลเริ่มต้นของเว็บ = ft
