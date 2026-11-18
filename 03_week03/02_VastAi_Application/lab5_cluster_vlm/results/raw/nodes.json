@@ -1,0 +1,76 @@
+{
+  "vapp-lab5-n1": {
+    "status": "destroyed",
+    "gpu": "2 x RTX 3090",
+    "geolocation": "Quebec, CA",
+    "price_usd_per_hour": 0.4141,
+    "cpu_cores": 12.0,
+    "inet_up_mbps": 867,
+    "inet_down_mbps": 750,
+    "inet_up_cost_per_gb": 3.90625e-06,
+    "inet_down_cost_per_gb": 2.6041666666666666e-06,
+    "driver": "535.161.07",
+    "image": "pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel",
+    "disk_gb": 80,
+    "age_hours": 3.002,
+    "age_hms": "3h 00m",
+    "billed_usd": {
+      "gpu": 1.11,
+      "disk": 0.122,
+      "download": 0.0,
+      "upload": 0.0,
+      "total": 1.232,
+      "gpu_hours": 2.974,
+      "disk_hours": 3.002,
+      "download_gb": 20.7,
+      "upload_gb": 2.6,
+      "gpu_usd_per_hour": 0.373,
+      "disk_usd_per_hour": 0.041,
+      "bandwidth_usd_per_gb": "0.000 (free on this host)"
+    }
+  },
+  "vapp-lab5-n2": {
+    "status": "destroyed",
+    "gpu": "2 x RTX 3090",
+    "geolocation": "Utah, US",
+    "price_usd_per_hour": 0.5096,
+    "cpu_cores": 32.0,
+    "inet_up_mbps": 936,
+    "inet_down_mbps": 929,
+    "inet_up_cost_per_gb": 0.010416666666666666,
+    "inet_down_cost_per_gb": 0.010416666666666666,
+    "driver": "615.71.09",
+    "image": "pytorch/pytorch:2.8.0-cuda12.8-cudnn9-devel",
+    "disk_gb": 80,
+    "age_hours": 1.937,
+    "age_hms": "1h 56m",
+    "billed_usd": {
+      "gpu": 0.903,
+      "disk": 0.057,
+      "download": 0.211,
+      "upload": 0.026,
+      "total": 1.197,
+      "gpu_hours": 1.88,
+      "disk_hours": 1.932,
+      "download_gb": 20.3,
+      "upload_gb": 2.4,
+      "gpu_usd_per_hour": 0.48,
+      "disk_usd_per_hour": 0.03,
+      "bandwidth_usd_per_gb": "0.010 down / 0.011 up"
+    }
+  },
+  "vapp-lab5-n1_first_try": {
+    "status": "destroyed before use (disk only, never reached running)",
+    "billed_usd": {
+      "gpu": 0.0,
+      "disk": 0.008,
+      "download": 0.0,
+      "upload": 0.0,
+      "total": 0.008,
+      "disk_hours": 0.189
+    }
+  },
+  "lab_total_billed_usd": 2.437,
+  "_note": "Node 2 chosen as closest offer to Node 1 (Quebec, CA) with a different public IP: no qualifying CA offer with another IP within $0.60/h at rent time (2026-11-18 22:38); Utah, US (neighbouring country).",
+  "_billing_note": "Amounts from Vast.ai charges (show invoices-v1 --charges) read ~3 min after destroy on 2026-11-19; IPs and instance/machine numbers removed on purpose."
+}

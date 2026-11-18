@@ -1,0 +1,123 @@
+{
+  "replicas": 2,
+  "accum_per_replica": 16,
+  "effective_batch": 32,
+  "steps": 6,
+  "warmup_excluded": 2,
+  "port": 9000,
+  "rejected_connections": 0,
+  "wait_for_replicas_s": 17.8,
+  "train_wall_s": 124.11,
+  "replicas_info": [
+    {
+      "type": "hello",
+      "host": "0572f39aca77",
+      "mode": "B",
+      "gpus": [
+        1
+      ],
+      "accum": 16,
+      "peer": "127.0.0.1"
+    },
+    {
+      "type": "hello",
+      "host": "0572f39aca77",
+      "mode": "B",
+      "gpus": [
+        0
+      ],
+      "accum": 16,
+      "peer": "127.0.0.1"
+    }
+  ],
+  "checksums": [
+    "77ca8bdbe5af438e1ec2c9f367682fd256d27e5cd07c8f981b58bc1463f55c56",
+    "77ca8bdbe5af438e1ec2c9f367682fd256d27e5cd07c8f981b58bc1463f55c56"
+  ],
+  "checksums_match": true,
+  "summary_measured_steps": {
+    "n": 4,
+    "sec_per_update": 20.653,
+    "receipts_per_sec": 1.549
+  },
+  "per_step": [
+    {
+      "step": 1,
+      "loss_mean": 0.13231,
+      "loss_per_replica": [
+        0.10557,
+        0.15906
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 0.182,
+      "average_s": 0.1221,
+      "broadcast_s": 0.0076,
+      "step_wall_s": 22.769
+    },
+    {
+      "step": 2,
+      "loss_mean": 0.12057,
+      "loss_per_replica": [
+        0.10944,
+        0.1317
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 0.791,
+      "average_s": 0.0445,
+      "broadcast_s": 0.0098,
+      "step_wall_s": 18.724
+    },
+    {
+      "step": 3,
+      "loss_mean": 0.10216,
+      "loss_per_replica": [
+        0.0945,
+        0.10982
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 0.519,
+      "average_s": 0.0436,
+      "broadcast_s": 0.0076,
+      "step_wall_s": 21.287
+    },
+    {
+      "step": 4,
+      "loss_mean": 0.07589,
+      "loss_per_replica": [
+        0.10256,
+        0.04922
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 3.578,
+      "average_s": 0.0651,
+      "broadcast_s": 0.0096,
+      "step_wall_s": 21.427
+    },
+    {
+      "step": 5,
+      "loss_mean": 0.13978,
+      "loss_per_replica": [
+        0.10856,
+        0.17099
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 1.036,
+      "average_s": 0.0466,
+      "broadcast_s": 0.0074,
+      "step_wall_s": 20.683
+    },
+    {
+      "step": 6,
+      "loss_mean": 0.0685,
+      "loss_per_replica": [
+        0.10431,
+        0.0327
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 0.185,
+      "average_s": 0.069,
+      "broadcast_s": 0.0081,
+      "step_wall_s": 19.214
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "replicas": 4,
+  "accum_per_replica": 8,
+  "effective_batch": 32,
+  "steps": 8,
+  "warmup_excluded": 2,
+  "port": 9000,
+  "rejected_connections": 0,
+  "wait_for_replicas_s": 29.3,
+  "train_wall_s": 89.65,
+  "replicas_info": [
+    {
+      "type": "hello",
+      "host": "7b59243f47a2",
+      "mode": "B",
+      "gpus": [
+        0
+      ],
+      "accum": 8,
+      "peer": "127.0.0.1"
+    },
+    {
+      "type": "hello",
+      "host": "59878f749138",
+      "mode": "B",
+      "gpus": [
+        0
+      ],
+      "accum": 8,
+      "peer": "203.0.113.20"
+    },
+    {
+      "type": "hello",
+      "host": "7b59243f47a2",
+      "mode": "B",
+      "gpus": [
+        1
+      ],
+      "accum": 8,
+      "peer": "127.0.0.1"
+    },
+    {
+      "type": "hello",
+      "host": "59878f749138",
+      "mode": "B",
+      "gpus": [
+        1
+      ],
+      "accum": 8,
+      "peer": "203.0.113.20"
+    }
+  ],
+  "checksums": [
+    "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291",
+    "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291",
+    "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291",
+    "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291"
+  ],
+  "checksums_match": true,
+  "summary_measured_steps": {
+    "n": 6,
+    "sec_per_update": 11.11,
+    "receipts_per_sec": 2.88
+  },
+  "per_step": [
+    {
+      "step": 1,
+      "loss_mean": 0.13231,
+      "loss_per_replica": [
+        0.06113,
+        0.12393,
+        0.15,
+        0.19419
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 2.437,
+      "average_s": 0.0505,
+      "broadcast_s": 0.498,
+      "step_wall_s": 12.548
+    },
+    {
+      "step": 2,
+      "loss_mean": 0.12087,
+      "loss_per_replica": [
+        0.08625,
+        0.16769,
+        0.13295,
+        0.09657
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 2.601,
+      "average_s": 0.035,
+      "broadcast_s": 0.4902,
+      "step_wall_s": 10.436
+    },
+    {
+      "step": 3,
+      "loss_mean": 0.1011,
+      "loss_per_replica": [
+        0.12707,
+        0.11717,
+        0.06147,
+        0.0987
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 1.845,
+      "average_s": 0.0352,
+      "broadcast_s": 0.4953,
+      "step_wall_s": 11.836
+    },
+    {
+      "step": 4,
+      "loss_mean": 0.07544,
+      "loss_per_replica": [
+        0.08908,
+        0.06479,
+        0.11659,
+        0.03133
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 1.924,
+      "average_s": 0.0376,
+      "broadcast_s": 0.4888,
+      "step_wall_s": 10.872
+    },
+    {
+      "step": 5,
+      "loss_mean": 0.13872,
+      "loss_per_replica": [
+        0.01156,
+        0.08948,
+        0.20489,
+        0.24894
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 0.659,
+      "average_s": 0.0349,
+      "broadcast_s": 0.4968,
+      "step_wall_s": 10.759
+    },
+    {
+      "step": 6,
+      "loss_mean": 0.06785,
+      "loss_per_replica": [
+        0.11241,
+        0.05339,
+        0.0918,
+        0.01378
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 2.714,
+      "average_s": 0.0393,
+      "broadcast_s": 0.4945,
+      "step_wall_s": 11.522
+    },
+    {
+      "step": 7,
+      "loss_mean": 0.04944,
+      "loss_per_replica": [
+        0.03593,
+        0.08265,
+        0.04955,
+        0.02964
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 1.498,
+      "average_s": 0.0353,
+      "broadcast_s": 0.5002,
+      "step_wall_s": 11.111
+    },
+    {
+      "step": 8,
+      "loss_mean": 0.04726,
+      "loss_per_replica": [
+        0.04095,
+        0.07259,
+        0.04207,
+        0.03344
+      ],
+      "grad_mb_per_replica": 7.668,
+      "first_to_last_arrival_s": 1.427,
+      "average_s": 0.0389,
+      "broadcast_s": 0.4945,
+      "step_wall_s": 10.561
+    }
+  ]
+}

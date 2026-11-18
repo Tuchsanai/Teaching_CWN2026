@@ -1,0 +1,694 @@
+{
+  "lab": "LAB 5 · cluster fine-tuning of Qwen3-VL-8B (LoRA) on 2 nodes x 2 RTX 3090",
+  "definitions": {
+    "sec_per_update": "mean wall time of one weight update (warm-up updates excluded)",
+    "receipts_per_s": "Effective Batch / sec_per_update",
+    "speedup": "receipts_per_s / receipts_per_s of 1 Node, same approach and Effective Batch",
+    "efficiency": "speedup / nodes",
+    "usd_per_epoch": "800 receipts / receipts_per_s, in hours, x sum of price per hour of all nodes used"
+  },
+  "prices_usd_per_hour": {
+    "node1": 0.4141,
+    "node2": 0.5096,
+    "1_node": 0.4141,
+    "2_nodes": 0.9237000000000001
+  },
+  "runs": [
+    {
+      "nodes": 1,
+      "gpus": 2,
+      "replicas": 1,
+      "accum_per_replica": 8,
+      "effective_batch": 8,
+      "updates_total": 20,
+      "warmup_excluded": 3,
+      "updates_measured": 17,
+      "sec_per_update": 9.193941176470588,
+      "compute_s": 9.137470588235294,
+      "comm_s": 0.041705882352941176,
+      "comm_breakdown_s": {
+        "send": 0.01676470588235294,
+        "wait": 0.02323529411764706,
+        "recv": 0.0018823529411764706
+      },
+      "other_s": 0.014764705882353096,
+      "receipts_per_s": 0.8701382624106669,
+      "gpu_util_mean_pct": 47.83235294117647,
+      "peak_vram_gib_per_gpu": 15.28,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "ee4d15c91d24df3fa0621fa29d5451b1796f2839b0d3bffc11fd606303ddf648",
+      "checksums_match": true,
+      "workers_found": 1,
+      "approach": "A",
+      "run": "A_eb8",
+      "speedup": 1.0,
+      "efficiency": 1.0,
+      "price_usd_per_hour": 0.4141,
+      "epoch_s": 919.3941176470588,
+      "usd_per_epoch": 0.10575586225490197
+    },
+    {
+      "nodes": 2,
+      "gpus": 4,
+      "replicas": 2,
+      "accum_per_replica": 4,
+      "effective_batch": 8,
+      "updates_total": 20,
+      "warmup_excluded": 3,
+      "updates_measured": 17,
+      "sec_per_update": 7.292294117647059,
+      "compute_s": 4.276764705882353,
+      "comm_s": 2.9970588235294118,
+      "comm_breakdown_s": {
+        "send": 0.7208823529411765,
+        "wait": 1.7245294117647059,
+        "recv": 0.5516176470588235
+      },
+      "other_s": 0.018470588235294905,
+      "receipts_per_s": 1.0970484556623026,
+      "gpu_util_mean_pct": 28.88235294117647,
+      "peak_vram_gib_per_gpu": 15.28,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "154c78adb7d60e738dc5494d2d717c0a41234ecd481423d8a24a9adc2e6ec656",
+      "checksums_match": true,
+      "workers_found": 2,
+      "approach": "A",
+      "run": "A_eb8",
+      "speedup": 1.260774871137139,
+      "efficiency": 0.6303874355685695,
+      "price_usd_per_hour": 0.9237000000000001,
+      "epoch_s": 729.2294117647059,
+      "usd_per_epoch": 0.18710811323529414
+    },
+    {
+      "nodes": 1,
+      "gpus": 2,
+      "replicas": 1,
+      "accum_per_replica": 32,
+      "effective_batch": 32,
+      "updates_total": 8,
+      "warmup_excluded": 2,
+      "updates_measured": 6,
+      "sec_per_update": 35.91266666666667,
+      "compute_s": 35.856500000000004,
+      "comm_s": 0.041833333333333333,
+      "comm_breakdown_s": {
+        "send": 0.016666666666666666,
+        "wait": 0.023333333333333334,
+        "recv": 0.002
+      },
+      "other_s": 0.014333333333329146,
+      "receipts_per_s": 0.8910505114258664,
+      "gpu_util_mean_pct": 47.975,
+      "peak_vram_gib_per_gpu": 15.29,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "a28f2be20ad38164d1cba962a90cf54c3252d453d5e732b5b3c7f5ab8a292596",
+      "checksums_match": true,
+      "workers_found": 1,
+      "approach": "A",
+      "run": "A_eb32",
+      "speedup": 1.0,
+      "efficiency": 1.0,
+      "price_usd_per_hour": 0.4141,
+      "epoch_s": 897.8166666666667,
+      "usd_per_epoch": 0.10327385601851853
+    },
+    {
+      "nodes": 2,
+      "gpus": 4,
+      "replicas": 2,
+      "accum_per_replica": 16,
+      "effective_batch": 32,
+      "updates_total": 8,
+      "warmup_excluded": 2,
+      "updates_measured": 6,
+      "sec_per_update": 19.318166666666666,
+      "compute_s": 17.17275,
+      "comm_s": 2.1255833333333336,
+      "comm_breakdown_s": {
+        "send": 0.5419166666666667,
+        "wait": 1.33375,
+        "recv": 0.24983333333333332
+      },
+      "other_s": 0.01983333333333226,
+      "receipts_per_s": 1.6564718874289313,
+      "gpu_util_mean_pct": 42.454166666666666,
+      "peak_vram_gib_per_gpu": 15.29,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "780927690d500789ae2e1b9e9954192530c0c6554e3e59ab3563a4ce1a10602b",
+      "checksums_match": true,
+      "workers_found": 2,
+      "approach": "A",
+      "run": "A_eb32",
+      "speedup": 1.8590100854981062,
+      "efficiency": 0.9295050427490531,
+      "price_usd_per_hour": 0.9237000000000001,
+      "epoch_s": 482.9541666666667,
+      "usd_per_epoch": 0.12391798993055558
+    },
+    {
+      "nodes": 1,
+      "gpus": 2,
+      "replicas": 2,
+      "accum_per_replica": 4,
+      "effective_batch": 8,
+      "updates_total": 20,
+      "warmup_excluded": 3,
+      "updates_measured": 17,
+      "sec_per_update": 5.287823529411765,
+      "compute_s": 4.908294117647059,
+      "comm_s": 0.365,
+      "comm_breakdown_s": {
+        "send": 0.014852941176470588,
+        "wait": 0.3471764705882353,
+        "recv": 0.0029705882352941177
+      },
+      "other_s": 0.01452941176470568,
+      "receipts_per_s": 1.512909792753607,
+      "gpu_util_mean_pct": 90.09705882352942,
+      "peak_vram_gib_per_gpu": 20.38,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "59fee9c27733c57ef729faaef7fd58c9da5af197af5a675ff5974f43f8ac3c1a",
+      "checksums_match": true,
+      "workers_found": 2,
+      "approach": "B",
+      "run": "B_eb8",
+      "speedup": 1.0,
+      "efficiency": 1.0,
+      "price_usd_per_hour": 0.4141,
+      "epoch_s": 528.7823529411764,
+      "usd_per_epoch": 0.0608246589869281
+    },
+    {
+      "nodes": 2,
+      "gpus": 4,
+      "replicas": 4,
+      "accum_per_replica": 2,
+      "effective_batch": 8,
+      "updates_total": 20,
+      "warmup_excluded": 3,
+      "updates_measured": 17,
+      "sec_per_update": 4.646470588235294,
+      "compute_s": 2.362882352941176,
+      "comm_s": 2.2653970588235293,
+      "comm_breakdown_s": {
+        "send": 0.45988235294117646,
+        "wait": 1.5651617647058824,
+        "recv": 0.2404264705882353
+      },
+      "other_s": 0.018191176470588655,
+      "receipts_per_s": 1.7217369287251552,
+      "gpu_util_mean_pct": 50.39411764705883,
+      "peak_vram_gib_per_gpu": 20.38,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "762519b835cda2b7b1351c4649ac16060aa6a9f869e747c11ce7d617c284a0f2",
+      "checksums_match": true,
+      "workers_found": 4,
+      "approach": "B",
+      "run": "B_eb8",
+      "speedup": 1.1380301303962528,
+      "efficiency": 0.5690150651981264,
+      "price_usd_per_hour": 0.9237000000000001,
+      "epoch_s": 464.6470588235294,
+      "usd_per_epoch": 0.11922069117647059
+    },
+    {
+      "nodes": 1,
+      "gpus": 2,
+      "replicas": 2,
+      "accum_per_replica": 16,
+      "effective_batch": 32,
+      "updates_total": 8,
+      "warmup_excluded": 2,
+      "updates_measured": 6,
+      "sec_per_update": 20.026666666666667,
+      "compute_s": 19.316416666666665,
+      "comm_s": 0.6963333333333334,
+      "comm_breakdown_s": {
+        "send": 0.015,
+        "wait": 0.6784166666666667,
+        "recv": 0.0030000000000000005
+      },
+      "other_s": 0.013916666666668687,
+      "receipts_per_s": 1.5978695073235685,
+      "gpu_util_mean_pct": 93.22500000000001,
+      "peak_vram_gib_per_gpu": 20.4,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "76a498685ed6e74c2c8ae6d8b0a365df6d175b147198c486962133b92a9ea492",
+      "checksums_match": true,
+      "workers_found": 2,
+      "approach": "B",
+      "run": "B_eb32",
+      "speedup": 1.0,
+      "efficiency": 1.0,
+      "price_usd_per_hour": 0.4141,
+      "epoch_s": 500.6666666666667,
+      "usd_per_epoch": 0.05759057407407408
+    },
+    {
+      "nodes": 2,
+      "gpus": 4,
+      "replicas": 4,
+      "accum_per_replica": 8,
+      "effective_batch": 32,
+      "updates_total": 8,
+      "warmup_excluded": 2,
+      "updates_measured": 6,
+      "sec_per_update": 11.110166666666666,
+      "compute_s": 9.46625,
+      "comm_s": 1.6239166666666665,
+      "comm_breakdown_s": {
+        "send": 0.291875,
+        "wait": 1.0861666666666667,
+        "recv": 0.246
+      },
+      "other_s": 0.01999999999999935,
+      "receipts_per_s": 2.880244820809769,
+      "gpu_util_mean_pct": 80.76666666666667,
+      "peak_vram_gib_per_gpu": 20.4,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291",
+      "checksums_match": true,
+      "workers_found": 4,
+      "approach": "B",
+      "run": "B_eb32",
+      "speedup": 1.802553217023447,
+      "efficiency": 0.9012766085117235,
+      "price_usd_per_hour": 0.9237000000000001,
+      "epoch_s": 277.75416666666666,
+      "usd_per_epoch": 0.07126708993055555
+    }
+  ],
+  "runs_excluded": {
+    "B_eb32_2node_try1_network_stall": {
+      "reason": "link between the nodes stalled at updates 3-4 (gradient send 8-13 s); re-measured with the same code",
+      "sec_per_update": 17.522166666666667,
+      "receipts_per_s": 1.82625816822501,
+      "speedup_vs_1node": 1.1429332369474856,
+      "checksums_match": true
+    }
+  },
+  "estimate_3_nodes": {
+    "note": "CALCULATED from measured 1-Node and 2-Node times, NOT measured. Assumes the third node computes at Node 1 speed; Effective Batch 8 and 32 do not split evenly over 3 or 6 replicas, so the slowest replica gets ceil(EB / replicas) receipts.",
+    "runs": {
+      "A_eb8": {
+        "replicas": 3,
+        "gpus": 6,
+        "receipts_on_slowest_replica": 3,
+        "even_split": false,
+        "compute_per_receipt_s": 1.1421838235294117,
+        "overhead_2node_s": 2.7235588235294124,
+        "optimistic": {
+          "sec_per_update": 6.150110294117647,
+          "receipts_per_s": 1.3007896797642318,
+          "speedup": 1.4949229748390451,
+          "efficiency": 0.4983076582796817
+        },
+        "pessimistic": {
+          "sec_per_update": 8.87366911764706,
+          "receipts_per_s": 0.9015436449044968,
+          "speedup": 1.0360924049091038,
+          "efficiency": 0.34536413496970125
+        }
+      },
+      "A_eb32": {
+        "replicas": 3,
+        "gpus": 6,
+        "receipts_on_slowest_replica": 11,
+        "even_split": false,
+        "compute_per_receipt_s": 1.1205156250000001,
+        "overhead_2node_s": 1.3899166666666645,
+        "optimistic": {
+          "sec_per_update": 13.715588541666666,
+          "receipts_per_s": 2.333111692785695,
+          "speedup": 2.6183832037223462,
+          "efficiency": 0.8727944012407821
+        },
+        "pessimistic": {
+          "sec_per_update": 15.10550520833333,
+          "receipts_per_s": 2.1184329526659194,
+          "speedup": 2.377455515149175,
+          "efficiency": 0.7924851717163918
+        }
+      },
+      "B_eb8": {
+        "replicas": 6,
+        "gpus": 6,
+        "receipts_on_slowest_replica": 2,
+        "even_split": false,
+        "compute_per_receipt_s": 1.2270735294117647,
+        "overhead_2node_s": 2.1923235294117647,
+        "optimistic": {
+          "sec_per_update": 4.646470588235294,
+          "receipts_per_s": 1.7217369287251552,
+          "speedup": 1.1380301303962526,
+          "efficiency": 0.37934337679875085
+        },
+        "pessimistic": {
+          "sec_per_update": 6.838794117647058,
+          "receipts_per_s": 1.1697968768143678,
+          "speedup": 0.7732099312314263,
+          "efficiency": 0.2577366437438088
+        }
+      },
+      "B_eb32": {
+        "replicas": 6,
+        "gpus": 6,
+        "receipts_on_slowest_replica": 6,
+        "even_split": false,
+        "compute_per_receipt_s": 1.2072760416666666,
+        "overhead_2node_s": 1.4519583333333337,
+        "optimistic": {
+          "sec_per_update": 8.695614583333333,
+          "receipts_per_s": 3.6800159084021042,
+          "speedup": 2.3030766226749835,
+          "efficiency": 0.7676922075583278
+        },
+        "pessimistic": {
+          "sec_per_update": 10.147572916666666,
+          "receipts_per_s": 3.1534634205428844,
+          "speedup": 1.9735425240230886,
+          "efficiency": 0.6578475080076962
+        }
+      }
+    }
+  },
+  "vram_limit_step3": {
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "weights_gib": 16.34,
+    "seq_len": 1685,
+    "image_tokens": 1080,
+    "answer_tokens": 456,
+    "test_receipt": "train_000",
+    "cases": [
+      {
+        "case": "A-1gpu",
+        "gpus": 1,
+        "batch": 1,
+        "gradient_checkpointing": false,
+        "result": "oom",
+        "peak_gib_per_gpu": [
+          23.0
+        ],
+        "sec_per_step": null,
+        "layers_gpu0": null
+      },
+      {
+        "case": "A-2gpu-split18",
+        "gpus": 2,
+        "batch": 1,
+        "gradient_checkpointing": false,
+        "result": "ok",
+        "peak_gib_per_gpu": [
+          14.5,
+          15.73
+        ],
+        "sec_per_step": 1.576,
+        "layers_gpu0": 18
+      },
+      {
+        "case": "B-b1",
+        "gpus": 1,
+        "batch": 1,
+        "gradient_checkpointing": true,
+        "result": "ok",
+        "peak_gib_per_gpu": [
+          20.26
+        ],
+        "sec_per_step": 1.601,
+        "layers_gpu0": null
+      },
+      {
+        "case": "B-b2",
+        "gpus": 1,
+        "batch": 2,
+        "gradient_checkpointing": true,
+        "result": "oom",
+        "peak_gib_per_gpu": [
+          22.2
+        ],
+        "sec_per_step": null,
+        "layers_gpu0": null
+      },
+      {
+        "case": "A-2gpu-split19",
+        "gpus": 2,
+        "batch": 1,
+        "gradient_checkpointing": false,
+        "result": "ok",
+        "peak_gib_per_gpu": [
+          15.14,
+          15.08
+        ],
+        "sec_per_step": 1.546,
+        "layers_gpu0": 19
+      }
+    ]
+  },
+  "gradient": {
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "dtype": "bf16",
+    "mb_per_replica_per_update": 7.668
+  },
+  "network_step5": {
+    "rtt_ms": {
+      "min": 55.0,
+      "median": 55.5,
+      "max": 56.1,
+      "n": 50
+    },
+    "tcp_connect_ms": 58.0,
+    "bulk_payload_mb": 7.6,
+    "bulk_roundtrip_s": [
+      1.095,
+      0.385,
+      0.317,
+      0.33,
+      0.357
+    ],
+    "bulk_one_way_mbps_est": 340.9
+  },
+  "training_step6": {
+    "A": {
+      "replicas": 2,
+      "accum_per_replica": 4,
+      "effective_batch": 8,
+      "updates": 50,
+      "unique_receipts": 400,
+      "train_wall_s": 334.12,
+      "round_wall_s_incl_model_load": 407,
+      "model_load_s_per_replica": [
+        6.6,
+        8.4
+      ],
+      "loss_first10_mean": 0.0732,
+      "loss_last10_mean": 0.0426,
+      "loss_first": 0.10552,
+      "loss_last": 0.00767,
+      "peak_vram_gib_per_gpu_max": 15.73,
+      "peak_vram_gib_per_replica": [
+        15.28,
+        15.73
+      ],
+      "checksums": [
+        "ca9cc7ef6ead09b32073b71544289e488194c9067769db7ef7c9cfa3fa38e664",
+        "ca9cc7ef6ead09b32073b71544289e488194c9067769db7ef7c9cfa3fa38e664"
+      ],
+      "checksums_match": true,
+      "adapter_bytes": 15356672
+    },
+    "B": {
+      "replicas": 4,
+      "accum_per_replica": 2,
+      "effective_batch": 8,
+      "updates": 50,
+      "unique_receipts": 400,
+      "train_wall_s": 260.94,
+      "round_wall_s_incl_model_load": 353,
+      "model_load_s_per_replica": [
+        4.7,
+        8.3,
+        9.4,
+        8.4
+      ],
+      "loss_first10_mean": 0.0735,
+      "loss_last10_mean": 0.0426,
+      "loss_first": 0.10552,
+      "loss_last": 0.00768,
+      "peak_vram_gib_per_gpu_max": 20.6,
+      "peak_vram_gib_per_replica": [
+        20.38,
+        19.95,
+        20.19,
+        20.6
+      ],
+      "checksums": [
+        "abc563bbad54df379e8a78d33c12996cfbf5f8db735be4a61fc80e954e001970",
+        "abc563bbad54df379e8a78d33c12996cfbf5f8db735be4a61fc80e954e001970",
+        "abc563bbad54df379e8a78d33c12996cfbf5f8db735be4a61fc80e954e001970",
+        "abc563bbad54df379e8a78d33c12996cfbf5f8db735be4a61fc80e954e001970"
+      ],
+      "checksums_match": true,
+      "adapter_bytes": 15356672
+    }
+  },
+  "evaluation_step7": {
+    "models": {
+      "base": {
+        "label": "Base",
+        "receipts": 100,
+        "json_readable_pct": 100.0,
+        "total_exact_pct": 95.8,
+        "total_receipts_scored": 95,
+        "item_precision_pct": 78.3,
+        "item_recall_pct": 75.6,
+        "item_f1_pct": 77.0,
+        "items_correct": 217,
+        "items_predicted": 277,
+        "items_ground_truth": 287,
+        "sec_per_receipt": 3.37,
+        "new_tokens_mean": 83.8
+      },
+      "A": {
+        "label": "Fine-tuned A",
+        "receipts": 100,
+        "json_readable_pct": 99.0,
+        "total_exact_pct": 93.7,
+        "total_receipts_scored": 95,
+        "item_precision_pct": 89.8,
+        "item_recall_pct": 86.1,
+        "item_f1_pct": 87.9,
+        "items_correct": 247,
+        "items_predicted": 275,
+        "items_ground_truth": 287,
+        "sec_per_receipt": 3.97,
+        "new_tokens_mean": 82.1
+      },
+      "B": {
+        "label": "Fine-tuned B",
+        "receipts": 100,
+        "json_readable_pct": 99.0,
+        "total_exact_pct": 93.7,
+        "total_receipts_scored": 95,
+        "item_precision_pct": 89.1,
+        "item_recall_pct": 85.4,
+        "item_f1_pct": 87.2,
+        "items_correct": 245,
+        "items_predicted": 275,
+        "items_ground_truth": 287,
+        "sec_per_receipt": 3.97,
+        "new_tokens_mean": 82.0
+      }
+    },
+    "improvement_points_vs_base": {
+      "A": {
+        "json_readable_pct": -1.0,
+        "total_exact_pct": -2.1,
+        "item_f1_pct": 10.9
+      },
+      "B": {
+        "json_readable_pct": -1.0,
+        "total_exact_pct": -2.1,
+        "item_f1_pct": 10.2
+      }
+    },
+    "reference_qwen3_vl_2b": {
+      "2B Base": {
+        "total_exact_pct": 88.4,
+        "item_f1_pct": 69.9
+      },
+      "2B Fine-tuned": {
+        "total_exact_pct": 100.0,
+        "item_f1_pct": 88.4,
+        "training": "800 receipts, 2 Epochs"
+      }
+    },
+    "settings": {
+      "decoding": "greedy (temperature 0, do_sample False)",
+      "max_new_tokens": 2048,
+      "image_long_side_px": 1280,
+      "requests": "one receipt at a time",
+      "runtime": "transformers generate, bf16, 1 RTX 3090 per model copy",
+      "parallel": "4 shards (receipt i -> shard i % 4) on 2 nodes x 2 GPUs; each shard runs Base, A and B on its receipts"
+    }
+  },
+  "checksums": {
+    "runs": {
+      "A_eb8_1node": {
+        "sha256": "ee4d15c91d24df3fa0621fa29d5451b1796f2839b0d3bffc11fd606303ddf648",
+        "replicas": 1,
+        "match": true
+      },
+      "A_eb8_2node": {
+        "sha256": "154c78adb7d60e738dc5494d2d717c0a41234ecd481423d8a24a9adc2e6ec656",
+        "replicas": 2,
+        "match": true
+      },
+      "A_eb32_1node": {
+        "sha256": "a28f2be20ad38164d1cba962a90cf54c3252d453d5e732b5b3c7f5ab8a292596",
+        "replicas": 1,
+        "match": true
+      },
+      "A_eb32_2node": {
+        "sha256": "780927690d500789ae2e1b9e9954192530c0c6554e3e59ab3563a4ce1a10602b",
+        "replicas": 2,
+        "match": true
+      },
+      "B_eb8_1node": {
+        "sha256": "59fee9c27733c57ef729faaef7fd58c9da5af197af5a675ff5974f43f8ac3c1a",
+        "replicas": 2,
+        "match": true
+      },
+      "B_eb8_2node": {
+        "sha256": "762519b835cda2b7b1351c4649ac16060aa6a9f869e747c11ce7d617c284a0f2",
+        "replicas": 4,
+        "match": true
+      },
+      "B_eb32_1node": {
+        "sha256": "76a498685ed6e74c2c8ae6d8b0a365df6d175b147198c486962133b92a9ea492",
+        "replicas": 2,
+        "match": true
+      },
+      "B_eb32_2node": {
+        "sha256": "4b8fe7d3b35b96243dbaac2e1fbd0cf2afc7732ce51d9d9ea7fd241c0f7a9291",
+        "replicas": 4,
+        "match": true
+      }
+    },
+    "training_step6": {
+      "A": {
+        "sha256": "ca9cc7ef6ead09b32073b71544289e488194c9067769db7ef7c9cfa3fa38e664",
+        "replicas": 2,
+        "match": true
+      },
+      "B": {
+        "sha256": "abc563bbad54df379e8a78d33c12996cfbf5f8db735be4a61fc80e954e001970",
+        "replicas": 4,
+        "match": true
+      }
+    }
+  },
+  "billing": {
+    "lab_total_billed_usd": 2.437,
+    "node1_usd": 1.232,
+    "node2_usd": 1.197
+  }
+}

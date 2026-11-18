@@ -1,0 +1,305 @@
+[
+  {
+    "case": "A-1gpu",
+    "gpus": 1,
+    "batch": 1,
+    "gradient_checkpointing": false,
+    "steps": 10,
+    "dtype": "bfloat16",
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "targets": "language q_proj,v_proj"
+    },
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "receipt": "train_000",
+    "answer_chars": 1089,
+    "answer_items": 22,
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "lora_on_vision": false,
+    "weights_gib_per_gpu": [
+      16.34
+    ],
+    "weights_gib_total": 16.34,
+    "image_size": [
+      853,
+      1280
+    ],
+    "seq_len": 1685,
+    "prompt_tokens": 1229,
+    "answer_tokens": 456,
+    "image_tokens": 1080,
+    "result": "oom",
+    "error": "CUDA out of memory. Tried to allocate 40.00 MiB. GPU 0 has a total capacity of 23.69 GiB of which 34.00 MiB is free. Process 583958 has 23.49 GiB memory in use. Of the allocated memory 23.00 GiB is allocated by PyTorch, and 188.43 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+    "failed_at_step": 1,
+    "peak_gib_per_gpu": [
+      23.0
+    ],
+    "peak_reserved_gib_per_gpu": [
+      23.18
+    ],
+    "step_times_s": [],
+    "losses": [],
+    "sec_per_step": null,
+    "samples_per_sec": null
+  },
+  {
+    "case": "A-2gpu-split18",
+    "gpus": 2,
+    "batch": 1,
+    "gradient_checkpointing": false,
+    "steps": 10,
+    "dtype": "bfloat16",
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "targets": "language q_proj,v_proj"
+    },
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "receipt": "train_000",
+    "answer_chars": 1089,
+    "answer_items": 22,
+    "layers_gpu0": 18,
+    "layers_gpu1": 18,
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "lora_on_vision": false,
+    "weights_gib_per_gpu": [
+      8.71,
+      7.64
+    ],
+    "weights_gib_total": 16.35,
+    "image_size": [
+      853,
+      1280
+    ],
+    "seq_len": 1685,
+    "prompt_tokens": 1229,
+    "answer_tokens": 456,
+    "image_tokens": 1080,
+    "result": "ok",
+    "error": null,
+    "peak_gib_per_gpu": [
+      14.5,
+      15.73
+    ],
+    "peak_reserved_gib_per_gpu": [
+      14.93,
+      16.45
+    ],
+    "step_times_s": [
+      2.146,
+      1.578,
+      1.581,
+      1.579,
+      1.576,
+      1.572,
+      1.574,
+      1.575,
+      1.573,
+      1.575
+    ],
+    "losses": [
+      0.0173,
+      0.0167,
+      0.0152,
+      0.0118,
+      0.0069,
+      0.0027,
+      0.0007,
+      0.0003,
+      0.0002,
+      0.0001
+    ],
+    "sec_per_step": 1.576,
+    "samples_per_sec": 0.635
+  },
+  {
+    "case": "B-b1",
+    "gpus": 1,
+    "batch": 1,
+    "gradient_checkpointing": true,
+    "steps": 10,
+    "dtype": "bfloat16",
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "targets": "language q_proj,v_proj"
+    },
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "receipt": "train_000",
+    "answer_chars": 1089,
+    "answer_items": 22,
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "lora_on_vision": false,
+    "weights_gib_per_gpu": [
+      16.34
+    ],
+    "weights_gib_total": 16.34,
+    "image_size": [
+      853,
+      1280
+    ],
+    "seq_len": 1685,
+    "prompt_tokens": 1229,
+    "answer_tokens": 456,
+    "image_tokens": 1080,
+    "result": "ok",
+    "error": null,
+    "peak_gib_per_gpu": [
+      20.26
+    ],
+    "peak_reserved_gib_per_gpu": [
+      20.6
+    ],
+    "step_times_s": [
+      2.04,
+      1.59,
+      1.596,
+      1.596,
+      1.601,
+      1.603,
+      1.604,
+      1.604,
+      1.605,
+      1.606
+    ],
+    "losses": [
+      0.0173,
+      0.0162,
+      0.0151,
+      0.0112,
+      0.0064,
+      0.0017,
+      0.0005,
+      0.0002,
+      0.0001,
+      0.0001
+    ],
+    "sec_per_step": 1.601,
+    "samples_per_sec": 0.625
+  },
+  {
+    "case": "B-b2",
+    "gpus": 1,
+    "batch": 2,
+    "gradient_checkpointing": true,
+    "steps": 10,
+    "dtype": "bfloat16",
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "targets": "language q_proj,v_proj"
+    },
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "receipt": "train_000",
+    "answer_chars": 1089,
+    "answer_items": 22,
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "lora_on_vision": false,
+    "weights_gib_per_gpu": [
+      16.34
+    ],
+    "weights_gib_total": 16.34,
+    "image_size": [
+      853,
+      1280
+    ],
+    "seq_len": 1685,
+    "prompt_tokens": 1229,
+    "answer_tokens": 456,
+    "image_tokens": 1080,
+    "result": "oom",
+    "error": "CUDA out of memory. Tried to allocate 1.91 GiB. GPU 0 has a total capacity of 23.69 GiB of which 894.00 MiB is free. Process 584766 has 22.65 GiB memory in use. Of the allocated memory 22.18 GiB is allocated by PyTorch, and 166.59 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+    "failed_at_step": 1,
+    "peak_gib_per_gpu": [
+      22.2
+    ],
+    "peak_reserved_gib_per_gpu": [
+      22.84
+    ],
+    "step_times_s": [],
+    "losses": [],
+    "sec_per_step": null,
+    "samples_per_sec": null
+  },
+  {
+    "case": "A-2gpu-split19",
+    "gpus": 2,
+    "batch": 1,
+    "gradient_checkpointing": false,
+    "steps": 10,
+    "dtype": "bfloat16",
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "targets": "language q_proj,v_proj"
+    },
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "gpu_total_gib": 23.69,
+    "receipt": "train_000",
+    "answer_chars": 1089,
+    "answer_items": 22,
+    "layers_gpu0": 19,
+    "layers_gpu1": 17,
+    "trainable_params": 3833856,
+    "total_params": 8770957552,
+    "lora_on_vision": false,
+    "weights_gib_per_gpu": [
+      9.07,
+      7.28
+    ],
+    "weights_gib_total": 16.35,
+    "image_size": [
+      853,
+      1280
+    ],
+    "seq_len": 1685,
+    "prompt_tokens": 1229,
+    "answer_tokens": 456,
+    "image_tokens": 1080,
+    "result": "ok",
+    "error": null,
+    "peak_gib_per_gpu": [
+      15.14,
+      15.08
+    ],
+    "peak_reserved_gib_per_gpu": [
+      15.58,
+      15.79
+    ],
+    "step_times_s": [
+      2.179,
+      1.551,
+      1.545,
+      1.54,
+      1.543,
+      1.542,
+      1.547,
+      1.546,
+      1.546,
+      1.555
+    ],
+    "losses": [
+      0.0173,
+      0.0168,
+      0.0134,
+      0.0107,
+      0.0059,
+      0.0014,
+      0.0004,
+      0.0002,
+      0.0001,
+      0.0001
+    ],
+    "sec_per_step": 1.546,
+    "samples_per_sec": 0.647
+  }
+]

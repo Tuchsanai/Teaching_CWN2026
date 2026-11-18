@@ -1,0 +1,259 @@
+{
+  "lab": "LAB 5 · cluster fine-tuning of Qwen3-VL-8B (LoRA) on 2 nodes x 2 RTX 3090",
+  "definitions": {
+    "sec_per_update": "mean wall time of one weight update (warm-up updates excluded)",
+    "receipts_per_s": "Effective Batch / sec_per_update",
+    "speedup": "receipts_per_s / receipts_per_s of 1 Node, same approach and Effective Batch",
+    "efficiency": "speedup / nodes",
+    "usd_per_epoch": "800 receipts / receipts_per_s, in hours, x sum of price per hour of all nodes used"
+  },
+  "prices_usd_per_hour": {
+    "node1": 0.4729,
+    "node2": 0.5437,
+    "1_node": 0.4729,
+    "2_nodes": 1.0166
+  },
+  "runs": [
+    {
+      "nodes": 1,
+      "gpus": 2,
+      "replicas": 2,
+      "accum_per_replica": 16,
+      "effective_batch": 32,
+      "updates_total": 6,
+      "warmup_excluded": 2,
+      "updates_measured": 4,
+      "sec_per_update": 20.652749999999997,
+      "compute_s": 19.8705,
+      "comm_s": 0.75225,
+      "comm_breakdown_s": {
+        "send": 0.02425,
+        "wait": 0.7215,
+        "recv": 0.00675
+      },
+      "other_s": 0.029999999999997695,
+      "receipts_per_s": 1.549430463255499,
+      "gpu_util_mean_pct": 90.575,
+      "peak_vram_gib_per_gpu": 20.4,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "77ca8bdbe5af438e1ec2c9f367682fd256d27e5cd07c8f981b58bc1463f55c56",
+      "checksums_match": true,
+      "workers_found": 2,
+      "approach": "B",
+      "run": "B_eb32",
+      "speedup": 1.0,
+      "efficiency": 1.0,
+      "price_usd_per_hour": 0.4729,
+      "epoch_s": 516.3187499999999,
+      "usd_per_epoch": 0.06782420468749999
+    },
+    {
+      "nodes": 2,
+      "gpus": 4,
+      "replicas": 4,
+      "accum_per_replica": 8,
+      "effective_batch": 32,
+      "updates_total": 6,
+      "warmup_excluded": 2,
+      "updates_measured": 4,
+      "sec_per_update": 14.34675,
+      "compute_s": 9.9525625,
+      "comm_s": 4.3516875,
+      "comm_breakdown_s": {
+        "send": 1.0119375,
+        "wait": 2.9344375,
+        "recv": 0.40525
+      },
+      "other_s": 0.04249999999999954,
+      "receipts_per_s": 2.2304703155766985,
+      "gpu_util_mean_pct": 64.45,
+      "peak_vram_gib_per_gpu": 20.4,
+      "grad_mb_per_replica_per_update": [
+        7.668
+      ],
+      "checksum_sha256": "12df8a4c96c325dd39ff704cfdc35cfbd68c268770574a1c3acf61f287d87331",
+      "checksums_match": true,
+      "workers_found": 4,
+      "approach": "B",
+      "run": "B_eb32",
+      "speedup": 1.4395420565633328,
+      "efficiency": 0.7197710282816664,
+      "price_usd_per_hour": 1.0166,
+      "epoch_s": 358.66875,
+      "usd_per_epoch": 0.10128406979166665
+    }
+  ],
+  "estimate_3_nodes": {
+    "note": "CALCULATED from measured 1-Node and 2-Node times, NOT measured. Assumes the third node computes at Node 1 speed; Effective Batch 8 and 32 do not split evenly over 3 or 6 replicas, so the slowest replica gets ceil(EB / replicas) receipts.",
+    "runs": {
+      "B_eb32": {
+        "replicas": 6,
+        "gpus": 6,
+        "receipts_on_slowest_replica": 6,
+        "even_split": false,
+        "compute_per_receipt_s": 1.24190625,
+        "overhead_2node_s": 4.4115,
+        "optimistic": {
+          "sec_per_update": 11.862937500000001,
+          "receipts_per_s": 2.697476910756716,
+          "speedup": 1.7409473833947111,
+          "efficiency": 0.5803157944649037
+        },
+        "pessimistic": {
+          "sec_per_update": 16.2744375,
+          "receipts_per_s": 1.9662737959453283,
+          "speedup": 1.2690300356003086,
+          "efficiency": 0.4230100118667695
+        }
+      }
+    }
+  },
+  "gradient": {
+    "trainable_params": null,
+    "total_params": null,
+    "dtype": "bf16",
+    "mb_per_replica_per_update": 7.668
+  },
+  "network_step5": {
+    "rtt_ms": {
+      "min": 33.9,
+      "median": 34.5,
+      "max": 40.1,
+      "n": 50
+    },
+    "tcp_connect_ms": 38.6,
+    "bulk_payload_mb": 7.6,
+    "bulk_roundtrip_s": [
+      0.785,
+      0.5,
+      0.551,
+      0.58,
+      0.581
+    ],
+    "bulk_one_way_mbps_est": 209.7
+  },
+  "training_step6": {
+    "B": {
+      "replicas": 4,
+      "accum_per_replica": 2,
+      "effective_batch": 8,
+      "updates": 25,
+      "unique_receipts": 200,
+      "train_wall_s": 125.03,
+      "round_wall_s_incl_model_load": 189,
+      "model_load_s_per_replica": [
+        10.0,
+        7.8,
+        10.2,
+        7.7
+      ],
+      "loss_first10_mean": 0.0731,
+      "loss_last10_mean": 0.058,
+      "loss_first": 0.10552,
+      "loss_last": 0.01847,
+      "peak_vram_gib_per_gpu_max": 20.38,
+      "peak_vram_gib_per_replica": [
+        20.38,
+        19.95,
+        20.19,
+        20.32
+      ],
+      "checksums": [
+        "97162bb158b776060d44e0ec7129805002495709d852fc32a5f03fb16c2d4387",
+        "97162bb158b776060d44e0ec7129805002495709d852fc32a5f03fb16c2d4387",
+        "97162bb158b776060d44e0ec7129805002495709d852fc32a5f03fb16c2d4387",
+        "97162bb158b776060d44e0ec7129805002495709d852fc32a5f03fb16c2d4387"
+      ],
+      "checksums_match": true,
+      "adapter_bytes": 15356672
+    }
+  },
+  "evaluation_step7": {
+    "models": {
+      "base": {
+        "label": "Base",
+        "receipts": 100,
+        "json_readable_pct": 100.0,
+        "total_exact_pct": 95.8,
+        "total_receipts_scored": 95,
+        "item_precision_pct": 78.3,
+        "item_recall_pct": 75.6,
+        "item_f1_pct": 77.0,
+        "items_correct": 217,
+        "items_predicted": 277,
+        "items_ground_truth": 287,
+        "sec_per_receipt": 5.09,
+        "new_tokens_mean": 83.8
+      },
+      "B": {
+        "label": "Fine-tuned B",
+        "receipts": 100,
+        "json_readable_pct": 99.0,
+        "total_exact_pct": 93.7,
+        "total_receipts_scored": 95,
+        "item_precision_pct": 85.4,
+        "item_recall_pct": 85.4,
+        "item_f1_pct": 85.4,
+        "items_correct": 245,
+        "items_predicted": 287,
+        "items_ground_truth": 287,
+        "sec_per_receipt": 6.28,
+        "new_tokens_mean": 84.8
+      }
+    },
+    "improvement_points_vs_base": {
+      "B": {
+        "json_readable_pct": -1.0,
+        "total_exact_pct": -2.1,
+        "item_f1_pct": 8.4
+      }
+    },
+    "reference_qwen3_vl_2b": {
+      "2B Base": {
+        "total_exact_pct": 88.4,
+        "item_f1_pct": 69.9
+      },
+      "2B Fine-tuned": {
+        "total_exact_pct": 100.0,
+        "item_f1_pct": 88.4,
+        "training": "800 receipts, 2 Epochs"
+      }
+    },
+    "settings": {
+      "decoding": "greedy (temperature 0, do_sample False)",
+      "max_new_tokens": 2048,
+      "image_long_side_px": 1280,
+      "requests": "one receipt at a time",
+      "runtime": "transformers generate, bf16, 1 RTX 3090 per model copy",
+      "parallel": "one shard per GPU (receipt i -> shard i % shards) on every node; each shard runs Base, A and B on its receipts"
+    }
+  },
+  "checksums": {
+    "runs": {
+      "B_eb32_1node": {
+        "sha256": "77ca8bdbe5af438e1ec2c9f367682fd256d27e5cd07c8f981b58bc1463f55c56",
+        "replicas": 2,
+        "match": true
+      },
+      "B_eb32_2node": {
+        "sha256": "12df8a4c96c325dd39ff704cfdc35cfbd68c268770574a1c3acf61f287d87331",
+        "replicas": 4,
+        "match": true
+      }
+    },
+    "training_step6": {
+      "B": {
+        "sha256": "97162bb158b776060d44e0ec7129805002495709d852fc32a5f03fb16c2d4387",
+        "replicas": 4,
+        "match": true
+      }
+    }
+  },
+  "billing": {
+    "lab_total_billed_usd": 0.822,
+    "node1_usd": 0.42,
+    "node2_usd": 0.39
+  }
+}
