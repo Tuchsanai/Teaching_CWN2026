@@ -1,0 +1,11 @@
+อุ่นระบบ 5 วินาที (N=4 ไม่นับผล)...
+N=1     PASS  thr=20.5 req/s  p50=33 p95=38 p99=38 ms  err=0.00%  | gpu0=8% gpu1=0% | CPU cores server=0.67 nginx=0.02 loadgen=-0.01 | replica {'gpu0-p0': 307} | server=28.0 ms (infer 22.5) batch=1
+N=4     PASS  thr=26.3 req/s  p50=101 p95=113 p99=117 ms  err=0.00%  | gpu0=9% gpu1=0% | CPU cores server=0.85 nginx=0.02 loadgen=-0.01 | replica {'gpu0-p0': 395} | server=94.9 ms (infer 23.8) batch=1
+N=16    PASS  thr=38.3 req/s  p50=417 p95=435 p99=441 ms  err=0.00%  | gpu0=12% gpu1=0% | CPU cores server=1.25 nginx=0.03 loadgen=0.03 | replica {'gpu0-p0': 574} | server=411.7 ms (infer 24.6) batch=1
+N=32    FAIL  thr=38.0 req/s  p50=838 p95=883 p99=890 ms  err=0.00%  | gpu0=12% gpu1=0% | CPU cores server=1.23 nginx=0.03 loadgen=0.03 | replica {'gpu0-p0': 570} | server=836.1 ms (infer 24.7) batch=1
+N=64    FAIL  thr=30.5 req/s  p50=1645 p95=9044 p99=9425 ms  err=0.00%  | gpu0=9% gpu1=0% | CPU cores server=1.19 nginx=0.02 loadgen=0.02 | replica {'gpu0-p0': 458} | server=2597.0 ms (infer 35.5) batch=1
+ซอยรอบ 1: N=24    FAIL  thr=33.5 req/s  p50=624 p95=663 p99=7211 ms  err=0.00%  | gpu0=10% gpu1=0% | CPU cores server=1.19 nginx=0.03 loadgen=0.03 | replica {'gpu0-p0': 502} | server=897.6 ms (infer 29.6) batch=1
+ซอยรอบ 2: N=20    FAIL  thr=39.3 req/s  p50=508 p95=526 p99=533 ms  err=0.00%  | gpu0=12% gpu1=0% | CPU cores server=1.25 nginx=0.03 loadgen=0.04 | replica {'gpu0-p0': 590} | server=501.4 ms (infer 23.8) batch=1
+ซอยรอบ 3: N=18    PASS  thr=39.5 req/s  p50=454 p95=479 p99=494 ms  err=0.00%  | gpu0=13% gpu1=0% | CPU cores server=1.24 nginx=0.03 loadgen=0.03 | replica {'gpu0-p0': 593} | server=449.4 ms (infer 23.7) batch=1
+ความจุ: รองรับผู้ใช้พร้อมกันได้ 18 คน ที่ p95 ≤ 500 ms และ error < 1% · ผล /workspace/lab5/results/base1.json
+DONE

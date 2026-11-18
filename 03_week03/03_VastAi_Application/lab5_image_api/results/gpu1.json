@@ -1,0 +1,418 @@
+{
+  "name": "gpu1",
+  "started": "2026-11-18 02:57:51",
+  "cluster_conf": "REPLICAS=1\nPROCS=4\nMAX_BATCH=32\nMODE=microbatch\nPORTS=\"9000 9001 9002 9003\"\nSTARTED=\"2026-11-18 02:55:59\"\n",
+  "slo": {
+    "p95_ms": 500.0,
+    "error_rate_lt": 0.01,
+    "timeout_s": 10.0
+  },
+  "level_s": 20.0,
+  "warmup_s": 5.0,
+  "levels": [
+    {
+      "users": 1,
+      "loadgen_processes": 1,
+      "window_s": 15.0,
+      "requests": 261,
+      "ok": 261,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 17.4,
+      "latency_ms": {
+        "p50": 37.9,
+        "p95": 45.6,
+        "p99": 48.4
+      },
+      "latency_mean_ms": 38.3,
+      "gpu_util_pct": {
+        "gpu0": 6.2,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 0.59,
+        "nginx": 0.01,
+        "loadgen": -0.0
+      },
+      "per_replica": {
+        "gpu0-p0": 65,
+        "gpu0-p1": 65,
+        "gpu0-p2": 66,
+        "gpu0-p3": 65
+      },
+      "server_ms_mean": 33.6,
+      "inference_ms_mean": 22.5,
+      "batch_mean": 1,
+      "pass": true
+    },
+    {
+      "users": 4,
+      "loadgen_processes": 4,
+      "window_s": 15.0,
+      "requests": 1024,
+      "ok": 1024,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 68.27,
+      "latency_ms": {
+        "p50": 37.9,
+        "p95": 50.2,
+        "p99": 61.2
+      },
+      "latency_mean_ms": 39.0,
+      "gpu_util_pct": {
+        "gpu0": 45.9,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 2.18,
+        "nginx": 0.04,
+        "loadgen": -0.02
+      },
+      "per_replica": {
+        "gpu0-p0": 257,
+        "gpu0-p1": 256,
+        "gpu0-p2": 255,
+        "gpu0-p3": 256
+      },
+      "server_ms_mean": 33.7,
+      "inference_ms_mean": 22.1,
+      "batch_mean": 1.04,
+      "pass": true
+    },
+    {
+      "users": 16,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 3552,
+      "ok": 3552,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 236.8,
+      "latency_ms": {
+        "p50": 66.9,
+        "p95": 84.2,
+        "p99": 96.8
+      },
+      "latency_mean_ms": 67.5,
+      "gpu_util_pct": {
+        "gpu0": 79.6,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 4.98,
+        "nginx": 0.12,
+        "loadgen": 0.14
+      },
+      "per_replica": {
+        "gpu0-p0": 886,
+        "gpu0-p1": 888,
+        "gpu0-p2": 889,
+        "gpu0-p3": 889
+      },
+      "server_ms_mean": 58.4,
+      "inference_ms_mean": 26.0,
+      "batch_mean": 2.29,
+      "pass": true
+    },
+    {
+      "users": 32,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4351,
+      "ok": 4351,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 290.07,
+      "latency_ms": {
+        "p50": 110.4,
+        "p95": 136.2,
+        "p99": 165.9
+      },
+      "latency_mean_ms": 110.3,
+      "gpu_util_pct": {
+        "gpu0": 81.9,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 5.61,
+        "nginx": 0.17,
+        "loadgen": 0.18
+      },
+      "per_replica": {
+        "gpu0-p0": 1087,
+        "gpu0-p1": 1088,
+        "gpu0-p2": 1090,
+        "gpu0-p3": 1086
+      },
+      "server_ms_mean": 93.8,
+      "inference_ms_mean": 42.3,
+      "batch_mean": 4.4,
+      "pass": true
+    },
+    {
+      "users": 64,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4590,
+      "ok": 4590,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 306.0,
+      "latency_ms": {
+        "p50": 207.5,
+        "p95": 275.1,
+        "p99": 503.4
+      },
+      "latency_mean_ms": 209.1,
+      "gpu_util_pct": {
+        "gpu0": 83.4,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 5.88,
+        "nginx": 0.2,
+        "loadgen": 0.21
+      },
+      "per_replica": {
+        "gpu0-p0": 1150,
+        "gpu0-p1": 1141,
+        "gpu0-p2": 1154,
+        "gpu0-p3": 1145
+      },
+      "server_ms_mean": 175.7,
+      "inference_ms_mean": 79.5,
+      "batch_mean": 8.85,
+      "pass": true
+    },
+    {
+      "users": 128,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4669,
+      "ok": 4669,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 311.27,
+      "latency_ms": {
+        "p50": 424.4,
+        "p95": 547.5,
+        "p99": 602.3
+      },
+      "latency_mean_ms": 408.4,
+      "gpu_util_pct": {
+        "gpu0": 81.2,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 6.16,
+        "nginx": 0.22,
+        "loadgen": 0.22
+      },
+      "per_replica": {
+        "gpu0-p0": 1156,
+        "gpu0-p1": 1155,
+        "gpu0-p2": 1178,
+        "gpu0-p3": 1180
+      },
+      "server_ms_mean": 344.9,
+      "inference_ms_mean": 156.4,
+      "batch_mean": 17.61,
+      "pass": false
+    },
+    {
+      "users": 256,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4876,
+      "ok": 4876,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 325.07,
+      "latency_ms": {
+        "p50": 793.9,
+        "p95": 1132.1,
+        "p99": 1258.8
+      },
+      "latency_mean_ms": 780.1,
+      "gpu_util_pct": {
+        "gpu0": 88.6,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 6.29,
+        "nginx": 0.24,
+        "loadgen": 0.22
+      },
+      "per_replica": {
+        "gpu0-p0": 1196,
+        "gpu0-p1": 1227,
+        "gpu0-p2": 1211,
+        "gpu0-p3": 1242
+      },
+      "server_ms_mean": 614.4,
+      "inference_ms_mean": 249.8,
+      "batch_mean": 29.44,
+      "pass": false
+    }
+  ],
+  "bisect": [
+    {
+      "users": 96,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4662,
+      "ok": 4662,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 310.8,
+      "latency_ms": {
+        "p50": 321.3,
+        "p95": 424.1,
+        "p99": 540.0
+      },
+      "latency_mean_ms": 309.2,
+      "gpu_util_pct": {
+        "gpu0": 81.9,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 5.97,
+        "nginx": 0.22,
+        "loadgen": 0.22
+      },
+      "per_replica": {
+        "gpu0-p0": 1161,
+        "gpu0-p1": 1169,
+        "gpu0-p2": 1166,
+        "gpu0-p3": 1166
+      },
+      "server_ms_mean": 259.4,
+      "inference_ms_mean": 115.5,
+      "batch_mean": 12.92,
+      "pass": true
+    },
+    {
+      "users": 112,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4660,
+      "ok": 4660,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 310.67,
+      "latency_ms": {
+        "p50": 366.7,
+        "p95": 572.8,
+        "p99": 686.2
+      },
+      "latency_mean_ms": 360.2,
+      "gpu_util_pct": {
+        "gpu0": 80.0,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 6.04,
+        "nginx": 0.22,
+        "loadgen": 0.22
+      },
+      "per_replica": {
+        "gpu0-p0": 1170,
+        "gpu0-p1": 1165,
+        "gpu0-p2": 1163,
+        "gpu0-p3": 1162
+      },
+      "server_ms_mean": 302.8,
+      "inference_ms_mean": 137.8,
+      "batch_mean": 15.3,
+      "pass": false
+    },
+    {
+      "users": 104,
+      "loadgen_processes": 8,
+      "window_s": 15.0,
+      "requests": 4554,
+      "ok": 4554,
+      "errors": 0,
+      "error_rate": 0.0,
+      "error_kinds": {},
+      "throughput_rps": 303.6,
+      "latency_ms": {
+        "p50": 340.2,
+        "p95": 496.9,
+        "p99": 587.7
+      },
+      "latency_mean_ms": 341.8,
+      "gpu_util_pct": {
+        "gpu0": 78.0,
+        "gpu1": 0
+      },
+      "gpu_mem_mib": {
+        "gpu0": 22384,
+        "gpu1": 400
+      },
+      "cpu_cores": {
+        "server": 6.13,
+        "nginx": 0.22,
+        "loadgen": 0.21
+      },
+      "per_replica": {
+        "gpu0-p0": 1137,
+        "gpu0-p1": 1140,
+        "gpu0-p2": 1139,
+        "gpu0-p3": 1138
+      },
+      "server_ms_mean": 292.0,
+      "inference_ms_mean": 146.8,
+      "batch_mean": 15.05,
+      "pass": true
+    }
+  ],
+  "capacity_users": 104,
+  "finished": "2026-11-18 03:01:29"
+}

@@ -1,0 +1,839 @@
+{
+  "name": "fo_noretry",
+  "mode": "fixed",
+  "started": "2026-11-18 04:08:29",
+  "cluster_conf": "REPLICAS=2\nPROCS=4\nMAX_BATCH=32\nMODE=microbatch\nLB=round_robin\nRETRY=off\nSLOW_REPLICA=-1\nSLOW_MS=0\nPORTS=\"9000 9001 9002 9003 9100 9101 9102 9103\"\nSTARTED=\"2026-11-18 04:05:56\"\n",
+  "users": 11,
+  "duration_s": 45.0,
+  "loadgen_processes": 8,
+  "events": [
+    {
+      "at_s": 15.0,
+      "cmd": "bash code/cluster.sh kill 1",
+      "started_s": 15.003,
+      "started_epoch": 1794974925.568,
+      "finished_s": 15.083,
+      "rc": 0,
+      "output": "04:08:45.646 ปิดกะทันหัน replica 1 (GPU 1) ทั้ง 4 process แล้ว (kill -9)"
+    },
+    {
+      "at_s": 30.0,
+      "cmd": "bash code/cluster.sh start 1 --wait",
+      "started_s": 30.004,
+      "started_epoch": 1794974940.569,
+      "finished_s": 121.519,
+      "rc": 0,
+      "output": "04:09:00.595 สั่งเปิด replica 1 (GPU 1) คืนแล้ว (4 process กำลังโหลดโมเดล · nice 10 · 2 thread)\n04:10:32.080 replica 1 พร้อมรับงานครบทุก process"
+    }
+  ],
+  "requests_total": 14822,
+  "ok_total": 9348,
+  "errors_total": 5474,
+  "error_kinds_total": {
+    "http502": 3255,
+    "http503": 2219
+  },
+  "phases": {
+    "before_failure": {
+      "from_s": 0.0,
+      "to_s": 15.0,
+      "requests": 3865,
+      "ok": 3865,
+      "errors": 0,
+      "throughput_rps": 257.67,
+      "p95_ms": 56.6
+    },
+    "during_failure": {
+      "from_s": 15.0,
+      "to_s": 30.0,
+      "requests": 5607,
+      "ok": 2804,
+      "errors": 2803,
+      "throughput_rps": 186.93,
+      "p95_ms": 72.7
+    },
+    "after_restart": {
+      "from_s": 30.0,
+      "to_s": 45.0,
+      "requests": 5339,
+      "ok": 2669,
+      "errors": 2670,
+      "throughput_rps": 177.93,
+      "p95_ms": 73.1
+    }
+  },
+  "track": {
+    "event1": {
+      "cmd": "bash code/cluster.sh kill 1",
+      "at_s": 15.0,
+      "last_ok_before_s": 14.981,
+      "first_ok_after_s": 15.009
+    },
+    "event2": {
+      "cmd": "bash code/cluster.sh start 1 --wait",
+      "at_s": 30.0,
+      "last_ok_before_s": 15.044,
+      "first_ok_after_s": null
+    },
+    "restart_cmd_took_s": 91.52
+  },
+  "worst_second_p95": {
+    "t": 34,
+    "p95_ms": 77.7
+  },
+  "per_second": [
+    {
+      "t": 0,
+      "ok": 253,
+      "ok_by_replica": {
+        "gpu0": 127,
+        "gpu1": 126
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 55.5,
+      "p50_ms": 40.1,
+      "gpu_util_pct": {
+        "gpu0": 39.5,
+        "gpu1": 35
+      }
+    },
+    {
+      "t": 1,
+      "ok": 272,
+      "ok_by_replica": {
+        "gpu0": 136,
+        "gpu1": 136
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 49.3,
+      "p50_ms": 40.2,
+      "gpu_util_pct": {
+        "gpu0": 76,
+        "gpu1": 75
+      }
+    },
+    {
+      "t": 2,
+      "ok": 259,
+      "ok_by_replica": {
+        "gpu0": 129,
+        "gpu1": 130
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 53.7,
+      "p50_ms": 42.4,
+      "gpu_util_pct": {
+        "gpu0": 77,
+        "gpu1": 81.5
+      }
+    },
+    {
+      "t": 3,
+      "ok": 262,
+      "ok_by_replica": {
+        "gpu0": 131,
+        "gpu1": 131
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 53.5,
+      "p50_ms": 41.3,
+      "gpu_util_pct": {
+        "gpu0": 81,
+        "gpu1": 77
+      }
+    },
+    {
+      "t": 4,
+      "ok": 265,
+      "ok_by_replica": {
+        "gpu0": 133,
+        "gpu1": 132
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 56.8,
+      "p50_ms": 39.6,
+      "gpu_util_pct": {
+        "gpu0": 80,
+        "gpu1": 77.5
+      }
+    },
+    {
+      "t": 5,
+      "ok": 254,
+      "ok_by_replica": {
+        "gpu0": 126,
+        "gpu1": 128
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 56.9,
+      "p50_ms": 42.3,
+      "gpu_util_pct": {
+        "gpu0": 76.5,
+        "gpu1": 85.5
+      }
+    },
+    {
+      "t": 6,
+      "ok": 250,
+      "ok_by_replica": {
+        "gpu0": 126,
+        "gpu1": 124
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 58.6,
+      "p50_ms": 42.6,
+      "gpu_util_pct": {
+        "gpu0": 74,
+        "gpu1": 82
+      }
+    },
+    {
+      "t": 7,
+      "ok": 254,
+      "ok_by_replica": {
+        "gpu0": 127,
+        "gpu1": 127
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 57.4,
+      "p50_ms": 40.6,
+      "gpu_util_pct": {
+        "gpu0": 81.5,
+        "gpu1": 84
+      }
+    },
+    {
+      "t": 8,
+      "ok": 250,
+      "ok_by_replica": {
+        "gpu0": 124,
+        "gpu1": 126
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 59.6,
+      "p50_ms": 42.0,
+      "gpu_util_pct": {
+        "gpu0": 71.5,
+        "gpu1": 81
+      }
+    },
+    {
+      "t": 9,
+      "ok": 250,
+      "ok_by_replica": {
+        "gpu0": 127,
+        "gpu1": 123
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 61.1,
+      "p50_ms": 42.7,
+      "gpu_util_pct": {
+        "gpu0": 76.5,
+        "gpu1": 84
+      }
+    },
+    {
+      "t": 10,
+      "ok": 257,
+      "ok_by_replica": {
+        "gpu0": 128,
+        "gpu1": 129
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 56.3,
+      "p50_ms": 41.0,
+      "gpu_util_pct": {
+        "gpu0": 75.5,
+        "gpu1": 78
+      }
+    },
+    {
+      "t": 11,
+      "ok": 255,
+      "ok_by_replica": {
+        "gpu0": 128,
+        "gpu1": 127
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 58.8,
+      "p50_ms": 41.0,
+      "gpu_util_pct": {
+        "gpu0": 90,
+        "gpu1": 62.5
+      }
+    },
+    {
+      "t": 12,
+      "ok": 263,
+      "ok_by_replica": {
+        "gpu0": 130,
+        "gpu1": 133
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 53.8,
+      "p50_ms": 41.1,
+      "gpu_util_pct": {
+        "gpu0": 88,
+        "gpu1": 78
+      }
+    },
+    {
+      "t": 13,
+      "ok": 265,
+      "ok_by_replica": {
+        "gpu0": 133,
+        "gpu1": 132
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 53.0,
+      "p50_ms": 40.1,
+      "gpu_util_pct": {
+        "gpu0": 76,
+        "gpu1": 86
+      }
+    },
+    {
+      "t": 14,
+      "ok": 256,
+      "ok_by_replica": {
+        "gpu0": 128,
+        "gpu1": 128
+      },
+      "errors": 0,
+      "error_kinds": {},
+      "p95_ms": 57.4,
+      "p50_ms": 41.7,
+      "gpu_util_pct": {
+        "gpu0": 75,
+        "gpu1": 84
+      }
+    },
+    {
+      "t": 15,
+      "ok": 192,
+      "ok_by_replica": {
+        "gpu0": 187,
+        "gpu1": 5
+      },
+      "errors": 191,
+      "error_kinds": {
+        "http502": 191
+      },
+      "p95_ms": 76.2,
+      "p50_ms": 56.5,
+      "gpu_util_pct": {
+        "gpu0": 83,
+        "gpu1": 33.5
+      }
+    },
+    {
+      "t": 16,
+      "ok": 197,
+      "ok_by_replica": {
+        "gpu0": 197
+      },
+      "errors": 196,
+      "error_kinds": {
+        "http502": 196
+      },
+      "p95_ms": 68.0,
+      "p50_ms": 54.6,
+      "gpu_util_pct": {
+        "gpu0": 79,
+        "gpu1": 77.5
+      }
+    },
+    {
+      "t": 17,
+      "ok": 193,
+      "ok_by_replica": {
+        "gpu0": 193
+      },
+      "errors": 196,
+      "error_kinds": {
+        "http502": 196
+      },
+      "p95_ms": 71.6,
+      "p50_ms": 55.9,
+      "gpu_util_pct": {
+        "gpu0": 75,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 18,
+      "ok": 199,
+      "ok_by_replica": {
+        "gpu0": 199
+      },
+      "errors": 197,
+      "error_kinds": {
+        "http502": 197
+      },
+      "p95_ms": 69.9,
+      "p50_ms": 56.7,
+      "gpu_util_pct": {
+        "gpu0": 83.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 19,
+      "ok": 186,
+      "ok_by_replica": {
+        "gpu0": 186
+      },
+      "errors": 187,
+      "error_kinds": {
+        "http502": 187
+      },
+      "p95_ms": 69.7,
+      "p50_ms": 59.0,
+      "gpu_util_pct": {
+        "gpu0": 78.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 20,
+      "ok": 186,
+      "ok_by_replica": {
+        "gpu0": 186
+      },
+      "errors": 188,
+      "error_kinds": {
+        "http502": 188
+      },
+      "p95_ms": 75.4,
+      "p50_ms": 58.3,
+      "gpu_util_pct": {
+        "gpu0": 75.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 21,
+      "ok": 187,
+      "ok_by_replica": {
+        "gpu0": 187
+      },
+      "errors": 184,
+      "error_kinds": {
+        "http502": 184
+      },
+      "p95_ms": 70.1,
+      "p50_ms": 58.4,
+      "gpu_util_pct": {
+        "gpu0": 78,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 22,
+      "ok": 185,
+      "ok_by_replica": {
+        "gpu0": 185
+      },
+      "errors": 188,
+      "error_kinds": {
+        "http502": 188
+      },
+      "p95_ms": 73.6,
+      "p50_ms": 59.7,
+      "gpu_util_pct": {
+        "gpu0": 78,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 23,
+      "ok": 185,
+      "ok_by_replica": {
+        "gpu0": 185
+      },
+      "errors": 184,
+      "error_kinds": {
+        "http502": 184
+      },
+      "p95_ms": 71.2,
+      "p50_ms": 60.8,
+      "gpu_util_pct": {
+        "gpu0": 79.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 24,
+      "ok": 185,
+      "ok_by_replica": {
+        "gpu0": 185
+      },
+      "errors": 184,
+      "error_kinds": {
+        "http502": 184
+      },
+      "p95_ms": 71.5,
+      "p50_ms": 60.0,
+      "gpu_util_pct": {
+        "gpu0": 79.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 25,
+      "ok": 178,
+      "ok_by_replica": {
+        "gpu0": 178
+      },
+      "errors": 180,
+      "error_kinds": {
+        "http502": 180
+      },
+      "p95_ms": 75.7,
+      "p50_ms": 61.6,
+      "gpu_util_pct": {
+        "gpu0": 86,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 26,
+      "ok": 178,
+      "ok_by_replica": {
+        "gpu0": 178
+      },
+      "errors": 176,
+      "error_kinds": {
+        "http502": 176
+      },
+      "p95_ms": 75.2,
+      "p50_ms": 61.6,
+      "gpu_util_pct": {
+        "gpu0": 82,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 27,
+      "ok": 194,
+      "ok_by_replica": {
+        "gpu0": 194
+      },
+      "errors": 196,
+      "error_kinds": {
+        "http502": 196
+      },
+      "p95_ms": 72.4,
+      "p50_ms": 56.9,
+      "gpu_util_pct": {
+        "gpu0": 80,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 28,
+      "ok": 176,
+      "ok_by_replica": {
+        "gpu0": 176
+      },
+      "errors": 176,
+      "error_kinds": {
+        "http502": 176
+      },
+      "p95_ms": 72.5,
+      "p50_ms": 61.7,
+      "gpu_util_pct": {
+        "gpu0": 76.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 29,
+      "ok": 183,
+      "ok_by_replica": {
+        "gpu0": 183
+      },
+      "errors": 180,
+      "error_kinds": {
+        "http502": 180
+      },
+      "p95_ms": 75.1,
+      "p50_ms": 60.0,
+      "gpu_util_pct": {
+        "gpu0": 84,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 30,
+      "ok": 180,
+      "ok_by_replica": {
+        "gpu0": 180
+      },
+      "errors": 180,
+      "error_kinds": {
+        "http502": 180
+      },
+      "p95_ms": 74.9,
+      "p50_ms": 62.1,
+      "gpu_util_pct": {
+        "gpu0": 79.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 31,
+      "ok": 173,
+      "ok_by_replica": {
+        "gpu0": 173
+      },
+      "errors": 174,
+      "error_kinds": {
+        "http502": 174
+      },
+      "p95_ms": 73.0,
+      "p50_ms": 63.3,
+      "gpu_util_pct": {
+        "gpu0": 85,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 32,
+      "ok": 186,
+      "ok_by_replica": {
+        "gpu0": 186
+      },
+      "errors": 186,
+      "error_kinds": {
+        "http502": 98,
+        "http503": 88
+      },
+      "p95_ms": 72.8,
+      "p50_ms": 61.3,
+      "gpu_util_pct": {
+        "gpu0": 76.5,
+        "gpu1": 0.5
+      }
+    },
+    {
+      "t": 33,
+      "ok": 171,
+      "ok_by_replica": {
+        "gpu0": 171
+      },
+      "errors": 155,
+      "error_kinds": {
+        "http503": 155
+      },
+      "p95_ms": 75.2,
+      "p50_ms": 60.4,
+      "gpu_util_pct": {
+        "gpu0": 82,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 34,
+      "ok": 132,
+      "ok_by_replica": {
+        "gpu0": 132
+      },
+      "errors": 144,
+      "error_kinds": {
+        "http503": 144
+      },
+      "p95_ms": 77.7,
+      "p50_ms": 54.3,
+      "gpu_util_pct": {
+        "gpu0": 90.5,
+        "gpu1": 19.5
+      }
+    },
+    {
+      "t": 35,
+      "ok": 179,
+      "ok_by_replica": {
+        "gpu0": 179
+      },
+      "errors": 182,
+      "error_kinds": {
+        "http503": 182
+      },
+      "p95_ms": 74.3,
+      "p50_ms": 59.5,
+      "gpu_util_pct": {
+        "gpu0": 64,
+        "gpu1": 0.5
+      }
+    },
+    {
+      "t": 36,
+      "ok": 189,
+      "ok_by_replica": {
+        "gpu0": 189
+      },
+      "errors": 191,
+      "error_kinds": {
+        "http503": 191
+      },
+      "p95_ms": 72.9,
+      "p50_ms": 56.0,
+      "gpu_util_pct": {
+        "gpu0": 83,
+        "gpu1": 2
+      }
+    },
+    {
+      "t": 37,
+      "ok": 185,
+      "ok_by_replica": {
+        "gpu0": 185
+      },
+      "errors": 184,
+      "error_kinds": {
+        "http503": 184
+      },
+      "p95_ms": 70.5,
+      "p50_ms": 59.2,
+      "gpu_util_pct": {
+        "gpu0": 79,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 38,
+      "ok": 191,
+      "ok_by_replica": {
+        "gpu0": 191
+      },
+      "errors": 192,
+      "error_kinds": {
+        "http503": 192
+      },
+      "p95_ms": 70.6,
+      "p50_ms": 57.9,
+      "gpu_util_pct": {
+        "gpu0": 82.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 39,
+      "ok": 188,
+      "ok_by_replica": {
+        "gpu0": 188
+      },
+      "errors": 187,
+      "error_kinds": {
+        "http503": 187
+      },
+      "p95_ms": 70.2,
+      "p50_ms": 58.9,
+      "gpu_util_pct": {
+        "gpu0": 79.5,
+        "gpu1": 5
+      }
+    },
+    {
+      "t": 40,
+      "ok": 185,
+      "ok_by_replica": {
+        "gpu0": 185
+      },
+      "errors": 183,
+      "error_kinds": {
+        "http503": 183
+      },
+      "p95_ms": 70.8,
+      "p50_ms": 59.3,
+      "gpu_util_pct": {
+        "gpu0": 77.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 41,
+      "ok": 176,
+      "ok_by_replica": {
+        "gpu0": 176
+      },
+      "errors": 178,
+      "error_kinds": {
+        "http503": 178
+      },
+      "p95_ms": 72.2,
+      "p50_ms": 61.3,
+      "gpu_util_pct": {
+        "gpu0": 84.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 42,
+      "ok": 175,
+      "ok_by_replica": {
+        "gpu0": 175
+      },
+      "errors": 176,
+      "error_kinds": {
+        "http503": 176
+      },
+      "p95_ms": 76.5,
+      "p50_ms": 61.5,
+      "gpu_util_pct": {
+        "gpu0": 80.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 43,
+      "ok": 181,
+      "ok_by_replica": {
+        "gpu0": 181
+      },
+      "errors": 180,
+      "error_kinds": {
+        "http503": 180
+      },
+      "p95_ms": 75.5,
+      "p50_ms": 61.6,
+      "gpu_util_pct": {
+        "gpu0": 85.5,
+        "gpu1": 0
+      }
+    },
+    {
+      "t": 44,
+      "ok": 178,
+      "ok_by_replica": {
+        "gpu0": 178
+      },
+      "errors": 178,
+      "error_kinds": {
+        "http503": 178
+      },
+      "p95_ms": 73.7,
+      "p50_ms": 60.8,
+      "gpu_util_pct": {
+        "gpu0": 80.5,
+        "gpu1": 13
+      }
+    }
+  ],
+  "finished": "2026-11-18 04:10:32"
+}

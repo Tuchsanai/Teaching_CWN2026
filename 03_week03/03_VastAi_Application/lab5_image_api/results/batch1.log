@@ -1,0 +1,12 @@
+อุ่นระบบ 5 วินาที (N=4 ไม่นับผล)...
+N=1     PASS  thr=18.7 req/s  p50=37 p95=44 p99=46 ms  err=0.00%  | gpu0=6% gpu1=0% | CPU cores server=0.57 nginx=0.02 loadgen=-0.00 | replica {'gpu0-p0': 280} | server=30.7 ms (infer 19.7) batch=1
+N=4     PASS  thr=42.3 req/s  p50=64 p95=72 p99=75 ms  err=0.00%  | gpu0=11% gpu1=0% | CPU cores server=0.92 nginx=0.02 loadgen=-0.01 | replica {'gpu0-p0': 634} | server=54.9 ms (infer 23.8) batch=2.5
+N=16    PASS  thr=107.9 req/s  p50=148 p95=172 p99=188 ms  err=0.00%  | gpu0=22% gpu1=0% | CPU cores server=1.76 nginx=0.07 loadgen=0.07 | replica {'gpu0-p0': 1619} | server=120.3 ms (infer 57.1) batch=9.99
+N=32    PASS  thr=113.1 req/s  p50=279 p95=309 p99=539 ms  err=0.00%  | gpu0=24% gpu1=0% | CPU cores server=1.75 nginx=0.07 loadgen=0.07 | replica {'gpu0-p0': 1696} | server=213.3 ms (infer 148.3) batch=30.06
+N=64    FAIL  thr=147.2 req/s  p50=414 p95=607 p99=632 ms  err=0.00%  | gpu0=24% gpu1=0% | CPU cores server=2.00 nginx=0.10 loadgen=0.10 | replica {'gpu0-p0': 2208} | server=326.8 ms (infer 167.1) batch=32
+N=128   FAIL  thr=140.8 req/s  p50=876 p95=1068 p99=1079 ms  err=0.00%  | gpu0=28% gpu1=0% | CPU cores server=1.93 nginx=0.09 loadgen=0.10 | replica {'gpu0-p0': 2112} | server=798.5 ms (infer 175.3) batch=32
+ซอยรอบ 1: N=48    PASS  thr=148.3 req/s  p50=315 p95=492 p99=521 ms  err=0.00%  | gpu0=32% gpu1=0% | CPU cores server=1.99 nginx=0.10 loadgen=0.10 | replica {'gpu0-p0': 2224} | server=254.6 ms (infer 120.5) batch=26.59
+ซอยรอบ 2: N=56    FAIL  thr=156.8 req/s  p50=343 p95=527 p99=553 ms  err=0.00%  | gpu0=31% gpu1=0% | CPU cores server=2.06 nginx=0.11 loadgen=0.11 | replica {'gpu0-p0': 2352} | server=286.3 ms (infer 131.5) batch=28.57
+ซอยรอบ 3: N=52    PASS  thr=157.3 req/s  p50=323 p95=365 p99=550 ms  err=0.00%  | gpu0=36% gpu1=0% | CPU cores server=2.06 nginx=0.10 loadgen=0.11 | replica {'gpu0-p0': 2360} | server=261.9 ms (infer 122.6) batch=27.32
+ความจุ: รองรับผู้ใช้พร้อมกันได้ 52 คน ที่ p95 ≤ 500 ms และ error < 1% · ผล /workspace/lab5/results/batch1.json
+DONE
