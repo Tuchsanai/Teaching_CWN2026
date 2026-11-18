@@ -1,0 +1,44 @@
+{
+  "run": "bench_1gpu_smoke",
+  "gpus": 1,
+  "gpu_names": [
+    "NVIDIA GeForce RTX 3090"
+  ],
+  "model": "yolo11m.pt",
+  "epochs": 2,
+  "imgsz": 640,
+  "batch_per_gpu": 32,
+  "batch_total": 32,
+  "seed": 0,
+  "workers_per_gpu": 8,
+  "fraction": 0.05,
+  "train_images": 737,
+  "steps_per_epoch": 24,
+  "epoch_seconds": [
+    14.76,
+    19.4
+  ],
+  "sec_per_epoch": 17.08,
+  "sec_per_step": 0.7117,
+  "images_per_sec": 43.1,
+  "map50": 0.0,
+  "map50_95": 0.0,
+  "gpu_util_mean": {
+    "gpu0": 34.9
+  },
+  "cpu_cores_used": 2.25,
+  "machine_cpu_threads": 16,
+  "steady_window": {
+    "what": "whole run (too few epochs for a steady window)",
+    "seconds": 43.2
+  },
+  "allreduce_80mb": null,
+  "wall_seconds": 55.2,
+  "versions": {
+    "ultralytics": "8.4.215",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "gpu_topology": "\t\u001b[4mGPU0\tGPU1\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\u001b[0m\nGPU0\t X \tPHB\t0-15\t0\t\tN/A\nGPU1\tPHB\t X \t0-15\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "finished_at": "2026-11-18 02:00:28"
+}

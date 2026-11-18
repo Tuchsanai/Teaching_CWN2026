@@ -1,0 +1,53 @@
+{
+  "run": "bench_2gpu_smoke",
+  "gpus": 2,
+  "gpu_names": [
+    "NVIDIA GeForce RTX 3090",
+    "NVIDIA GeForce RTX 3090"
+  ],
+  "model": "yolo11m.pt",
+  "epochs": 2,
+  "imgsz": 640,
+  "batch_per_gpu": 32,
+  "batch_total": 64,
+  "seed": 0,
+  "workers_per_gpu": 8,
+  "fraction": 0.05,
+  "train_images": 737,
+  "steps_per_epoch": 12,
+  "epoch_seconds": [
+    12.19,
+    11.03
+  ],
+  "sec_per_epoch": 11.61,
+  "sec_per_step": 0.9675,
+  "images_per_sec": 63.5,
+  "map50": 0.0,
+  "map50_95": 0.0,
+  "gpu_util_mean": {
+    "gpu0": 25.9,
+    "gpu1": 32.0
+  },
+  "cpu_cores_used": 4.15,
+  "machine_cpu_threads": 16,
+  "steady_window": {
+    "what": "whole run (too few epochs for a steady window)",
+    "seconds": 32.1
+  },
+  "allreduce_80mb": {
+    "size_mb": 80,
+    "iters": 50,
+    "median_ms": 22.49,
+    "mean_ms": 22.46,
+    "min_ms": 21.92,
+    "busbw_GBps": 3.73
+  },
+  "wall_seconds": 44.1,
+  "versions": {
+    "ultralytics": "8.4.215",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "gpu_topology": "\t\u001b[4mGPU0\tGPU1\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\u001b[0m\nGPU0\t X \tPHB\t0-15\t0\t\tN/A\nGPU1\tPHB\t X \t0-15\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "finished_at": "2026-11-18 02:01:20"
+}
