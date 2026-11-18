@@ -1,0 +1,311 @@
+{
+  "api": "http://127.0.0.1:8000",
+  "mode": "hybrid",
+  "slo": {
+    "p95_sec_max": 10.0,
+    "failed_pct_lt": 1.0
+  },
+  "user_model": {
+    "think_sec": [
+      2.5,
+      7.5
+    ],
+    "timeout_sec": 30.0,
+    "prompts": 12
+  },
+  "level_sec": 20.0,
+  "warmup_sec": 5.0,
+  "cpu_count": 16,
+  "levels": [
+    {
+      "users": 16,
+      "requests_measured": 45,
+      "images_ok": 45,
+      "failed": 0,
+      "images_per_sec": 3.0,
+      "p50_sec": 0.451,
+      "p95_sec": 0.834,
+      "p99_sec": 1.034,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        45.5,
+        39.4
+      ],
+      "loadgen_cpu_pct_of_one_core": 0.8,
+      "loadgen_cpu_pct_of_machine": 0.05,
+      "drain_sec": 0.0,
+      "slo_pass": true,
+      "avg_images_per_batch": 1.02,
+      "batches_measured": 43
+    },
+    {
+      "users": 32,
+      "requests_measured": 80,
+      "images_ok": 80,
+      "failed": 0,
+      "images_per_sec": 5.33,
+      "p50_sec": 0.869,
+      "p95_sec": 1.655,
+      "p99_sec": 1.808,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        70.9,
+        65.1
+      ],
+      "loadgen_cpu_pct_of_one_core": 1.4,
+      "loadgen_cpu_pct_of_machine": 0.09,
+      "drain_sec": 0.0,
+      "slo_pass": true,
+      "avg_images_per_batch": 1.51,
+      "batches_measured": 53
+    },
+    {
+      "users": 64,
+      "requests_measured": 116,
+      "images_ok": 116,
+      "failed": 0,
+      "images_per_sec": 7.73,
+      "p50_sec": 2.968,
+      "p95_sec": 4.198,
+      "p99_sec": 4.55,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        98.2,
+        98.6
+      ],
+      "loadgen_cpu_pct_of_one_core": 1.8,
+      "loadgen_cpu_pct_of_machine": 0.11,
+      "drain_sec": 0.0,
+      "slo_pass": true,
+      "avg_images_per_batch": 4.0,
+      "batches_measured": 29
+    },
+    {
+      "users": 96,
+      "requests_measured": 116,
+      "images_ok": 116,
+      "failed": 0,
+      "images_per_sec": 7.73,
+      "p50_sec": 6.277,
+      "p95_sec": 7.712,
+      "p99_sec": 7.762,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        93.3,
+        93.8
+      ],
+      "loadgen_cpu_pct_of_one_core": 1.9,
+      "loadgen_cpu_pct_of_machine": 0.12,
+      "drain_sec": 0.0,
+      "slo_pass": true,
+      "avg_images_per_batch": 4.0,
+      "batches_measured": 30
+    },
+    {
+      "users": 112,
+      "requests_measured": 112,
+      "images_ok": 112,
+      "failed": 0,
+      "images_per_sec": 7.47,
+      "p50_sec": 6.747,
+      "p95_sec": 9.608,
+      "p99_sec": 9.936,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        91.5,
+        93.5
+      ],
+      "loadgen_cpu_pct_of_one_core": 1.9,
+      "loadgen_cpu_pct_of_machine": 0.12,
+      "drain_sec": 0.0,
+      "slo_pass": true,
+      "avg_images_per_batch": 4.0,
+      "batches_measured": 29,
+      "refine": true
+    },
+    {
+      "users": 120,
+      "requests_measured": 112,
+      "images_ok": 112,
+      "failed": 0,
+      "images_per_sec": 7.47,
+      "p50_sec": 7.174,
+      "p95_sec": 10.628,
+      "p99_sec": 11.009,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        91.6,
+        95.5
+      ],
+      "loadgen_cpu_pct_of_one_core": 2.1,
+      "loadgen_cpu_pct_of_machine": 0.13,
+      "drain_sec": 0.0,
+      "slo_pass": false,
+      "avg_images_per_batch": 4.0,
+      "batches_measured": 30,
+      "refine": true
+    },
+    {
+      "users": 128,
+      "requests_measured": 118,
+      "images_ok": 118,
+      "failed": 0,
+      "images_per_sec": 7.87,
+      "p50_sec": 7.389,
+      "p95_sec": 11.295,
+      "p99_sec": 11.846,
+      "failed_pct": 0.0,
+      "gpu_util_pct": [
+        91.6,
+        93.6
+      ],
+      "loadgen_cpu_pct_of_one_core": 1.9,
+      "loadgen_cpu_pct_of_machine": 0.12,
+      "drain_sec": 0.0,
+      "slo_pass": false,
+      "avg_images_per_batch": 4.0,
+      "batches_measured": 29
+    }
+  ],
+  "max_users_meeting_slo": 112,
+  "first_failing_users": 120,
+  "server_stats_after": {
+    "waiting": {
+      "normal": 0,
+      "express": 0,
+      "in_rabbitmq": 0
+    },
+    "running": 0,
+    "done": 1209,
+    "rejected_429": 0,
+    "redelivered": 0,
+    "dead": {
+      "jobs": 0,
+      "in_dead_letter_queue": 0
+    },
+    "cap_normal_now": 200,
+    "live_workers": 2,
+    "sec_per_image": 0.248,
+    "workers": [
+      {
+        "worker": "gpu0",
+        "state": "idle",
+        "job_id": null,
+        "done": 607,
+        "last_seen": 1794969087.2067516,
+        "working": 0,
+        "alive": true,
+        "last_seen_sec_ago": 0.6
+      },
+      {
+        "worker": "gpu1",
+        "state": "idle",
+        "job_id": null,
+        "done": 602,
+        "last_seen": 1794969087.6097136,
+        "working": 0,
+        "alive": true,
+        "last_seen_sec_ago": 0.2
+      }
+    ],
+    "recent_done": [
+      {
+        "id": "cbc2024a02a4",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.252,
+        "prompt": "a basket of fresh strawberries at a farmers market, photo",
+        "total_seconds": 10.02
+      },
+      {
+        "id": "7a34f1578d70",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.252,
+        "prompt": "a yellow taxi on a rainy city street at night, photo",
+        "total_seconds": 10.13
+      },
+      {
+        "id": "5e64c6f7898f",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.252,
+        "prompt": "a snowy mountain peak above a calm blue lake, photo",
+        "total_seconds": 10.27
+      },
+      {
+        "id": "70462c89a993",
+        "priority": "normal",
+        "worker": "gpu1",
+        "seconds": 0.249,
+        "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+        "total_seconds": 9.89
+      },
+      {
+        "id": "06f3ac090776",
+        "priority": "normal",
+        "worker": "gpu1",
+        "seconds": 0.249,
+        "prompt": "a golden retriever running on a sandy beach, photo",
+        "total_seconds": 10.14
+      },
+      {
+        "id": "424619aa6041",
+        "priority": "normal",
+        "worker": "gpu1",
+        "seconds": 0.249,
+        "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+        "total_seconds": 10.15
+      },
+      {
+        "id": "d6a66e4c9cdb",
+        "priority": "normal",
+        "worker": "gpu1",
+        "seconds": 0.249,
+        "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+        "total_seconds": 10.17
+      },
+      {
+        "id": "876e51224979",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.247,
+        "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+        "total_seconds": 10.51
+      },
+      {
+        "id": "e9b0a2b13891",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.247,
+        "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+        "total_seconds": 10.78
+      },
+      {
+        "id": "a70cef9bb5fe",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.247,
+        "prompt": "a field of sunflowers under a clear summer sky, photo",
+        "total_seconds": 10.79
+      },
+      {
+        "id": "1e14993ac9f3",
+        "priority": "normal",
+        "worker": "gpu0",
+        "seconds": 0.247,
+        "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+        "total_seconds": 10.78
+      },
+      {
+        "id": "f8de8d88b44b",
+        "priority": "normal",
+        "worker": "gpu1",
+        "seconds": 0.249,
+        "prompt": "an old wooden sailboat docked in a small harbor, photo",
+        "total_seconds": 10.01
+      }
+    ]
+  },
+  "finished": "2026-11-18 02:31:27"
+}

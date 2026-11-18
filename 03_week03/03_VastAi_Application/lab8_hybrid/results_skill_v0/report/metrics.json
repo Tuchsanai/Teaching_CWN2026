@@ -1,0 +1,236 @@
+{
+ "slo": {
+  "p95_sec_max": 10.0,
+  "failed_pct_lt": 1.0
+ },
+ "capacity_table": [
+  {
+   "gpus": 1,
+   "architecture": "Synchronous API, 1 GPU (baseline)",
+   "capacity_users": 40,
+   "max_images_per_sec": 2.93,
+   "p95_at_capacity_sec": 9.077,
+   "x_baseline_capacity": 1.0,
+   "efficiency_vs_hybrid_1gpu_pct": null
+  },
+  {
+   "gpus": 2,
+   "architecture": "Hybrid queue, 2 GPU workers",
+   "capacity_users": 112,
+   "max_images_per_sec": 7.87,
+   "p95_at_capacity_sec": 9.608,
+   "x_baseline_capacity": 2.8,
+   "efficiency_vs_hybrid_1gpu_pct": null
+  }
+ ],
+ "estimate_3_gpus": null,
+ "ladders": {
+  "sync": {
+   "label": "Synchronous API, 1 GPU (baseline)",
+   "gpus": 1,
+   "capacity_users": 40,
+   "first_failing_users": 48,
+   "p95_at_capacity_sec": 9.077,
+   "p50_at_capacity_sec": 6.209,
+   "max_images_per_sec": 2.93,
+   "gpu_util_at_capacity_pct": [
+    78.5
+   ],
+   "levels": [
+    {
+     "users": 16,
+     "images_per_sec": 2.73,
+     "p50_sec": 0.976,
+     "p95_sec": 1.745,
+     "p99_sec": 1.972,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      74.2,
+      0.0
+     ],
+     "avg_images_per_batch": null,
+     "slo_pass": true
+    },
+    {
+     "users": 32,
+     "images_per_sec": 2.87,
+     "p50_sec": 4.974,
+     "p95_sec": 6.023,
+     "p99_sec": 6.098,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      80.5,
+      0.0
+     ],
+     "avg_images_per_batch": null,
+     "slo_pass": true
+    },
+    {
+     "users": 40,
+     "images_per_sec": 2.8,
+     "p50_sec": 6.209,
+     "p95_sec": 9.077,
+     "p99_sec": 9.241,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      78.5,
+      0.0
+     ],
+     "avg_images_per_batch": null,
+     "slo_pass": true
+    },
+    {
+     "users": 48,
+     "images_per_sec": 2.93,
+     "p50_sec": 8.085,
+     "p95_sec": 12.337,
+     "p99_sec": 12.537,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      80.0,
+      0.0
+     ],
+     "avg_images_per_batch": null,
+     "slo_pass": false
+    },
+    {
+     "users": 64,
+     "images_per_sec": 2.87,
+     "p50_sec": 8.222,
+     "p95_sec": 13.311,
+     "p99_sec": 13.699,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      79.2,
+      0.0
+     ],
+     "avg_images_per_batch": null,
+     "slo_pass": false
+    }
+   ],
+   "x_baseline_capacity": 1.0,
+   "x_baseline_images_per_sec": 1.0
+  },
+  "h2": {
+   "label": "Hybrid queue, 2 GPU workers",
+   "gpus": 2,
+   "capacity_users": 112,
+   "first_failing_users": 120,
+   "p95_at_capacity_sec": 9.608,
+   "p50_at_capacity_sec": 6.747,
+   "max_images_per_sec": 7.87,
+   "gpu_util_at_capacity_pct": [
+    91.5,
+    93.5
+   ],
+   "levels": [
+    {
+     "users": 16,
+     "images_per_sec": 3.0,
+     "p50_sec": 0.451,
+     "p95_sec": 0.834,
+     "p99_sec": 1.034,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      45.5,
+      39.4
+     ],
+     "avg_images_per_batch": 1.02,
+     "slo_pass": true
+    },
+    {
+     "users": 32,
+     "images_per_sec": 5.33,
+     "p50_sec": 0.869,
+     "p95_sec": 1.655,
+     "p99_sec": 1.808,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      70.9,
+      65.1
+     ],
+     "avg_images_per_batch": 1.51,
+     "slo_pass": true
+    },
+    {
+     "users": 64,
+     "images_per_sec": 7.73,
+     "p50_sec": 2.968,
+     "p95_sec": 4.198,
+     "p99_sec": 4.55,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      98.2,
+      98.6
+     ],
+     "avg_images_per_batch": 4.0,
+     "slo_pass": true
+    },
+    {
+     "users": 96,
+     "images_per_sec": 7.73,
+     "p50_sec": 6.277,
+     "p95_sec": 7.712,
+     "p99_sec": 7.762,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      93.3,
+      93.8
+     ],
+     "avg_images_per_batch": 4.0,
+     "slo_pass": true
+    },
+    {
+     "users": 112,
+     "images_per_sec": 7.47,
+     "p50_sec": 6.747,
+     "p95_sec": 9.608,
+     "p99_sec": 9.936,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      91.5,
+      93.5
+     ],
+     "avg_images_per_batch": 4.0,
+     "slo_pass": true
+    },
+    {
+     "users": 120,
+     "images_per_sec": 7.47,
+     "p50_sec": 7.174,
+     "p95_sec": 10.628,
+     "p99_sec": 11.009,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      91.6,
+      95.5
+     ],
+     "avg_images_per_batch": 4.0,
+     "slo_pass": false
+    },
+    {
+     "users": 128,
+     "images_per_sec": 7.87,
+     "p50_sec": 7.389,
+     "p95_sec": 11.295,
+     "p99_sec": 11.846,
+     "failed_pct": 0.0,
+     "gpu_util_pct": [
+      91.6,
+      93.6
+     ],
+     "avg_images_per_batch": 4.0,
+     "slo_pass": false
+    }
+   ],
+   "x_baseline_capacity": 2.8,
+   "x_baseline_images_per_sec": 2.69
+  }
+ },
+ "burst": null,
+ "kill_worker": null,
+ "charts": [
+  "1_latency_vs_users.png",
+  "2_throughput_vs_users.png"
+ ]
+}
