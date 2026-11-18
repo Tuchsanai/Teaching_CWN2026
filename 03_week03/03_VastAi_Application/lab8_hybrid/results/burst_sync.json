@@ -1,0 +1,3482 @@
+{
+  "test": "burst",
+  "mode": "sync",
+  "api": "http://127.0.0.1:8001",
+  "seed": 8,
+  "settings": {
+    "jobs": 200,
+    "arrive_within_sec": 10.0,
+    "express_pct": 0,
+    "user_gives_up_after_sec": 30.0,
+    "on_429": null
+  },
+  "summary": {
+    "jobs": 200,
+    "ok": 71,
+    "ok_pct": 35.5,
+    "gave_up": 129,
+    "errors": 0,
+    "wait_p50_sec": 15.204,
+    "wait_p95_sec": 28.614,
+    "wait_max_sec": 29.876,
+    "first_answer_p50_sec": 15.204,
+    "first_answer_p95_sec": 28.614,
+    "jobs_got_429": 0,
+    "answers_429": 0
+  },
+  "by_priority": {
+    "normal": {
+      "jobs": 200,
+      "ok": 71,
+      "ok_pct": 35.5,
+      "gave_up": 129,
+      "errors": 0,
+      "wait_p50_sec": 15.204,
+      "wait_p95_sec": 28.614,
+      "wait_max_sec": 29.876,
+      "first_answer_p50_sec": 15.204,
+      "first_answer_p95_sec": 28.614,
+      "jobs_got_429": 0,
+      "answers_429": 0
+    }
+  },
+  "first_answer_after_burst_start_sec": 0.563,
+  "first_image_after_burst_start_sec": 0.565,
+  "last_image_after_burst_start_sec": 33.309,
+  "images_drawn_by_server": 200,
+  "images_received_by_users": 71,
+  "images_wasted": 129,
+  "server_429_counter_delta": 0,
+  "peak_backlog": 179,
+  "drained_after_sec": 94.0,
+  "gpu_util_mean_pct": [
+    58.9,
+    0.0
+  ],
+  "backlog_every_0_5s": [
+    {
+      "t": 0.0,
+      "backlog": 0,
+      "users_waiting": 0,
+      "users_done_ok": 0
+    },
+    {
+      "t": 0.5,
+      "backlog": 8,
+      "users_waiting": 8,
+      "users_done_ok": 0
+    },
+    {
+      "t": 1.0,
+      "backlog": 19,
+      "users_waiting": 19,
+      "users_done_ok": 1
+    },
+    {
+      "t": 1.5,
+      "backlog": 28,
+      "users_waiting": 28,
+      "users_done_ok": 2
+    },
+    {
+      "t": 2.0,
+      "backlog": 37,
+      "users_waiting": 37,
+      "users_done_ok": 4
+    },
+    {
+      "t": 2.5,
+      "backlog": 49,
+      "users_waiting": 49,
+      "users_done_ok": 5
+    },
+    {
+      "t": 3.0,
+      "backlog": 61,
+      "users_waiting": 61,
+      "users_done_ok": 6
+    },
+    {
+      "t": 3.5,
+      "backlog": 64,
+      "users_waiting": 64,
+      "users_done_ok": 7
+    },
+    {
+      "t": 4.0,
+      "backlog": 77,
+      "users_waiting": 77,
+      "users_done_ok": 8
+    },
+    {
+      "t": 4.5,
+      "backlog": 88,
+      "users_waiting": 88,
+      "users_done_ok": 9
+    },
+    {
+      "t": 5.0,
+      "backlog": 97,
+      "users_waiting": 97,
+      "users_done_ok": 10
+    },
+    {
+      "t": 5.5,
+      "backlog": 107,
+      "users_waiting": 107,
+      "users_done_ok": 11
+    },
+    {
+      "t": 6.0,
+      "backlog": 112,
+      "users_waiting": 112,
+      "users_done_ok": 12
+    },
+    {
+      "t": 6.5,
+      "backlog": 121,
+      "users_waiting": 121,
+      "users_done_ok": 13
+    },
+    {
+      "t": 7.0,
+      "backlog": 125,
+      "users_waiting": 125,
+      "users_done_ok": 14
+    },
+    {
+      "t": 7.5,
+      "backlog": 139,
+      "users_waiting": 139,
+      "users_done_ok": 15
+    },
+    {
+      "t": 8.0,
+      "backlog": 144,
+      "users_waiting": 144,
+      "users_done_ok": 16
+    },
+    {
+      "t": 8.5,
+      "backlog": 154,
+      "users_waiting": 154,
+      "users_done_ok": 17
+    },
+    {
+      "t": 9.0,
+      "backlog": 158,
+      "users_waiting": 158,
+      "users_done_ok": 18
+    },
+    {
+      "t": 9.5,
+      "backlog": 167,
+      "users_waiting": 167,
+      "users_done_ok": 19
+    },
+    {
+      "t": 10.0,
+      "backlog": 179,
+      "users_waiting": 179,
+      "users_done_ok": 21
+    },
+    {
+      "t": 10.5,
+      "backlog": 178,
+      "users_waiting": 178,
+      "users_done_ok": 22
+    },
+    {
+      "t": 11.0,
+      "backlog": 177,
+      "users_waiting": 177,
+      "users_done_ok": 23
+    },
+    {
+      "t": 11.5,
+      "backlog": 176,
+      "users_waiting": 176,
+      "users_done_ok": 24
+    },
+    {
+      "t": 12.0,
+      "backlog": 175,
+      "users_waiting": 175,
+      "users_done_ok": 25
+    },
+    {
+      "t": 12.5,
+      "backlog": 174,
+      "users_waiting": 174,
+      "users_done_ok": 26
+    },
+    {
+      "t": 13.0,
+      "backlog": 173,
+      "users_waiting": 173,
+      "users_done_ok": 27
+    },
+    {
+      "t": 13.5,
+      "backlog": 172,
+      "users_waiting": 172,
+      "users_done_ok": 28
+    },
+    {
+      "t": 14.0,
+      "backlog": 171,
+      "users_waiting": 171,
+      "users_done_ok": 29
+    },
+    {
+      "t": 14.5,
+      "backlog": 170,
+      "users_waiting": 170,
+      "users_done_ok": 30
+    },
+    {
+      "t": 15.0,
+      "backlog": 169,
+      "users_waiting": 169,
+      "users_done_ok": 31
+    },
+    {
+      "t": 15.5,
+      "backlog": 168,
+      "users_waiting": 168,
+      "users_done_ok": 32
+    },
+    {
+      "t": 16.0,
+      "backlog": 167,
+      "users_waiting": 167,
+      "users_done_ok": 33
+    },
+    {
+      "t": 16.5,
+      "backlog": 166,
+      "users_waiting": 166,
+      "users_done_ok": 34
+    },
+    {
+      "t": 17.0,
+      "backlog": 164,
+      "users_waiting": 164,
+      "users_done_ok": 36
+    },
+    {
+      "t": 17.5,
+      "backlog": 163,
+      "users_waiting": 163,
+      "users_done_ok": 37
+    },
+    {
+      "t": 18.0,
+      "backlog": 162,
+      "users_waiting": 162,
+      "users_done_ok": 38
+    },
+    {
+      "t": 18.5,
+      "backlog": 161,
+      "users_waiting": 161,
+      "users_done_ok": 39
+    },
+    {
+      "t": 19.0,
+      "backlog": 160,
+      "users_waiting": 160,
+      "users_done_ok": 40
+    },
+    {
+      "t": 19.5,
+      "backlog": 159,
+      "users_waiting": 159,
+      "users_done_ok": 41
+    },
+    {
+      "t": 20.0,
+      "backlog": 158,
+      "users_waiting": 158,
+      "users_done_ok": 42
+    },
+    {
+      "t": 20.5,
+      "backlog": 157,
+      "users_waiting": 157,
+      "users_done_ok": 43
+    },
+    {
+      "t": 21.0,
+      "backlog": 156,
+      "users_waiting": 156,
+      "users_done_ok": 44
+    },
+    {
+      "t": 21.5,
+      "backlog": 155,
+      "users_waiting": 155,
+      "users_done_ok": 45
+    },
+    {
+      "t": 22.0,
+      "backlog": 154,
+      "users_waiting": 154,
+      "users_done_ok": 46
+    },
+    {
+      "t": 22.5,
+      "backlog": 153,
+      "users_waiting": 153,
+      "users_done_ok": 47
+    },
+    {
+      "t": 23.0,
+      "backlog": 152,
+      "users_waiting": 152,
+      "users_done_ok": 48
+    },
+    {
+      "t": 23.5,
+      "backlog": 151,
+      "users_waiting": 151,
+      "users_done_ok": 49
+    },
+    {
+      "t": 24.0,
+      "backlog": 149,
+      "users_waiting": 149,
+      "users_done_ok": 51
+    },
+    {
+      "t": 24.5,
+      "backlog": 148,
+      "users_waiting": 148,
+      "users_done_ok": 52
+    },
+    {
+      "t": 25.0,
+      "backlog": 147,
+      "users_waiting": 147,
+      "users_done_ok": 53
+    },
+    {
+      "t": 25.5,
+      "backlog": 146,
+      "users_waiting": 146,
+      "users_done_ok": 54
+    },
+    {
+      "t": 26.0,
+      "backlog": 145,
+      "users_waiting": 145,
+      "users_done_ok": 55
+    },
+    {
+      "t": 26.5,
+      "backlog": 144,
+      "users_waiting": 144,
+      "users_done_ok": 56
+    },
+    {
+      "t": 27.0,
+      "backlog": 143,
+      "users_waiting": 143,
+      "users_done_ok": 57
+    },
+    {
+      "t": 27.5,
+      "backlog": 142,
+      "users_waiting": 142,
+      "users_done_ok": 58
+    },
+    {
+      "t": 28.0,
+      "backlog": 141,
+      "users_waiting": 141,
+      "users_done_ok": 59
+    },
+    {
+      "t": 28.5,
+      "backlog": 140,
+      "users_waiting": 140,
+      "users_done_ok": 60
+    },
+    {
+      "t": 29.0,
+      "backlog": 139,
+      "users_waiting": 139,
+      "users_done_ok": 61
+    },
+    {
+      "t": 29.5,
+      "backlog": 138,
+      "users_waiting": 138,
+      "users_done_ok": 62
+    },
+    {
+      "t": 30.0,
+      "backlog": 137,
+      "users_waiting": 137,
+      "users_done_ok": 63
+    },
+    {
+      "t": 30.5,
+      "backlog": 136,
+      "users_waiting": 136,
+      "users_done_ok": 64
+    },
+    {
+      "t": 31.0,
+      "backlog": 134,
+      "users_waiting": 134,
+      "users_done_ok": 66
+    },
+    {
+      "t": 31.5,
+      "backlog": 133,
+      "users_waiting": 133,
+      "users_done_ok": 67
+    },
+    {
+      "t": 32.0,
+      "backlog": 132,
+      "users_waiting": 132,
+      "users_done_ok": 68
+    },
+    {
+      "t": 32.5,
+      "backlog": 131,
+      "users_waiting": 131,
+      "users_done_ok": 69
+    },
+    {
+      "t": 33.0,
+      "backlog": 130,
+      "users_waiting": 130,
+      "users_done_ok": 70
+    },
+    {
+      "t": 33.5,
+      "backlog": 129,
+      "users_waiting": 129,
+      "users_done_ok": 71
+    },
+    {
+      "t": 34.0,
+      "backlog": 128,
+      "users_waiting": 115,
+      "users_done_ok": 71
+    },
+    {
+      "t": 34.5,
+      "backlog": 127,
+      "users_waiting": 103,
+      "users_done_ok": 71
+    },
+    {
+      "t": 35.0,
+      "backlog": 126,
+      "users_waiting": 93,
+      "users_done_ok": 71
+    },
+    {
+      "t": 35.5,
+      "backlog": 125,
+      "users_waiting": 82,
+      "users_done_ok": 71
+    },
+    {
+      "t": 36.0,
+      "backlog": 124,
+      "users_waiting": 76,
+      "users_done_ok": 71
+    },
+    {
+      "t": 36.5,
+      "backlog": 123,
+      "users_waiting": 66,
+      "users_done_ok": 71
+    },
+    {
+      "t": 37.0,
+      "backlog": 122,
+      "users_waiting": 61,
+      "users_done_ok": 71
+    },
+    {
+      "t": 37.5,
+      "backlog": 121,
+      "users_waiting": 46,
+      "users_done_ok": 71
+    },
+    {
+      "t": 38.0,
+      "backlog": 119,
+      "users_waiting": 40,
+      "users_done_ok": 71
+    },
+    {
+      "t": 38.5,
+      "backlog": 118,
+      "users_waiting": 29,
+      "users_done_ok": 71
+    },
+    {
+      "t": 39.0,
+      "backlog": 117,
+      "users_waiting": 24,
+      "users_done_ok": 71
+    },
+    {
+      "t": 39.5,
+      "backlog": 116,
+      "users_waiting": 14,
+      "users_done_ok": 71
+    },
+    {
+      "t": 40.0,
+      "backlog": 115,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 40.5,
+      "backlog": 114,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 41.0,
+      "backlog": 113,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 41.5,
+      "backlog": 112,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 42.0,
+      "backlog": 111,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 42.5,
+      "backlog": 110,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 43.0,
+      "backlog": 109,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 43.5,
+      "backlog": 108,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 44.0,
+      "backlog": 107,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 44.5,
+      "backlog": 106,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 45.0,
+      "backlog": 104,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 45.5,
+      "backlog": 103,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 46.0,
+      "backlog": 102,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 46.5,
+      "backlog": 101,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 47.0,
+      "backlog": 100,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 47.5,
+      "backlog": 99,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 48.0,
+      "backlog": 98,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 48.5,
+      "backlog": 97,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 49.0,
+      "backlog": 96,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 49.5,
+      "backlog": 95,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 50.0,
+      "backlog": 94,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 50.5,
+      "backlog": 93,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 51.0,
+      "backlog": 92,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 51.5,
+      "backlog": 91,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 52.0,
+      "backlog": 89,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 52.5,
+      "backlog": 88,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 53.0,
+      "backlog": 87,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 53.5,
+      "backlog": 86,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 54.0,
+      "backlog": 85,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 54.5,
+      "backlog": 84,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 55.0,
+      "backlog": 83,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 55.5,
+      "backlog": 82,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 56.0,
+      "backlog": 81,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 56.5,
+      "backlog": 80,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 57.0,
+      "backlog": 79,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 57.5,
+      "backlog": 78,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 58.0,
+      "backlog": 77,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 58.5,
+      "backlog": 76,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 59.0,
+      "backlog": 74,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 59.5,
+      "backlog": 73,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 60.0,
+      "backlog": 72,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 60.5,
+      "backlog": 71,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 61.0,
+      "backlog": 70,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 61.5,
+      "backlog": 69,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 62.0,
+      "backlog": 68,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 62.5,
+      "backlog": 67,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 63.0,
+      "backlog": 66,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 63.5,
+      "backlog": 65,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 64.0,
+      "backlog": 64,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 64.5,
+      "backlog": 63,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 65.0,
+      "backlog": 62,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 65.5,
+      "backlog": 61,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 66.0,
+      "backlog": 59,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 66.5,
+      "backlog": 58,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 67.0,
+      "backlog": 57,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 67.5,
+      "backlog": 56,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 68.0,
+      "backlog": 55,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 68.5,
+      "backlog": 54,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 69.0,
+      "backlog": 53,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 69.5,
+      "backlog": 52,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 70.0,
+      "backlog": 51,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 70.5,
+      "backlog": 50,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 71.0,
+      "backlog": 49,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 71.5,
+      "backlog": 48,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 72.0,
+      "backlog": 47,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 72.5,
+      "backlog": 46,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 73.0,
+      "backlog": 44,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 73.5,
+      "backlog": 43,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 74.0,
+      "backlog": 42,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 74.5,
+      "backlog": 41,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 75.0,
+      "backlog": 40,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 75.5,
+      "backlog": 39,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 76.0,
+      "backlog": 38,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 76.5,
+      "backlog": 37,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 77.0,
+      "backlog": 36,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 77.5,
+      "backlog": 35,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 78.0,
+      "backlog": 34,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 78.5,
+      "backlog": 33,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 79.0,
+      "backlog": 32,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 79.5,
+      "backlog": 31,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 80.0,
+      "backlog": 30,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 80.5,
+      "backlog": 28,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 81.0,
+      "backlog": 27,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 81.5,
+      "backlog": 26,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 82.0,
+      "backlog": 25,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 82.5,
+      "backlog": 24,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 83.0,
+      "backlog": 23,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 83.5,
+      "backlog": 22,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 84.0,
+      "backlog": 21,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 84.5,
+      "backlog": 20,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 85.0,
+      "backlog": 19,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 85.5,
+      "backlog": 18,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 86.0,
+      "backlog": 17,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 86.5,
+      "backlog": 16,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 87.0,
+      "backlog": 15,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 87.5,
+      "backlog": 13,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 88.0,
+      "backlog": 12,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 88.5,
+      "backlog": 11,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 89.0,
+      "backlog": 10,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 89.5,
+      "backlog": 9,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 90.0,
+      "backlog": 8,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 90.5,
+      "backlog": 7,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 91.0,
+      "backlog": 6,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 91.5,
+      "backlog": 5,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 92.0,
+      "backlog": 4,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 92.5,
+      "backlog": 3,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 93.0,
+      "backlog": 2,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 93.5,
+      "backlog": 1,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    },
+    {
+      "t": 94.0,
+      "backlog": 0,
+      "users_waiting": 0,
+      "users_done_ok": 71
+    }
+  ],
+  "jobs": [
+    {
+      "n": 0,
+      "arrive_sec": 0.029,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 0.534,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 0.565,
+      "wait_sec": 0.534
+    },
+    {
+      "n": 1,
+      "arrive_sec": 0.067,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 0.973,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 1.041,
+      "wait_sec": 0.973
+    },
+    {
+      "n": 2,
+      "arrive_sec": 0.119,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 1.393,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 1.513,
+      "wait_sec": 1.393
+    },
+    {
+      "n": 3,
+      "arrive_sec": 0.132,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 1.847,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 1.98,
+      "wait_sec": 1.847
+    },
+    {
+      "n": 4,
+      "arrive_sec": 0.169,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 2.286,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 2.456,
+      "wait_sec": 2.286
+    },
+    {
+      "n": 5,
+      "arrive_sec": 0.2,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 2.725,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 2.925,
+      "wait_sec": 2.725
+    },
+    {
+      "n": 6,
+      "arrive_sec": 0.226,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 3.166,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 3.394,
+      "wait_sec": 3.166
+    },
+    {
+      "n": 7,
+      "arrive_sec": 0.331,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 3.537,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 3.87,
+      "wait_sec": 3.537
+    },
+    {
+      "n": 8,
+      "arrive_sec": 0.63,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 3.71,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 4.341,
+      "wait_sec": 3.71
+    },
+    {
+      "n": 9,
+      "arrive_sec": 0.631,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 4.184,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 4.816,
+      "wait_sec": 4.184
+    },
+    {
+      "n": 10,
+      "arrive_sec": 0.644,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 4.65,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 5.296,
+      "wait_sec": 4.65
+    },
+    {
+      "n": 11,
+      "arrive_sec": 0.686,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 5.075,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 5.761,
+      "wait_sec": 5.075
+    },
+    {
+      "n": 12,
+      "arrive_sec": 0.714,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 5.518,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 6.232,
+      "wait_sec": 5.518
+    },
+    {
+      "n": 13,
+      "arrive_sec": 0.834,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 5.866,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 6.701,
+      "wait_sec": 5.866
+    },
+    {
+      "n": 14,
+      "arrive_sec": 0.852,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 6.322,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 7.174,
+      "wait_sec": 6.322
+    },
+    {
+      "n": 15,
+      "arrive_sec": 0.853,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 6.796,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 7.649,
+      "wait_sec": 6.796
+    },
+    {
+      "n": 16,
+      "arrive_sec": 0.896,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 7.217,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 8.114,
+      "wait_sec": 7.217
+    },
+    {
+      "n": 17,
+      "arrive_sec": 0.933,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 7.651,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 8.585,
+      "wait_sec": 7.651
+    },
+    {
+      "n": 18,
+      "arrive_sec": 0.951,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 8.1,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 9.052,
+      "wait_sec": 8.1
+    },
+    {
+      "n": 19,
+      "arrive_sec": 0.976,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 8.541,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 9.518,
+      "wait_sec": 8.541
+    },
+    {
+      "n": 20,
+      "arrive_sec": 1.065,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 8.928,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 9.994,
+      "wait_sec": 8.928
+    },
+    {
+      "n": 21,
+      "arrive_sec": 1.082,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 9.377,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 10.459,
+      "wait_sec": 9.377
+    },
+    {
+      "n": 22,
+      "arrive_sec": 1.137,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 9.788,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 10.925,
+      "wait_sec": 9.788
+    },
+    {
+      "n": 23,
+      "arrive_sec": 1.17,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 10.217,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 11.387,
+      "wait_sec": 10.217
+    },
+    {
+      "n": 24,
+      "arrive_sec": 1.22,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 10.63,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 11.851,
+      "wait_sec": 10.63
+    },
+    {
+      "n": 25,
+      "arrive_sec": 1.263,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 11.051,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 12.315,
+      "wait_sec": 11.051
+    },
+    {
+      "n": 26,
+      "arrive_sec": 1.265,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 11.516,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 12.781,
+      "wait_sec": 11.516
+    },
+    {
+      "n": 27,
+      "arrive_sec": 1.35,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 11.9,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 13.251,
+      "wait_sec": 11.9
+    },
+    {
+      "n": 28,
+      "arrive_sec": 1.404,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 12.315,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 13.72,
+      "wait_sec": 12.315
+    },
+    {
+      "n": 29,
+      "arrive_sec": 1.421,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 12.769,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 14.191,
+      "wait_sec": 12.77
+    },
+    {
+      "n": 30,
+      "arrive_sec": 1.502,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 13.156,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 14.659,
+      "wait_sec": 13.156
+    },
+    {
+      "n": 31,
+      "arrive_sec": 1.545,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 13.579,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 15.125,
+      "wait_sec": 13.579
+    },
+    {
+      "n": 32,
+      "arrive_sec": 1.662,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 13.926,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 15.589,
+      "wait_sec": 13.926
+    },
+    {
+      "n": 33,
+      "arrive_sec": 1.702,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 14.352,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 16.054,
+      "wait_sec": 14.352
+    },
+    {
+      "n": 34,
+      "arrive_sec": 1.753,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 14.765,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 16.519,
+      "wait_sec": 14.765
+    },
+    {
+      "n": 35,
+      "arrive_sec": 1.778,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 15.204,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 16.983,
+      "wait_sec": 15.204
+    },
+    {
+      "n": 36,
+      "arrive_sec": 1.922,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 15.526,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 17.45,
+      "wait_sec": 15.526
+    },
+    {
+      "n": 37,
+      "arrive_sec": 1.939,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 15.976,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 17.916,
+      "wait_sec": 15.976
+    },
+    {
+      "n": 38,
+      "arrive_sec": 1.957,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 16.426,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 18.384,
+      "wait_sec": 16.426
+    },
+    {
+      "n": 39,
+      "arrive_sec": 1.975,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 16.874,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 18.851,
+      "wait_sec": 16.874
+    },
+    {
+      "n": 40,
+      "arrive_sec": 1.976,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 17.342,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 19.319,
+      "wait_sec": 17.342
+    },
+    {
+      "n": 41,
+      "arrive_sec": 2.007,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 17.779,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 19.787,
+      "wait_sec": 17.779
+    },
+    {
+      "n": 42,
+      "arrive_sec": 2.018,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 18.237,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 20.255,
+      "wait_sec": 18.237
+    },
+    {
+      "n": 43,
+      "arrive_sec": 2.094,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 18.627,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 20.722,
+      "wait_sec": 18.627
+    },
+    {
+      "n": 44,
+      "arrive_sec": 2.101,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 19.087,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 21.188,
+      "wait_sec": 19.087
+    },
+    {
+      "n": 45,
+      "arrive_sec": 2.2,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 19.456,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 21.657,
+      "wait_sec": 19.456
+    },
+    {
+      "n": 46,
+      "arrive_sec": 2.237,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 19.882,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 22.12,
+      "wait_sec": 19.882
+    },
+    {
+      "n": 47,
+      "arrive_sec": 2.255,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 20.33,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 22.586,
+      "wait_sec": 20.33
+    },
+    {
+      "n": 48,
+      "arrive_sec": 2.267,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 20.784,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 23.051,
+      "wait_sec": 20.784
+    },
+    {
+      "n": 49,
+      "arrive_sec": 2.294,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 21.22,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 23.515,
+      "wait_sec": 21.22
+    },
+    {
+      "n": 50,
+      "arrive_sec": 2.317,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 21.662,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 23.98,
+      "wait_sec": 21.662
+    },
+    {
+      "n": 51,
+      "arrive_sec": 2.342,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 22.105,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 24.448,
+      "wait_sec": 22.105
+    },
+    {
+      "n": 52,
+      "arrive_sec": 2.439,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 22.475,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 24.915,
+      "wait_sec": 22.475
+    },
+    {
+      "n": 53,
+      "arrive_sec": 2.474,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 22.907,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 25.382,
+      "wait_sec": 22.907
+    },
+    {
+      "n": 54,
+      "arrive_sec": 2.584,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 23.266,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 25.851,
+      "wait_sec": 23.266
+    },
+    {
+      "n": 55,
+      "arrive_sec": 2.668,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 24.115,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 26.784,
+      "wait_sec": 24.115
+    },
+    {
+      "n": 56,
+      "arrive_sec": 2.668,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 23.649,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 26.317,
+      "wait_sec": 23.649
+    },
+    {
+      "n": 57,
+      "arrive_sec": 2.688,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 24.561,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 27.25,
+      "wait_sec": 24.561
+    },
+    {
+      "n": 58,
+      "arrive_sec": 2.709,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 25.008,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 27.717,
+      "wait_sec": 25.008
+    },
+    {
+      "n": 59,
+      "arrive_sec": 2.739,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 25.445,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 28.185,
+      "wait_sec": 25.445
+    },
+    {
+      "n": 60,
+      "arrive_sec": 2.857,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 25.794,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 28.652,
+      "wait_sec": 25.794
+    },
+    {
+      "n": 61,
+      "arrive_sec": 2.887,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 26.23,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 29.118,
+      "wait_sec": 26.23
+    },
+    {
+      "n": 62,
+      "arrive_sec": 2.905,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 26.676,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 29.583,
+      "wait_sec": 26.676
+    },
+    {
+      "n": 63,
+      "arrive_sec": 2.916,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 27.13,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 30.048,
+      "wait_sec": 27.13
+    },
+    {
+      "n": 64,
+      "arrive_sec": 2.958,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 27.554,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 30.512,
+      "wait_sec": 27.554
+    },
+    {
+      "n": 65,
+      "arrive_sec": 2.964,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 28.01,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 30.974,
+      "wait_sec": 28.01
+    },
+    {
+      "n": 66,
+      "arrive_sec": 3.0,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 28.441,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 31.442,
+      "wait_sec": 28.441
+    },
+    {
+      "n": 67,
+      "arrive_sec": 3.12,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 28.788,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 31.91,
+      "wait_sec": 28.788
+    },
+    {
+      "n": 68,
+      "arrive_sec": 3.384,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 28.992,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 32.377,
+      "wait_sec": 28.992
+    },
+    {
+      "n": 69,
+      "arrive_sec": 3.418,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 29.426,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 32.845,
+      "wait_sec": 29.426
+    },
+    {
+      "n": 70,
+      "arrive_sec": 3.432,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "first_answer_sec": 29.876,
+      "ok": true,
+      "gave_up": false,
+      "end_sec": 33.309,
+      "wait_sec": 29.876
+    },
+    {
+      "n": 71,
+      "arrive_sec": 3.514,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.516,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 72,
+      "arrive_sec": 3.567,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.569,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 73,
+      "arrive_sec": 3.602,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.603,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 74,
+      "arrive_sec": 3.608,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.609,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 75,
+      "arrive_sec": 3.622,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.625,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 76,
+      "arrive_sec": 3.641,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.644,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 77,
+      "arrive_sec": 3.693,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.694,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 78,
+      "arrive_sec": 3.7,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.701,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 79,
+      "arrive_sec": 3.769,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.77,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 80,
+      "arrive_sec": 3.772,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.773,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 81,
+      "arrive_sec": 3.791,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.793,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 82,
+      "arrive_sec": 3.863,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.866,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 83,
+      "arrive_sec": 3.938,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.94,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 84,
+      "arrive_sec": 3.963,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 33.965,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 85,
+      "arrive_sec": 4.077,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.078,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 86,
+      "arrive_sec": 4.101,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.103,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 87,
+      "arrive_sec": 4.18,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.181,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 88,
+      "arrive_sec": 4.197,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.199,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 89,
+      "arrive_sec": 4.234,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.236,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 90,
+      "arrive_sec": 4.275,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.276,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 91,
+      "arrive_sec": 4.324,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.325,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 92,
+      "arrive_sec": 4.356,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.357,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 93,
+      "arrive_sec": 4.395,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.397,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 94,
+      "arrive_sec": 4.415,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.416,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 95,
+      "arrive_sec": 4.461,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.462,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 96,
+      "arrive_sec": 4.462,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.463,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 97,
+      "arrive_sec": 4.527,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.528,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 98,
+      "arrive_sec": 4.531,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.532,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 99,
+      "arrive_sec": 4.591,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.593,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 100,
+      "arrive_sec": 4.713,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.715,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 101,
+      "arrive_sec": 4.732,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.734,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 102,
+      "arrive_sec": 4.887,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.889,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 103,
+      "arrive_sec": 4.899,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.9,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 104,
+      "arrive_sec": 4.95,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.951,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 105,
+      "arrive_sec": 4.972,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.973,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 106,
+      "arrive_sec": 4.976,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 34.977,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 107,
+      "arrive_sec": 5.026,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.027,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 108,
+      "arrive_sec": 5.036,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.039,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 109,
+      "arrive_sec": 5.049,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.051,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 110,
+      "arrive_sec": 5.074,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.075,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 111,
+      "arrive_sec": 5.098,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.099,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 112,
+      "arrive_sec": 5.163,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.165,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 113,
+      "arrive_sec": 5.209,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.211,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 114,
+      "arrive_sec": 5.257,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.258,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 115,
+      "arrive_sec": 5.287,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.288,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 116,
+      "arrive_sec": 5.289,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.291,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 117,
+      "arrive_sec": 5.473,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.475,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 118,
+      "arrive_sec": 5.737,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.74,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 119,
+      "arrive_sec": 5.79,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.791,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 120,
+      "arrive_sec": 5.8,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.803,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 121,
+      "arrive_sec": 5.807,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.808,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 122,
+      "arrive_sec": 5.815,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.818,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 123,
+      "arrive_sec": 5.885,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 35.886,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 124,
+      "arrive_sec": 6.049,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.05,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 125,
+      "arrive_sec": 6.054,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.056,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 126,
+      "arrive_sec": 6.115,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.116,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 127,
+      "arrive_sec": 6.13,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.131,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 128,
+      "arrive_sec": 6.132,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.134,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 129,
+      "arrive_sec": 6.202,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.203,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 130,
+      "arrive_sec": 6.251,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.252,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 131,
+      "arrive_sec": 6.419,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.421,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 132,
+      "arrive_sec": 6.473,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.475,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 133,
+      "arrive_sec": 6.497,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.498,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 134,
+      "arrive_sec": 6.608,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.61,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 135,
+      "arrive_sec": 6.632,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.633,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 136,
+      "arrive_sec": 6.843,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.846,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 137,
+      "arrive_sec": 6.902,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.903,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 138,
+      "arrive_sec": 6.913,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 36.914,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 139,
+      "arrive_sec": 7.013,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.015,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 140,
+      "arrive_sec": 7.021,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.023,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 141,
+      "arrive_sec": 7.048,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.05,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 142,
+      "arrive_sec": 7.052,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.053,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 143,
+      "arrive_sec": 7.082,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.084,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 144,
+      "arrive_sec": 7.083,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.084,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 145,
+      "arrive_sec": 7.155,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.157,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 146,
+      "arrive_sec": 7.251,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.252,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 147,
+      "arrive_sec": 7.255,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.256,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 148,
+      "arrive_sec": 7.28,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.283,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 149,
+      "arrive_sec": 7.289,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.29,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 150,
+      "arrive_sec": 7.331,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.332,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 151,
+      "arrive_sec": 7.433,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.435,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 152,
+      "arrive_sec": 7.438,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.44,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 153,
+      "arrive_sec": 7.44,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.441,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 154,
+      "arrive_sec": 7.556,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.558,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 155,
+      "arrive_sec": 7.594,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.595,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 156,
+      "arrive_sec": 7.643,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.645,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 157,
+      "arrive_sec": 7.643,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.645,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 158,
+      "arrive_sec": 7.665,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.667,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 159,
+      "arrive_sec": 7.833,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 37.834,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 160,
+      "arrive_sec": 8.077,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.078,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 161,
+      "arrive_sec": 8.209,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.211,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 162,
+      "arrive_sec": 8.293,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.294,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 163,
+      "arrive_sec": 8.305,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.305,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 164,
+      "arrive_sec": 8.343,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.345,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 165,
+      "arrive_sec": 8.357,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.359,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 166,
+      "arrive_sec": 8.382,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.384,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 167,
+      "arrive_sec": 8.426,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.427,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 168,
+      "arrive_sec": 8.435,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.438,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 169,
+      "arrive_sec": 8.457,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.459,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 170,
+      "arrive_sec": 8.471,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.473,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 171,
+      "arrive_sec": 8.505,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.506,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 172,
+      "arrive_sec": 8.752,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.754,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 173,
+      "arrive_sec": 8.781,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.783,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 174,
+      "arrive_sec": 8.81,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.811,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 175,
+      "arrive_sec": 8.915,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 38.917,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 176,
+      "arrive_sec": 9.014,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.015,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 177,
+      "arrive_sec": 9.021,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.023,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 178,
+      "arrive_sec": 9.032,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.033,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 179,
+      "arrive_sec": 9.089,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.09,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 180,
+      "arrive_sec": 9.276,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.278,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 181,
+      "arrive_sec": 9.36,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.361,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 182,
+      "arrive_sec": 9.414,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.415,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 183,
+      "arrive_sec": 9.46,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.462,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 184,
+      "arrive_sec": 9.461,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.462,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 185,
+      "arrive_sec": 9.5,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.501,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 186,
+      "arrive_sec": 9.571,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.571,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 187,
+      "arrive_sec": 9.586,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.588,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 188,
+      "arrive_sec": 9.623,
+      "prompt": "an old wooden sailboat docked in a small harbor, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.625,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 189,
+      "arrive_sec": 9.65,
+      "prompt": "a cozy reading corner with an armchair and a bookshelf, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.652,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 190,
+      "arrive_sec": 9.652,
+      "prompt": "a field of sunflowers under a clear summer sky, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.653,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 191,
+      "arrive_sec": 9.678,
+      "prompt": "a tabby cat sleeping on a windowsill in morning light, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.68,
+      "wait_sec": 30.002
+    },
+    {
+      "n": 192,
+      "arrive_sec": 9.699,
+      "prompt": "a white lighthouse on a rocky coast at sunset, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.7,
+      "wait_sec": 30.0
+    },
+    {
+      "n": 193,
+      "arrive_sec": 9.748,
+      "prompt": "a vintage red bicycle leaning against a brick wall, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.75,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 194,
+      "arrive_sec": 9.768,
+      "prompt": "a steaming bowl of ramen with egg and green onions, top view, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.769,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 195,
+      "arrive_sec": 9.801,
+      "prompt": "a golden retriever running on a sandy beach, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.802,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 196,
+      "arrive_sec": 9.817,
+      "prompt": "a cup of latte with heart latte art on a wooden table, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.819,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 197,
+      "arrive_sec": 9.905,
+      "prompt": "a snowy mountain peak above a calm blue lake, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.908,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 198,
+      "arrive_sec": 9.916,
+      "prompt": "a yellow taxi on a rainy city street at night, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.918,
+      "wait_sec": 30.001
+    },
+    {
+      "n": 199,
+      "arrive_sec": 9.991,
+      "prompt": "a basket of fresh strawberries at a farmers market, photo",
+      "priority": "normal",
+      "n_429": 0,
+      "ok": false,
+      "gave_up": true,
+      "end_sec": 39.993,
+      "wait_sec": 30.001
+    }
+  ],
+  "server_stats_before": {
+    "received": 0,
+    "done": 0,
+    "failed": 0,
+    "waiting_or_running": 0,
+    "avg_gen_seconds": null,
+    "uptime_seconds": 1243
+  },
+  "server_stats_after": {
+    "received": 200,
+    "done": 200,
+    "failed": 0,
+    "waiting_or_running": 0,
+    "avg_gen_seconds": 0.467,
+    "uptime_seconds": 1337
+  },
+  "finished": "2026-11-18 01:28:45"
+}
