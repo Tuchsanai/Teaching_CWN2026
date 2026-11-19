@@ -1,0 +1,198 @@
+{
+  "test": "5 photos through the web API",
+  "started_utc": "2026-11-19T02:04:27.517Z",
+  "base": "http://localhost:3410",
+  "user": "sup.a@sitesafe.test",
+  "batch_id": "3c97ee18-3b08-4358-a8a8-786fb1a3551e",
+  "photos": 5,
+  "done_in_web": 5,
+  "done_in_gateway": 5,
+  "matching_db_vs_gateway": 5,
+  "all_uploaded_s": 10.293,
+  "first_upload_to_last_result_s": 14.635,
+  "per_photo_accept_to_finish_s": {
+    "min": 2.339,
+    "max": 4.004,
+    "mean": 3.38
+  },
+  "gpu_infer_ms": {
+    "min": 12,
+    "max": 88,
+    "mean": 30.6
+  },
+  "timeline": [
+    {
+      "t_s": 12.34,
+      "utc": "2026-11-19T02:04:39.861Z",
+      "DONE": 4,
+      "QUEUED": 1
+    },
+    {
+      "t_s": 14.64,
+      "utc": "2026-11-19T02:04:42.153Z",
+      "DONE": 5
+    }
+  ],
+  "items": [
+    {
+      "file": "-4405-_png_jpg.rf.82b5c10b2acd1cfaa24259ada8e599fe.jpg",
+      "id": "def761a8-abdb-46b2-9873-62f23d6010d2",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 0,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 1,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 88
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 3.396,
+      "accept_to_finish_s": 4.004,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 12.344,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "000005_jpg.rf.96e9379ccae638140c4a90fc4b700a2b.jpg",
+      "id": "ab8faf57-d109-455f-81ae-df8cb70ad311",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 12
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 3.512,
+      "accept_to_finish_s": 3.891,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 12.344,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "002551_jpg.rf.ce4b9f934161faa72c80dc6898d37b2d.jpg",
+      "id": "b031cb34-843d-4e5f-8b11-69eb1abc48cf",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 3,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 3,
+      "gateway": {
+        "h": 0,
+        "v": 3,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 3,
+      "accept_to_submit_s": 3.24,
+      "accept_to_finish_s": 3.625,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 12.344,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "003357_jpg.rf.9867f91e88089bb68dc95947d5116d14.jpg",
+      "id": "333ac45c-d94e-4310-ba8b-2c84ac357b88",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 1,
+        "model_result": "WARN",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 0,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 16
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 2.664,
+      "accept_to_finish_s": 3.043,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 12.344,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "004063_jpg.rf.1b7cdc4035bcb24ef69b8798b444053e.jpg",
+      "id": "e5633c16-875f-4156-a538-2a73de600872",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 4,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 5,
+      "gateway": {
+        "h": 1,
+        "v": 4,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 19
+      },
+      "gateway_boxes": 5,
+      "accept_to_submit_s": 1.95,
+      "accept_to_finish_s": 2.339,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 14.635,
+      "match": true,
+      "problems": []
+    }
+  ]
+}

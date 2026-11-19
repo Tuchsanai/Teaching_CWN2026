@@ -1,0 +1,74 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": "c0072bbd-bf1b-49c7-95f3-7ff1de45303b",
+    "batchUpload": {
+      "batchStatus": 201,
+      "fileStatus": 201
+    }
+  },
+  "statuses": {
+    "page /photos/{photoB}": 404,
+    "GET /api/photos/{photoB}": 404,
+    "GET /api/photos/{photoB}/image": 404,
+    "GET /api/photos/{photoB}/overrides": 404,
+    "GET /api/uploads/{batchB}": 404,
+    "GET /api/photos?site=SITE-B&date=2026-11-16": 404,
+    "GET /api/photos?problems=1&site=SITE-B&date=2026-11-16": 404
+  },
+  "singleSuccesses": 0,
+  "leaks": {
+    "GET /api/photos/{photoB}": {
+      "status": 404,
+      "contentType": "application/json",
+      "bytes": 67,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "NOT_FOUND"
+    },
+    "GET /api/photos/{photoB}/image": {
+      "status": 404,
+      "contentType": "application/json",
+      "bytes": 67,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "NOT_FOUND"
+    },
+    "GET /api/photos/{photoB}/overrides": {
+      "status": 404,
+      "contentType": "application/json",
+      "bytes": 67,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "NOT_FOUND"
+    },
+    "GET /api/uploads/{batchB}": {
+      "status": 404,
+      "contentType": "application/json",
+      "bytes": 67,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "NOT_FOUND"
+    }
+  },
+  "lists": {
+    "GET /api/photos?site=SITE-B&date=2026-11-16": {
+      "status": 404,
+      "returned": 0,
+      "total": null,
+      "notSiteA": 0,
+      "siteB": 0,
+      "mentionsPhotoB": false
+    },
+    "GET /api/photos?problems=1&site=SITE-B&date=2026-11-16": {
+      "status": 404,
+      "returned": 0,
+      "total": null,
+      "notSiteA": 0,
+      "siteB": 0,
+      "mentionsPhotoB": false
+    }
+  },
+  "pagePhotoImage": 0
+}

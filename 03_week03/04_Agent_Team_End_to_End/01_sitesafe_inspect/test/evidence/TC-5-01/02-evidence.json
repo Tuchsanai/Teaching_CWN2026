@@ -1,0 +1,91 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": "01ba3d3b-3673-492c-baa8-4ffa383522a7",
+    "batchUpload": {
+      "batchStatus": 201,
+      "fileStatus": 201
+    }
+  },
+  "statuses": {
+    "/api/photos": 401,
+    "/api/photos/{photoB}": 401,
+    "/api/photos/{photoB}/image": 401,
+    "/api/uploads/{batchB}": 401,
+    "/api/reports/daily?date=2026-11-16": 401,
+    "/api/auth/me": 401
+  },
+  "pages": [
+    {
+      "page": "/upload",
+      "landed": "/login",
+      "photoImage": 0
+    },
+    {
+      "page": "/uploads/{batchB}",
+      "landed": "/login",
+      "photoImage": 0
+    },
+    {
+      "page": "/photos",
+      "landed": "/login",
+      "photoImage": 0
+    },
+    {
+      "page": "/photos/problems",
+      "landed": "/login",
+      "photoImage": 0
+    },
+    {
+      "page": "/photos/{photoB}",
+      "landed": "/login",
+      "photoImage": 0
+    },
+    {
+      "page": "/reports/daily",
+      "landed": "/login",
+      "photoImage": 0
+    }
+  ],
+  "pagesRedirectedToLogin": "6 / 6",
+  "api401": "6 / 6",
+  "apiLeak": [
+    {
+      "api": "/api/photos",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    },
+    {
+      "api": "/api/photos/{photoB}",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    },
+    {
+      "api": "/api/photos/{photoB}/image",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    },
+    {
+      "api": "/api/uploads/{batchB}",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    },
+    {
+      "api": "/api/reports/daily?date=2026-11-16",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    },
+    {
+      "api": "/api/auth/me",
+      "isImage": false,
+      "dataKeys": [],
+      "contentType": "application/json"
+    }
+  ]
+}

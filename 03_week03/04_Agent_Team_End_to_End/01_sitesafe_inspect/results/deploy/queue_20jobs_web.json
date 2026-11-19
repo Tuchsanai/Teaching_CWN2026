@@ -1,0 +1,715 @@
+{
+  "test": "20 photos through the web API",
+  "started_utc": "2026-11-19T02:05:56.583Z",
+  "base": "http://127.0.0.1:3410",
+  "user": "sup.a@sitesafe.test",
+  "batch_id": "8ba5df64-6406-42f4-ba42-5481b1eea989",
+  "photos": 20,
+  "done_in_web": 20,
+  "done_in_gateway": 20,
+  "matching_db_vs_gateway": 20,
+  "all_uploaded_s": 0.344,
+  "first_upload_to_last_result_s": 37.329,
+  "per_photo_accept_to_finish_s": {
+    "min": 3.227,
+    "max": 36.868,
+    "mean": 27.567
+  },
+  "gpu_infer_ms": {
+    "min": 9,
+    "max": 72,
+    "mean": 20.8
+  },
+  "timeline": [
+    {
+      "t_s": 0.35,
+      "utc": "2026-11-19T02:05:56.935Z",
+      "QUEUED": 20
+    },
+    {
+      "t_s": 3.45,
+      "utc": "2026-11-19T02:06:00.038Z",
+      "DONE": 1,
+      "QUEUED": 19
+    },
+    {
+      "t_s": 6.04,
+      "utc": "2026-11-19T02:06:02.622Z",
+      "DONE": 3,
+      "QUEUED": 17
+    },
+    {
+      "t_s": 7.33,
+      "utc": "2026-11-19T02:06:03.915Z",
+      "DONE": 4,
+      "QUEUED": 16
+    },
+    {
+      "t_s": 8.63,
+      "utc": "2026-11-19T02:06:05.209Z",
+      "DONE": 5,
+      "QUEUED": 15
+    },
+    {
+      "t_s": 11.47,
+      "utc": "2026-11-19T02:06:08.054Z",
+      "DONE": 6,
+      "PROCESSING": 1,
+      "QUEUED": 13
+    },
+    {
+      "t_s": 36.29,
+      "utc": "2026-11-19T02:06:32.877Z",
+      "DONE": 13,
+      "PROCESSING": 1,
+      "QUEUED": 6
+    },
+    {
+      "t_s": 37.33,
+      "utc": "2026-11-19T02:06:33.913Z",
+      "DONE": 20
+    }
+  ],
+  "items": [
+    {
+      "file": "-4405-_png_jpg.rf.82b5c10b2acd1cfaa24259ada8e599fe.jpg",
+      "id": "6e4fd5bd-0928-429c-852e-f9fc7a39de90",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 0,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 1,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 41
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 2.842,
+      "accept_to_finish_s": 3.227,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 3.455,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "000005_jpg.rf.96e9379ccae638140c4a90fc4b700a2b.jpg",
+      "id": "7b710cbc-953e-4253-a7cd-aca39daffec1",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 20
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 4.198,
+      "accept_to_finish_s": 5.78,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 6.039,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "002551_jpg.rf.ce4b9f934161faa72c80dc6898d37b2d.jpg",
+      "id": "a073e934-1da7-4215-b203-a115f3bf8743",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 3,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 3,
+      "gateway": {
+        "h": 0,
+        "v": 3,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 19
+      },
+      "gateway_boxes": 3,
+      "accept_to_submit_s": 5.378,
+      "accept_to_finish_s": 5.766,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 6.039,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "003357_jpg.rf.9867f91e88089bb68dc95947d5116d14.jpg",
+      "id": "8c2c820d-7909-4f7c-a8de-0205dccb180b",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 1,
+        "model_result": "WARN",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 0,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 20
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 6.76,
+      "accept_to_finish_s": 7.144,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 7.332,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "004063_jpg.rf.1b7cdc4035bcb24ef69b8798b444053e.jpg",
+      "id": "c7df13ee-aafd-4a4e-8dbf-aa9e8438c3ac",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 4,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 5,
+      "gateway": {
+        "h": 1,
+        "v": 4,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 20
+      },
+      "gateway_boxes": 5,
+      "accept_to_submit_s": 8.134,
+      "accept_to_finish_s": 8.518,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 8.626,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "004763_jpg.rf.46484e6ca73caeaa9de45822cf1085a9.jpg",
+      "id": "3e116d78-c746-40f3-86f6-2a49c3de9439",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 3,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 3,
+      "gateway": {
+        "h": 0,
+        "v": 3,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 3,
+      "accept_to_submit_s": 9.447,
+      "accept_to_finish_s": 11.265,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 11.471,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "006463_jpg.rf.02f19082420ecc5537b9d59abbe6050c.jpg",
+      "id": "b86b8211-a64e-4b6e-9a5c-41681ed51333",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 9,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 9,
+      "gateway": {
+        "h": 0,
+        "v": 9,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 72
+      },
+      "gateway_boxes": 9,
+      "accept_to_submit_s": 10.641,
+      "accept_to_finish_s": 36.046,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "006672_jpg.rf.87d5978c486feb53177408cf00a0d87f.jpg",
+      "id": "ccdb26d0-29de-4deb-bb91-56bc42cdab65",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 12
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 12.134,
+      "accept_to_finish_s": 36.031,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "0_jpg.rf.2ff49f74309118f169e07aa12564df87.jpg",
+      "id": "0bf8546d-0dcd-41b2-ac82-7eaab94674ae",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 9
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 12.878,
+      "accept_to_finish_s": 35.996,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "2008_008320_jpg.rf.bd34011d46f82f9410d95f00e560b8ea.jpg",
+      "id": "765d8dce-90d0-4941-aaa7-4d02fb644bbf",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 0,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 1,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 19
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 14.124,
+      "accept_to_finish_s": 35.989,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "2008_008519_jpg.rf.1798c8eed7de04399a0e7e297b4b4c9e.jpg",
+      "id": "7e292294-fd5a-46be-a561-96000509a6b2",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 1,
+        "model_result": "WARN",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 1,
+      "gateway": {
+        "h": 0,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 19
+      },
+      "gateway_boxes": 1,
+      "accept_to_submit_s": 14.958,
+      "accept_to_finish_s": 35.975,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "2009_000059_jpg.rf.50e8398a37eb33f33fd9f662feeea083.jpg",
+      "id": "5466f9ef-e3eb-4fa3-98ef-5ee936461612",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 1,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 2,
+      "gateway": {
+        "h": 1,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 2,
+      "accept_to_submit_s": 16.177,
+      "accept_to_finish_s": 35.951,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "2009_000496_jpg.rf.9a2d210fe0f5ea4b572aeb07e41ecbae.jpg",
+      "id": "546bdb9e-2659-43ae-b02c-62e58bbf7353",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 16.976,
+      "accept_to_finish_s": 35.938,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 36.294,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "3e7e40981ddd4cdb055c7ffe4c2af5d8_jpg.rf.bac50dc18195e9aeb6f3a21782a3efcb.jpg",
+      "id": "200e7a7a-1866-4436-bab0-6694b2862980",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 17
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 18.175,
+      "accept_to_finish_s": 36.868,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "777_jpg.rf.92dc6945342410ced7ac93f3dfbff0c5.jpg",
+      "id": "ff7ead73-1324-49dd-9121-453b07cfcf5a",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 19.014,
+      "accept_to_finish_s": 36.857,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "Bookstore_More_Merchandise_jpg.rf.7ab5add3e28ced74f9b316e794cc04d2.jpg",
+      "id": "18615032-02a5-44f1-8d68-5c1314dd340d",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 0,
+        "model_v": 0,
+        "model_result": "PASS",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 0,
+      "gateway": {
+        "h": 0,
+        "v": 0,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 10
+      },
+      "gateway_boxes": 0,
+      "accept_to_submit_s": 20.138,
+      "accept_to_finish_s": 36.833,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "IMG_0871_MOV-12_jpg.rf.36858a9d51613f9a39b7855b54dfa098.jpg",
+      "id": "da9a05e1-383e-4e38-982a-0e03209c45ec",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 1,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 2,
+      "gateway": {
+        "h": 1,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 10
+      },
+      "gateway_boxes": 2,
+      "accept_to_submit_s": 20.854,
+      "accept_to_finish_s": 36.821,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "IMG_0871_mp4-11_jpg.rf.432092b53ebeb84f4b9b27b40343c9aa.jpg",
+      "id": "a07c9ef6-eb8c-4835-a7a1-40c46b0d80f3",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 1,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 2,
+      "gateway": {
+        "h": 1,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 19
+      },
+      "gateway_boxes": 2,
+      "accept_to_submit_s": 22.924,
+      "accept_to_finish_s": 36.802,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "IMG_0871_mp4-23_jpg.rf.03f872b1ed87ad7fadc85e09475ad37a.jpg",
+      "id": "112f2c44-4916-4ef2-947d-971f8c8eb23f",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 1,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 2,
+      "gateway": {
+        "h": 1,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 2,
+      "accept_to_submit_s": 24.112,
+      "accept_to_finish_s": 36.776,
+      "submit_attempts": 1,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    },
+    {
+      "file": "IMG_3100_mp4-12_jpg.rf.58849ca6a931c2cfe1b17fb4206d9d82.jpg",
+      "id": "15427718-bb23-4e2a-8f00-6171225c0e62",
+      "web_status": "DONE",
+      "gateway_status": "DONE",
+      "db": {
+        "model_h": 1,
+        "model_v": 1,
+        "model_result": "FAIL",
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640
+      },
+      "db_boxes": 2,
+      "gateway": {
+        "h": 1,
+        "v": 1,
+        "model_version": "ppe-yolo-v1",
+        "conf_threshold": 0.32,
+        "image_w": 640,
+        "image_h": 640,
+        "infer_ms": 18
+      },
+      "gateway_boxes": 2,
+      "accept_to_submit_s": 31.704,
+      "accept_to_finish_s": 36.76,
+      "submit_attempts": 2,
+      "seen_done_by_client_s": 37.329,
+      "match": true,
+      "problems": []
+    }
+  ]
+}

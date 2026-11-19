@@ -1,0 +1,16 @@
+# bug mode (BUG_MODE=1) · 2026-11-19T11:39:25+07:00
+## U-2 POST /api/uploads {"count":49}
+{"batch_id":"cdf73a42-4bd7-4fb1-a5d1-875efa6ff420","declared_count":49,"site":{"id":1,"code":"SITE-A","name":"ไซต์ ก"},"created_at":"2026-11-19T04:39:25.221Z","upload_url":"/api/uploads/cdf73a42-4bd7-4fb1-a5d1-875efa6ff420/photos","limits":{"min_photos":1,"max_photos":51,"max_file_bytes":15728640,"max_file_mb":15,"accepted_types":["image/jpeg","image/png"]}}
+HTTP 201
+## U-2 POST /api/uploads {"count":50}
+{"batch_id":"4bb6a222-a04d-4df6-8fe9-bf3543f750e0","declared_count":50,"site":{"id":1,"code":"SITE-A","name":"ไซต์ ก"},"created_at":"2026-11-19T04:39:25.255Z","upload_url":"/api/uploads/4bb6a222-a04d-4df6-8fe9-bf3543f750e0/photos","limits":{"min_photos":1,"max_photos":51,"max_file_bytes":15728640,"max_file_mb":15,"accepted_types":["image/jpeg","image/png"]}}
+HTTP 201
+## U-2 POST /api/uploads {"count":51}
+{"batch_id":"ea895fa1-3acb-41d8-ac00-fb01f0f2fb6c","declared_count":51,"site":{"id":1,"code":"SITE-A","name":"ไซต์ ก"},"created_at":"2026-11-19T04:39:25.290Z","upload_url":"/api/uploads/ea895fa1-3acb-41d8-ac00-fb01f0f2fb6c/photos","limits":{"min_photos":1,"max_photos":51,"max_file_bytes":15728640,"max_file_mb":15,"accepted_types":["image/jpeg","image/png"]}}
+HTTP 201
+## U-2 POST /api/uploads {"count":52}
+{"error":"TOO_MANY_PHOTOS","message":"ส่งได้ครั้งละไม่เกิน 50 รูป กรุณาแบ่งส่ง"}
+HTTP 422
+## U-1 GET /api/reports/daily?date=2026-11-16
+{"date":"2026-11-16","ready":true,"ready_label":"รายงานประจำวันพร้อมแล้ว","sites":[{"site":{"id":1,"code":"SITE-A","name":"ไซต์ ก"},"has_data":true,"taken":300,"with_result":300,"pass":269,"warn":11,"fail":20,"h_total":15,"edited":0,"failed":0,"pending":0,"pass_rate":89.66666666666667,"pass_rate_text":"89.67","red":true},{"site":{"id":2,"code":"SITE-B","name":"ไซต์ ข"},"has_data":true,"taken":300,"with_result":300,"pass":270,"warn":10,"fail":20,"h_total":20,"edited":0,"failed":0,"pending":0,"pass_rate":90,"pass_rate_text":"90.00","red":true},{"site":{"id":3,"code":"SITE-C","name":"ไซต์ ค"},"has_data":true,"taken":300,"with_result":300,"pass":271,"warn":9,"fail":20,"h_total":20,"edited":0,"failed":0,"pending":0,"pass_rate":90.33333333333333,"pass_rate_text":"90.33","red":false}],"now":"2026-11-19T11:39:25+07:00"}
+HTTP 200

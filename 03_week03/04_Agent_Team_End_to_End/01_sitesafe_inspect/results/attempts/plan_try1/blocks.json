@@ -1,0 +1,119 @@
+{
+  "goal": "สร้างระบบ SiteSafe Inspect ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md: ฝั่งเว็บ (Next.js web + dispatcher + PostgreSQL + volume photos รันด้วย docker compose) และฝั่ง AI (API gateway + RabbitMQ + GPU Worker YOLO 1 ตัว) หัวหน้างานอัปโหลดรูปหน้างาน ระบบตรวจหาคนไม่ใส่หมวก (H) และไม่ใส่เสื้อสะท้อนแสง (V) ตัดสินผล ผ่าน/เตือน/ไม่ผ่าน ตาม BR-01 ถึง BR-07 แก้ผลได้พร้อมร่องรอย และมีรายงานรายวันต่อไซต์",
+  "name": "sitesafe",
+  "blocks": [
+    {
+      "id": "B01",
+      "title": "โครงโปรเจกต์ + docker compose",
+      "size": "S",
+      "depends_on": [],
+      "skill": "cyolo",
+      "difficulty": 2,
+      "output": "docker-compose.yml",
+      "done": "docker compose config ผ่าน มีบริการ web, dispatcher, db, mock-gateway (profile test) และ volume photos พร้อมโฟลเดอร์ web/ ai/gateway ai/worker ai/train และ .env.example ครบทุกตัวแปรใน DESIGN หัวข้อ 11",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 0, 1, 11 สร้างโครงโฟลเดอร์: web/ (Next.js App Router ว่าง ๆ ที่ build ได้), ai/gateway, ai/worker, ai/train, mock-gateway/ และ ai/docker-compose.yml ของฝั่ง AI (gateway, rabbitmq, worker) สร้าง .env.example (ไม่มีค่าจริงของ key) .gitignore ที่กัน .env และ README.md บอกวิธีเปิดระบบ ห้ามเขียน logic ของบล็อกอื่น"
+    },
+    {
+      "id": "B02",
+      "title": "ฐานข้อมูล 7 ตาราง + ข้อมูลตั้งต้น",
+      "size": "M",
+      "depends_on": ["B01"],
+      "skill": "yolo",
+      "difficulty": 3,
+      "output": "web/db/schema.sql",
+      "done": "schema.sql สร้าง 7 ตารางตาม ER (CHECK declared_count 1–50, index site_id+upload_date+current_result, ถอนสิทธิ์ UPDATE/DELETE บน result_overrides) และ npm run seed ใส่ 3 ไซต์ 5 ผู้ใช้ 1233 รูป 1 การแก้ผล ตาม docs/TEST-DATA.md เรียกซ้ำได้ผลเท่าเดิม",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 2, 7.2 และ docs/TEST-DATA.md เขียน web/db/schema.sql, web/db/seed.ts (รหัสแถว seed คงที่ รหัสผ่านเก็บเป็น argon2id) และตัวเชื่อมต่อฐานข้อมูล web/lib/db.ts ห้ามอ่าน docs/BUGS-SECRET.md"
+    },
+    {
+      "id": "B03",
+      "title": "API gateway + คิว RabbitMQ",
+      "size": "L",
+      "depends_on": ["B01"],
+      "skill": "review",
+      "worker": "yolo",
+      "max_rounds": 2,
+      "difficulty": 4,
+      "output": "ai/gateway/main.py",
+      "done": "gateway มี API 4 เส้นทางตาม DESIGN 5.1 (ทุกเส้นทางรวม /v1/health ตอบ 401 เมื่อไม่มี X-API-Key หรือ key ผิด เทียบแบบ constant-time) POST /v1/jobs ซ้ำ job_id เดิมไม่สร้างงานใหม่ ตอบ 202 หลังได้ publisher confirm เท่านั้น ตอบ 429 + Retry-After เมื่อ queue_depth >= MAX_QUEUE_DEPTH โดยไม่เก็บไฟล์ ประกาศคิว quorum ppe.jobs/ppe.results/ppe.jobs.dead ตาม 6.1 และเขียนผลเฉพาะงานที่ยังไม่จบ มี unit test ผ่าน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 5.1, 6.1, 6.2, 6.3 เขียน ai/gateway/ (HTTP API, jobs.db SQLite 1 ตาราง, ไฟล์รูปชั่วคราวที่ลบเมื่องานจบ, consumer ของ ppe.results และ ppe.jobs.dead, PROCESSING_TIMEOUT_S, ตัวกรอง log ที่ตัด X-API-Key) และไฟล์ ai/gateway/queues.py ที่เป็นที่เดียวซึ่งประกาศชื่อคิวกับ argument (x-delivery-limit=3, dead-letter, x-max-length, reject-publish) เพื่อให้ GPU Worker ใช้ร่วม บล็อกนี้ผิดแล้วรูปหายหรือผลซ้ำ (NFR-04) และรูปรั่วออกนอกระบบ (NFR-05) ผู้ตรวจต้องไล่ตรวจตารางรหัสคำตอบและเส้นแบ่ง 199/200 ทีละข้อ"
+    },
+    {
+      "id": "B04",
+      "title": "GPU Worker (YOLO ตรวจรูป)",
+      "size": "M",
+      "depends_on": ["B03"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "output": "ai/worker/worker.py",
+      "done": "worker.py โหลดโมเดลจาก MODEL_PATH ครั้งเดียว ตั้ง prefetch=1 publish STARTED แล้ว DONE/FAILED ลง ppe.results และ ack หลังได้ confirm เท่านั้น ผลมี h, v, detections (NO_HARDHAT/NO_VEST, box เป็นพิกเซลรูปต้นฉบับ), image_w, image_h, model_version, conf_threshold, infer_ms รูปเปิดไม่ได้ให้ FAILED IMAGE_UNREADABLE",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 3, 5.1 (API 2), 6.1, 6.2 และ ai/gateway/queues.py ของ B03 (ใช้ชื่อคิวและ argument ชุดเดียวกัน ห้ามประกาศเอง) เขียน ai/worker/ (worker.py, Dockerfile, requirements.txt) นับ H, V เฉพาะกรอบที่ confidence >= CONF_THRESHOLD ไม่เรียกบริการภายนอก มี unit test ที่ใช้โมเดลจำลอง"
+    },
+    {
+      "id": "B05",
+      "title": "โค้ด Training + Evaluation ของโมเดล",
+      "size": "M",
+      "depends_on": ["B01"],
+      "skill": "yolo",
+      "difficulty": 3,
+      "output": "ai/train/evaluate.py",
+      "done": "train.py เทรน YOLO ได้ไฟล์โมเดล 2 คลาส NO_HARDHAT/NO_VEST · select_threshold.py เลือก Confidence Threshold บน Validation Set (Recall สูงสุดโดย Precision >= 0.80) · evaluate.py วัด Image-level Recall และ Precision ของทั้ง 2 คลาสบน Test Set แล้วเขียน metrics.json พร้อมผลตัดสินเกณฑ์ >= 0.80 ของคลาสไม่ใส่หมวก",
+      "detail": "อ่าน docs/REQUIREMENTS.md NFR-01, AS-04, AS-14 และ docs/DESIGN.md DQ-02 เขียน ai/train/ (train.py, select_threshold.py, evaluate.py, requirements.txt, README.md) นิยาม TP/FN/FP ที่ระดับรูปตาม NFR-01 ตรวจว่า Test Set มีรูป Positive >= 100 และรูปที่ไม่มีคนไม่ใส่หมวก >= 100 และไม่ปนกับรูปเทรนหรือ Validation บล็อกนี้เขียนโค้ดและ unit test ของการคำนวณตัวชี้วัดเท่านั้น ยังไม่เทรนจริง"
+    },
+    {
+      "id": "B06",
+      "title": "เว็บฝั่งเซิร์ฟเวอร์: API 14 เส้นทาง + กติกา + dispatcher",
+      "size": "L",
+      "depends_on": ["B02"],
+      "skill": "yolo",
+      "difficulty": 4,
+      "output": "web/lib/rules.ts",
+      "done": "API 14 เส้นทางตาม DESIGN 5.2 ตอบรหัสถูกต้อง (401/403/404/413/415/422) ผ่าน canAccess ทุก Route Handler · lib/rules ตัดสิน BR-01 ถึง BR-07 ที่เส้นแบ่งถูก (H=1, V=1/2, 15,728,640 ไบต์, 50 รูป, 269/270/271 ต่อ 300, 18:00) · dispatcher ส่งงาน ถามสถานะ backoff และตั้ง FAILED เมื่อค้างเกิน 15 นาที · unit test ของ lib/rules ผ่าน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 3, 4, 5.2, 7.1, 7.2, 8, 9, 10 และไฟล์ของ B02 เขียน web/app/api/**, web/lib/ (rules.ts เป็นที่เดียวที่อ่าน BUG_MODE, auth.ts, access.ts, storage.ts, report.ts), web/dispatcher/ (วนทุก 1 วินาที เขียน detections ใน transaction เดียวกับ status=DONE ที่มีเงื่อนไข WHERE status IN ('QUEUED','PROCESSING')), /api/health และ /api/test/reset ยังไม่ทำหน้าจอ"
+    },
+    {
+      "id": "B07",
+      "title": "หน้าเว็บ 7 หน้า + data-testid",
+      "size": "M",
+      "depends_on": ["B06"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "output": "web/app/(app)/layout.tsx",
+      "done": "มีหน้า /login /upload /uploads/{batchId} /photos /photos/problems /photos/{id} /reports/daily และแถบบน ทุกชิ้นมี data-testid ครบตามตาราง DESIGN 7.4 ผู้ที่ไม่ล็อกอินถูกส่งไป /login เมนูซ่อนตามบทบาท และ npm run build ผ่าน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 7.4, 9.2, D-08 และ API ของ B06 เขียนหน้าจอใน web/app/ (ข้อความภาษาไทย) กรอบแจ้งปัญหาวาดทับรูปจากพิกัดในฐานข้อมูล หน้าสถานะ polling ทุก 2 วินาที หน้ารายงานแสดงครบ 3 ไซต์ สีแดงใช้ data-red ใช้ภาพโลโก้ที่ public/logo.png (ถ้ายังไม่มีไฟล์ให้อ้าง path ไว้) ห้ามแก้ไฟล์ใน web/lib และ web/app/api"
+    },
+    {
+      "id": "B08",
+      "title": "mock-gateway (AI_MODE=mock)",
+      "size": "S",
+      "depends_on": ["B01"],
+      "skill": "cyolo",
+      "difficulty": 2,
+      "output": "mock-gateway/server.js",
+      "done": "mock-gateway ทำตาม API Contract 5.1 ทั้ง 4 เส้นทาง (รวม 401 และ 200 เมื่อส่ง job_id ซ้ำ) คืน h, v ตามชื่อไฟล์ h{H}_v{V}* · corrupt* ให้ FAILED IMAGE_UNREADABLE · ชื่ออื่นให้ h=0 v=0 และมี test ผ่าน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 5.1 และ 7.3 เขียน mock-gateway/ (server.js, Dockerfile, package.json) อ่านชื่อจากช่อง filename ของส่วน image ใน multipart คืนกรอบตามจำนวน H และ V"
+    },
+    {
+      "id": "B09",
+      "title": "โลโก้ SiteSafe Inspect",
+      "size": "S",
+      "depends_on": [],
+      "skill": "image",
+      "difficulty": 1,
+      "output": "web/public/logo.png",
+      "done": "PNG โลโก้ SiteSafe Inspect รูปหมวกนิรภัยกับเครื่องหมายถูก สีเหลืองและน้ำเงินเข้ม พื้นขาว อ่านชื่อได้ชัดที่ขนาดเล็ก",
+      "detail": "โลโก้แบบ flat สี่เหลี่ยมจัตุรัส มีสัญลักษณ์หมวกนิรภัยสีเหลืองกับเครื่องหมายถูก และคำว่า SiteSafe Inspect ไม่มีใบหน้าคน"
+    },
+    {
+      "id": "B10",
+      "title": "รวมระบบ + ทดสอบเบื้องต้น",
+      "size": "M",
+      "depends_on": ["B04", "B05", "B07", "B08", "B09"],
+      "skill": "yolo",
+      "difficulty": 3,
+      "output": "TEST.md",
+      "done": "docker compose --profile test up ขึ้นครบ /api/health ตอบ status ok ในโหมด AI_MODE=mock · POST /api/test/reset ได้ sites 3 users 5 photos 1233 · ล็อกอินแล้วอัปโหลด h1_v0.jpg ได้ผลไม่ผ่าน, h0_v1.jpg ได้เตือน, h0_v0.jpg ได้ผ่าน · หน้าเว็บแสดงโลโก้ · unit test ทุกส่วนผ่าน · TEST.md บันทึกคำสั่งและผลจริงทุกข้อ รวมข้อที่ยังทดสอบไม่ได้เพราะไม่มี GPU",
+      "exclusive": true,
+      "detail": "อ่านไฟล์ผลของทุกบล็อก แก้จุดที่ต่อกันไม่ติด (ชื่อบริการ พอร์ต ตัวแปร .env path ของโลโก้) รัน smoke test ด้วยโหมด mock ไม่เช่า GPU และไม่เทรนโมเดลจริง ตรวจว่าไม่มี API key ในซอร์สโค้ดและ log ห้ามอ่าน docs/BUGS-SECRET.md แล้วเขียน TEST.md"
+    }
+  ]
+}

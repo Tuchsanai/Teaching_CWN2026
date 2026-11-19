@@ -1,0 +1,33 @@
+{
+  "name": "sitesafe-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0 -p 3000",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx db/seed-cli.ts",
+    "migrate": "tsx db/migrate-cli.ts",
+    "dispatcher": "tsx dispatcher/index.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
+    "busboy": "^1.6.0",
+    "next": "15.5.29",
+    "pg": "^8.13.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.4",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}

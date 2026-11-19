@@ -1,0 +1,437 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: 53_queue.spec.ts >> TC-3-08 [P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป
+- Location: tests\53_queue.spec.ts:287:1
+
+# Error details
+
+```
+Error: p95 เวลารอผล ≤ 30 วินาที (ได้ 42.4 วินาที)
+
+expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 30
+Received:    42.4
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "SiteSafe Inspect SiteSafe Inspect" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - img "SiteSafe Inspect" [ref=e4]
+      - generic [ref=e5]: SiteSafe Inspect
+    - navigation [ref=e6]:
+      - link "อัปโหลดรูป" [ref=e7] [cursor=pointer]:
+        - /url: /upload
+      - link "รูปทั้งหมด" [ref=e8] [cursor=pointer]:
+        - /url: /photos
+      - link "รูปที่มีปัญหา" [ref=e9] [cursor=pointer]:
+        - /url: /photos/problems
+      - link "รายงานรายวัน" [ref=e10] [cursor=pointer]:
+        - /url: /reports/daily
+    - generic [ref=e11]:
+      - strong [ref=e12]: หัวหน้างานไซต์ ก
+      - generic [ref=e13]: หัวหน้างานไซต์
+      - generic [ref=e14]: ไซต์ ก
+      - button "ออกจากระบบ" [ref=e15] [cursor=pointer]
+  - main [ref=e16]:
+    - heading "สถานะการตรวจรูป" [level=1] [ref=e17]
+    - generic [ref=e18]:
+      - paragraph [ref=e19]: ไซต์ ไซต์ ก · ผู้อัปโหลด หัวหน้างานไซต์ ก · แจ้งจำนวนไว้ 20 รูป
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - text: รูปที่ระบบรับแล้ว
+          - generic [ref=e22]: "20"
+        - generic [ref=e23]:
+          - text: รอคิว
+          - generic [ref=e24]: "0"
+        - generic [ref=e25]:
+          - text: กำลังตรวจ
+          - generic [ref=e26]: "0"
+        - generic [ref=e27]:
+          - text: เสร็จแล้ว
+          - generic [ref=e28]: "20"
+        - generic [ref=e29]:
+          - text: ตรวจไม่สำเร็จ
+          - generic [ref=e30]: "0"
+      - generic [ref=e31]:
+        - button "โหลดใหม่" [ref=e32] [cursor=pointer]
+        - generic [ref=e33]: อัปเดตอัตโนมัติทุก 2 วินาที · ล่าสุด 10:25:51
+    - table [ref=e34]:
+      - rowgroup [ref=e35]:
+        - row [ref=e36]:
+          - columnheader "#" [ref=e37]
+          - columnheader "ไฟล์" [ref=e38]
+          - columnheader "สถานะ" [ref=e39]
+          - columnheader "ผล" [ref=e40]
+          - columnheader "H" [ref=e41]
+          - columnheader "V" [ref=e42]
+          - columnheader "เหตุผล" [ref=e43]
+          - columnheader [ref=e44]
+      - rowgroup [ref=e45]:
+        - row [ref=e46]:
+          - cell "1" [ref=e47]
+          - cell "-4405-_png_jpg.rf.82b5c10b2acd1cfaa24259ada8e599fe.jpg" [ref=e48]
+          - cell "เสร็จแล้ว" [ref=e49]
+          - cell "ไม่ผ่าน" [ref=e50]
+          - cell "1" [ref=e51]
+          - cell "0" [ref=e52]
+          - cell [ref=e53]
+          - cell [ref=e54]:
+            - link "เปิดรูป" [ref=e55] [cursor=pointer]:
+              - /url: /photos/9e049cf2-3e38-4a57-a6f1-80a1835af2a5
+        - row [ref=e56]:
+          - cell "2" [ref=e57]
+          - cell "000005_jpg.rf.96e9379ccae638140c4a90fc4b700a2b.jpg" [ref=e58]
+          - cell "เสร็จแล้ว" [ref=e59]
+          - cell "ผ่าน" [ref=e60]
+          - cell "0" [ref=e61]
+          - cell "0" [ref=e62]
+          - cell [ref=e63]
+          - cell [ref=e64]:
+            - link "เปิดรูป" [ref=e65] [cursor=pointer]:
+              - /url: /photos/03b67b55-e6ec-4ce2-b075-a5812e1148ea
+        - row [ref=e66]:
+          - cell "3" [ref=e67]
+          - cell "002551_jpg.rf.ce4b9f934161faa72c80dc6898d37b2d.jpg" [ref=e68]
+          - cell "เสร็จแล้ว" [ref=e69]
+          - cell "ไม่ผ่าน" [ref=e70]
+          - cell "0" [ref=e71]
+          - cell "3" [ref=e72]
+          - cell [ref=e73]
+          - cell [ref=e74]:
+            - link "เปิดรูป" [ref=e75] [cursor=pointer]:
+              - /url: /photos/9f6ee73c-a108-4e49-bcbc-2769ccf4f918
+        - row [ref=e76]:
+          - cell "4" [ref=e77]
+          - cell "003357_jpg.rf.9867f91e88089bb68dc95947d5116d14.jpg" [ref=e78]
+          - cell "เสร็จแล้ว" [ref=e79]
+          - cell "เตือน" [ref=e80]
+          - cell "0" [ref=e81]
+          - cell "1" [ref=e82]
+          - cell [ref=e83]
+          - cell [ref=e84]:
+            - link "เปิดรูป" [ref=e85] [cursor=pointer]:
+              - /url: /photos/d6fbca65-bc9e-41e3-9af6-64e32bd045d4
+        - row [ref=e86]:
+          - cell "5" [ref=e87]
+          - cell "004063_jpg.rf.1b7cdc4035bcb24ef69b8798b444053e.jpg" [ref=e88]
+          - cell "เสร็จแล้ว" [ref=e89]
+          - cell "ไม่ผ่าน" [ref=e90]
+          - cell "1" [ref=e91]
+          - cell "4" [ref=e92]
+          - cell [ref=e93]
+          - cell [ref=e94]:
+            - link "เปิดรูป" [ref=e95] [cursor=pointer]:
+              - /url: /photos/d6f8f397-5f5f-4cc4-ab63-2a9be23490f6
+        - row [ref=e96]:
+          - cell "6" [ref=e97]
+          - cell "004763_jpg.rf.46484e6ca73caeaa9de45822cf1085a9.jpg" [ref=e98]
+          - cell "เสร็จแล้ว" [ref=e99]
+          - cell "ไม่ผ่าน" [ref=e100]
+          - cell "0" [ref=e101]
+          - cell "3" [ref=e102]
+          - cell [ref=e103]
+          - cell [ref=e104]:
+            - link "เปิดรูป" [ref=e105] [cursor=pointer]:
+              - /url: /photos/946dea37-6493-4a07-9869-449ee1a89cd0
+        - row [ref=e106]:
+          - cell "7" [ref=e107]
+          - cell "006463_jpg.rf.02f19082420ecc5537b9d59abbe6050c.jpg" [ref=e108]
+          - cell "เสร็จแล้ว" [ref=e109]
+          - cell "ไม่ผ่าน" [ref=e110]
+          - cell "0" [ref=e111]
+          - cell "9" [ref=e112]
+          - cell [ref=e113]
+          - cell [ref=e114]:
+            - link "เปิดรูป" [ref=e115] [cursor=pointer]:
+              - /url: /photos/ef23219b-e8d6-41fe-87ed-b22c10a48646
+        - row [ref=e116]:
+          - cell "8" [ref=e117]
+          - cell "006672_jpg.rf.87d5978c486feb53177408cf00a0d87f.jpg" [ref=e118]
+          - cell "เสร็จแล้ว" [ref=e119]
+          - cell "ผ่าน" [ref=e120]
+          - cell "0" [ref=e121]
+          - cell "0" [ref=e122]
+          - cell [ref=e123]
+          - cell [ref=e124]:
+            - link "เปิดรูป" [ref=e125] [cursor=pointer]:
+              - /url: /photos/6e91e3ad-1d7a-4754-b24f-bf11346426f6
+        - row [ref=e126]:
+          - cell "9" [ref=e127]
+          - cell "0_jpg.rf.2ff49f74309118f169e07aa12564df87.jpg" [ref=e128]
+          - cell "เสร็จแล้ว" [ref=e129]
+          - cell "ผ่าน" [ref=e130]
+          - cell "0" [ref=e131]
+          - cell "0" [ref=e132]
+          - cell [ref=e133]
+          - cell [ref=e134]:
+            - link "เปิดรูป" [ref=e135] [cursor=pointer]:
+              - /url: /photos/a2a48d17-962a-44c9-a646-6b58940cbf3f
+        - row [ref=e136]:
+          - cell "10" [ref=e137]
+          - cell "2008_008320_jpg.rf.bd34011d46f82f9410d95f00e560b8ea.jpg" [ref=e138]
+          - cell "เสร็จแล้ว" [ref=e139]
+          - cell "ไม่ผ่าน" [ref=e140]
+          - cell "1" [ref=e141]
+          - cell "0" [ref=e142]
+          - cell [ref=e143]
+          - cell [ref=e144]:
+            - link "เปิดรูป" [ref=e145] [cursor=pointer]:
+              - /url: /photos/b9798daf-0a47-49f7-9e99-635c086ba2fa
+        - row [ref=e146]:
+          - cell "11" [ref=e147]
+          - cell "2008_008519_jpg.rf.1798c8eed7de04399a0e7e297b4b4c9e.jpg" [ref=e148]
+          - cell "เสร็จแล้ว" [ref=e149]
+          - cell "เตือน" [ref=e150]
+          - cell "0" [ref=e151]
+          - cell "1" [ref=e152]
+          - cell [ref=e153]
+          - cell [ref=e154]:
+            - link "เปิดรูป" [ref=e155] [cursor=pointer]:
+              - /url: /photos/d4d56424-3740-4d49-bfc1-f7cb82082707
+        - row [ref=e156]:
+          - cell "12" [ref=e157]
+          - cell "2009_000059_jpg.rf.50e8398a37eb33f33fd9f662feeea083.jpg" [ref=e158]
+          - cell "เสร็จแล้ว" [ref=e159]
+          - cell "ไม่ผ่าน" [ref=e160]
+          - cell "1" [ref=e161]
+          - cell "1" [ref=e162]
+          - cell [ref=e163]
+          - cell [ref=e164]:
+            - link "เปิดรูป" [ref=e165] [cursor=pointer]:
+              - /url: /photos/e9a8f40b-0a6c-4b3a-ab18-b7296d429b2b
+        - row [ref=e166]:
+          - cell "13" [ref=e167]
+          - cell "2009_000496_jpg.rf.9a2d210fe0f5ea4b572aeb07e41ecbae.jpg" [ref=e168]
+          - cell "เสร็จแล้ว" [ref=e169]
+          - cell "ผ่าน" [ref=e170]
+          - cell "0" [ref=e171]
+          - cell "0" [ref=e172]
+          - cell [ref=e173]
+          - cell [ref=e174]:
+            - link "เปิดรูป" [ref=e175] [cursor=pointer]:
+              - /url: /photos/3ca76996-2255-4fc0-8397-cbef939f2c7e
+        - row [ref=e176]:
+          - cell "14" [ref=e177]
+          - cell "3e7e40981ddd4cdb055c7ffe4c2af5d8_jpg.rf.bac50dc18195e9aeb6f3a21782a3efcb.jpg" [ref=e178]
+          - cell "เสร็จแล้ว" [ref=e179]
+          - cell "ผ่าน" [ref=e180]
+          - cell "0" [ref=e181]
+          - cell "0" [ref=e182]
+          - cell [ref=e183]
+          - cell [ref=e184]:
+            - link "เปิดรูป" [ref=e185] [cursor=pointer]:
+              - /url: /photos/a85b5258-24fc-4331-9d8e-db372513d19a
+        - row [ref=e186]:
+          - cell "15" [ref=e187]
+          - cell "777_jpg.rf.92dc6945342410ced7ac93f3dfbff0c5.jpg" [ref=e188]
+          - cell "เสร็จแล้ว" [ref=e189]
+          - cell "ผ่าน" [ref=e190]
+          - cell "0" [ref=e191]
+          - cell "0" [ref=e192]
+          - cell [ref=e193]
+          - cell [ref=e194]:
+            - link "เปิดรูป" [ref=e195] [cursor=pointer]:
+              - /url: /photos/a367ce3b-9222-44d0-a9d5-1b84bce45ee7
+        - row [ref=e196]:
+          - cell "16" [ref=e197]
+          - cell "Bookstore_More_Merchandise_jpg.rf.7ab5add3e28ced74f9b316e794cc04d2.jpg" [ref=e198]
+          - cell "เสร็จแล้ว" [ref=e199]
+          - cell "ผ่าน" [ref=e200]
+          - cell "0" [ref=e201]
+          - cell "0" [ref=e202]
+          - cell [ref=e203]
+          - cell [ref=e204]:
+            - link "เปิดรูป" [ref=e205] [cursor=pointer]:
+              - /url: /photos/050bf998-5ab1-437c-80ea-e74f20c95c9c
+        - row [ref=e206]:
+          - cell "17" [ref=e207]
+          - cell "IMG_0871_MOV-12_jpg.rf.36858a9d51613f9a39b7855b54dfa098.jpg" [ref=e208]
+          - cell "เสร็จแล้ว" [ref=e209]
+          - cell "ไม่ผ่าน" [ref=e210]
+          - cell "1" [ref=e211]
+          - cell "1" [ref=e212]
+          - cell [ref=e213]
+          - cell [ref=e214]:
+            - link "เปิดรูป" [ref=e215] [cursor=pointer]:
+              - /url: /photos/3bcb95b6-bfaf-4b49-90a7-e9c00367259f
+        - row [ref=e216]:
+          - cell "18" [ref=e217]
+          - cell "IMG_0871_mp4-11_jpg.rf.432092b53ebeb84f4b9b27b40343c9aa.jpg" [ref=e218]
+          - cell "เสร็จแล้ว" [ref=e219]
+          - cell "ไม่ผ่าน" [ref=e220]
+          - cell "1" [ref=e221]
+          - cell "1" [ref=e222]
+          - cell [ref=e223]
+          - cell [ref=e224]:
+            - link "เปิดรูป" [ref=e225] [cursor=pointer]:
+              - /url: /photos/abc716c8-6d8c-45aa-b550-235f29a9f10e
+        - row [ref=e226]:
+          - cell "19" [ref=e227]
+          - cell "IMG_0871_mp4-23_jpg.rf.03f872b1ed87ad7fadc85e09475ad37a.jpg" [ref=e228]
+          - cell "เสร็จแล้ว" [ref=e229]
+          - cell "ไม่ผ่าน" [ref=e230]
+          - cell "1" [ref=e231]
+          - cell "1" [ref=e232]
+          - cell [ref=e233]
+          - cell [ref=e234]:
+            - link "เปิดรูป" [ref=e235] [cursor=pointer]:
+              - /url: /photos/5da963b9-8ed3-4647-aba7-ca78e859a567
+        - row [ref=e236]:
+          - cell "20" [ref=e237]
+          - cell "IMG_3100_mp4-12_jpg.rf.58849ca6a931c2cfe1b17fb4206d9d82.jpg" [ref=e238]
+          - cell "เสร็จแล้ว" [ref=e239]
+          - cell "ไม่ผ่าน" [ref=e240]
+          - cell "1" [ref=e241]
+          - cell "1" [ref=e242]
+          - cell [ref=e243]
+          - cell [ref=e244]:
+            - link "เปิดรูป" [ref=e245] [cursor=pointer]:
+              - /url: /photos/cd09b174-faec-45ae-bc6f-f8847325a746
+  - alert [ref=e246]
+```
+
+# Test source
+
+```ts
+  237 |     const { batchId, items } = await upload(cookie, rd.files.map(f => ({ path: f.path })));
+  238 |     const photos = rd.files.map((f, i) => ({
+  239 |       key: f.key, file: path.basename(f.path), bytes: fs.statSync(f.path).size, http: items[i].status, id: items[i].photoId,
+  240 |       acceptedAt: items[i].acceptedAt, everProcessing: false, terminalS: null as number | null, status: null as string | null,
+  241 |       label: null as string | null, fail_reason: null as string | null,
+  242 |     }));
+  243 |     photos.forEach(p => expect.soft(p.http, `รอบ ${rd.round} ${p.key} (${p.file}) ต้องได้ 201`).toBe(201));
+  244 |     const t0 = Date.now(); const timeline: any[] = []; let lastSig = '';
+  245 |     while (Date.now() - t0 < (STUCK_LIMIT_S + WATCHDOG_GRACE_S) * 1000) {
+  246 |       for (const p of photos) {
+  247 |         if (!p.id || (p.status && TERMINAL.has(p.status))) continue;
+  248 |         const g = await getPhoto(cookie, p.id);
+  249 |         p.status = g.photo?.status ?? `HTTP ${g.status}`; p.label = g.photo?.status_label ?? null; p.fail_reason = g.photo?.fail_reason ?? null;
+  250 |         if (p.status === 'PROCESSING') p.everProcessing = true;
+  251 |         if (TERMINAL.has(p.status!) && p.terminalS === null) p.terminalS = Math.round((Date.now() - p.acceptedAt) / 100) / 10;
+  252 |       }
+  253 |       const sig = photos.map(p => `${p.key}:${p.status}`).join(' ');
+  254 |       if (sig !== lastSig) { timeline.push({ t_s: Math.round((Date.now() - t0) / 1000), statuses: sig }); lastSig = sig; }
+  255 |       if (photos.every(p => !p.id || (p.status && TERMINAL.has(p.status)))) break;
+  256 |       await sleep(5000);
+  257 |     }
+  258 |     for (const p of photos) {
+  259 |       const e = expected[p.key];
+  260 |       expect.soft(p.terminalS !== null && p.terminalS <= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+  261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+  262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = "${e.label}"`).toBe(e.label);
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = "${e.reason}"`).toBe(e.reason);
+  264 |     }
+  265 |     const page = await openBatchPage(context, cookie, batchId);
+  266 |     await sleep(3000);
+  267 |     await shot(testInfo, page, `round${rd.round}-uploads-batch`);
+  268 |     await page.close();
+  269 |     const stalled = photos.some(p => p.terminalS === null || p.terminalS > 30 || p.fail_reason === 'เกินเวลา 15 นาที');
+  270 |     out.push({
+  271 |       round: rd.round, user: rd.user, site: rd.site, batchId, queue_before: { empty: pre.empty, waited_s: pre.waitedS, depth: pre.health?.body?.queue_depth },
+  272 |       stalled_over_30s_or_timeout: stalled,
+  273 |       photos: photos.map(({ acceptedAt, ...p }) => ({ ...p, accepted_at: new Date(acceptedAt).toISOString() })),
+  274 |       timeline,
+  275 |     });
+  276 |   }
+  277 |   const [r1, r2, r3] = out.map(o => o.stalled_over_30s_or_timeout);
+  278 |   const diagnosis = !r1 && !r2 && !r3 ? 'ไม่ค้างทุกรอบ (D-1 ไม่เกิดซ้ำ)'
+  279 |     : r1 && r2 && r3 ? 'ค้างทุกรอบ รวมรูปปกติ → ไม่ผูกกับไซต์หรือขนาดไฟล์ (ทั้งหมด)'
+  280 |       : r1 && r2 && !r3 ? 'ค้างรอบ 1 และ 2 แต่รูปปกติไม่ค้าง → ผูกกับขนาดไฟล์ / ไฟล์เสีย'
+  281 |         : r1 && !r2 ? 'ค้างรอบ 1 (SITE-B) แต่รอบ 2 (SITE-A) ไม่ค้าง → ผูกกับไซต์' + (r3 ? ' (รอบ 3 SITE-B ก็ค้าง)' : '')
+  282 |           : `รูปแบบอื่น r1=${r1} r2=${r2} r3=${r3}`;
+  283 |   await evidence(testInfo, 'evidence', { tc: 'TC-3-07', poll_every_s: 5, cap_s: STUCK_LIMIT_S, grace_s: WATCHDOG_GRACE_S, diagnosis, rounds: out });
+  284 | });
+  285 | 
+  286 | // ---------------- TC-3-08 ----------------
+  287 | test('TC-3-08 [P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป', async ({ context }, testInfo) => {
+  288 |   test.setTimeout(25 * 60 * 1000);
+  289 |   await reset();
+  290 |   const cookie = await login('U2');
+  291 |   const files = allTestImages();
+  292 |   expect.soft(files.length, 'โฟลเดอร์ test_images มี 20 รูป').toBe(20);
+  293 |   const health = await gwHealth();
+  294 |   useRealBudget(files.length, 'TC-3-08');
+  295 |   const b = await openBatch(cookie, files.length);
+  296 |   expect(b.status, 'เปิด batch ต้องได้ 201').toBe(201);
+  297 |   const batchId = b.json.batch_id as string;
+  298 | 
+  299 |   type Row = { file: string; http?: number; id?: string; start?: number; endS: number | null; status?: string };
+  300 |   const rows: Row[] = files.map(f => ({ file: path.basename(f), endS: null }));
+  301 |   let uploading = true; let interleaved: any = null; let polls = 0; let lastAccepted = Date.now();
+  302 |   // ส่งทีละไฟล์ และถามสถานะทุก 1 วินาทีไปพร้อมกัน เวลาเริ่ม = เวลาได้ 201 ของแต่ละรูป
+  303 |   const uploader = (async () => {
+  304 |     for (let i = 0; i < files.length; i++) {
+  305 |       const r = await sendFile(cookie, batchId, files[i]);
+  306 |       rows[i].http = r.status; rows[i].id = r.photoId; rows[i].start = r.acceptedAt; lastAccepted = r.acceptedAt;
+  307 |     }
+  308 |     uploading = false;
+  309 |   })();
+  310 |   const poller = (async () => {
+  311 |     while (true) {
+  312 |       const pending = rows.filter(r => r.id && r.endS === null);
+  313 |       const now0 = Date.now();
+  314 |       if (!uploading && pending.length === 0) break;
+  315 |       if (!uploading && now0 - lastAccepted > STUCK_LIMIT_S * 1000) break;
+  316 |       const snap = await Promise.all(rows.filter(r => r.id).map(async r => ({ r, g: await getPhoto(cookie, r.id!) })));
+  317 |       polls++;
+  318 |       const tNow = Date.now();
+  319 |       for (const { r, g } of snap) {
+  320 |         r.status = g.photo?.status;
+  321 |         if (r.endS === null && hasResult(g.photo)) r.endS = Math.round((tNow - r.start!) / 100) / 10;
+  322 |       }
+  323 |       const withResult = snap.filter(s => hasResult(s.g.photo)).length;
+  324 |       const waiting = snap.filter(s => s.g.photo?.status === 'QUEUED' || s.g.photo?.status === 'PROCESSING').length;
+  325 |       if (!interleaved && withResult >= 1 && waiting >= 1) interleaved = { poll: polls, with_result: withResult, queued_or_processing: waiting };
+  326 |       await sleep(Math.max(0, 1000 - (Date.now() - now0)));
+  327 |     }
+  328 |   })();
+  329 |   await uploader; await poller;
+  330 | 
+  331 |   rows.forEach(r => expect.soft(r.http, `${r.file} ต้องได้ 201`).toBe(201));
+  332 |   const times = rows.map(r => r.endS === null ? STUCK_LIMIT_S : Math.min(r.endS, STUCK_LIMIT_S));
+  333 |   const sorted = [...times].sort((a, b) => a - b);
+  334 |   const rank = Math.ceil(0.95 * sorted.length);           // 20 รูป → ลำดับที่ 19
+  335 |   const p95 = sorted[rank - 1];
+  336 |   expect.soft(rank, 'p95 nearest-rank ของ 20 ค่า = ลำดับที่ 19').toBe(19);
+> 337 |   expect.soft(p95, `p95 เวลารอผล ≤ 30 วินาที (ได้ ${p95} วินาที)`).toBeLessThanOrEqual(30);
+      |                                                                    ^ Error: p95 เวลารอผล ≤ 30 วินาที (ได้ 42.4 วินาที)
+  338 |   expect.soft(interleaved !== null, 'มีอย่างน้อย 1 ครั้งที่บางรูปมีผลขณะที่รูปอื่นยัง รอคิว/กำลังตรวจ (ผลขึ้นทีละรูป)').toBe(true);
+  339 |   expect.soft(health.status, 'GET /v1/health ด้วย key ถูก ต้องได้ 200').toBe(200);
+  340 |   const gpu = (health as any).body?.gpu;
+  341 |   expect.soft(typeof gpu === 'string' && gpu.length > 0, 'gateway รายงานรุ่น GPU').toBe(true);
+  342 |   expect.soft(typeof gpu === 'string' && !/[,;]/.test(gpu), 'gateway รายงาน GPU 1 ใบ (ชื่อเดียว)').toBe(true);
+  343 |   expect.soft((health as any).body?.workers, 'workers = 1 (เครื่องมี GPU 1 ใบ)').toBe(1);
+  344 | 
+  345 |   const page = await openBatchPage(context, cookie, batchId);
+  346 |   await sleep(3000);
+  347 |   await shot(testInfo, page, 'uploads-batch-end');
+  348 |   await evidence(testInfo, 'evidence', {
+  349 |     tc: 'TC-3-08', batchId, poll_every_s: 1, cap_s: STUCK_LIMIT_S, polls,
+  350 |     gpu, workers: (health as any).body?.workers, gateway_health: health,
+  351 |     per_photo: rows.map(r => ({ file: r.file, http: r.http, photoId: r.id, accepted_at: r.start ? new Date(r.start).toISOString() : null, wait_s: r.endS, counted_s: r.endS === null ? STUCK_LIMIT_S : r.endS, final_status: r.status })),
+  352 |     times_sorted_s: sorted, p95_rank: rank, p95_s: p95, interleaved,
+  353 |   });
+  354 | });
+  355 | 
+  356 | // ---------------- blocked ----------------
+  357 | test('TC-3-09 [P1] รูปค้างเกิน 15 นาทีเป็นตรวจไม่สำเร็จ ผลที่มาช้าไม่เปลี่ยนสถานะ', async ({ }, testInfo) => {
+  358 |   await blockedTC(testInfo, 'TC-3-09', ['หยุด Worker 15 นาที แล้วเปิดใหม่', 'นับแถว detections'],
+  359 |     'ต้องหยุด Worker บนเครื่อง GPU ที่เช่า 15 นาทีแล้วเปิดใหม่ ซึ่งห้ามแตะเครื่องนั้น');
+  360 | });
+  361 | test('TC-3-10 [P1] คิว gateway เต็ม เว็บยังรับรูป 201 และส่งใหม่เองจนเสร็จแล้ว', async ({ }, testInfo) => {
+  362 |   await blockedTC(testInfo, 'TC-3-10', ['MAX_QUEUE_DEPTH=5', 'หยุด Worker แล้วเติมงานให้ค้าง 5', 'นับแถว jobs'],
+  363 |     'ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะ');
+  364 | });
+  365 | 
+```

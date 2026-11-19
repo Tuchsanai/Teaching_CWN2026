@@ -1,0 +1,23 @@
+{
+  "tc": "TC-3-10",
+  "run": "blocked · ไม่ได้ส่งงานหรือรูปใดเลย",
+  "needs": [
+    "MAX_QUEUE_DEPTH=5",
+    "หยุด Worker แล้วเติมงานให้ค้าง 5",
+    "นับแถว jobs"
+  ],
+  "gateway_health_now": {
+    "at": "2026-11-19T03:25:55.735Z",
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "rabbitmq": "ok",
+      "workers": 1,
+      "queue_depth": 0,
+      "max_queue_depth": 200,
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "model_version": "ppe-yolo-v1"
+    }
+  },
+  "note": "เครื่อง GPU เป็นเครื่องเช่า ห้ามหยุด Worker / ห้ามแก้ MAX_QUEUE_DEPTH / ไม่มี shell และไม่มีสิทธิ์อ่าน jobs.db"
+}

@@ -1,0 +1,62 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": null,
+    "batchUpload": null
+  },
+  "statuses": {
+    "GET /api/photos?date=2026-11-16": 403,
+    "GET /api/photos/{photoB}": 403,
+    "GET /api/photos/{photoB}/image": 403,
+    "GET /api/photos/{photoB}/overrides": 403
+  },
+  "leaks": {
+    "GET /api/photos?date=2026-11-16": {
+      "status": 403,
+      "contentType": "application/json",
+      "bytes": 124,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "FORBIDDEN"
+    },
+    "GET /api/photos/{photoB}": {
+      "status": 403,
+      "contentType": "application/json",
+      "bytes": 124,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "FORBIDDEN"
+    },
+    "GET /api/photos/{photoB}/image": {
+      "status": 403,
+      "contentType": "application/json",
+      "bytes": 124,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "FORBIDDEN"
+    },
+    "GET /api/photos/{photoB}/overrides": {
+      "status": 403,
+      "contentType": "application/json",
+      "bytes": 124,
+      "isImage": false,
+      "dataKeys": [],
+      "error": "FORBIDDEN"
+    }
+  },
+  "pages": {
+    "/photos": {
+      "forbiddenText": true,
+      "photoImage": 0,
+      "photoRows": 0,
+      "currentResult": 0
+    },
+    "/photos/{photoB}": {
+      "forbiddenText": true,
+      "photoImage": 0,
+      "photoRows": 0,
+      "currentResult": 0
+    }
+  }
+}

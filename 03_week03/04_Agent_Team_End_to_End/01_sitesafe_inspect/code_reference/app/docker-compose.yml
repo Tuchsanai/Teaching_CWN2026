@@ -1,0 +1,107 @@
+# SiteSafe Inspect · web side (DESIGN §0, §1)
+#
+#   real AI : cp .env.example .env            && docker compose up -d --build
+#   test    : cp .env.test.example .env.test  && docker compose --env-file .env.test --profile test up -d --build
+#
+# Services: db (PostgreSQL) · migrate (one-shot schema) · web (Next.js) · dispatcher
+#           · mock-gateway (profile test only, AI_MODE=mock)
+# web, dispatcher, migrate and mock-gateway share one image built from ./web.
+
+x-web-environment: &web-environment
+  # Runtime login (member of sitesafe_web: no UPDATE/DELETE on result_overrides · NFR-07).
+  # web and dispatcher must use the same login: /api/health reads the dispatcher heartbeat
+  # from pg_stat_activity.
+  DATABASE_URL: postgresql://${WEB_DB_USER:-sitesafe_app}:${WEB_DB_PASSWORD:-sitesafe-app-local}@db:5432/sitesafe
+  # Table owner: schema migration, `npm run seed` and POST /api/test/reset only.
+  DATABASE_OWNER_URL: postgresql://sitesafe:${POSTGRES_PASSWORD:-sitesafe-local}@db:5432/sitesafe
+  PHOTOS_DIR: /data/photos
+  BUG_MODE: ${BUG_MODE:-0}
+  AI_MODE: ${AI_MODE:-real}
+  ENABLE_TEST_RESET: ${ENABLE_TEST_RESET:-0}
+  TEST_RESET_KEY: ${TEST_RESET_KEY:-}
+  GATEWAY_URL: ${GATEWAY_URL:-}
+  GATEWAY_API_KEY: ${GATEWAY_API_KEY:-}
+  GATEWAY_CA_CERT: ${GATEWAY_CA_CERT:-}
+  STUCK_TIMEOUT_MIN: ${STUCK_TIMEOUT_MIN:-15}
+  TZ: Asia/Bangkok
+
+x-web-service: &web-service
+  image: sitesafe-web:local
+  build: ./web
+  environment: *web-environment
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: sitesafe
+      POSTGRES_USER: sitesafe
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sitesafe-local}
+      WEB_DB_USER: ${WEB_DB_USER:-sitesafe_app}
+      WEB_DB_PASSWORD: ${WEB_DB_PASSWORD:-sitesafe-app-local}
+      TZ: Asia/Bangkok
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./web/db/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # Applies web/db/schema.sql as the table owner (idempotent, keeps data), then exits.
+  migrate:
+    <<: *web-service
+    command: ["npm", "run", "migrate"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *web-service
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    volumes:
+      - photos:/data/photos
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  dispatcher:
+    <<: *web-service
+    command: ["npm", "run", "dispatcher"]
+    volumes:
+      - photos:/data/photos:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  # Profile test: follows the gateway API Contract (DESIGN §5.1, §7.3); H and V come from
+  # the uploaded file name. Point the dispatcher at it with GATEWAY_URL=http://mock-gateway:8080
+  # and AI_MODE=mock (see .env.test.example). Reachable only inside the compose network.
+  mock-gateway:
+    <<: *web-service
+    profiles: [test]
+    command: ["npm", "run", "dispatcher", "--", "--mock-gateway"]
+    environment:
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:-}
+      MOCK_GATEWAY_PORT: "8080"
+      MAX_QUEUE_DEPTH: ${MOCK_MAX_QUEUE_DEPTH:-200}
+      TZ: Asia/Bangkok
+
+volumes:
+  db-data:
+  photos:

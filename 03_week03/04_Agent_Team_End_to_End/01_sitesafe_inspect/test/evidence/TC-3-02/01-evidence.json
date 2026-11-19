@@ -1,0 +1,81 @@
+{
+  "tc": "TC-3-02",
+  "requests": [
+    {
+      "key": "none",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "none",
+      "method": "GET",
+      "path": "/v1/jobs/{uuid}",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "none",
+      "method": "GET",
+      "path": "/v1/jobs?ids={uuid}",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "none",
+      "method": "GET",
+      "path": "/v1/health",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "wrong",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "wrong",
+      "method": "GET",
+      "path": "/v1/jobs/{uuid}",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "wrong",
+      "method": "GET",
+      "path": "/v1/jobs?ids={uuid}",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    },
+    {
+      "key": "wrong",
+      "method": "GET",
+      "path": "/v1/health",
+      "status": 401,
+      "error": "UNAUTHORIZED"
+    }
+  ],
+  "rejected_401": "8/8",
+  "job_lookup_with_good_key": {
+    "status": 404,
+    "error": "JOB_NOT_FOUND"
+  },
+  "queue_depth_before": 0,
+  "queue_depth_after": 0,
+  "control_health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "rabbitmq": "ok",
+      "workers": 1,
+      "queue_depth": 0,
+      "max_queue_depth": 200,
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "model_version": "ppe-yolo-v1"
+    }
+  },
+  "note": "ไม่มีสิทธิ์อ่าน jobs.db บนเครื่อง GPU จึงใช้ (1) GET /v1/jobs/{uuid} ด้วย key ถูก → 404 และ (2) queue_depth จาก /v1/health ก่อน/หลัง แทนการนับแถว jobs.db · queue_depth อาจขยับได้ถ้าผู้ทดสอบคนอื่นส่งรูปพร้อมกัน · ไม่ใช้รูปเข้า GPU"
+}

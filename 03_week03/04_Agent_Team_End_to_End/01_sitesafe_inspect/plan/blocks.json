@@ -1,0 +1,129 @@
+{
+  "goal": "สร้างระบบ SiteSafe Inspect ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบอยู่ที่ docs/TEST-DATA.md): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume photos + mock-gateway) และฝั่ง AI บนเครื่อง GPU 1 ใบ (API gateway + RabbitMQ + GPU Worker YOLO) หัวหน้างานอัปโหลดรูปหน้างาน ระบบนับคนไม่ใส่หมวก (H) และคนไม่ใส่เสื้อสะท้อนแสง (V) ตัดสินผล ผ่าน / เตือน / ไม่ผ่าน ตาม BR-01 ถึง BR-07 แก้ผลได้พร้อมร่องรอย มีรายงานรายวันต่อไซต์ และรูปห้ามหาย",
+  "name": "sitesafe",
+  "blocks": [
+    {
+      "id": "B01",
+      "title": "โครงโปรเจกต์ + docker compose",
+      "size": "S",
+      "depends_on": [],
+      "skill": "cyolo",
+      "difficulty": 2,
+      "timeout": 900,
+      "output": "docker-compose.yml",
+      "done": "docker compose config ผ่าน มีบริการ web, dispatcher, db, mock-gateway (profile test) และ volume photos · มี ai/docker-compose.yml (gateway, rabbitmq, worker) · .env.example มีตัวแปรครบตาม DESIGN หัวข้อ 11 โดยไม่มีค่า key จริง",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 0, 1, 6.1, 11 แล้วสร้างเฉพาะโครง: web/ (Next.js App Router + TypeScript ที่ build ได้ มี package.json, Dockerfile, หน้าเปล่า 1 หน้า), mock-gateway/, ai/gateway/, ai/worker/, ai/train/ (แต่ละโฟลเดอร์มี Dockerfile และไฟล์ requirements เปล่าพร้อมให้บล็อกถัดไปเติม) · docker-compose.yml ของฝั่งเว็บ: web และ dispatcher ใช้ image เดียวกัน, healthcheck ของ web ชี้ /api/health, ส่งตัวแปร BUG_MODE (ค่าเริ่มต้น 0), AI_MODE, ENABLE_TEST_RESET, TEST_RESET_KEY, GATEWAY_URL, GATEWAY_API_KEY, GATEWAY_CA_CERT, STUCK_TIMEOUT_MIN ให้ web และ dispatcher · ai/docker-compose.yml: rabbitmq มี volume ถาวร, worker ขอ GPU 1 ใบ, ตัวแปร MAX_QUEUE_DEPTH, MAX_DELIVERY, PROCESSING_TIMEOUT_S, MODEL_PATH, CONF_THRESHOLD · ai/common/queues.py เก็บชื่อคิว 3 คิวและ arguments ตาม DESIGN 6.1 ไว้ที่เดียว (gateway และ worker จะ import ไฟล์นี้) · .env.example, .gitignore ที่กัน .env, README.md วิธีเปิดระบบ · ห้ามเขียน logic ของบล็อกอื่น"
+    },
+    {
+      "id": "B02",
+      "title": "ฐานข้อมูล 7 ตาราง + ข้อมูลตั้งต้น",
+      "size": "M",
+      "depends_on": ["B01"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "timeout": 1800,
+      "output": "web/db/schema.sql",
+      "done": "schema.sql สร้าง 7 ตารางตาม ER ใน DESIGN หัวข้อ 2 (CHECK declared_count 1–50, index site_id+upload_date+current_result, บัญชีของเว็บไม่มีสิทธิ์ UPDATE/DELETE บน result_overrides) และ npm run seed ใส่ข้อมูลตาม TEST-DATA หัวข้อ 1–3 ได้ 3 ไซต์ 5 ผู้ใช้ 1233 รูป 1 การแก้ผล รันซ้ำได้ผลเท่าเดิม",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 2, 7.2, 9.2 และ docs/TEST-DATA.md หัวข้อ 1–3 · สร้าง web/db/schema.sql, web/db/migrate.ts, web/db/seed.ts (ฟังก์ชัน resetAndSeed(now?) ที่ทั้งคำสั่ง npm run seed และ API รีเซ็ตเรียกใช้ได้: ล้าง 7 ตาราง + ไฟล์ใน volume photos แล้วใส่ seed ด้วยรหัสแถวคงที่) และ web/lib/db.ts (pool เชื่อมต่อ PostgreSQL จาก DATABASE_URL) · รหัสผ่านใน seed เก็บเป็น argon2id · site_id ของ supervisor ต้องมีค่า บทบาทอื่นเป็น NULL · ค่าที่ผลของรูปใน seed ให้ใส่ตามตารางใน TEST-DATA ตรงตัว ห้ามคำนวณผ่านกติกาเอง · ห้ามแตะไฟล์นอก web/db และ web/lib/db.ts ยกเว้นเพิ่ม script ใน web/package.json"
+    },
+    {
+      "id": "B03",
+      "title": "กติกา Business Rule + สิทธิ์ + API ของเว็บ",
+      "size": "L",
+      "depends_on": ["B02"],
+      "skill": "review",
+      "worker": "yolo",
+      "max_rounds": 2,
+      "difficulty": 4,
+      "timeout": 2700,
+      "output": "web/lib/rules.ts",
+      "done": "web/lib/rules.ts เป็นที่เดียวที่มีเส้นแบ่งของ BR-01 ถึง BR-07 และเป็นไฟล์เดียวที่อ่าน BUG_MODE · unit test ของกติกาผ่านทุกแถวใน TEST-DATA หัวข้อ 4–7 และ 12 เมื่อ BUG_MODE=0 · API ของเว็บครบ 14 เส้นทางตาม DESIGN 5.2 ทุกเส้นทางเรียก canAccess ที่ฝั่งเซิร์ฟเวอร์ (ไม่ล็อกอิน 401 · ไม่มีสิทธิ์ 403 · ไซต์อื่น 404) · POST รูปตอบ 201 หลังเขียนไฟล์และแถว photos แล้วเท่านั้น · npm test และ npm run build ผ่าน",
+      "detail": "บล็อกนี้ผิดแล้วเสียหายมากที่สุด (ตัดสินผลความปลอดภัยผิด · รูปของไซต์อื่นรั่ว · รูปหาย) จึงให้อีก CLI ตรวจ · อ่าน docs/REQUIREMENTS.md หัวข้อ 1–3, docs/DESIGN.md หัวข้อ 2, 4, 5.2, 7.1, 7.2, 7.4, 8, 9, 10 และ docs/TEST-DATA.md · งาน 3 ส่วน: (1) web/lib/rules.ts: ค่าคงที่ HELMET_FAIL_MIN, VEST_FAIL_MIN, VEST_WARN_MIN, เพดาน 15,728,640 ไบต์, เพดาน 50 รูป, เส้น 90% และ 18:00 น. พร้อมฟังก์ชัน judge(h, v), isSizeAllowed, isCountAllowed, passRate/isRed (เทียบด้วยจำนวนเต็ม), isReportReady(now, date) · ทุกส่วนของระบบ (API, dispatcher, หน้าเว็บ) ต้องเรียกฟังก์ชันและค่าคงที่จากไฟล์นี้ ห้ามเขียนเส้นแบ่งซ้ำที่อื่น (2) โหมด BUG_MODE=1 ตาม DESIGN หัวข้อ 8: เปิดอ่าน docs/BUGS-SECRET.md แล้วทำให้ Business Rule 3 ข้อในรายชื่อนั้นทำงานผิดตามที่ไฟล์ระบุ ภายใน web/lib/rules.ts เท่านั้น · อ่าน BUG_MODE ครั้งเดียวตอนเริ่มบริการ ค่าเริ่มต้น 0 · ห้ามคัดลอกรายชื่อ 3 ข้อหรือคำบอกใบ้ไปไว้ในไฟล์อื่น ชื่อตัวแปร คำอธิบายในโค้ดส่วนอื่น log หน้าเว็บ /api/health หรือในคำตอบของบล็อก (3) web/lib/auth.ts (ล็อกอิน argon2id, session token สุ่ม 256 บิต เก็บเฉพาะ hash, cookie HttpOnly + Secure + SameSite=Lax), web/lib/access.ts (canAccess(user, action, siteId) · query ของ supervisor มี WHERE site_id เสมอ), web/middleware.ts และ Route Handler 14 เส้นทางใต้ web/app/api/ ตาม DESIGN 5.2: ตรวจชนิดไฟล์จาก magic bytes, นับขนาดจากไบต์ที่ได้รับจริงและตัดการรับทันทีที่เกิน, ไฟล์ที่ถูกปฏิเสธไม่ถูกเขียนลง volume, site_id และ upload_date มาจากบัญชีและเวลาเซิร์ฟเวอร์ Asia/Bangkok, รูปส่งผ่าน /api/photos/{id}/image พร้อม Cache-Control: private, no-store, การแก้ผลเพิ่มแถว result_overrides อย่างเดียวและไม่เขียนทับ model_result, รายงานรายวันคำนวณสดครบ 3 ไซต์, /api/test/reset เปิดเฉพาะ ENABLE_TEST_RESET=1 และเรียก resetAndSeed ของ B02, นาฬิกาของระบบอยู่ที่ web/lib/clock.ts (ตั้งได้จากการรีเซ็ต) · เขียน unit test ที่ web/tests/ · ผู้ตรวจ: เปิด docs/BUGS-SECRET.md ได้ ตรวจว่า BUG_MODE=0 ตรงข้อกำหนดทุกเส้นแบ่ง (ต่ำกว่า / เท่ากับ / สูงกว่า), BUG_MODE=1 ผิดเฉพาะ 3 ข้อในรายชื่อ, ไม่มีที่อื่นอ่าน BUG_MODE, และทุก Route Handler ตรวจสิทธิ์ที่ฝั่งเซิร์ฟเวอร์"
+    },
+    {
+      "id": "B04",
+      "title": "dispatcher + mock-gateway",
+      "size": "M",
+      "depends_on": ["B03"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "timeout": 1800,
+      "output": "web/dispatcher/index.ts",
+      "done": "ด้วย AI_MODE=mock: อัปโหลด h0_v2.jpg แล้วรูปเป็น DONE พร้อม detections และผลจาก judge ของ lib/rules ภายใน 10 วินาที · corrupt.jpg เป็น FAILED พร้อมเหตุผล · ผลที่มาซ้ำไม่สร้าง detections ชุดที่สอง · รูปที่ค้างเกิน STUCK_TIMEOUT_MIN เป็น FAILED \"เกินเวลา 15 นาที\" · test ของ dispatcher ผ่าน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 3, 4, 5.1 (รวมตารางพฤติกรรมของเว็บต่อคำตอบของ gateway), 6.2, 7.3 · web/dispatcher/index.ts: กระบวนการแยกที่วนทุก 1 วินาที (1) ส่งรูป dispatch_state = PENDING ไป POST /v1/jobs ด้วย job_id = photos.id + sha256 + X-API-Key (2) ถามสถานะงานที่ SUBMITTED ด้วย GET /v1/jobs?ids= ครั้งละไม่เกิน 100 (3) เขียนผลใน transaction เดียว: detections + model_h, model_v, model_result, current_result + status = DONE โดยมี WHERE status IN ('QUEUED','PROCESSING') (4) จัดการ 429 ตาม Retry-After, 503/timeout แบบ backoff 2–60 วินาที, 401 หยุดส่งและแจ้ง /api/health, 404 กลับเป็น PENDING (5) เฝ้ารูปค้าง · ผลของรูปต้องได้จากฟังก์ชัน judge ใน web/lib/rules.ts ของ B03 เท่านั้น ห้ามอ่าน BUG_MODE และห้ามเขียนเส้นแบ่งเอง · ตัวกรอง log ตัดค่า X-API-Key · บันทึกเวลาวนรอบล่าสุดให้ /api/health อ่านได้ · mock-gateway/: บริการ HTTP ที่ทำตาม API Contract 4 API ของ DESIGN 5.1 ทุกรหัสคำตอบ (รวม 401 เมื่อ key ผิด และ 200 เมื่อ job_id ซ้ำ) คืน H, V ตามชื่อไฟล์ตาม DESIGN 7.3 · ห้ามแก้ไฟล์ของ B03"
+    },
+    {
+      "id": "B05",
+      "title": "API gateway + คิว RabbitMQ",
+      "size": "L",
+      "depends_on": ["B01"],
+      "skill": "yolo",
+      "difficulty": 4,
+      "timeout": 2700,
+      "output": "ai/gateway/main.py",
+      "done": "pytest ของ ai/gateway ผ่าน: 4 API ตาม DESIGN 5.1 · ไม่มี key หรือ key ผิดได้ 401 ทุกเส้นทางรวม /v1/health · job_id ซ้ำได้ 200 ไม่สร้างงานใหม่ · ตอบ 202 หลังได้ publisher confirm เท่านั้น ไม่ได้ confirm ตอบ 503 · queue_depth 199 รับ, 200 ตอบ 429 พร้อม Retry-After · งานจาก ppe.jobs.dead เป็น FAILED MAX_RETRIES · ค่า key ไม่ปรากฏใน log",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 5.1, 6, 10, 11 และ docs/TEST-DATA.md หัวข้อ 10 · Python (FastAPI) ใน ai/gateway/: POST /v1/jobs (multipart: job_id, image, sha256 · ตรวจ sha256, ชนิดไฟล์, ขนาด 15 MB · เก็บไฟล์ชั่วคราว + INSERT jobs ใน jobs.db (SQLite) · publish แบบ persistent ลง ppe.jobs แล้วรอ confirm), GET /v1/jobs/{job_id}, GET /v1/jobs?ids=, GET /v1/health (workers, queue_depth, รุ่น GPU, model_version) · ประกาศคิว 3 คิวจาก ai/common/queues.py ของ B01 (quorum, durable, x-delivery-limit, dead-letter, x-max-length, reject-publish) · consumer ของ ppe.results อัปเดตสถานะด้วยเงื่อนไข \"งานยังไม่จบ\" (ผลชุดเดียว) และ consumer ของ ppe.jobs.dead · backpressure ตาม DESIGN 6.3 รวมสูตร Retry-After จากเวลาตรวจเฉลี่ย 50 งานล่าสุด · งาน PROCESSING เกิน PROCESSING_TIMEOUT_S รายงานเป็น QUEUED · ลบไฟล์ชั่วคราวเมื่องานจบ เก็บผล 24 ชั่วโมง · เทียบ API key แบบ constant-time · เขียน test ที่ ai/gateway/tests/ (จำลอง RabbitMQ ได้) · ห้ามแตะ ai/worker และ ai/train"
+    },
+    {
+      "id": "B06",
+      "title": "GPU Worker (YOLO)",
+      "size": "M",
+      "depends_on": ["B01"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "timeout": 1800,
+      "output": "ai/worker/worker.py",
+      "done": "pytest ของ ai/worker ผ่านด้วยตัวตรวจจำลอง: รับงานทีละ 1 (prefetch = 1) · publish STARTED แล้ว DONE พร้อม h, v, detections, image_w, image_h, model_version, conf_threshold, infer_ms ตามรูปแบบใน DESIGN 5.1 · ack หลัง publish ผลและได้ confirm เท่านั้น · ไฟล์ที่เปิดไม่ได้ publish FAILED IMAGE_UNREADABLE · ไม่ ack เมื่อหยุดกลางงาน",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 3, 5.1 (API 2), 6.1, 6.2, 11 · ai/worker/worker.py: โหลดโมเดล YOLO จาก MODEL_PATH ครั้งเดียวตอนเริ่ม (ไฟล์ในเครื่อง ไม่เรียกบริการภายนอก) ใช้ GPU 1 ใบ · consume ppe.jobs แบบ manual ack, prefetch = 1 โดยประกาศคิวจาก ai/common/queues.py ของ B01 · อ่านรูปจาก image_path · นับ h = จำนวนกรอบคลาส NO_HARDHAT และ v = จำนวนกรอบคลาส NO_VEST ที่ confidence ≥ CONF_THRESHOLD · พิกัดกรอบเป็นพิกเซลของรูปต้นฉบับ [x1, y1, x2, y2] · ชื่อคลาสของโมเดลที่แทน NO_HARDHAT และ NO_VEST ตั้งได้ในไฟล์ ai/worker/classes.json (DQ-02 ยังไม่ตัดสิน) · Worker ไม่ตัดสิน ผ่าน / เตือน / ไม่ผ่าน (D-03) · แยกตัวตรวจเป็น class ที่สลับเป็นตัวจำลองได้เพื่อ test บนเครื่องที่ไม่มี GPU · เขียน test ที่ ai/worker/tests/ · ห้ามแตะ ai/gateway และ ai/train"
+    },
+    {
+      "id": "B07",
+      "title": "โค้ด Training และ Evaluation ของโมเดล",
+      "size": "M",
+      "depends_on": ["B01"],
+      "skill": "cyolo",
+      "difficulty": 3,
+      "timeout": 1800,
+      "output": "ai/train/evaluate.py",
+      "done": "ai/train มี train.py, select_threshold.py, evaluate.py และ README.md · pytest ของ ai/train ผ่าน: Image-level Recall และ Precision คำนวณตามนิยาม TP/FN/FP ใน NFR-01 (79/100 ไม่ผ่าน · 80/100 ผ่าน · 81/100 ผ่าน) · Threshold เลือกบน Validation Set (Recall สูงสุดโดย Precision ≥ 0.80) แล้วคงที่ก่อนวัดบน Test Set · evaluate.py ปฏิเสธ Test Set ที่มีรูป Positive หรือรูป Negative น้อยกว่า 100 รูป",
+      "detail": "อ่าน docs/REQUIREMENTS.md หัวข้อ NFR-01 และ AS-14, docs/DESIGN.md หัวข้อ 11 และ DQ-02 · เขียนโค้ดเท่านั้น ไม่เทรนจริงในบล็อกนี้ (ไม่มี GPU) · ai/train/train.py: fine-tune YOLO ด้วย ultralytics จากไฟล์ data.yaml (รับ epochs, imgsz, batch, โมเดลตั้งต้น เป็นอาร์กิวเมนต์) บันทึก best.pt · ai/train/select_threshold.py: ไล่ค่า Confidence Threshold บน Validation Set คิดระดับรูปของคลาส \"ไม่ใส่หมวก\" แล้วเขียน threshold.json · ai/train/evaluate.py: วัดบน Test Set ด้วย Threshold ที่คงที่แล้ว รายงาน Image-level Recall และ Precision ของคลาส \"ไม่ใส่หมวก\" (เกณฑ์ ≥ 0.80 ทั้งสองค่า) และของคลาส \"ไม่ใส่เสื้อสะท้อนแสง\" (รายงานค่า ไม่เป็นเกณฑ์) เขียน metrics.json ที่มี TP, FN, FP, จำนวนรูป, รุ่น GPU, model_version และผล ผ่าน / ไม่ผ่านเกณฑ์ · แยกส่วนคำนวณตัวชี้วัดเป็นฟังก์ชันบริสุทธิ์ ai/train/metrics.py ที่ test ได้โดยไม่มีโมเดล · ใช้ไฟล์ชื่อคลาสรูปแบบเดียวกับ ai/worker/classes.json (สร้างสำเนาใน ai/train ห้ามแตะ ai/worker) · README.md บอกลำดับคำสั่ง train → select_threshold → evaluate และค่าที่นำไปใส่ MODEL_PATH, CONF_THRESHOLD"
+    },
+    {
+      "id": "B08",
+      "title": "หน้าเว็บ 8 หน้า",
+      "size": "L",
+      "depends_on": ["B03"],
+      "skill": "yolo",
+      "difficulty": 3,
+      "timeout": 2700,
+      "output": "web/app/login/page.tsx",
+      "done": "npm run build ผ่าน · มีหน้า /login, /upload, /uploads/{batchId}, /photos, /photos/problems, /photos/{id}, /reports/daily และแถบบน · data-testid ครบทุกชิ้นตามตารางใน DESIGN 7.4 · ผู้ที่ไม่ล็อกอินถูกส่งไป /login · เมนูแสดงตามบทบาท (executive ไม่มี nav-upload) · หน้าสถานะอัปเดตทุก 2 วินาทีและแสดงผลทีละรูปที่เสร็จ",
+      "detail": "อ่าน docs/DESIGN.md หัวข้อ 3, 5.2, 7.4, 9.2, 9.3 และ docs/REQUIREMENTS.md กลุ่ม A–E แล้วอ่าน Route Handler ของ B03 ใต้ web/app/api/ เพื่อใช้รูปแบบคำตอบจริง · สร้างหน้าใต้ web/app/ และ component ใต้ web/components/: ล็อกอิน · อัปโหลดหลายรูป (ส่งขนานไม่เกิน 3 รูป แสดงข้อความปฏิเสธต่อไฟล์) · รายการสถานะ 4 ค่า \"รอคิว / กำลังตรวจ / เสร็จแล้ว / ตรวจไม่สำเร็จ\" พร้อมเหตุผล · รูปทั้งหมดพร้อมตัวกรอง · รูปที่มีปัญหา (เฉพาะ ไม่ผ่าน และ เตือน) · รายละเอียดรูป: วาดกรอบทับรูปจากพิกัดในฐานข้อมูล กำกับ \"ไม่ใส่หมวก\" / \"ไม่ใส่เสื้อสะท้อนแสง\", H, V, ผลของโมเดล, ผลล่าสุด, ฟอร์มแก้ผลที่ต้องใส่เหตุผล, ประวัติการแก้ · รายงานรายวัน 3 ไซต์: 4 ค่า + จำนวนรูปที่ถูกแก้ผล + ตรวจไม่สำเร็จ, สีแดง (data-red), ป้ายความพร้อม, \"ไม่มีข้อมูล\" / \"ยังไม่มีผล\" · ข้อความบนหน้าจอเป็นภาษาไทย · เส้นแบ่งและผลตัดสินทุกค่าต้องมาจากคำตอบของ API หรือจาก web/lib/rules.ts ผ่าน Server Component ห้ามเขียนตัวเลขเส้นแบ่ง (50 รูป, 15 MB, 90%, 18:00 น.) ซ้ำในหน้าเว็บ และห้ามอ่าน BUG_MODE · ใช้โลโก้ที่ path /logo.png (ไฟล์ web/public/logo.png บล็อกรวมระบบจะวางให้) · API key ของ gateway ห้ามอยู่ในโค้ดฝั่งเบราว์เซอร์ · ห้ามแก้ไฟล์ใต้ web/app/api และ web/lib"
+    },
+    {
+      "id": "B09",
+      "title": "โลโก้ SiteSafe Inspect",
+      "size": "S",
+      "depends_on": [],
+      "skill": "image",
+      "difficulty": 1,
+      "timeout": 900,
+      "output": "logo.png",
+      "done": "PNG สี่เหลี่ยมจัตุรัส โลโก้แบบ flat รูปหมวกนิรภัยสีเหลืองกับเครื่องหมายถูก พื้นหลังสีขาว ไม่มีตัวอักษร อ่านออกเมื่อย่อเหลือ 32 พิกเซล",
+      "detail": "โลโก้ของระบบตรวจอุปกรณ์ความปลอดภัยหน้างานก่อสร้าง SiteSafe Inspect: หมวกนิรภัยสีเหลืองมีแถบสะท้อนแสงสีส้ม และเครื่องหมายถูกสีเขียว เส้นเรียบ สีทึบ ไม่มีเงา ไม่มีตัวอักษร ไม่มีใบหน้าคน"
+    },
+    {
+      "id": "B10",
+      "title": "รวมระบบ + ทดสอบเบื้องต้น",
+      "size": "L",
+      "depends_on": ["B04", "B05", "B06", "B07", "B08", "B09"],
+      "skill": "yolo",
+      "difficulty": 4,
+      "timeout": 2700,
+      "exclusive": true,
+      "output": "TEST.md",
+      "done": "TEST.md บันทึกผลจริงของทุกข้อ (ผ่าน / ไม่ผ่าน / รันไม่ได้พร้อมเหตุผล): build ของ web ผ่าน · unit test ของ web, ai/gateway, ai/worker, ai/train ผ่าน · ด้วย AI_MODE=mock และ BUG_MODE=0: /api/health เป็น ok, รีเซ็ตข้อมูลได้ 3 ไซต์ 5 ผู้ใช้ 1233 รูป, ล็อกอินครบ 3 บทบาท, อัปโหลด h1_v0 / h0_v2 / h0_v1 / h0_v0 ได้ผล ไม่ผ่าน / ไม่ผ่าน / เตือน / ผ่าน, รายงานรายวันตรง TEST-DATA หัวข้อ 3, เปิดลิงก์รูปโดยไม่ล็อกอินไม่ได้รูป · โลโก้อยู่ที่ web/public/logo.png · ค้นทั้ง repository แล้ว BUG_MODE ถูกอ่านที่ web/lib/rules.ts ที่เดียว",
+      "detail": "อ่าน docs/DESIGN.md และ docs/TEST-DATA.md ทั้งไฟล์ และอ่านไฟล์ผลของทุกบล็อก · บล็อกนี้รันคนเดียวและแก้ไฟล์ของบล็อกอื่นได้เพื่อให้ส่วนต่าง ๆ ต่อกันติด: คัดลอก logo.png ไป web/public/logo.png · ให้ dispatcher, mock-gateway, gateway, worker ใช้ API Contract และรูปแบบข้อความในคิวตรงกัน · ให้ docker-compose.yml และ ai/docker-compose.yml build และ config ผ่าน · รัน build และ unit test ทุกส่วน · ถ้าเครื่องนี้รัน docker compose ได้ ให้เปิดฝั่งเว็บด้วย profile test (AI_MODE=mock, ENABLE_TEST_RESET=1, BUG_MODE=0) แล้วทดสอบเบื้องต้นผ่าน HTTP ตามเกณฑ์เสร็จ ถ้ารัน docker ไม่ได้ให้รัน web, dispatcher, mock-gateway เป็นกระบวนการตรง ๆ กับ PostgreSQL ที่มี หรือบันทึกว่ารันไม่ได้พร้อมเหตุผล · ฝั่ง AI ทดสอบด้วยตัวตรวจจำลอง (ไม่มี GPU ในขั้นนี้) · ตรวจด้วยการค้นว่าไม่มีไฟล์อื่นนอก web/lib/rules.ts อ่าน BUG_MODE และไม่มีเส้นแบ่งของ BR ซ้ำนอกไฟล์นั้น · ห้ามเปลี่ยนพฤติกรรมของ BUG_MODE และห้ามคัดลอกเนื้อหาของ docs/BUGS-SECRET.md ลง TEST.md, README.md หรือ log · ปิดบริการที่เปิดไว้เมื่อทดสอบเสร็จ · ปรับ README.md ให้คำสั่งเปิดระบบตรงกับของจริง · งานนอกขอบเขตของบล็อกนี้: เช่า GPU, เทรนโมเดลจริง, ทดสอบ SLO ตาม NFR-02 และ NFR-03"
+    }
+  ]
+}

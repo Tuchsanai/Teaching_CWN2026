@@ -1,0 +1,368 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SiteSafe Test Evidence</title>
+<style>
+:root{--bg:#f7f7f5;--fg:#1d1d1b;--muted:#6b6b66;--card:#fff;--line:#e2e1dc;--pass:#1f7a3a;--fail:#b3261e;--block:#8a6d00}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161615;--fg:#ecebe6;--muted:#a3a29c;--card:#20201e;--line:#34332f;--pass:#5cc27a;--fail:#ff8a80;--block:#e6c450}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 "Sarabun","Noto Sans Thai",system-ui,sans-serif}
+main{max-width:1100px;margin:auto;padding:16px}h1{margin:.2em 0}table{border-collapse:collapse;width:100%;background:var(--card)}td,th{border:1px solid var(--line);padding:6px 8px;text-align:left}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.filters button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:6px 12px;border-radius:16px;cursor:pointer}.filters button.on{outline:2px solid var(--fg)}
+.tc{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
+.st-ผ่าน{border-left-color:var(--pass)}.st-ล้ม{border-left-color:var(--fail)}.st-บล็อก{border-left-color:var(--block)}
+.tc header{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.tc h3{margin:0;font-size:1.05em;flex:1 1 300px}.tc h3 small{font-weight:400;color:var(--muted)}
+.badge,.cat{padding:2px 10px;border-radius:12px;font-size:.85em;border:1px solid currentColor}.st-ผ่าน .badge{color:var(--pass)}.st-ล้ม .badge{color:var(--fail)}.st-บล็อก .badge{color:var(--block)}
+.meta,.note{color:var(--muted);margin:.3em 0}.note{color:var(--fg)}pre{white-space:pre-wrap;word-break:break-word;font-size:12px;max-height:320px;overflow:auto;background:var(--bg);padding:8px}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}.shots a{display:block;color:var(--muted);font-size:12px;text-decoration:none}.shots img{width:100%;height:120px;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:4px}
+.files a{margin-right:10px}a{color:inherit}.ann{font-size:.9em;color:var(--muted)}
+</style></head><body><main>
+<h1>หลักฐานการทดสอบ SiteSafe Inspect</h1>
+<p class="meta">Playwright Test · Chromium · 1 worker · เว็บ http://localhost:3410 (ai_mode real) · รายงาน: <a href="TEST-REPORT.md">TEST-REPORT.md</a> · แผน: <a href="TEST-PLAN.md">TEST-PLAN.md</a> · trace เปิดได้ที่ <a href="https://trace.playwright.dev" target="_blank">trace.playwright.dev</a> หรือ <code>npx playwright show-trace &lt;ไฟล์&gt;</code></p>
+<table><tr><th>กลุ่ม</th><th>ผ่าน</th><th>ล้ม</th><th>บล็อก</th></tr>
+<tr><td>5.1 รับรูป</td><td>6</td><td>0</td><td>0</td></tr><tr><td>5.2 ผลตรวจ AI</td><td>2</td><td>0</td><td>4</td></tr><tr><td>5.3 คิว</td><td>2</td><td>2</td><td>6</td></tr><tr><td>5.4 รายงาน/แก้ผล</td><td>8</td><td>0</td><td>0</td></tr><tr><td>5.5 สิทธิ์</td><td>9</td><td>0</td><td>0</td></tr>
+<tr><th>รวม</th><th>27</th><th>2</th><th>10</th></tr></table>
+<div class="filters"><button data-f="all" class="on">ทั้งหมด</button><button data-f="ผ่าน">ผ่าน</button><button data-f="ล้ม">ล้ม</button><button data-f="บล็อก">บล็อก</button><button data-g="1">5.1 รับรูป</button><button data-g="2">5.2 ผลตรวจ AI</button><button data-g="3">5.3 คิว</button><button data-g="4">5.4 รายงาน/แก้ผล</button><button data-g="5">5.5 สิทธิ์</button></div>
+<nav><a href="#TC-1-01">TC-1-01</a> · <a href="#TC-1-02">TC-1-02</a> · <a href="#TC-1-03">TC-1-03</a> · <a href="#TC-1-04">TC-1-04</a> · <a href="#TC-1-05">TC-1-05</a> · <a href="#TC-1-06">TC-1-06</a> · <a href="#TC-2-01">TC-2-01</a> · <a href="#TC-2-02">TC-2-02</a> · <a href="#TC-2-03">TC-2-03</a> · <a href="#TC-2-04">TC-2-04</a> · <a href="#TC-2-05">TC-2-05</a> · <a href="#TC-2-06">TC-2-06</a> · <a href="#TC-3-01">TC-3-01</a> · <a href="#TC-3-02">TC-3-02</a> · <a href="#TC-3-03">TC-3-03</a> · <a href="#TC-3-04">TC-3-04</a> · <a href="#TC-3-05">TC-3-05</a> · <a href="#TC-3-06">TC-3-06</a> · <a href="#TC-3-07">TC-3-07</a> · <a href="#TC-3-08">TC-3-08</a> · <a href="#TC-3-09">TC-3-09</a> · <a href="#TC-3-10">TC-3-10</a> · <a href="#TC-4-01">TC-4-01</a> · <a href="#TC-4-02">TC-4-02</a> · <a href="#TC-4-03">TC-4-03</a> · <a href="#TC-4-04">TC-4-04</a> · <a href="#TC-4-05">TC-4-05</a> · <a href="#TC-4-06">TC-4-06</a> · <a href="#TC-4-07">TC-4-07</a> · <a href="#TC-4-08">TC-4-08</a> · <a href="#TC-5-01">TC-5-01</a> · <a href="#TC-5-02">TC-5-02</a> · <a href="#TC-5-03">TC-5-03</a> · <a href="#TC-5-04">TC-5-04</a> · <a href="#TC-5-05">TC-5-05</a> · <a href="#TC-5-06">TC-5-06</a> · <a href="#TC-5-07">TC-5-07</a> · <a href="#TC-5-08">TC-5-08</a> · <a href="#TC-5-09">TC-5-09</a></nav>
+<section class="tc st-ผ่าน" id="TC-1-01" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-01 <small>[P1] ไฟล์ 14.9 MB และ 15.0 MB (เท่าเพดานพอดี) ต้องรับทั้งคู่</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 1.5 วินาที · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-01/02-batch-page-F1-F2.png" target="_blank"><img src="evidence/TC-1-01/02-batch-page-F1-F2.png" alt="batch-page-F1-F2"><span>batch-page-F1-F2</span></a></div><p class="files"><a class="file" href="evidence/TC-1-01/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-1-02" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-02 <small>[P1] ไฟล์ 15 MB + 1 ไบต์ และ 15.1 MB ต้องถูกปฏิเสธ 413 ไม่เก็บไฟล์</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 2.5 วินาที · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-02/02-upload-page-F3-F4-selected.png" target="_blank"><img src="evidence/TC-1-02/02-upload-page-F3-F4-selected.png" alt="upload-page-F3-F4-selected"><span>upload-page-F3-F4-selected</span></a><a href="evidence/TC-1-02/03-batch-page-after-413.png" target="_blank"><img src="evidence/TC-1-02/03-batch-page-after-413.png" alt="batch-page-after-413"><span>batch-page-after-413</span></a></div><p class="files"><a class="file" href="evidence/TC-1-02/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-1-03" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-03 <small>[P1] รับ JPG และ PNG เก็บต้นฉบับตรง sha256 ทั้งก่อนและหลังรีสตาร์ต web</small></h3><span class="badge">ผ่าน</span><span class="cat">เทสต์ผิด → แก้แล้ว ผ่าน</span></header>
+  <p class="note">รอบแรกล้มด้วย fetch failed (other side closed) ก่อนถึงขั้นรีสตาร์ต: TC-1-02 ก่อนหน้าได้ 413 เว็บตอบเร็วแล้วปิด socket แต่ fetch() ของ Node นำ socket ที่ปิดแล้วกลับมาใช้ (keep-alive) · แก้ helpers.http() ให้เปิดการเชื่อมต่อใหม่ทุกคำขอและรับคำตอบที่มาก่อนส่ง body จบ · ไม่ได้แก้ผลที่คาดหวัง</p>
+  <p class="meta">P1 · 4.1 วินาที · รันซ้ำหลังแก้เทสต์ (รอบแรก: ล้ม) · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-03/02-batch-page-after-restart.png" target="_blank"><img src="evidence/TC-1-03/02-batch-page-after-restart.png" alt="batch-page-after-restart"><span>batch-page-after-restart</span></a><a href="evidence/TC-1-03/03-photo-png-after-restart.png" target="_blank"><img src="evidence/TC-1-03/03-photo-png-after-restart.png" alt="photo-png-after-restart"><span>photo-png-after-restart</span></a></div><p class="files"><a class="file" href="evidence/TC-1-03/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-1-04" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-04 <small>[P1] GIF PDF และไฟล์ข้อความนามสกุล .jpg ต้องได้ 415 ไม่เก็บไฟล์</small></h3><span class="badge">ผ่าน</span><span class="cat">เทสต์ผิด → แก้แล้ว ผ่าน</span></header>
+  <p class="note">รอบแรกล้มที่ plan.pdf ด้วย fetch failed: เว็บตอบ 415 ก่อนรับ body ครบแล้วปิดการเชื่อมต่อ (curl ได้ 415 ปกติ) · แก้ที่ helper ตัวเดียวกับ TC-1-03</p>
+  <p class="meta">P1 · 1.3 วินาที · รันซ้ำหลังแก้เทสต์ (รอบแรก: ล้ม) · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-04/02-batch-page-after-415.png" target="_blank"><img src="evidence/TC-1-04/02-batch-page-after-415.png" alt="batch-page-after-415"><span>batch-page-after-415</span></a></div><p class="files"><a class="file" href="evidence/TC-1-04/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-1-05" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-05 <small>[P1] จำนวนรูปต่อครั้ง 0 · 1 · 49 · 50 · 51 และไฟล์ที่ 51 ใน batch 50 (ตรวจฝั่ง server)</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 4.5 วินาที · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-05/01-batch-page-50-photos.png" target="_blank"><img src="evidence/TC-1-05/01-batch-page-50-photos.png" alt="batch-page-50-photos"><span>batch-page-50-photos</span></a><a href="evidence/TC-1-05/02-batch-page-after-file-51.png" target="_blank"><img src="evidence/TC-1-05/02-batch-page-after-file-51.png" alt="batch-page-after-file-51"><span>batch-page-after-file-51</span></a></div><p class="files"><a class="file" href="evidence/TC-1-05/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-1-06" data-st="ผ่าน" data-g="1">
+  <header><h3>TC-1-06 <small>[P2] หน้าอัปโหลดไม่มีช่องเลือกไซต์ รูปได้ไซต์ SITE-A และวันที่ 2026-11-19</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 1.6 วินาที · 51_upload.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-1-06/01-upload-page-no-site-select.png" target="_blank"><img src="evidence/TC-1-06/01-upload-page-no-site-select.png" alt="upload-page-no-site-select"><span>upload-page-no-site-select</span></a><a href="evidence/TC-1-06/03-batch-page-one-photo.png" target="_blank"><img src="evidence/TC-1-06/03-batch-page-one-photo.png" alt="batch-page-one-photo"><span>batch-page-one-photo</span></a></div><p class="files"><a class="file" href="evidence/TC-1-06/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-2-01" data-st="บล็อก" data-g="2">
+  <header><h3>TC-2-01 <small>[P1] ตัดสินผล 8 กรณี R-1–R-8 ตามลำดับ BR-01→BR-03</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องใช้ AI_MODE=mock (ค่า H, V จากชื่อไฟล์) แต่เครื่องนี้รันแบบ real และไม่มี mock-gateway</p>
+  <p class="meta">P1 · 0.3 วินาที · 52_rules_ai.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li><li><b>skip</b>: บล็อก: ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li></ul>
+  <div class="shots"><a href="evidence/TC-2-01/02-upload-page.png" target="_blank"><img src="evidence/TC-2-01/02-upload-page.png" alt="upload-page"><span>upload-page</span></a></div><p class="files"><a class="file" href="evidence/TC-2-01/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-2-02" data-st="บล็อก" data-g="2">
+  <header><h3>TC-2-02 <small>[P1] H, V และจำนวนกรอบของ 8 รูปตรงชื่อไฟล์</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องใช้ AI_MODE=mock เหมือน TC-2-01</p>
+  <p class="meta">P1 · 0.4 วินาที · 52_rules_ai.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li><li><b>skip</b>: บล็อก: ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li></ul>
+  <div class="shots"><a href="evidence/TC-2-02/02-photos-page.png" target="_blank"><img src="evidence/TC-2-02/02-photos-page.png" alt="photos-page"><span>photos-page</span></a></div><p class="files"><a class="file" href="evidence/TC-2-02/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-2-03" data-st="ผ่าน" data-g="2">
+  <header><h3>TC-2-03 <small>[P1] โมเดลจริง 6 รูป ค่า H, V ผล และตำแหน่งกรอบตรงกับ gateway</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 20.7 วินาที · 52_rules_ai.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-2-03/01-detail--4405-_png_jpg.png" target="_blank"><img src="evidence/TC-2-03/01-detail--4405-_png_jpg.png" alt="detail--4405-_png_jpg"><span>detail--4405-_png_jpg</span></a><a href="evidence/TC-2-03/02-detail-000005_jpg.png" target="_blank"><img src="evidence/TC-2-03/02-detail-000005_jpg.png" alt="detail-000005_jpg"><span>detail-000005_jpg</span></a><a href="evidence/TC-2-03/03-detail-002551_jpg.png" target="_blank"><img src="evidence/TC-2-03/03-detail-002551_jpg.png" alt="detail-002551_jpg"><span>detail-002551_jpg</span></a><a href="evidence/TC-2-03/04-detail-003357_jpg.png" target="_blank"><img src="evidence/TC-2-03/04-detail-003357_jpg.png" alt="detail-003357_jpg"><span>detail-003357_jpg</span></a><a href="evidence/TC-2-03/05-detail-004063_jpg.png" target="_blank"><img src="evidence/TC-2-03/05-detail-004063_jpg.png" alt="detail-004063_jpg"><span>detail-004063_jpg</span></a><a href="evidence/TC-2-03/06-detail-004763_jpg.png" target="_blank"><img src="evidence/TC-2-03/06-detail-004763_jpg.png" alt="detail-004763_jpg"><span>detail-004763_jpg</span></a></div><p class="files"><a class="file" href="evidence/TC-2-03/07-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-2-04" data-st="บล็อก" data-g="2">
+  <header><h3>TC-2-04 <small>[P1] รูปที่มีปัญหา มีเฉพาะไม่ผ่านและเตือน (ผลล่าสุด)</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก บางส่วน (Entry E-4)</span></header>
+  <p class="note">ส่วนข้อมูล seed ผ่าน: D1 SITE-A = 31 (ไม่ผ่าน 20 + เตือน 11) · D3 SITE-A = 30 ไม่มีรูป &quot;ผ่าน&quot; ปน · ส่วน &quot;วันนี้ = 7&quot; ต่อจาก TC-2-01 จึงรันไม่ได้</p>
+  <p class="meta">P1 · 3.3 วินาที · 52_rules_ai.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ส่วน &quot;วันนี้ = 7 รูป&quot; ต่อจาก TC-2-01 ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li><li><b>skip</b>: บล็อก: ส่วน &quot;วันนี้ = 7 รูป&quot; ต่อจาก TC-2-01 ต้องใช้ AI_MODE=mock (mock-gateway) ซึ่งเครื่องนี้ไม่มี</li></ul>
+  <div class="shots"><a href="evidence/TC-2-04/01-problems-2026-11-16-SITE-A.png" target="_blank"><img src="evidence/TC-2-04/01-problems-2026-11-16-SITE-A.png" alt="problems-2026-11-16-SITE-A"><span>problems-2026-11-16-SITE-A</span></a><a href="evidence/TC-2-04/02-problems-2026-11-18-SITE-A.png" target="_blank"><img src="evidence/TC-2-04/02-problems-2026-11-18-SITE-A.png" alt="problems-2026-11-18-SITE-A"><span>problems-2026-11-18-SITE-A</span></a></div><p class="files"><a class="file" href="evidence/TC-2-04/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-2-05" data-st="บล็อก" data-g="2">
+  <header><h3>TC-2-05 <small>[P1] รอบ B วัด Recall และ Precision บน Test Set</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (รอบ B · Entry E-6)</span></header>
+  <p class="note">ต้องอนุมัติงบ GPU แยก และ Test Set Positive ≥ 100 · Negative ≥ 100</p>
+  <p class="meta">P1 · 0.3 วินาที · 52_rules_ai.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: รอบ B: ต้องได้อนุมัติงบ GPU แยก และ Test Set ที่มี Positive ≥ 100 · Negative ≥ 100 (เฉลยโดยคน) ซึ่งยังไม่มี</li><li><b>skip</b>: บล็อก: รอบ B: ต้องได้อนุมัติงบ GPU แยก และ Test Set ที่มี Positive ≥ 100 · Negative ≥ 100 (เฉลยโดยคน) ซึ่งยังไม่มี</li></ul>
+  <div class="shots"><a href="evidence/TC-2-05/01-report-page.png" target="_blank"><img src="evidence/TC-2-05/01-report-page.png" alt="report-page"><span>report-page</span></a></div><p class="files"><a class="file" href="evidence/TC-2-05/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-2-06" data-st="ผ่าน" data-g="2">
+  <header><h3>TC-2-06 <small>[P2] กรองรูปทั้งหมดตามผล ผ่าน 269 · เตือน 11 · ไม่กรอง 300</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 16.2 วินาที · 52_rules_ai.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-2-06/01-photos-PASS.png" target="_blank"><img src="evidence/TC-2-06/01-photos-PASS.png" alt="photos-PASS"><span>photos-PASS</span></a><a href="evidence/TC-2-06/02-photos-WARN.png" target="_blank"><img src="evidence/TC-2-06/02-photos-WARN.png" alt="photos-WARN"><span>photos-WARN</span></a><a href="evidence/TC-2-06/03-photos-ALL.png" target="_blank"><img src="evidence/TC-2-06/03-photos-ALL.png" alt="photos-ALL"><span>photos-ALL</span></a></div><p class="files"><a class="file" href="evidence/TC-2-06/04-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-3-01" data-st="ผ่าน" data-g="3">
+  <header><h3>TC-3-01 <small>[P1] ปิดหน้าแล้วรูปไม่หาย สถานะ 4 ค่ารวม 10 จบเสร็จแล้ว 10</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 20.3 วินาที · 53_queue.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-3-01/01-uploads-batch-end.png" target="_blank"><img src="evidence/TC-3-01/01-uploads-batch-end.png" alt="uploads-batch-end"><span>uploads-batch-end</span></a></div><p class="files"><a class="file" href="evidence/TC-3-01/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-3-02" data-st="ผ่าน" data-g="3">
+  <header><h3>TC-3-02 <small>[P1] gateway ไม่มี key หรือ key ผิด ปฏิเสธ 401 ทั้ง 8 คำขอ</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 7.4 วินาที · 53_queue.spec.ts</p>
+  
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-02/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-03" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-03 <small>[P1] คิวเต็มที่ 5 งาน งานที่ 6 ได้ 429 QUEUE_FULL</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะในรอบนี้</p>
+  <p class="meta">P1 · 0.8 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะ และอ่าน jobs.db ไม่ได้</li><li><b>skip</b>: บล็อก: ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะ และอ่าน jobs.db ไม่ได้</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-03/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-04" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-04 <small>[P2] งานที่ถูกปฏิเสธเพราะคิวเต็มส่งใหม่ด้วย job_id เดิมได้</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต่อจาก TC-3-03</p>
+  <p class="meta">P2 · 1.3 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต่อจาก TC-3-03 ต้องหยุดและเปิด Worker และตั้ง MAX_QUEUE_DEPTH=5 บนเครื่อง GPU ที่ห้ามแตะ</li><li><b>skip</b>: บล็อก: ต่อจาก TC-3-03 ต้องหยุดและเปิด Worker และตั้ง MAX_QUEUE_DEPTH=5 บนเครื่อง GPU ที่ห้ามแตะ</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-04/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-05" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-05 <small>[P2] ส่ง job_id ซ้ำได้ 200 สถานะเดิม ไม่สร้างงานซ้ำ</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องหยุด Worker ให้งานค้างคงที่</p>
+  <p class="meta">P2 · 0.7 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องหยุด Worker ให้งานค้างคงที่ 3 งาน และนับแถวใน jobs.db บนเครื่อง GPU ที่ห้ามแตะ</li><li><b>skip</b>: บล็อก: ต้องหยุด Worker ให้งานค้างคงที่ 3 งาน และนับแถวใน jobs.db บนเครื่อง GPU ที่ห้ามแตะ</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-05/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-06" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-06 <small>[P1] Worker ล่มกลางคัน 100 รูปไม่หาย ผลชุดเดียว (รอบ B)</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (รอบ B · Entry E-6)</span></header>
+  <p class="note">100 รูปจริง + หยุด Worker</p>
+  <p class="meta">P1 · 1.6 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: เป็นรอบ B ต้องอนุมัติงบ GPU 100 รูปแยก และต้องหยุด/เปิด Worker บนเครื่อง GPU ที่ห้ามแตะ</li><li><b>skip</b>: บล็อก: เป็นรอบ B ต้องอนุมัติงบ GPU 100 รูปแยก และต้องหยุด/เปิด Worker บนเครื่อง GPU ที่ห้ามแตะ</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-06/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ล้ม" id="TC-3-07" data-st="ล้ม" data-g="3">
+  <header><h3>TC-3-07 <small>[P1] ทำซ้ำ D-1 ไฟล์ใหญ่/ไฟล์เสีย/ไซต์ ถึงสถานะปลายทางภายใน 900 วินาที</small></h3><span class="badge">ล้ม</span><span class="cat">เว็บผิด</span></header>
+  <p class="note">ทำซ้ำ D-1 ได้: ไฟล์ 14.9 MB และ 15.0 MB ที่เว็บรับ 201 แล้ว ไม่เคยถึง &quot;กำลังตรวจ&quot; ค้าง &quot;รอคิว&quot; จนตัวเฝ้าตัดเป็น &quot;ตรวจไม่สำเร็จ · เกินเวลา 15 นาที&quot; (~904 วินาที) ทั้งไซต์ ข (รอบ 1) และไซต์ ก (รอบ 2) → ไม่ผูกกับไซต์ ผูกกับไฟล์ใหญ่ · corrupt_half.jpg ใน batch เดียวกันก็ค้างตาม (ได้เหตุผลเกินเวลา ไม่ใช่ &quot;เปิดไฟล์รูปไม่ได้&quot;) ขณะที่ TC-4-04 ส่ง corrupt_half.jpg เดี่ยว ๆ ได้ &quot;ตรวจไม่สำเร็จ&quot; ใน 5 วินาที · รอบ 3 รูปปกติ &quot;เสร็จแล้ว&quot; ใน 80 วินาที · ขัด BR-05 (รับถึง 15 MB) + NFR-04</p>
+  <p class="meta">P1 · 1919.1 วินาที · 53_queue.spec.ts</p>
+  <details><summary>ข้อความที่ล้ม (16)</summary><pre>Error: รอบ 1 F-1 ถึงสถานะปลายทางภายใน 900 วินาที (ได้ 904.1 วินาที)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  258 |     for (const p of photos) {
+  259 |       const e = expected[p.key];
+&gt; 260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+      |                                                                                                                                                                             ^
+  261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+  262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:260:173
+
+Error: รอบ 1 F-1 สถานะปลายทาง = DONE
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;DONE&quot;
+Received: &quot;FAILED&quot;
+
+  259 |       const e = expected[p.key];
+  260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+&gt; 261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+      |                                                                                    ^
+  262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+  264 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:261:84
+
+Error: รอบ 1 F-1 ป้ายสถานะ = &quot;เสร็จแล้ว&quot;
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;เสร็จแล้ว&quot;
+Received: &quot;ตรวจไม่สำเร็จ&quot;
+
+  260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+  261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+&gt; 262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+      |                                                                                              ^
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+  264 |     }
+  265 |     const page = await openBatchPage(context, cookie, batchId);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:262:94
+
+Error: รอบ 1 F-2 ถึงสถานะปลายทางภายใน 900 วินาที (ได้ 904 วินาที)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  258 |     for (const p of photos) {
+  259 |       const e = expected[p.key];
+&gt; 260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+      |                                                                                                                                                                             ^
+  261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+  262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:260:173
+
+Error: รอบ 1 F-2 สถานะปลายทาง = DONE
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;DONE&quot;
+Received: &quot;FAILED&quot;
+
+  259 |       const e = expected[p.key];
+  260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+&gt; 261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+      |                                                                                    ^
+  262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+  264 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:261:84
+
+Error: รอบ 1 F-2 ป้ายสถานะ = &quot;เสร็จแล้ว&quot;
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;เสร็จแล้ว&quot;
+Received: &quot;ตรวจไม่สำเร็จ&quot;
+
+  260 |       expect.soft(p.terminalS !== null &amp;&amp; p.terminalS &lt;= STUCK_LIMIT_S, `รอบ ${rd.round} ${p.key} ถึงสถานะปลายทางภายใน 900 วินาที (ได้ ${p.terminalS ?? 'ไม่ถึง'} วินาที)`).toBe(true);
+  261 |       expect.soft(p.status, `รอบ ${rd.round} ${p.key} สถานะปลายทาง = ${e.status}`).toBe(e.status);
+&gt; 262 |       if (e.label) expect.soft(p.label, `รอบ ${rd.round} ${p.key} ป้ายสถานะ = &quot;${e.label}&quot;`).toBe(e.label);
+      |                                                                                              ^
+  263 |       if (e.reason) expect.soft(p.fail_reason, `รอบ ${rd.round} ${p.key} เหตุผล = &quot;${e.reason}&quot;`).toBe(e.reason);
+  264 |     }
+  265 |     const page = await openBatchPage(context, c</pre></details>
+  <div class="shots"><a href="evidence/TC-3-07/01-round1-uploads-batch.png" target="_blank"><img src="evidence/TC-3-07/01-round1-uploads-batch.png" alt="round1-uploads-batch"><span>round1-uploads-batch</span></a><a href="evidence/TC-3-07/02-round2-uploads-batch.png" target="_blank"><img src="evidence/TC-3-07/02-round2-uploads-batch.png" alt="round2-uploads-batch"><span>round2-uploads-batch</span></a><a href="evidence/TC-3-07/03-round3-uploads-batch.png" target="_blank"><img src="evidence/TC-3-07/03-round3-uploads-batch.png" alt="round3-uploads-batch"><span>round3-uploads-batch</span></a></div><p class="files"><a class="file" href="evidence/TC-3-07/04-evidence.json" target="_blank">📄 evidence</a> <a class="file" href="evidence/TC-3-07/05-error-context.txt" target="_blank">📄 error-context</a> <a class="file" href="evidence/TC-3-07/06-trace.zip" target="_blank">🧭 trace trace</a></p></section>
+<section class="tc st-ล้ม" id="TC-3-08" data-st="ล้ม" data-g="3">
+  <header><h3>TC-3-08 <small>[P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป</small></h3><span class="badge">ล้ม</span><span class="cat">เว็บผิด</span></header>
+  <p class="note">ภาระปกติ 20 รูป: เวลารอผลเรียงแล้ว 10.1 … 45.4 วินาที · p95 (ลำดับที่ 19) = 42.4 วินาที &gt; 30 (NFR-02) · ผลแสดงทีละรูปได้ (FR-10 ผ่าน) · ผลออกเป็นจังหวะ ~3 วินาทีต่อรูป ทั้งที่ GPU ใช้ ~19 ms ต่อรูป (RTX 3090 1 ใบ) → คอขวดอยู่ที่การส่ง/ถามผลของฝั่งเว็บ ไม่ใช่ GPU</p>
+  <p class="meta">P1 · 51.1 วินาที · 53_queue.spec.ts</p>
+  <details><summary>ข้อความที่ล้ม (1)</summary><pre>Error: p95 เวลารอผล ≤ 30 วินาที (ได้ 42.4 วินาที)
+
+expect(received).toBeLessThanOrEqual(expected)
+
+Expected: &lt;= 30
+Received:    42.4
+
+  335 |   const p95 = sorted[rank - 1];
+  336 |   expect.soft(rank, 'p95 nearest-rank ของ 20 ค่า = ลำดับที่ 19').toBe(19);
+&gt; 337 |   expect.soft(p95, `p95 เวลารอผล ≤ 30 วินาที (ได้ ${p95} วินาที)`).toBeLessThanOrEqual(30);
+      |                                                                    ^
+  338 |   expect.soft(interleaved !== null, 'มีอย่างน้อย 1 ครั้งที่บางรูปมีผลขณะที่รูปอื่นยัง รอคิว/กำลังตรวจ (ผลขึ้นทีละรูป)').toBe(true);
+  339 |   expect.soft(health.status, 'GET /v1/health ด้วย key ถูก ต้องได้ 200').toBe(200);
+  340 |   const gpu = (health as any).body?.gpu;
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:337:68</pre></details>
+  <div class="shots"><a href="evidence/TC-3-08/01-uploads-batch-end.png" target="_blank"><img src="evidence/TC-3-08/01-uploads-batch-end.png" alt="uploads-batch-end"><span>uploads-batch-end</span></a><a href="evidence/TC-3-08/03-screenshot.png" target="_blank"><img src="evidence/TC-3-08/03-screenshot.png" alt="screenshot"><span>screenshot</span></a></div><p class="files"><a class="file" href="evidence/TC-3-08/02-evidence.json" target="_blank">📄 evidence</a> <a class="file" href="evidence/TC-3-08/04-error-context.txt" target="_blank">📄 error-context</a> <a class="file" href="evidence/TC-3-08/05-trace.zip" target="_blank">🧭 trace trace</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-09" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-09 <small>[P1] รูปค้างเกิน 15 นาทีเป็นตรวจไม่สำเร็จ ผลที่มาช้าไม่เปลี่ยนสถานะ</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องหยุด Worker 15 นาที · แต่ตัวเฝ้า 15 นาทีของเว็บทำงานจริงตามที่เห็นใน TC-3-07 (FAILED &quot;เกินเวลา 15 นาที&quot; ที่ ~904 วินาที)</p>
+  <p class="meta">P1 · 1.4 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องหยุด Worker บนเครื่อง GPU ที่เช่า 15 นาทีแล้วเปิดใหม่ ซึ่งห้ามแตะเครื่องนั้น</li><li><b>skip</b>: บล็อก: ต้องหยุด Worker บนเครื่อง GPU ที่เช่า 15 นาทีแล้วเปิดใหม่ ซึ่งห้ามแตะเครื่องนั้น</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-09/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-บล็อก" id="TC-3-10" data-st="บล็อก" data-g="3">
+  <header><h3>TC-3-10 <small>[P1] คิว gateway เต็ม เว็บยังรับรูป 201 และส่งใหม่เองจนเสร็จแล้ว</small></h3><span class="badge">บล็อก</span><span class="cat">บล็อก (Entry E-4)</span></header>
+  <p class="note">ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker</p>
+  <p class="meta">P1 · 0.9 วินาที · 53_queue.spec.ts</p>
+  <ul class="ann"><li><b>blocked</b>: ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะ</li><li><b>skip</b>: บล็อก: ต้องตั้ง MAX_QUEUE_DEPTH=5 และหยุด Worker บนเครื่อง GPU ที่เช่า ซึ่งห้ามแตะ</li></ul>
+  <div class="shots"></div><p class="files"><a class="file" href="evidence/TC-3-10/01-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-01" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-01 <small>[P1] รายงาน D1 เส้นแบ่งอัตราผ่าน 90% ต่ำกว่า/เท่ากับ/สูงกว่า</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 2.6 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-01/01-report-2026-11-16.png" target="_blank"><img src="evidence/TC-4-01/01-report-2026-11-16.png" alt="report-2026-11-16"><span>report-2026-11-16</span></a></div><p class="files"><a class="file" href="evidence/TC-4-01/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-02" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-02 <small>[P2] รายงาน D2 วันไม่มีรูป รูปเตือน และรูปตรวจไม่สำเร็จ</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 1.4 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-02/01-report-2026-11-17.png" target="_blank"><img src="evidence/TC-4-02/01-report-2026-11-17.png" alt="report-2026-11-17"><span>report-2026-11-17</span></a></div><p class="files"><a class="file" href="evidence/TC-4-02/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-03" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-03 <small>[P2] รายงาน D3 ใช้ผลล่าสุดและไม่นับรูปที่ยังไม่เสร็จ</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 1.1 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-03/01-report-2026-11-18.png" target="_blank"><img src="evidence/TC-4-03/01-report-2026-11-18.png" alt="report-2026-11-18"><span>report-2026-11-18</span></a></div><p class="files"><a class="file" href="evidence/TC-4-03/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-04" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-04 <small>[P1] รายงานวันที่มีรูปแต่ยังไม่มีผล ไม่หารด้วยศูนย์</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 6.1 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-04/01-report-2026-11-19.png" target="_blank"><img src="evidence/TC-4-04/01-report-2026-11-19.png" alt="report-2026-11-19"><span>report-2026-11-19</span></a></div><p class="files"><a class="file" href="evidence/TC-4-04/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-05" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-05 <small>[P1] ป้ายความพร้อมของรายงานที่ 17:59 / 18:00 / 18:01</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 3.7 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-05/01-report-D3-1759.png" target="_blank"><img src="evidence/TC-4-05/01-report-D3-1759.png" alt="report-D3-1759"><span>report-D3-1759</span></a><a href="evidence/TC-4-05/02-report-D3-1800.png" target="_blank"><img src="evidence/TC-4-05/02-report-D3-1800.png" alt="report-D3-1800"><span>report-D3-1800</span></a><a href="evidence/TC-4-05/03-report-D3-1801.png" target="_blank"><img src="evidence/TC-4-05/03-report-D3-1801.png" alt="report-D3-1801"><span>report-D3-1801</span></a></div><p class="files"><a class="file" href="evidence/TC-4-05/04-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-06" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-06 <small>[P1] รูปหลัง 18:00 และเส้นแบ่งวันตามเวลาไทย</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 8.6 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-06/01-%E0%B8%81-report-D3-SITE-C.png" target="_blank"><img src="evidence/TC-4-06/01-%E0%B8%81-report-D3-SITE-C.png" alt="ก-report-D3-SITE-C"><span>ก-report-D3-SITE-C</span></a><a href="evidence/TC-4-06/02-%E0%B8%84-report-D3-SITE-C.png" target="_blank"><img src="evidence/TC-4-06/02-%E0%B8%84-report-D3-SITE-C.png" alt="ค-report-D3-SITE-C"><span>ค-report-D3-SITE-C</span></a></div><p class="files"><a class="file" href="evidence/TC-4-06/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-07" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-07 <small>[P1] หัวหน้างานแก้ผล failA และเหตุผลว่างต้องถูกปฏิเสธ</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 3.6 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-07/01-photo-failA-detail.png" target="_blank"><img src="evidence/TC-4-07/01-photo-failA-detail.png" alt="photo-failA-detail"><span>photo-failA-detail</span></a><a href="evidence/TC-4-07/02-report-D1.png" target="_blank"><img src="evidence/TC-4-07/02-report-D1.png" alt="report-D1"><span>report-D1</span></a></div><p class="files"><a class="file" href="evidence/TC-4-07/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-4-08" data-st="ผ่าน" data-g="4">
+  <header><h3>TC-4-08 <small>[P2] แก้ผลซ้ำหลายครั้ง ประวัติลบ/แก้ไม่ได้ และผู้จัดการดูประวัติข้ามไซต์</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 1.7 วินาที · 54_reports.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-4-08/01-photo-passC-history.png" target="_blank"><img src="evidence/TC-4-08/01-photo-passC-history.png" alt="photo-passC-history"><span>photo-passC-history</span></a><a href="evidence/TC-4-08/02-photo-failA-history-U1.png" target="_blank"><img src="evidence/TC-4-08/02-photo-failA-history-U1.png" alt="photo-failA-history-U1"><span>photo-failA-history-U1</span></a><a href="evidence/TC-4-08/03-report-D1.png" target="_blank"><img src="evidence/TC-4-08/03-report-D1.png" alt="report-D1"><span>report-D1</span></a></div><p class="files"><a class="file" href="evidence/TC-4-08/04-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-01" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-01 <small>[P1] ไม่ล็อกอิน เปิดหน้าและเรียก API ไม่ได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.5 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-01/01-TC-5-01_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%96%E0%B8%B9%E0%B8%81%E0%B8%AA%E0%B9%88%E0%B8%87%E0%B9%84%E0%B8%9B_login.png" target="_blank"><img src="evidence/TC-5-01/01-TC-5-01_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%96%E0%B8%B9%E0%B8%81%E0%B8%AA%E0%B9%88%E0%B8%87%E0%B9%84%E0%B8%9B_login.png" alt="TC-5-01 หน้าที่ถูกส่งไป login"><span>TC-5-01 หน้าที่ถูกส่งไป login</span></a></div><p class="files"><a class="file" href="evidence/TC-5-01/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-02" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-02 <small>[P2] ล็อกอินผิด ข้อความเดียวกัน ไม่มี session cookie</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P2 · 0.7 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-02/01-TC-5-02_%E0%B8%81_login-error.png" target="_blank"><img src="evidence/TC-5-02/01-TC-5-02_%E0%B8%81_login-error.png" alt="TC-5-02 ก login-error"><span>TC-5-02 ก login-error</span></a><a href="evidence/TC-5-02/02-TC-5-02_%E0%B8%82_login-error.png" target="_blank"><img src="evidence/TC-5-02/02-TC-5-02_%E0%B8%82_login-error.png" alt="TC-5-02 ข login-error"><span>TC-5-02 ข login-error</span></a></div><p class="files"><a class="file" href="evidence/TC-5-02/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-03" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-03 <small>[P1] หัวหน้างานไซต์ ก เปิดรูปและงานของไซต์ ข ไม่ได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.4 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-03/01-TC-5-03_U-2_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos_photoB_.png" target="_blank"><img src="evidence/TC-5-03/01-TC-5-03_U-2_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos_photoB_.png" alt="TC-5-03 U-2 เปิด /photos/{photoB}"><span>TC-5-03 U-2 เปิด /photos/{photoB}</span></a></div><p class="files"><a class="file" href="evidence/TC-5-03/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-04" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-04 <small>[P1] หัวหน้างานไซต์ ก แก้ผลรูปไซต์ ข ไม่ได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.4 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-04/01-TC-5-04_U-1_%E0%B9%80%E0%B8%AB%E0%B9%87%E0%B8%99%E0%B8%9C%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%B2%E0%B8%AA%E0%B8%B8%E0%B8%94%E0%B8%82%E0%B8%AD%E0%B8%87_photoB_%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%B3%E0%B8%82%E0%B8%AD%E0%B8%82%E0%B8%AD%E0%B8%87_U-2.png" target="_blank"><img src="evidence/TC-5-04/01-TC-5-04_U-1_%E0%B9%80%E0%B8%AB%E0%B9%87%E0%B8%99%E0%B8%9C%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%B2%E0%B8%AA%E0%B8%B8%E0%B8%94%E0%B8%82%E0%B8%AD%E0%B8%87_photoB_%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%B3%E0%B8%82%E0%B8%AD%E0%B8%82%E0%B8%AD%E0%B8%87_U-2.png" alt="TC-5-04 U-1 เห็นผลล่าสุดของ {photoB} หลังคำขอของ U-2"><span>TC-5-04 U-1 เห็นผลล่าสุดของ {photoB} หลังคำขอของ U-2</span></a></div><p class="files"><a class="file" href="evidence/TC-5-04/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-05" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-05 <small>[P1] รายงานตามบทบาท และผู้จัดการเปิดรูปได้ทุกไซต์</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.9 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-05/01-TC-5-05_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99_D1_%E0%B8%82%E0%B8%AD%E0%B8%87_U-2.png" target="_blank"><img src="evidence/TC-5-05/01-TC-5-05_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99_D1_%E0%B8%82%E0%B8%AD%E0%B8%87_U-2.png" alt="TC-5-05 หน้ารายงาน D1 ของ U-2"><span>TC-5-05 หน้ารายงาน D1 ของ U-2</span></a><a href="evidence/TC-5-05/02-TC-5-05_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99_D1_%E0%B8%82%E0%B8%AD%E0%B8%87_U-1.png" target="_blank"><img src="evidence/TC-5-05/02-TC-5-05_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99_D1_%E0%B8%82%E0%B8%AD%E0%B8%87_U-1.png" alt="TC-5-05 หน้ารายงาน D1 ของ U-1"><span>TC-5-05 หน้ารายงาน D1 ของ U-1</span></a><a href="evidence/TC-5-05/03-TC-5-05_U-1_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%82%E0%B8%AD%E0%B8%87_SITE-B.png" target="_blank"><img src="evidence/TC-5-05/03-TC-5-05_U-1_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%82%E0%B8%AD%E0%B8%87_SITE-B.png" alt="TC-5-05 U-1 เปิดรูปของ SITE-B"><span>TC-5-05 U-1 เปิดรูปของ SITE-B</span></a></div><p class="files"><a class="file" href="evidence/TC-5-05/04-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-06" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-06 <small>[P1] ผู้บริหารอัปโหลดและแก้ผลไม่ได้ แต่เปิดรายงานได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.4 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-06/01-TC-5-06_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_upload.png" target="_blank"><img src="evidence/TC-5-06/01-TC-5-06_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_upload.png" alt="TC-5-06 U-5 เปิด /upload"><span>TC-5-06 U-5 เปิด /upload</span></a></div><p class="files"><a class="file" href="evidence/TC-5-06/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-07" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-07 <small>[P1] ผู้บริหารดูรูป ผลรายรูป และประวัติไม่ได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.4 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-07/01-TC-5-07_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos.png" target="_blank"><img src="evidence/TC-5-07/01-TC-5-07_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos.png" alt="TC-5-07 U-5 เปิด /photos"><span>TC-5-07 U-5 เปิด /photos</span></a><a href="evidence/TC-5-07/02-TC-5-07_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos_photoB_.png" target="_blank"><img src="evidence/TC-5-07/02-TC-5-07_U-5_%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94_photos_photoB_.png" alt="TC-5-07 U-5 เปิด /photos/{photoB}"><span>TC-5-07 U-5 เปิด /photos/{photoB}</span></a></div><p class="files"><a class="file" href="evidence/TC-5-07/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-08" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-08 <small>[P1] ไม่พบ API key ของ gateway ในทุกแหล่ง</small></h3><span class="badge">ผ่าน</span><span class="cat">เทสต์ผิด → แก้แล้ว ผ่าน</span></header>
+  <p class="note">รอบแรกค้างจนหมดเวลา 20 นาที: เทสต์รอ networkidle และรออ่าน body ของคำตอบแบบ stream บนหน้าที่ถามสถานะเป็นระยะ ซึ่งไม่มีวันจบ · แก้ให้รอไม่เกิน 5 วินาทีต่อคำตอบ และตั้ง navigationTimeout 30 วินาที · ผลรันซ้ำ: พบ key 0 ครั้งในทุกแหล่ง</p>
+  <p class="meta">P1 · 16.6 วินาที · รันซ้ำหลังแก้เทสต์ (รอบแรก: ล้ม) · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-08/01-TC-5-08_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2_login.png" target="_blank"><img src="evidence/TC-5-08/01-TC-5-08_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2_login.png" alt="TC-5-08 หน้า login"><span>TC-5-08 หน้า login</span></a><a href="evidence/TC-5-08/02-TC-5-08_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99%E0%B8%82%E0%B8%AD%E0%B8%87_U-1.png" target="_blank"><img src="evidence/TC-5-08/02-TC-5-08_%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99%E0%B8%82%E0%B8%AD%E0%B8%87_U-1.png" alt="TC-5-08 หน้ารายงานของ U-1"><span>TC-5-08 หน้ารายงานของ U-1</span></a></div><p class="files"><a class="file" href="evidence/TC-5-08/03-evidence.json" target="_blank">📄 evidence</a></p></section>
+<section class="tc st-ผ่าน" id="TC-5-09" data-st="ผ่าน" data-g="5">
+  <header><h3>TC-5-09 <small>[P1] ออกจากระบบแล้ว cookie เดิมใช้ไม่ได้</small></h3><span class="badge">ผ่าน</span></header>
+  
+  <p class="meta">P1 · 0.4 วินาที · 55_permissions.spec.ts</p>
+  
+  <div class="shots"><a href="evidence/TC-5-09/01-TC-5-09_cookie_%E0%B9%80%E0%B8%94%E0%B8%B4%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87_logout.png" target="_blank"><img src="evidence/TC-5-09/01-TC-5-09_cookie_%E0%B9%80%E0%B8%94%E0%B8%B4%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87_logout.png" alt="TC-5-09 cookie เดิมหลัง logout"><span>TC-5-09 cookie เดิมหลัง logout</span></a></div><p class="files"><a class="file" href="evidence/TC-5-09/02-evidence.json" target="_blank">📄 evidence</a></p></section>
+</main><script>
+document.querySelectorAll('.filters button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+const f=b.dataset.f,g=b.dataset.g;document.querySelectorAll('.tc').forEach(s=>{s.style.display=(g?s.dataset.g===g:(f==='all'||s.dataset.st===f))?'':'none'})});
+</script></body></html>

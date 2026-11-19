@@ -1,0 +1,37 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": null,
+    "batchUpload": null
+  },
+  "statuses": {
+    "U-2 POST /api/photos/{photoB}/overrides": 404,
+    "U-1 GET overrides (หลัง)": 200,
+    "U-1 GET report D1": 200
+  },
+  "response": {
+    "status": 404,
+    "contentType": "application/json",
+    "bytes": 67,
+    "isImage": false,
+    "dataKeys": [],
+    "error": "NOT_FOUND"
+  },
+  "indirect": "ไม่เข้าถึงฐานข้อมูล: ใช้ประวัติ GET /api/photos/{photoB}/overrides ของ U-1 ก่อน/หลัง + current_result + is_overridden + รายงาน D1 SITE-B edited แทนการนับ result_overrides",
+  "before": {
+    "overridesStatus": 200,
+    "overrides": 0,
+    "detailStatus": 200,
+    "current_result": "FAIL",
+    "is_overridden": false
+  },
+  "after": {
+    "overridesStatus": 200,
+    "overrides": 0,
+    "detailStatus": 200,
+    "current_result": "FAIL",
+    "is_overridden": false
+  },
+  "reportSiteB_edited": 0
+}

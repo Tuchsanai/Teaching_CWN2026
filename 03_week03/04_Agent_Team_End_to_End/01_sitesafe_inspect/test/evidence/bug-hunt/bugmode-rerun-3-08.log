@@ -1,0 +1,42 @@
+npm notice run e2e@1.0.0 npx
+npm notice run playwright test --project=chromium --workers=1 -g TC-3-08
+
+Running 1 test using 1 worker
+
+  x  1 [chromium] › tests\53_queue.spec.ts:287:1 › TC-3-08 [P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป (46.8s)
+
+
+  1) [chromium] › tests\53_queue.spec.ts:287:1 › TC-3-08 [P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป 
+
+    Error: p95 เวลารอผล ≤ 30 วินาที (ได้ 37.1 วินาที)
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 30
+    Received:    37.1
+
+      335 |   const p95 = sorted[rank - 1];
+      336 |   expect.soft(rank, 'p95 nearest-rank ของ 20 ค่า = ลำดับที่ 19').toBe(19);
+    > 337 |   expect.soft(p95, `p95 เวลารอผล ≤ 30 วินาที (ได้ ${p95} วินาที)`).toBeLessThanOrEqual(30);
+          |                                                                    ^
+      338 |   expect.soft(interleaved !== null, 'มีอย่างน้อย 1 ครั้งที่บางรูปมีผลขณะที่รูปอื่นยัง รอคิว/กำลังตรวจ (ผลขึ้นทีละรูป)').toBe(true);
+      339 |   expect.soft(health.status, 'GET /v1/health ด้วย key ถูก ต้องได้ 200').toBe(200);
+      340 |   const gpu = (health as any).body?.gpu;
+        at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\01_sitesafe_inspect\test\e2e\tests\53_queue.spec.ts:337:68
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\53_queue-TC-3-08-P1-ภาระปก-59866-ล-≤-30-วินาที-ผลขึ้นทีละรูป-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\53_queue-TC-3-08-P1-ภาระปก-59866-ล-≤-30-วินาที-ผลขึ้นทีละรูป-chromium\error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\53_queue-TC-3-08-P1-ภาระปก-59866-ล-≤-30-วินาที-ผลขึ้นทีละรูป-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\53_queue-TC-3-08-P1-ภาระปก-59866-ล-≤-30-วินาที-ผลขึ้นทีละรูป-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests\53_queue.spec.ts:287:1 › TC-3-08 [P1] ภาระปกติ 20 รูป p95 เวลารอผล ≤ 30 วินาที ผลขึ้นทีละรูป 

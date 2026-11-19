@@ -1,0 +1,342 @@
+{
+  "expected": {
+    "s1": "201 fail 21 edited 1 rate 90.00",
+    "s2": "201 fail 20 history 2 row2 before FAIL",
+    "s3": 422,
+    "deletePut": "405/403/404 history unchanged"
+  },
+  "passC": "5eed0000-0000-4000-8000-020000000259",
+  "failA": "5eed0000-0000-4000-8000-020000000119",
+  "steps": [
+    {
+      "step": 1,
+      "status": 201,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 9,
+        "fail": 21,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      },
+      "history": [
+        {
+          "id": 2,
+          "photo_id": "5eed0000-0000-4000-8000-020000000259",
+          "edited_by": {
+            "id": 1,
+            "full_name": "ผู้จัดการความปลอดภัย"
+          },
+          "edited_at": "2026-11-19T03:26:23.719Z",
+          "result_before": "PASS",
+          "result_before_label": "ผ่าน",
+          "result_after": "FAIL",
+          "result_after_label": "ไม่ผ่าน",
+          "reason": "มีคนไม่ใส่หมวกอยู่หลังเสา"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "status": 201,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      },
+      "history": [
+        {
+          "id": 2,
+          "photo_id": "5eed0000-0000-4000-8000-020000000259",
+          "edited_by": {
+            "id": 1,
+            "full_name": "ผู้จัดการความปลอดภัย"
+          },
+          "edited_at": "2026-11-19T03:26:23.719Z",
+          "result_before": "PASS",
+          "result_before_label": "ผ่าน",
+          "result_after": "FAIL",
+          "result_after_label": "ไม่ผ่าน",
+          "reason": "มีคนไม่ใส่หมวกอยู่หลังเสา"
+        },
+        {
+          "id": 3,
+          "photo_id": "5eed0000-0000-4000-8000-020000000259",
+          "edited_by": {
+            "id": 1,
+            "full_name": "ผู้จัดการความปลอดภัย"
+          },
+          "edited_at": "2026-11-19T03:26:23.732Z",
+          "result_before": "FAIL",
+          "result_before_label": "ไม่ผ่าน",
+          "result_after": "WARN",
+          "result_after_label": "เตือน",
+          "reason": "ตรวจซ้ำ คนหลังเสาใส่หมวก แต่ไม่ใส่เสื้อ"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "status": 422,
+      "body": {
+        "error": "SAME_RESULT",
+        "message": "ผลใหม่ต้องต่างจากผลล่าสุด"
+      },
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      },
+      "historyRows": 2
+    },
+    {
+      "step": "DELETE U1",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    },
+    {
+      "step": "PUT U1",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    },
+    {
+      "step": "DELETE U2",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    },
+    {
+      "step": "PUT U2",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    },
+    {
+      "step": "DELETE U5",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    },
+    {
+      "step": "PUT U5",
+      "status": 405,
+      "historyRows": 2,
+      "report": {
+        "site": {
+          "id": 3,
+          "code": "SITE-C",
+          "name": "ไซต์ ค"
+        },
+        "has_data": true,
+        "taken": 300,
+        "with_result": 300,
+        "pass": 270,
+        "warn": 10,
+        "fail": 20,
+        "h_total": 20,
+        "edited": 1,
+        "failed": 0,
+        "pending": 0,
+        "pass_rate": 90,
+        "pass_rate_text": "90.00",
+        "red": false
+      }
+    }
+  ],
+  "controls": [
+    {
+      "id": "",
+      "text": "SiteSafe Inspect"
+    },
+    {
+      "id": "nav-photos",
+      "text": "รูปทั้งหมด"
+    },
+    {
+      "id": "nav-problems",
+      "text": "รูปที่มีปัญหา"
+    },
+    {
+      "id": "nav-report",
+      "text": "รายงานรายวัน"
+    },
+    {
+      "id": "nav-logout",
+      "text": "ออกจากระบบ"
+    },
+    {
+      "id": "photo-back",
+      "text": "← กลับ"
+    },
+    {
+      "id": "override-submit",
+      "text": "บันทึกการแก้ผล"
+    },
+    {
+      "id": "override-cancel",
+      "text": "ยกเลิก"
+    },
+    {
+      "id": "history-toggle",
+      "text": "ซ่อนประวัติ"
+    }
+  ],
+  "failAHistory": {
+    "status": 200,
+    "json": {
+      "photo_id": "5eed0000-0000-4000-8000-020000000119",
+      "model_result": "FAIL",
+      "current_result": "FAIL",
+      "overrides": []
+    }
+  },
+  "uiReport": {
+    "row": true,
+    "taken": "300",
+    "fail": "20",
+    "h": "20",
+    "rate": "90.00",
+    "edited": "1",
+    "failed": "0",
+    "red": "false"
+  }
+}

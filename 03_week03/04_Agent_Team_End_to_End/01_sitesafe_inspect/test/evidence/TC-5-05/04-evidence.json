@@ -1,0 +1,153 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": null,
+    "batchUpload": null
+  },
+  "statuses": {
+    "U-2 GET /api/reports/daily?date=2026-11-16": 200,
+    "U-2 GET /api/reports/daily?date=2026-11-16&site=SITE-B": 200,
+    "U-1 GET /api/reports/daily?date=2026-11-16": 200,
+    "U-1 GET /api/reports/daily?date=2026-11-16&site=SITE-B": 200,
+    "U-1 page /photos/{SITE-A}": 200,
+    "U-1 GET /api/photos/{SITE-A}/image": 200,
+    "U-1 page /photos/{SITE-B}": 200,
+    "U-1 GET /api/photos/{SITE-B}/image": 200,
+    "U-1 page /photos/{SITE-C}": 200,
+    "U-1 GET /api/photos/{SITE-C}/image": 200
+  },
+  "reports": {
+    "U-2 GET /api/reports/daily?date=2026-11-16": [
+      {
+        "code": "SITE-A",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 15,
+        "pass_rate_text": "89.67",
+        "red": true,
+        "edited": 0,
+        "failed": 0
+      }
+    ],
+    "U-2 GET /api/reports/daily?date=2026-11-16&site=SITE-B": [
+      {
+        "code": "SITE-A",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 15,
+        "pass_rate_text": "89.67",
+        "red": true,
+        "edited": 0,
+        "failed": 0
+      }
+    ],
+    "U-1 GET /api/reports/daily?date=2026-11-16": [
+      {
+        "code": "SITE-A",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 15,
+        "pass_rate_text": "89.67",
+        "red": true,
+        "edited": 0,
+        "failed": 0
+      },
+      {
+        "code": "SITE-B",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 20,
+        "pass_rate_text": "90.00",
+        "red": false,
+        "edited": 0,
+        "failed": 0
+      },
+      {
+        "code": "SITE-C",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 20,
+        "pass_rate_text": "90.33",
+        "red": false,
+        "edited": 0,
+        "failed": 0
+      }
+    ],
+    "U-1 GET /api/reports/daily?date=2026-11-16&site=SITE-B": [
+      {
+        "code": "SITE-A",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 15,
+        "pass_rate_text": "89.67",
+        "red": true,
+        "edited": 0,
+        "failed": 0
+      },
+      {
+        "code": "SITE-B",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 20,
+        "pass_rate_text": "90.00",
+        "red": false,
+        "edited": 0,
+        "failed": 0
+      },
+      {
+        "code": "SITE-C",
+        "taken": 300,
+        "fail": 20,
+        "h_total": 20,
+        "pass_rate_text": "90.33",
+        "red": false,
+        "edited": 0,
+        "failed": 0
+      }
+    ]
+  },
+  "u2PageRows": {
+    "A": 1,
+    "B": 0,
+    "C": 0
+  },
+  "u1PageDataRed": {
+    "SITE-A": "true",
+    "SITE-B": "false",
+    "SITE-C": "false"
+  },
+  "photoOpen": [
+    {
+      "site": "SITE-A",
+      "id": "5eed0000-0000-4000-8000-02000000012c",
+      "pageStatus": 200,
+      "photoImage": 1,
+      "imageStatus": 200,
+      "imageType": "image/jpeg",
+      "imageBytes": 796,
+      "ok": true
+    },
+    {
+      "site": "SITE-B",
+      "id": "5eed0000-0000-4000-8000-020000000258",
+      "pageStatus": 200,
+      "photoImage": 1,
+      "imageStatus": 200,
+      "imageType": "image/jpeg",
+      "imageBytes": 796,
+      "ok": true
+    },
+    {
+      "site": "SITE-C",
+      "id": "5eed0000-0000-4000-8000-020000000384",
+      "pageStatus": 200,
+      "photoImage": 1,
+      "imageStatus": 200,
+      "imageType": "image/jpeg",
+      "imageBytes": 796,
+      "ok": true
+    }
+  ],
+  "managerOpened": "3 / 3"
+}

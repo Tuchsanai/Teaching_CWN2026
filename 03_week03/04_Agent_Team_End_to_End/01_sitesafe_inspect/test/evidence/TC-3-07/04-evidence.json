@@ -1,0 +1,172 @@
+{
+  "tc": "TC-3-07",
+  "poll_every_s": 5,
+  "cap_s": 900,
+  "grace_s": 30,
+  "diagnosis": "ค้างทุกรอบ รวมรูปปกติ → ไม่ผูกกับไซต์หรือขนาดไฟล์ (ทั้งหมด)",
+  "rounds": [
+    {
+      "round": 1,
+      "user": "U3",
+      "site": "SITE-B",
+      "batchId": "430834ec-3860-4557-b03f-36fa27d84ce8",
+      "queue_before": {
+        "empty": true,
+        "waited_s": 1,
+        "depth": 0
+      },
+      "stalled_over_30s_or_timeout": true,
+      "photos": [
+        {
+          "key": "F-1",
+          "file": "h0_v0_14_9mb.jpg",
+          "bytes": 15623782,
+          "http": 201,
+          "id": "247f6399-7159-4d56-add1-d28a1194a0a3",
+          "everProcessing": false,
+          "terminalS": 904.1,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T02:53:03.894Z"
+        },
+        {
+          "key": "F-2",
+          "file": "h0_v0_15_0mb.jpg",
+          "bytes": 15728640,
+          "http": 201,
+          "id": "fb5547ae-0daa-4a9e-8365-852263449f09",
+          "everProcessing": false,
+          "terminalS": 904,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T02:53:03.999Z"
+        },
+        {
+          "key": "F-10",
+          "file": "corrupt_half.jpg",
+          "bytes": 29766,
+          "http": 201,
+          "id": "f4229707-2834-4aed-b529-248c12b8fd6e",
+          "everProcessing": false,
+          "terminalS": 904,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T02:53:04.014Z"
+        }
+      ],
+      "timeline": [
+        {
+          "t_s": 0,
+          "statuses": "F-1:QUEUED F-2:QUEUED F-10:QUEUED"
+        },
+        {
+          "t_s": 904,
+          "statuses": "F-1:FAILED F-2:FAILED F-10:FAILED"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "user": "U2",
+      "site": "SITE-A",
+      "batchId": "38106154-8e7f-405e-81d4-a4dcc994f057",
+      "queue_before": {
+        "empty": true,
+        "waited_s": 17,
+        "depth": 0
+      },
+      "stalled_over_30s_or_timeout": true,
+      "photos": [
+        {
+          "key": "F-1",
+          "file": "h0_v0_14_9mb.jpg",
+          "bytes": 15623782,
+          "http": 201,
+          "id": "ecc2003a-c7ac-4a1d-9d90-e633a2b4462a",
+          "everProcessing": false,
+          "terminalS": 904,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T03:08:28.757Z"
+        },
+        {
+          "key": "F-2",
+          "file": "h0_v0_15_0mb.jpg",
+          "bytes": 15728640,
+          "http": 201,
+          "id": "86c632e8-2a1a-44fe-b112-8e710fa2cc27",
+          "everProcessing": false,
+          "terminalS": 903.9,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T03:08:28.860Z"
+        },
+        {
+          "key": "F-10",
+          "file": "corrupt_half.jpg",
+          "bytes": 29766,
+          "http": 201,
+          "id": "40e4e3b9-931f-4e1b-bd00-30629a41f6fc",
+          "everProcessing": false,
+          "terminalS": 903.9,
+          "status": "FAILED",
+          "label": "ตรวจไม่สำเร็จ",
+          "fail_reason": "เกินเวลา 15 นาที",
+          "accepted_at": "2026-11-19T03:08:28.876Z"
+        }
+      ],
+      "timeline": [
+        {
+          "t_s": 0,
+          "statuses": "F-1:QUEUED F-2:QUEUED F-10:QUEUED"
+        },
+        {
+          "t_s": 904,
+          "statuses": "F-1:FAILED F-2:FAILED F-10:FAILED"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "user": "U3",
+      "site": "SITE-B",
+      "batchId": "228a1d34-3e01-4f60-9b3d-a499cb0eb0ec",
+      "queue_before": {
+        "empty": true,
+        "waited_s": 1,
+        "depth": 0
+      },
+      "stalled_over_30s_or_timeout": true,
+      "photos": [
+        {
+          "key": "normal",
+          "file": "000005_jpg.rf.96e9379ccae638140c4a90fc4b700a2b.jpg",
+          "bytes": 59533,
+          "http": 201,
+          "id": "4d37392f-2a68-448c-a336-686cb34ff38c",
+          "everProcessing": false,
+          "terminalS": 80.2,
+          "status": "DONE",
+          "label": "เสร็จแล้ว",
+          "fail_reason": null,
+          "accepted_at": "2026-11-19T03:23:38.075Z"
+        }
+      ],
+      "timeline": [
+        {
+          "t_s": 0,
+          "statuses": "normal:QUEUED"
+        },
+        {
+          "t_s": 80,
+          "statuses": "normal:DONE"
+        }
+      ]
+    }
+  ]
+}

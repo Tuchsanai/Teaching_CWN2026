@@ -1,0 +1,32 @@
+{
+  "split": "test",
+  "image_count": 82,
+  "conf_threshold": 0.32,
+  "model_version": "yolo11s-coco-pretrained",
+  "note": "model has no NO_HARDHAT/NO_VEST class -> H=0, V=0 on every image (yolo11s.pt: no class name matches NO_HARDHAT)",
+  "positive_images": 25,
+  "negative_images": 57,
+  "min_images_per_group": 100,
+  "test_size_ok": false,
+  "classes": {
+    "NO_HARDHAT": {
+      "tp": 0,
+      "fn": 25,
+      "fp": 0,
+      "tn": 57,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    "NO_VEST": {
+      "tp": 0,
+      "fn": 36,
+      "fp": 0,
+      "tn": 46,
+      "recall": 0.0,
+      "precision": 0.0
+    }
+  },
+  "metrics_pass": false,
+  "passed": false,
+  "result": "ไม่ผ่านเกณฑ์"
+}

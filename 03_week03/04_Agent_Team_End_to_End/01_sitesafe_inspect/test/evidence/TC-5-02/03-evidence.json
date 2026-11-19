@@ -1,0 +1,33 @@
+{
+  "statuses": {
+    "ก API": 401,
+    "ข API": 401,
+    "ก UI": 401,
+    "ข UI": 401
+  },
+  "cases": [
+    {
+      "case": "(ก) อีเมล U-2 + wrong-password",
+      "apiStatus": 401,
+      "apiSessionSetCookie": false,
+      "apiMessage": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      "uiLoginStatus": 401,
+      "uiSessionSetCookie": false,
+      "browserSessionCookies": 0,
+      "loginError": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      "landed": "/login"
+    },
+    {
+      "case": "(ข) nobody@sitesafe.test + Test-SupA-01",
+      "apiStatus": 401,
+      "apiSessionSetCookie": false,
+      "apiMessage": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      "uiLoginStatus": 401,
+      "uiSessionSetCookie": false,
+      "browserSessionCookies": 0,
+      "loginError": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+      "landed": "/login"
+    }
+  ],
+  "sameLoginError": true
+}

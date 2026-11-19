@@ -1,0 +1,86 @@
+# SiteSafe Inspect · AI side on the rented GPU machine (DESIGN §0, §1, §6)
+#
+#   cp .env.example .env      # set GATEWAY_API_KEY (same as the web side), RabbitMQ password, model
+#   docker compose up -d --build
+#
+# gateway (API + X-API-Key) · rabbitmq (ppe.jobs / ppe.results / ppe.jobs.dead) · worker (YOLO, 1 GPU)
+# The gateway listens on 127.0.0.1 only: publish it to the web side through a TLS reverse proxy
+# (DESIGN §10, the web accepts https:// only).
+
+x-queue-environment: &queue-environment
+  # gateway and worker must declare the queues with identical arguments (ai/common/queues.py)
+  RABBITMQ_URL: amqp://${RABBITMQ_USER:-sitesafe}:${RABBITMQ_PASSWORD:-sitesafe-mq-local}@rabbitmq:5672/
+  MAX_QUEUE_DEPTH: ${MAX_QUEUE_DEPTH:-200}
+  MAX_DELIVERY: ${MAX_DELIVERY:-3}
+
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    # Run as the rabbitmq user directly (the root → gosu start fails to read .erlang.cookie on some hosts).
+    user: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-sitesafe}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-sitesafe-mq-local}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    image: sitesafe-gateway:local
+    environment:
+      <<: *queue-environment
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:?set GATEWAY_API_KEY in ai/.env}
+      JOBS_DB_PATH: /data/jobs.db
+      IMAGES_DIR: /data/images
+      PROCESSING_TIMEOUT_S: ${PROCESSING_TIMEOUT_S:-120}
+      GPU_NAME: ${GPU_NAME:-}
+      MODEL_VERSION: ${MODEL_VERSION:-}
+    volumes:
+      - ai-data:/data
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-8000}:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    image: sitesafe-worker:local
+    environment:
+      <<: *queue-environment
+      MODEL_PATH: /models/${MODEL_FILE:-best.pt}
+      CONF_THRESHOLD: ${CONF_THRESHOLD:?set CONF_THRESHOLD (chosen on the validation set) in ai/.env}
+      MODEL_VERSION: ${MODEL_VERSION:-}
+    volumes:
+      # image_path in ppe.jobs is the gateway's path (/data/images/…): same volume, same path
+      - ai-data:/data:ro
+      - ${MODEL_DIR:-./models}:/models:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  rabbitmq-data:
+  ai-data:

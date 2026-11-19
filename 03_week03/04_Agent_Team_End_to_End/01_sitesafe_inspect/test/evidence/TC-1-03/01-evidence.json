@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-19",
+  "batchId": "257497b5-a5a3-4be4-b017-04513ef53912",
+  "source": [
+    {
+      "file": "h0_v0.jpg",
+      "sha256": "9552c67d86d8a82b613c41252842a2ba63a6a36f0365d9b71cb38984a66d2232",
+      "magic": "FF D8 FF E0"
+    },
+    {
+      "file": "h0_v0.png",
+      "sha256": "ea7ea4acaa96e7c96c170affa45f79abff208eacf8bf48a2e078ed09c76a5ed1",
+      "magic": "89 50 4E 47"
+    }
+  ],
+  "uploads": [
+    {
+      "file": "h0_v0.jpg",
+      "status": 201,
+      "photoId": "ab7457b6-673b-4789-936c-f0c1e28f5b7a",
+      "response": {
+        "id": "ab7457b6-673b-4789-936c-f0c1e28f5b7a",
+        "batch_id": "257497b5-a5a3-4be4-b017-04513ef53912",
+        "original_filename": "h0_v0.jpg",
+        "mime": "image/jpeg",
+        "size_bytes": 59533,
+        "sha256": "9552c67d86d8a82b613c41252842a2ba63a6a36f0365d9b71cb38984a66d2232",
+        "upload_date": "2026-11-19",
+        "status": "QUEUED",
+        "status_label": "รอคิว"
+      }
+    },
+    {
+      "file": "h0_v0.png",
+      "status": 201,
+      "photoId": "267c0272-5804-43df-a51b-8856d9d677d8",
+      "response": {
+        "id": "267c0272-5804-43df-a51b-8856d9d677d8",
+        "batch_id": "257497b5-a5a3-4be4-b017-04513ef53912",
+        "original_filename": "h0_v0.png",
+        "mime": "image/png",
+        "size_bytes": 483918,
+        "sha256": "ea7ea4acaa96e7c96c170affa45f79abff208eacf8bf48a2e078ed09c76a5ed1",
+        "upload_date": "2026-11-19",
+        "status": "QUEUED",
+        "status_label": "รอคิว"
+      }
+    }
+  ],
+  "readBackBeforeRestart": [
+    {
+      "status": 200,
+      "sha256": "9552c67d86d8a82b613c41252842a2ba63a6a36f0365d9b71cb38984a66d2232",
+      "bytes": 59533
+    },
+    {
+      "status": 200,
+      "sha256": "ea7ea4acaa96e7c96c170affa45f79abff208eacf8bf48a2e078ed09c76a5ed1",
+      "bytes": 483918
+    }
+  ],
+  "readBackAfterRestart": [
+    {
+      "status": 200,
+      "sha256": "9552c67d86d8a82b613c41252842a2ba63a6a36f0365d9b71cb38984a66d2232",
+      "bytes": 59533
+    },
+    {
+      "status": 200,
+      "sha256": "ea7ea4acaa96e7c96c170affa45f79abff208eacf8bf48a2e078ed09c76a5ed1",
+      "bytes": 483918
+    }
+  ],
+  "rows": {
+    "before": 0,
+    "after": 2,
+    "afterRestart": 2,
+    "expectedDiff": 2
+  },
+  "restart": "docker restart sitesafe-e2e-web-1 then /api/health db ok, login U-2 again"
+}

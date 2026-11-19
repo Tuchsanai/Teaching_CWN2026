@@ -1,0 +1,54 @@
+{
+  "prep": {
+    "photoB": "5eed0000-0000-4000-8000-020000000258",
+    "photoB_site": "SITE-B",
+    "batchB": null,
+    "batchUpload": null
+  },
+  "statuses": {
+    "U-5 POST /api/uploads": 403,
+    "U-5 POST /api/photos/{photoB}/overrides": 403,
+    "U-5 GET /api/reports/daily?date=2026-11-16": 200
+  },
+  "uploadResponse": {
+    "status": 403,
+    "contentType": "application/json",
+    "bytes": 124,
+    "isImage": false,
+    "dataKeys": [],
+    "error": "FORBIDDEN"
+  },
+  "overrideResponse": {
+    "status": 403,
+    "contentType": "application/json",
+    "bytes": 124,
+    "isImage": false,
+    "dataKeys": [],
+    "error": "FORBIDDEN"
+  },
+  "indirect": "ไม่เข้าถึงฐานข้อมูล: upload_batches +0 = คำตอบไม่มี batch_id · result_overrides +0 = ประวัติการแก้ผลและผลล่าสุดของ {photoB} (อ่านโดย U-1) ก่อน/หลังเท่ากัน",
+  "before": {
+    "overridesStatus": 200,
+    "overrides": 0,
+    "detailStatus": 200,
+    "current_result": "FAIL",
+    "is_overridden": false
+  },
+  "after": {
+    "overridesStatus": 200,
+    "overrides": 0,
+    "detailStatus": 200,
+    "current_result": "FAIL",
+    "is_overridden": false
+  },
+  "reportRows": [
+    "SITE-A",
+    "SITE-B",
+    "SITE-C"
+  ],
+  "uploadPage": {
+    "forbiddenText": true,
+    "navUpload": 0,
+    "uploadFileInput": 0
+  }
+}

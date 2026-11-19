@@ -1,0 +1,277 @@
+== 1_install: start 01:33:01
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+== 1_install: ok 01:33:42
+== 2_data: start 01:33:42
+{'path': '/workspace/e2e_sitesafe/dataset', 'train': 'train/images', 'val': 'valid/images', 'test': 'test/images', 'nc': 10, 'names': ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone', 'Safety Vest', 'machinery', 'vehicle']}
+== 2_data: ok 01:33:42
+== 3_map_before: start 01:33:42
+Creating new Ultralytics Settings v0.0.8 file ✅ 
+View Ultralytics Settings with 'yolo settings' or at '/root/.config/Ultralytics/settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/usage/settings
+
+Ultralytics 8.4.215 🚀 Python-3.12.15 torch-2.14.1+cu130 CUDA:0 (NVIDIA GeForce RTX 3090, 24124MiB)
+YOLO11s summary (fused): 100 layers, 9,443,760 parameters, 0 gradients, 21.6 GFLOPs
+
+[34m[1mval: [0mFast image access ✅ (ping: 0.0±0.0 ms, read: 776.8±220.0 MB/s, size: 61.0 KB)
+
+[34m[1mval: [0mNew cache created: /workspace/e2e_sitesafe/dataset/test/labels.cache
+
+                   all         82        760     0.0173     0.0698     0.0114    0.00784
+Speed: 1.2ms preprocess, 3.5ms inference, 0.0ms loss, 1.5ms postprocess per image
+Results saved to [1m/workspace/e2e_sitesafe/model_results/val_before[0m
+before mAP50 0.011388800648631405 mAP50-95 0.007840101399059527
+== 3_map_before: ok 01:34:09
+== 4_train: start 01:34:09
+Ultralytics 8.4.215 🚀 Python-3.12.15 torch-2.14.1+cu130 CUDA:0 (NVIDIA GeForce RTX 3090, 24124MiB)
+[34m[1mengine/trainer: [0magnostic_nms=False, amp=True, angle=1.0, augment=False, auto_augment=randaugment, batch=16, bgr=0.0, box=7.5, cache=False, cfg=None, channels_last=None, classes=None, close_mosaic=10, cls=0.5, cls_pw=0.0, cls_remap=True, compile=False, conf=None, copy_paste=0.0, copy_paste_mode=flip, cos_lr=False, cutmix=0.0, data=/workspace/e2e_sitesafe/dataset/data_fixed.yaml, degrees=0.0, deterministic=True, device=0, dfl=1.5, dgrad=0.5, dis=6.0, distill_model=None, dlam=1.0, dlog=1.0, dnn=False, dropout=0.0, dynamic=False, embed=None, epochs=30, erasing=0.4, exist_ok=True, fliplr=0.5, flipud=0.0, format=torchscript, fraction=1.0, freeze=None, hsv_h=0.015, hsv_s=0.7, hsv_v=0.4, imgsz=640, iou=None, kobj=1.0, line_width=None, lr0=0.01, lrf=0.01, mask_ratio=4, max_det=300, mixup=0.0, mode=train, model=yolo11s.pt, momentum=0.937, mosaic=1.0, multi_scale=0.0, name=train, nbs=64, nms=None, opset=None, optimize=False, optimizer=auto, overlap_mask=True, patience=100, perspective=0.0, plots=True, pose=12.0, pretrained=True, profile=False, project=/workspace/e2e_sitesafe/runs, quantize=None, rect=False, resume=False, retina_masks=False, rle=1.0, save=True, save_conf=False, save_crop=False, save_dir=/workspace/e2e_sitesafe/runs/train, save_frames=False, save_json=False, save_period=-1, save_txt=False, scale=0.5, seed=0, shear=0.0, show=False, show_boxes=True, show_conf=True, show_labels=True, simplify=True, single_cls=False, source=None, split=val, stream_buffer=False, task=detect, tile=False, time=None, tracker=tracktrack.yaml, translate=0.1, val=True, verbose=True, vid_stride=1, visualize=False, warmup_bias_lr=0.1, warmup_epochs=3.0, warmup_momentum=0.8, weight_decay=0.0005, workers=8, workspace=None
+Overriding model.yaml nc=80 with nc=10
+
+                   from  n    params  module                                       arguments                     
+  0                  -1  1       928  ultralytics.nn.modules.conv.Conv             [3, 32, 3, 2]                 
+  1                  -1  1     18560  ultralytics.nn.modules.conv.Conv             [32, 64, 3, 2]                
+  2                  -1  1     26080  ultralytics.nn.modules.block.C3k2            [64, 128, 1, False, 0.25]     
+  3                  -1  1    147712  ultralytics.nn.modules.conv.Conv             [128, 128, 3, 2]              
+  4                  -1  1    103360  ultralytics.nn.modules.block.C3k2            [128, 256, 1, False, 0.25]    
+  5                  -1  1    590336  ultralytics.nn.modules.conv.Conv             [256, 256, 3, 2]              
+  6                  -1  1    346112  ultralytics.nn.modules.block.C3k2            [256, 256, 1, True]           
+  7                  -1  1   1180672  ultralytics.nn.modules.conv.Conv             [256, 512, 3, 2]              
+  8                  -1  1   1380352  ultralytics.nn.modules.block.C3k2            [512, 512, 1, True]           
+  9                  -1  1    656896  ultralytics.nn.modules.block.SPPF            [512, 512, 5]                 
+ 10                  -1  1    990976  ultralytics.nn.modules.block.C2PSA           [512, 512, 1]                 
+ 11                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']          
+ 12             [-1, 6]  1         0  ultralytics.nn.modules.conv.Concat           [1]                           
+ 13                  -1  1    443776  ultralytics.nn.modules.block.C3k2            [768, 256, 1, False]          
+ 14                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']          
+ 15             [-1, 4]  1         0  ultralytics.nn.modules.conv.Concat           [1]                           
+ 16                  -1  1    127680  ultralytics.nn.modules.block.C3k2            [512, 128, 1, False]          
+ 17                  -1  1    147712  ultralytics.nn.modules.conv.Conv             [128, 128, 3, 2]              
+ 18            [-1, 13]  1         0  ultralytics.nn.modules.conv.Concat           [1]                           
+ 19                  -1  1    345472  ultralytics.nn.modules.block.C3k2            [384, 256, 1, False]          
+ 20                  -1  1    590336  ultralytics.nn.modules.conv.Conv             [256, 256, 3, 2]              
+ 21            [-1, 10]  1         0  ultralytics.nn.modules.conv.Concat           [1]                           
+ 22                  -1  1   1511424  ultralytics.nn.modules.block.C3k2            [768, 512, 1, True]           
+ 23        [16, 19, 22]  1    823278  ultralytics.nn.modules.head.Detect           [10, 16, None, [128, 256, 512]]
+YOLO11s summary: 181 layers, 9,431,662 parameters, 9,431,646 gradients, 21.7 GFLOPs
+
+Remapped 1/10 cls head rows from pretrained weights by class name
+Transferred 499/499 items from pretrained weights
+Freezing layer 'model.23.dfl.conv.weight'
+[34m[1mAMP: [0mrunning Automatic Mixed Precision (AMP) checks...
+[34m[1mAMP: [0mchecks passed ✅
+[34m[1mtrain: [0mFast image access ✅ (ping: 0.0±0.0 ms, read: 1167.4±232.9 MB/s, size: 55.4 KB)
+
+[34m[1mtrain: [0m/workspace/e2e_sitesafe/dataset/train/images/004720_jpg.rf.afc486560a4004c7cfd67910af31a29c.jpg: 1 duplicate labels removed
+[34m[1mtrain: [0m/workspace/e2e_sitesafe/dataset/train/images/construction-813-_jpg.rf.b085952261fd98f2e76b8065de149b5f.jpg: 1 duplicate labels removed
+[34m[1mtrain: [0mNew cache created: /workspace/e2e_sitesafe/dataset/train/labels.cache
+[34m[1mval: [0mFast image access ✅ (ping: 0.0±0.0 ms, read: 1182.7±390.1 MB/s, size: 52.1 KB)
+
+[34m[1mval: [0mNew cache created: /workspace/e2e_sitesafe/dataset/valid/labels.cache
+[34m[1moptimizer:[0m 'optimizer=auto' found, ignoring 'lr0=0.01' and determining best 'optimizer' and 'lr0' automatically... 
+[34m[1moptimizer:[0m AdamW(lr=0.000714, momentum=0.9) with parameter groups 81 weight(decay=0.0), 88 weight(decay=0.0005), 87 bias(decay=0.0)
+Plotting labels to /workspace/e2e_sitesafe/runs/train/labels.jpg... 
+Using 2605 train, 114 val images for fraction=1.0 at imgsz=640
+Using 8 dataloader workers
+Logging results to [1m/workspace/e2e_sitesafe/runs/train[0m
+Starting training for 30 epochs...
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+[K       1/30      4.04G      1.912      3.606      1.804        379        640: 0% ──────────── 0/163  3.6s
+
+                   all        114        697      0.566       0.48      0.494      0.225
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697       0.65      0.484       0.52      0.258
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.529      0.474      0.472      0.218
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697       0.69      0.507      0.562      0.258
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.766      0.521      0.594      0.297
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.703      0.551      0.619      0.303
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.762       0.58      0.655      0.335
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.764      0.613      0.679      0.374
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.766      0.658        0.7      0.368
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.816      0.617      0.696      0.371
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.802      0.643      0.706      0.383
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.701      0.645      0.685      0.381
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697       0.83      0.647      0.727      0.398
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.818       0.64      0.726      0.401
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.846      0.673      0.749      0.413
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697       0.87       0.64      0.738      0.408
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.851      0.651      0.738      0.435
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.873      0.704       0.78      0.458
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.834      0.689      0.764      0.447
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.831      0.713      0.782      0.471
+Closing dataloader mosaic
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+[K      21/30      5.08G      1.001     0.8134      1.216        187        640: 0% ──────────── 0/163  1.1s
+
+                   all        114        697      0.836      0.707      0.775      0.459
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697       0.88      0.707      0.786      0.467
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.857      0.726       0.79      0.469
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.884      0.733      0.806      0.479
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.887      0.739      0.807      0.481
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.872      0.748      0.817      0.496
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.879      0.753      0.812      0.504
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.885      0.754      0.823      0.499
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.866      0.761      0.826      0.501
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+
+
+                   all        114        697      0.877      0.759      0.827      0.502
+
+30 epochs completed in 0.143 hours.
+Optimizer stripped from /workspace/e2e_sitesafe/runs/train/weights/last.pt, 19.2MB
+Optimizer stripped from /workspace/e2e_sitesafe/runs/train/weights/best.pt, 19.2MB
+
+Validating /workspace/e2e_sitesafe/runs/train/weights/best.pt...
+Ultralytics 8.4.215 🚀 Python-3.12.15 torch-2.14.1+cu130 CUDA:0 (NVIDIA GeForce RTX 3090, 24124MiB)
+YOLO11s summary (fused): 100 layers, 9,416,670 parameters, 0 gradients, 21.4 GFLOPs
+
+                   all        114        697      0.875      0.754      0.814      0.505
+               Hardhat         42         79      0.954      0.786      0.893      0.579
+                  Mask         19         21      0.961      0.905      0.947      0.654
+            NO-Hardhat         37         69      0.772      0.609       0.68      0.365
+               NO-Mask         44         74      0.857      0.595      0.644      0.329
+        NO-Safety Vest         56        106      0.881       0.67      0.777       0.47
+                Person         84        166      0.895      0.783      0.864      0.531
+           Safety Cone         13         44      0.877      0.864      0.901      0.505
+           Safety Vest         28         41      0.968      0.854        0.9      0.579
+             machinery         26         55      0.859      0.891      0.919      0.662
+               vehicle         16         42      0.731      0.581      0.614      0.373
+Speed: 0.1ms preprocess, 3.3ms inference, 0.0ms loss, 1.5ms postprocess per image
+Results saved to [1m/workspace/e2e_sitesafe/runs/train[0m
+TRAIN_DONE {'segments': [534.7], 'train_seconds': 534.7, 'epochs': 30, 'imgsz': 640, 'seed': 0, 'batch': 16, 'model': 'yolo11s.pt'}
+== 4_train: ok 01:43:07
+== 5_map_after: start 01:43:07
+Ultralytics 8.4.215 🚀 Python-3.12.15 torch-2.14.1+cu130 CUDA:0 (NVIDIA GeForce RTX 3090, 24124MiB)
+YOLO11s summary (fused): 100 layers, 9,416,670 parameters, 0 gradients, 21.4 GFLOPs
+[34m[1mval: [0mFast image access ✅ (ping: 0.0±0.0 ms, read: 1630.9±287.4 MB/s, size: 63.6 KB)
+
+
+                   all         82        760      0.849      0.709      0.749      0.458
+Speed: 1.7ms preprocess, 2.9ms inference, 0.0ms loss, 1.2ms postprocess per image
+Results saved to [1m/workspace/e2e_sitesafe/model_results/val_after[0m
+after mAP50 0.7491545055244917 mAP50-95 0.4578310492765456
+== 5_map_after: ok 01:43:17
+== 6_threshold: start 01:43:17
+THRESHOLD {'conf_threshold': 0.32, 'split': 'val', 'image_count': 114, 'rule': 'max image-level Recall of NO_HARDHAT with Precision >= 0.80; ties -> highest threshold', 'precision_floor_met_on_val': True, 'val_metrics_at_threshold': {'threshold': 0.32, 'tp': 35, 'fn': 2, 'fp': 2, 'tn': 75, 'recall': 0.9459459459459459, 'precision': 0.9459459459459459}, 'positive_images': 37, 'negative_images': 77}
+== 6_threshold: ok 01:43:24
+== 7_gate_before: start 01:43:24
+BASELINE {'tp': 0, 'fn': 25, 'fp': 0, 'tn': 57, 'recall': 0.0, 'precision': 0.0}
+== 7_gate_before: ok 01:43:27
+== 8_gate_after: start 01:43:27
+ยังตัดสินไม่ได้ (Test Set ไม่ครบเงื่อนไข NFR-01 · ค่าที่วัดได้ถึงเกณฑ์) (/workspace/e2e_sitesafe/model_results/metrics_after.json)
+evaluate.py exit code 1
+== 8_gate_after: ok 01:43:33
+== 9_examples: start 01:43:33
+EXAMPLES {'TP': 20, 'FN': 5, 'FP': 1, 'TN': 56}
+== 9_examples: ok 01:43:40
+PIPELINE_DONE
