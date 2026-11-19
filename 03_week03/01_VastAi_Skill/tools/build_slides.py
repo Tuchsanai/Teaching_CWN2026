@@ -31,6 +31,19 @@ SECS = E.load(README, transform=lambda t: re.sub(r"<details>\s*\n\s*<summary>", 
 FIG = {f["img"]: f for f in FIGS}
 CASES = json.loads(E.read("chatbot/e2e/cases.json"))["cases"]
 HOW = "วางในช่องพิมพ์ของ Claude Code ที่เปิดโฟลเดอร์ของบทนี้ แล้วกด Enter"
+LEAD = "ให้ Claude Code เช่า GPU จริงบน Vast.ai แทนเรา แล้วใช้ GPU นั้นรันโมเดลภาษาให้แชทบอทร้านค้า"
+CHECK_NOTE = "เครื่องตรวจได้แค่ว่าคำตอบ**มีคำสำคัญ**หรือไม่ · คำตอบที่ผ่านเครื่องตรวจอาจยังผิดความหมาย คนจึงต้องเทียบกับ baseline อีกชั้น"
+# LAB: (ทำอะไร, ค่าใช้จ่าย) สำหรับหน้าแผนที่ LAB และหน้าคั่นของแต่ละ LAB
+LABS = {
+    "LAB 0": ("เตรียมบัญชี Vast.ai · API key · กุญแจ SSH", "เติมเครดิต $5–10"),
+    "LAB 1": ("ติดตั้งสกิล `vastai` ใน container", "ฟรี"),
+    "LAB 2": ("ตั้งค่าบัญชีให้พร้อมเช่า", "ฟรี"),
+    "LAB 3": ("หาเครื่องและเปรียบเทียบราคา", "ฟรี"),
+    "LAB 4": ("เช่า RTX 4090 → ssh → ลบเครื่อง", "≈ $0.02"),
+    "LAB 5": ("เช่า RTX 5090 แล้วเปิด AI server (NInfer + Qwen)", "≈ $0.9 ต่อชั่วโมง"),
+    "LAB 6": ("ต่อแชทบอทร้านค้าเข้ากับ AI server แล้วทดสอบ 26 เคส", "(เครื่องเดิม)"),
+    "LAB 7": ("ปิดทุกอย่าง", "หยุดเสียเงิน"),
+}
 VARY = "ราคาและเครื่องในตลาดเปลี่ยนตลอดเวลา ตัวเลขของคุณจะไม่เหมือนของผู้สอน ให้ดูที่วิธีคิด"
 
 
@@ -209,9 +222,8 @@ def gif_slide(n, title):
 
 # ------------------------------------------------------------------ โครงเรื่อง
 def build():
-    labtab = table("เช่า GPU", "LAB")
-    labrow = {E.plain(r[0]): r for r in labtab["rows"]}
-    labs = sorted(labrow)
+    labs = ["LAB %d" % n for n in range(8)]
+    labrow = {k: (k, LABS[k][0], LABS[k][1]) for k in labs}
 
     def lab_divider(n, what, time=""):
         name = heading("LAB %d ·" % n).split("·", 1)[1].strip()
@@ -225,11 +237,10 @@ def build():
     # ===== เปิด
     CTX.update(kicker="", group="เริ่มต้น")
     intro = sec("เช่า GPU")
-    lead = next(b for b in intro if b["t"] == "p")["lines"][0]
-    add(E.cover(E.plain(SECS[0]["text"]), E.plain(lead), IMG + "cover.jpg", small="03_week03 · บทที่ 01"))
+    add(E.cover(E.plain(SECS[0]["text"]), LEAD, IMG + "cover.jpg", small="03_week03 · บทที่ 01"))
     CTX["kicker"] = "ภาพรวมของบท"
     add(fig("ทั้งเรื่องในภาพเดียว: แชทบอทร้านค้าที่ใช้โมเดลภาษาบน GPU ที่ AI เช่าให้", IMG + "lab6-overview.png",
-            ptext("เช่า GPU", "สกิลที่ใช้คือ").split("·", 1)[1].strip()))
+            "ทุกขั้นทำด้วยพรอมต์ Copy & Paste ใน **Claude Code** และงานทั้งหมดเกิดใน container `multi-account`"))
     theory = [s["text"] for s in SECS if s["level"] == 2 and re.match(r"\d ·", s["text"])]
     box = lambda cls, name, small, inner: '<div class="partbox %s"><div class="ph">%s<small>%s</small></div>%s</div>' % (cls, name, small, inner)
     road = box("", "ภาคทฤษฎี", "%d หัวข้อ" % len(theory),
@@ -286,35 +297,12 @@ def build():
     add(explain("สกิลไม่มีเพดานราคาในตัว เราเขียนเพดานไว้ในพรอมต์เอง", IMG + "concept-04-price-cap.png",
                 p + ["ราคาไม่เกินเพดาน → AI เช่าได้เลย", "ราคาเกินเพดาน → AI หยุดแล้วถามเรา"]))
 
-    # 5 · โมเดลภาษาบน GPU
+    # 5 · โมเดลใหญ่เกิน GPU
     h = "5 · โมเดล"
-    name = heading(h).split("·", 1)[1].strip()
-    CTX.update(kicker="", group="ภาคทฤษฎี · " + E.plain(heading(h)))
-    add(E.divider(heading(h).split("·")[0].strip(), name, "<p>%s</p>" % md(next(b for b in sec(h) if b["t"] == "p")["lines"][0]),
-                  IMG + "s02-model.jpg", small="ภาคทฤษฎี"))
-    CTX["kicker"] = "ภาคทฤษฎี · " + heading(h)
-    add(explain("สามคำที่ต้องรู้ก่อน: token · parameter · VRAM", IMG + "concept-06-basics.png", first_ul("5.1")))
-    p = ptext("5.2", "โมเดล Qwen").split(" · ")
-    add(explain("โมเดลใหญ่เกิน GPU จึงต้องบีบอัดด้วย quantization", IMG + "concept-09-quantization.png",
-                p + [rx(r"(เหมือน.+)$",image("5.2", "concept-09")["alt"]).replace("เหมือน", "เปรียบได้กับการ", 1)]))
-    add(fig("จากโมเดลต้นฉบับ ถึง API ที่แชทบอทเรียกใช้", IMG + "concept-05-ninfer.png",
-            "โมเดลต้นฉบับ → **quantization** → ไฟล์ `.ninfer` → **NInfer** บน GPU → API แบบเดียวกับ OpenAI → แชทบอท"))
-    t = table("5.3", "คำถาม")
-    add(S("NInfer: โปรแกรมรันโมเดลที่เปิด API แบบเดียวกับ OpenAI", cards([(r[0], r[1]) for r in t["rows"]], 2), cls="mid"))
-    add(explain("ข้างในโมเดล Qwen 27B: ผ่านหลายชั้น แล้วได้ token ถัดไปทีละตัว", IMG + "concept-07-model-inside.png", first_ul("5.4"),
-                post=note(cap("5.4", "concept-07"), "info")))
-    im = image("5.5", "concept-08")
-    add(explain("Dense แม่นกว่า · MoE ตอบเร็วกว่า", im["src"],
-                [bold1(x) for x in im["alt"].split(":", 1)[1].split(" · ")] + ptext("5.5", "LAB 5 ใช้").split(" · ")[:2],
-                post=note(ptext("5.5", "LAB 5 ใช้").split(" · ")[2], "info")))
-
-    # 6 · แชทบอทร้านค้า
-    h = "6 · แชทบอท"
     CTX.update(kicker="ภาคทฤษฎี · " + heading(h), group="ภาคทฤษฎี · " + E.plain(heading(h)))
-    add(explain("ข้อมูลร้านในฐานข้อมูลคือสิ่งเดียวที่บอทรู้", IMG + "concept-10-chatbot.png", first_ul(h)))
-    im = image(h, "concept-11")
-    add(explain("ตรวจคำตอบ 2 ชั้น: เครื่องตรวจคำสำคัญ แล้วคนเทียบกับ baseline", im["src"],
-                [bold1(x) for x in im["alt"].split(":", 1)[1].split(" · ")], post=note(ptext(h, "เครื่องตรวจได้แค่"))))
+    p = ptext(h, "โมเดล Qwen").split(" · ")
+    add(explain("โมเดลใหญ่เกิน GPU จึงต้องบีบอัดด้วย quantization", IMG + "concept-09-quantization.png",
+                p + [rx(r"(เหมือน.+)$", image(h, "concept-09")["alt"]).replace("เหมือน", "เปรียบได้กับการ", 1)]))
 
     # ===== ภาค LAB
     CTX.update(kicker="", group="ภาค LAB")
@@ -324,8 +312,8 @@ def build():
     add(S("แผนที่ของ LAB: LAB ไหนฟรี LAB ไหนเสียเงินจริง", cards([
         (k, "%s<br>**%s**" % (labrow[k][1], labrow[k][2]), "warn" if "$" in labrow[k][2] else "ok") for k in labs], 4), cls="mid"))
     warn = clean(next(b for b in intro if b["t"] == "alert")["blocks"][0]["lines"][0])
-    add(S("ก่อนเริ่ม: container พร้อม และจำไว้ว่าเครื่องคิดเงินจริง",
-          cards([("ต้องมีก่อน", x, "navy") for x in ul_after("เช่า GPU", "**ต้องมีก่อน**")], 2) + note(warn, "bad")
+    add(S("ก่อนเริ่ม: จำไว้ว่าเครื่องคิดเงินจริง",
+          note(warn, "bad")
           + note("ทุก LAB มีลำดับเดียวกัน: ภาพขั้นตอน → พรอมต์ (คัดลอก) → ตรวจผลของคุณ → ผลที่ควรได้ → อ่านผลอย่างไร", label="ลำดับ"), cls="mid"))
 
     # ----- LAB 0
@@ -519,7 +507,7 @@ def build():
     add(gif_slide(20, "เคส 20 · ถามต่อเนื่อง: บอทจำราคาเดิมแล้วคิดส่วนลดนักศึกษา"))
     found = [re.match(r"^(เคส \d+(?: และ \d+)?) (.*)$", x) for x in rr[3:]]
     add(S("ผ่านเครื่องตรวจไม่ได้แปลว่าคำตอบดีทั้งหมด: คนยังต้องเทียบกับ baseline",
-          cards([(m.group(1), m.group(2), "warn") for m in found if m], 3) + note(ptext("6 · แชทบอท", "เครื่องตรวจได้แค่")), cls="mid"))
+          cards([(m.group(1), m.group(2), "warn") for m in found if m], 3) + note(CHECK_NOTE), cls="mid"))
 
     # ----- LAB 7
     h = "LAB 7 ·"
