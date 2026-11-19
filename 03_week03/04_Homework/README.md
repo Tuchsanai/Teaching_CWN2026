@@ -21,20 +21,100 @@
 
 ข้อ 1–6 ใช้ Dataset ใหม่ · ข้อ 7–8 ใช้ Dataset เดียวกับ LAB ในบท 02 และ 03 · ข้อ 9–10 ใช้ Dataset จาก Roboflow Universe · ทุกชุดเป็น Dataset สาธารณะที่ดาวน์โหลดได้โดยไม่ต้องขอสิทธิ์ (ข้อ 7 · 9 · 10 ใช้ `ROBOFLOW_API_KEY` ที่สมัครฟรี) · ผู้สอนประกาศว่ากลุ่มไหนทำข้อไหน
 
-| ข้อ | ภาพ | ชื่อ | ระบบทำอะไร | สิ่งที่เทรน | Dataset (กดเพื่อเปิดดู) |
-|---|---|---|---|---|---|
-| [1](problems/01_roadcount.md) | [<img src="image/thumb-01.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 1">](problems/01_roadcount.md) | **RoadCount** | เจ้าหน้าที่จราจรอัปโหลดภาพจากกล้องตามแยก → โมเดลตรวจจับและนับรถยนต์ รถบัส รถบรรทุก → ระบบบอกว่าแยกไหนหนาแน่นหรือมีรถบรรทุกกีดขวาง ให้หัวหน้าเวรจัดการก่อน | Object Detection | [`Francesco/vehicles-q0x2v`](https://huggingface.co/datasets/Francesco/vehicles-q0x2v) |
-| [2](problems/02_voice_of_customer.md) | [<img src="image/thumb-02.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 2">](problems/02_voice_of_customer.md) | **VoiceOfCustomer** | ทีมดูแลลูกค้าวางข้อความจากโซเชียลเป็นชุด → โมเดลจำแนกเป็น บวก · กลาง · ลบ · คำถาม พร้อมความมั่นใจ → ข้อความเชิงลบที่โมเดลมั่นใจสูงขึ้นเป็นงานที่ต้องตอบทันที | Text Classification | [`pythainlp/wisesight_sentiment`](https://huggingface.co/datasets/pythainlp/wisesight_sentiment) |
-| [3](problems/03_invoiceflow.md) | [<img src="image/thumb-03.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 3">](problems/03_invoiceflow.md) | **InvoiceFlow** | พนักงานบัญชีอัปโหลดภาพใบแจ้งหนี้ → โมเดลอ่านเลขที่ วันที่ ผู้ขาย และยอดเงินออกมาเป็นข้อมูล → ระบบตรวจว่ายอดก่อนภาษีบวกภาษีเท่ากับยอดรวม และแจ้งใบที่ยอดไม่ลงตัวหรือยอดสูง | Vision-Language Model (LoRA) | [`katanaml-org/invoices-donut-data-v1`](https://huggingface.co/datasets/katanaml-org/invoices-donut-data-v1) |
-| [4](problems/04_shopsnap.md) | [<img src="image/thumb-04.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 4">](problems/04_shopsnap.md) | **ShopSnap** | ร้านค้าอัปโหลดรูปสินค้า → โมเดลจำแนกหมวดหมู่ เพศ และสี แล้ว LLM เขียนคำบรรยายขายภาษาไทย → สินค้าที่โมเดลไม่มั่นใจหรือเป็นสินค้าควบคุมถูกส่งให้คนตรวจก่อนลงขาย | Image Classification | [`ashraq/fashion-product-images-small`](https://huggingface.co/datasets/ashraq/fashion-product-images-small) |
-| [5](problems/05_photofind.md) | [<img src="image/thumb-05.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 5">](problems/05_photofind.md) | **PhotoFind** | ช่างภาพอัปโหลดภาพข่าว → ระบบเขียนคำบรรยายและแปลงภาพเป็น Embedding → บรรณาธิการพิมพ์ข้อความเพื่อค้นภาพ และระบบแจ้งภาพที่ซ้ำกับของเดิม | Embedding ภาพ-ข้อความ | [`nlphuji/flickr_1k_test_image_text_retrieval`](https://huggingface.co/datasets/nlphuji/flickr_1k_test_image_text_retrieval) |
-| [6](problems/06_stormeye.md) | [<img src="image/thumb-06.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 6">](problems/06_stormeye.md) | **StormEye** | เจ้าหน้าที่อัปโหลดภาพดาวเทียมของอาคารหลังพายุ → โมเดลให้ความน่าจะเป็นที่อาคารเสียหาย → ระบบจัดลำดับอาคารที่ต้องส่งทีมกู้ภัยก่อน และ LLM สรุปสถานการณ์ของแต่ละชุด | Image Classification | [`jonathan-roberts1/Satellite-Images-of-Hurricane-Damage`](https://huggingface.co/datasets/jonathan-roberts1/Satellite-Images-of-Hurricane-Damage) |
-| [7](problems/07_sitegate.md) | [<img src="image/thumb-07.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 7">](problems/07_sitegate.md) | **SiteGate** | หัวหน้ากะอัปโหลดภาพคนงานหน้าประตูไซต์ → โมเดลตรวจจับคนที่ไม่ใส่หมวกนิรภัย หน้ากาก หรือเสื้อสะท้อนแสง → ระบบบอกว่าภาพไหนต้องแก้ไขก่อนเข้าพื้นที่ | Object Detection | [`construction-site-safety`](https://universe.roboflow.com/roboflow-universe-projects/construction-site-safety) รุ่น 28 (Roboflow) |
-| [8](problems/08_receiptrush.md) | [<img src="image/thumb-08.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 8">](problems/08_receiptrush.md) | **ReceiptRush** | เลขานุการอัปโหลดภาพใบเสร็จ → โมเดลอ่านรายการและยอดรวมออกมาเป็นข้อมูล → ระบบตรวจว่ายอดรวมตรงกับรายการและไม่เกินวงเงิน ก่อนส่งเบิก | Vision-Language Model (LoRA) | [`naver-clova-ix/cord-v2`](https://huggingface.co/datasets/naver-clova-ix/cord-v2) |
-| [9](problems/09_bloodcount.md) | [<img src="image/thumb-09.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 9">](problems/09_bloodcount.md) | **BloodCount** | นักเทคนิคการแพทย์อัปโหลดภาพสเมียร์เลือด → โมเดลตรวจจับและนับเม็ดเลือดแดง เม็ดเลือดขาว และเกล็ดเลือด → ระบบคัดภาพที่จำนวนผิดปกติให้ผู้เชี่ยวชาญดูซ้ำ | Object Detection | [`bccd-ouzjz`](https://universe.roboflow.com/roboflow-100/bccd-ouzjz/dataset/2) รุ่น 2 (Roboflow) |
-| [10](problems/10_coolercheck.md) | [<img src="image/thumb-10.jpg" width="150" alt="ภาพจำลองของโจทย์ข้อ 10">](problems/10_coolercheck.md) | **CoolerCheck** | พนักงานขายอัปโหลดภาพจากกล้องในตู้แช่ → โมเดลตรวจจับและนับขวด 3 ยี่ห้อ → ระบบบอกว่าตู้ไหนของใกล้หมดหรือยี่ห้อไหนหมด เพื่อจัดรอบเติมสินค้า | Object Detection | [`soda-bottles`](https://universe.roboflow.com/roboflow-100/soda-bottles/dataset/4) รุ่น 4 (Roboflow) |
+<table>
+<tr>
+<td width="50%" valign="top">
+<a href="problems/01_roadcount.md"><img src="image/thumb-01.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 1 RoadCount"></a>
+<h3><a href="problems/01_roadcount.md">ข้อ 1 · RoadCount</a></h3>
+เจ้าหน้าที่จราจรอัปโหลดภาพจากกล้องตามแยก → โมเดลตรวจจับและนับรถยนต์ รถบัส รถบรรทุก → ระบบบอกว่าแยกไหนหนาแน่นหรือมีรถบรรทุกกีดขวาง ให้หัวหน้าเวรจัดการก่อน
+<br><br>
+<b>สิ่งที่เทรน:</b> Object Detection<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/Francesco/vehicles-q0x2v"><code>Francesco/vehicles-q0x2v</code></a>
+</td>
+<td width="50%" valign="top">
+<a href="problems/02_voice_of_customer.md"><img src="image/thumb-02.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 2 VoiceOfCustomer"></a>
+<h3><a href="problems/02_voice_of_customer.md">ข้อ 2 · VoiceOfCustomer</a></h3>
+ทีมดูแลลูกค้าวางข้อความจากโซเชียลเป็นชุด → โมเดลจำแนกเป็น บวก · กลาง · ลบ · คำถาม พร้อมความมั่นใจ → ข้อความเชิงลบที่โมเดลมั่นใจสูงขึ้นเป็นงานที่ต้องตอบทันที
+<br><br>
+<b>สิ่งที่เทรน:</b> Text Classification<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/pythainlp/wisesight_sentiment"><code>pythainlp/wisesight_sentiment</code></a>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<a href="problems/03_invoiceflow.md"><img src="image/thumb-03.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 3 InvoiceFlow"></a>
+<h3><a href="problems/03_invoiceflow.md">ข้อ 3 · InvoiceFlow</a></h3>
+พนักงานบัญชีอัปโหลดภาพใบแจ้งหนี้ → โมเดลอ่านเลขที่ วันที่ ผู้ขาย และยอดเงินออกมาเป็นข้อมูล → ระบบตรวจว่ายอดก่อนภาษีบวกภาษีเท่ากับยอดรวม และแจ้งใบที่ยอดไม่ลงตัวหรือยอดสูง
+<br><br>
+<b>สิ่งที่เทรน:</b> Vision-Language Model (LoRA)<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/katanaml-org/invoices-donut-data-v1"><code>katanaml-org/invoices-donut-data-v1</code></a>
+</td>
+<td width="50%" valign="top">
+<a href="problems/04_shopsnap.md"><img src="image/thumb-04.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 4 ShopSnap"></a>
+<h3><a href="problems/04_shopsnap.md">ข้อ 4 · ShopSnap</a></h3>
+ร้านค้าอัปโหลดรูปสินค้า → โมเดลจำแนกหมวดหมู่ เพศ และสี แล้ว LLM เขียนคำบรรยายขายภาษาไทย → สินค้าที่โมเดลไม่มั่นใจหรือเป็นสินค้าควบคุมถูกส่งให้คนตรวจก่อนลงขาย
+<br><br>
+<b>สิ่งที่เทรน:</b> Image Classification<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/ashraq/fashion-product-images-small"><code>ashraq/fashion-product-images-small</code></a>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<a href="problems/05_photofind.md"><img src="image/thumb-05.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 5 PhotoFind"></a>
+<h3><a href="problems/05_photofind.md">ข้อ 5 · PhotoFind</a></h3>
+ช่างภาพอัปโหลดภาพข่าว → ระบบเขียนคำบรรยายและแปลงภาพเป็น Embedding → บรรณาธิการพิมพ์ข้อความเพื่อค้นภาพ และระบบแจ้งภาพที่ซ้ำกับของเดิม
+<br><br>
+<b>สิ่งที่เทรน:</b> Embedding ภาพ-ข้อความ<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/nlphuji/flickr_1k_test_image_text_retrieval"><code>nlphuji/flickr_1k_test_image_text_retrieval</code></a>
+</td>
+<td width="50%" valign="top">
+<a href="problems/06_stormeye.md"><img src="image/thumb-06.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 6 StormEye"></a>
+<h3><a href="problems/06_stormeye.md">ข้อ 6 · StormEye</a></h3>
+เจ้าหน้าที่อัปโหลดภาพดาวเทียมของอาคารหลังพายุ → โมเดลให้ความน่าจะเป็นที่อาคารเสียหาย → ระบบจัดลำดับอาคารที่ต้องส่งทีมกู้ภัยก่อน และ LLM สรุปสถานการณ์ของแต่ละชุด
+<br><br>
+<b>สิ่งที่เทรน:</b> Image Classification<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/jonathan-roberts1/Satellite-Images-of-Hurricane-Damage"><code>jonathan-roberts1/Satellite-Images-of-Hurricane-Damage</code></a>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<a href="problems/07_sitegate.md"><img src="image/thumb-07.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 7 SiteGate"></a>
+<h3><a href="problems/07_sitegate.md">ข้อ 7 · SiteGate</a></h3>
+หัวหน้ากะอัปโหลดภาพคนงานหน้าประตูไซต์ → โมเดลตรวจจับคนที่ไม่ใส่หมวกนิรภัย หน้ากาก หรือเสื้อสะท้อนแสง → ระบบบอกว่าภาพไหนต้องแก้ไขก่อนเข้าพื้นที่
+<br><br>
+<b>สิ่งที่เทรน:</b> Object Detection<br>
+<b>Dataset:</b> <a href="https://universe.roboflow.com/roboflow-universe-projects/construction-site-safety"><code>construction-site-safety</code></a> รุ่น 28 (Roboflow)
+</td>
+<td width="50%" valign="top">
+<a href="problems/08_receiptrush.md"><img src="image/thumb-08.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 8 ReceiptRush"></a>
+<h3><a href="problems/08_receiptrush.md">ข้อ 8 · ReceiptRush</a></h3>
+เลขานุการอัปโหลดภาพใบเสร็จ → โมเดลอ่านรายการและยอดรวมออกมาเป็นข้อมูล → ระบบตรวจว่ายอดรวมตรงกับรายการและไม่เกินวงเงิน ก่อนส่งเบิก
+<br><br>
+<b>สิ่งที่เทรน:</b> Vision-Language Model (LoRA)<br>
+<b>Dataset:</b> <a href="https://huggingface.co/datasets/naver-clova-ix/cord-v2"><code>naver-clova-ix/cord-v2</code></a>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<a href="problems/09_bloodcount.md"><img src="image/thumb-09.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 9 BloodCount"></a>
+<h3><a href="problems/09_bloodcount.md">ข้อ 9 · BloodCount</a></h3>
+นักเทคนิคการแพทย์อัปโหลดภาพสเมียร์เลือด → โมเดลตรวจจับและนับเม็ดเลือดแดง เม็ดเลือดขาว และเกล็ดเลือด → ระบบคัดภาพที่จำนวนผิดปกติให้ผู้เชี่ยวชาญดูซ้ำ
+<br><br>
+<b>สิ่งที่เทรน:</b> Object Detection<br>
+<b>Dataset:</b> <a href="https://universe.roboflow.com/roboflow-100/bccd-ouzjz/dataset/2"><code>bccd-ouzjz</code></a> รุ่น 2 (Roboflow)
+</td>
+<td width="50%" valign="top">
+<a href="problems/10_coolercheck.md"><img src="image/thumb-10.jpg" width="100%" alt="ภาพจำลองของโจทย์ข้อ 10 CoolerCheck"></a>
+<h3><a href="problems/10_coolercheck.md">ข้อ 10 · CoolerCheck</a></h3>
+พนักงานขายอัปโหลดภาพจากกล้องในตู้แช่ → โมเดลตรวจจับและนับขวด 3 ยี่ห้อ → ระบบบอกว่าตู้ไหนของใกล้หมดหรือยี่ห้อไหนหมด เพื่อจัดรอบเติมสินค้า
+<br><br>
+<b>สิ่งที่เทรน:</b> Object Detection<br>
+<b>Dataset:</b> <a href="https://universe.roboflow.com/roboflow-100/soda-bottles/dataset/4"><code>soda-bottles</code></a> รุ่น 4 (Roboflow)
+</td>
+</tr>
+</table>
 
-ภาพในตารางเป็นภาพจำลอง · กดที่ภาพหรือเลขข้อเพื่อเปิดโจทย์ · กดที่ชื่อ Dataset เพื่อเปิดหน้าของ Dataset
+ภาพในตารางเป็นภาพจำลอง · กดที่ภาพหรือชื่อข้อเพื่อเปิดโจทย์ · กดที่ชื่อ Dataset เพื่อเปิดหน้าของ Dataset
 
 แต่ละข้อ **คะแนนเต็ม 100** · ไม่จำกัดงบเช่า GPU แต่ต้องรายงานค่าใช้จ่ายจริง
 
