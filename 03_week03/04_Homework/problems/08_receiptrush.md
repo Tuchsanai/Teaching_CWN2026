@@ -22,7 +22,7 @@
 | เรื่อง | ค่า |
 |---|---|
 | ชื่อ | [`naver-clova-ix/cord-v2`](https://huggingface.co/datasets/naver-clova-ix/cord-v2) บน Hugging Face · สัญญาอนุญาต CC BY 4.0 |
-| ชุดวัดผล | **split `validation` 100 ใบ + split `test` 100 ใบ = 200 ใบ** (ไม่ต้องดาวน์โหลด split `train` ซึ่งมีขนาดใหญ่) |
+| ชุดวัดผล | **split `validation` 100 ใบ + split `test` 100 ใบ = 200 ใบ** (split `train` 800 ใบใช้เทรน) |
 | ภาพ | ใบเสร็จร้านอาหารจากอินโดนีเซีย ถ่ายด้วยมือถือ ยอดเงินเป็นจำนวนเต็ม |
 | เฉลย | คอลัมน์ `ground_truth` เป็น JSON: `gt_parse.menu` (รายการ) และ `gt_parse.total.total_price` (ยอดรวม) |
 
@@ -33,10 +33,15 @@
 ![ใบเสร็จ 6 ใบจาก CORD-v2 แต่ละใบมีภาพใบเสร็จและคำตอบจริงเป็น JSON ที่มี items subtotal tax total](image/08-samples.jpg)
 *6 ใบจาก split `train` พร้อมเฉลยที่จัดรูปแบบแล้ว · ภาพมีทั้งเอียง ยับ มืด และจาง · ข้อมูลร้านค้าในภาพถูกเบลอมาจากต้นทาง*
 
-## โมเดล
+## โมเดลและการเทรน (ระยะ M)
 
-Vision-Language Model สำเร็จรูป เช่น `Qwen/Qwen3-VL-2B-Instruct` · หรือใช้ LoRA adapter ที่ **เทรนไว้แล้วใน LAB 2** ของบท 02 ก็ได้ · การบ้านข้อนี้ไม่มีการเทรนเพิ่ม
-ระบุใน `quality.json` ว่าใช้แบบไหน (`"model"`)
+| เรื่อง | ค่า |
+|---|---|
+| โมเดลตั้งต้น | Vision-Language Model สำเร็จรูป เช่น `Qwen/Qwen3-VL-2B-Instruct` |
+| ชุดเทรน | split `train` 800 ใบ · แบ่ง Validation ของตัวเองจากชุดนี้เพื่อเลือก checkpoint |
+| สิ่งที่เทรน | Fine-tune ด้วย LoRA ใหม่ในการบ้านนี้ ให้ตอบเป็น JSON ที่มีรายการและยอดรวม |
+| Baseline | โมเดลตั้งต้นที่ยังไม่เทรน ใช้คำสั่ง (prompt) เดียวกัน |
+| ค่าที่ต้องเลือกเอง | จำนวน epoch · LoRA rank · ขนาดภาพที่ย่อ |
 
 **ผลจากโมเดลต่อ 1 ใบ:** `items` (รายการ มี `name` · `qty` · `price`) และ `total`
 กำหนดให้ I = จำนวนรายการ · S = ผลรวมของ `price` ทุกรายการ · T = `total`

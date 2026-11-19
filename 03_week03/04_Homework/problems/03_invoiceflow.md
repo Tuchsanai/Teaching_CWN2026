@@ -21,7 +21,7 @@
 | เรื่อง | ค่า |
 |---|---|
 | ชื่อ | [`katanaml-org/invoices-donut-data-v1`](https://huggingface.co/datasets/katanaml-org/invoices-donut-data-v1) บน Hugging Face · สัญญาอนุญาต MIT |
-| ชุดวัดผล | **ทั้ง 501 ใบ** (split `train` 425 + `validation` 50 + `test` 26) |
+| ชุดวัดผล | **split `validation` 50 ใบ + split `test` 26 ใบ = 76 ใบ** (split `train` 425 ใบใช้เทรน) |
 | ภาพ | JPG ขนาด 2481 × 3508 (ควรย่อก่อนส่งให้โมเดล) |
 | ขนาดไฟล์ | ทั้งชุดราว 198 MB |
 | เฉลย | คอลัมน์ `ground_truth` เป็น JSON: `gt_parse.header` (`invoice_no` · `invoice_date` · `seller` · `client` · …) และ `gt_parse.summary` (`total_net_worth` · `total_vat` · `total_gross_worth`) |
@@ -33,9 +33,15 @@
 ![ใบแจ้งหนี้ 3 ใบจาก Dataset แต่ละใบมีเลขที่ วันที่ ผู้ขาย ผู้ซื้อ ตารางรายการ และตารางสรุปยอด ใต้ภาพเป็นค่าเฉลย](image/03-samples.jpg)
 *3 ใบแรกของ split `train` · ข้อความใต้ภาพคือค่าในเฉลย · ยอดเงินในเฉลยใช้เครื่องหมาย `,` เป็นจุดทศนิยม*
 
-## โมเดล
+## โมเดลและการเทรน (ระยะ M)
 
-Vision-Language Model สำเร็จรูป เช่น `Qwen/Qwen3-VL-2B-Instruct` หรือรุ่นที่ใหญ่กว่า · เขียนคำสั่งให้โมเดลตอบเป็น JSON เอง
+| เรื่อง | ค่า |
+|---|---|
+| โมเดลตั้งต้น | Vision-Language Model สำเร็จรูป เช่น `Qwen/Qwen3-VL-2B-Instruct` หรือรุ่นที่ใหญ่กว่า |
+| ชุดเทรน | split `train` 425 ใบ · แบ่ง Validation ของตัวเองจากชุดนี้เพื่อเลือก checkpoint |
+| สิ่งที่เทรน | Fine-tune ด้วย LoRA ให้ตอบเป็น JSON ตามช่องข้อมูลของโจทย์ |
+| Baseline | โมเดลตั้งต้นที่ยังไม่เทรน ใช้คำสั่ง (prompt) เดียวกัน |
+| ค่าที่ต้องเลือกเอง | จำนวน epoch · LoRA rank · ขนาดภาพที่ย่อ |
 
 **ผลจากโมเดลต่อ 1 ใบ:** `invoice_no` · `invoice_date` · `seller` · `client` · `net` · `vat` · `gross`
 กำหนดให้ M = จำนวนช่องที่อ่านไม่ได้ ใน 4 ช่อง: `invoice_no` · `invoice_date` · `seller` · `client`

@@ -23,7 +23,7 @@
 |---|---|
 | ชื่อ | [`construction-site-safety`](https://universe.roboflow.com/roboflow-universe-projects/construction-site-safety) รุ่น 28 บน Roboflow Universe · สัญญาอนุญาต CC BY 4.0 |
 | การดาวน์โหลด | ใช้ `ROBOFLOW_API_KEY` (สมัครฟรี ตามบท 02 LAB 0) รูปแบบ YOLO |
-| ชุดวัดผล | **Validation Set 114 ภาพ + Test Set 82 ภาพ = 196 ภาพ** (ไม่ใช้ Training Set เพราะโมเดลเคยเห็นแล้ว) |
+| ชุดวัดผล | **Validation Set 114 ภาพ + Test Set 82 ภาพ = 196 ภาพ** (Training Set ใช้เทรน) |
 | ภาพ | JPG ขนาด 640 × 640 |
 | เฉลย | กรอบของ 10 ประเภท ที่ใช้ในโจทย์นี้: `Person` · `NO-Hardhat` · `NO-Mask` · `NO-Safety Vest` |
 
@@ -32,10 +32,15 @@
 ![ภาพหน้างานก่อสร้าง 8 ภาพจาก Training Set มีกรอบและชื่อประเภท เช่น Person NO-Hardhat NO-Mask NO-Safety Vest Safety Cone machinery](image/07-samples.jpg)
 *8 ภาพจาก Training Set พร้อมกรอบจากเฉลย · ภาพใน Training Set ถูกตัดต่อหลายภาพเข้าด้วยกัน (Mosaic Augmentation) ส่วนภาพใน Validation Set และ Test Set เป็นภาพเดี่ยว*
 
-## โมเดล
+## โมเดลและการเทรน (ระยะ M)
 
-ใช้ไฟล์ `best.pt` ของ YOLO11s ที่ **เทรนไว้แล้วใน LAB 1** ของบท 02 · การบ้านข้อนี้ไม่มีการเทรนเพิ่ม
-เลือกค่า confidence threshold เองหนึ่งค่าแล้วใช้ค่านั้นตลอด
+| เรื่อง | ค่า |
+|---|---|
+| โมเดลตั้งต้น | โมเดล Object Detection สำเร็จรูป เช่น YOLO11s ที่เทรนด้วย COCO |
+| ชุดเทรน | Training Set ของ Dataset รุ่น 28 · แบ่ง Validation ของตัวเองจาก Training Set เพื่อเลือก checkpoint |
+| สิ่งที่เทรน | Fine-tune ใหม่ในการบ้านนี้ โดยเปลี่ยนค่าจาก LAB 1 อย่างน้อย 1 อย่าง (เช่น ขนาดโมเดล · ขนาดภาพ · จำนวน epoch) แล้วบอกเหตุผล |
+| Baseline | ไฟล์ `best.pt` จาก LAB 1 ของบท 02 · ถ้าไม่มีแล้วใช้ checkpoint หลัง epoch ที่ 3 ของการเทรนครั้งนี้ |
+| ค่าที่ต้องเลือกเอง | จำนวน epoch · ขนาดภาพ · confidence threshold หนึ่งค่าที่ใช้ตลอด |
 
 **ผลจากโมเดลต่อ 1 ภาพ:** P (จำนวน `Person`) · NH (จำนวน `NO-Hardhat`) · NM (จำนวน `NO-Mask`) · NV (จำนวน `NO-Safety Vest`)
 
