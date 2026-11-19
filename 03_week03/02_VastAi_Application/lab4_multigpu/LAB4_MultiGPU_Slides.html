@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAB 4 · 1 GPU เทียบ 2 GPU · Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#12305e;--teal:#0f8f8c;--teal-soft:#e2f5f4;--orange:#e87f1c;--orange-soft:#fff1e3;--red:#c92a2a;--red-soft:#fdecec;
+--green:#15803d;--green-soft:#e7f7ec;--ink:#1c2533;--muted:#5b6b80;--line:#d8e0ec;--bg:#f5f7fb;--card:#fff;--code:#0e1a2b;
+--font:'IBM Plex Sans Thai','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif;--mono:'JetBrains Mono','Cascadia Code',Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#070d18;overflow:hidden;font-family:var(--font);color:var(--ink)}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1600px;height:900px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--bg);padding:40px 72px 44px;display:none;flex-direction:column;overflow:hidden}
+.slide.active,.slide.measure{display:flex}
+.slide.measure{visibility:hidden}
+.slide.active{animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hd{flex:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--line)}
+.kicker{font-size:17px;font-weight:600;color:var(--teal);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kicker code{font-size:.9em;background:none;padding:0;color:inherit}
+h2{font-size:36px;line-height:1.22;margin:3px 0 0;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:14px}
+h2 .tt{min-width:0}
+h2 code{font-size:.88em}
+.tag{flex:none;font-size:15px;font-weight:600;background:var(--orange-soft);color:#9a4d06;border:1px solid #f6d3ad;border-radius:999px;padding:3px 13px;white-space:nowrap}
+.pg{flex:none;margin-left:auto;font-size:16px;font-weight:500;color:var(--muted);white-space:nowrap}
+.slide .no{display:none;position:absolute;right:26px;bottom:12px;font-size:13px;color:#8796ab}
+.slide .dk{position:absolute;left:72px;bottom:12px;font-size:13px;color:#8796ab}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:.5em;font-size:calc(23px*var(--fs,1));overflow:hidden}
+.body.scroll{overflow:auto}
+.body>*{flex:none;margin:0}
+p{line-height:1.55}
+ul{padding-left:1.3em;margin:0}
+li{line-height:1.5;margin:.22em 0}
+b,strong{color:var(--navy)}
+a{color:#1d5fd0;text-decoration:none;border-bottom:1px solid rgba(29,95,208,.3)}
+.xref{color:var(--navy);font-weight:600}
+code{font-family:var(--mono);font-size:.84em;background:#e6edf7;color:#0b3b7a;padding:.08em .38em;border-radius:5px;overflow-wrap:break-word}
+pre,code{font-variant-ligatures:none}
+h3.lead{font-size:1.14em;color:var(--navy);font-weight:700;line-height:1.35;padding-left:.6em;border-left:5px solid var(--teal)}
+h3.lead span{font-weight:400;color:var(--muted);font-size:.86em}
+h3.lead span b{color:var(--muted)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.9em;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:.4em .62em;text-align:left;vertical-align:top;line-height:1.42;border-bottom:1px solid var(--line)}
+th{background:var(--navy);color:#fff;font-weight:600}
+th code{background:rgba(255,255,255,.16);color:#fff}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even) td{background:#f6f9fd}
+td:first-child{font-weight:500}
+td.yes{color:#0f5132}td.no{color:#9b1c1c}
+.slide td.no{display:table-cell;position:static;font-size:inherit;color:#9b1c1c}
+table.c6,table.c7{font-size:.84em}
+.v{font-weight:700;font-size:.92em;padding:.05em .5em;border-radius:6px;white-space:nowrap}
+.v.accept{background:var(--green-soft);color:var(--green)}
+.v.reject{background:var(--red-soft);color:var(--red)}
+.note{border-left:6px solid var(--teal);background:var(--teal-soft);padding:.55em .9em;border-radius:8px;line-height:1.5}
+.note>*{margin:0}
+.note>*+*{margin-top:.4em}
+.note.ok{border-color:var(--green);background:var(--green-soft)}
+.note.warn{border-color:var(--orange);background:var(--orange-soft)}
+.note.bad{border-color:var(--red);background:var(--red-soft)}
+.note.result{border-color:var(--navy);background:#e9eff8}
+.note.eye{border-color:var(--orange);background:var(--orange-soft);display:flex;gap:.8em;align-items:baseline}
+.note.eye>*+*{margin-top:0}
+.note .lbl{flex:none;font-size:.72em;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--orange);border-radius:6px;padding:.15em .6em}
+pre.code{position:relative;background:var(--code);color:#dbe7ff;font-family:var(--mono);font-size:.74em;line-height:1.5;padding:.85em 1.1em;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4}
+pre.code.term{border-left:6px solid var(--teal)}
+pre .copy{position:absolute;top:8px;right:8px;font-family:var(--font);font-size:14px;background:#26406a;color:#fff;border:0;border-radius:7px;padding:5px 12px;cursor:pointer;opacity:.85}
+pre .copy:hover,.copy.big:hover{background:var(--teal);opacity:1}
+pre .err{color:#ff9b9b}pre .ok{color:#86e3ae}pre .dim{color:#8ea3c4}pre .cmd{color:#ffd28a}
+.tk-c{color:#7f93b5;font-style:italic}.tk-s{color:#a5e8b5}.tk-k{color:#ffb86b}.tk-n{color:#8fd3ff}
+.fig{flex:1 1 0;min-height:var(--figmin,260px);display:flex;align-items:center;justify-content:center}
+.fig img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 6px 22px rgba(18,48,94,.16);background:#fff;cursor:zoom-in}
+.fig.wide{flex:none;min-height:0;display:block}
+.fig.wide img{width:100%;max-height:none}
+.body>.fig.wide:only-child{margin:auto 0}
+.figrow{flex:1 1 0;min-height:0;display:flex;gap:24px;align-items:center}
+.figrow .fig{height:100%}
+.cols{display:flex;gap:26px;align-items:flex-start}
+.cols .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5em}
+.cols .col>*{margin:0}
+.cmp pre.code{font-size:.72em}
+.fails{display:flex;flex-direction:column;gap:.45em}
+.fails .cardx{padding:.4em .8em}
+.slide.mid .body{justify-content:center;gap:.8em}
+.cardx h4 code{font-size:.9em}
+.fails .cardx p{font-size:.8em;font-family:var(--mono);line-height:1.45}
+/* พรอมต์ */
+.pbar{display:flex;align-items:center;gap:16px;background:var(--orange-soft);border:1px solid #f6d3ad;border-radius:10px;padding:.45em .8em;font-size:.86em}
+.pbar .how{flex:1;min-width:0}
+.pbar .plabel{flex:none;color:var(--muted);font-size:.9em}
+.copy.big{flex:none;font-family:var(--font);font-size:19px;font-weight:700;background:var(--orange);color:#fff;border:0;border-radius:9px;padding:9px 20px;cursor:pointer;box-shadow:0 3px 10px rgba(232,127,28,.35)}
+.copy.done{background:var(--green)!important}
+pre.code.prompt{font-size:.76em;line-height:1.52;border:2px solid #f08a24}
+.full{display:none}
+/* checklist */
+.checks{display:flex;flex-direction:column;gap:.45em}
+.chk{display:flex;gap:.7em;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.5em .8em;cursor:pointer;line-height:1.45}
+.chk input{width:1.15em;height:1.15em;margin-top:.2em;flex:none;accent-color:var(--teal)}
+.chk:has(input:checked){background:var(--green-soft);border-color:#a7dcb8}
+/* ภาพ + ขั้นตอน */
+.fitbox{overflow:hidden}
+.ex{flex:1 1 0;min-height:0;display:flex;gap:30px;align-items:stretch}
+.ex .fig{flex:1.5 1 0;min-height:0;min-width:0}
+.ex .side{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.5em}
+.ex .side>*{flex:none;margin:0}
+.stp{display:flex;gap:.7em;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:.5em .8em;line-height:1.45;box-shadow:0 2px 6px rgba(18,48,94,.05)}
+.stp .n{flex:none;width:1.75em;height:1.75em;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.88em;margin-top:.05em}
+.cap{color:var(--muted);line-height:1.5;text-align:center}
+.cap b{color:var(--navy)}
+/* ตัวเลขใหญ่ */
+.tiles{display:flex;gap:20px;align-items:stretch}
+.tile{flex:1;min-width:0;background:#fff;border:1px solid var(--line);border-top:7px solid var(--teal);border-radius:14px;padding:.6em .85em .7em;box-shadow:0 3px 10px rgba(18,48,94,.06)}
+.tile .k{font-size:.74em;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.tile .num{font-size:2.05em;font-weight:700;color:var(--navy);line-height:1.2;white-space:nowrap}
+.tile .num small{font-size:.5em;font-weight:600;color:var(--muted)}
+.tile .s{font-size:.8em;color:var(--muted);line-height:1.4}
+.tile.ok{border-top-color:var(--green)}.tile.ok .num{color:var(--green)}
+.tile.bad{border-top-color:var(--red)}.tile.bad .num{color:var(--red)}
+.tile.warn{border-top-color:var(--orange)}
+/* การ์ด */
+.cards{display:grid;gap:18px;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+.cardx{background:#fff;border:1px solid var(--line);border-left:7px solid var(--teal);border-radius:14px;padding:.65em .9em;box-shadow:0 3px 10px rgba(18,48,94,.05);display:flex;flex-direction:column;gap:.3em}
+.cardx>*{margin:0}
+.cardx h4{font-size:1.02em;color:var(--navy);line-height:1.35}
+.cardx p,.cardx li{font-size:.88em;line-height:1.48;color:#2b3648}
+.cardx .n{display:inline-flex;width:1.6em;height:1.6em;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font-size:.85em;margin-right:.45em}
+.cardx.ok{border-left-color:var(--green)}.cardx.bad{border-left-color:var(--red)}.cardx.warn{border-left-color:var(--orange)}.cardx.navy{border-left-color:var(--navy)}
+.cardx .chips{display:flex;flex-direction:column;gap:.3em}
+.cardx .chips div{font-size:.86em;line-height:1.45}
+/* สมการ (KaTeX) */
+.katex{font-size:1.1em;font-family:KaTeX_Main,'IBM Plex Sans Thai','Leelawadee UI','Times New Roman',serif}
+.katex-display{margin:0}
+.eqbox{background:#fff;border:2px solid var(--line);border-radius:18px;padding:.3em .6em;text-align:center;box-shadow:0 4px 14px rgba(18,48,94,.06);font-size:2.2em;color:var(--ink);display:flex;flex-direction:column;gap:.12em}
+.eqbox .row+.row{border-top:1px dashed var(--line);padding-top:.12em}
+.eqbox .sub{font-size:.36em;color:var(--muted);line-height:1.4;padding-bottom:.3em}
+.eqlead{color:var(--muted);font-size:.95em;line-height:1.45}
+.parts{display:grid;gap:16px;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))}
+.part{background:#fff;border:1px solid var(--line);border-top:9px solid var(--c);border-radius:14px;padding:.55em .8em .65em;display:flex;flex-direction:column;gap:.22em;box-shadow:0 3px 10px rgba(18,48,94,.05)}
+.part>*{margin:0}
+.part .role{font-size:.64em;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.part .top{display:flex;align-items:center;gap:.5em;min-height:2.3em}
+.part .n{flex:none;display:inline-flex;width:1.7em;height:1.7em;border-radius:50%;background:var(--c);color:#fff;align-items:center;justify-content:center;font-size:.8em;font-weight:700}
+.part .sym{font-size:1.3em;color:var(--c)}
+.part h4{font-size:1em;color:var(--navy);line-height:1.3}
+.part p{font-size:.86em;line-height:1.45;color:#2b3648}
+.part .lab{align-self:flex-start;font-family:var(--mono);font-size:.74em;color:#0b6b69;background:var(--teal-soft);border-radius:6px;padding:.12em .5em;margin-top:.15em}
+/* เทียบ 2 ฝั่ง */
+.vs{display:flex;gap:26px;align-items:stretch}
+.vs .sidebox{flex:1;min-width:0;border-radius:16px;padding:.8em 1em;border:2px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:.4em}
+.vs .sidebox>*{margin:0}
+.vs .bad{border-color:#f0b4b4;background:#fff8f8}.vs .good{border-color:#a7dcb8;background:#f5fcf7}
+.vs .hd2{font-size:.8em;font-weight:700;letter-spacing:.03em}
+.vs .bad .hd2{color:var(--red)}.vs .good .hd2{color:var(--green)}
+.vs .bigv{font-family:var(--mono);font-size:2.6em;font-weight:700;line-height:1.15}
+.vs .bad .bigv{color:var(--red)}.vs .good .bigv{color:var(--green)}
+.vs .calc{font-family:var(--mono);font-size:.95em;color:#2b3648}
+.callbox{background:var(--code);color:#dbe7ff;font-family:var(--mono);border-radius:12px;padding:.6em 1em;font-size:1.05em;text-align:center}
+.formula{background:#fff;border:2px solid var(--navy);border-radius:16px;padding:.7em 1em;text-align:center;font-size:1.25em;font-weight:700;color:var(--navy);line-height:1.5}
+.bigq{font-size:1.9em;font-weight:700;color:var(--navy);line-height:1.35;margin:auto 0 .2em!important}
+.bigq em{font-style:normal;color:var(--orange)}
+.bigsub{font-size:1.05em;color:var(--muted);line-height:1.6;margin-bottom:auto!important}
+/* แท่ง */
+.bars{display:flex;flex-direction:column;gap:.5em}
+.bar{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) 7.5em;gap:18px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:.45em .85em}
+.bar .lb{line-height:1.4}
+.bar .lb small{display:block;color:var(--muted);font-size:.8em}
+.bar .tr{height:1.15em;background:#e7edf5;border-radius:999px;overflow:hidden}
+.bar .fl{height:100%;border-radius:999px;background:var(--green);min-width:6px}
+.bar .fl.mid{background:var(--orange)}.bar .fl.low{background:var(--red)}
+.bar .vl{font-family:var(--mono);font-weight:700;color:var(--navy);text-align:right;font-size:.92em}
+/* ตารางสี 18 Trial */
+.heat{display:grid;grid-template-columns:auto repeat(6,1fr);gap:8px;align-items:stretch}
+.heat .hh{font-family:var(--mono);font-size:.74em;font-weight:600;color:var(--navy);text-align:center;padding:.2em 0}
+.heat .hr{font-size:.82em;color:var(--muted);display:flex;align-items:center;padding-right:.4em;white-space:nowrap}
+.heat .hc{border-radius:10px;text-align:center;font-family:var(--mono);font-weight:700;font-size:1.15em;padding:.55em 0;color:#12305e}
+.heat .grp{grid-column:span 4;text-align:center;font-size:.8em;font-weight:700;color:#fff;background:var(--teal);border-radius:8px;padding:.15em}
+.heat .grp.val{grid-column:span 2;background:var(--orange)}
+/* Input -> LAB -> Output */
+.ff{display:flex;gap:22px;align-items:center}
+.ffcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:.42em}
+.ffh{font-size:.78em;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.file{background:#fff;border:1px solid var(--line);border-left:7px solid var(--teal);border-radius:10px;padding:.42em .7em;font-size:.9em;line-height:1.42}
+.ffcol.out .file{border-left-color:var(--orange)}
+.ffmid{flex:none;width:8em;text-align:center;background:var(--navy);color:#fff;border-radius:18px;padding:1.1em .5em;font-weight:700;font-size:1.1em;line-height:1.3;position:relative}
+.ffmid small{display:block;font-weight:500;font-size:.62em;color:#b9d2f5;margin-top:.3em}
+.ffar{flex:none;font-size:2em;color:var(--orange);font-weight:700}
+/* กลุ่มข้อตรวจ */
+.ck{display:flex;gap:.55em;align-items:baseline;font-size:.86em;line-height:1.45}
+.ck code{flex:none}
+/* แผนของบท */
+.road{display:flex;gap:26px;align-items:stretch}
+.road .partbox{flex:1;border-radius:18px;padding:.8em 1em 1em;background:#fff;border:2px solid var(--line);display:flex;flex-direction:column;gap:.55em}
+.road .partbox>*{margin:0}
+.road .ph{font-size:1.25em;font-weight:700;color:var(--navy)}
+.road .ph small{font-size:.6em;font-weight:600;color:var(--teal);margin-left:.6em}
+.road .secbox{border-left:7px solid var(--teal);background:var(--bg);border-radius:10px;padding:.5em .8em}
+.road .secbox b{display:block;font-size:1.02em}
+.road .secbox span{font-size:.86em;color:#2b3648;line-height:1.45;display:block}
+.road .partbox.lab .secbox{border-left-color:var(--orange)}
+/* ปก และหน้าคั่น */
+.cover,.divider{padding:0;background:linear-gradient(135deg,#0d2447 0%,#163f7a 62%,#0f8f8c 140%);background-size:cover;background-position:center;color:#fff}
+.cover .shade,.divider.photo .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,13,26,.96) 0%,rgba(6,13,26,.86) 46%,rgba(6,13,26,.25) 80%)}
+.inner{position:relative;height:100%;padding:90px 96px 70px;display:flex;flex-direction:column;max-width:1120px;font-size:25px}
+.divider:not(.photo) .inner{max-width:1400px}
+.inner .small{font-size:21px;font-weight:600;color:#8fe0dc;letter-spacing:.03em;min-height:28px}
+.inner .big{font-size:120px;font-weight:700;line-height:1.05;color:#fff;margin-top:8px}
+.inner h1{font-size:54px;line-height:1.2;margin:10px 0 0;color:#fff}
+.cover .inner h1{font-size:68px;margin-top:120px}
+.inner .sub{margin-top:26px;color:#d6e4fb;line-height:1.55;display:flex;flex-direction:column;gap:.55em}
+.cover .inner .sub{font-size:34px;color:#cfe0ff}
+.inner .sub p,.inner .sub ul{margin:0}
+.inner b{color:#fff}
+.inner code{background:rgba(255,255,255,.14);color:#fff}
+.inner a{color:#9fd8ff;border-bottom-color:rgba(159,216,255,.4)}
+.inner .xref{color:#fff}
+.inner .hint{margin-top:auto;font-size:19px;color:#9fb6dd}
+.inner .v.accept{background:rgba(134,227,174,.2);color:#9af0bf}.inner .v.reject{background:rgba(255,155,155,.2);color:#ffb3b3}
+.imgnote{position:absolute;right:22px;bottom:14px;font-size:13px;color:#fff;background:rgba(0,0,0,.45);padding:2px 10px;border-radius:7px}
+.facts{display:flex;gap:18px;margin-top:10px}
+.facts div:last-child{flex:2}
+.facts div{flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:16px 20px;font-size:26px;font-weight:600;color:#fff}
+.facts .fl{display:block;font-size:16px;font-weight:500;color:#9fd8ff;margin-bottom:4px}
+.kbd{display:inline-block;border:1px solid #9fb6dd;border-bottom-width:3px;border-radius:7px;padding:0 9px;font-family:var(--mono);font-size:.8em;margin:0 2px;background:rgba(255,255,255,.06)}
+.body .kbd{border-color:#9aa9bf;background:#fff}
+/* ส่วนควบคุม */
+#bar{position:fixed;left:0;bottom:0;height:4px;background:var(--orange);transition:width .25s;z-index:5}
+#hud{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;align-items:center;z-index:6;font-family:var(--font);opacity:.35;transition:opacity .2s}
+#hud:hover{opacity:1}
+#hud button{background:rgba(18,48,94,.85);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:9px;height:36px;min-width:38px;font-size:16px;cursor:pointer;padding:0 10px}
+#hud button:hover{background:var(--teal)}
+#count{color:#fff;background:rgba(18,48,94,.85);border-radius:9px;padding:7px 10px;font-size:15px;min-width:80px;text-align:center}
+body.ov #stage{display:none}
+#ov{display:none;position:fixed;inset:0;overflow:auto;padding:26px 32px 60px;z-index:10;background:#0b1424;color:#dbe7ff}
+body.ov #ov{display:block}
+#ov h4{margin:22px 0 10px;font-size:19px;color:#8fe0dc;font-weight:600;border-bottom:1px solid #22324d;padding-bottom:6px}
+#ov .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+#ov .th{background:#16233a;border:2px solid transparent;border-radius:9px;padding:9px 12px;cursor:pointer;font-size:15px;line-height:1.4}
+#ov .th:hover,#ov .th.cur{border-color:var(--orange)}
+#ov .th span{color:var(--orange);font-weight:700;margin-right:6px}
+#lb{display:none;position:fixed;inset:0;z-index:20;background:rgba(4,8,16,.95);overflow:auto;padding:18px;text-align:center;cursor:zoom-out}
+#lb.on{display:block}
+#lb img{width:min(100%,2000px);height:auto;border-radius:8px;background:#fff}
+@media print{html,body{overflow:visible;height:auto;background:#fff}#hud,#bar,#ov,#lb,.copy{display:none!important}.slide .no{display:block}
+#stage{position:static;display:block}#deck{transform:none!important;height:auto}
+.slide{display:flex!important;position:relative;width:1600px;height:900px;page-break-after:always;break-after:page;animation:none}}
+@page{size:1600px 900px;margin:0}
+</style>
+</head>
+<body>
+<!-- สร้างจาก README.md ด้วย tools/build_slides.py · ห้ามแก้ไฟล์นี้ด้วยมือ ให้แก้ README.md แล้วสร้างใหม่ -->
+<div id="stage"><div id="deck">
+<section class="slide cover" style="background-image:url(img/s00-cover.jpg)" data-title="ปก" data-group="เริ่มต้น"><div class="shade"></div><div class="inner"><div class="small">สัปดาห์ที่ 3 · เช่า GPU บน Vast.ai มาเทรนโมเดล · LAB 4</div><h1>LAB 4 · 1 GPU เทียบ 2 GPU</h1><div class="sub">เทรนงานเดิมบน 1 GPU เทียบ 2 GPU: เร็วขึ้นกี่เท่า คุ้มเงินไหม</div><div class="hint">กด <span class="kbd">→</span> หรือ <span class="kbd">Space</span> เพื่อไปต่อ · <span class="kbd">O</span> สารบัญ · <span class="kbd">F</span> เต็มจอ · คลิกภาพเพื่อขยาย</div><div class="imgnote">ภาพจำลอง</div></div><style>.divider .inner .small{margin-bottom:26px;font-size:24px}</style></section>
+<section class="slide " data-title="คำถามของ LAB: จ่ายเพิ่มเกือบ 2 เท่าเพื่อ GPU ใบที่สอง แล้วจะเทรนเร็วขึ้น 2 เท่าหรือไม่" data-group="เริ่มต้น" data-max="1.10"><header class="hd"><div class="kicker">ภาพรวมของ LAB</div><h2><span class="tt">คำถามของ LAB: จ่ายเพิ่มเกือบ 2 เท่าเพื่อ GPU ใบที่สอง แล้วจะเทรนเร็วขึ้น 2 เท่าหรือไม่</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/why2-multigpu.png" alt="คำถามของ LAB: จ่ายเพิ่มเกือบ 2 เท่าเพื่อ GPU ใบที่สอง แล้วจะเทรนเร็วขึ้น 2 เท่าหรือไม่" width="1400" height="788"></div><p class="cap">เราตอบคำถามนี้ด้วยการวัด โดยเทรนงานเดียวกัน 2 รอบบนเครื่องเดียวกัน ต่างกันเพียงจำนวน GPU</p></div></section>
+<section class="slide " data-title="คำตอบ: 2 GPU เร็วขึ้น 1.74 เท่า แต่ราคาตลาดแพงขึ้น 1.83 เท่า เงินต่อ Epoch จึงไม่ได้ถูกลง" data-group="เริ่มต้น" data-max="1.10"><header class="hd"><div class="kicker">ภาพรวมของ LAB</div><h2><span class="tt">คำตอบ: 2 GPU เร็วขึ้น 1.74 เท่า แต่ราคาตลาดแพงขึ้น 1.83 เท่า เงินต่อ Epoch จึงไม่ได้ถูกลง</span><span class="tag">results/metrics.json</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/t2-cost.png" alt="คำตอบ: 2 GPU เร็วขึ้น 1.74 เท่า แต่ราคาตลาดแพงขึ้น 1.83 เท่า เงินต่อ Epoch จึงไม่ได้ถูกลง" width="1400" height="788"></div><p class="cap">1 GPU ใช้เงิน <b>$0.0068</b> ต่อ Epoch ส่วน 2 GPU ใช้ <b>$0.0072</b> ต่อ Epoch แต่ได้งานเสร็จเร็วกว่า</p></div></section>
+<section class="slide " data-title="LAB นี้มี 4 ส่วน: พื้นฐาน ภาค LAB 6 ขั้น การเก็บงานเป็นสกิล และสรุป" data-group="เริ่มต้น" data-max="1.10"><header class="hd"><div class="kicker">ภาพรวมของ LAB</div><h2><span class="tt">LAB นี้มี 4 ส่วน: พื้นฐาน ภาค LAB 6 ขั้น การเก็บงานเป็นสกิล และสรุป</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/n21-roadmap.jpg" alt="LAB นี้มี 4 ส่วน: พื้นฐาน ภาค LAB 6 ขั้น การเก็บงานเป็นสกิล และสรุป" width="1672" height="941"></div><p class="cap">ภาค LAB ทั้ง 6 ขั้นทำบนเครื่องเช่าเครื่องเดียวกัน · 6 ขั้นรวมราว 64 นาที · เครื่องเปิด 76.5 นาที · <b>$0.51</b></p></div></section>
+<section class="slide mid" data-title="วิธีใช้สไลด์ชุดนี้" data-group="เริ่มต้น" data-max="1.40"><header class="hd"><div class="kicker">ภาพรวมของ LAB</div><h2><span class="tt">วิธีใช้สไลด์ชุดนี้</span></h2></header><div class="body"><div class="cards" style="--cols:2"><div class="cardx "><h4>เลื่อนหน้า</h4><p>กด <span class="kbd">→</span> หรือ <span class="kbd">Space</span> เพื่อไปต่อ และ <span class="kbd">←</span> เพื่อย้อนกลับ</p></div><div class="cardx "><h4>สารบัญและเต็มจอ</h4><p>กด <span class="kbd">O</span> เปิดสารบัญ และ <span class="kbd">F</span> เต็มจอ · คลิกภาพเพื่อขยาย</p></div><div class="cardx warn"><h4>คัดลอกพรอมต์</h4><p>ปุ่ม <b>คัดลอกพรอมต์ทั้งหมด</b> ให้พรอมต์ครบทั้งก้อน ตรงกับ README ทุกตัวอักษร แล้ววางในช่องพิมพ์ของ Claude Code ทีละขั้น</p></div><div class="cardx ok"><h4>ตรวจผลของคุณ</h4><p>หน้า <b>ตรวจผลของคุณ</b> ติ๊กได้ทีละข้อ และมีผลของผู้สอนไว้เทียบ ตัวเลขของคุณอาจต่างจากของผู้สอน</p></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p21-site.jpg)" data-title="พื้นฐาน · Dataset โมเดล และทฤษฎีที่ต้องรู้" data-group="พื้นฐาน · Dataset และโมเดล"><div class="shade"></div><div class="inner"><div class="small">ส่วนที่ 1 จาก 4</div><div class="big">พื้นฐาน</div><h1>Dataset โมเดล และทฤษฎีที่ต้องรู้</h1><div class="sub"><p>ก่อนวัดความเร็ว เราต้องรู้ว่าเทรนอะไร ด้วยโมเดลอะไร และวัดด้วยตัวเลขใด</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="Dataset: ภาพคนงานหน้างาน ตีกรอบที่ศีรษะ บอกว่าสวมหมวกนิรภัยหรือไม่" data-group="พื้นฐาน · Dataset และโมเดล" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · Dataset และโมเดล</div><h2><span class="tt">Dataset: ภาพคนงานหน้างาน ตีกรอบที่ศีรษะ บอกว่าสวมหมวกนิรภัยหรือไม่</span></h2></header><div class="body"><style>
+.ex.px .fig{flex:2.1 1 0}
+.ex.px .side{flex:1 1 0}
+.ex.px .side .cap{text-align:left;font-size:.82em}
+.ansv{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:.45em}
+.ansv .fig{flex:1 1 0;min-height:0}
+.ansv .fig img{box-shadow:0 0 0 1px var(--line),0 6px 22px rgba(18,48,94,.16)}
+.ansv .cap{font-size:.78em;margin:0}
+.arow{flex:none;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.6em}
+.arow .stp{font-size:.86em}
+.pairs{display:flex;flex-direction:column;gap:.75em}
+.pairs .lg{display:flex;gap:1.4em;font-size:.82em;color:var(--muted)}
+.pairs .lg i{display:inline-block;width:1em;height:1em;border-radius:3px;vertical-align:-.15em;margin-right:.35em}
+.prow{display:grid;grid-template-columns:12em 1fr;gap:.2em 1em;align-items:center}
+.prow .pl{font-weight:700;color:var(--navy);line-height:1.3}
+.prow .pl small{display:block;font-weight:400;color:var(--muted);font-size:.78em}
+.prow .pb{display:flex;flex-direction:column;gap:.25em}
+.pbr{display:flex;align-items:center;gap:.6em}
+.pbr .f{height:1.15em;border-radius:6px;min-width:4px}
+.pbr .v{font-family:var(--mono);font-weight:700;color:var(--navy);font-size:.9em;white-space:nowrap}
+.pa .f{background:#4f79b3}.pb2 .f{background:var(--orange)}
+.stk{display:flex;flex-direction:column;gap:.8em}
+.stk .row{display:grid;grid-template-columns:11em 1fr;gap:1em;align-items:center}
+.stk .nm{font-weight:700;color:var(--navy);line-height:1.3}
+.stk .nm small{display:block;font-weight:400;color:var(--muted);font-size:.8em}
+.stk .tr{display:flex;height:2.1em;border-radius:8px;overflow:hidden}
+.stk .tr div{display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-weight:700;font-size:.82em;white-space:nowrap}
+.stk .hd{background:#c92a2a}.stk .hm{background:#15803d}
+</style><div class="ex px"><div class="fig"><img src="results/dataset_samples.jpg" alt="ภาพตัวอย่าง 8 รูปจาก Training Set เรียง 4 คูณ 2 กรอบสีเขียวคือ helmet กรอบสีแดงคือ head บางภาพเอียงและมีสี่เหลี่ยมดำซึ่งเป็น Augmentation ของ Dataset" width="1664" height="832"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>กรอบสีเขียวคือ <code>helmet</code> (สวมหมวกนิรภัย) กรอบสีแดงคือ <code>head</code> (ไม่สวมหมวก)</span></div><div class="stp"><span class="n">2</span><span>ภาพที่เอียงและสี่เหลี่ยมดำเป็น Augmentation ที่ Dataset รุ่นนี้เพิ่มไว้แล้ว</span></div><div class="stp"><span class="n">3</span><span><b>เหตุที่ใช้ชุดนี้</b> งานเดียวกับ LAB 1 (ตรวจหมวกนิรภัย) แต่ภาพมากกว่าราว 5.7 เท่า 1 Epoch จึงมีหลายร้อย step และเวลาที่วัดได้นิ่งพอจะเทียบกัน</span></div><p class="cap">ภาพตัวอย่าง 8 รูปจาก Training Set ซึ่งได้จากพรอมต์ขั้นที่ 2</p></div></div></div></section>
+<section class="slide mid" data-title="กรอบ helmet มีมากกว่า head ราว 3 เท่าในทุกชุด ข้อมูลจึงไม่สมดุล" data-group="พื้นฐาน · Dataset และโมเดล" data-max="1.40"><header class="hd"><div class="kicker">พื้นฐาน · Dataset และโมเดล</div><h2><span class="tt">กรอบ helmet มีมากกว่า head ราว 3 เท่าในทุกชุด ข้อมูลจึงไม่สมดุล</span><span class="tag">README · รู้จัก Dataset</span></h2></header><div class="body"><div class="pairs"><div class="lg"><span><i style="background:#c92a2a"></i>กรอบ <code>head</code></span><span><i style="background:#15803d"></i>กรอบ <code>helmet</code></span></div></div><div class="stk"><div class="row"><div class="nm">Training Set<small>14,748 ภาพ</small></div><div class="tr" style="width:100.0%"><div class="hd" style="flex:13670">13,670</div><div class="hm" style="flex:41450">41,450</div></div></div><div class="row"><div class="nm">Validation Set<small>1,413 ภาพ</small></div><div class="tr" style="width:100.0%"><div class="hd" style="flex:1339">1,339</div><div class="hm" style="flex:3913">3,913</div></div></div><div class="row"><div class="nm">Test Set<small>706 ภาพ</small></div><div class="tr" style="width:100.0%"><div class="hd" style="flex:726">726</div><div class="hm" style="flex:1915">1,915</div></div></div></div><p class="cap">แต่ละแถบแสดงสัดส่วนของกรอบ head กับ helmet ภายในชุดนั้น</p><div class="note eye"><span class="lbl">Dataset</span><span>Dataset ทั้งชุดมี 16,867 ภาพ และ 63,013 กรอบ ทุกภาพมีขนาด 416 × 416 และใช้พื้นที่ 557 MB · สัญญาอนุญาต Public Domain (ตามหน้า Dataset บน Roboflow Universe)</span></div></div></section>
+<section class="slide " data-title="label 1 บรรทัด = 1 กรอบ มี 5 ช่อง" data-group="พื้นฐาน · Dataset และโมเดล" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · Dataset และโมเดล</div><h2><span class="tt">label 1 บรรทัด = 1 กรอบ มี 5 ช่อง</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n01-label.jpg" alt="label 1 บรรทัด = 1 กรอบ มี 5 ช่อง" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>1 กรอบ = 1 บรรทัด</b> มี 5 ช่อง ทุกค่าเป็นสัดส่วนของภาพ (0–1)</span></div><div class="stp"><span class="n">2</span><span>ช่อง 1 คือ <b>คลาส</b> · <code>0 head</code> = ไม่สวมหมวก · <code>1 helmet</code> = สวมหมวกนิรภัย</span></div><div class="stp"><span class="n">3</span><span>ช่อง 2–3 คือ <b>จุดกลางกรอบ</b> x, y (ราว 237, 126 px)</span></div><div class="stp"><span class="n">4</span><span>ช่อง 4–5 คือ <b>กว้าง, สูง</b> ของกรอบ (ราว 51 × 74 px)</span></div></div></div></div></section>
+<section class="slide " data-title="โมเดล YOLO11m รับภาพ 1 รูป แล้วตอบเป็นกรอบ คลาส และ Confidence" data-group="พื้นฐาน · Dataset และโมเดล" data-max="1.10"><header class="hd"><div class="kicker">พื้นฐาน · Dataset และโมเดล</div><h2><span class="tt">โมเดล YOLO11m รับภาพ 1 รูป แล้วตอบเป็นกรอบ คลาส และ Confidence</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/model-yolo11m.png" alt="โมเดล YOLO11m รับภาพ 1 รูป แล้วตอบเป็นกรอบ คลาส และ Confidence" width="1400" height="788"></div><p class="cap">20.1 ล้าน parameter · ไฟล์ประมาณ 39 MB · ใน LAB นี้เป้าหมายคือ <b>วัดความเร็ว</b> ไม่ใช่ทำโมเดลให้แม่นที่สุด</p></div></section>
+<section class="slide " data-title="ทฤษฎี 1 · DDP: ทุก GPU มีสำเนาโมเดลครบชุด แล้วแบ่งภาพใน Batch กันคนละส่วน" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ทฤษฎี 1 · DDP: ทุก GPU มีสำเนาโมเดลครบชุด แล้วแบ่งภาพใน Batch กันคนละส่วน</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="image/t2-ddp.png" alt="ทฤษฎี 1 · DDP: ทุก GPU มีสำเนาโมเดลครบชุด แล้วแบ่งภาพใน Batch กันคนละส่วน" width="1400" height="788"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>แต่ละ GPU รับภาพ 32 ภาพ คำนวณ Forward + Backward แล้วได้ Gradient ของตัวเอง</span></div><div class="stp"><span class="n">2</span><span><b>All-reduce</b> เฉลี่ย Gradient ของทุกใบให้เป็นค่าเดียวกัน</span></div><div class="stp"><span class="n">3</span><span>ทุกใบปรับ (Update) โมเดลด้วยค่าเดียวกัน โมเดลทุกสำเนาจึงยังเหมือนกัน</span></div></div></div></div></section>
+<section class="slide " data-title="Batch รวมโตขึ้น 2 เท่า จำนวน step ต่อ Epoch จึงเหลือครึ่งเดียว" data-group="พื้นฐาน · ทฤษฎี" data-max="1.10"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">Batch รวมโตขึ้น 2 เท่า จำนวน step ต่อ Epoch จึงเหลือครึ่งเดียว</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/n22-halfsteps.jpg" alt="Batch รวมโตขึ้น 2 เท่า จำนวน step ต่อ Epoch จึงเหลือครึ่งเดียว" width="1672" height="941"></div><p class="cap">ภาพต่อวินาทีเพิ่มจาก <b>114.9</b> เป็น <b>199.6</b> · ถ้าแต่ละ step ใช้เวลาเท่าเดิม Epoch จะเร็วขึ้น 2 เท่าพอดี</p></div></section>
+<section class="slide " data-title="แต่ละ step ของ 2 GPU ช้าลงจาก 278 เป็น 320 ms เพราะต้อง Sync กัน" data-group="พื้นฐาน · ทฤษฎี" data-max="1.10"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">แต่ละ step ของ 2 GPU ช้าลงจาก 278 เป็น 320 ms เพราะต้อง Sync กัน</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/t2-step.png" alt="แต่ละ step ของ 2 GPU ช้าลงจาก 278 เป็น 320 ms เพราะต้อง Sync กัน" width="1400" height="788"></div><p class="cap">ดูส่วนสีส้มของแท่ง 2 GPU ซึ่งเป็นเวลาที่เพิ่มขึ้นจากการ Sync <b>+41 ms ต่อ step</b></p></div></section>
+<section class="slide " data-title="ทฤษฎี 2 · Speedup 1.74 เท่า คิดเป็น Efficiency 87% ของ Ideal" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ทฤษฎี 2 · Speedup 1.74 เท่า คิดเป็น Efficiency 87% ของ Ideal</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="image/t2-speedup.png" alt="ทฤษฎี 2 · Speedup 1.74 เท่า คิดเป็น Efficiency 87% ของ Ideal" width="1400" height="788"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>Speedup</b> = เวลา 1 GPU ÷ เวลา N GPU หมายถึงเร็วขึ้นกี่เท่า</span></div><div class="stp"><span class="n">2</span><span><b>Ideal</b> คือ N เท่า และ <b>Efficiency</b> = Speedup ÷ N หมายถึงได้กี่ % ของ Ideal</span></div><div class="stp"><span class="n">3</span><span>วัดเป็นวินาทีต่อ Epoch โดยไม่นับ Epoch แรกและ Epoch สุดท้าย</span></div><div class="stp"><span class="n">4</span><span>ใน LAB นี้ 128.3 ÷ 73.9 = <b>1.74 เท่า</b> และ 1.74 ÷ 2 = <b>87%</b></span></div></div></div></div></section>
+<section class="slide " data-title="ทฤษฎี 3 · 2 GPU ไม่เร็วขึ้น 2 เท่า เพราะการ Sync แบ่งให้ GPU ทำพร้อมกันไม่ได้" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ทฤษฎี 3 · 2 GPU ไม่เร็วขึ้น 2 เท่า เพราะการ Sync แบ่งให้ GPU ทำพร้อมกันไม่ได้</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="image/t2-bottleneck.png" alt="ทฤษฎี 3 · 2 GPU ไม่เร็วขึ้น 2 เท่า เพราะการ Sync แบ่งให้ GPU ทำพร้อมกันไม่ได้" width="1400" height="788"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ส่วนที่แบ่งทำพร้อมกันไม่ได้เป็น <b>เพดานของ Speedup</b> ตามหลักเดียวกับ Amdahl's law</span></div><div class="stp"><span class="n">2</span><span>เวลาที่เพิ่ม 41 ms ต่อ step ราวครึ่งหนึ่งคือ All-reduce (21.4 ms) ที่เหลือคือเวลาที่ GPU ใบหนึ่งรออีกใบ</span></div><div class="stp"><span class="n">3</span><span><b>CPU ไม่ใช่คอขวด</b> 1 GPU ใช้ CPU เพียง 2.8 core และ 2 GPU ใช้ 5.3 core จาก 32 core ที่เครื่องให้ ส่วน GPU util เฉลี่ยเป็น 85.5% (1 GPU) และ 81.1% / 81.3% (2 GPU)</span></div></div></div></div></section>
+<section class="slide " data-title="Gradient ราว 80 MB ต้องข้าม GPU ทุก step ความเร็วจึงขึ้นกับทางเชื่อม" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">Gradient ราว 80 MB ต้องข้าม GPU ทุก step ความเร็วจึงขึ้นกับทางเชื่อม</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="image/t2-topology.png" alt="Gradient ราว 80 MB ต้องข้าม GPU ทุก step ความเร็วจึงขึ้นกับทางเชื่อม" width="1400" height="788"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>เครื่องใน LAB นี้เป็น <code>PHB</code> ข้อมูลผ่าน PCIe 3.0 x8 ลงไปที่ CPU และ RAM แล้วจึงขึ้นไป GPU อีกใบ</span></div><div class="stp"><span class="n">2</span><span>วัดได้ 3.9 GB/s และส่ง 80 MB ใช้เวลา 21.4 ms</span></div><div class="stp"><span class="n">3</span><span>เครื่องที่มี <b>NVLink</b> มีทางตรงระหว่าง GPU จึงส่งได้เร็วกว่า</span></div></div></div></div></section>
+<section class="slide " data-title="ระดับทางเชื่อมระหว่าง GPU จากดีไปแย่" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ระดับทางเชื่อมระหว่าง GPU จากดีไปแย่</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n03-topology.jpg" alt="ระดับทางเชื่อมระหว่าง GPU จากดีไปแย่" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ดูด้วยคำสั่ง <code>nvidia-smi topo -m</code> ทุกครั้ง ก่อนใช้หลาย GPU</span></div><div class="stp"><span class="n">2</span><span><code>NV#</code> <b>NVLink</b> สายตรงระหว่าง GPU · <code>PIX</code> / <code>PXB</code> อยู่ใต้ PCIe switch เดียวกัน ไม่ผ่าน CPU</span></div><div class="stp"><span class="n">3</span><span><b><code>PHB</code></b> ผ่าน PCIe Host Bridge ของ CPU · <b>เครื่องใน LAB นี้</b></span></div><div class="stp"><span class="n">4</span><span><code>NODE</code> / <code>SYS</code> ข้าม Host Bridge หรือข้าม CPU socket</span></div></div></div></div></section>
+<section class="slide " data-title="ทฤษฎี 4 · Cost per Epoch: เร็วขึ้นไม่ได้แปลว่าถูกลง" data-group="พื้นฐาน · ทฤษฎี" data-max="1.25"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ทฤษฎี 4 · Cost per Epoch: เร็วขึ้นไม่ได้แปลว่าถูกลง</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n23-costmeter.jpg" alt="ทฤษฎี 4 · Cost per Epoch: เร็วขึ้นไม่ได้แปลว่าถูกลง" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>เงินต่อ Epoch</b> = ราคาต่อชั่วโมง × วินาทีต่อ Epoch ÷ 3600</span></div><div class="stp"><span class="n">2</span><span>1 GPU: $0.191/ชม. × 128.3 วินาที ได้ <b>$0.0068</b> ต่อ Epoch</span></div><div class="stp"><span class="n">3</span><span>2 GPU: $0.351/ชม. × 73.9 วินาที ได้ <b>$0.0072</b> ต่อ Epoch</span></div><div class="stp"><span class="n">4</span><span>ราคาเพิ่ม 1.83 เท่า แต่เร็วขึ้น 1.74 เท่า เมื่อราคาเพิ่มเร็วกว่า Speedup เงินต่อ Epoch จึงแพงขึ้น</span></div></div></div></div></section>
+<section class="slide " data-title="ควรใช้หลาย GPU เมื่องานใหญ่ ราคาไม่เกิน N เท่า และทางเชื่อมดี" data-group="พื้นฐาน · ทฤษฎี" data-max="1.10"><header class="hd"><div class="kicker">พื้นฐาน · ทฤษฎีที่ต้องรู้</div><h2><span class="tt">ควรใช้หลาย GPU เมื่องานใหญ่ ราคาไม่เกิน N เท่า และทางเชื่อมดี</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/n24-when.jpg" alt="ควรใช้หลาย GPU เมื่องานใหญ่ ราคาไม่เกิน N เท่า และทางเชื่อมดี" width="1672" height="941"></div><p class="cap">ถ้างานเล็กหรือต้องการประหยัด ใช้ 1 GPU · ดูทางเชื่อมด้วย <code>nvidia-smi topo -m</code> ทุกครั้ง</p></div></section>
+<section class="slide divider photo" style="background-image:url(img/s01-lab.jpg)" data-title="ภาค LAB · 6 ขั้นบนเครื่องเช่าเครื่องเดียวกัน" data-group="ภาค LAB · ภาพรวม"><div class="shade"></div><div class="inner"><div class="small">ส่วนที่ 2 จาก 4</div><div class="big">ภาค LAB</div><h1>6 ขั้นบนเครื่องเช่าเครื่องเดียวกัน</h1><div class="sub"><p>ทุกขั้นคือ 1 พรอมต์ และโค้ดทุกไฟล์ AI เขียนให้จากพรอมต์ โดยเริ่มจากโฟลเดอร์ว่าง</p><p>6 ขั้นรวมราว 64 นาที · เครื่องเปิด 76.5 นาที · <b>$0.51</b></p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="แผนที่ของ LAB: เช่าเครื่อง เตรียม Dataset เทรน 1 GPU เทรน 2 GPU สรุปผล แล้วลบเครื่อง" data-group="ภาค LAB · ภาพรวม" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · ภาพรวม</div><h2><span class="tt">แผนที่ของ LAB: เช่าเครื่อง เตรียม Dataset เทรน 1 GPU เทรน 2 GPU สรุปผล แล้วลบเครื่อง</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/lab4-overview.png" alt="แผนที่ของ LAB: เช่าเครื่อง เตรียม Dataset เทรน 1 GPU เทรน 2 GPU สรุปผล แล้วลบเครื่อง" width="1400" height="788"></div><p class="cap">ทำขั้นที่ 1 ถึง 6 ให้ครบในรอบเดียว แล้วปิดท้ายด้วยขั้นที่ 7–8 ซึ่งเก็บงานเป็นสกิลเวอร์ชัน 0</p></div></section>
+<section class="slide " data-title="การทดลอง: ตรึงทุกค่า เปลี่ยนแค่จำนวน GPU" data-group="ภาค LAB · ภาพรวม" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ภาพรวม</div><h2><span class="tt">การทดลอง: ตรึงทุกค่า เปลี่ยนแค่จำนวน GPU</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n02-experiment.jpg" alt="การทดลอง: ตรึงทุกค่า เปลี่ยนแค่จำนวน GPU" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span><b>A</b> = เทรนด้วย GPU 1 ใบ · <b>B</b> = เทรนงานเดิมด้วย GPU 2 ใบ (DDP) บนเครื่องเดียวกัน</span></div><div class="stp"><span class="n">2</span><span><b>ค่าที่ตรึงไว้</b>: 5 Epoch · ภาพ 640 · batch 32 ภาพต่อ GPU · seed 0 · วัด Validation ครั้งเดียวตอนจบ</span></div><div class="stp"><span class="n">3</span><span><b>วิธีวัด</b>: วินาทีต่อ Epoch (เฉลี่ย Epoch 2–4) · วินาทีต่อ step · GPU util · CPU ที่ใช้จริง · All-reduce 80 MB · mAP50</span></div><div class="stp"><span class="n">4</span><span><b>เครื่อง</b>: RTX 3090 2 ใบในเครื่องเดียว · เพดาน $0.60/ชม. · ได้เครื่อง $0.414/ชม.</span></div></div></div></div></section>
+<section class="slide " data-title="ก่อนเริ่ม ต้องเตรียม 4 อย่างนี้ให้พร้อม" data-group="ภาค LAB · ภาพรวม" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ภาพรวม</div><h2><span class="tt">ก่อนเริ่ม ต้องเตรียม 4 อย่างนี้ให้พร้อม</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n25-before.jpg" alt="ก่อนเริ่ม ต้องเตรียม 4 อย่างนี้ให้พร้อม" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>ขั้นที่ 2 ใช้ <code>ROBOFLOW_API_KEY</code> จาก <code>.env</code> ซึ่งเตรียมไว้ใน <a href="../README.md#lab-0--เตรียม-key-3-ตัว" target="_blank" rel="noopener">LAB 0</a></span></div><div class="stp"><span class="n">2</span><span>"โฟลเดอร์ปัจจุบัน" ในพรอมต์คือ <code>02_VastAi_Application</code> และงานทำผ่าน container <code>multi-account</code> ด้วยสกิล <code>vastai</code></span></div><div class="stp"><span class="n">3</span><span>โค้ดของคุณอยู่ใน <code>lab4_multigpu/code</code> ส่วนตัวอย่างจากรอบจริงอยู่ใน <code>code_reference/</code></span></div><div class="stp"><span class="n">4</span><span>เพดานราคาคือ $0.60/ชม. ทำ 6 ขั้นให้ครบในรอบเดียว และ <b>ลบเครื่องในขั้นที่ 6 เสมอ</b></span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p22-rent.jpg)" data-title="ขั้นที่ 1 · เช่าเครื่อง 2 GPU" data-group="ขั้นที่ 1 · เช่าเครื่อง"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 1 จาก 8</div><div class="big">ขั้นที่ 1</div><h1>เช่าเครื่อง 2 GPU</h1><div class="sub"><p>AI ค้นหาเครื่องที่มี RTX 3090 2 ใบในเครื่องเดียว เช่า รอจนพร้อม แล้วรายงานว่า GPU ต่อถึงกันแบบไหน</p><p>ใช้เวลา <b>7 นาที</b> · ผลจริง: RTX 3090 2 ใบ $0.414/ชม. ทางเชื่อม <code>PHB</code></p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI ค้นหาเครื่อง เช่า รอจนพร้อม แล้วรายงานว่า GPU ต่อถึงกันแบบไหน" data-group="ขั้นที่ 1 · เช่าเครื่อง" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 1 จาก 8</div><h2><span class="tt">AI ค้นหาเครื่อง เช่า รอจนพร้อม แล้วรายงานว่า GPU ต่อถึงกันแบบไหน</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n26-step1.jpg" alt="AI ค้นหาเครื่อง เช่า รอจนพร้อม แล้วรายงานว่า GPU ต่อถึงกันแบบไหน" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI เช่า RTX 3090 <b>2 ใบในเครื่องเดียว</b> ราคาไม่เกิน $0.60 ต่อชั่วโมง ป้าย <code>vapp-lab4</code></span></div><div class="stp"><span class="n">2</span><span>เลือกเครื่อง verified ที่ต่อ SSH ได้ตรง มี CPU 16 cores ขึ้นไป ไม่อยู่ในจีน และถูกที่สุด</span></div><div class="stp"><span class="n">3</span><span>ใช้ image PyTorch 2.8 กับ CUDA 12.8 และ disk 60 GB ถ้ารอเกิน 10 นาที ให้ลบแล้วเช่าใหม่</span></div><div class="stp"><span class="n">4</span><span>ต้องรายงานว่า <b>GPU 2 ใบต่อถึงกันแบบไหน</b></span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 1 · เช่าเครื่อง 2 GPU" data-group="ขั้นที่ 1 · เช่าเครื่อง" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 1 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 1 · เช่าเครื่อง 2 GPU</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 10 บรรทัด</span><button class="copy big" data-full="prompt0">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+
+เช่าเครื่องที่มี GPU 2 ใบในเครื่องเดียว สำหรับเทียบความเร็ว 1 กับ 2 GPU
+1. เช่าเครื่อง RTX 3090 2 ใบ ราคารวมไม่เกิน $0.60 ต่อชั่วโมง ตั้งป้ายเครื่องว่า vapp-lab4
+2. เลือกเครื่อง verified ที่ต่อ SSH ได้ตรง เน็ตเร็ว มี CPU 16 cores ขึ้นไป ไม่อยู่ในจีน แล้วเอาเครื่องที่ถูกที่สุด
+3. ใช้ image PyTorch 2.8 ที่มี CUDA 12.8 disk 60 GB
+4. รอจนเครื่องพร้อมและเข้าไปเห็น GPU ครบ 2 ใบ ถ้าเกิน 10 นาทียังไม่พร้อม ให้ลบแล้วเช่าเครื่องอื่น
+กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+
+สรุปเป็นตารางภาษาไทย: GPU · ราคาต่อชั่วโมง · ที่ตั้ง · CPU cores · GPU ต่อถึงกันแบบไหน (NVLink หรือ PCIe และข้าม CPU socket ไหม) แล้วบอกว่าเครื่องยังเปิดอยู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 1 · เช่าเครื่อง 2 GPU" data-group="ขั้นที่ 1 · เช่าเครื่อง" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 1 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 1 · เช่าเครื่อง 2 GPU</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step1-0"><span>ได้เครื่องป้าย <code>vapp-lab4</code> ที่มี RTX 3090 <b>2 ใบในเครื่องเดียว</b> ราคาไม่เกิน $0.60 ต่อชั่วโมง</span></label><label class="chk"><input type="checkbox" data-k="step1-1"><span>AI เข้าเครื่องแล้วเห็น GPU ครบ 2 ใบ</span></label><label class="chk"><input type="checkbox" data-k="step1-2"><span>ตารางสรุปมีครบ: GPU · ราคาต่อชั่วโมง · ที่ตั้ง · CPU cores · GPU ต่อถึงกันแบบไหน</span></label><label class="chk"><input type="checkbox" data-k="step1-3"><span>รู้ว่าเครื่องของคุณมี NVLink หรือไม่ และ 2 ใบอยู่ CPU socket เดียวกันหรือไม่</span></label><label class="chk"><input type="checkbox" data-k="step1-4"><span>AI บอกว่าเครื่องยังเปิดอยู่</span></label></div><div class="note result">ผลของผู้สอน: RTX 3090 2 ใบ · $0.414/ชม. · Estonia · 32 cores · <code>PHB</code> ไม่มี NVLink · อยู่ CPU socket เดียวกัน · ใช้ 7 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>เครื่อง ราคา และที่ตั้งของคุณอาจต่างจากของผู้สอน ขึ้นกับข้อเสนอในตลาดตอนที่เช่า · ทางเชื่อมของเครื่องที่ได้จะกำหนดว่า 2 GPU เร็วขึ้นได้แค่ไหน</span></div></div></section>
+<section class="slide " data-title="ได้ RTX 3090 2 ใบที่ Estonia ราคา $0.414 ต่อชั่วโมง และ GPU ต่อกันแบบ PHB ไม่มี NVLink" data-group="ขั้นที่ 1 · เช่าเครื่อง" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 1 จาก 8</div><h2><span class="tt">ได้ RTX 3090 2 ใบที่ Estonia ราคา $0.414 ต่อชั่วโมง และ GPU ต่อกันแบบ PHB ไม่มี NVLink</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c01-step1-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 1" width="1652" height="650"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step1.png" target="_blank" rel="noopener">ดูภาพเต็ม</a> · เครื่องให้ CPU 32 cores และราคาอยู่ใต้เพดาน $0.60</p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>เครื่องนี้เป็น <code>PHB</code> และไม่มี NVLink จึงคาดได้ตั้งแต่ขั้นนี้ว่า 2 GPU จะเร็วขึ้นไม่ถึง 2 เท่า (ทฤษฎีข้อ 3)</span></div><div class="stp"><span class="n">2</span><span>GPU 2 ใบอยู่ CPU socket เดียวกัน ซึ่งดีกว่าแบบข้าม socket</span></div><div class="stp"><span class="n">3</span><span><b>เงินเริ่มเดินตั้งแต่ขั้นนี้</b> ชั่วโมงละ $0.414 จนกว่าจะลบเครื่องในขั้นที่ 6</span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p23-data.jpg)" data-title="ขั้นที่ 2 · เตรียม Dataset และดูภาพตัวอย่าง" data-group="ขั้นที่ 2 · เตรียม Dataset"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 2 จาก 8</div><div class="big">ขั้นที่ 2</div><h1>เตรียม Dataset และดูภาพตัวอย่าง</h1><div class="sub"><p>AI ดาวน์โหลด Dataset ลงเครื่องเช่า และเขียน <code>code/show_samples.py</code> (ทำภาพตัวอย่าง) พร้อมสคริปต์ดาวน์โหลดและสคริปต์นับจำนวน</p><p>ใช้เวลา <b>3 นาที</b> · ผลจริง: 14,748 / 1,413 / 706 ภาพ · 2 คลาส</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI ดาวน์โหลด Dataset แล้วเขียนสคริปต์ทำภาพตัวอย่างจาก label จริง" data-group="ขั้นที่ 2 · เตรียม Dataset" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 2 จาก 8</div><h2><span class="tt">AI ดาวน์โหลด Dataset แล้วเขียนสคริปต์ทำภาพตัวอย่างจาก label จริง</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n27-step2.jpg" alt="AI ดาวน์โหลด Dataset แล้วเขียนสคริปต์ทำภาพตัวอย่างจาก label จริง" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI ติดตั้ง <code>ultralytics</code> กับ <code>roboflow</code> แล้วดาวน์โหลด hard-hat-workers รุ่น 13 ในรูปแบบ YOLO</span></div><div class="stp"><span class="n">2</span><span>key อ่านจาก <code>.env</code> โดย <b>ไม่แสดงค่า และไม่ทิ้งไว้บนเครื่องเช่า</b></span></div><div class="stp"><span class="n">3</span><span>สคริปต์ <code>code/show_samples.py</code> วาดกรอบจาก label จริงลงภาพตัวอย่าง 8 รูป</span></div><div class="stp"><span class="n">4</span><span>คำตอบต้องมีจำนวนภาพ จำนวนกรอบของแต่ละคลาส และ label จริง 1 บรรทัด</span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 2 · เตรียม Dataset และดูภาพตัวอย่าง" data-group="ขั้นที่ 2 · เตรียม Dataset" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 2 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 2 · เตรียม Dataset และดูภาพตัวอย่าง</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 13 บรรทัด</span><button class="copy big" data-full="prompt1">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เตรียม Dataset ภาพคนงานสวม/ไม่สวมหมวกนิรภัยบนเครื่องที่เช่า
+1. ติดตั้ง ultralytics และ roboflow ให้ใช้งานได้
+2. ดาวน์โหลด Dataset hard-hat-workers รุ่น 13 ของ joseph-nelson จาก Roboflow ในรูปแบบ YOLO
+3. ใช้ ROBOFLOW_API_KEY จากไฟล์ .env ของโฟลเดอร์ปัจจุบัน ห้ามแสดงค่า key และห้ามทิ้ง key ไว้บนเครื่องที่เช่า
+4. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/show_samples.py ทำภาพตัวอย่าง 8 รูปจาก Training Set เรียงเป็นตาราง วาดกรอบและชื่อคลาสจาก label จริงทับบนรูป
+   แล้วเก็บภาพกลับมาที่ lab4_multigpu/results/dataset_samples.jpg
+
+สรุปเป็นตารางภาษาไทย: จำนวนภาพของ Training Set · Validation Set · Test Set · จำนวนกรอบของแต่ละคลาสในแต่ละชุด · ขนาด Dataset
+ยก label ของจริง 1 บรรทัดมาให้ดู พร้อมอธิบายว่าแต่ละช่องคืออะไร แล้วบอกว่าเครื่องยังเปิดอยู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 2 · เตรียม Dataset และดูภาพตัวอย่าง" data-group="ขั้นที่ 2 · เตรียม Dataset" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 2 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 2 · เตรียม Dataset และดูภาพตัวอย่าง</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step2-0"><span>Training Set 14,748 · Validation Set 1,413 · Test Set 706 ภาพ · 2 คลาส</span></label><label class="chk"><input type="checkbox" data-k="step2-1"><span>มีไฟล์ <code>lab4_multigpu/results/dataset_samples.jpg</code> และกรอบตรงกับศีรษะคน</span></label><label class="chk"><input type="checkbox" data-k="step2-2"><span>มี <code>lab4_multigpu/code/show_samples.py</code> พร้อมสคริปต์ดาวน์โหลดและสคริปต์นับจำนวน</span></label><label class="chk"><input type="checkbox" data-k="step2-3"><span>ตารางมีจำนวนกรอบของแต่ละคลาสในแต่ละชุด และขนาด Dataset</span></label><label class="chk"><input type="checkbox" data-k="step2-4"><span>AI ยก label จริง 1 บรรทัด พร้อมอธิบายว่าแต่ละช่องคืออะไร</span></label><label class="chk"><input type="checkbox" data-k="step2-5"><span>ไม่มีค่า key ในคำตอบ และไม่มี key ค้างบนเครื่องเช่า</span></label></div><div class="note result">ผลของผู้สอน: 14,748 / 1,413 / 706 ภาพ · 16,867 ภาพ · 63,013 กรอบ · ทุกภาพ 416 × 416 · 557 MB · ใช้ 3 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>จำนวนภาพควรตรงกับของผู้สอนเพราะเป็น Dataset รุ่นเดียวกัน · ภาษาของคำตอบอาจต่างได้ (รอบจริง AI ตอบเป็นภาษาอังกฤษ เนื้อหาเหมือนกัน)</span></div></div></section>
+<section class="slide " data-title="ได้ 14,748 / 1,413 / 706 ภาพ ครบ 2 คลาส รวม 63,013 กรอบ และไม่มี key ค้างบนเครื่องเช่า" data-group="ขั้นที่ 2 · เตรียม Dataset" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 2 จาก 8</div><h2><span class="tt">ได้ 14,748 / 1,413 / 706 ภาพ ครบ 2 คลาส รวม 63,013 กรอบ และไม่มี key ค้างบนเครื่องเช่า</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c02-step2-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 2" width="1652" height="505"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step2.png" target="_blank" rel="noopener">ดูภาพเต็ม</a> · Dataset ใช้พื้นที่ 557 MB</p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>จำนวนภาพต้องตรงกับนี้ เพราะเป็น Dataset รุ่นเดียวกัน แล้วเปิด <code>results/dataset_samples.jpg</code> ดูว่ากรอบตรงกับศีรษะคน</span></div><div class="stp"><span class="n">2</span><span>กรอบ <code>helmet</code> มีมากกว่า <code>head</code> ราว 3 เท่า หมายความว่าข้อมูลไม่สมดุล</span></div><div class="stp"><span class="n">3</span><span>AI ส่ง key ให้เครื่องเช่าโดยไม่เขียนลงไฟล์ แล้วตรวจซ้ำว่าไม่มี key ค้าง</span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p24-onegpu.jpg)" data-title="ขั้นที่ 3 · เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ" data-group="ขั้นที่ 3 · เทรน 1 GPU"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 3 จาก 8</div><div class="big">ขั้นที่ 3</div><h1>เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ</h1><div class="sub"><p>AI เขียน <code>code/bench.py</code> (สคริปต์เดียวใช้ทั้ง 1 และ 2 GPU) ลองรันสั้น ๆ ทั้งสองแบบ แล้วเทรนจริงด้วย GPU 1 ใบเป็นเส้นฐาน</p><p>ใช้เวลา <b>36 นาที</b> · ผลจริง: 1 GPU 128.3 วินาทีต่อ Epoch</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI เขียนสคริปต์วัดความเร็วสคริปต์เดียวที่ใช้ได้ทั้ง 1 และ 2 GPU" data-group="ขั้นที่ 3 · เทรน 1 GPU" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 3 จาก 8</div><h2><span class="tt">AI เขียนสคริปต์วัดความเร็วสคริปต์เดียวที่ใช้ได้ทั้ง 1 และ 2 GPU</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n28-step3.jpg" alt="AI เขียนสคริปต์วัดความเร็วสคริปต์เดียวที่ใช้ได้ทั้ง 1 และ 2 GPU" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI เขียน <code>code/bench.py</code> สคริปต์เดียวที่รับจำนวน GPU เป็น 1 หรือ 2</span></div><div class="stp"><span class="n">2</span><span>ทุกรอบใช้ค่าเดียวกัน คือ 5 Epoch ภาพ 640 batch 32 ภาพต่อ GPU และ seed 0</span></div><div class="stp"><span class="n">3</span><span>ลองรันสั้นด้วยภาพ 5% จำนวน 2 Epoch ทั้ง 1 และ 2 GPU ก่อน แล้วจึงรันจริงด้วย GPU 1 ใบ</span></div><div class="stp"><span class="n">4</span><span>ผลของแต่ละรอบเก็บเป็นไฟล์ JSON 1 ไฟล์</span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 3 · เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ" data-group="ขั้นที่ 3 · เทรน 1 GPU" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 3 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 3 · เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 14 บรรทัด</span><button class="copy big" data-full="prompt2">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เขียนสคริปต์วัดความเร็วการเทรน แล้ววัดรอบแรกด้วย GPU 1 ใบเป็นเส้นฐานไว้เทียบ
+1. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/bench.py รับจำนวน GPU (1 หรือ 2) แล้วเทรน yolo11m ที่เทรนบน COCO มาแล้ว ด้วย Dataset ที่เตรียมไว้
+   ค่าเดียวกันทุกรอบ: 5 Epoch · ภาพ 640 · batch 32 ภาพต่อ GPU (2 ใบ = batch รวม 64) · seed 0 · ไม่วัด Validation ระหว่างเทรน วัดครั้งเดียวตอนจบ
+2. สคริปต์บันทึกผลรอบละ 1 ไฟล์ JSON: วินาทีต่อ Epoch (เฉลี่ยโดยไม่นับ Epoch แรกและ Epoch สุดท้าย) · วินาทีต่อ step · mAP50 ตอนจบ
+   · GPU util เฉลี่ยของแต่ละใบ · CPU ที่งานใช้จริงกี่ core (คิดจากเวลา CPU ที่ใช้ ไม่ใช่จำนวน core ที่เครื่องมี)
+3. ถ้าใช้ 2 GPU ให้วัดเพิ่มว่าการรวม gradient ขนาด 80 MB ระหว่าง GPU (all-reduce) ใช้เวลากี่มิลลิวินาที · ก่อนเริ่มให้ตรวจว่า GPU ว่าง
+4. ลองรันสั้นๆ ก่อน (ภาพ 5% 2 Epoch) ทั้ง 1 และ 2 GPU ให้แน่ใจว่าใช้ได้ แล้วรันจริงด้วย GPU 1 ใบ
+5. ให้เทรนต่อได้แม้การเชื่อมต่อหลุด รายงานทุก 2–3 นาทีว่าถึง Epoch ไหน และรอจนเสร็จ
+
+สรุปเป็นตารางภาษาไทย: วินาทีต่อ Epoch · วินาทีต่อ step · GPU util · CPU ที่ใช้กี่ core · mAP50 แล้วบอกว่าเครื่องยังเปิดอยู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 3 · เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ" data-group="ขั้นที่ 3 · เทรน 1 GPU" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 3 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 3 · เขียนสคริปต์วัดความเร็ว แล้วเทรนด้วย GPU 1 ใบ</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step3-0"><span>มี <code>lab4_multigpu/code/bench.py</code> ที่รับจำนวน GPU 1 หรือ 2</span></label><label class="chk"><input type="checkbox" data-k="step3-1"><span>รอบลองสั้นรันผ่านทั้ง 1 และ 2 GPU (mAP50 ของรอบสั้นเป็น 0 ได้ ถือว่าปกติ)</span></label><label class="chk"><input type="checkbox" data-k="step3-2"><span>รอบจริง 1 GPU ครบ 5 Epoch และมีไฟล์ JSON ของรอบนั้น</span></label><label class="chk"><input type="checkbox" data-k="step3-3"><span>ตารางสรุปมีครบ: วินาทีต่อ Epoch · วินาทีต่อ step · GPU util · CPU ที่ใช้กี่ core · mAP50</span></label><label class="chk"><input type="checkbox" data-k="step3-4"><span>วินาทีของ Epoch 2–4 ใกล้กัน (การวัดนิ่ง)</span></label></div><div class="note result">ผลของผู้สอน: 128.3 วินาทีต่อ Epoch · 0.278 วินาทีต่อ step · GPU util 85.5% · CPU 2.8 core · mAP50 0.962 · ใช้ 36 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>วินาทีต่อ Epoch ของคุณจะต่างจากนี้ตามเครื่องที่ได้ · สิ่งที่ต้องเหมือนคือวิธีวัดและค่าที่ตรึงไว้</span></div></div></section>
+<section class="slide " data-title="1 GPU ใช้ 128.3 วินาทีต่อ Epoch และ 0.278 วินาทีต่อ step ได้ mAP50 0.962" data-group="ขั้นที่ 3 · เทรน 1 GPU" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 3 จาก 8</div><h2><span class="tt">1 GPU ใช้ 128.3 วินาทีต่อ Epoch และ 0.278 วินาทีต่อ step ได้ mAP50 0.962</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c03-step3-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 3" width="1672" height="610"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step3.png" target="_blank" rel="noopener">ดูภาพเต็ม</a></p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>1 Epoch มี 461 step</span></div><div class="stp"><span class="n">2</span><span>GPU util 85.5% และใช้ CPU เพียง 2.8 core แสดงว่า GPU คือส่วนที่ทำงานหนัก ไม่ได้รอ CPU</span></div><div class="stp"><span class="n">3</span><span>รอบลองสั้นได้ mAP50 เป็น 0 เพราะเทรนเพียง 48 step ถือว่าปกติ รอบนี้มีไว้ตรวจว่าสคริปต์รันได้ก่อนเสียเวลารอบจริง</span></div></div></div></div></section>
+<section class="slide mid" data-title="Epoch 1 และ 5 ช้ากว่า จึงเฉลี่ยเฉพาะ Epoch 2–4 ได้ 128.3 วินาทีต่อ Epoch" data-group="ขั้นที่ 3 · เทรน 1 GPU" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 3 จาก 8</div><h2><span class="tt">Epoch 1 และ 5 ช้ากว่า จึงเฉลี่ยเฉพาะ Epoch 2–4 ได้ 128.3 วินาทีต่อ Epoch</span><span class="tag">results/metrics.json</span></h2></header><div class="body"><div class="bars"><div class="bar"><div class="lb">Epoch 1<small>ช่วงเริ่มต้น · ไม่นับ</small></div><div class="tr"><div class="fl mid" style="width:94%"></div></div><div class="vl">146.1 วินาที</div></div><div class="bar"><div class="lb">Epoch 2<small>ใช้เฉลี่ย</small></div><div class="tr"><div class="fl mid" style="width:82%"></div></div><div class="vl">128.1 วินาที</div></div><div class="bar"><div class="lb">Epoch 3<small>ใช้เฉลี่ย</small></div><div class="tr"><div class="fl mid" style="width:82%"></div></div><div class="vl">128.5 วินาที</div></div><div class="bar"><div class="lb">Epoch 4<small>ใช้เฉลี่ย</small></div><div class="tr"><div class="fl mid" style="width:82%"></div></div><div class="vl">128.3 วินาที</div></div><div class="bar"><div class="lb">Epoch 5<small>รวมการวัด Validation · ไม่นับ</small></div><div class="tr"><div class="fl mid" style="width:95%"></div></div><div class="vl">148.8 วินาที</div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>Epoch 2–4 ต่างกันไม่ถึง 0.5 วินาที การวัดจึงนิ่งพอที่จะเชื่อถือได้</span></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p25-twogpu.jpg)" data-title="ขั้นที่ 4 · เทรนงานเดิมด้วย GPU 2 ใบ" data-group="ขั้นที่ 4 · เทรน 2 GPU"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 4 จาก 8</div><div class="big">ขั้นที่ 4</div><h1>เทรนงานเดิมด้วย GPU 2 ใบ</h1><div class="sub"><p>รันสคริปต์เดิมจากขั้นที่ 3 โดยไม่แก้ เปลี่ยนแค่จำนวน GPU เป็น 2 · ขั้นนี้ไม่มีโค้ดใหม่</p><p>ใช้เวลา <b>11 นาที</b> · ผลจริง: 2 GPU 73.9 วินาทีต่อ Epoch · เร็วขึ้น 1.74 เท่า</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="รันสคริปต์เดิมโดยไม่แก้ เปลี่ยนเพียงจำนวน GPU เป็น 2" data-group="ขั้นที่ 4 · เทรน 2 GPU" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 4 จาก 8</div><h2><span class="tt">รันสคริปต์เดิมโดยไม่แก้ เปลี่ยนเพียงจำนวน GPU เป็น 2</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n29-step4.jpg" alt="รันสคริปต์เดิมโดยไม่แก้ เปลี่ยนเพียงจำนวน GPU เป็น 2" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>รัน <code>code/bench.py</code> ตัวเดิมด้วย <b>ค่าเดิมทุกอย่าง</b> เปลี่ยนเพียงจำนวน GPU เป็น 2 ใบ</span></div><div class="stp"><span class="n">2</span><span>การเทรนต้องเดินต่อได้แม้การเชื่อมต่อหลุด และ AI รายงานความคืบหน้าทุก 2–3 นาที</span></div><div class="stp"><span class="n">3</span><span>ถ้าต้องแก้สคริปต์ ต้อง <b>รันรอบ 1 GPU ใหม่ด้วย</b> เพื่อให้สองรอบเทียบกันได้</span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 4 · เทรนงานเดิมด้วย GPU 2 ใบ" data-group="ขั้นที่ 4 · เทรน 2 GPU" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 4 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 4 · เทรนงานเดิมด้วย GPU 2 ใบ</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 10 บรรทัด</span><button class="copy big" data-full="prompt3">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เทรนงานเดิมซ้ำบนเครื่องเดิม แต่แบ่งให้ GPU หลายใบช่วยกัน
+1. รันสคริปต์ที่เขียนไว้ในขั้นที่ 3 (lab4_multigpu/code/bench.py) ค่าเดิมทุกอย่าง เปลี่ยนแค่จำนวน GPU เป็น 2 ใบ
+2. ให้เทรนต่อได้แม้การเชื่อมต่อหลุด รายงานทุก 2–3 นาที และรอจนเสร็จ
+3. ถ้าต้องแก้สคริปต์ ให้รันรอบ 1 GPU ใหม่ด้วย เพื่อให้ทั้ง 2 รอบเทียบกันได้
+
+สรุปเป็นตารางภาษาไทยเทียบ 1 กับ 2 GPU: วินาทีต่อ Epoch · เร็วขึ้นกี่เท่า · วินาทีต่อ step · GPU util · CPU ที่ใช้กี่ core · เวลา all-reduce · mAP50 แล้วบอกว่าเครื่องยังเปิดอยู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 4 · เทรนงานเดิมด้วย GPU 2 ใบ" data-group="ขั้นที่ 4 · เทรน 2 GPU" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 4 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 4 · เทรนงานเดิมด้วย GPU 2 ใบ</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step4-0"><span>รอบ 2 GPU ครบ 5 Epoch ด้วยสคริปต์เดิม (ถ้าสคริปต์ถูกแก้ รอบ 1 GPU ถูกรันใหม่แล้ว)</span></label><label class="chk"><input type="checkbox" data-k="step4-1"><span>step ต่อ Epoch ลดลงราวครึ่งหนึ่ง</span></label><label class="chk"><input type="checkbox" data-k="step4-2"><span>ตารางเทียบมีครบ: วินาทีต่อ Epoch · เร็วขึ้นกี่เท่า · วินาทีต่อ step · GPU util · CPU · เวลา all-reduce · mAP50</span></label><label class="chk"><input type="checkbox" data-k="step4-3"><span>เห็น GPU util ของทั้ง 2 ใบ</span></label><label class="chk"><input type="checkbox" data-k="step4-4"><span>mAP50 ของ 2 รอบใกล้กัน</span></label></div><div class="note result">ผลของผู้สอน: 128.3 → 73.9 วินาทีต่อ Epoch · เร็วขึ้น 1.74× · 461 → 231 step ต่อ Epoch · 0.278 → 0.320 วินาทีต่อ step · mAP50 0.962 / 0.963 · ใช้ 11 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>Speedup ของคุณขึ้นกับทางเชื่อมระหว่าง GPU ของเครื่องที่ได้ · เครื่องที่มีทางเชื่อมดีกว่าอาจได้ใกล้ 2 เท่ากว่านี้</span></div></div></section>
+<section class="slide " data-title="2 GPU ใช้ 73.9 วินาทีต่อ Epoch เร็วขึ้น 1.74 เท่า โดย mAP50 ไม่ลดลง" data-group="ขั้นที่ 4 · เทรน 2 GPU" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 4 จาก 8</div><h2><span class="tt">2 GPU ใช้ 73.9 วินาทีต่อ Epoch เร็วขึ้น 1.74 เท่า โดย mAP50 ไม่ลดลง</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c04-step4-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 4" width="1654" height="576"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step4.png" target="_blank" rel="noopener">ดูภาพเต็ม</a></p><div class="arow" style="--n:2"><div class="stp"><span class="n">1</span><span>mAP50 เท่าเดิม (0.962 กับ 0.963) แสดงว่า DDP ทำให้เร็วขึ้นโดยคุณภาพโมเดลไม่ลด</span></div><div class="stp"><span class="n">2</span><span>ข้อ 3 ของพรอมต์สำคัญ ถ้าสคริปต์ถูกแก้ ต้องวัด 1 GPU ใหม่ด้วย มิฉะนั้นสองรอบเทียบกันไม่ได้</span></div></div></div></div></section>
+<section class="slide mid" data-title="step ต่อ Epoch เหลือครึ่ง แต่แต่ละ step ช้าลงราว 15% ผลจึงเป็น 1.74 เท่า ไม่ใช่ 2 เท่า" data-group="ขั้นที่ 4 · เทรน 2 GPU" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 4 จาก 8</div><h2><span class="tt">step ต่อ Epoch เหลือครึ่ง แต่แต่ละ step ช้าลงราว 15% ผลจึงเป็น 1.74 เท่า ไม่ใช่ 2 เท่า</span><span class="tag">results/metrics.json</span></h2></header><div class="body"><div class="pairs"><div class="lg"><span><i style="background:#4f79b3"></i>1 GPU</span><span><i style="background:#e87f1c"></i>2 GPU</span></div><div class="prow"><div class="pl">วินาทีต่อ Epoch<small>เฉลี่ย Epoch 2–4</small></div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">128.3</span></div><div class="pbr pb2"><div class="f" style="width:44.9%"></div><span class="v">73.9</span></div></div></div><div class="prow"><div class="pl">step ต่อ Epoch</div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">461</span></div><div class="pbr pb2"><div class="f" style="width:39.1%"></div><span class="v">231</span></div></div></div><div class="prow"><div class="pl">วินาทีต่อ step</div><div class="pb"><div class="pbr pa"><div class="f" style="width:67.9%"></div><span class="v">0.278</span></div><div class="pbr pb2"><div class="f" style="width:78.0%"></div><span class="v">0.320</span></div></div></div><div class="prow"><div class="pl">mAP50</div><div class="pb"><div class="pbr pa"><div class="f" style="width:77.9%"></div><span class="v">0.962</span></div><div class="pbr pb2"><div class="f" style="width:78.0%"></div><span class="v">0.963</span></div></div></div><div class="prow"><div class="pl">mAP50-95</div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">0.638</span></div><div class="pbr pb2"><div class="f" style="width:76.2%"></div><span class="v">0.623</span></div></div></div></div><div class="note eye"><span class="lbl">ข้อสังเกต</span><span>เร็วขึ้น <b>1.74×</b> เทียบกับ Ideal 2.00× · แท่งยาวขึ้นในแถววินาทีต่อ step คือราคาของการ Sync</span></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p26-report.jpg)" data-title="ขั้นที่ 5 · สรุปตาราง กราฟ และเงินต่อ Epoch" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 5 จาก 8</div><div class="big">ขั้นที่ 5</div><h1>สรุปตาราง กราฟ และเงินต่อ Epoch</h1><div class="sub"><p>AI ค้นราคาตลาด นำผลดิบกลับมา แล้วเขียน <code>code/report.py</code> คำนวณทุกตัวเลขลง <code>results/metrics.json</code> และวาดกราฟ 4 รูป</p><p>ใช้เวลา <b>4 นาที</b> · ผลจริง: Efficiency 86.9% · ราคาตลาด 1 GPU ถูกกว่าต่อ Epoch</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI ค้นราคาตลาด นำผลดิบกลับมา แล้วคำนวณทุกตัวเลขด้วยสคริปต์" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">AI ค้นราคาตลาด นำผลดิบกลับมา แล้วคำนวณทุกตัวเลขด้วยสคริปต์</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n30-step5.jpg" alt="AI ค้นราคาตลาด นำผลดิบกลับมา แล้วคำนวณทุกตัวเลขด้วยสคริปต์" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI ค้นราคาตลาดของ RTX 3090 แบบ 1 ใบ และ 2 ใบ ที่ถูกที่สุด</span></div><div class="stp"><span class="n">2</span><span>ผลดิบของทั้ง 2 รอบถูกนำกลับมาไว้ที่ <code>results/raw</code></span></div><div class="stp"><span class="n">3</span><span><code>code/report.py</code> คำนวณ ideal, speedup, efficiency และเงินต่อ Epoch ลง <code>results/metrics.json</code> แล้ววาดกราฟ 4 รูป</span></div><div class="stp"><span class="n">4</span><span>คำตอบต้องตอบ 3 คำถาม คือ เร็วขึ้นกี่เท่า แบบไหนคุ้มเงินที่สุด และทำไมไม่เร็วขึ้นตามจำนวน GPU</span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 5 · สรุปตาราง กราฟ และเงินต่อ Epoch" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 5 · สรุปตาราง กราฟ และเงินต่อ Epoch</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 14 บรรทัด</span><button class="copy big" data-full="prompt4">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+สรุปผลทั้ง 2 รอบเป็นตารางและกราฟ แล้วคิดเงินต่อ 1 Epoch
+1. ค้นราคาตลาดตอนนี้ของเครื่อง RTX 3090 แบบ 1 ใบ และ 2 ใบ ที่ถูกที่สุด (verified ต่อ SSH ได้ตรง ไม่อยู่ในจีน disk 60 GB)
+2. นำผลของทั้ง 2 รอบ (ไฟล์ JSON และข้อมูลดิบ) กลับมาไว้ที่ lab4_multigpu/results/raw
+3. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/report.py อ่านผลทั้ง 2 รอบกับราคา แล้วคำนวณ ideal (เวลา 1 GPU ÷ จำนวน GPU) · speedup · efficiency
+   · เงินต่อ Epoch (ราคาตลาด และราคาเครื่องที่เช่าจริง) แล้วเขียนทุกตัวเลขลง lab4_multigpu/results/metrics.json
+4. ให้สคริปต์วาดกราฟ 4 รูปไว้ที่ lab4_multigpu/results/images (ข้อความในกราฟเป็นภาษาอังกฤษ): เวลาต่อ Epoch เทียบเส้น ideal · speedup เทียบเส้น ideal
+   · เงินต่อ Epoch · คอขวด (เวลาต่อ step แยกส่วนคำนวณกับส่วนที่เพิ่มขึ้น และ GPU util เทียบ CPU ที่ใช้)
+
+สรุปเป็นตารางภาษาไทย 1 กับ 2 GPU: วินาทีต่อ Epoch · ideal · speedup · efficiency · ราคาต่อชั่วโมง · เงินต่อ Epoch แล้วตอบ 3 ข้อ:
+เร็วขึ้นกี่เท่า · แบบไหนคุ้มเงินที่สุดต่อ 1 Epoch · ทำไมไม่เร็วขึ้นตามจำนวน GPU (อ้างตัวเลขที่วัดได้) แล้วบอกว่าเครื่องยังเปิดอยู่</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 5 · สรุปตาราง กราฟ และเงินต่อ Epoch" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 5 · สรุปตาราง กราฟ และเงินต่อ Epoch</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step5-0"><span>มี <code>lab4_multigpu/results/metrics.json</code> และกราฟ 4 รูปใน <code>lab4_multigpu/results/images</code></span></label><label class="chk"><input type="checkbox" data-k="step5-1"><span>มี <code>lab4_multigpu/code/report.py</code> และผลดิบของทั้ง 2 รอบใน <code>lab4_multigpu/results/raw</code></span></label><label class="chk"><input type="checkbox" data-k="step5-2"><span>ตารางมี ideal · speedup · efficiency · ราคาต่อชั่วโมง · เงินต่อ Epoch ของทั้ง 1 และ 2 GPU</span></label><label class="chk"><input type="checkbox" data-k="step5-3"><span>เงินต่อ Epoch คิดทั้งราคาตลาด และราคาเครื่องที่เช่าจริง</span></label><label class="chk"><input type="checkbox" data-k="step5-4"><span>คำตอบ 3 ข้ออ้างตัวเลขที่วัดได้</span></label></div><div class="note result">ผลของผู้สอน: Speedup 1.74× · Efficiency 86.9% · เงินต่อ Epoch ราคาตลาด $0.0068 กับ $0.0072 · บนเครื่องที่เช่า $0.0148 กับ $0.0085 · ใช้ 4 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ราคาตลาดเปลี่ยนตลอด คำตอบเรื่อง "คุ้มไหม" ของคุณจึงอาจพลิกจากของผู้สอนได้ ต้องคิดจากราคา ณ วันที่เช่า</span></div></div></section>
+<section class="slide " data-title="Speedup 1.74 เท่า Efficiency 86.9% และในราคาตลาด 1 GPU ถูกกว่าต่อ Epoch" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">Speedup 1.74 เท่า Efficiency 86.9% และในราคาตลาด 1 GPU ถูกกว่าต่อ Epoch</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c05-step5-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 5" width="1635" height="635"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step5.png" target="_blank" rel="noopener">ดูภาพเต็ม</a></p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>ราคาตลาด 1 GPU ถูกกว่าราว 5% ต่อ Epoch เพราะเครื่อง 2 ใบแพงขึ้น 1.83 เท่า แต่เร็วขึ้น 1.74 เท่า โดย 2 GPU เสร็จเร็วกว่า 42%</span></div><div class="stp"><span class="n">2</span><span><b>เช่าเครื่อง 2 ใบแล้วใช้ใบเดียวแพงที่สุด</b> ($0.0148) เพราะจ่ายค่าเครื่องเต็มแต่ได้งานครึ่งเดียว</span></div><div class="stp"><span class="n">3</span><span>ราคาตลาดเปลี่ยนตลอด คำตอบเรื่องความคุ้มจึงต้องคิดจากราคา ณ วันที่เช่า และควรดูค่า reliability ประกอบ</span></div></div></div></div></section>
+<section class="slide " data-title="2 GPU ใช้ 73.9 วินาทีต่อ Epoch ช้ากว่า Ideal 64.2 วินาที" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">2 GPU ใช้ 73.9 วินาทีต่อ Epoch ช้ากว่า Ideal 64.2 วินาที</span></h2></header><div class="body"><div class="figrow"><div class="fig"><img src="results/images/1_epoch_time.png" alt="กราฟแท่งเวลาต่อ Epoch: 1 GPU 128.3 วินาที 2 GPU 73.9 วินาที เทียบเส้น ideal ของ 2 GPU ที่ 64.2 วินาที" width="975" height="675"></div><div class="fig"><img src="results/images/2_speedup.png" alt="กราฟเส้น Speedup: เส้น ideal ขึ้นถึง 2.00 เท่าที่ 2 GPU ส่วนค่าที่วัดจริงได้ 1.74 เท่า efficiency 87%" width="975" height="675"></div></div><p class="cap">ดูแท่งสีส้มเทียบจุดสีเขียว (ideal) ทางซ้าย และเส้นสีส้มที่อยู่ใต้เส้น ideal ทางขวา · Speedup <b>1.74×</b> · Efficiency <b>86.9%</b></p></div></section>
+<section class="slide " data-title="ช่องว่างจาก Ideal คือเวลา Sync 41 ms ต่อ step ส่วน CPU ใช้งานน้อย" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.10"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">ช่องว่างจาก Ideal คือเวลา Sync 41 ms ต่อ step ส่วน CPU ใช้งานน้อย</span></h2></header><div class="body"><div class="figrow"><div class="fig"><img src="results/images/4_bottleneck.png" alt="กราฟคอขวด: เวลาต่อ step ของ 1 GPU 278 ms ส่วน 2 GPU มีส่วนคำนวณ 278 ms บวกส่วนเพิ่ม 41 ms และ GPU util 85.5% เทียบ 81.1% กับ 81.3% โดย CPU ใช้ 2.8 และ 5.3 core" width="1650" height="690"></div></div><p class="cap">ดูส่วนสีส้มบนแท่ง 2 GPU ทางซ้าย และเส้นสีเทาของ CPU ที่อยู่ต่ำทางขวา</p></div></section>
+<section class="slide " data-title="เงินต่อ Epoch: ในราคาตลาด 1 GPU ถูกกว่า แต่บนเครื่อง 2 ใบที่เช่าอยู่ การใช้ 2 GPU ถูกกว่า" data-group="ขั้นที่ 5 · สรุปและเงินต่อ Epoch" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 5 จาก 8</div><h2><span class="tt">เงินต่อ Epoch: ในราคาตลาด 1 GPU ถูกกว่า แต่บนเครื่อง 2 ใบที่เช่าอยู่ การใช้ 2 GPU ถูกกว่า</span><span class="tag">results/metrics.json</span></h2></header><div class="body"><div class="tiles"><div class="tile ok"><div class="k">ราคาตลาด · 1 GPU</div><div class="num">$0.0068</div><div class="s">$0.191/ชม.</div></div><div class="tile "><div class="k">ราคาตลาด · 2 GPU</div><div class="num">$0.0072</div><div class="s">$0.351/ชม.</div></div><div class="tile bad"><div class="k">เครื่องที่เช่า · 1 GPU</div><div class="num">$0.0148</div><div class="s">จ่ายเต็มเครื่อง $0.414/ชม. ได้งานครึ่งเดียว</div></div><div class="tile ok"><div class="k">เครื่องที่เช่า · 2 GPU</div><div class="num">$0.0085</div><div class="s">$0.414/ชม.</div></div></div><div class="fig" style="--figmin:300px"><img src="results/images/3_cost_per_epoch.png" alt="กราฟแท่งเงินต่อ Epoch: ราคาตลาด 1 GPU $0.0068 และ 2 GPU $0.0072 บนเครื่องที่เช่าจริง 1 GPU $0.0148 และ 2 GPU $0.0085" width="1050" height="675"></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p27-delete.jpg)" data-title="ขั้นที่ 6 · ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)" data-group="ขั้นที่ 6 · ลบเครื่อง"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 6 จาก 8</div><div class="big">ขั้นที่ 6</div><h1>ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)</h1><div class="sub"><p>AI ลบเครื่อง ตรวจว่าไม่มีเครื่องค้าง แล้วอ่านยอดที่ถูกคิดเงินจริง</p><p>ใช้เวลา <b>2 นาที</b> · ผลจริง: ลบเครื่องแล้ว · ค่าเช่าจริง $0.507</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI ลบเครื่อง ตรวจว่าไม่มีเครื่องค้าง แล้วอ่านยอดที่ถูกคิดเงินจริง" data-group="ขั้นที่ 6 · ลบเครื่อง" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 6 จาก 8</div><h2><span class="tt">AI ลบเครื่อง ตรวจว่าไม่มีเครื่องค้าง แล้วอ่านยอดที่ถูกคิดเงินจริง</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n31-step6.jpg" alt="AI ลบเครื่อง ตรวจว่าไม่มีเครื่องค้าง แล้วอ่านยอดที่ถูกคิดเงินจริง" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI ลบเครื่องป้าย <code>vapp-lab4</code> แล้วตรวจว่าไม่มีเครื่องป้ายนี้ค้างในบัญชี</span></div><div class="stp"><span class="n">2</span><span><b>ห้ามแตะเครื่องที่มีป้ายอื่น</b></span></div><div class="stp"><span class="n">3</span><span>คำตอบสรุปอายุเครื่อง ราคาต่อชั่วโมง และยอดที่ถูกคิดแยกเป็น GPU, disk และการรับส่งข้อมูล</span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 6 · ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)" data-group="ขั้นที่ 6 · ลบเครื่อง" data-max="1.45"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 6 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 6 · ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 6 บรรทัด</span><button class="copy big" data-full="prompt5">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+
+ปิดทุกอย่างของ LAB 4
+1. ลบเครื่องป้าย vapp-lab4 แล้วตรวจว่าไม่มีเครื่องป้ายนี้ค้างในบัญชี (ห้ามแตะเครื่องป้ายอื่น)
+
+สรุปเป็นภาษาไทย ค่าใช้จ่ายจริงของเครื่อง vapp-lab4: อายุเครื่อง · ราคาต่อชั่วโมง · ยอดที่ถูกคิด (GPU · disk · รับส่งข้อมูล)</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 6 · ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)" data-group="ขั้นที่ 6 · ลบเครื่อง" data-max="1.40"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 6 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 6 · ลบเครื่องและสรุปค่าใช้จ่าย (ห้ามข้าม)</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step6-0"><span>AI รายงานว่าลบ <code>vapp-lab4</code> แล้ว และไม่มีเครื่องป้ายนี้ค้างในบัญชี</span></label><label class="chk"><input type="checkbox" data-k="step6-1"><span>เปิดหน้า <a href="https://cloud.vast.ai/instances/" target="_blank" rel="noopener">Instances</a> ของ Vast.ai แล้วไม่เห็นเครื่องนี้</span></label><label class="chk"><input type="checkbox" data-k="step6-2"><span>สรุปมีอายุเครื่อง · ราคาต่อชั่วโมง · ยอดแยก GPU · disk · รับส่งข้อมูล</span></label><label class="chk"><input type="checkbox" data-k="step6-3"><span>เครื่องป้ายอื่นในบัญชี (ถ้ามี) ยังอยู่ครบ</span></label></div><div class="note result">ผลของผู้สอน: เครื่องเปิด 76.5 นาที · $0.414/ชม. · ยอดที่ AI อ่านได้ $0.498 · ยอดสุดท้ายในใบแจ้งหนี้ $0.507 · ใช้ 2 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>ยอดของคุณขึ้นกับเวลาที่เครื่องเปิดจริง · ยอดในใบแจ้งหนี้อาจสูงกว่าที่ AI อ่านได้ทันทีหลังลบเล็กน้อย</span></div></div></section>
+<section class="slide " data-title="เครื่องเปิด 76.5 นาที AI อ่านยอดได้ $0.498 และยอดสุดท้ายในใบแจ้งหนี้คือ $0.507" data-group="ขั้นที่ 6 · ลบเครื่อง" data-max="1.20"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 6 จาก 8</div><h2><span class="tt">เครื่องเปิด 76.5 นาที AI อ่านยอดได้ $0.498 และยอดสุดท้ายในใบแจ้งหนี้คือ $0.507</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c06-step6-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 6" width="1640" height="705"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step6.png" target="_blank" rel="noopener">ดูภาพเต็ม</a></p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>ราคา $0.414 ต่อชั่วโมงของเครื่อง 2 ใบ ถูกคิดตลอดอายุเครื่อง</span></div><div class="stp"><span class="n">2</span><span>ยอดในใบแจ้งหนี้สูงกว่าที่ AI อ่านได้ทันทีหลังลบเล็กน้อย</span></div><div class="stp"><span class="n">3</span><span>ต้องเห็นว่า <b>ไม่มีเครื่องป้ายนี้เหลือ</b> แล้วเปิดหน้า <a href="https://cloud.vast.ai/instances/" target="_blank" rel="noopener">Instances</a> ดูอีกครั้ง</span></div></div></div></div></section>
+<section class="slide " data-title="เงินเดินตลอดเวลาที่เครื่องเปิด ไม่ใช่แค่ตอนเทรน" data-group="ขั้นที่ 6 · ลบเครื่อง" data-max="1.25"><header class="hd"><div class="kicker">ภาค LAB · ขั้นที่ 6 จาก 8</div><h2><span class="tt">เงินเดินตลอดเวลาที่เครื่องเปิด ไม่ใช่แค่ตอนเทรน</span></h2></header><div class="body"><div class="ex"><div class="fig"><img src="img/n04-meter.jpg" alt="เงินเดินตลอดเวลาที่เครื่องเปิด ไม่ใช่แค่ตอนเทรน" width="1448" height="1086"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>เทรนจริงรวมราว 20 นาที แต่เครื่องเปิด 76.5 นาที · <b>เงินเดินตลอดเวลาที่เครื่องเปิด</b> รวมช่วงที่ AI เขียนโค้ดและช่วงที่เรายังไม่วางพรอมต์ถัดไป</span></div><div class="stp"><span class="n">2</span><span>ผลทั้งหมดถูกเก็บกลับมาที่ <code>lab4_multigpu/results</code> ตั้งแต่ขั้นที่ 5 · ลบเครื่องแล้วทุกอย่างบนเครื่องหายหมด</span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p31-recipe.jpg)" data-title="ปิดท้าย · เก็บงานทั้ง LAB เป็นสกิลเวอร์ชัน 0" data-group="ปิดท้าย · สกิล v0"><div class="shade"></div><div class="inner"><div class="small">ส่วนที่ 3 จาก 4</div><div class="big">ปิดท้าย</div><h1>เก็บงานทั้ง LAB เป็นสกิลเวอร์ชัน 0</h1><div class="sub"><p>เราเพิ่งสั่งงาน 6 ขั้นจนสำเร็จ ถ้าต้องทำซ้ำ (เช่น เปลี่ยนรุ่น GPU หรือจำนวน Epoch) ไม่ควรต้องวาง 6 พรอมต์ใหม่ · <b>สกิล</b> คือไฟล์ที่เก็บวิธีทำงานที่สำเร็จแล้ว พร้อมโค้ดที่ใช้ได้แล้ว ให้ AI ทำซ้ำได้ในคำสั่งเดียว</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="สกิลเก็บวิธีทำงานที่สำเร็จแล้วพร้อมโค้ด ให้ทำซ้ำได้ในคำสั่งเดียว" data-group="ปิดท้าย · สกิล v0" data-max="1.10"><header class="hd"><div class="kicker">ปิดท้าย · สกิลเวอร์ชัน 0</div><h2><span class="tt">สกิลเก็บวิธีทำงานที่สำเร็จแล้วพร้อมโค้ด ให้ทำซ้ำได้ในคำสั่งเดียว</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="image/skill-v0.png" alt="สกิลเก็บวิธีทำงานที่สำเร็จแล้วพร้อมโค้ด ให้ทำซ้ำได้ในคำสั่งเดียว" width="1400" height="788"></div><p class="cap">ขั้นที่ 7 ให้ AI เขียนสกิลจากงาน 6 ขั้น และขั้นที่ 8 ลองใช้สกิลนั้นทำซ้ำทั้ง LAB</p></div></section>
+<section class="slide divider photo" style="background-image:url(img/p28-skill.jpg)" data-title="ขั้นที่ 7 · ให้ AI สร้างสกิล v0" data-group="ขั้นที่ 7 · สร้างสกิล v0"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 7 จาก 8</div><div class="big">ขั้นที่ 7</div><h1>ให้ AI สร้างสกิล v0</h1><div class="sub"><p>AI อ่านพรอมต์ โค้ด และผลของ LAB นี้ แล้วเขียน <code>skill_v0/SKILL.md</code> พร้อมคัดลอกโค้ดเข้า <code>skill_v0/scripts</code></p><p>ใช้เวลา <b>3 นาที</b> · ผลจริง: สกิล <code>multigpu-speedup</code></p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI อ่านพรอมต์ โค้ด และผลของ LAB แล้วเขียนสกิล v0" data-group="ขั้นที่ 7 · สร้างสกิล v0" data-max="1.25"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 7 จาก 8</div><h2><span class="tt">AI อ่านพรอมต์ โค้ด และผลของ LAB แล้วเขียนสกิล v0</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n32-step7.jpg" alt="AI อ่านพรอมต์ โค้ด และผลของ LAB แล้วเขียนสกิล v0" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>AI อ่านพรอมต์ทุกขั้นใน <code>PROMPTS.md</code> โค้ดใน <code>code</code> และผลใน <code>results</code></span></div><div class="stp"><span class="n">2</span><span>เขียนสกิล <code>multigpu-speedup</code> ที่ <code>skill_v0/SKILL.md</code> ให้มีค่าที่ปรับได้ ขั้นตอน เกณฑ์ตรวจผ่าน และกติกาเรื่องเงิน</span></div><div class="stp"><span class="n">3</span><span>คัดลอกโค้ดที่ใช้ได้แล้วไปไว้ใน <code>skill_v0/scripts</code> แทนการเขียนใหม่</span></div><div class="stp"><span class="n">4</span><span>สกิลเรียกใช้สกิล <code>vastai</code> ต่อ และติดตั้งที่ <code>.claude/skills/multigpu-speedup</code></span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 7 · ให้ AI สร้างสกิล v0" data-group="ขั้นที่ 7 · สร้างสกิล v0" data-max="1.45"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 7 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 7 · ให้ AI สร้างสกิล v0</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 9 บรรทัด</span><button class="copy big" data-full="prompt6">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">สร้างสกิลเวอร์ชัน 0 จากงานของ LAB 4 ที่เพิ่งทำเสร็จ เพื่อให้ครั้งหน้าสั่งทดสอบความเร็วหลาย GPU ได้ในคำสั่งเดียว
+1. ดูงานทั้งหมดจากพรอมต์ทุกขั้นใน lab4_multigpu/PROMPTS.md โค้ดใน lab4_multigpu/code และผลใน lab4_multigpu/results
+2. เขียนเป็นสกิลชื่อ multigpu-speedup เก็บที่ lab4_multigpu/skill_v0/SKILL.md ให้มี name กับ description (บอกว่าใช้เมื่อไร)
+   · ค่าที่ปรับได้พร้อมค่าเริ่มต้น (รุ่น GPU · จำนวน GPU ไม่เกิน 2 ใบ · เพดานราคา · Epoch · ป้ายเครื่อง) · ขั้นตอน · เกณฑ์ตรวจผ่าน · กติกาเรื่องเงิน (ลบเครื่องเสมอ)
+3. คัดลอกโค้ดที่ใช้ได้แล้วจาก lab4_multigpu/code ไปไว้ใน lab4_multigpu/skill_v0/scripts ให้สกิลใช้โค้ดชุดนี้ ไม่ต้องเขียนใหม่
+4. ให้สกิลนี้เรียกใช้สกิล vastai ต่อ ไม่เขียนวิธีใช้ Vast.ai ซ้ำ แล้วติดตั้งเป็นสกิลของโปรเจกต์ที่ .claude/skills/multigpu-speedup ของโฟลเดอร์ปัจจุบัน
+
+สรุปเป็นภาษาไทย: สกิลทำอะไรได้ · ค่าที่ปรับได้ · ไฟล์ที่สร้าง
+ไม่ต้อง commit</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 7 · ให้ AI สร้างสกิล v0" data-group="ขั้นที่ 7 · สร้างสกิล v0" data-max="1.40"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 7 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 7 · ให้ AI สร้างสกิล v0</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step7-0"><span>มี <code>lab4_multigpu/skill_v0/SKILL.md</code> ที่มี name และ description</span></label><label class="chk"><input type="checkbox" data-k="step7-1"><span>มีโค้ดใน <code>lab4_multigpu/skill_v0/scripts</code> (คัดลอกจาก <code>code</code>)</span></label><label class="chk"><input type="checkbox" data-k="step7-2"><span>SKILL.md มีค่าที่ปรับได้พร้อมค่าเริ่มต้น: รุ่น GPU · จำนวน GPU · เพดานราคา · Epoch · ป้ายเครื่อง และกติกาลบเครื่องเสมอ</span></label><label class="chk"><input type="checkbox" data-k="step7-3"><span>ติดตั้งแล้วที่ <code>.claude/skills/multigpu-speedup</code> ของโฟลเดอร์ปัจจุบัน</span></label><label class="chk"><input type="checkbox" data-k="step7-4"><span>ปิดแล้วเปิด Claude Code ใหม่ 1 ครั้งก่อนไปขั้นที่ 8</span></label></div><div class="note result">ผลของผู้สอน: สร้างสกิล <code>multigpu-speedup</code> · ไม่ต้องเช่าเครื่อง · สกิลที่ได้: <a href="skill_v0/SKILL.md" target="_blank" rel="noopener">skill_v0/SKILL.md</a> · ใช้ 3 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>เนื้อหาของ SKILL.md ของคุณจะไม่เหมือนของผู้สอนทุกบรรทัด สิ่งที่ต้องมีคือหัวข้อตามข้อ 2 ของพรอมต์</span></div></div></section>
+<section class="slide " data-title="ได้สกิล multigpu-speedup ที่สั่ง LAB 4 ครบ 6 ขั้นได้ในคำสั่งเดียว" data-group="ขั้นที่ 7 · สร้างสกิล v0" data-max="1.20"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 7 จาก 8</div><h2><span class="tt">ได้สกิล multigpu-speedup ที่สั่ง LAB 4 ครบ 6 ขั้นได้ในคำสั่งเดียว</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c07-step7-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 7" width="1660" height="490"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step7.png" target="_blank" rel="noopener">ดูภาพเต็ม</a></p><div class="arow" style="--n:3"><div class="stp"><span class="n">1</span><span>สกิลอยู่ที่ <a href="skill_v0/SKILL.md" target="_blank" rel="noopener">skill_v0/SKILL.md</a> มีค่าที่ปรับได้ คือ รุ่น GPU จำนวน GPU เพดานราคา Epoch และป้ายเครื่อง</span></div><div class="stp"><span class="n">2</span><span>โค้ดใน <code>scripts/</code> คัดลอกจาก <code>code</code> สกิลจึงใช้โค้ดที่ใช้ได้แล้ว ไม่เขียนใหม่</span></div><div class="stp"><span class="n">3</span><span><b>สำคัญ</b> หลังขั้นนี้ให้ปิดแล้วเปิด Claude Code ใหม่ 1 ครั้ง สกิลที่เพิ่งติดตั้งจึงจะถูกมองเห็น · ถ้า AI ตอบว่าไม่รู้จักสกิล ให้เปิดใหม่อีกครั้ง</span></div></div></div></div></section>
+<section class="slide divider photo" style="background-image:url(img/p29-auto.jpg)" data-title="ขั้นที่ 8 · ลองใช้สกิลทำซ้ำในคำสั่งเดียว" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ"><div class="shade"></div><div class="inner"><div class="small">ภาค LAB · ขั้นที่ 8 จาก 8</div><div class="big">ขั้นที่ 8</div><h1>ลองใช้สกิลทำซ้ำในคำสั่งเดียว</h1><div class="sub"><p>AI ตัวใหม่ทำทั้ง LAB เองด้วยสกิล: เช่า เตรียม Dataset เทรน 1 และ 2 GPU ทำรายงาน และลบเครื่อง</p><p>ใช้เวลา <b>25 นาที</b> · ผลจริง: 1 พรอมต์ · Speedup 1.79× · ค่าเช่า $0.15</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="AI ตัวใหม่ทำทั้ง LAB เองด้วยสกิล ตั้งแต่เช่าเครื่องจนลบเครื่อง" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ" data-max="1.25"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 8 จาก 8</div><h2><span class="tt">AI ตัวใหม่ทำทั้ง LAB เองด้วยสกิล ตั้งแต่เช่าเครื่องจนลบเครื่อง</span></h2></header><div class="body"><div class="ex px"><div class="fig"><img src="img/n33-step8.jpg" alt="AI ตัวใหม่ทำทั้ง LAB เองด้วยสกิล ตั้งแต่เช่าเครื่องจนลบเครื่อง" width="1672" height="941"></div><div class="side fitbox"><div class="stp"><span class="n">1</span><span>พรอมต์เดียวสั่งให้ใช้สกิล <code>multigpu-speedup</code> กับเครื่อง RTX 3090 2 ใบ ราคาไม่เกิน $0.60 ต่อชั่วโมง ป้าย <code>vapp-lab4-skill</code></span></div><div class="stp"><span class="n">2</span><span>เทรนรอบละ 3 Epoch แล้วลบเครื่องเมื่อเสร็จ</span></div><div class="stp"><span class="n">3</span><span>ผลเก็บที่ <code>results/skill_v0_run</code> และ <b>ห้ามเขียนทับผลเดิม</b> ใน <code>results</code></span></div></div></div></div></section>
+<section class="slide pslide" data-title="พรอมต์ · ขั้นที่ 8 · ลองใช้สกิลทำซ้ำในคำสั่งเดียว" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ" data-max="1.45"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 8 จาก 8</div><h2><span class="tt">พรอมต์ · ขั้นที่ 8 · ลองใช้สกิลทำซ้ำในคำสั่งเดียว</span><span class="tag">Copy &amp; Paste</span></h2></header><div class="body"><div class="pbar"><span class="how"></span><span class="plabel">พรอมต์ทั้งหมด 4 บรรทัด</span><button class="copy big" data-full="prompt7">คัดลอกพรอมต์ทั้งหมด</button></div><pre class="code prompt"><span class="t">ใช้สกิล multigpu-speedup เทียบความเร็ว 1 กับ 2 GPU บนเครื่อง RTX 3090 2 ใบ ราคาไม่เกิน $0.60 ต่อชั่วโมง ป้าย vapp-lab4-skill เทรนรอบละ 3 Epoch เสร็จแล้วลบเครื่อง
+เก็บผลไว้ที่ lab4_multigpu/results/skill_v0_run ห้ามเขียนทับผลเดิมใน lab4_multigpu/results
+สรุปเป็นภาษาไทย: วินาทีต่อ Epoch · speedup · เงินต่อ Epoch · เวลาแต่ละขั้น · ค่าใช้จ่ายจริง
+ไม่ต้อง commit</span></pre></div></section>
+<section class="slide cslide" data-title="ตรวจผลของคุณ · ขั้นที่ 8 · ลองใช้สกิลทำซ้ำในคำสั่งเดียว" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ" data-max="1.40"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 8 จาก 8</div><h2><span class="tt">ตรวจผลของคุณ · ขั้นที่ 8 · ลองใช้สกิลทำซ้ำในคำสั่งเดียว</span><span class="tag">Checklist</span></h2></header><div class="body"><div class="checks"><label class="chk"><input type="checkbox" data-k="step8-0"><span>AI ทำครบในพรอมต์เดียว: เช่า · เตรียม Dataset · เทรน 1 และ 2 GPU · ทำรายงาน · ลบเครื่อง</span></label><label class="chk"><input type="checkbox" data-k="step8-1"><span>มีผลใน <code>lab4_multigpu/results/skill_v0_run</code> และผลเดิมใน <code>results</code> ไม่ถูกเขียนทับ</span></label><label class="chk"><input type="checkbox" data-k="step8-2"><span>เครื่องป้าย <code>vapp-lab4-skill</code> ถูกลบแล้ว (ดูหน้า Instances ซ้ำ)</span></label><label class="chk"><input type="checkbox" data-k="step8-3"><span>สรุปมีวินาทีต่อ Epoch · speedup · เงินต่อ Epoch · เวลาแต่ละขั้น · ค่าใช้จ่ายจริง</span></label></div><div class="note result">ผลของผู้สอน: Missouri, US · $0.369/ชม. · 110.3 → 61.4 วินาทีต่อ Epoch · Speedup / Efficiency 1.79× / 89.8% · เครื่องเปิด 23.2 นาที · ใบแจ้งหนี้ $0.151 · ใช้ 25 นาที</div><div class="note eye"><span class="lbl">หมายเหตุ</span><span>รอบนี้เช่าเครื่องใหม่ ตัวเลขจึงต่างจากรอบทีละขั้นได้ · ถ้าทางเชื่อมเป็นแบบเดียวกัน Speedup ควรใกล้กัน</span></div></div></section>
+<section class="slide " data-title="สกิล v0 ผ่านในรอบแรก: 110.3 → 61.4 วินาทีต่อ Epoch เร็วขึ้น 1.79×" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ" data-max="1.20"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 8 จาก 8</div><h2><span class="tt">สกิล v0 ผ่านในรอบแรก: 110.3 → 61.4 วินาทีต่อ Epoch เร็วขึ้น 1.79×</span><span class="tag">คำตอบจริง</span></h2></header><div class="body"><div class="ansv"><div class="fig"><img src="img/c08-step8-answer.jpg" alt="ส่วนหนึ่งของคำตอบจริงของขั้นที่ 8" width="1640" height="685"></div><p class="cap">ส่วนหนึ่งของคำตอบจริง · <a href="image/lab4-step8.png" target="_blank" rel="noopener">ดูภาพเต็ม</a> · Efficiency 89.8%</p><div class="arow" style="--n:2"><div class="stp"><span class="n">1</span><span>ไม่ต้องเขียนโค้ดใหม่ และไม่มีช่วงรอคนวางพรอมต์ถัดไป เครื่องจึงเปิดสั้นกว่ามาก</span></div><div class="stp"><span class="n">2</span><span>เครื่องคนละเครื่อง แต่ทางเชื่อมแบบเดียวกัน (<code>PHB</code>) ได้ผลใกล้กัน คือ <b>1.74 กับ 1.79 เท่า</b> และ All-reduce 21–23 ms ข้อสรุปจึงทำซ้ำได้</span></div></div></div></div></section>
+<section class="slide mid" data-title="สกิลได้ Speedup ใกล้เดิม แต่ใช้พรอมต์เดียว และเครื่องเปิดสั้นลงจาก 76.5 นาที เหลือ 23.2 นาที" data-group="ขั้นที่ 8 · ใช้สกิลทำซ้ำ" data-max="1.40"><header class="hd"><div class="kicker">ปิดท้าย · ขั้นที่ 8 จาก 8</div><h2><span class="tt">สกิลได้ Speedup ใกล้เดิม แต่ใช้พรอมต์เดียว และเครื่องเปิดสั้นลงจาก 76.5 นาที เหลือ 23.2 นาที</span><span class="tag">README · ขั้นที่ 8</span></h2></header><div class="body"><div class="pairs"><div class="lg"><span><i style="background:#4f79b3"></i>สั่งทีละขั้น (ขั้นที่ 1–6)</span><span><i style="background:#e87f1c"></i>สกิล v0</span></div><div class="prow"><div class="pl">จำนวนพรอมต์</div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">6</span></div><div class="pbr pb2"><div class="f" style="width:13.0%"></div><span class="v">1</span></div></div></div><div class="prow"><div class="pl">Speedup</div><div class="pb"><div class="pbr pa"><div class="f" style="width:75.8%"></div><span class="v">1.74×</span></div><div class="pbr pb2"><div class="f" style="width:78.0%"></div><span class="v">1.79×</span></div></div></div><div class="prow"><div class="pl">เครื่องเปิด</div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">76.5 นาที</span></div><div class="pbr pb2"><div class="f" style="width:23.7%"></div><span class="v">23.2 นาที</span></div></div></div><div class="prow"><div class="pl">ค่าเช่า</div><div class="pb"><div class="pbr pa"><div class="f" style="width:78.0%"></div><span class="v">$0.51</span></div><div class="pbr pb2"><div class="f" style="width:22.9%"></div><span class="v">$0.15</span></div></div></div></div><div class="note eye"><span class="lbl">เรื่องเงิน</span><span>รอบนี้ 2 GPU <b>ถูกกว่า</b> ต่อ Epoch เล็กน้อย เพราะราคาตลาดของเครื่อง 1 ใบขึ้นเป็น $0.206/ชม. และ คำตอบเรื่องเงินพลิกได้ตามราคาของวันนั้น</span></div><div class="note eye"><span class="lbl">ข้อควรระวัง</span><span>เทรน 3 Epoch เหลือ Epoch กลางให้เฉลี่ยเพียง 1 ค่า ตัวเลข Speedup จึงแกว่งได้มากกว่ารอบ 5 Epoch</span></div><p class="cap">ผลของรอบสกิลอยู่ที่ <a href="results/skill_v0_run/metrics.json" target="_blank">results/skill_v0_run/</a> · เทรน 3 Epoch ต่อรอบ</p></div></section>
+<section class="slide divider photo" style="background-image:url(img/p30-summary.jpg)" data-title="สรุป · เพิ่ม GPU จาก 1 เป็น 2 ใบ เร็วขึ้น 1.74 เท่า แต่ไม่ได้ถูกลงเสมอ" data-group="สรุป"><div class="shade"></div><div class="inner"><div class="small">ส่วนที่ 4 จาก 4</div><div class="big">สรุป</div><h1>เพิ่ม GPU จาก 1 เป็น 2 ใบ เร็วขึ้น 1.74 เท่า แต่ไม่ได้ถูกลงเสมอ</h1><div class="sub"><p>ผลรวม ตารางสรุป บทเรียน และสิ่งที่ยังไม่ผ่าน</p></div><div class="imgnote">ภาพจำลอง</div></div></section>
+<section class="slide " data-title="ผลรวม: 128.3 → 73.9 วินาทีต่อ Epoch ใกล้ Ideal 64.2 แต่ไม่ถึง" data-group="สรุป" data-max="1.10"><header class="hd"><div class="kicker">สรุป</div><h2><span class="tt">ผลรวม: 128.3 → 73.9 วินาทีต่อ Epoch ใกล้ Ideal 64.2 แต่ไม่ถึง</span><span class="tag">results/metrics.json</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="results/images/1_epoch_time.png" alt="ผลรวม: 128.3 → 73.9 วินาทีต่อ Epoch ใกล้ Ideal 64.2 แต่ไม่ถึง" width="975" height="675"></div><p class="cap">ดูแท่งสีส้มที่สูงกว่าจุด ideal · Speedup <b>1.74×</b> · Efficiency <b>86.9%</b> · mAP50 0.962 กับ 0.963</p></div></section>
+<section class="slide " data-title="สั่งทีละขั้นกับสกิล v0 ได้ข้อสรุปเดียวกัน: Speedup 1.74× กับ 1.79×" data-group="สรุป" data-max="1.40"><header class="hd"><div class="kicker">สรุป</div><h2><span class="tt">สั่งทีละขั้นกับสกิล v0 ได้ข้อสรุปเดียวกัน: Speedup 1.74× กับ 1.79×</span><span class="tag">ตารางหลัก</span></h2></header><div class="body"><table class="c3"><thead><tr><th></th><th>สั่งทีละขั้น (ขั้นที่ 1–6)</th><th>สกิล v0</th></tr></thead><tbody><tr><td>จำนวนพรอมต์</td><td>6</td><td><b>1</b></td></tr><tr><td>Epoch ต่อรอบ</td><td>5</td><td>3</td></tr><tr><td>เครื่อง (RTX 3090 2 ใบ)</td><td>Estonia · $0.414/ชม.</td><td>Missouri, US · $0.369/ชม.</td></tr><tr><td>วินาทีต่อ Epoch (1 → 2 GPU)</td><td>128.3 → 73.9</td><td>110.3 → 61.4</td></tr><tr><td>Speedup / Efficiency</td><td>1.74× / 87%</td><td>1.79× / 89.8%</td></tr><tr><td>วินาทีต่อ step (1 → 2 GPU)</td><td>0.278 → 0.320</td><td>0.239 → 0.266</td></tr><tr><td>All-reduce 80 MB</td><td>21.4 ms</td><td>22.5 ms</td></tr><tr><td>เงินต่อ Epoch ราคาตลาด (1 กับ 2 GPU)</td><td>$0.0068 กับ $0.0072</td><td>$0.0063 กับ $0.0060</td></tr><tr><td>เครื่องเปิด</td><td>76.5 นาที</td><td>23.2 นาที</td></tr><tr><td>ค่าเช่า</td><td>$0.51</td><td>$0.15</td></tr></tbody></table></div></section>
+<section class="slide " data-title="บทเรียนของ LAB 4: วัดจริง ดูทางเชื่อม คิดเงินต่อ Epoch และลบเครื่องเสมอ" data-group="สรุป" data-max="1.10"><header class="hd"><div class="kicker">สรุป</div><h2><span class="tt">บทเรียนของ LAB 4: วัดจริง ดูทางเชื่อม คิดเงินต่อ Epoch และลบเครื่องเสมอ</span></h2></header><div class="body"><div class="fig" style="--figmin:482px"><img src="img/n34-lessons.jpg" alt="บทเรียนของ LAB 4: วัดจริง ดูทางเชื่อม คิดเงินต่อ Epoch และลบเครื่องเสมอ" width="1672" height="941"></div><p class="cap">สกิลดีขึ้นทีละเวอร์ชันจากหลักฐานของการรันจริง</p></div></section>
+<section class="slide " data-title="v0 ยังไม่สมบูรณ์: มี 5 จุดที่ AI ต้องแก้หรือเดาเอง และควรแก้ใน v1" data-group="สรุป" data-max="1.40"><header class="hd"><div class="kicker">สรุป</div><h2><span class="tt">v0 ยังไม่สมบูรณ์: มี 5 จุดที่ AI ต้องแก้หรือเดาเอง และควรแก้ใน v1</span><span class="tag">README · ขั้นที่ 8</span></h2></header><div class="body"><div class="cards" style="--cols:3"><div class="cardx warn"><h4><span class="n">1</span>ใส่ขั้นติดตั้ง <code>opencv-python-headless</code> ไว้ในสกิล</h4><p>ติดตั้ง <code>ultralytics</code> กับ <code>roboflow</code> แล้วได้ OpenCV แบบมีหน้าต่าง (GUI) ซึ่ง import ไม่ได้บนเครื่องเช่า AI ต้องเปลี่ยนเป็น <code>opencv-python-headless</code> เอง</p></div><div class="cardx warn"><h4><span class="n">2</span>กำหนด reliability ขั้นต่ำ ทั้งตอนเช่าและตอนค้นราคาตลาด</h4><p>สกิลไม่กำหนด reliability ขั้นต่ำ AI ตัดสินใจเองว่าข้ามเครื่องที่ถูกที่สุด (reliability 0.60) · ราคาตลาดที่ใช้คิดเงินก็ไม่ได้กรอง reliability</p></div><div class="cardx warn"><h4><span class="n">3</span>ระบุเกณฑ์ตามจำนวน Epoch</h4><p>เกณฑ์ "mAP50 ≥ 0.90" เขียนไว้สำหรับ 5 Epoch ไม่บอกว่าใช้กับ Epoch น้อยกว่าได้ไหม</p></div><div class="cardx warn"><h4><span class="n">4</span>ตั้งขั้นต่ำ 4–5 Epoch หรือวัดเป็นจำนวน step</h4><p>3 Epoch เหลือค่าให้เฉลี่ยค่าเดียว Speedup แกว่งได้</p></div><div class="cardx warn"><h4><span class="n">5</span>ให้บันทึกชื่อ image และยอดบิลลง <code>results</code> ทุกครั้ง</h4><p>ชื่อ image เต็มและงบประมาณในสกิลเป็นค่าที่ AI ใส่เอง เพราะผลรอบแรกไม่ได้บันทึกไว้</p></div></div><div class="note eye"><span class="lbl">ถัดไป</span><span>วิธีปรับคือสั่ง AI ด้วยพรอมต์อีก 1 อันให้แก้สกิลตามตารางนี้ แล้วลองใช้ซ้ำ · สกิลจึงดีขึ้นทีละเวอร์ชันจากหลักฐานของการรันจริง</span></div></div></section>
+<section class="slide divider" data-title="จบ LAB 4 · ถัดไป: ปรับสกิลเป็น v1 ตามจุดที่พลาด" data-group="สรุป"><div class="shade"></div><div class="inner"><div class="small"></div><div class="big">จบ LAB 4</div><h1>ถัดไป: ปรับสกิลเป็น v1 ตามจุดที่พลาด</h1><div class="sub"><p>รายละเอียดเต็มของ LAB นี้: <a href="README.md" target="_blank">README.md</a> · พรอมต์ทุกขั้น: <a href="PROMPTS.md" target="_blank">PROMPTS.md</a> · <a href="../README.md" target="_blank">กลับหน้ารวมของบท</a></p></div></div></section>
+</div></div>
+<pre class="full" id="prompt0">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+
+เช่าเครื่องที่มี GPU 2 ใบในเครื่องเดียว สำหรับเทียบความเร็ว 1 กับ 2 GPU
+1. เช่าเครื่อง RTX 3090 2 ใบ ราคารวมไม่เกิน $0.60 ต่อชั่วโมง ตั้งป้ายเครื่องว่า vapp-lab4
+2. เลือกเครื่อง verified ที่ต่อ SSH ได้ตรง เน็ตเร็ว มี CPU 16 cores ขึ้นไป ไม่อยู่ในจีน แล้วเอาเครื่องที่ถูกที่สุด
+3. ใช้ image PyTorch 2.8 ที่มี CUDA 12.8 disk 60 GB
+4. รอจนเครื่องพร้อมและเข้าไปเห็น GPU ครบ 2 ใบ ถ้าเกิน 10 นาทียังไม่พร้อม ให้ลบแล้วเช่าเครื่องอื่น
+กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+
+สรุปเป็นตารางภาษาไทย: GPU · ราคาต่อชั่วโมง · ที่ตั้ง · CPU cores · GPU ต่อถึงกันแบบไหน (NVLink หรือ PCIe และข้าม CPU socket ไหม) แล้วบอกว่าเครื่องยังเปิดอยู่</pre>
+<pre class="full" id="prompt1">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เตรียม Dataset ภาพคนงานสวม/ไม่สวมหมวกนิรภัยบนเครื่องที่เช่า
+1. ติดตั้ง ultralytics และ roboflow ให้ใช้งานได้
+2. ดาวน์โหลด Dataset hard-hat-workers รุ่น 13 ของ joseph-nelson จาก Roboflow ในรูปแบบ YOLO
+3. ใช้ ROBOFLOW_API_KEY จากไฟล์ .env ของโฟลเดอร์ปัจจุบัน ห้ามแสดงค่า key และห้ามทิ้ง key ไว้บนเครื่องที่เช่า
+4. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/show_samples.py ทำภาพตัวอย่าง 8 รูปจาก Training Set เรียงเป็นตาราง วาดกรอบและชื่อคลาสจาก label จริงทับบนรูป
+   แล้วเก็บภาพกลับมาที่ lab4_multigpu/results/dataset_samples.jpg
+
+สรุปเป็นตารางภาษาไทย: จำนวนภาพของ Training Set · Validation Set · Test Set · จำนวนกรอบของแต่ละคลาสในแต่ละชุด · ขนาด Dataset
+ยก label ของจริง 1 บรรทัดมาให้ดู พร้อมอธิบายว่าแต่ละช่องคืออะไร แล้วบอกว่าเครื่องยังเปิดอยู่</pre>
+<pre class="full" id="prompt2">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เขียนสคริปต์วัดความเร็วการเทรน แล้ววัดรอบแรกด้วย GPU 1 ใบเป็นเส้นฐานไว้เทียบ
+1. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/bench.py รับจำนวน GPU (1 หรือ 2) แล้วเทรน yolo11m ที่เทรนบน COCO มาแล้ว ด้วย Dataset ที่เตรียมไว้
+   ค่าเดียวกันทุกรอบ: 5 Epoch · ภาพ 640 · batch 32 ภาพต่อ GPU (2 ใบ = batch รวม 64) · seed 0 · ไม่วัด Validation ระหว่างเทรน วัดครั้งเดียวตอนจบ
+2. สคริปต์บันทึกผลรอบละ 1 ไฟล์ JSON: วินาทีต่อ Epoch (เฉลี่ยโดยไม่นับ Epoch แรกและ Epoch สุดท้าย) · วินาทีต่อ step · mAP50 ตอนจบ
+   · GPU util เฉลี่ยของแต่ละใบ · CPU ที่งานใช้จริงกี่ core (คิดจากเวลา CPU ที่ใช้ ไม่ใช่จำนวน core ที่เครื่องมี)
+3. ถ้าใช้ 2 GPU ให้วัดเพิ่มว่าการรวม gradient ขนาด 80 MB ระหว่าง GPU (all-reduce) ใช้เวลากี่มิลลิวินาที · ก่อนเริ่มให้ตรวจว่า GPU ว่าง
+4. ลองรันสั้นๆ ก่อน (ภาพ 5% 2 Epoch) ทั้ง 1 และ 2 GPU ให้แน่ใจว่าใช้ได้ แล้วรันจริงด้วย GPU 1 ใบ
+5. ให้เทรนต่อได้แม้การเชื่อมต่อหลุด รายงานทุก 2–3 นาทีว่าถึง Epoch ไหน และรอจนเสร็จ
+
+สรุปเป็นตารางภาษาไทย: วินาทีต่อ Epoch · วินาทีต่อ step · GPU util · CPU ที่ใช้กี่ core · mAP50 แล้วบอกว่าเครื่องยังเปิดอยู่</pre>
+<pre class="full" id="prompt3">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+เทรนงานเดิมซ้ำบนเครื่องเดิม แต่แบ่งให้ GPU หลายใบช่วยกัน
+1. รันสคริปต์ที่เขียนไว้ในขั้นที่ 3 (lab4_multigpu/code/bench.py) ค่าเดิมทุกอย่าง เปลี่ยนแค่จำนวน GPU เป็น 2 ใบ
+2. ให้เทรนต่อได้แม้การเชื่อมต่อหลุด รายงานทุก 2–3 นาที และรอจนเสร็จ
+3. ถ้าต้องแก้สคริปต์ ให้รันรอบ 1 GPU ใหม่ด้วย เพื่อให้ทั้ง 2 รอบเทียบกันได้
+
+สรุปเป็นตารางภาษาไทยเทียบ 1 กับ 2 GPU: วินาทีต่อ Epoch · เร็วขึ้นกี่เท่า · วินาทีต่อ step · GPU util · CPU ที่ใช้กี่ core · เวลา all-reduce · mAP50 แล้วบอกว่าเครื่องยังเปิดอยู่</pre>
+<pre class="full" id="prompt4">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+เครื่องที่ใช้คือเครื่องป้าย vapp-lab4 · กุญแจ SSH อยู่ที่ /workspace/vastai_lab/Devtool_SSH/devtoolSSH
+โค้ดและผลที่เก็บกลับ ให้อยู่ในโฟลเดอร์ lab4_multigpu ของโฟลเดอร์ที่เปิด Claude Code อยู่ (ไม่ใช่ใน container)
+
+สรุปผลทั้ง 2 รอบเป็นตารางและกราฟ แล้วคิดเงินต่อ 1 Epoch
+1. ค้นราคาตลาดตอนนี้ของเครื่อง RTX 3090 แบบ 1 ใบ และ 2 ใบ ที่ถูกที่สุด (verified ต่อ SSH ได้ตรง ไม่อยู่ในจีน disk 60 GB)
+2. นำผลของทั้ง 2 รอบ (ไฟล์ JSON และข้อมูลดิบ) กลับมาไว้ที่ lab4_multigpu/results/raw
+3. เขียนสคริปต์ไว้ที่ lab4_multigpu/code/report.py อ่านผลทั้ง 2 รอบกับราคา แล้วคำนวณ ideal (เวลา 1 GPU ÷ จำนวน GPU) · speedup · efficiency
+   · เงินต่อ Epoch (ราคาตลาด และราคาเครื่องที่เช่าจริง) แล้วเขียนทุกตัวเลขลง lab4_multigpu/results/metrics.json
+4. ให้สคริปต์วาดกราฟ 4 รูปไว้ที่ lab4_multigpu/results/images (ข้อความในกราฟเป็นภาษาอังกฤษ): เวลาต่อ Epoch เทียบเส้น ideal · speedup เทียบเส้น ideal
+   · เงินต่อ Epoch · คอขวด (เวลาต่อ step แยกส่วนคำนวณกับส่วนที่เพิ่มขึ้น และ GPU util เทียบ CPU ที่ใช้)
+
+สรุปเป็นตารางภาษาไทย 1 กับ 2 GPU: วินาทีต่อ Epoch · ideal · speedup · efficiency · ราคาต่อชั่วโมง · เงินต่อ Epoch แล้วตอบ 3 ข้อ:
+เร็วขึ้นกี่เท่า · แบบไหนคุ้มเงินที่สุดต่อ 1 Epoch · ทำไมไม่เร็วขึ้นตามจำนวน GPU (อ้างตัวเลขที่วัดได้) แล้วบอกว่าเครื่องยังเปิดอยู่</pre>
+<pre class="full" id="prompt5">ทำงานใน container `multi-account` โฟลเดอร์ /workspace/vastapp_lab ด้วยสกิล vastai
+
+ปิดทุกอย่างของ LAB 4
+1. ลบเครื่องป้าย vapp-lab4 แล้วตรวจว่าไม่มีเครื่องป้ายนี้ค้างในบัญชี (ห้ามแตะเครื่องป้ายอื่น)
+
+สรุปเป็นภาษาไทย ค่าใช้จ่ายจริงของเครื่อง vapp-lab4: อายุเครื่อง · ราคาต่อชั่วโมง · ยอดที่ถูกคิด (GPU · disk · รับส่งข้อมูล)</pre>
+<pre class="full" id="prompt6">สร้างสกิลเวอร์ชัน 0 จากงานของ LAB 4 ที่เพิ่งทำเสร็จ เพื่อให้ครั้งหน้าสั่งทดสอบความเร็วหลาย GPU ได้ในคำสั่งเดียว
+1. ดูงานทั้งหมดจากพรอมต์ทุกขั้นใน lab4_multigpu/PROMPTS.md โค้ดใน lab4_multigpu/code และผลใน lab4_multigpu/results
+2. เขียนเป็นสกิลชื่อ multigpu-speedup เก็บที่ lab4_multigpu/skill_v0/SKILL.md ให้มี name กับ description (บอกว่าใช้เมื่อไร)
+   · ค่าที่ปรับได้พร้อมค่าเริ่มต้น (รุ่น GPU · จำนวน GPU ไม่เกิน 2 ใบ · เพดานราคา · Epoch · ป้ายเครื่อง) · ขั้นตอน · เกณฑ์ตรวจผ่าน · กติกาเรื่องเงิน (ลบเครื่องเสมอ)
+3. คัดลอกโค้ดที่ใช้ได้แล้วจาก lab4_multigpu/code ไปไว้ใน lab4_multigpu/skill_v0/scripts ให้สกิลใช้โค้ดชุดนี้ ไม่ต้องเขียนใหม่
+4. ให้สกิลนี้เรียกใช้สกิล vastai ต่อ ไม่เขียนวิธีใช้ Vast.ai ซ้ำ แล้วติดตั้งเป็นสกิลของโปรเจกต์ที่ .claude/skills/multigpu-speedup ของโฟลเดอร์ปัจจุบัน
+
+สรุปเป็นภาษาไทย: สกิลทำอะไรได้ · ค่าที่ปรับได้ · ไฟล์ที่สร้าง
+ไม่ต้อง commit</pre>
+<pre class="full" id="prompt7">ใช้สกิล multigpu-speedup เทียบความเร็ว 1 กับ 2 GPU บนเครื่อง RTX 3090 2 ใบ ราคาไม่เกิน $0.60 ต่อชั่วโมง ป้าย vapp-lab4-skill เทรนรอบละ 3 Epoch เสร็จแล้วลบเครื่อง
+เก็บผลไว้ที่ lab4_multigpu/results/skill_v0_run ห้ามเขียนทับผลเดิมใน lab4_multigpu/results
+สรุปเป็นภาษาไทย: วินาทีต่อ Epoch · speedup · เงินต่อ Epoch · เวลาแต่ละขั้น · ค่าใช้จ่ายจริง
+ไม่ต้อง commit</pre>
+<div id="bar"></div>
+<div id="hud"><button id="bo" title="สารบัญ (O)">☰</button><button id="bp" title="ก่อนหน้า (←)">‹</button><span id="count"></span><button id="bn" title="ถัดไป (→)">›</button><button id="bf" title="เต็มจอ (F)">⛶</button></div>
+<div id="ov"></div>
+<div id="lb"><img alt=""></div>
+<script>
+(function(){
+  const deck=document.getElementById('deck');
+  const slides=[...deck.querySelectorAll('.slide')];
+  const N=slides.length; let cur=0;
+  slides.forEach((s,k)=>{ if(!s.classList.contains('cover')){ const n=document.createElement('div'); n.className='no'; n.textContent=(k+1)+' / '+N; s.appendChild(n);} });
+  function fit(){ deck.style.transform='scale('+Math.min(innerWidth/1600,innerHeight/900)+')'; }
+  /* ปรับขนาดตัวอักษรของแต่ละสไลด์ให้พอดีหน้า: เริ่มที่ค่าสูงสุด แล้วลดจนไม่ล้น */
+  function fitSlide(s){
+    const body=s.querySelector('.body'); if(!body) return;
+    const on=s.classList.contains('active'); if(!on) s.classList.add('measure');
+    body.classList.remove('scroll');
+    let fs=parseFloat(s.dataset.max||'1.4');
+    const boxes=[body,...body.querySelectorAll('.fitbox')];
+    const over=()=>boxes.some(b=>b.scrollHeight>b.clientHeight+3||b.scrollWidth>b.clientWidth+1);
+    s.style.setProperty('--fs',fs);
+    while(over()&&fs>0.62){ fs=Math.round((fs-0.03)*100)/100; s.style.setProperty('--fs',fs); }
+    s.dataset.fs=fs; s.dataset.over=over()?'1':'0';
+    if(over()) body.classList.add('scroll');
+    if(!on) s.classList.remove('measure');
+  }
+  function fitAll(){ slides.forEach(fitSlide); document.documentElement.dataset.fitted='1'; }
+  function go(i,push){
+    cur=Math.max(0,Math.min(N-1,i));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===cur));
+    document.getElementById('count').textContent=(cur+1)+' / '+N;
+    document.getElementById('bar').style.width=((cur+1)/N*100)+'%';
+    if(push!==false){ try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){} }
+    document.querySelectorAll('#ov .th').forEach((t,k)=>t.classList.toggle('cur',k===cur));
+  }
+  const next=()=>go(cur+1), prev=()=>go(cur-1);
+  function fs(){ if(!document.fullscreenElement){ const r=document.documentElement; r.requestFullscreen&&r.requestFullscreen(); } else document.exitFullscreen&&document.exitFullscreen(); }
+  const ovEl=document.getElementById('ov'); let grid=null,last=null;
+  slides.forEach((s,k)=>{
+    if(s.dataset.group!==last){ last=s.dataset.group; const h=document.createElement('h4'); h.textContent=last; ovEl.appendChild(h); grid=document.createElement('div'); grid.className='grid'; ovEl.appendChild(grid); }
+    const d=document.createElement('div'); d.className='th';
+    const n=document.createElement('span'); n.textContent=k+1; d.appendChild(n); d.appendChild(document.createTextNode(s.dataset.title||''));
+    d.onclick=()=>{ go(k); ov(false); }; grid.appendChild(d);
+  });
+  function ov(on){ const v=on===undefined?!document.body.classList.contains('ov'):on; document.body.classList.toggle('ov',v);
+    if(v){ const c=ovEl.querySelector('.th.cur'); c&&c.scrollIntoView({block:'center'}); } }
+  const lb=document.getElementById('lb'), lbi=lb.querySelector('img');
+  deck.addEventListener('click',e=>{ const im=e.target.closest('.fig img'); if(im){ lbi.src=im.src; lbi.alt=im.alt; lb.classList.add('on'); lb.scrollTop=0; } });
+  lb.addEventListener('click',()=>lb.classList.remove('on'));
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey) return;
+    const k=e.key;
+    if(lb.classList.contains('on')){ if(k==='Escape'||k==='Enter'||k===' '){ e.preventDefault(); lb.classList.remove('on'); } return; }
+    if(['ArrowRight','PageDown',' ','Enter'].includes(k)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','PageUp','Backspace'].includes(k)){ e.preventDefault(); prev(); }
+    else if(k==='Home') go(0); else if(k==='End') go(N-1);
+    else if(k==='f'||k==='F') fs(); else if(k==='o'||k==='O') ov();
+    else if(k==='Escape'&&document.body.classList.contains('ov')) ov(false);
+  });
+  document.getElementById('bn').onclick=next; document.getElementById('bp').onclick=prev;
+  document.getElementById('bf').onclick=fs; document.getElementById('bo').onclick=()=>ov();
+  let tx=null;
+  document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; tx=null; if(Math.abs(dx)>60)(dx<0?next:prev)(); });
+  function copyText(text,btn,label){
+    const done=()=>{ btn.textContent='คัดลอกแล้ว ✓'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent=label; btn.classList.remove('done'); },1600); };
+    const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.remove(); done(); };
+    if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(text).then(done,fallback); else fallback();
+  }
+  window.promptText=id=>document.getElementById(id).textContent;
+  document.querySelectorAll('.copy').forEach(b=>{
+    const label=b.textContent;
+    b.addEventListener('click',ev=>{ ev.stopPropagation();
+      const text=b.dataset.full?window.promptText(b.dataset.full):b.parentElement.querySelector('.t').textContent;
+      copyText(text,b,label); });
+  });
+  document.querySelectorAll('.chk input').forEach(c=>{
+    const key='slides:'+location.pathname+':'+c.dataset.k;
+    try{ c.checked=localStorage.getItem(key)==='1'; }catch(e){}
+    c.addEventListener('change',()=>{ try{ localStorage.setItem(key,c.checked?'1':'0'); }catch(e){} });
+  });
+  addEventListener('resize',fit);
+  addEventListener('hashchange',()=>{ const n=parseInt(location.hash.slice(1)); if(n) go(n-1,false); });
+  fit(); const start=parseInt(location.hash.slice(1)); go(start?start-1:0,false);
+  fitAll();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitAll);
+  addEventListener('load',fitAll);
+})();
+</script>
+</body>
+</html>

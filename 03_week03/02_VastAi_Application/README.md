@@ -21,6 +21,8 @@
 | [LAB 8](lab8_job_queue/README.md) | [lab8_job_queue](lab8_job_queue/README.md) | อ่านใบเสร็จด้วย VLM เป็นงานคิว: RabbitMQ + GPU Worker 1 → 2 ใบ | งานหนักเข้าพร้อมกันเกินความจุ ระบบคิวช่วยอะไร และเพิ่ม Worker แล้วรับได้เพิ่มเท่าไร | $0.78 |
 | [LAB 9](lab9_hybrid/README.md) | [lab9_hybrid](lab9_hybrid/README.md) | บริการสร้างภาพ: API gateway + RabbitMQ + GPU Worker 1 → 2 ใบ | GPU 1 ใบรับผู้ใช้พร้อมกันได้กี่คน และออกแบบระบบอย่างไรให้รับได้มากขึ้น | $0.57 |
 
+สไลด์ประกอบการสอน (เปิดในเบราว์เซอร์): [LAB 1](lab1_yolo/LAB1_YOLO_Slides.html) · [LAB 2](lab2_vlm/LAB2_VLM_Slides.html) · [LAB 3](lab3_qlora/LAB3_QLoRA_Slides.html) · [LAB 4](lab4_multigpu/LAB4_MultiGPU_Slides.html) · [LAB 5](lab5_cluster_vlm/LAB5_Cluster_VLM_Slides.html) · [LAB 6](lab6_image_api/LAB6_Image_API_Slides.html) · [LAB 7](lab7_llm_chat/LAB7_LLM_Chat_Slides.html) · [LAB 8](lab8_job_queue/LAB8_Job_Queue_Slides.html) · [LAB 9](lab9_hybrid/LAB9_Hybrid_Slides.html)
+
 **ต้องมีก่อน**
 - ทำ [บท 01](../01_VastAi_Skill/readme.md) ถึง LAB 2 แล้ว: container `multi-account` รันอยู่ · มีสกิล `vastai` · ตั้ง API key และกุญแจ SSH ของ Vast.ai แล้ว
 - Docker Desktop บนเครื่องนี้ (เว็บของทุก LAB รันด้วย `docker compose` บนเครื่องเรา)
