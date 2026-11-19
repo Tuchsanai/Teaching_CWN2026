@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "backend": "hf",
+    "model": "/workspace/e2e_receipt/models/Qwen3-VL-2B-Instruct + no adapter",
+    "prompt_sha256_16": "f643affef1ea76df",
+    "attempts": 1,
+    "blockers": [],
+    "finished_at": "2026-11-19 06:33:07"
+  },
+  "deployable": false,
+  "metrics": [
+    {
+      "id": "M1",
+      "name": "Total Accuracy",
+      "num": 45,
+      "den": 98,
+      "value": 45.92,
+      "rule": ">= 95.0%",
+      "passed": false
+    },
+    {
+      "id": "M2",
+      "name": "Silent Error Rate",
+      "num": 24,
+      "den": 98,
+      "value": 24.49,
+      "rule": "<= 1.0%",
+      "passed": false
+    },
+    {
+      "id": "M3",
+      "name": "Flag Recall",
+      "num": 29,
+      "den": 53,
+      "value": 54.72,
+      "rule": ">= 80.0% (no wrong totals = pass)",
+      "passed": false
+    },
+    {
+      "id": "M4",
+      "name": "Flag Rate",
+      "num": 55,
+      "den": 98,
+      "value": 56.12,
+      "rule": "<= 20.0%",
+      "passed": false
+    },
+    {
+      "id": "M5",
+      "name": "Abstention (unreadable set)",
+      "num": 0,
+      "den": 0,
+      "value": 0,
+      "rule": "== 0 receipts",
+      "passed": false
+    },
+    {
+      "id": "M6",
+      "name": "JSON Validity",
+      "num": 89,
+      "den": 98,
+      "value": 90.82,
+      "rule": ">= 99.0%",
+      "passed": false
+    },
+    {
+      "id": "M7",
+      "name": "Item F1 (report only)",
+      "num": 175,
+      "den": 217,
+      "value": 76.09,
+      "rule": "not a gate",
+      "passed": null
+    }
+  ],
+  "counts": {
+    "n": 98,
+    "correct": 45,
+    "wrong": 53,
+    "silent": 24,
+    "caught": 29,
+    "needs_review": 55,
+    "flagged_only": 46,
+    "valid": 89,
+    "n_unreadable": 0,
+    "m5_violations": 0,
+    "item_tp": 175,
+    "item_pred": 243,
+    "item_gold": 217
+  },
+  "threshold_sweep": [
+    {
+      "threshold": "0.50",
+      "M2": 27.55,
+      "M3": 49.06,
+      "M4": 53.06,
+      "M5": 0
+    },
+    {
+      "threshold": "0.70",
+      "M2": 25.51,
+      "M3": 52.83,
+      "M4": 55.1,
+      "M5": 0
+    },
+    {
+      "threshold": "0.80",
+      "M2": 25.51,
+      "M3": 52.83,
+      "M4": 55.1,
+      "M5": 0
+    },
+    {
+      "threshold": "0.85",
+      "M2": 25.51,
+      "M3": 52.83,
+      "M4": 55.1,
+      "M5": 0
+    },
+    {
+      "threshold": "0.90",
+      "M2": 24.49,
+      "M3": 54.72,
+      "M4": 56.12,
+      "M5": 0
+    },
+    {
+      "threshold": "0.95",
+      "M2": 24.49,
+      "M3": 54.72,
+      "M4": 56.12,
+      "M5": 0
+    },
+    {
+      "threshold": "0.99",
+      "M2": 21.43,
+      "M3": 60.38,
+      "M4": 59.18,
+      "M5": 0
+    }
+  ]
+}

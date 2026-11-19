@@ -1,0 +1,35 @@
+{
+ "test": "dlq",
+ "submitted": 22,
+ "codes": [
+  202
+ ],
+ "broken": [
+  {
+   "file": "broken_garbage.png",
+   "status": "dead",
+   "attempts": 3,
+   "error": "bad_image",
+   "finished_s": -0.12
+  },
+  {
+   "file": "broken_truncated.jpg",
+   "status": "dead",
+   "attempts": 3,
+   "error": "bad_image",
+   "finished_s": 2.88
+  }
+ ],
+ "good_done": 20,
+ "good_n": 20,
+ "good_all_done_s": 8.88,
+ "dead_letter_count_before_after": [
+  0,
+  2
+ ],
+ "rabbit_receipts_dlq_before_after": [
+  0,
+  2
+ ],
+ "pass": true
+}

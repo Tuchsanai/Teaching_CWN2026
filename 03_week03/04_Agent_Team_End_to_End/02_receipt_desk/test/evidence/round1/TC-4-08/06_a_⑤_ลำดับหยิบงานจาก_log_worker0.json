@@ -1,0 +1,100 @@
+{
+  "expected": [
+    "U1",
+    "U2",
+    "U3",
+    "N1",
+    "N2"
+  ],
+  "observed": [
+    "U1",
+    "U3",
+    "U2",
+    "N2",
+    "N1"
+  ],
+  "events": [
+    {
+      "time": "2026-11-19 10:18:12,500",
+      "id": "165b9a0a-4d63-49bf-8e56-d466ecef7d5b",
+      "queue": "urgent",
+      "attempt": 1,
+      "label": "U1"
+    },
+    {
+      "time": "2026-11-19 10:18:13,332",
+      "id": "2296d514-fa33-4178-8473-08d86165c14b",
+      "queue": "urgent",
+      "attempt": 1,
+      "label": "U3"
+    },
+    {
+      "time": "2026-11-19 10:18:14,308",
+      "id": "f436315e-2f59-4bd0-b1ed-8354e9a18a38",
+      "queue": "urgent",
+      "attempt": 1,
+      "label": "U2"
+    },
+    {
+      "time": "2026-11-19 10:18:14,911",
+      "id": "7f3b88b0-eb41-42eb-9666-46f8818ee3ad",
+      "queue": "normal",
+      "attempt": 1,
+      "label": "N2"
+    },
+    {
+      "time": "2026-11-19 10:18:15,723",
+      "id": "c5fe379f-e0bc-47d3-b346-a077f97b4b0b",
+      "queue": "normal",
+      "attempt": 1,
+      "label": "N1"
+    }
+  ],
+  "perId": [
+    {
+      "label": "N1",
+      "id": "c5fe379f-e0bc-47d3-b346-a077f97b4b0b",
+      "go": 1,
+      "read": 1,
+      "queues": [
+        "normal"
+      ]
+    },
+    {
+      "label": "N2",
+      "id": "7f3b88b0-eb41-42eb-9666-46f8818ee3ad",
+      "go": 1,
+      "read": 1,
+      "queues": [
+        "normal"
+      ]
+    },
+    {
+      "label": "U1",
+      "id": "165b9a0a-4d63-49bf-8e56-d466ecef7d5b",
+      "go": 1,
+      "read": 1,
+      "queues": [
+        "urgent"
+      ]
+    },
+    {
+      "label": "U2",
+      "id": "f436315e-2f59-4bd0-b1ed-8354e9a18a38",
+      "go": 1,
+      "read": 1,
+      "queues": [
+        "urgent"
+      ]
+    },
+    {
+      "label": "U3",
+      "id": "2296d514-fa33-4178-8473-08d86165c14b",
+      "go": 1,
+      "read": 1,
+      "queues": [
+        "urgent"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+Loading weights:   0%|          | 0/625 [00:00<?, ?it/s]Loading weights: 100%|██████████| 625/625 [00:00<00:00, 15416.97it/s]
+/venv/main/lib/python3.12/site-packages/transformers/modeling_utils.py:3303: FutureWarning: `is_gradient_checkpointing` is deprecated and will be removed in v6. Use `is_activation_checkpointing` instead.
+  warnings.warn(
+/venv/main/lib/python3.12/site-packages/transformers/models/qwen2_vl/image_processing_qwen2_vl.py:129: FutureWarning: Passing `min_pixels` and `max_pixels` to a processor call is deprecated and will be removed in v5.23. Pass in `size={'longest_edge': xxx, 'shortest_edge': xxx} to override the target size.`
+  warnings.warn(
+2026-11-19 06:34:26,340 INFO predicted 25/115
+2026-11-19 06:36:54,217 INFO predicted 50/115
+2026-11-19 06:39:07,609 INFO predicted 75/115
+2026-11-19 06:41:06,275 INFO predicted 100/115
+2026-11-19 06:41:46,554 INFO predicted 115/115
+2026-11-19 06:41:46,655 INFO M1  Total Accuracy                  94.74  (90/95)  >= 95.0%     FAIL
+2026-11-19 06:41:46,655 INFO M2  Silent Error Rate                1.05  (1/95)  <= 1.0%      FAIL
+2026-11-19 06:41:46,655 INFO M3  Flag Recall                      80.0  (4/5)  >= 80.0% (no wrong totals = pass) PASS
+2026-11-19 06:41:46,655 INFO M4  Flag Rate                       52.63  (50/95)  <= 20.0%     FAIL
+2026-11-19 06:41:46,655 INFO M5  Abstention (unreadable set)        20  (20/20)  == 0 receipts FAIL
+2026-11-19 06:41:46,655 INFO M6  JSON Validity                   100.0  (95/95)  >= 99.0%     PASS
+2026-11-19 06:41:46,655 INFO M7  Item F1 (report only)           85.19  (210/235)  not a gate   —
+2026-11-19 06:41:46,655 INFO report: eval/ft_test/report.md
+EVAL_DONE ft test rc=1

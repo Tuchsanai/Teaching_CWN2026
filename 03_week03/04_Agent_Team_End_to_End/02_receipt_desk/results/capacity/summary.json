@@ -1,0 +1,174 @@
+{
+ "capacity": [
+  {
+   "run": "run1",
+   "t_1worker_s": 133.83,
+   "t_2workers_s": 62.67,
+   "rate_1worker_per_min": 44.8,
+   "rate_2workers_per_min": 95.7,
+   "max_latency_1w_s": 133.08,
+   "max_latency_2w_s": 40.24,
+   "accept_100_1w_s": 0.75,
+   "accept_100_2w_s": 22.46,
+   "speedup": 2.14
+  },
+  {
+   "run": "run2",
+   "t_1worker_s": 98.66,
+   "t_2workers_s": 49.36,
+   "rate_1worker_per_min": 60.8,
+   "rate_2workers_per_min": 121.5,
+   "max_latency_1w_s": 97.93,
+   "max_latency_2w_s": 48.64,
+   "accept_100_1w_s": 0.73,
+   "accept_100_2w_s": 0.73,
+   "speedup": 2.0
+  }
+ ],
+ "mean_t_1worker_s": 116.2,
+ "mean_t_2workers_s": 56.0,
+ "mean_speedup": 2.08,
+ "efficiency": 1.04,
+ "slo_normal_s": 1800,
+ "urgent": {
+  "urgent_all_done_s": 5.73,
+  "urgent_finish_s": [
+   0.73,
+   0.73,
+   0.73,
+   1.73,
+   2.73,
+   3.73,
+   3.73,
+   4.73,
+   5.73,
+   5.73
+  ],
+  "claim_window": "UUUUNUUUUNUU",
+  "max_urgent_in_a_row": 4,
+  "normals_in_window": 2,
+  "normal_done_before_urgent": {
+   "queued": 64,
+   "processing": 2,
+   "done": 34,
+   "dead": 0
+  },
+  "normal_all_done_s": 82.65,
+  "g5_response": {
+   "job_ref": "42c667e3-c721-4d2c-9fe4-b53122896d1b",
+   "priority": "urgent",
+   "moved": 10,
+   "already_processing": 0,
+   "already_finished": 0
+  }
+ },
+ "queuefull": {
+  "test": "queuefull",
+  "submitted": 500,
+  "accepted_202": 409,
+  "rejected_429": 91,
+  "other_codes": [],
+  "first_429_body": {
+   "error": "queue_full",
+   "queue": "normal",
+   "pending": 400,
+   "limit": 400,
+   "workers_alive": 2,
+   "retry_after_minutes": 1,
+   "retry_after_seconds": 60
+  },
+  "first_429_retry_after_header": "60",
+  "first_429_at_submission": 403,
+  "peak_pending": 400,
+  "queue_when_full": {
+   "normal": {
+    "pending": 400,
+    "limit": 400
+   },
+   "urgent": {
+    "pending": 1,
+    "limit": 50
+   },
+   "dead_letter": {
+    "count": 0
+   },
+   "workers_alive": 2,
+   "vllm_up": 2,
+   "rate_per_minute": 53.6
+  },
+  "urgent_while_full_code": 202,
+  "rejected_lookup_codes": [
+   404
+  ],
+  "accepted_rows_found": 410,
+  "accepted_final_status": {
+   "done": 410
+  },
+  "lost": 0,
+  "drain_s": 200.2,
+  "total_s": 203.8,
+  "pass": true
+ },
+ "crash": {
+  "test": "crash",
+  "n": 40,
+  "killed": "worker0",
+  "done_at_kill": 10,
+  "kill_at_s": 4.25,
+  "workers_alive_1_after_s": 14.7,
+  "counts": {
+   "queued": 0,
+   "processing": 0,
+   "done": 40,
+   "dead": 0
+  },
+  "finished_after_kill_by_worker": {
+   "worker1": 30
+  },
+  "held_by_killed": {
+   "attempts": 2,
+   "status": "done",
+   "worker": null
+  },
+  "lost": 0,
+  "duplicate_results": 0,
+  "all_done_s": 50.65,
+  "pass": true,
+  "restart_workers_alive_2_after_s": 0.5
+ },
+ "dlq": {
+  "test": "dlq",
+  "submitted": 22,
+  "codes": [
+   202
+  ],
+  "broken": [
+   {
+    "file": "broken_garbage.png",
+    "status": "dead",
+    "attempts": 3,
+    "error": "bad_image",
+    "finished_s": -0.12
+   },
+   {
+    "file": "broken_truncated.jpg",
+    "status": "dead",
+    "attempts": 3,
+    "error": "bad_image",
+    "finished_s": 2.88
+   }
+  ],
+  "good_done": 20,
+  "good_n": 20,
+  "good_all_done_s": 8.88,
+  "dead_letter_count_before_after": [
+   0,
+   2
+  ],
+  "rabbit_receipts_dlq_before_after": [
+   0,
+   2
+  ],
+  "pass": true
+ }
+}

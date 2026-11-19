@@ -1,0 +1,36 @@
+PASS H-01 · /api/health 200 {"status":"ok","db":"ok","ai":{"mode":"mock","reachable":true,"workersAlive":2},"version":"1.0.0"}
+PASS H-02 · /logo.png 200 image/png 368692 bytes
+PASS H-03 · หน้า /login แสดง /logo.png และใช้เป็น favicon
+PASS E-01 · CSV CL-01 2026-10: ยอดจากไฟล์ 150.00 · 1 แถว · X-Report-Total 150.00 · คาด 150.00/1
+PASS E-02 · CSV CL-01 2026-11: ยอดจากไฟล์ 1340.00 · 4 แถว · X-Report-Total 1340.00 · คาด 1340.00/4
+PASS E-03 · CSV CL-01 2026-12: ยอดจากไฟล์ 75.25 · 1 แถว · X-Report-Total 75.25 · คาด 75.25/1
+PASS E-04 · CSV CL-02 2026-11: ยอดจากไฟล์ 999.00 · 1 แถว · X-Report-Total 999.00 · คาด 999.00/1
+PASS E-06 · CSV CL-03 2026-11: ยอดจากไฟล์ 0.00 · 0 แถว · X-Report-Total 0.00 · คาด 0.00/0
+PASS E-05 · หมวด CL-01 2026-11 {"วัตถุดิบ":"1200.50","ค่าแก๊ส":"40.00","ค่าน้ำแข็ง":"99.50","อื่น ๆ":"0.00"} รวม 1340.00
+PASS E-06-csv · CL-03 ได้ไฟล์มีแต่หัวตาราง: "receipt_date,merchant,category,total,file_name,confirmed_by,confirmed_at,receipt_id" (text/csv; charset=utf-8)
+PASS F-01 · อัปโหลดชุด 5 ไฟล์ของ CL-03 → 201 accepted=5
+PASS F-02 · ตัวอ่านจำลองอ่านจบ: {"queued":0,"processing":0,"review":4,"confirmed":0,"unreadable":1} (คาด review 4 · unreadable 1 จาก fail3)
+PASS F-03 · ธง: ok-100=false conf-089=["ไม่แน่ใจยอดรวม: ความมั่นใจของยอดรวมต่ำกว่า 0.90"] diff-101=["ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม (เกิน 1.00 บาท)"] fail3=unreadable
+PASS F-04 · ยืนยันใบติดธงก่อนเปิด → 409 review_not_opened
+PASS F-05:ok-100 · เปิด(review) → PATCH - → confirm 200 → confirmed ยอด 100.00 โดย คุณพิมพ์
+PASS F-05:conf-089 · เปิด(review) → PATCH 200 → confirm 200 → confirmed ยอด 100.50 โดย คุณพิมพ์
+PASS F-05:diff-101 · เปิด(review) → PATCH 200 → confirm 200 → confirmed ยอด 100.00 โดย คุณพิมพ์
+PASS F-05:fail3 · เปิด(unreadable) → PATCH 200 → confirm 200 → confirmed ยอด 35.75 โดย คุณพิมพ์ · กรอกเอง=true
+PASS F-06 · ยืนยันใบยอด 0.00 → 422 total_invalid
+PASS F-07 · ประวัติการแก้ conf-089: [["total","100.00","100.50"],["category_id",null,"6f89e91e-c065-42f6-a8b7-9a3080e7a209"]]
+PASS F-08 · CSV CL-03 2026-11 หลังยืนยัน: ยอดจากไฟล์ 336.25 · 4 แถว (คาด 336.25 · 4 แถว)
+PASS E-01·หลังยืนยัน · CSV CL-01 2026-10: ยอดจากไฟล์ 150.00 · 1 แถว · X-Report-Total 150.00 · คาด 150.00/1
+PASS E-02·หลังยืนยัน · CSV CL-01 2026-11: ยอดจากไฟล์ 1340.00 · 4 แถว · X-Report-Total 1340.00 · คาด 1340.00/4
+PASS E-03·หลังยืนยัน · CSV CL-01 2026-12: ยอดจากไฟล์ 75.25 · 1 แถว · X-Report-Total 75.25 · คาด 75.25/1
+PASS E-04·หลังยืนยัน · CSV CL-02 2026-11: ยอดจากไฟล์ 999.00 · 1 แถว · X-Report-Total 999.00 · คาด 999.00/1
+PASS E-05·หลังยืนยัน · หมวด CL-01 2026-11 {"วัตถุดิบ":"1200.50","ค่าแก๊ส":"40.00","ค่าน้ำแข็ง":"99.50","อื่น ๆ":"0.00"} รวม 1340.00
+PASS F-09 · กระทบยอดชุด: {"scope":{"batchId":"371eb0f9-bd28-450a-a271-17595a0cab0d"},"batches":1,"accepted":5,"counts":{"queued":0,"processing":0,"review":1,"confirmed":4,"unreadable":0},"sum":5,"diff":0}
+PASS TD-BR11-b · ค้าง 300 + 100 → 201 รับ 100 · ค้าง 400
+PASS TD-BR11-c · ค้าง 301 + 100 · Worker 2 → 429 queue_full N=1 Retry-After=60s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 1 นาที" · ค้างหลังปฏิเสธ 301
+PASS TD-BR12-d · ค้าง 309 + 100 · Worker 2 → 429 queue_full N=2 Retry-After=120s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 2 นาที" · ค้างหลังปฏิเสธ 309
+PASS TD-BR12-e · ค้าง 380 + 100 · Worker 2 → 429 queue_full N=10 Retry-After=600s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 10 นาที" · ค้างหลังปฏิเสธ 380
+PASS TD-BR12-f · ค้าง 400 + 100 · Worker 2 → 429 queue_full N=13 Retry-After=780s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 13 นาที" · ค้างหลังปฏิเสธ 400
+PASS TD-BR12-g · ค้าง 309 + 100 · Worker 1 → 429 queue_full N=3 Retry-After=180s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 3 นาที" · ค้างหลังปฏิเสธ 309
+PASS TD-BR12-h · ค้าง 380 + 100 · Worker 0 → 429 queue_full N=20 Retry-After=1200s · "ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 20 นาที" · ค้างหลังปฏิเสธ 380
+
+สรุป: ผ่าน 34 · ไม่ผ่าน 0

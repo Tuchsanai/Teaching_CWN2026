@@ -1,0 +1,63 @@
+{
+ "test": "queuefull",
+ "queue_before": {
+  "normal": {
+   "pending": 0,
+   "limit": 400
+  },
+  "urgent": {
+   "pending": 0,
+   "limit": 50
+  },
+  "dead_letter": {
+   "count": 0
+  },
+  "workers_alive": 2,
+  "vllm_up": 2,
+  "rate_per_minute": 52.4
+ },
+ "submitted": 500,
+ "accepted_202": 409,
+ "rejected_429": 91,
+ "other_codes": [],
+ "first_429_body": {
+  "error": "queue_full",
+  "queue": "normal",
+  "pending": 400,
+  "limit": 400,
+  "workers_alive": 2,
+  "retry_after_minutes": 1,
+  "retry_after_seconds": 60
+ },
+ "first_429_retry_after_header": "60",
+ "first_429_at_submission": 403,
+ "peak_pending": 400,
+ "queue_when_full": {
+  "normal": {
+   "pending": 400,
+   "limit": 400
+  },
+  "urgent": {
+   "pending": 1,
+   "limit": 50
+  },
+  "dead_letter": {
+   "count": 0
+  },
+  "workers_alive": 2,
+  "vllm_up": 2,
+  "rate_per_minute": 53.6
+ },
+ "urgent_while_full_code": 202,
+ "rejected_lookup_codes": [
+  404
+ ],
+ "accepted_rows_found": 410,
+ "accepted_final_status": {
+  "done": 410
+ },
+ "lost": 0,
+ "drain_s": 200.2,
+ "total_s": 203.8,
+ "pass": true
+}

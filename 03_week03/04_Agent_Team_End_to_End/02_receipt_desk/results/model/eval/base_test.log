@@ -1,0 +1,17 @@
+Loading weights:   0%|          | 0/625 [00:00<?, ?it/s]Loading weights: 100%|██████████| 625/625 [00:00<00:00, 12602.41it/s]
+/venv/main/lib/python3.12/site-packages/transformers/models/qwen2_vl/image_processing_qwen2_vl.py:129: FutureWarning: Passing `min_pixels` and `max_pixels` to a processor call is deprecated and will be removed in v5.23. Pass in `size={'longest_edge': xxx, 'shortest_edge': xxx} to override the target size.`
+  warnings.warn(
+2026-11-19 06:24:54,523 INFO predicted 25/115
+2026-11-19 06:26:11,325 INFO predicted 50/115
+2026-11-19 06:27:23,327 INFO predicted 75/115
+2026-11-19 06:28:21,718 INFO predicted 100/115
+2026-11-19 06:28:32,518 INFO predicted 115/115
+2026-11-19 06:28:32,610 INFO M1  Total Accuracy                  46.32  (44/95)  >= 95.0%     FAIL
+2026-11-19 06:28:32,610 INFO M2  Silent Error Rate                20.0  (19/95)  <= 1.0%      FAIL
+2026-11-19 06:28:32,610 INFO M3  Flag Recall                     62.75  (32/51)  >= 80.0% (no wrong totals = pass) FAIL
+2026-11-19 06:28:32,610 INFO M4  Flag Rate                       63.16  (60/95)  <= 20.0%     FAIL
+2026-11-19 06:28:32,610 INFO M5  Abstention (unreadable set)         4  (4/20)  == 0 receipts FAIL
+2026-11-19 06:28:32,610 INFO M6  JSON Validity                   89.47  (85/95)  >= 99.0%     FAIL
+2026-11-19 06:28:32,610 INFO M7  Item F1 (report only)           76.45  (185/235)  not a gate   —
+2026-11-19 06:28:32,610 INFO report: eval/base_test/report.md
+EVAL_DONE base test rc=1

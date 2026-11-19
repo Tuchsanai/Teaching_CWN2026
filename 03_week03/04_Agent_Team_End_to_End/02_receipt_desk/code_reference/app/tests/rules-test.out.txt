@@ -1,0 +1,665 @@
+npm notice run receiptdesk-web@1.0.0 test
+npm notice run node --experimental-strip-types --test lib/rules.test.ts
+TAP version 13
+# Subtest: BR-01 · ชุดละ 1–100 ไฟล์
+    # Subtest: TD-BR01-a · 99 ไฟล์ → รับ 99
+    ok 1 - TD-BR01-a · 99 ไฟล์ → รับ 99
+      ---
+      duration_ms: 0.60191
+      type: 'test'
+      ...
+    # Subtest: TD-BR01-b · 100 ไฟล์ → รับ 100
+    ok 2 - TD-BR01-b · 100 ไฟล์ → รับ 100
+      ---
+      duration_ms: 0.082346
+      type: 'test'
+      ...
+    # Subtest: TD-BR01-c · 101 ไฟล์ → 422 batch_size
+    ok 3 - TD-BR01-c · 101 ไฟล์ → 422 batch_size
+      ---
+      duration_ms: 0.066634
+      type: 'test'
+      ...
+    # Subtest: TD-BR01-d · 0 ไฟล์ → 422 batch_size
+    ok 4 - TD-BR01-d · 0 ไฟล์ → 422 batch_size
+      ---
+      duration_ms: 0.044063
+      type: 'test'
+      ...
+    1..4
+ok 1 - BR-01 · ชุดละ 1–100 ไฟล์
+  ---
+  duration_ms: 1.216231
+  type: 'suite'
+  ...
+# Subtest: BR-02 · ไฟล์ไม่เกิน 10.00 MB
+    # Subtest: TD-BR02-a · 10,485,759 ไบต์ → รับ
+    ok 1 - TD-BR02-a · 10,485,759 ไบต์ → รับ
+      ---
+      duration_ms: 0.547116
+      type: 'test'
+      ...
+    # Subtest: TD-BR02-b · 10,485,760 ไบต์ → รับ
+    ok 2 - TD-BR02-b · 10,485,760 ไบต์ → รับ
+      ---
+      duration_ms: 0.070384
+      type: 'test'
+      ...
+    # Subtest: TD-BR02-c · 10,485,761 ไบต์ → 422 file_too_large บอกชื่อไฟล์ · ชุดไม่ถูกรับ
+    ok 3 - TD-BR02-c · 10,485,761 ไบต์ → 422 file_too_large บอกชื่อไฟล์ · ชุดไม่ถูกรับ
+      ---
+      duration_ms: 0.190072
+      type: 'test'
+      ...
+    1..3
+ok 2 - BR-02 · ไฟล์ไม่เกิน 10.00 MB
+  ---
+  duration_ms: 1.021807
+  type: 'suite'
+  ...
+# Subtest: BR-03 · ชนิดไฟล์ และ PDF 1 หน้า
+    # Subtest: TD-BR03-a · page-0.pdf (เสีย 0 หน้า) → 422 pdf_pages
+    ok 1 - TD-BR03-a · page-0.pdf (เสีย 0 หน้า) → 422 pdf_pages
+      ---
+      duration_ms: 0.258547
+      type: 'test'
+      ...
+    # Subtest: TD-BR03-b · page-1.pdf → รับ
+    ok 2 - TD-BR03-b · page-1.pdf → รับ
+      ---
+      duration_ms: 1.127735
+      type: 'test'
+      ...
+    # Subtest: TD-BR03-c · page-2.pdf → 422 pdf_pages
+    ok 3 - TD-BR03-c · page-2.pdf → 422 pdf_pages
+      ---
+      duration_ms: 0.353063
+      type: 'test'
+      ...
+    # Subtest: TD-BR03-d · JPG → รับ
+    ok 4 - TD-BR03-d · JPG → รับ
+      ---
+      duration_ms: 0.063524
+      type: 'test'
+      ...
+    # Subtest: TD-BR03-e · PNG → รับ
+    ok 5 - TD-BR03-e · PNG → รับ
+      ---
+      duration_ms: 0.034123
+      type: 'test'
+      ...
+    # Subtest: TD-BR03-f · GIF → 422 file_type บอกชื่อไฟล์
+    ok 6 - TD-BR03-f · GIF → 422 file_type บอกชื่อไฟล์
+      ---
+      duration_ms: 0.036582
+      type: 'test'
+      ...
+    1..6
+ok 3 - BR-03 · ชนิดไฟล์ และ PDF 1 หน้า
+  ---
+  duration_ms: 2.001592
+  type: 'suite'
+  ...
+# Subtest: BR-04 · ความมั่นใจของยอดรวมต่ำกว่า 0.90 → ติดธง
+    # Subtest: TD-BR04-a · 0.89 → ติด
+    ok 1 - TD-BR04-a · 0.89 → ติด
+      ---
+      duration_ms: 0.216964
+      type: 'test'
+      ...
+    # Subtest: TD-BR04-b · 0.90 → ไม่ติด
+    ok 2 - TD-BR04-b · 0.90 → ไม่ติด
+      ---
+      duration_ms: 0.089426
+      type: 'test'
+      ...
+    # Subtest: TD-BR04-c · 0.91 → ไม่ติด
+    ok 3 - TD-BR04-c · 0.91 → ไม่ติด
+      ---
+      duration_ms: 0.032472
+      type: 'test'
+      ...
+    # Subtest: TD-BR04-d · 0.8999 → ติด (ไม่ปัดก่อนเทียบ)
+    ok 4 - TD-BR04-d · 0.8999 → ติด (ไม่ปัดก่อนเทียบ)
+      ---
+      duration_ms: 0.022372
+      type: 'test'
+      ...
+    # Subtest: TD-BR04-e · 0.50 + ต่าง 5.00 → ติดทั้ง 2 ธง · นับเป็น 1 ใบ
+    ok 5 - TD-BR04-e · 0.50 + ต่าง 5.00 → ติดทั้ง 2 ธง · นับเป็น 1 ใบ
+      ---
+      duration_ms: 0.104137
+      type: 'test'
+      ...
+    1..5
+ok 4 - BR-04 · ความมั่นใจของยอดรวมต่ำกว่า 0.90 → ติดธง
+  ---
+  duration_ms: 0.518805
+  type: 'suite'
+  ...
+# Subtest: BR-05 · ผลรวมรายการต่างจากยอดรวมเกิน 1.00 บาท → ติดธง
+    # Subtest: TD-BR05-a · ต่าง 0.99 → ไม่ติด
+    ok 1 - TD-BR05-a · ต่าง 0.99 → ไม่ติด
+      ---
+      duration_ms: 0.113967
+      type: 'test'
+      ...
+    # Subtest: TD-BR05-b · ต่าง 1.00 → ไม่ติด
+    ok 2 - TD-BR05-b · ต่าง 1.00 → ไม่ติด
+      ---
+      duration_ms: 0.040453
+      type: 'test'
+      ...
+    # Subtest: TD-BR05-c · ต่าง 1.01 → ติด
+    ok 3 - TD-BR05-c · ต่าง 1.01 → ติด
+      ---
+      duration_ms: 0.096567
+      type: 'test'
+      ...
+    # Subtest: TD-BR05-d · รายการมากกว่ายอดรวม 1.01 → ติด
+    ok 4 - TD-BR05-d · รายการมากกว่ายอดรวม 1.01 → ติด
+      ---
+      duration_ms: 0.047603
+      type: 'test'
+      ...
+    # Subtest: TD-BR05-e · ต่าง 1.49 → ติด
+    ok 5 - TD-BR05-e · ต่าง 1.49 → ติด
+      ---
+      duration_ms: 0.033602
+      type: 'test'
+      ...
+    1..5
+ok 5 - BR-05 · ผลรวมรายการต่างจากยอดรวมเกิน 1.00 บาท → ติดธง
+  ---
+  duration_ms: 0.421248
+  type: 'suite'
+  ...
+# Subtest: BR-06 · ยืนยันได้เมื่อยอดรวมตั้งแต่ 0.01 บาท
+    # Subtest: TD-BR06-a · 0.00 → 422 total_invalid
+    ok 1 - TD-BR06-a · 0.00 → 422 total_invalid
+      ---
+      duration_ms: 0.333902
+      type: 'test'
+      ...
+    # Subtest: TD-BR06-b · 0.01 → ยืนยันได้
+    ok 2 - TD-BR06-b · 0.01 → ยืนยันได้
+      ---
+      duration_ms: 0.031492
+      type: 'test'
+      ...
+    # Subtest: TD-BR06-c · 0.02 → ยืนยันได้
+    ok 3 - TD-BR06-c · 0.02 → ยืนยันได้
+      ---
+      duration_ms: 0.025442
+      type: 'test'
+      ...
+    # Subtest: TD-BR06-d · −5.00 → 422 total_invalid
+    ok 4 - TD-BR06-d · −5.00 → 422 total_invalid
+      ---
+      duration_ms: 0.025902
+      type: 'test'
+      ...
+    1..4
+ok 6 - BR-06 · ยืนยันได้เมื่อยอดรวมตั้งแต่ 0.01 บาท
+  ---
+  duration_ms: 0.468341
+  type: 'suite'
+  ...
+# Subtest: BR-07 · อ่านได้ไม่เกิน 3 ครั้ง (แบบจำลองอ้างอิงของฝั่ง AI)
+    # Subtest: TD-BR07-a · ล้มเหลว 1 แล้วสำเร็จ → รอตรวจ attempts = 2
+    ok 1 - TD-BR07-a · ล้มเหลว 1 แล้วสำเร็จ → รอตรวจ attempts = 2
+      ---
+      duration_ms: 0.061124
+      type: 'test'
+      ...
+    # Subtest: TD-BR07-b · ล้มเหลว 2 แล้วสำเร็จ → รอตรวจ attempts = 3
+    ok 2 - TD-BR07-b · ล้มเหลว 2 แล้วสำเร็จ → รอตรวจ attempts = 3
+      ---
+      duration_ms: 0.085075
+      type: 'test'
+      ...
+    # Subtest: TD-BR07-c · ล้มเหลวทุกครั้ง → อ่านไม่ได้ attempts = 3 ไม่มีครั้งที่ 4
+    ok 3 - TD-BR07-c · ล้มเหลวทุกครั้ง → อ่านไม่ได้ attempts = 3 ไม่มีครั้งที่ 4
+      ---
+      duration_ms: 0.056804
+      type: 'test'
+      ...
+    1..3
+ok 7 - BR-07 · อ่านได้ไม่เกิน 3 ครั้ง (แบบจำลองอ้างอิงของฝั่ง AI)
+  ---
+  duration_ms: 0.252457
+  type: 'suite'
+  ...
+# Subtest: BR-08 · งานด่วนไม่เกิน 10 ใบ
+    # Subtest: TD-BR08-a · 9 ใบ → ตั้งด่วนได้
+    ok 1 - TD-BR08-a · 9 ใบ → ตั้งด่วนได้
+      ---
+      duration_ms: 0.114757
+      type: 'test'
+      ...
+    # Subtest: TD-BR08-b · 10 ใบ → ตั้งด่วนได้
+    ok 2 - TD-BR08-b · 10 ใบ → ตั้งด่วนได้
+      ---
+      duration_ms: 0.054054
+      type: 'test'
+      ...
+    # Subtest: TD-BR08-c · 11 ใบ → 422 urgent_too_large
+    ok 3 - TD-BR08-c · 11 ใบ → 422 urgent_too_large
+      ---
+      duration_ms: 0.046313
+      type: 'test'
+      ...
+    1..3
+ok 8 - BR-08 · งานด่วนไม่เกิน 10 ใบ
+  ---
+  duration_ms: 0.268238
+  type: 'suite'
+  ...
+# Subtest: BR-09 · งานด่วนไม่เกิน 5 งานต่อวัน (เวลาไทย)
+    # Subtest: TD-BR09-a · ตั้งไปแล้ว 4 → งานที่ 5 ตั้งได้ (รวม 5)
+    ok 1 - TD-BR09-a · ตั้งไปแล้ว 4 → งานที่ 5 ตั้งได้ (รวม 5)
+      ---
+      duration_ms: 0.139939
+      type: 'test'
+      ...
+    # Subtest: TD-BR09-b · ตั้งไปแล้ว 5 → 409 urgent_quota
+    ok 2 - TD-BR09-b · ตั้งไปแล้ว 5 → 409 urgent_quota
+      ---
+      duration_ms: 0.120568
+      type: 'test'
+      ...
+    # Subtest: TD-BR09-c · เมื่อวาน 23:59 มี 5 · วันนี้ 0 → ตั้งได้ (รวม 1)
+    ok 3 - TD-BR09-c · เมื่อวาน 23:59 มี 5 · วันนี้ 0 → ตั้งได้ (รวม 1)
+      ---
+      duration_ms: 0.056083
+      type: 'test'
+      ...
+    1..3
+ok 9 - BR-09 · งานด่วนไม่เกิน 5 งานต่อวัน (เวลาไทย)
+  ---
+  duration_ms: 0.365264
+  type: 'suite'
+  ...
+# Subtest: BR-10 · อ่านใบด่วนติดกันไม่เกิน 4 ใบเมื่อมีใบปกติรอ (แบบจำลองอ้างอิงของฝั่ง AI)
+    # Subtest: TD-BR10-a · ด่วน 3 ปกติ 2
+    ok 1 - TD-BR10-a · ด่วน 3 ปกติ 2
+      ---
+      duration_ms: 0.176752
+      type: 'test'
+      ...
+    # Subtest: TD-BR10-b · ด่วน 4 ปกติ 2
+    ok 2 - TD-BR10-b · ด่วน 4 ปกติ 2
+      ---
+      duration_ms: 0.075955
+      type: 'test'
+      ...
+    # Subtest: TD-BR10-c · ด่วน 5 ปกติ 2 → ใบที่ 5 ต้องเป็นปกติ
+    ok 3 - TD-BR10-c · ด่วน 5 ปกติ 2 → ใบที่ 5 ต้องเป็นปกติ
+      ---
+      duration_ms: 0.16208
+      type: 'test'
+      ...
+    # Subtest: TD-BR10-d · ด่วน 5 ปกติ 0 → ด่วนติดกัน 5 ได้
+    ok 4 - TD-BR10-d · ด่วน 5 ปกติ 0 → ด่วนติดกัน 5 ได้
+      ---
+      duration_ms: 0.052043
+      type: 'test'
+      ...
+    1..4
+ok 10 - BR-10 · อ่านใบด่วนติดกันไม่เกิน 4 ใบเมื่อมีใบปกติรอ (แบบจำลองอ้างอิงของฝั่ง AI)
+  ---
+  duration_ms: 0.546886
+  type: 'suite'
+  ...
+# Subtest: BR-11 · ใบงานปกติค้าง + ชุดใหม่ ไม่เกิน 400
+    # Subtest: TD-BR11-a · 299 + 100 = 399 → รับ
+    ok 1 - TD-BR11-a · 299 + 100 = 399 → รับ
+      ---
+      duration_ms: 0.094866
+      type: 'test'
+      ...
+    # Subtest: TD-BR11-b · 300 + 100 = 400 → รับ
+    ok 2 - TD-BR11-b · 300 + 100 = 400 → รับ
+      ---
+      duration_ms: 0.026612
+      type: 'test'
+      ...
+    # Subtest: TD-BR11-c · 301 + 100 = 401 → 429 queue_full
+    ok 3 - TD-BR11-c · 301 + 100 = 401 → 429 queue_full
+      ---
+      duration_ms: 0.070694
+      type: 'test'
+      ...
+    # Subtest: TD-BR11-d · 395 + 5 = 400 → รับ
+    ok 4 - TD-BR11-d · 395 + 5 = 400 → รับ
+      ---
+      duration_ms: 0.025342
+      type: 'test'
+      ...
+    # Subtest: TD-BR11-e · ค้าง 400 + งานด่วน 10 → รับ (งานด่วนไม่นับ)
+    ok 5 - TD-BR11-e · ค้าง 400 + งานด่วน 10 → รับ (งานด่วนไม่นับ)
+      ---
+      duration_ms: 0.019891
+      type: 'test'
+      ...
+    1..5
+ok 11 - BR-11 · ใบงานปกติค้าง + ชุดใหม่ ไม่เกิน 400
+  ---
+  duration_ms: 0.289539
+  type: 'suite'
+  ...
+# Subtest: BR-12 · นาทีที่ให้ลองใหม่
+    # Subtest: TD-BR12-a · ค้าง 301 + 100 · Worker 2 → 1 นาที
+    ok 1 - TD-BR12-a · ค้าง 301 + 100 · Worker 2 → 1 นาที
+      ---
+      duration_ms: 0.066325
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-b · ค้าง 307 + 100 · Worker 2 → 1 นาที
+    ok 2 - TD-BR12-b · ค้าง 307 + 100 · Worker 2 → 1 นาที
+      ---
+      duration_ms: 0.021372
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-c · ค้าง 308 + 100 · Worker 2 → 1 นาที
+    ok 3 - TD-BR12-c · ค้าง 308 + 100 · Worker 2 → 1 นาที
+      ---
+      duration_ms: 0.019991
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-d · ค้าง 309 + 100 · Worker 2 → 2 นาที
+    ok 4 - TD-BR12-d · ค้าง 309 + 100 · Worker 2 → 2 นาที
+      ---
+      duration_ms: 0.023071
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-e · ค้าง 380 + 100 · Worker 2 → 10 นาที
+    ok 5 - TD-BR12-e · ค้าง 380 + 100 · Worker 2 → 10 นาที
+      ---
+      duration_ms: 0.020751
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-f · ค้าง 400 + 100 · Worker 2 → 13 นาที
+    ok 6 - TD-BR12-f · ค้าง 400 + 100 · Worker 2 → 13 นาที
+      ---
+      duration_ms: 0.020152
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-g · ค้าง 309 + 100 · Worker 1 → 3 นาที
+    ok 7 - TD-BR12-g · ค้าง 309 + 100 · Worker 1 → 3 นาที
+      ---
+      duration_ms: 0.020921
+      type: 'test'
+      ...
+    # Subtest: TD-BR12-h · ค้าง 380 + 100 · Worker 0 → 20 นาที
+    ok 8 - TD-BR12-h · ค้าง 380 + 100 · Worker 0 → 20 นาที
+      ---
+      duration_ms: 0.105357
+      type: 'test'
+      ...
+    1..8
+ok 12 - BR-12 · นาทีที่ให้ลองใหม่
+  ---
+  duration_ms: 0.908809
+  type: 'suite'
+  ...
+# Subtest: BR-13 · งานปกติค้างเกิน 120 นาที
+    # Subtest: TD-BR13-a · 119 นาที → ไม่อยู่
+    ok 1 - TD-BR13-a · 119 นาที → ไม่อยู่
+      ---
+      duration_ms: 0.083306
+      type: 'test'
+      ...
+    # Subtest: TD-BR13-b · 120 นาทีพอดี → ไม่อยู่
+    ok 2 - TD-BR13-b · 120 นาทีพอดี → ไม่อยู่
+      ---
+      duration_ms: 0.024112
+      type: 'test'
+      ...
+    # Subtest: TD-BR13-c · 121 นาที → อยู่ · แสดง 121 นาที · รายการมี 1 ใบ
+    ok 3 - TD-BR13-c · 121 นาที → อยู่ · แสดง 121 นาที · รายการมี 1 ใบ
+      ---
+      duration_ms: 0.022192
+      type: 'test'
+      ...
+    # Subtest: TD-BR13-d · รอตรวจแล้ว (มีผล) → ไม่อยู่
+    ok 4 - TD-BR13-d · รอตรวจแล้ว (มีผล) → ไม่อยู่
+      ---
+      duration_ms: 0.018412
+      type: 'test'
+      ...
+    1..4
+ok 13 - BR-13 · งานปกติค้างเกิน 120 นาที
+  ---
+  duration_ms: 0.189962
+  type: 'suite'
+  ...
+# Subtest: BR-14 · นับเดือนตามวันที่บนใบเสร็จ
+    # Subtest: TD-BR14-a · S-01 2026-10-31 → 2026-10 · E-01 = 150.00
+    ok 1 - TD-BR14-a · S-01 2026-10-31 → 2026-10 · E-01 = 150.00
+      ---
+      duration_ms: 0.444589
+      type: 'test'
+      ...
+    # Subtest: TD-BR14-b · S-02 2026-11-01 → 2026-11 · E-02 = 1,340.00
+    ok 2 - TD-BR14-b · S-02 2026-11-01 → 2026-11 · E-02 = 1,340.00
+      ---
+      duration_ms: 0.203694
+      type: 'test'
+      ...
+    # Subtest: TD-BR14-c · S-03 2026-11-02 → 2026-11
+    ok 3 - TD-BR14-c · S-03 2026-11-02 → 2026-11
+      ---
+      duration_ms: 0.047653
+      type: 'test'
+      ...
+    # Subtest: TD-BR14-d · S-04 2026-11-30 → 2026-11
+    ok 4 - TD-BR14-d · S-04 2026-11-30 → 2026-11
+      ---
+      duration_ms: 0.090216
+      type: 'test'
+      ...
+    # Subtest: TD-BR14-e · S-05 2026-12-01 → 2026-12 · E-03 = 75.25 และไม่อยู่ใน E-02
+    ok 5 - TD-BR14-e · S-05 2026-12-01 → 2026-12 · E-03 = 75.25 และไม่อยู่ใน E-02
+      ---
+      duration_ms: 0.088536
+      type: 'test'
+      ...
+    1..5
+ok 14 - BR-14 · นับเดือนตามวันที่บนใบเสร็จ
+  ---
+  duration_ms: 0.939452
+  type: 'suite'
+  ...
+# Subtest: เสริม · BR-03 PDF ที่เปิดไม่ได้
+    # Subtest: มีแค่หัว PDF + /Count 1 + %%EOF → ปฏิเสธ
+    ok 1 - มีแค่หัว PDF + /Count 1 + %%EOF → ปฏิเสธ
+      ---
+      duration_ms: 0.109447
+      type: 'test'
+      ...
+    # Subtest: /Kids อ้างวัตถุหน้าว่าง << >> → ปฏิเสธ
+    ok 2 - /Kids อ้างวัตถุหน้าว่าง << >> → ปฏิเสธ
+      ---
+      duration_ms: 0.219334
+      type: 'test'
+      ...
+    # Subtest: /Kids อ้างพจนานุกรมที่ไม่ระบุ /Type → ปฏิเสธ
+    ok 3 - /Kids อ้างพจนานุกรมที่ไม่ระบุ /Type → ปฏิเสธ
+      ---
+      duration_ms: 0.132239
+      type: 'test'
+      ...
+    # Subtest: /Kids อ้างวัตถุที่ไม่มี → ปฏิเสธ
+    ok 4 - /Kids อ้างวัตถุที่ไม่มี → ปฏิเสธ
+      ---
+      duration_ms: 0.077385
+      type: 'test'
+      ...
+    # Subtest: ต้นไม้หน้าวนซ้ำ → ปฏิเสธ
+    ok 5 - ต้นไม้หน้าวนซ้ำ → ปฏิเสธ
+      ---
+      duration_ms: 0.120638
+      type: 'test'
+      ...
+    # Subtest: /Kids ว่าง (0 หน้า) → ปฏิเสธ
+    ok 6 - /Kids ว่าง (0 หน้า) → ปฏิเสธ
+      ---
+      duration_ms: 0.072074
+      type: 'test'
+      ...
+    # Subtest: /Count โกหกว่า 1 แต่มีจริง 2 หน้า → ปฏิเสธ
+    ok 7 - /Count โกหกว่า 1 แต่มีจริง 2 หน้า → ปฏิเสธ
+      ---
+      duration_ms: 0.116948
+      type: 'test'
+      ...
+    # Subtest: ต้นไม้ซ้อนสองชั้น 1 หน้า → รับ
+    ok 8 - ต้นไม้ซ้อนสองชั้น 1 หน้า → รับ
+      ---
+      duration_ms: 0.077235
+      type: 'test'
+      ...
+    # Subtest: PDF 1 หน้าที่มีคอมเมนต์คั่นระหว่าง /Type กับ /Page → รับ
+    ok 9 - PDF 1 หน้าที่มีคอมเมนต์คั่นระหว่าง /Type กับ /Page → รับ
+      ---
+      duration_ms: 0.15598
+      type: 'test'
+      ...
+    # Subtest: PDF 2 หน้าที่มีคอมเมนต์คั่น /Type กับ /Page → ยังนับได้ 2 หน้าและปฏิเสธ
+    ok 10 - PDF 2 หน้าที่มีคอมเมนต์คั่น /Type กับ /Page → ยังนับได้ 2 หน้าและปฏิเสธ
+      ---
+      duration_ms: 0.225265
+      type: 'test'
+      ...
+    # Subtest: PDF 1 หน้าที่คอมเมนต์คั่น /Type กับ /Page มีคำ endobj (`/Type % endobj` ขึ้นบรรทัดใหม่ `/Page`) → รับ
+    ok 11 - PDF 1 หน้าที่คอมเมนต์คั่น /Type กับ /Page มีคำ endobj (`/Type % endobj` ขึ้นบรรทัดใหม่ `/Page`) → รับ
+      ---
+      duration_ms: 0.179222
+      type: 'test'
+      ...
+    # Subtest: คอมเมนต์ที่มีคำ stream / endobj / หัววัตถุปลอม และสตริงที่มี endobj → ยังเป็น PDF 1 หน้า
+    ok 12 - คอมเมนต์ที่มีคำ stream / endobj / หัววัตถุปลอม และสตริงที่มี endobj → ยังเป็น PDF 1 หน้า
+      ---
+      duration_ms: 0.538106
+      type: 'test'
+      ...
+    # Subtest: PDF 2 หน้าที่คอมเมนต์มีคำ endobj → ยังนับ 2 หน้าและปฏิเสธ
+    ok 13 - PDF 2 หน้าที่คอมเมนต์มีคำ endobj → ยังนับ 2 หน้าและปฏิเสธ
+      ---
+      duration_ms: 0.163001
+      type: 'test'
+      ...
+    # Subtest: PDF 1 หน้าที่คอมเมนต์คั่น /Type กับ /Page มีคำ /Encrypt (`/Type % /Encrypt 9 0 R` ขึ้นบรรทัดใหม่ `/Page`) → รับ
+    ok 14 - PDF 1 หน้าที่คอมเมนต์คั่น /Type กับ /Page มีคำ /Encrypt (`/Type % /Encrypt 9 0 R` ขึ้นบรรทัดใหม่ `/Page`) → รับ
+      ---
+      duration_ms: 0.101607
+      type: 'test'
+      ...
+    # Subtest: /Encrypt ในคอมเมนต์ของ trailer หรือในสตริง → ไม่ถือว่าเข้ารหัส
+    ok 15 - /Encrypt ในคอมเมนต์ของ trailer หรือในสตริง → ไม่ถือว่าเข้ารหัส
+      ---
+      duration_ms: 0.167151
+      type: 'test'
+      ...
+    # Subtest: trailer มี /Encrypt จริง → เปิดไม่ได้ (pdf_pages)
+    ok 16 - trailer มี /Encrypt จริง → เปิดไม่ได้ (pdf_pages)
+      ---
+      duration_ms: 0.14311
+      type: 'test'
+      ...
+    # Subtest: XRef stream มี /Encrypt → เปิดไม่ได้
+    ok 17 - XRef stream มี /Encrypt → เปิดไม่ได้
+      ---
+      duration_ms: 0.135099
+      type: 'test'
+      ...
+    # Subtest: % ในสตริงไม่ถือเป็นคอมเมนต์ (ไม่ตัด /Type /Page ที่ตามมาทิ้ง)
+    ok 18 - % ในสตริงไม่ถือเป็นคอมเมนต์ (ไม่ตัด /Type /Page ที่ตามมาทิ้ง)
+      ---
+      duration_ms: 0.089366
+      type: 'test'
+      ...
+    # Subtest: ไฟล์ทั้งชุดถูกปฏิเสธและรายงานทุกไฟล์ที่ไม่ผ่าน
+    ok 19 - ไฟล์ทั้งชุดถูกปฏิเสธและรายงานทุกไฟล์ที่ไม่ผ่าน
+      ---
+      duration_ms: 0.101897
+      type: 'test'
+      ...
+    1..19
+ok 15 - เสริม · BR-03 PDF ที่เปิดไม่ได้
+  ---
+  duration_ms: 3.138397
+  type: 'suite'
+  ...
+# Subtest: เสริม · BR-13 เทียบละเอียดระดับวินาที
+    # Subtest: 120 นาที 1 วินาที → ค้างทันที
+    ok 1 - 120 นาที 1 วินาที → ค้างทันที
+      ---
+      duration_ms: 0.069555
+      type: 'test'
+      ...
+    # Subtest: 120 นาที 1 มิลลิวินาที → ค้าง · 120 นาทีพอดี → ไม่ค้าง
+    ok 2 - 120 นาที 1 มิลลิวินาที → ค้าง · 120 นาทีพอดี → ไม่ค้าง
+      ---
+      duration_ms: 0.022742
+      type: 'test'
+      ...
+    # Subtest: overdueCutoff = now − 120 นาที และสอดคล้องกับ isOverdue
+    ok 3 - overdueCutoff = now − 120 นาที และสอดคล้องกับ isOverdue
+      ---
+      duration_ms: 0.047453
+      type: 'test'
+      ...
+    # Subtest: งานด่วนไม่นับเป็นค้างเกินกำหนด
+    ok 4 - งานด่วนไม่นับเป็นค้างเกินกำหนด
+      ---
+      duration_ms: 0.019432
+      type: 'test'
+      ...
+    # Subtest: ค่าเวลาแบบข้อความ ISO ให้ผลเท่ากับ Date
+    ok 5 - ค่าเวลาแบบข้อความ ISO ให้ผลเท่ากับ Date
+      ---
+      duration_ms: 0.032872
+      type: 'test'
+      ...
+    1..5
+ok 16 - เสริม · BR-13 เทียบละเอียดระดับวินาที
+  ---
+  duration_ms: 0.231946
+  type: 'suite'
+  ...
+# Subtest: เสริม · BR-09/BR-14 เวลาไทย
+    # Subtest: เที่ยงคืนไทย (17:00Z) เป็นวันใหม่ของ BR-09
+    ok 1 - เที่ยงคืนไทย (17:00Z) เป็นวันใหม่ของ BR-09
+      ---
+      duration_ms: 0.037212
+      type: 'test'
+      ...
+    # Subtest: timestamp ISO และ Date ของเที่ยงคืนไทยเข้าเดือนเดียวกัน
+    ok 2 - timestamp ISO และ Date ของเที่ยงคืนไทยเข้าเดือนเดียวกัน
+      ---
+      duration_ms: 0.047764
+      type: 'test'
+      ...
+    # Subtest: ค่าเงินจาก PostgreSQL เป็นข้อความเทียบเป็นสตางค์ ไม่มีปัญหา float
+    ok 3 - ค่าเงินจาก PostgreSQL เป็นข้อความเทียบเป็นสตางค์ ไม่มีปัญหา float
+      ---
+      duration_ms: 0.023921
+      type: 'test'
+      ...
+    1..3
+ok 17 - เสริม · BR-09/BR-14 เวลาไทย
+  ---
+  duration_ms: 0.134509
+  type: 'suite'
+  ...
+1..17
+# tests 89
+# suites 17
+# pass 89
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 83.19961

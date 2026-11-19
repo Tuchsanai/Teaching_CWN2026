@@ -1,0 +1,1653 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReceiptDesk Test Evidence</title>
+<style>
+:root{--bg:#f7f7f5;--fg:#1d1d1b;--muted:#6b6b66;--card:#fff;--line:#e3e2dc;--pass:#1f7a3f;--fail:#b3261e;--blk:#8a6d00;--web:#b3261e;--plan:#5b4bb7;--test:#0b6e99}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161615;--fg:#ecebe6;--muted:#a3a29b;--card:#20201e;--line:#34332f}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,"Segoe UI","Noto Sans Thai",sans-serif}
+main{max-width:1100px;margin:auto;padding:16px} h1{margin:.2em 0} h2{margin-top:1.6em;font-size:1.15em} h2 small{color:var(--muted);font-weight:400}
+.kpi{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0} .kpi div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:120px}
+.kpi b{display:block;font-size:1.5em} .verdict{padding:12px 14px;border-radius:10px;border:2px solid var(--fail);background:var(--card)}
+details.tc{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:8px;margin:6px 0}
+details.tc.s-pass{border-left-color:var(--pass)} details.tc.s-fail{border-left-color:var(--fail)} details.tc.s-blocked{border-left-color:var(--blk)}
+summary{cursor:pointer;padding:8px 10px} .body{padding:0 14px 12px} .muted{color:var(--muted)}
+.badge{display:inline-block;border-radius:6px;padding:0 7px;color:#fff;font-size:.85em;margin-right:4px}
+.b-pass{background:var(--pass)} .b-fail{background:var(--fail)} .b-blocked{background:var(--blk)} .v-web{background:var(--web)} .v-plan{background:var(--plan)} .v-test{background:var(--test)}
+.tag{border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:4px;font-size:.8em;color:var(--muted)}
+.shots{display:flex;flex-wrap:wrap;gap:8px} .shots a{width:220px;text-decoration:none;color:var(--muted);font-size:.8em} .shots img{width:100%;height:140px;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:6px}
+pre{white-space:pre-wrap;font-size:.8em;background:var(--bg);padding:8px;border-radius:6px;max-height:300px;overflow:auto}
+table{border-collapse:collapse;width:100%;background:var(--card)} td,th{border:1px solid var(--line);padding:5px 8px;text-align:left}
+nav a{margin-right:10px} a{color:var(--test)}
+</style></head><body><main>
+<h1>ReceiptDesk · หลักฐานการทดสอบ</h1>
+<p class="muted">Playwright Test บน Chromium · 4 shard · เว็บจำลอง :3421 (AI_MODE=mock) + เว็บจริง :3420 (โมเดลจริง) · รอบ: round1, round2 · รายงานเต็ม <a href="TEST-REPORT.md">TEST-REPORT.md</a></p>
+<div class="kpi"><div>ผ่าน<b>46</b></div><div>ล้ม<b>11</b></div><div>บล็อก<b>2</b></div>
+<div>อัตราผ่านรวม<b>46/57 = 80.7%</b></div><div>อัตราผ่าน P1<b>28/32 = 87.5%</b></div></div>
+<table><tr><th>กลุ่ม</th><th>ผ่าน</th><th>ล้ม</th><th>บล็อก</th></tr><tr><td><a href="#g1">5.1 การรับชุดใบเสร็จ</a></td><td>9</td><td>0</td><td>0</td></tr><tr><td><a href="#g2">5.2 ผลอ่านและธงไม่แน่ใจ</a></td><td>5</td><td>3</td><td>0</td></tr><tr><td><a href="#g3">5.3 การตรวจแก้และยืนยัน</a></td><td>5</td><td>3</td><td>0</td></tr><tr><td><a href="#g4">5.4 งานด่วน</a></td><td>5</td><td>2</td><td>1</td></tr><tr><td><a href="#g5">5.5 สถานะงานในคิวและใบที่อ่านไม่ได้</a></td><td>9</td><td>0</td><td>1</td></tr><tr><td><a href="#g6">5.6 รายงานรายเดือน</a></td><td>6</td><td>1</td><td>0</td></tr><tr><td><a href="#g7">5.7 สิทธิ์ของแต่ละบทบาท</a></td><td>4</td><td>0</td><td>0</td></tr><tr><td><a href="#g8">5.8 ลูกค้าภายนอก</a></td><td>3</td><td>2</td><td>0</td></tr></table>
+<h2 id="g1">5.1 การรับชุดใบเสร็จ <small>ผ่าน 9 · ล้ม 0 · บล็อก 0</small></h2>
+<details class="tc s-pass" id="TC-1-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-01</b> ชุด 99 ไฟล์ (ต่ำกว่าเส้น) <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> รับ · `upload-accepted-count` = 99 · ยอดตรวจนับทั้งสำนักงาน 8 + 99 = 107 = ผลรวมทุกสถานะ · ผลต่าง 0</p>
+<p class="muted">ที่มา: FR-04 · BR-01 · TD-BR01-a · เวลา 458.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-01/01_upload_99_accepted.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-01/01_upload_99_accepted.png" alt="upload 99 accepted"><span>upload 99 accepted</span></a><a href="evidence/round1/TC-1-01/03_batches_reconcile_หลังส่ง_99.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-01/03_batches_reconcile_หลังส่ง_99.png" alt="batches reconcile หลังส่ง 99"><span>batches reconcile หลังส่ง 99</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-01/00_W7_response_99_files_.json" target="_blank">W7 response (99 files)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-01/02_W20_reconcile_หลังส่ง_99.json" target="_blank">W20 reconcile หลังส่ง 99</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-02</b> ชุด 100 ไฟล์ (เท่ากับเส้น) และเวลาตอบ <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> รับ · จำนวนที่รับ = 100 = จำนวนไฟล์ที่ส่ง · เวลาตอบ ≤ 60 วินาที · ยอดตรวจนับ 8 + 100 = 108</p>
+<p class="muted">ที่มา: FR-04 · BR-01 · NFR-02 (ข้อรับแล้ว 60 วินาที) · TD-BR01-b · เวลา 1.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-02/01_upload_100_accepted.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-02/01_upload_100_accepted.png" alt="upload 100 accepted"><span>upload 100 accepted</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-02/00_W7_response_100_files_.json" target="_blank">W7 response (100 files)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-02/02_W20_reconcile_หลังส่ง_100.json" target="_blank">W20 reconcile หลังส่ง 100</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-03</b> ชุด 101 ไฟล์ และชุด 0 ไฟล์ <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง ① ② ได้ `422 batch_size` · รับ 0 ใบ · ใบทั้งระบบยังเป็น 8 (ไม่มีใบใดของชุด 101 ถูกเก็บ)</p>
+<p class="muted">ที่มา: FR-04 · FR-23 · BR-01 · TD-BR01-c, d · เวลา 1.1 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-03/01_①_upload_101_rejected.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-03/01_①_upload_101_rejected.png" alt="① upload 101 rejected"><span>① upload 101 rejected</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-03/00_①_W7_from_page_101_files_.json" target="_blank">① W7 from page (101 files)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-03/02_W20_reconcile_หลัง_①_ใบทั้งระบบยังเป็น_8_.json" target="_blank">W20 reconcile หลัง ① (ใบทั้งระบบยังเป็น 8)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-03/03_②_W7_API_0_files_.json" target="_blank">② W7 API (0 files)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-03/04_W20_reconcile_หลัง_②_ใบทั้งระบบยังเป็น_8_.json" target="_blank">W20 reconcile หลัง ② (ใบทั้งระบบยังเป็น 8)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-04</b> ขนาดต่ำกว่าและเท่ากับ 10.00 MB <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ชุดรับ 1 ใบ · 10 MB = 10 × 1,048,576 = 10,485,760 ไบต์ ไฟล์ที่ ≤ ค่านี้ผ่าน</p>
+<p class="muted">ที่มา: FR-05 · BR-02 · TD-BR02-a, b · เวลา 1.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-04/01_upload_size-under.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-04/01_upload_size-under.jpg.png" alt="upload size-under.jpg"><span>upload size-under.jpg</span></a><a href="evidence/round1/TC-1-04/03_upload_size-equal.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-04/03_upload_size-equal.jpg.png" alt="upload size-equal.jpg"><span>upload size-equal.jpg</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-04/00_W7_size-under.jpg.json" target="_blank">W7 size-under.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-04/02_W7_size-equal.jpg.json" target="_blank">W7 size-equal.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-04/04_W20_reconcile_after_both_.json" target="_blank">W20 reconcile (after both)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-05">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-05</b> ขนาดเกิน 10.00 MB 1 ไบต์ <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> `422 file_too_large` · ข้อความมีชื่อ `size-over.jpg` และเหตุผล · รับ 0 ใบ</p>
+<p class="muted">ที่มา: FR-05 · BR-02 · TD-BR02-c · เวลา 1.1 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-05/01_upload_size-over_rejected.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-05/01_upload_size-over_rejected.png" alt="upload size-over rejected"><span>upload size-over rejected</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-05/00_W7_size-over.jpg.json" target="_blank">W7 size-over.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-05/02_W20_reconcile_รับ_0_ใบ_ยังเป็น_8_.json" target="_blank">W20 reconcile รับ 0 ใบ (ยังเป็น 8)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-06">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-06</b> ชนิดไฟล์ที่รับ <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> รับ 3 ใบ · ทั้ง 3 ใบอยู่ในหน้าชุดเดียวกัน</p>
+<p class="muted">ที่มา: FR-05 · BR-03 · TD-BR03-b, d, e · เวลา 1.2 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-06/01_upload_3_types.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-06/01_upload_3_types.png" alt="upload 3 types"><span>upload 3 types</span></a><a href="evidence/round1/TC-1-06/03_batch_page_with_3_receipts.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-06/03_batch_page_with_3_receipts.png" alt="batch page with 3 receipts"><span>batch page with 3 receipts</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-06/00_W7_jpg_png_pdf.json" target="_blank">W7 jpg+png+pdf</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-06/02_W9_batch.json" target="_blank">W9 batch</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-07">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-07</b> PDF 0 หน้า และ 2 หน้า <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ชุดได้ `422 pdf_pages` บอกชื่อไฟล์ · รับ 0 ใบ</p>
+<p class="muted">ที่มา: FR-05 · BR-03 · TD-BR03-a, c · เวลา 0.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-07/00_W7_page-0.pdf.json" target="_blank">W7 page-0.pdf</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-07/01_W7_page-2.pdf.json" target="_blank">W7 page-2.pdf</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-07/02_W20_reconcile_รับ_0_ใบ_ยังเป็น_8_.json" target="_blank">W20 reconcile รับ 0 ใบ (ยังเป็น 8)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-08">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-08</b> ไฟล์ชนิดอื่น และนามสกุลปลอม <span class="tag">P3</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ได้ `422 file_type` บอกชื่อไฟล์ · รับ 0 ใบ (ตรวจจากเนื้อไฟล์ ไม่ใช่นามสกุล เพราะ FR-05 รับ &quot;เฉพาะ JPG · PNG · PDF&quot;)</p>
+<p class="muted">ที่มา: FR-05 · BR-03 · TD-BR03-f · เวลา 0.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-08/00_W7_anim.gif.json" target="_blank">W7 anim.gif</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-08/01_W7_fake.jpg.json" target="_blank">W7 fake.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-08/02_W20_reconcile_รับ_0_ใบ_ยังเป็น_8_.json" target="_blank">W20 reconcile รับ 0 ใบ (ยังเป็น 8)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-1-09">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-1-09</b> ชุดผสม: ไฟล์ดี 3 + ไฟล์เกินขนาด 1 แล้วเอาออก <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ปฏิเสธทั้งชุด บอก `size-over.jpg` · รับ 0 ใบ · ใบทั้งระบบยังเป็น 8 · ② รับ 3 ใบ · ยอดตรวจนับ 8 + 3 = 11 · ผลต่าง 0</p>
+<p class="muted">ที่มา: FR-05 · FR-23 · NFR-06 · เวลา 1.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-1-09/01_①_mixed_batch_rejected.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-09/01_①_mixed_batch_rejected.png" alt="① mixed batch rejected"><span>① mixed batch rejected</span></a><a href="evidence/round1/TC-1-09/04_②_3_accepted.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-09/04_②_3_accepted.png" alt="② 3 accepted"><span>② 3 accepted</span></a><a href="evidence/round1/TC-1-09/06_batches_reconcile_②_ยอดตรวจนับ_11.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-1-09/06_batches_reconcile_②_ยอดตรวจนับ_11.png" alt="batches reconcile ② ยอดตรวจนับ 11"><span>batches reconcile ② ยอดตรวจนับ 11</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-1-09/00_①_W7_3_ok_size-over.json" target="_blank">① W7 3 ok + size-over</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-09/02_W20_reconcile_①_ใบทั้งระบบยังเป็น_8.json" target="_blank">W20 reconcile ① ใบทั้งระบบยังเป็น 8</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-09/03_②_W7_3_ok.json" target="_blank">② W7 3 ok</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-1-09/05_W20_reconcile_②_ยอดตรวจนับ_11.json" target="_blank">W20 reconcile ② ยอดตรวจนับ 11</a> <span class="muted">application/json</span></li></ul>
+</div></details><h2 id="g2">5.2 ผลอ่านและธงไม่แน่ใจ <small>ผ่าน 5 · ล้ม 3 · บล็อก 0</small></h2>
+<details class="tc s-pass" id="TC-2-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-2-01</b> อ่านครบ 5 ช่อง ใบปกติ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ชื่อร้าน &quot;ร้านตัวอย่าง&quot; · วันที่ 2026-11-18 · รายการ 3 บรรทัด แต่ละบรรทัดมี**ชื่อรายการไม่ว่าง**คู่กับราคา 45.00 · 30.00 · 25.00 (ชื่อที่ได้บันทึกไว้ ตาม AP-06) · ยอดรวม 100.00 · `items-sum` = 45.00 + 30.00 + 25.00 = 100.00 · ไม่ติดธงทั้ง 2 ชนิด</p>
+<p class="muted">ที่มา: FR-03 · FR-09 · AP-06 · เวลา 11.2 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>AP</b> AP-06: ชื่อรายการที่ได้: &quot;ข้าวสาร&quot; 45.00 · &quot;น้ำมันพืช&quot; 30.00 · &quot;น้ำตาลทราย&quot; 25.00</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-2-01/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-01/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-01/03_review_page_ok-100__001.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-01/03_review_page_ok-100__001.png" alt="review page ok-100__001"><span>review page ok-100__001</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-01/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-01/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-01/04_review_page_values.json" target="_blank">review page values</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-2-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-2-02</b> ความมั่นใจต่ำกว่า 0.90 <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ใบติดธง &quot;ไม่แน่ใจยอดรวม&quot; · เหตุผลบอกว่าความมั่นใจของยอดรวมต่ำกว่า 0.90 · 0.89 &lt; 0.90 และ 0.8999 &lt; 0.90 (ห้ามปัดเป็น 0.90 ก่อนเทียบ) · ไม่ติดธง &quot;ยอดไม่ตรงรายการ&quot; (ผลต่าง \</p>
+<p class="muted">ที่มา: 100.00 − 100.00\ · เวลา 9.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-2-02/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-02/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-02/03_review_page_conf-089.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-02/03_review_page_conf-089.jpg.png" alt="review page conf-089.jpg"><span>review page conf-089.jpg</span></a><a href="evidence/round1/TC-2-02/05_review_page_conf-08999.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-02/05_review_page_conf-08999.jpg.png" alt="review page conf-08999.jpg"><span>review page conf-08999.jpg</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-02/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-02/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-02/04_review_page_conf-089.jpg.json" target="_blank">review page conf-089.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-02/06_review_page_conf-08999.jpg.json" target="_blank">review page conf-08999.jpg</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-2-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-2-03</b> ความมั่นใจเท่ากับและสูงกว่า 0.90 <span class="tag">P2</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ใบไม่ติดธงใดเลย (0.90 ไม่ต่ำกว่า 0.90 · 0.91 &gt; 0.90)</p>
+<p class="muted">ที่มา: FR-09 · BR-04 · TD-BR04-b, c · เวลา 11.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-2-03/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-03/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-03/03_review_page_conf-090.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-03/03_review_page_conf-090.jpg.png" alt="review page conf-090.jpg"><span>review page conf-090.jpg</span></a><a href="evidence/round1/TC-2-03/05_review_page_conf-091.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-03/05_review_page_conf-091.jpg.png" alt="review page conf-091.jpg"><span>review page conf-091.jpg</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-03/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-03/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-03/04_review_page_conf-090.jpg.json" target="_blank">review page conf-090.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-03/06_review_page_conf-091.jpg.json" target="_blank">review page conf-091.jpg</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-2-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-2-04</b> ผลต่างไม่เกิน 1.00 บาท <span class="tag">P2</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ไม่ติดธง &quot;ยอดไม่ตรงรายการ&quot; · \</p>
+<p class="muted">ที่มา: 99.01 − 100.00\ · เวลา 9.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-2-04/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-04/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-04/03_review_page_diff-099.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-04/03_review_page_diff-099.jpg.png" alt="review page diff-099.jpg"><span>review page diff-099.jpg</span></a><a href="evidence/round1/TC-2-04/05_review_page_diff-100.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-04/05_review_page_diff-100.jpg.png" alt="review page diff-100.jpg"><span>review page diff-100.jpg</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-04/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-04/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-04/04_review_page_diff-099.jpg.json" target="_blank">review page diff-099.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-04/06_review_page_diff-100.jpg.json" target="_blank">review page diff-100.jpg</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-2-05">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-2-05</b> ผลต่างเกิน 1.00 บาท ทั้งขาดและเกิน <span class="tag">P1</span><span class="tag">M</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 3 ใบติดธง &quot;ยอดไม่ตรงรายการ&quot; · เหตุผลแสดงยอดรวมที่อ่าน ผลรวมรายการ และผลต่าง: 100.00 / 98.99 / 1.01 · 100.00 / 101.01 / 1.01 · 100.00 / 98.51 / 1.49 ล้วน &gt; 1.00</p>
+<p class="muted">ที่มา: FR-09 · BR-05 · TD-BR05-c, d, e · เวลา 9.7 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> ธงถูกต้องทั้ง 3 ใบ แต่เหตุผลของธงบอกแค่ผลต่าง (เช่น 1.01 บาท) ไม่บอกยอดรวมที่อ่านและผลรวมรายการตามที่ FR-09 / แผนกำหนด</p>
+
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: diff-101.jpg: เหตุผลแสดงยอดรวมที่อ่าน 100 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.01 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 10000
+Received array: [101, 100]
+
+  202 |       expect.soft(v.mismatch.present, `${c.f}: ติดธง &quot;ยอดไม่ตรงรายการ&quot;`).toBe(true);
+  203 |       const nums = moneyInText(v.mismatch.text);
+&gt; 204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+      |                                                                                                         ^
+  205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:204:105</pre><pre>Error: diff-101.jpg: เหตุผลแสดงผลรวมรายการ 98.99 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.01 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 9899
+Received array: [101, 100]
+
+  203 |       const nums = moneyInText(v.mismatch.text);
+  204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+&gt; 205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+      |                                                                                                                  ^
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+  208 |   } finally { await p.context.close(); await p.api.dispose(); }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:205:114</pre><pre>Error: diff-over-101.jpg: เหตุผลแสดงยอดรวมที่อ่าน 100 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.01 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 10000
+Received array: [101, 100]
+
+  202 |       expect.soft(v.mismatch.present, `${c.f}: ติดธง &quot;ยอดไม่ตรงรายการ&quot;`).toBe(true);
+  203 |       const nums = moneyInText(v.mismatch.text);
+&gt; 204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+      |                                                                                                         ^
+  205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:204:105</pre><pre>Error: diff-over-101.jpg: เหตุผลแสดงผลรวมรายการ 101.01 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.01 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 10101
+Received array: [101, 100]
+
+  203 |       const nums = moneyInText(v.mismatch.text);
+  204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+&gt; 205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+      |                                                                                                                  ^
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+  208 |   } finally { await p.context.close(); await p.api.dispose(); }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:205:114</pre><pre>Error: diff-149.jpg: เหตุผลแสดงยอดรวมที่อ่าน 100 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.49 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 10000
+Received array: [149, 100]
+
+  202 |       expect.soft(v.mismatch.present, `${c.f}: ติดธง &quot;ยอดไม่ตรงรายการ&quot;`).toBe(true);
+  203 |       const nums = moneyInText(v.mismatch.text);
+&gt; 204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+      |                                                                                                         ^
+  205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:204:105</pre><pre>Error: diff-149.jpg: เหตุผลแสดงผลรวมรายการ 98.51 — text &quot;ยอดไม่ตรงรายการ: ผลรวมรายการต่างจากยอดรวม 1.49 บาท (เกิน 1.00 บาท)&quot;
+
+expect(received).toContain(expected) // indexOf
+
+Expected value: 9851
+Received array: [149, 100]
+
+  203 |       const nums = moneyInText(v.mismatch.text);
+  204 |       expect.soft(nums, `${c.f}: เหตุผลแสดงยอดรวมที่อ่าน ${c.total / 100} — text &quot;${v.mismatch.text}&quot;`).toContain(c.total);
+&gt; 205 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลรวมรายการ ${(c.sum / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.sum);
+      |                                                                                                                  ^
+  206 |       expect.soft(nums, `${c.f}: เหตุผลแสดงผลต่าง ${(c.diff / 100).toFixed(2)} — text &quot;${v.mismatch.text}&quot;`).toContain(c.diff);
+  207 |     }
+  208 |   } finally { await p.context.close(); await p.api.dispose(); }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:205:114</pre></details>
+<div class="shots"><a href="evidence/round1/TC-2-05/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-05/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-05/03_review_page_diff-101.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-05/03_review_page_diff-101.jpg.png" alt="review page diff-101.jpg"><span>review page diff-101.jpg</span></a><a href="evidence/round1/TC-2-05/05_review_page_diff-over-101.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-05/05_review_page_diff-over-101.jpg.png" alt="review page diff-over-101.jpg"><span>review page diff-over-101.jpg</span></a><a href="evidence/round1/TC-2-05/07_review_page_diff-149.jpg.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-05/07_review_page_diff-149.jpg.png" alt="review page diff-149.jpg"><span>review page diff-149.jpg</span></a><a href="evidence/round1/TC-2-05/09_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-05/09_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-05/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-05/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-05/04_review_page_diff-101.jpg.json" target="_blank">review page diff-101.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-05/06_review_page_diff-over-101.jpg.json" target="_blank">review page diff-over-101.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-05/08_review_page_diff-149.jpg.json" target="_blank">review page diff-149.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-05/10_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-2-05/11_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-2-06">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-2-06</b> ติด 2 ธง และตัวกรองเฉพาะใบติดธง <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> `both-flags` ติดทั้ง 2 ธง พร้อมเหตุผลทั้ง 2 ข้อ (0.50 &lt; 0.90 และ \</p>
+<p class="muted">ที่มา: 95.00 − 100.00\ · เวลา 35.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-2-06/02_batch_page_after_reading.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-06/02_batch_page_after_reading.png" alt="batch page after reading"><span>batch page after reading</span></a><a href="evidence/round1/TC-2-06/03_review_page_both-flags.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-06/03_review_page_both-flags.png" alt="review page both-flags"><span>review page both-flags</span></a><a href="evidence/round1/TC-2-06/05_receipts_filtered_flagged.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-06/05_receipts_filtered_flagged.png" alt="receipts filtered flagged"><span>receipts filtered flagged</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-06/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-06/01_W12_receipts_after_reading.json" target="_blank">W12 receipts after reading</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-06/04_review_page_both-flags.json" target="_blank">review page both-flags</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-06/06_flagged_filter_rows_of_this_batch.json" target="_blank">flagged filter rows of this batch</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-06/07_W11_flagged_true_ids_of_this_batch_.json" target="_blank">W11 flagged=true (ids of this batch)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-2-07">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-2-07</b> โมเดลจริงอ่านใบเสร็จจริง 12 ใบ (smoke) <span class="tag">P1</span><span class="tag">R</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ทั้ง 12 ใบเป็น &quot;รอตรวจ&quot; มีโครงสร้าง 5 ช่องครบ (M6 ≥ 99%: 12 × 0.99 = 11.88 → ต้องครบ 12) · ② ชื่อร้านไม่ว่างและไม่ใช่ `UNKNOWN` · วันที่เป็นวันที่จริงที่ไม่ใช่ `1900-01-01` (FR-03 · ชุดนี้ไม่มีเฉลยชื่อร้าน/วันที่ จึงตรวจได้แค่ว่าอ่านออกมาจริง) · ③ ใบที่ยอดรวม (ปัด 2 ตำแหน่ง) ≠ `total` ในเฉลย ต้องติดธงทุกใบ: เกณฑ์ของรอบย่อยนี้ = ยอมให้ผิดและไม่ติดธงได้ 0 ใบ [ข้อสมมติของแผน] ไม่ใช่การรับรอง M2 (M2 ใช้ชุด ≥ 200 ใบ) · ④ บันทึกจำนวนรายการเทียบ `n_items` และยอดถูก ÷ 12 เพื่อดูแนวโน้ม M1/M7 ไม่ใช้ตัดสิน</p>
+<p class="muted">ที่มา: FR-03 · FR-09 · NFR-01 (smoke) · เวลา 42.9 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> โมเดลจริง 12/12 ใบได้ชื่อร้าน UNKNOWN และวันที่ 1900-01-01 (FR-03 อ่านได้แค่ 3 จาก 5 ช่อง) · ส่วน ① ครบ 12 ใบรอตรวจ และ ③ ยอดผิดที่ไม่ติดธง = 0 ผ่าน · ยอดถูก 11/12</p>
+<ul class="ann"><li><b>E6</b> gateway queue (GET /v1/queue) not checked from the test (API key of the gateway is not used by the suite); W23 pending 0 · urgent 0 · workers 2 checked</li><li><b>trend</b> total correct 11/12 · items count match 10/12 · wrong &amp; unflagged 0</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: te0000.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0000.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0001.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0001.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0002.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0002.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0003.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0003.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0004.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0004.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0005.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0005.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0006.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0006.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0007.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0007.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0008.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0008.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0010.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0010.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0011.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0011.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre><pre>Error: te0012.jpg: ชื่อร้านไม่ใช่ UNKNOWN
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;UNKNOWN&quot;
+
+  294 |       // ② merchant / date read for real
+  295 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim(), `${g.file}: ชื่อร้านไม่ว่าง`).not.toBe(&#x27;&#x27;);
+&gt; 296 |       expect.soft((r?.merchant ?? &#x27;&#x27;).trim().toUpperCase(), `${g.file}: ชื่อร้านไม่ใช่ UNKNOWN`).not.toBe(&#x27;UNKNOWN&#x27;);
+      |                                                                                                      ^
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+  299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:296:102</pre><pre>Error: te0012.jpg: วันที่ไม่ใช่ 1900-01-01
+
+expect(received).not.toBe(expected) // Object.is equality
+
+Expected: not &quot;1900-01-01&quot;
+
+  297 |       const d = String(r?.receiptDate ?? &#x27;&#x27;);
+  298 |       expect.soft(/^\d{4}-\d{2}-\d{2}/.test(d) &amp;&amp; !Number.isNaN(Date.parse(d.slice(0, 10))), `${g.file}: วันที่เป็นวันที่จริง (got &quot;${d}&quot;)`).toBe(true);
+&gt; 299 |       expect.soft(d.slice(0, 10), `${g.file}: วันที่ไม่ใช่ 1900-01-01`).not.toBe(&#x27;1900-01-01&#x27;);
+      |                                                                             ^
+  300 |       // ③ wrong total must be flagged
+  301 |       if (!ok) expect.soft(flagged, `${g.file}: ยอดอ่าน ${r?.total} ≠ เฉลย ${g.total} ต้องติดธง`).toBe(true);
+  302 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:299:77</pre></details>
+<div class="shots"><a href="evidence/round1/TC-2-07/02_batch_page_12_real_receipts_read.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-07/02_batch_page_12_real_receipts_read.png" alt="batch page 12 real receipts read"><span>batch page 12 real receipts read</span></a><a href="evidence/round1/TC-2-07/06_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-07/06_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-07/00_E6_W23_queue_after_reset.json" target="_blank">E6 W23 queue after reset</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-07/01_W7_upload_12_real.json" target="_blank">W7 upload 12 real</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-07/03_W12_12_real_receipts.json" target="_blank">W12 12 real receipts</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-07/04_per-receipt_comparison_satang_.txt" target="_blank">per-receipt comparison (satang)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-2-07/05_W23_at_end.json" target="_blank">W23 at end</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-07/07_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-2-07/08_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-2-08">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-2-08</b> โมเดลจริงไม่เดากับรูปที่อ่านไม่ได้ <span class="tag">P2</span><span class="tag">R</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ใบต้องติดธงอย่างน้อย 1 ธง หรือไปอยู่ &quot;อ่านไม่ได้&quot; · ใบที่มียอดรวมโดยไม่ติดธง = 0 (หลัก M5 &quot;อย่าเดา&quot;)</p>
+<p class="muted">ที่มา: NFR-01 M5 · FR-09 · FR-16 · เวลา 13.1 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> รูปที่ครอปยอดรวมทิ้งและรูปเบลอได้ยอด 0.00 โดยไม่ติดธงและไม่ไป &#x27;อ่านไม่ได้&#x27; (ผิดหลัก M5 อย่าเดา) · ยอด 0.00 ยืนยันไม่ได้ตาม BR-06 จึงไม่หลุดเข้าบัญชีโดยตรง</p>
+<ul class="ann"><li><b>deviation</b> te0000-crop (bottom half cut) และ te0000-blur (Gaussian 25) ตรวจว่าอ่านยอดรวม 60,000.00 ไม่ได้โดยผู้ตรวจ 1 คน (แผนกำหนด 2 คน)</li><li><b>E6</b> gateway queue (GET /v1/queue) not checked from the test (API key of the gateway is not used by the suite); W23 pending 0 · urgent 0 · workers 2 checked</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: te0000-crop.jpg: ติดธงอย่างน้อย 1 ธง หรืออยู่ &quot;อ่านไม่ได้&quot; (status review, total 0.00)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  343 |       if (g) guessed++;
+  344 |       rows.push(`| ${n} | ${r?.status} | ${r?.total ?? &#x27;&#x27;} | ${flagged ? &#x27;yes&#x27; : &#x27;no&#x27;} | ${(r?.flags?.reasons || []).join(&#x27; / &#x27;)} | ${g ? &#x27;YES&#x27; : &#x27;no&#x27;} |`);
+&gt; 345 |       expect.soft(flagged || r?.status === &#x27;unreadable&#x27;, `${n}: ติดธงอย่างน้อย 1 ธง หรืออยู่ &quot;อ่านไม่ได้&quot; (status ${r?.status}, total ${r?.total})`).toBe(true);
+      |                                                                                                                                                      ^
+  346 |     }
+  347 |     await evidence(testInfo, &#x27;per-receipt comparison&#x27;, rows.join(&#x27;\n&#x27;));
+  348 |     expect.soft(guessed, &#x27;ใบที่มียอดรวมโดยไม่ติดธง = 0 (M5 อย่าเดา)&#x27;).toBe(0);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:345:150</pre><pre>Error: te0000-blur.jpg: ติดธงอย่างน้อย 1 ธง หรืออยู่ &quot;อ่านไม่ได้&quot; (status review, total 0.00)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  343 |       if (g) guessed++;
+  344 |       rows.push(`| ${n} | ${r?.status} | ${r?.total ?? &#x27;&#x27;} | ${flagged ? &#x27;yes&#x27; : &#x27;no&#x27;} | ${(r?.flags?.reasons || []).join(&#x27; / &#x27;)} | ${g ? &#x27;YES&#x27; : &#x27;no&#x27;} |`);
+&gt; 345 |       expect.soft(flagged || r?.status === &#x27;unreadable&#x27;, `${n}: ติดธงอย่างน้อย 1 ธง หรืออยู่ &quot;อ่านไม่ได้&quot; (status ${r?.status}, total ${r?.total})`).toBe(true);
+      |                                                                                                                                                      ^
+  346 |     }
+  347 |     await evidence(testInfo, &#x27;per-receipt comparison&#x27;, rows.join(&#x27;\n&#x27;));
+  348 |     expect.soft(guessed, &#x27;ใบที่มียอดรวมโดยไม่ติดธง = 0 (M5 อย่าเดา)&#x27;).toBe(0);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:345:150</pre><pre>Error: ใบที่มียอดรวมโดยไม่ติดธง = 0 (M5 อย่าเดา)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 0
+Received: 2
+
+  346 |     }
+  347 |     await evidence(testInfo, &#x27;per-receipt comparison&#x27;, rows.join(&#x27;\n&#x27;));
+&gt; 348 |     expect.soft(guessed, &#x27;ใบที่มียอดรวมโดยไม่ติดธง = 0 (M5 อย่าเดา)&#x27;).toBe(0);
+      |                                                                       ^
+  349 |
+  350 |     const qEnd = await queue(api);
+  351 |     await evidence(testInfo, &#x27;W23 at end&#x27;, qEnd);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\52-flags.spec.ts:348:71</pre></details>
+<div class="shots"><a href="evidence/round1/TC-2-08/03_batch_page_crop_blur.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-08/03_batch_page_crop_blur.png" alt="batch page crop + blur"><span>batch page crop + blur</span></a><a href="evidence/round1/TC-2-08/06_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-2-08/06_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-2-08/00_E6_W23_queue_after_reset.json" target="_blank">E6 W23 queue after reset</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-08/01_W7_upload_2_unreadable_images.json" target="_blank">W7 upload 2 unreadable images</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-08/02_W12_2_receipts.json" target="_blank">W12 2 receipts</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-08/04_per-receipt_comparison.txt" target="_blank">per-receipt comparison</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-2-08/05_W23_at_end.json" target="_blank">W23 at end</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-2-08/07_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-2-08/08_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details><h2 id="g3">5.3 การตรวจแก้และยืนยัน <small>ผ่าน 5 · ล้ม 3 · บล็อก 0</small></h2>
+<details class="tc s-pass" id="TC-3-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-3-01</b> ยอดรวม 0.00 ยืนยันไม่ได้ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> `422 total_invalid` · 0.00 &lt; 0.01 · สถานะยังเป็น &quot;รอตรวจ&quot; · ไม่มีผู้ยืนยัน</p>
+<p class="muted">ที่มา: FR-12 · BR-06 · TD-BR06-a · เวลา 449.7 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>note</b> confirm-button disabled on the page for total 0.00 -&gt; same W15 sent by API</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-3-01/00_confirm-blocked-on-page.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-01/00_confirm-blocked-on-page.png" alt="confirm-blocked-on-page"><span>confirm-blocked-on-page</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-01/01_W15_confirm_total_0.00.json" target="_blank">W15 confirm total 0.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-01/02_W12_after_confirm.json" target="_blank">W12 after confirm</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-3-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-3-02</b> ยอดรวม 0.01 และ 0.02 ยืนยันได้ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 ใบเป็น &quot;ยืนยันแล้ว&quot; · `confirmed-by` = คุณพิมพ์ · มีเวลายืนยันไม่ว่าง (0.01 ≥ 0.01 · 0.02 ≥ 0.01)</p>
+<p class="muted">ที่มา: FR-12 · FR-13 · BR-06 · TD-BR06-b, c · เวลา 9.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-3-02/01_confirmed_total_0.01.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-02/01_confirmed_total_0.01.png" alt="confirmed total 0.01"><span>confirmed total 0.01</span></a><a href="evidence/round1/TC-3-02/04_confirmed_total_0.02.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-02/04_confirmed_total_0.02.png" alt="confirmed total 0.02"><span>confirmed total 0.02</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-02/00_W15_total_0.01.json" target="_blank">W15 total 0.01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-02/02_W12_total_0.01.json" target="_blank">W12 total 0.01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-02/03_W15_total_0.02.json" target="_blank">W15 total 0.02</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-02/05_W12_total_0.02.json" target="_blank">W12 total 0.02</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-3-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-3-03</b> แก้ยอดเป็นค่าติดลบ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> `422 total_invalid` (−5.00 &lt; 0.01) · สถานะยังรอตรวจ · ประวัติแสดงค่าเดิม 100.00 → ค่าใหม่ −5.00 · ผู้แก้ คุณพิมพ์ · เวลา</p>
+<p class="muted">ที่มา: FR-12 · FR-14 · BR-06 · TD-BR06-d · เวลา 9.3 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>note</b> confirm-button disabled for total -5.00 -&gt; same W15 sent by API</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-3-03/02_history.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-03/02_history.png" alt="history"><span>history</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-03/00_W14_total_-5.00.json" target="_blank">W14 total -5.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-03/01_W15_confirm_total_-5.00.json" target="_blank">W15 confirm total -5.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-03/03_W17_history.json" target="_blank">W17 history</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-3-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-3-04</b> ยืนยันโดยไม่ติ๊กเทียบยอด / ไม่เลือกหมวด <span class="tag">P2</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ② ถูกปฏิเสธ (4xx) · สถานะยังรอตรวจ · ไม่มีผู้ยืนยัน (ไม่ตรวจรหัส error เพราะ DESIGN 9.2 ไม่ได้กำหนด) · ③ ยืนยันได้ เป็นตัวควบคุมว่า ① ② ถูกปฏิเสธเพราะเงื่อนไขที่ตัดออกเท่านั้น</p>
+<p class="muted">ที่มา: FR-12 · FR-29 · A-02 · A-14 · เวลา 11.1 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-3-04/00_review_page.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-04/00_review_page.png" alt="review page"><span>review page</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-04/01_①_totalChecked_false.json" target="_blank">① totalChecked=false</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-04/02_②_no_categoryId.json" target="_blank">② no categoryId</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-04/03_③_control.json" target="_blank">③ control</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-04/04_W12_end.json" target="_blank">W12 end</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-3-05">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-3-05</b> ใบติดธงต้องเปิดดูก่อนยืนยัน <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ถูกปฏิเสธ สถานะยังรอตรวจ (ตัดสินด้วย FR-12) · ② บันทึกผลส่งลูกค้าตาม AP-03 ไม่ใช้ตัดสินผ่าน/ตก · ③ ยืนยันได้ ผู้ยืนยัน คุณพิมพ์</p>
+<p class="muted">ที่มา: FR-12 · US-09 · AP-03 · เวลา 10.0 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>AP</b> AP-03: W12 then W15 on conf-089__001 -&gt; HTTP 200  · status=confirmed</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-3-05/04_③_confirmed___002.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-05/04_③_confirmed___002.png" alt="③ confirmed __002"><span>③ confirmed __002</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-05/00_①_confirm_without_opening.json" target="_blank">① confirm without opening</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-05/01_②_W12___001_after_①_.json" target="_blank">② W12 __001 (after ①)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-05/02_②_confirm_after_W12.json" target="_blank">② confirm after W12</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-05/03_③_confirm_on_page.json" target="_blank">③ confirm on page</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-05/05_③_W12___002.json" target="_blank">③ W12 __002</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-3-06">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-3-06</b> แก้ทุกช่องโดยพนักงานและหัวหน้า ค่าเดิมไม่ถูกทับ <span class="tag">P2</span><span class="tag">M</span>
+<span class="badge v-plan">แผนผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① `items-sum` = 45.00 + 30.00 + 45.00 = 120.00 · ผลต่าง \</p>
+<p class="muted">ที่มา: 120.00 − 120.00\ · เวลา 25.0 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> ขั้น ① ให้แก้ชื่อรายการบรรทัด 1 เป็น &#x27;ข้าวสาร&#x27; ซึ่งตรงกับค่าที่ตัวอ่านจำลองให้อยู่แล้ว จึงไม่เกิดการแก้ → ประวัติ 5 แถว ไม่ใช่ 6 · ส่วนอื่นผ่านทั้งหมด · แผนต้องเปลี่ยนชื่อใหม่ในขั้น ①</p>
+<ul class="ann"><li><b>AP</b> AP-06: ok-100 line 1 is already named &quot;ข้าวสาร&quot; by the mock, so step ① renames it to the same value; the plan expects 6 history rows assuming a real change (plan input issue, assertion kept as written)</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ③ 6 history rows on page
+
+expect(locator).toHaveCount(expected) failed
+
+Locator:  locator(&#x27;[data-testid^=&quot;history-row-&quot;]&#x27;)
+Expected: 6
+Received: 5
+Timeout:  15000ms
+
+Call log:
+  - ③ 6 history rows on page locator(&#x27;[data-testid^=&quot;history-row-&quot;]&#x27;) with timeout 15000ms
+  - waiting for locator(&#x27;[data-testid^=&quot;history-row-&quot;]&#x27;)
+    - locator resolved to 0 elements
+    - unexpected value &quot;0&quot;
+    32 × locator resolved to 5 elements
+       - unexpected value &quot;5&quot;
+
+
+  346 |     await q.reload();
+  347 |     await q.getByTestId(&#x27;history-button&#x27;).click();
+&gt; 348 |     await expect.soft(q.locator(&#x27;[data-testid^=&quot;history-row-&quot;]&#x27;), &#x27;③ 6 history rows on page&#x27;).toHaveCount(6);
+      |                                                                                               ^
+  349 |     const om = (await q.getByTestId(&#x27;original-merchant&#x27;).textContent().catch(() =&gt; &#x27;&#x27;)) || &#x27;&#x27;;
+  350 |     const od = (await q.getByTestId(&#x27;original-date&#x27;).textContent().catch(() =&gt; &#x27;&#x27;)) || &#x27;&#x27;;
+  351 |     const ot = (await q.getByTestId(&#x27;original-total&#x27;).textContent().catch(() =&gt; &#x27;&#x27;)) || &#x27;&#x27;;
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:348:95</pre><pre>Error: 6 edits (5 U-01 + 1 U-03)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 6
+Received: 5
+
+  363 |     if (h.original?.items?.find((x: any) =&gt; x.lineNo === 1)?.name === &#x27;ข้าวสาร&#x27;)
+  364 |       pendingAP(testInfo, &#x27;AP-06&#x27;, &#x27;ok-100 line 1 is already named &quot;ข้าวสาร&quot; by the mock, so step ① renames it to the same value; the plan expects 6 history rows assuming a real change (plan input issue, assertion kept as written)&#x27;);
+&gt; 365 |     expect.soft(edits.length, &#x27;6 edits (5 U-01 + 1 U-03)&#x27;).toBe(6);
+      |                                                            ^
+  366 |     expect.soft(edits.filter((e: any) =&gt; e.actor.includes(PIM)).length, &#x27;5 edits by คุณพิมพ์&#x27;).toBe(5);
+  367 |     expect.soft(edits.filter((e: any) =&gt; e.actor.includes(KITTI)).length, &#x27;1 edit by คุณกิตติ&#x27;).toBe(1);
+  368 |     for (const [i, e] of edits.entries()) {
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:365:60</pre><pre>Error: 5 edits by คุณพิมพ์
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 5
+Received: 4
+
+  364 |       pendingAP(testInfo, &#x27;AP-06&#x27;, &#x27;ok-100 line 1 is already named &quot;ข้าวสาร&quot; by the mock, so step ① renames it to the same value; the plan expects 6 history rows assuming a real change (plan input issue, assertion kept as written)&#x27;);
+  365 |     expect.soft(edits.length, &#x27;6 edits (5 U-01 + 1 U-03)&#x27;).toBe(6);
+&gt; 366 |     expect.soft(edits.filter((e: any) =&gt; e.actor.includes(PIM)).length, &#x27;5 edits by คุณพิมพ์&#x27;).toBe(5);
+      |                                                                                                ^
+  367 |     expect.soft(edits.filter((e: any) =&gt; e.actor.includes(KITTI)).length, &#x27;1 edit by คุณกิตติ&#x27;).toBe(1);
+  368 |     for (const [i, e] of edits.entries()) {
+  369 |       expect.soft(e.old !== undefined &amp;&amp; e.neu !== undefined, `edit ${i + 1} has old and new value`).toBe(true);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:366:96</pre></details>
+<div class="shots"><a href="evidence/round1/TC-3-06/01_①_after_U-01_edit.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-06/01_①_after_U-01_edit.png" alt="① after U-01 edit"><span>① after U-01 edit</span></a><a href="evidence/round1/TC-3-06/05_③_history_U-03.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-06/05_③_history_U-03.png" alt="③ history U-03"><span>③ history U-03</span></a><a href="evidence/round1/TC-3-06/07_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-06/07_screenshot.png" alt="screenshot"><span>screenshot</span></a><a href="evidence/round1/TC-3-06/08_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-06/08_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-06/00_①_W14_U-01.json" target="_blank">① W14 U-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-06/02_①_W12.json" target="_blank">① W12</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-06/03_②_W14_U-03.json" target="_blank">② W14 U-03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-06/04_③_original-_on_page.json" target="_blank">③ original-* on page</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-06/06_③_W17.json" target="_blank">③ W17</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-06/09_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-3-06/10_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-3-07">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-3-07</b> ธงยอดไม่ตรงคิดจากค่าหลังแก้ <span class="tag">P1</span><span class="tag">M</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ผลรวมรายการ 45.00 + 30.00 + 23.99 = 98.99 · \</p>
+<p class="muted">ที่มา: 98.99 − 100.00\ · เวลา 24.9 วินาที · รอบ: round1: failed → round2: failed</p>
+<p><b>คัดแยก:</b> รอบ 1 ล้มเพราะไฟล์ trace ชนกันจากการรันซ้อน (ปัญหาการรัน) จึงรันซ้ำ · รอบ 2: แก้ราคาเป็น 23.99 แล้ว items-sum 98.99 แต่ไม่ติดธง &#x27;ยอดไม่ตรงรายการ&#x27; (AP-01 ชั่วคราว) และ U-02 ที่ไม่เคยเปิดใบยืนยันได้ · ยอดผิดผ่านไปโดยไม่มีธง</p>
+
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ① flag ยอดไม่ตรงรายการ shown (|98.99-100.00| = 1.01 &gt; 1.00, AP-01)
+
+expect(locator).toBeVisible() failed
+
+Locator: getByTestId(&#x27;flag-mismatch&#x27;)
+Expected: visible
+Timeout: 15000ms
+Error: element(s) not found
+
+Call log:
+  - ① flag ยอดไม่ตรงรายการ shown (|98.99-100.00| = 1.01 &gt; 1.00, AP-01) getByTestId(&#x27;flag-mismatch&#x27;) with timeout 15000ms
+  - waiting for getByTestId(&#x27;flag-mismatch&#x27;)
+
+
+  399 |     await page.reload();
+  400 |     await expect.soft(page.getByTestId(&#x27;items-sum&#x27;), &#x27;① items-sum 98.99&#x27;).toContainText(&#x27;98.99&#x27;);
+&gt; 401 |     await expect.soft(page.getByTestId(&#x27;flag-mismatch&#x27;), &#x27;① flag ยอดไม่ตรงรายการ shown (|98.99-100.00| = 1.01 &gt; 1.00, AP-01)&#x27;).toBeVisible();
+      |                                                                                                                                ^
+  402 |     await shot(testInfo, page, &#x27;① after edit 23.99&#x27;);
+  403 |     const a = await getR(u01, id1);
+  404 |     await evidence(testInfo, &#x27;① W12&#x27;, a);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:401:128</pre><pre>Error: ① flags.mismatch true (AP-01 provisional: current values)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  404 |     await evidence(testInfo, &#x27;① W12&#x27;, a);
+  405 |     expect.soft(money(a.itemsSum), &#x27;① itemsSum 98.99&#x27;).toBe(9899);
+&gt; 406 |     expect.soft(a.flags?.mismatch, &#x27;① flags.mismatch true (AP-01 provisional: current values)&#x27;).toBe(true);
+      |                                                                                                 ^
+  407 |     expect.soft(a.flags?.flagged, &#x27;① flags.flagged true&#x27;).toBe(true);
+  408 |
+  409 |     // ② U-02 (never opened) sends a correct W15
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:406:97</pre><pre>Error: ① flags.flagged true
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  405 |     expect.soft(money(a.itemsSum), &#x27;① itemsSum 98.99&#x27;).toBe(9899);
+  406 |     expect.soft(a.flags?.mismatch, &#x27;① flags.mismatch true (AP-01 provisional: current values)&#x27;).toBe(true);
+&gt; 407 |     expect.soft(a.flags?.flagged, &#x27;① flags.flagged true&#x27;).toBe(true);
+      |                                                           ^
+  408 |
+  409 |     // ② U-02 (never opened) sends a correct W15
+  410 |     const c2 = await confirm(u02, id1);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:407:59</pre><pre>Error: ② must be rejected (got 200)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  410 |     const c2 = await confirm(u02, id1);
+  411 |     await evidence(testInfo, &#x27;② W15 by U-02 not opened&#x27;, c2);
+&gt; 412 |     expect.soft(c2.status &gt;= 400 &amp;&amp; c2.status &lt; 500, `② must be rejected (got ${c2.status})`).toBe(true);
+      |                                                                                               ^
+  413 |     const b = await getR(u01, id1);
+  414 |     expect.soft(b.status, &#x27;② status stays review&#x27;).toBe(&#x27;review&#x27;);
+  415 |
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:412:95</pre><pre>Error: ② status stays review
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;review&quot;
+Received: &quot;confirmed&quot;
+
+  412 |     expect.soft(c2.status &gt;= 400 &amp;&amp; c2.status &lt; 500, `② must be rejected (got ${c2.status})`).toBe(true);
+  413 |     const b = await getR(u01, id1);
+&gt; 414 |     expect.soft(b.status, &#x27;② status stays review&#x27;).toBe(&#x27;review&#x27;);
+      |                                                    ^
+  415 |
+  416 |     // ③ U-01 reloads (opens every field) and confirms
+  417 |     await page.reload();
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:414:52</pre><pre>Error: ③ confirm-button usable
+
+expect(received).not.toBeNull()
+
+Received: null
+
+  419 |     await viewAllFields(page);
+  420 |     const c3 = await confirmOnPage(page, id1);
+&gt; 421 |     expect.soft(c3, &#x27;③ confirm-button usable&#x27;).not.toBeNull();
+      |                                                    ^
+  422 |     if (c3) {
+  423 |       await evidence(testInfo, &#x27;③ W15 by U-01 on page&#x27;, c3);
+  424 |       expect.soft(c3.status, &#x27;③ confirm must succeed&#x27;).toBeLessThan(300);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:421:52</pre><pre>Error: ③ confirmedBy คุณพิมพ์
+
+expect(received).toContain(expected) // indexOf
+
+Expected substring: &quot;พิมพ์&quot;
+Received string:    &quot;\&quot;คุณแนน\&quot;&quot;
+
+  427 |     await evidence(testInfo, &#x27;③ W12&#x27;, c);
+  428 |     expect.soft(c.status, &#x27;③ status confirmed&#x27;).toBe(&#x27;confirmed&#x27;);
+&gt; 429 |     expect.soft(JSON.stringify(c.confirmedBy ?? &#x27;&#x27;), &#x27;③ confirmedBy คุณพิมพ์&#x27;).toContain(PIM);
+      |                                                                                ^
+  430 |     await page.reload();
+  431 |     await shot(testInfo, page, &#x27;③ confirmed __001&#x27;);
+  432 |
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:429:80</pre></details>
+<div class="shots"><a href="evidence/round2/TC-3-07/01_①_after_edit_23.99.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-3-07/01_①_after_edit_23.99.png" alt="① after edit 23.99"><span>① after edit 23.99</span></a><a href="evidence/round2/TC-3-07/05_③_confirmed___001.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-3-07/05_③_confirmed___001.png" alt="③ confirmed __001"><span>③ confirmed __001</span></a><a href="evidence/round2/TC-3-07/07_④_after_edit_24.00.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-3-07/07_④_after_edit_24.00.png" alt="④ after edit 24.00"><span>④ after edit 24.00</span></a><a href="evidence/round2/TC-3-07/09_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-3-07/09_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round2/TC-3-07/00_①_W14_line3_23.99.json" target="_blank">① W14 line3 23.99</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/02_①_W12.json" target="_blank">① W12</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/03_②_W15_by_U-02_not_opened.json" target="_blank">② W15 by U-02 not opened</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/04_③_W12.json" target="_blank">③ W12</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/06_④_W14_line3_24.00.json" target="_blank">④ W14 line3 24.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/08_④_W12.json" target="_blank">④ W12</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-3-07/10_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round2/TC-3-07/11_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-3-08">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-3-08</b> หลังยืนยัน พนักงานแก้ไม่ได้ หัวหน้าเปิดกลับได้ <span class="tag">P2</span><span class="tag">M</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ② ถูกปฏิเสธ (`403`) ยอดยังเป็น 100.00 · ③ สถานะกลับเป็น &quot;รอตรวจ&quot; · ประวัติมีแถวยืนยันโดยคุณพิมพ์และแถวเปิดกลับโดยคุณกิตติ พร้อมเวลา</p>
+<p class="muted">ที่มา: A-15 · FR-13 · NFR-10 · เวลา 19.5 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> พนักงาน PATCH ใบที่ยืนยันแล้วได้ 409 not_editable แทน 403 ตามตาราง error ของ DESIGN 9.2 · ยอดยังเป็น 100.00 (ข้อมูลไม่เสีย) · reopen ทำงานถูก</p>
+
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ① PATCH after confirm must be 403
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 403
+Received: 409
+
+  463 |     const p1j = await p1.json().catch(() =&gt; ({}));
+  464 |     await evidence(testInfo, &#x27;① PATCH by U-01&#x27;, { status: p1.status(), json: p1j });
+&gt; 465 |     expect.soft(p1.status(), &#x27;① PATCH after confirm must be 403&#x27;).toBe(403);
+      |                                                                   ^
+  466 |     let r = await getR(u01, id);
+  467 |     expect.soft(money(r.total), &#x27;① total stays 100.00&#x27;).toBe(10000);
+  468 |
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\53-review.spec.ts:465:67</pre></details>
+<div class="shots"><a href="evidence/round1/TC-3-08/04_③_after_reopen.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-08/04_③_after_reopen.png" alt="③ after reopen"><span>③ after reopen</span></a><a href="evidence/round1/TC-3-08/06_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-3-08/06_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-3-08/00_confirm_by_U-01.json" target="_blank">confirm by U-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-08/01_①_PATCH_by_U-01.json" target="_blank">① PATCH by U-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-08/02_②_reopen_by_U-01.json" target="_blank">② reopen by U-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-08/03_③_reopen_by_U-03.json" target="_blank">③ reopen by U-03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-08/05_③_W17.json" target="_blank">③ W17</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-3-08/07_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-3-08/08_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details><h2 id="g4">5.4 งานด่วน <small>ผ่าน 5 · ล้ม 2 · บล็อก 1</small></h2>
+<details class="tc s-fail" id="TC-4-01">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-4-01</b> ชุด 9 และ 10 ใบ ตั้งด่วนได้ · ชุดที่อ่านเสร็จแล้วตั้งไม่ได้ <span class="tag">P2</span><span class="tag">A</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ชุด 9 และ 10: `batch-priority` = ด่วน (9 ≤ 10 · 10 ≤ 10) · ตัวนับงานด่วนวันนี้ 0 → 1 → 2 · ชุดที่อ่านเสร็จแล้ว: ไม่ถูกตั้งเป็นด่วน ตัวนับยังเป็น 2 (FR-18 ให้ตั้งกับชุดที่ยังอ่านไม่เสร็จเท่านั้น)</p>
+<p class="muted">ที่มา: FR-18 · BR-08 · TD-BR08-a, b · เวลา 378.0 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> ชุดที่อ่านเสร็จทุกใบแล้วยังตั้งด่วนได้ (200) และกินโควตา ตัวนับ 2 → 3 · FR-18 ให้ตั้งกับชุดที่ยังอ่านไม่เสร็จเท่านั้น</p>
+
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ชุดที่อ่านเสร็จแล้ว ไม่ถูกตั้งเป็นด่วน (FR-18)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;normal&quot;
+Received: &quot;urgent&quot;
+
+  110 |     await shot(testInfo, page, &#x27;ชุดที่อ่านเสร็จแล้ว หลังกดงานด่วน&#x27;);
+  111 |     const after = await batchOf(lead, b3.json.batchId);
+&gt; 112 |     expect.soft(after.batch.priority, &#x27;ชุดที่อ่านเสร็จแล้ว ไม่ถูกตั้งเป็นด่วน (FR-18)&#x27;).toBe(&#x27;normal&#x27;);
+      |                                                                                         ^
+  113 |     await expect.soft(page.getByTestId(&#x27;batch-priority&#x27;), &#x27;batch-priority ของชุดที่อ่านเสร็จแล้ว ไม่ใช่ด่วน&#x27;).not.toContainText(&#x27;ด่วน&#x27;);
+  114 |     expect.soft(await usedToday(lead), &#x27;ตัวนับยังเป็น 2&#x27;).toBe(2);
+  115 |     await evidence(testInfo, &#x27;W23 ตอนจบ&#x27;, await queue(lead));
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\54-urgent.spec.ts:112:89</pre><pre>Error: batch-priority ของชุดที่อ่านเสร็จแล้ว ไม่ใช่ด่วน
+
+expect(locator).not.toContainText(expected) failed
+
+Locator: getByTestId(&#x27;batch-priority&#x27;)
+Expected substring: not &quot;ด่วน&quot;
+Received string: &quot;ด่วน&quot;
+Timeout: 15000ms
+
+Call log:
+  - batch-priority ของชุดที่อ่านเสร็จแล้ว ไม่ใช่ด่วน getByTestId(&#x27;batch-priority&#x27;) with timeout 15000ms
+  - waiting for getByTestId(&#x27;batch-priority&#x27;)
+    33 × locator resolved to &lt;span class=&quot;badge urgent&quot; data-priority=&quot;urgent&quot; data-testid=&quot;batch-priority&quot;&gt;ด่วน&lt;/span&gt;
+       - unexpected value &quot;ด่วน&quot;
+
+
+  111 |     const after = await batchOf(lead, b3.json.batchId);
+  112 |     expect.soft(after.batch.priority, &#x27;ชุดที่อ่านเสร็จแล้ว ไม่ถูกตั้งเป็นด่วน (FR-18)&#x27;).toBe(&#x27;normal&#x27;);
+&gt; 113 |     await expect.soft(page.getByTestId(&#x27;batch-priority&#x27;), &#x27;batch-priority ของชุดที่อ่านเสร็จแล้ว ไม่ใช่ด่วน&#x27;).not.toContainText(&#x27;ด่วน&#x27;);
+      |                                                                                                                   ^
+  114 |     expect.soft(await usedToday(lead), &#x27;ตัวนับยังเป็น 2&#x27;).toBe(2);
+  115 |     await evidence(testInfo, &#x27;W23 ตอนจบ&#x27;, await queue(lead));
+  116 |   } finally {
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\54-urgent.spec.ts:113:115</pre><pre>Error: ตัวนับยังเป็น 2
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 2
+Received: 3
+
+  112 |     expect.soft(after.batch.priority, &#x27;ชุดที่อ่านเสร็จแล้ว ไม่ถูกตั้งเป็นด่วน (FR-18)&#x27;).toBe(&#x27;normal&#x27;);
+  113 |     await expect.soft(page.getByTestId(&#x27;batch-priority&#x27;), &#x27;batch-priority ของชุดที่อ่านเสร็จแล้ว ไม่ใช่ด่วน&#x27;).not.toContainText(&#x27;ด่วน&#x27;);
+&gt; 114 |     expect.soft(await usedToday(lead), &#x27;ตัวนับยังเป็น 2&#x27;).toBe(2);
+      |                                                           ^
+  115 |     await evidence(testInfo, &#x27;W23 ตอนจบ&#x27;, await queue(lead));
+  116 |   } finally {
+  117 |     await context.close();
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\54-urgent.spec.ts:114:59</pre></details>
+<div class="shots"><a href="evidence/round1/TC-4-01/01_ชุด_9_ใบ_หลังกดงานด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-01/01_ชุด_9_ใบ_หลังกดงานด่วน.png" alt="ชุด 9 ใบ หลังกดงานด่วน"><span>ชุด 9 ใบ หลังกดงานด่วน</span></a><a href="evidence/round1/TC-4-01/03_ชุด_10_ใบ_หลังกดงานด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-01/03_ชุด_10_ใบ_หลังกดงานด่วน.png" alt="ชุด 10 ใบ หลังกดงานด่วน"><span>ชุด 10 ใบ หลังกดงานด่วน</span></a><a href="evidence/round1/TC-4-01/05_ชุดที่อ่านเสร็จแล้ว_หลังกดงานด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-01/05_ชุดที่อ่านเสร็จแล้ว_หลังกดงานด่วน.png" alt="ชุดที่อ่านเสร็จแล้ว หลังกดงานด่วน"><span>ชุดที่อ่านเสร็จแล้ว หลังกดงานด่วน</span></a><a href="evidence/round1/TC-4-01/07_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-01/07_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-01/00_W10_ชุด_9_ใบ.json" target="_blank">W10 ชุด 9 ใบ</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-01/02_W10_ชุด_10_ใบ.json" target="_blank">W10 ชุด 10 ใบ</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-01/04_W10_ชุดที่อ่านเสร็จแล้ว.json" target="_blank">W10 ชุดที่อ่านเสร็จแล้ว</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-01/06_W23_ตอนจบ.json" target="_blank">W23 ตอนจบ</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-01/08_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-4-01/09_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-4-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-4-02</b> ชุด 11 ใบ ตั้งด่วนไม่ได้ <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① `422 urgent_too_large` · ชุดยังเป็นงานปกติ รับไว้ 11 ใบ · ตัวนับด่วนวันนี้ยังเป็น 0 · ② จำนวนใบใหม่ = 0 หรือ 11 เท่านั้น (ห้ามรับครึ่งชุด) · ถ้า 11 ทุกใบเป็นงานปกติ · ตัวนับด่วนยังเป็น 0 · แบบใดถูกต้องตัดสินตาม AP-02</p>
+<p class="muted">ที่มา: FR-18 · FR-23 · BR-08 · TD-BR08-c · AP-02 · เวลา 3.8 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>AP</b> AP-02: W7 11 ไฟล์ urgent=true → HTTP 422 urgent_too_large · ใบใหม่ 0 ใบ (ปฏิเสธทั้งชุด)</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-4-02/01_①_ชุด_11_ใบ_กดงานด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-02/01_①_ชุด_11_ใบ_กดงานด่วน.png" alt="① ชุด 11 ใบ กดงานด่วน"><span>① ชุด 11 ใบ กดงานด่วน</span></a><a href="evidence/round1/TC-4-02/02_②_อัปโหลด_11_ไฟล์ติ๊กด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-02/02_②_อัปโหลด_11_ไฟล์ติ๊กด่วน.png" alt="② อัปโหลด 11 ไฟล์ติ๊กด่วน"><span>② อัปโหลด 11 ไฟล์ติ๊กด่วน</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-02/00_①_W10_ชุด_11_ใบ.json" target="_blank">① W10 ชุด 11 ใบ</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-02/03_②_W7_11_ไฟล์_urgent_true.json" target="_blank">② W7 11 ไฟล์ urgent=true</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-02/04_②_ใบใหม่.json" target="_blank">② ใบใหม่</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-4-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-4-03</b> โควตาวันนี้ใช้ไป 4 → งานที่ 5 ได้ <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ตั้งได้ · ตัวนับ 4 + 1 = 5 / 5</p>
+<p class="muted">ที่มา: FR-18 · BR-09 · TD-BR09-a · เวลา 1.0 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-4-03/02_หน้าชุดงานด่วนที่_5.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-03/02_หน้าชุดงานด่วนที่_5.png" alt="หน้าชุดงานด่วนที่ 5"><span>หน้าชุดงานด่วนที่ 5</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-03/00_W7_5_ไฟล์_urgent_true.json" target="_blank">W7 5 ไฟล์ urgent=true</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-03/01_W23_หลังตั้ง.json" target="_blank">W23 หลังตั้ง</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-4-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-4-04</b> โควตาครบ 5 → งานที่ 6 ไม่ได้ ทุกช่องทาง <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① (ก) (ข) `409 urgent_quota` · ตัวนับยังเป็น 5 / 5 · ② 3 + 2 = 5 ตั้งได้ครบ · งานที่ 6 ทั้ง 2 ช่องทาง `409 urgent_quota` · ตัวนับ 5 / 5 (โควตาเป็นของทั้งสำนักงาน นับรวมทุกช่องทาง · การทดสอบด้วยหัวหน้า 2 คนรอ AP-05)</p>
+<p class="muted">ที่มา: FR-18 · BR-09 · TD-BR09-b · AP-05 · เวลา 8.0 วินาที · รอบ: round1: passed</p>
+
+<ul class="ann"><li><b>AP</b> AP-05: โควตาทั้งสำนักงานทดสอบด้วยหัวหน้าคนเดียว (U-03) ผ่าน 2 ช่องทาง · การทดสอบด้วยหัวหน้า 2 คนรอ U-07</li></ul>
+
+<div class="shots"><a href="evidence/round1/TC-4-04/00_①_ก_อัปโหลดติ๊กด่วน_งานที่_6.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-04/00_①_ก_อัปโหลดติ๊กด่วน_งานที่_6.png" alt="① (ก) อัปโหลดติ๊กด่วน งานที่ 6"><span>① (ก) อัปโหลดติ๊กด่วน งานที่ 6</span></a><a href="evidence/round1/TC-4-04/03_①_ข_กดปุ่มด่วน_งานที่_6.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-04/03_①_ข_กดปุ่มด่วน_งานที่_6.png" alt="① (ข) กดปุ่มด่วน งานที่ 6"><span>① (ข) กดปุ่มด่วน งานที่ 6</span></a><a href="evidence/round1/TC-4-04/04_②_งานที่_6_กดปุ่มด่วน.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-04/04_②_งานที่_6_กดปุ่มด่วน.png" alt="② งานที่ 6 กดปุ่มด่วน"><span>② งานที่ 6 กดปุ่มด่วน</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-04/01_①_ก_W7_urgent_true.json" target="_blank">① (ก) W7 urgent=true</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-04/02_①_ข_W10.json" target="_blank">① (ข) W10</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-04/05_②_ลำดับการตั้งด่วน.json" target="_blank">② ลำดับการตั้งด่วน</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-4-05">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-4-05</b> วันใหม่เริ่มนับ 0 <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ตั้งได้ · ตัวนับวันนี้ 0 + 1 = 1 · งานเมื่อวาน 23:59 ไม่ถูกนับในวันนี้ (วันปฏิทินเวลาไทย)</p>
+<p class="muted">ที่มา: BR-09 · A-08 · TD-BR09-c · เวลา 1.0 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-4-05/02_หน้าชุดงานด่วนวันใหม่.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-05/02_หน้าชุดงานด่วนวันใหม่.png" alt="หน้าชุดงานด่วนวันใหม่"><span>หน้าชุดงานด่วนวันใหม่</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-05/00_W23_ก่อนเริ่ม.json" target="_blank">W23 ก่อนเริ่ม</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-05/01_W7_5_ไฟล์_urgent_true.json" target="_blank">W7 5 ไฟล์ urgent=true</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-4-06">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-4-06</b> งานด่วนไม่ติดเพดานคิว <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① รับ 10 · ใบงานปกติค้าง (W23) ยังเป็น 400 · ② 400 + 1 = 401 &gt; 400 → `429 queue_full` · N = ปัดขึ้น(1 ÷ 8) = 1 นาที</p>
+<p class="muted">ที่มา: BR-11 · BR-12 · FR-22 · TD-BR11-e · เวลา 1.0 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-4-06/02_②_U-01_ส่ง_1_ไฟล์ขณะคิวเต็ม.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-4-06/02_②_U-01_ส่ง_1_ไฟล์ขณะคิวเต็ม.png" alt="② U-01 ส่ง 1 ไฟล์ขณะคิวเต็ม"><span>② U-01 ส่ง 1 ไฟล์ขณะคิวเต็ม</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-4-06/00_①_W7_10_ไฟล์_urgent_true.json" target="_blank">① W7 10 ไฟล์ urgent=true</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-06/01_①_W23.json" target="_blank">① W23</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-4-06/03_②_W7_1_ไฟล์ปกติ.json" target="_blank">② W7 1 ไฟล์ปกติ</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-blocked" id="TC-4-07">
+<summary><span class="badge b-blocked">บล็อก</span>
+<b>TC-4-07</b> งานด่วน 10 ใบมีผลภายใน 5 นาที (smoke ของ NFR-03) <span class="tag">P1</span><span class="tag">R</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 2 รอบ: ใบด่วนทั้ง 10 มีผล ≤ t0 + 300 วินาที · เพดานทางทฤษฎีของรอบ ข: Worker 1 ตัว 4 ใบ/นาที สลับ 4:1 → ใบด่วน 4 × 4/5 = 3.2 ใบ/นาที → 10 ÷ 3.2 = 3.125 นาที = 187.5 วินาที &lt; 300 วินาที · ใบปกติ 40 ใบมีผลครบภายใน 120 นาทีจากรับแล้ว (BR-13) · จบด้วย `workersAlive` = 2 · ผลนี้ไม่ใช่การรับรอง NFR-03 (หัวข้อ 2.2)</p>
+<p class="muted">ที่มา: NFR-03 (smoke) · FR-20 · BR-13 · เวลา 5.1 วินาที · รอบ: round1: skipped</p>
+
+<ul class="ann"><li><b>blocked</b> รอบปล่อยรุ่น ★: ต้องใช้ใบจริง 100 ไฟล์ เกินงบรอบปกติ/งบของขั้นนี้ (120 ใบ) และต้องได้อนุมัติหัวหน้าทีมทดสอบ</li><li><b>skip</b> รอบปล่อยรุ่น ★ เท่านั้น (2 × 50 ไฟล์จริง ต้องได้อนุมัติหัวหน้าทีมทดสอบ)</li></ul>
+
+<div class="shots"></div>
+<ul class="files"></ul>
+</div></details>
+<details class="tc s-fail" id="TC-4-08">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-4-08</b> ลำดับอ่าน 4:1 ครบ 4 รูปคิว <span class="tag">P2</span><span class="tag">R</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> a ด่วน 3 · ปกติ 2 → U1 U2 U3 N1 N2 · b ด่วน 4 · ปกติ 2 → U1 U2 U3 U4 N1 N2 · c ด่วน 5 · ปกติ 2 → U1 U2 U3 U4 N1 U5 N2 (ห้ามด่วนติดกัน 5 ขณะมีปกติรอ) · d ด่วน 5 · ปกติ 0 → U1 U2 U3 U4 U5 (ไม่มีปกติรอ ไม่ต้องสลับ) · ใบที่กำลังอ่านอยู่ไม่ถูกขัดจังหวะ (ทุก ID มีเหตุการณ์หยิบ 1 ครั้งและผล 1 ครั้ง) · จบด้วย `workersAlive` = 2</p>
+<p class="muted">ที่มา: FR-20 · BR-10 · TD-BR10-a – d · เวลา 156.8 วินาที · รอบ: round1: failed → round2: failed</p>
+<p><b>คัดแยก:</b> รอบ 1 เทสต์ผิด: ตั้งป้าย U1..N2 ตามลำดับอัปโหลด ไม่ใช่ลำดับเข้าคิวที่ gateway → แก้ให้ตัดสินจากรูปแบบด่วน/ปกติตาม BR-10 · รอบ 1 รูปแบบถูกทั้ง 4 รูปคิว แต่รอบ 2 รูปคิว a ได้ U N U U N (หยิบใบปกติทั้งที่ใบด่วนรออยู่ 2 ใบ) b c d ถูก → ลำดับความสำคัญไม่คงที่ (เกิด 1 ใน 8 ครั้ง)</p>
+<ul class="ann"><li><b>note</b> E6: คิวที่ gateway (GET /v1/queue) เรียกจากเครื่องทดสอบไม่ได้ จึงไม่ได้ตรวจในสเปกนี้</li><li><b>info</b> a: ลำดับหยิบ (ป้ายตามลำดับอัปโหลด) U1 N2 U2 U3 N1 · รูปแบบ U N U U N · คาด U U U N N</li><li><b>info</b> b: ลำดับหยิบ (ป้ายตามลำดับอัปโหลด) U4 U1 U3 U2 N1 N2 · รูปแบบ U U U U N N · คาด U U U U N N</li><li><b>info</b> c: ลำดับหยิบ (ป้ายตามลำดับอัปโหลด) U3 U5 U1 U2 N2 U4 N1 · รูปแบบ U U U U N U N · คาด U U U U N U N</li><li><b>info</b> d: ลำดับหยิบ (ป้ายตามลำดับอัปโหลด) U3 U5 U1 U4 U2 · รูปแบบ U U U U U · คาด U U U U U</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: a ⑤ ลำดับอ่าน (รูปแบบด่วน/ปกติ ตาม BR-10)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;U U U N N&quot;
+Received: &quot;U N U U N&quot;
+
+  501 |       const expectedPattern = s.expected.map((l: string) =&gt; l[0]).join(&#x27; &#x27;);
+  502 |       testInfo.annotations.push({ type: &#x27;info&#x27;, description: `${s.key}: ลำดับหยิบ (ป้ายตามลำดับอัปโหลด) ${order.join(&#x27; &#x27;)} · รูปแบบ ${pattern} · คาด ${expectedPattern}` });
+&gt; 503 |       expect.soft(pattern, `${s.key} ⑤ ลำดับอ่าน (รูปแบบด่วน/ปกติ ตาม BR-10)`).toBe(expectedPattern);
+      |                                                                                ^
+  504 |       expect.soft(perId.filter(p =&gt; p.go !== 1 || p.read !== 1).map(p =&gt; `${p.label}: go=${p.go} read=${p.read}`), `${s.key} ทุก ID หยิบ 1 ครั้งและผล 1 ครั้ง`).toEqual([]);
+  505 |       expect.soft(perId.filter(p =&gt; p.queues.some(qq =&gt; qq !== (p.label.startsWith(&#x27;U&#x27;) ? &#x27;urgent&#x27; : &#x27;normal&#x27;))).map(p =&gt; `${p.label}: ${p.queues}`), `${s.key} ใบ U มาจาก queue=urgent · ใบ N มาจาก queue=normal`).toEqual([]);
+  506 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\54-urgent.spec.ts:503:80</pre></details>
+<div class="shots"><a href="evidence/round2/TC-4-08/04_a_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-4-08/04_a_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" alt="a ③ ชุดด่วนรออ่านก่อนเปิด worker0"><span>a ③ ชุดด่วนรออ่านก่อนเปิด worker0</span></a><a href="evidence/round2/TC-4-08/11_b_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-4-08/11_b_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" alt="b ③ ชุดด่วนรออ่านก่อนเปิด worker0"><span>b ③ ชุดด่วนรออ่านก่อนเปิด worker0</span></a><a href="evidence/round2/TC-4-08/18_c_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-4-08/18_c_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" alt="c ③ ชุดด่วนรออ่านก่อนเปิด worker0"><span>c ③ ชุดด่วนรออ่านก่อนเปิด worker0</span></a><a href="evidence/round2/TC-4-08/25_d_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-4-08/25_d_③_ชุดด่วนรออ่านก่อนเปิด_worker0.png" alt="d ③ ชุดด่วนรออ่านก่อนเปิด worker0"><span>d ③ ชุดด่วนรออ่านก่อนเปิด worker0</span></a><a href="evidence/round2/TC-4-08/31_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-4-08/31_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round2/TC-4-08/00_E6_W23_หลังรีเซ็ต.json" target="_blank">E6 W23 หลังรีเซ็ต</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/01_a_①_stop.txt" target="_blank">a ① stop</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/02_a_②_W7_ชุดด่วน.json" target="_blank">a ② W7 ชุดด่วน</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/03_a_③_W23_W9_ก่อนเปิด_worker0.json" target="_blank">a ③ W23 + W9 ก่อนเปิด worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/05_a_④_start_worker0.txt" target="_blank">a ④ start worker0</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/06_a_⑤_ลำดับหยิบงานจาก_log_worker0.json" target="_blank">a ⑤ ลำดับหยิบงานจาก log worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/07_a_⑤_log_worker0_tail_40_.txt" target="_blank">a ⑤ log worker0 (tail 40)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/08_b_①_stop.txt" target="_blank">b ① stop</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/09_b_②_W7_ชุดด่วน.json" target="_blank">b ② W7 ชุดด่วน</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/10_b_③_W23_W9_ก่อนเปิด_worker0.json" target="_blank">b ③ W23 + W9 ก่อนเปิด worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/12_b_④_start_worker0.txt" target="_blank">b ④ start worker0</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/13_b_⑤_ลำดับหยิบงานจาก_log_worker0.json" target="_blank">b ⑤ ลำดับหยิบงานจาก log worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/14_b_⑤_log_worker0_tail_40_.txt" target="_blank">b ⑤ log worker0 (tail 40)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/15_c_①_stop.txt" target="_blank">c ① stop</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/16_c_②_W7_ชุดด่วน.json" target="_blank">c ② W7 ชุดด่วน</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/17_c_③_W23_W9_ก่อนเปิด_worker0.json" target="_blank">c ③ W23 + W9 ก่อนเปิด worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/19_c_④_start_worker0.txt" target="_blank">c ④ start worker0</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/20_c_⑤_ลำดับหยิบงานจาก_log_worker0.json" target="_blank">c ⑤ ลำดับหยิบงานจาก log worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/21_c_⑤_log_worker0_tail_40_.txt" target="_blank">c ⑤ log worker0 (tail 40)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/22_d_①_stop.txt" target="_blank">d ① stop</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/23_d_②_W7_ชุดด่วน.json" target="_blank">d ② W7 ชุดด่วน</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/24_d_③_W23_W9_ก่อนเปิด_worker0.json" target="_blank">d ③ W23 + W9 ก่อนเปิด worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/26_d_④_start_worker0.txt" target="_blank">d ④ start worker0</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/27_d_⑤_ลำดับหยิบงานจาก_log_worker0.json" target="_blank">d ⑤ ลำดับหยิบงานจาก log worker0</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/28_d_⑤_log_worker0_tail_40_.txt" target="_blank">d ⑤ log worker0 (tail 40)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/29_สรุปลำดับทุกรูปคิว.json" target="_blank">สรุปลำดับทุกรูปคิว</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-4-08/30_จบ_start_worker0_worker1.txt" target="_blank">จบ: start worker0 worker1</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-4-08/32_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round2/TC-4-08/33_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details><h2 id="g5">5.5 สถานะงานในคิวและใบที่อ่านไม่ได้ <small>ผ่าน 9 · ล้ม 0 · บล็อก 1</small></h2>
+<details class="tc s-pass" id="TC-5-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-01</b> ค้าง + ใหม่ ≤ 400 รับ <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① 299 + 100 = 399 ≤ 400 รับ 100 · ค้าง 399 · ② 300 + 100 = 400 รับ 100 · ค้าง 400 · ③ 395 + 5 = 400 รับ 5 · ค้าง 400</p>
+<p class="muted">ที่มา: FR-22 · BR-11 · TD-BR11-a, b, d · เวลา 7.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-01/01_①_299_100_upload_result.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-01/01_①_299_100_upload_result.png" alt="① 299 + 100 upload result"><span>① 299 + 100 upload result</span></a><a href="evidence/round1/TC-5-01/04_②_300_100_upload_result.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-01/04_②_300_100_upload_result.png" alt="② 300 + 100 upload result"><span>② 300 + 100 upload result</span></a><a href="evidence/round1/TC-5-01/07_③_395_5_upload_result.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-01/07_③_395_5_upload_result.png" alt="③ 395 + 5 upload result"><span>③ 395 + 5 upload result</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-01/00_①_299_100_W7_response.json" target="_blank">① 299 + 100 W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-01/02_①_299_100_W23.json" target="_blank">① 299 + 100 W23</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-01/03_②_300_100_W7_response.json" target="_blank">② 300 + 100 W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-01/05_②_300_100_W23.json" target="_blank">② 300 + 100 W23</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-01/06_③_395_5_W7_response.json" target="_blank">③ 395 + 5 W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-01/08_③_395_5_W23.json" target="_blank">③ 395 + 5 W23</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-02</b> ค้าง + ใหม่ &gt; 400 ไม่รับทั้งชุด <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> 301 + 100 = 401 &gt; 400 → `429 queue_full` · `upload-full-message` = &quot;ตอนนี้ระบบเต็ม กรุณาลองใหม่ในอีก 1 นาที&quot; (เกิน 1 ÷ 8 → 1) · รับ 0 ใบ · ค้างยังเป็น 301 · ยอดรับเข้าเท่าก่อนส่ง · ใบตั้งต้น 8 ใบสถานะไม่เปลี่ยน</p>
+<p class="muted">ที่มา: FR-22 · FR-23 · BR-11 · BR-12 · TD-BR11-c · เวลา 1.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-02/03_upload_refused_queue_full.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-02/03_upload_refused_queue_full.png" alt="upload refused queue_full"><span>upload refused queue_full</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-02/00_W20_before.json" target="_blank">W20 before</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-02/01_S-01..S-08_before.json" target="_blank">S-01..S-08 before</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-02/02_W7_response_page_.json" target="_blank">W7 response (page)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-02/04_W23_after.json" target="_blank">W23 after</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-02/05_W20_after.json" target="_blank">W20 after</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-02/06_S-01..S-08_after.json" target="_blank">S-01..S-08 after</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-03</b> นาทีให้ลองใหม่ตามจำนวน Worker <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> Worker 2 (อัตรา 8): ค้าง 307 → เกิน 7 → 1 · 308 → 8 → 1 · 309 → 9 → ปัดขึ้น 1.125 = 2 · 380 → 80 → 10 · 400 → 100 → ปัดขึ้น 12.5 = 13 · Worker 1 (อัตรา 4): 309 → 9 ÷ 4 = 2.25 → 3 · Worker 0 (ใช้ 1 ตัว): 380 → 80 ÷ 4 = 20 · ทุกแถวรับ 0 ใบ · หน้าเว็บแสดงเลขเดียวกับ API</p>
+<p class="muted">ที่มา: FR-22 · BR-12 · TD-BR12-b – h · เวลา 8.9 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-03/00_TD-BR12-b_upload-retry-minutes.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-03/00_TD-BR12-b_upload-retry-minutes.png" alt="TD-BR12-b upload-retry-minutes"><span>TD-BR12-b upload-retry-minutes</span></a><a href="evidence/round1/TC-5-03/01_TD-BR12-g_upload-retry-minutes.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-03/01_TD-BR12-g_upload-retry-minutes.png" alt="TD-BR12-g upload-retry-minutes"><span>TD-BR12-g upload-retry-minutes</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-03/02_TD-BR12-b..h_results.json" target="_blank">TD-BR12-b..h results</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-04</b> ออกจากหน้าแล้วกลับมาเห็นสถานะ และยอดตรวจนับ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ชุด: รับเข้า 5 = รออ่าน 5 · ทั้งสำนักงาน 8 + 5 = 13 = ยืนยันแล้ว 7 + รอตรวจ 1 + รออ่าน 5 · ผลต่าง 0 · ③ ชุด: 5 = รอตรวจ 4 + อ่านไม่ได้ 1 · สถานะรายใบตรงตาม ID (ok-100 ×3 และ conf-089 = รอตรวจ · fail3 = อ่านไม่ได้) · ทั้งสำนักงาน 13 = ยืนยันแล้ว 7 + รอตรวจ (1 + 4) 5 + อ่านไม่ได้ 1 · `reconcile-diff` = 0 ทั้งรายชุดและทั้งสำนักงาน</p>
+<p class="muted">ที่มา: FR-06 · FR-07 · FR-08 · NFR-06 · เวลา 20.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-04/01_①_batch_page_paused_.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-04/01_①_batch_page_paused_.png" alt="① batch page (paused)"><span>① batch page (paused)</span></a><a href="evidence/round1/TC-5-04/02_①_batches_paused_.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-04/02_①_batches_paused_.png" alt="① /batches (paused)"><span>① /batches (paused)</span></a><a href="evidence/round1/TC-5-04/05_③_batch_page_after_re-login.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-04/05_③_batch_page_after_re-login.png" alt="③ batch page after re-login"><span>③ batch page after re-login</span></a><a href="evidence/round1/TC-5-04/06_③_batches_after_re-login.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-04/06_③_batches_after_re-login.png" alt="③ /batches after re-login"><span>③ /batches after re-login</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-04/00_W7_response_page_.json" target="_blank">W7 response (page)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-04/03_①_W20_office.json" target="_blank">① W20 office</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-04/04_②_statuses.json" target="_blank">② statuses</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-04/07_③_W20_office.json" target="_blank">③ W20 office</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-04/08_③_W20_batch.json" target="_blank">③ W20 batch</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-04/09_③_W9_batch.json" target="_blank">③ W9 batch</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-05">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-05</b> อ่านซ้ำไม่เกิน 3 ครั้ง <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> fail1 → รอตรวจ · attempts 1 + 1 = 2 · fail2 → รอตรวจ · attempts 2 + 1 = 3 · fail3 → อ่านไม่ได้ · attempts = 3 พอดี (ไม่มีครั้งที่ 4) · ประวัติของ fail3 มีการลองอ่าน 3 ครั้งพร้อมเวลา (NFR-10) · อยู่ใน `/unreadable` เหตุผลบอกว่าอ่านไม่สำเร็จ ไม่ใช่ &quot;ไม่พบไฟล์รูป&quot; ในเมื่อ W13 ส่งรูปได้ (`200`) · หลังรอ 2 นาทีสถานะไม่กลับเป็นรออ่าน</p>
+<p class="muted">ที่มา: FR-16 · BR-07 · NFR-10 · TD-BR07-a, b, c · เวลา 697.1 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-05/07__unreadable.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-05/07__unreadable.png" alt="/unreadable"><span>/unreadable</span></a><a href="evidence/round1/TC-5-05/08_fail3_opened_from_unreadable.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-05/08_fail3_opened_from_unreadable.png" alt="fail3 opened from /unreadable"><span>fail3 opened from /unreadable</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-05/00_W7_response.json" target="_blank">W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/01_W12_when_all_have_a_result.json" target="_blank">W12 when all have a result</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/02_W12_after_2_min.json" target="_blank">W12 after +2 min</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/03_W17_fail3.json" target="_blank">W17 fail3</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/04_W17_fail1-then-ok.jpg.json" target="_blank">W17 fail1-then-ok.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/05_W17_fail2-then-ok.jpg.json" target="_blank">W17 fail2-then-ok.jpg</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-05/06_unreadable-reason_text.txt" target="_blank">unreadable-reason text</a> <span class="muted">text/plain</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-06">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-06</b> พิมพ์ 5 ช่องเองให้ใบอ่านไม่ได้ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① `422 total_invalid` (0.00 &lt; 0.01) · ② ผลรวมรายการ 30.00 + 25.50 = 55.50 ผลต่าง 0 · ยืนยันได้ · สถานะยืนยันแล้ว · ใบหายจากรายการ `/unreadable` (นับ 1 → 0) · ③ ค่าที่เก็บตรงที่พิมพ์ครบ 5 ช่อง (ร้าน วันที่ 2 รายการพร้อมราคา ยอด 55.50)</p>
+<p class="muted">ที่มา: FR-17 · FR-12 · BR-06 · เวลา 20.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-5-06/03_①_total_0.00_refused.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-06/03_①_total_0.00_refused.png" alt="① total 0.00 refused"><span>① total 0.00 refused</span></a><a href="evidence/round1/TC-5-06/06_②_confirmed_55.50.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-06/06_②_confirmed_55.50.png" alt="② confirmed 55.50"><span>② confirmed 55.50</span></a><a href="evidence/round1/TC-5-06/07_②_unreadable_empty.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-06/07_②_unreadable_empty.png" alt="② /unreadable empty"><span>② /unreadable empty</span></a><a href="evidence/round1/TC-5-06/08_③_reopened_receipt.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-5-06/08_③_reopened_receipt.png" alt="③ reopened receipt"><span>③ reopened receipt</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-5-06/00_①_W14_save_total_0.00.json" target="_blank">① W14 save total 0.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-06/01_①_page_blocked_confirm_confirm-blockers_.txt" target="_blank">① page blocked confirm (confirm-blockers)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-5-06/02_①_W15_confirm_with_total_0.00.json" target="_blank">① W15 confirm with total 0.00</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-06/04_②_W14_save_total_55.50.json" target="_blank">② W14 save total 55.50</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-06/05_②_W15_confirm.json" target="_blank">② W15 confirm</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-5-06/09_③_W12.json" target="_blank">③ W12</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-07">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-07</b> ค้างเกิน 120 นาที <span class="tag">P2</span><span class="tag">A</span>
+<span class="badge v-test">เทสต์ผิด → แก้แล้ว</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ② รายการมี 1 ใบ (TD-BR13-c) · `overdue-minutes` = 121 · ใบ 119 และ 120 นาทีไม่อยู่ (119 &lt; 120 · 120 ไม่เกิน 120 ตามนาทีเต็มที่ AP-04) · ใบ 121 นาทีที่มีผลแล้วไม่อยู่ · หัวหน้าเห็นการแจ้ง · ③ U-01 ถูกปฏิเสธ (FR-21 แจ้งหัวหน้าทีม) · กรณีใบด่วนอายุเกิน 120 นาทีรอข้อมูลตาม AP-05</p>
+<p class="muted">ที่มา: FR-21 · BR-13 · TD-BR13-a – d · AP-04 · เวลา 26.3 วินาที · รอบ: round1: failed → round2: passed</p>
+<p><b>คัดแยก:</b> รอบ 1 เทสต์ผิด: นับใบ 120 นาทีที่เกินเพียงเศษวินาทีเป็นผลล้ม ทั้งที่แผน AP-04 ให้ &#x27;บันทึกแยก ไม่ใช้ตัดสิน&#x27; → แก้เป็นบันทึกรอตัดสิน · รอบ 2 ผ่าน (ใบ 121 นาทีอยู่ · 119 และ 121-รอตรวจไม่อยู่ · U-01 ถูกปฏิเสธ) · ใบ 120 นาทีแสดงในรายการ = รอตัดสิน AP-04</p>
+<ul class="ann"><li><b>รอตัดสิน</b> AP-04: ใบ TD-BR13-b (120 นาที + เศษวินาที) อยู่ในรายการ แสดง 120 นาที · overdue-count=2</li><li><b>AP</b> AP-04: ตรวจที่ 0 s หลังรีเซ็ต · overdue-count=2 · แถว={&quot;b35b3cf4-f79f-4b08-9f50-21579963db7f&quot;:&quot;121&quot;,&quot;ac9c2517-d20f-46e4-96b8-effda61ad4f2&quot;:&quot;120&quot;} · ใบ 120 นาที อยู่ในรายการ</li><li><b>AP</b> AP-05: ไม่มีใบด่วนอายุเกิน 120 นาทีในข้อมูลรีเซ็ต · กรณีใบด่วนรอข้อมูลเพิ่มใน TEST-DATA</li></ul>
+
+<div class="shots"><a href="evidence/round2/TC-5-07/02_②_overdue_U-03_.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-5-07/02_②_overdue_U-03_.png" alt="② /overdue (U-03)"><span>② /overdue (U-03)</span></a><a href="evidence/round2/TC-5-07/04_③_overdue_U-01_.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-5-07/04_③_overdue_U-01_.png" alt="③ /overdue (U-01)"><span>③ /overdue (U-01)</span></a></div>
+<ul class="files"><li><a href="evidence/round2/TC-5-07/00_①_W11_receipts_made_by_reset_overdue_true_.json" target="_blank">① W11 receipts made by reset {overdue:true}</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-07/01_②_nav-overdue_text_U-03_.txt" target="_blank">② nav-overdue text (U-03)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-5-07/03_②_overdue.json" target="_blank">② /overdue</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-07/05_③_U-01_url_after_overdue.txt" target="_blank">③ U-01 url after /overdue</a> <span class="muted">text/plain</span></li></ul>
+</div></details>
+<details class="tc s-blocked" id="TC-5-08">
+<summary><span class="badge b-blocked">บล็อก</span>
+<b>TC-5-08</b> ดับ Worker ที่กำลังถือใบกลางงาน 100 ใบ <span class="tag">P1</span><span class="tag">R</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ใบหาย 0: ทั้ง 100 ID มีอยู่และรับเข้า 100 = ผลรวมทุกสถานะ 100 · ทุก ID มีผลอ่านบันทึก 1 ครั้งพอดี (ผลซ้ำ 0) · ใบที่ถูกถืออยู่ตอนดับมีเหตุการณ์กลับเป็นรออ่านแล้วถูกอ่านใหม่ · Worker ที่เหลืออ่านต่อจนครบ 100 · จบด้วย `workersAlive` = 2</p>
+<p class="muted">ที่มา: NFR-06 · FR-08 · เวลา 0.0 วินาที · รอบ: round1: skipped</p>
+
+<ul class="ann"><li><b>blocked</b> รอบปล่อยรุ่น ★: ต้องใช้ใบจริง 100 ไฟล์ เกินงบรอบปกติ/งบของขั้นนี้ (120 ใบ) และต้องได้อนุมัติหัวหน้าทีมทดสอบ</li><li><b>skip</b> รอบปล่อยรุ่น ★ เท่านั้น (ใบจริง 100 ไฟล์ · ต้องอนุมัติหัวหน้าทีมทดสอบ)</li></ul>
+
+<div class="shots"></div>
+<ul class="files"></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-09">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-09</b> ฝั่ง AI ล่มทั้งหมด แล้วกลับมา <span class="tag">P1</span><span class="tag">R</span>
+<span class="badge v-test">เทสต์ผิด → แก้แล้ว</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ② เว็บยังเปิดทุกหน้า · `/api/health` 200 (`ai.reachable` = false ได้) · รับ 3 ใบ · ทั้ง 3 ID คงสถานะ &quot;รออ่าน&quot; · ยอดตรวจนับผลต่าง 0 · ③ ทั้ง 3 ใบถูกอ่านต่อเองจนมีผล โดยไม่มีใครกดอะไร · `workersAlive` = 2</p>
+<p class="muted">ที่มา: NFR-06 ข้อ 5 · FR-06 · เวลา 354.8 วินาที · รอบ: round1: failed → round2: passed</p>
+<p><b>คัดแยก:</b> รอบ 1 ล้มเพราะไฟล์ trace ชนกันจากการรันซ้อน (ปัญหาการรันของผู้ทดสอบ ไม่ใช่เว็บ) · รอบ 2 ผ่าน: gateway ดับ 3 นาที ใบค้างรออ่าน ผลต่าง 0 แล้วอ่านต่อเองครบ</p>
+
+
+<div class="shots"><a href="evidence/round2/TC-5-09/04_②_batch_page_while_gateway_is_down.png" target="_blank"><img loading="lazy" src="evidence/round2/TC-5-09/04_②_batch_page_while_gateway_is_down.png" alt="② batch page while gateway is down"><span>② batch page while gateway is down</span></a></div>
+<ul class="files"><li><a href="evidence/round2/TC-5-09/00_E6_W23.json" target="_blank">E6 W23</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/01_E6_gpu.sh_status_all.txt" target="_blank">E6 gpu.sh status all</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-5-09/02_①_gpu.sh_stop_gateway.txt" target="_blank">① gpu.sh stop gateway</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-5-09/03_②_W7_response.json" target="_blank">② W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/05_②_api_health_while_gateway_is_down.json" target="_blank">② /api/health while gateway is down</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/06_②_statuses_after_3_min.json" target="_blank">② statuses after 3 min</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/07_②_W20.json" target="_blank">② W20</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/08_③_gpu.sh_start_gateway.txt" target="_blank">③ gpu.sh start gateway</a> <span class="muted">text/plain</span></li><li><a href="evidence/round2/TC-5-09/09_③_results.json" target="_blank">③ results</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/10_③_api_health_ai.workersAlive.json" target="_blank">③ /api/health ai.workersAlive</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-09/11_③_W20.json" target="_blank">③ W20</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-5-10">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-5-10</b> ปิดแล้วเปิดคิวและฐานข้อมูลใหม่กลางงาน <span class="tag">P1</span><span class="tag">A</span>
+<span class="badge v-test">เทสต์ผิด → แก้แล้ว</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ทั้ง 20 ID มีอยู่ · ทุกใบมีผล &quot;รอตรวจ&quot; 1 ครั้ง · รับเข้า 8 + 20 = 28 = ผลรวมทุกสถานะ · ผลต่าง 0 · ใบหาย 0</p>
+<p class="muted">ที่มา: NFR-06 ข้อ 4 · FR-08 · เวลา 11.0 วินาที · รอบ: round1: failed → round2: passed</p>
+<p><b>คัดแยก:</b> รอบ 1 เทสต์ผิด: เริ่ม restart หลังตัวอ่านจำลองอ่านครบ 20 ใบแล้ว จึงไม่ใช่ &#x27;กลางงาน&#x27; → แก้ให้สั่ง restart ทันทีที่มีผลใบแรก · รอบ 2 ผ่าน: ใบหาย 0 ทุกใบมีผล 1 ครั้ง 28 = 28</p>
+
+
+<div class="shots"></div>
+<ul class="files"><li><a href="evidence/round2/TC-5-10/00_W7_response.json" target="_blank">W7 response</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-10/01_batch_counts_when_the_restart_starts.json" target="_blank">batch counts when the restart starts</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-10/02_final_statuses.json" target="_blank">final statuses</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-10/03_W17_number_of_review_results_per_receipt.json" target="_blank">W17: number of &quot;review&quot; results per receipt</a> <span class="muted">application/json</span></li><li><a href="evidence/round2/TC-5-10/04_W20_at_the_end.json" target="_blank">W20 at the end</a> <span class="muted">application/json</span></li></ul>
+</div></details><h2 id="g6">5.6 รายงานรายเดือน <small>ผ่าน 6 · ล้ม 1 · บล็อก 0</small></h2>
+<details class="tc s-pass" id="TC-6-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-01</b> สรุป พ.ย. 2026 ของ CL-01 <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> S-02 + S-03 + S-04 + S-07 = 200.50 + 99.50 + 1,000.00 + 40.00 = **1,340.00 บาท · 4 ใบ** · ไม่มี S-06 (500.00 ยังไม่ยืนยัน) · มี S-07 (วันที่บนใบ 2026-11-10 แม้อัปโหลด 2026-12-02) · ผลรวมคอลัมน์ยอดใน CSV = 1,340.00</p>
+<p class="muted">ที่มา: FR-28 · BR-14 · E-02 · TD-BR14-b, c, d · เวลา 1.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-01/00_CL-01_2026-11_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-01/00_CL-01_2026-11_preview.png" alt="CL-01 2026-11 preview"><span>CL-01 2026-11 preview</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-01/01_CL-01_2026-11.csv" target="_blank">CL-01 2026-11.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-01/02_CL-01_2026-11_report.json" target="_blank">CL-01 2026-11 report</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-6-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-02</b> ใบที่ขอบเดือน ต.ค. / ธ.ค. <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ต.ค. = S-01 = **150.00 · 1 ใบ** (2026-10-31 ก่อนวันที่ 1) · ธ.ค. = S-05 = **75.25 · 1 ใบ** (2026-12-01) · S-05 ไม่อยู่ใน พ.ย.</p>
+<p class="muted">ที่มา: BR-14 · E-01 · E-03 · TD-BR14-a, e · เวลา 2.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-02/00_CL-01_2026-10_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-02/00_CL-01_2026-10_preview.png" alt="CL-01 2026-10 preview"><span>CL-01 2026-10 preview</span></a><a href="evidence/round1/TC-6-02/03_CL-01_2026-12_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-02/03_CL-01_2026-12_preview.png" alt="CL-01 2026-12 preview"><span>CL-01 2026-12 preview</span></a><a href="evidence/round1/TC-6-02/06_CL-01_2026-11_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-02/06_CL-01_2026-11_preview.png" alt="CL-01 2026-11 preview"><span>CL-01 2026-11 preview</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-02/01_CL-01_2026-10.csv" target="_blank">CL-01 2026-10.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-02/02_CL-01_2026-10_report.json" target="_blank">CL-01 2026-10 report</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-02/04_CL-01_2026-12.csv" target="_blank">CL-01 2026-12.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-02/05_CL-01_2026-12_report.json" target="_blank">CL-01 2026-12 report</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-02/07_CL-01_2026-11.csv" target="_blank">CL-01 2026-11.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-02/08_CL-01_2026-11_report.json" target="_blank">CL-01 2026-11 report</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-6-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-03</b> ร้านอื่น และร้านที่ไม่มีใบ <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> CL-02 = S-08 = **999.00 · 1 ใบ** · CL-03 = **0.00 · 0 ใบ** ได้ไฟล์ CSV ที่มีแต่หัวตาราง (ไม่ error) · ไม่มีใบของ CL-01 ปน</p>
+<p class="muted">ที่มา: FR-28 · E-04 · E-06 · เวลา 1.8 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-03/00_CL-02_2026-11_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-03/00_CL-02_2026-11_preview.png" alt="CL-02 2026-11 preview"><span>CL-02 2026-11 preview</span></a><a href="evidence/round1/TC-6-03/03_CL-03_2026-11_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-03/03_CL-03_2026-11_preview.png" alt="CL-03 2026-11 preview"><span>CL-03 2026-11 preview</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-03/01_CL-02_2026-11.csv" target="_blank">CL-02 2026-11.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-03/02_CL-02_2026-11_report.json" target="_blank">CL-02 2026-11 report</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-03/04_CL-03_2026-11.csv" target="_blank">CL-03 2026-11.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-03/05_CL-03_2026-11_report.json" target="_blank">CL-03 2026-11 report</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-03/06_W18_CL-03_2026-11_API_.json" target="_blank">W18 CL-03 2026-11 (API)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-6-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-04</b> ใบที่ยืนยันใหม่เข้าเดือนตามวันที่บนใบ <span class="tag">P2</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> พ.ย. = 1,340.00 + 100.00 = **1,440.00 · 5 ใบ** · ธ.ค. = 75.25 + 100.00 = **175.25 · 2 ใบ** · ใบสองนับตามวันที่ที่แก้แล้ว (2026-12-01) ไม่ใช่ค่าที่อ่านได้ (2026-11-18)</p>
+<p class="muted">ที่มา: FR-28 · BR-14 · เวลา 9.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-04/02_CL-01_2026-11_after_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-04/02_CL-01_2026-11_after_preview.png" alt="CL-01 2026-11 after preview"><span>CL-01 2026-11 after preview</span></a><a href="evidence/round1/TC-6-04/05_CL-01_2026-12_after_preview.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-04/05_CL-01_2026-12_after_preview.png" alt="CL-01 2026-12 after preview"><span>CL-01 2026-12 after preview</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-04/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-04/01_W15_W14_results.json" target="_blank">W15/W14 results</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-04/03_CL-01_2026-11_after.csv" target="_blank">CL-01 2026-11 after.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-04/04_CL-01_2026-11_after_report.json" target="_blank">CL-01 2026-11 after report</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-04/06_CL-01_2026-12_after.csv" target="_blank">CL-01 2026-12 after.csv</a> <span class="muted">text/csv</span></li><li><a href="evidence/round1/TC-6-04/07_CL-01_2026-12_after_report.json" target="_blank">CL-01 2026-12 after report</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-6-05">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-05</b> ยอดแยกหมวด พ.ย. ของ CL-01 <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> CAT-01 = 200.50 + 1,000.00 = 1,200.50 · CAT-02 = 40.00 · CAT-03 = 99.50 · CAT-04 = 0.00 · รวม 1,200.50 + 40.00 + 99.50 + 0.00 = **1,340.00 = TC-6-01** · ทั้ง 2 ช่องทางได้ตัวเลขเดียวกัน</p>
+<p class="muted">ที่มา: FR-29 · E-05 · เวลา 1.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-05/02_portal_2026-11_U-05.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-05/02_portal_2026-11_U-05.png" alt="portal 2026-11 U-05"><span>portal 2026-11 U-05</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-05/00_W19_CL-01_2026-11_U-04_.json" target="_blank">W19 CL-01 2026-11 (U-04)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-05/01_portal_category_totals_U-05_.json" target="_blank">portal category totals (U-05)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-6-06">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-6-06</b> เวลาตรวจเฉลี่ยต่อชุด <span class="tag">P3</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> U-03 และ U-04 เห็นค่าเดียวกัน: ค่าเฉลี่ยของชุดนี้ = (30 + 50) ÷ 2 = 40 วินาที (คลาดเคลื่อนได้ ±3 วินาทีจากการคลิก) · U-01 ถูกปฏิเสธ · ข้อนี้ตรวจสูตร FR-31 ไม่ใช่การรับรอง NFR-09</p>
+<p class="muted">ที่มา: FR-31 · NFR-09 (สูตร) · เวลา 89.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-6-06/01_receipt_2_before_confirm_50_s_.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-06/01_receipt_2_before_confirm_50_s_.png" alt="receipt 2 before confirm (50 s)"><span>receipt 2 before confirm (50 s)</span></a><a href="evidence/round1/TC-6-06/05_U03_insights_review_time.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-06/05_U03_insights_review_time.png" alt="U03 /insights review time"><span>U03 /insights review time</span></a><a href="evidence/round1/TC-6-06/08_U04_insights_review_time.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-06/08_U04_insights_review_time.png" alt="U04 /insights review time"><span>U04 /insights review time</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-06/00_W7_upload.json" target="_blank">W7 upload</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/02_held_times_open_-_confirm_click_.json" target="_blank">held times (open -&gt; confirm click)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/03_W21_as_U-01.json" target="_blank">W21 as U-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/04_U03_insights_batch_row.json" target="_blank">U03 /insights batch row</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/06_W21_as_U03.json" target="_blank">W21 as U03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/07_U04_insights_batch_row.json" target="_blank">U04 /insights batch row</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-06/09_W21_as_U04.json" target="_blank">W21 as U04</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-6-07">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-6-07</b> รายงาน GPU 1 เทียบ 2 ใบ <span class="tag">P2</span><span class="tag">A</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> **ต้องมี**ตาราง (หน้าว่าง / &quot;ยังไม่มีข้อมูล&quot; = ไม่ผ่าน FR-30) มี เวลา · ใบต่อนาที · ค่าเช่า · บาทต่อ 100 ใบ · คำตัดสิน · สูตร: Speedup = อัตรา 2 ใบ ÷ อัตรา 1 ใบ · Efficiency = Speedup ÷ 2 · บาทต่อ 100 ใบ = ค่าเช่า ÷ จำนวนใบ × 100 · &quot;คุ้ม&quot; เมื่อ Speedup ≥ 1.6 **หรือ** 1 ใบไม่ผ่าน SLO (NFR-02/05) แต่ 2 ใบผ่าน · ตัวอย่างตรวจสูตร: 6.0 ÷ 4 = 1.5 และ 1 ใบผ่าน SLO → ไม่คุ้ม · 6.4 ÷ 4 = 1.6 → คุ้ม · 1.5 แต่ 1 ใบไม่ผ่าน SLO และ 2 ใบผ่าน → คุ้ม · ผลขั้นที่ 12: 116.2 ÷ 56.0 = 2.075 (แสดง 2.08) · Efficiency 103.75% (แสดง 104%) → คุ้ม · ตัดสินด้วยค่าก่อนปัด</p>
+<p class="muted">ที่มา: FR-30 · NFR-08 · A-12 · เวลา 0.8 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> หน้า /insights ตาราง GPU 1 เทียบ 2 ใบว่าง (&#x27;ยังไม่มีผลวัด&#x27;) W22 คืน null · FR-30 ต้องมีตาราง (ผลขั้นที่ 12: Speedup 2.08 · 104% · คุ้ม ไม่ถูกนำเข้า)</p>
+
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: แถว GPU 1 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ [&quot;1&quot;,&quot;ยังไม่มีผลวัด&quot;])
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  377 |       // columns: จำนวน GPU | ใบ | เวลา (นาที) | ใบต่อนาที | ค่าเช่า (บาท) | บาทต่อ 100 ใบ | วัดเมื่อ
+  378 |       const hasValues = (r?: string[]) =&gt; !!r &amp;&amp; r.length &gt;= 6 &amp;&amp; !Number.isNaN(numOf(r[1])) &amp;&amp; !Number.isNaN(numOf(r[2])) &amp;&amp; !Number.isNaN(numOf(r[3])) &amp;&amp; !Number.isNaN(numOf(r[4])) &amp;&amp; !Number.isNaN(numOf(r[5]));
+&gt; 379 |       expect.soft(hasValues(row1), `แถว GPU 1 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row1)})`).toBe(true);
+      |                                                                                                                                ^
+  380 |       expect.soft(hasValues(row2), `แถว GPU 2 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row2)})`).toBe(true);
+  381 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;&#x27;).not.toMatch(/ยังไม่มี/);
+  382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:379:128</pre><pre>Error: แถว GPU 2 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ [&quot;2&quot;,&quot;ยังไม่มีผลวัด&quot;])
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+  378 |       const hasValues = (r?: string[]) =&gt; !!r &amp;&amp; r.length &gt;= 6 &amp;&amp; !Number.isNaN(numOf(r[1])) &amp;&amp; !Number.isNaN(numOf(r[2])) &amp;&amp; !Number.isNaN(numOf(r[3])) &amp;&amp; !Number.isNaN(numOf(r[4])) &amp;&amp; !Number.isNaN(numOf(r[5]));
+  379 |       expect.soft(hasValues(row1), `แถว GPU 1 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row1)})`).toBe(true);
+&gt; 380 |       expect.soft(hasValues(row2), `แถว GPU 2 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row2)})`).toBe(true);
+      |                                                                                                                                ^
+  381 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;&#x27;).not.toMatch(/ยังไม่มี/);
+  382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+  383 |       expect.soft(numOf(shown.efficiency), `gpu-efficiency เป็นตัวเลข (ได้ &quot;${shown.efficiency}&quot;)`).not.toBeNaN();
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:380:128</pre><pre>Error: gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;
+
+expect(received).not.toMatch(expected)
+
+Expected pattern: not /ยังไม่มี/
+Received string:      &quot;ยังไม่มีผลวัดครบทั้ง 1 และ 2 GPU&quot;
+
+  379 |       expect.soft(hasValues(row1), `แถว GPU 1 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row1)})`).toBe(true);
+  380 |       expect.soft(hasValues(row2), `แถว GPU 2 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row2)})`).toBe(true);
+&gt; 381 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;&#x27;).not.toMatch(/ยังไม่มี/);
+      |                                                                                   ^
+  382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+  383 |       expect.soft(numOf(shown.efficiency), `gpu-efficiency เป็นตัวเลข (ได้ &quot;${shown.efficiency}&quot;)`).not.toBeNaN();
+  384 |       expect.soft(numOf(shown.costPer100), `gpu-cost-per-100 เป็นตัวเลข (ได้ &quot;${shown.costPer100}&quot;)`).not.toBeNaN();
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:381:83</pre><pre>Error: gpu-speedup เป็นตัวเลข (ได้ &quot;—&quot;)
+
+expect(received).not.toBeNaN()
+
+Received: NaN
+
+  380 |       expect.soft(hasValues(row2), `แถว GPU 2 ใบ มีค่า ใบ·เวลา·ใบต่อนาที·ค่าเช่า·บาทต่อ 100 ใบ (ได้ ${JSON.stringify(row2)})`).toBe(true);
+  381 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;&#x27;).not.toMatch(/ยังไม่มี/);
+&gt; 382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+      |                                                                                                ^
+  383 |       expect.soft(numOf(shown.efficiency), `gpu-efficiency เป็นตัวเลข (ได้ &quot;${shown.efficiency}&quot;)`).not.toBeNaN();
+  384 |       expect.soft(numOf(shown.costPer100), `gpu-cost-per-100 เป็นตัวเลข (ได้ &quot;${shown.costPer100}&quot;)`).not.toBeNaN();
+  385 |
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:382:96</pre><pre>Error: gpu-efficiency เป็นตัวเลข (ได้ &quot;—&quot;)
+
+expect(received).not.toBeNaN()
+
+Received: NaN
+
+  381 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ &quot;ยังไม่มีข้อมูล/ผลวัด&quot;&#x27;).not.toMatch(/ยังไม่มี/);
+  382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+&gt; 383 |       expect.soft(numOf(shown.efficiency), `gpu-efficiency เป็นตัวเลข (ได้ &quot;${shown.efficiency}&quot;)`).not.toBeNaN();
+      |                                                                                                         ^
+  384 |       expect.soft(numOf(shown.costPer100), `gpu-cost-per-100 เป็นตัวเลข (ได้ &quot;${shown.costPer100}&quot;)`).not.toBeNaN();
+  385 |
+  386 |       // recompute from the rows (only when they exist)
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:383:105</pre><pre>Error: gpu-cost-per-100 เป็นตัวเลข (ได้ &quot;—&quot;)
+
+expect(received).not.toBeNaN()
+
+Received: NaN
+
+  382 |       expect.soft(numOf(shown.speedup), `gpu-speedup เป็นตัวเลข (ได้ &quot;${shown.speedup}&quot;)`).not.toBeNaN();
+  383 |       expect.soft(numOf(shown.efficiency), `gpu-efficiency เป็นตัวเลข (ได้ &quot;${shown.efficiency}&quot;)`).not.toBeNaN();
+&gt; 384 |       expect.soft(numOf(shown.costPer100), `gpu-cost-per-100 เป็นตัวเลข (ได้ &quot;${shown.costPer100}&quot;)`).not.toBeNaN();
+      |                                                                                                           ^
+  385 |
+  386 |       // recompute from the rows (only when they exist)
+  387 |       if (hasValues(row1) &amp;&amp; hasValues(row2)) {
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:384:107</pre><pre>Error: gpu-speedup = ผลขั้นที่ 12 (แสดง 2.08)
+
+expect(received).toMatch(expected)
+
+Expected pattern: /2\.08/
+Received string:  &quot;—&quot;
+
+  408 |       // compare with the step-12 measurement (116.2 vs 56.0 -&gt; 2.075 shown 2.08 · 103.75% shown 104% · คุ้ม)
+  409 |       await evidence(testInfo, &#x27;step-12 reference&#x27;, { ...step12, speedup: step12Speedup, efficiencyPct: step12Speedup / 2 * 100 });
+&gt; 410 |       expect.soft(shown.speedup, &#x27;gpu-speedup = ผลขั้นที่ 12 (แสดง 2.08)&#x27;).toMatch(/2\.08/);
+      |                                                                            ^
+  411 |       expect.soft(Math.round(numOf(shown.efficiency)), &#x27;gpu-efficiency = ผลขั้นที่ 12 (แสดง 104%)&#x27;).toBe(104);
+  412 |       expect.soft(shown.verdict, &#x27;gpu-verdict = คุ้ม (ผลขั้นที่ 12)&#x27;).toMatch(/คุ้ม/);
+  413 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ ไม่คุ้ม&#x27;).not.toMatch(/ไม่คุ้ม/);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:410:76</pre><pre>Error: gpu-efficiency = ผลขั้นที่ 12 (แสดง 104%)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 104
+Received: NaN
+
+  409 |       await evidence(testInfo, &#x27;step-12 reference&#x27;, { ...step12, speedup: step12Speedup, efficiencyPct: step12Speedup / 2 * 100 });
+  410 |       expect.soft(shown.speedup, &#x27;gpu-speedup = ผลขั้นที่ 12 (แสดง 2.08)&#x27;).toMatch(/2\.08/);
+&gt; 411 |       expect.soft(Math.round(numOf(shown.efficiency)), &#x27;gpu-efficiency = ผลขั้นที่ 12 (แสดง 104%)&#x27;).toBe(104);
+      |                                                                                                     ^
+  412 |       expect.soft(shown.verdict, &#x27;gpu-verdict = คุ้ม (ผลขั้นที่ 12)&#x27;).toMatch(/คุ้ม/);
+  413 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ ไม่คุ้ม&#x27;).not.toMatch(/ไม่คุ้ม/);
+  414 |     } finally { await context.close(); }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:411:101</pre><pre>Error: gpu-verdict = คุ้ม (ผลขั้นที่ 12)
+
+expect(received).toMatch(expected)
+
+Expected pattern: /คุ้ม/
+Received string:  &quot;ยังไม่มีผลวัดครบทั้ง 1 และ 2 GPU&quot;
+
+  410 |       expect.soft(shown.speedup, &#x27;gpu-speedup = ผลขั้นที่ 12 (แสดง 2.08)&#x27;).toMatch(/2\.08/);
+  411 |       expect.soft(Math.round(numOf(shown.efficiency)), &#x27;gpu-efficiency = ผลขั้นที่ 12 (แสดง 104%)&#x27;).toBe(104);
+&gt; 412 |       expect.soft(shown.verdict, &#x27;gpu-verdict = คุ้ม (ผลขั้นที่ 12)&#x27;).toMatch(/คุ้ม/);
+      |                                                                       ^
+  413 |       expect.soft(shown.verdict, &#x27;gpu-verdict ไม่ใช่ ไม่คุ้ม&#x27;).not.toMatch(/ไม่คุ้ม/);
+  414 |     } finally { await context.close(); }
+  415 |   });
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\56-reports.spec.ts:412:71</pre></details>
+<div class="shots"><a href="evidence/round1/TC-6-07/02_U-04_insights_GPU.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-07/02_U-04_insights_GPU.png" alt="U-04 /insights GPU"><span>U-04 /insights GPU</span></a><a href="evidence/round1/TC-6-07/04_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-6-07/04_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-6-07/00_W22_as_U-04.json" target="_blank">W22 as U-04</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-07/01__insights_GPU_table_cards.json" target="_blank">/insights GPU table + cards</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-07/03_step-12_reference.json" target="_blank">step-12 reference</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-6-07/05_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-6-07/06_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details><h2 id="g7">5.7 สิทธิ์ของแต่ละบทบาท <small>ผ่าน 4 · ล้ม 0 · บล็อก 0</small></h2>
+<details class="tc s-pass" id="TC-7-01">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-7-01</b> ใครตั้งงานด่วนได้ ทั้ง W10 และ W7 <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ② ทุกคำขอได้ `403 forbidden` · ไม่มีใบใหม่ถูกรับจากคำขอ ② · ไม่มีใบหรือชุดใดเป็นงานด่วน · ตัวนับยังเป็น 0 · หน้าชุดของ U-01 ไม่มี `batch-urgent-button` และหน้าอัปโหลดไม่มี `upload-urgent-checkbox` · ③ ตั้งได้ ตัวนับ 0 + 1 = 1</p>
+<p class="muted">ที่มา: FR-18 · FR-19 · P-01 – P-04 · เวลา 52.5 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-7-01/07_U-01_batches_id_no_urgent_button.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-01/07_U-01_batches_id_no_urgent_button.png" alt="U-01 /batches/[id] no urgent button"><span>U-01 /batches/[id] no urgent button</span></a><a href="evidence/round1/TC-7-01/08_U-01_upload_no_urgent_checkbox.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-01/08_U-01_upload_no_urgent_checkbox.png" alt="U-01 /upload no urgent checkbox"><span>U-01 /upload no urgent checkbox</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-7-01/00_W5_U03.json" target="_blank">W5 U03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/01_W5_U01.json" target="_blank">W5 U01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/02_W5_U04.json" target="_blank">W5 U04</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/03_W5_U05.json" target="_blank">W5 U05</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/04_U-03_W7_5_files_not_urgent_.json" target="_blank">U-03 W7 5 files (not urgent)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/05_①②_requests_-_status.json" target="_blank">①② requests -&gt; status</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/06_after_①②_W11_W8_W23.json" target="_blank">after ①② W11/W8/W23</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-01/09_③_U-03_W10.json" target="_blank">③ U-03 W10</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-7-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-7-02</b> ผู้ไม่เข้าสู่ระบบ และการเข้าสู่ระบบ <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ทุกหน้าพาไป `/login` · ทุก API `401 unauthenticated` (เปิดได้ 0 รายการ) · `/api/health` 200 ไม่มีข้อมูลใบเสร็จ · ② `nav-user-role` ตรงบทบาทใน TEST-DATA หัวข้อ 1 · U-05 ผูก CL-01 · U-06 ผูก CL-02 · ③ `login-error` แสดง · W5 ได้ `401`</p>
+<p class="muted">ที่มา: FR-01 · FR-02 · NFR-07 · P-06 · เวลา 398.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-7-02/01_①_anonymous_-_login.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/01_①_anonymous_-_login.png" alt="① anonymous -&gt; /login"><span>① anonymous -&gt; /login</span></a><a href="evidence/round1/TC-7-02/04_②_U01_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/04_②_U01_logged_in.png" alt="② U01 logged in"><span>② U01 logged in</span></a><a href="evidence/round1/TC-7-02/05_②_U02_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/05_②_U02_logged_in.png" alt="② U02 logged in"><span>② U02 logged in</span></a><a href="evidence/round1/TC-7-02/06_②_U03_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/06_②_U03_logged_in.png" alt="② U03 logged in"><span>② U03 logged in</span></a><a href="evidence/round1/TC-7-02/07_②_U04_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/07_②_U04_logged_in.png" alt="② U04 logged in"><span>② U04 logged in</span></a><a href="evidence/round1/TC-7-02/08_②_U05_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/08_②_U05_logged_in.png" alt="② U05 logged in"><span>② U05 logged in</span></a><a href="evidence/round1/TC-7-02/09_②_U06_logged_in.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/09_②_U06_logged_in.png" alt="② U06 logged in"><span>② U06 logged in</span></a><a href="evidence/round1/TC-7-02/11_③_wrong_password.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-02/11_③_wrong_password.png" alt="③ wrong password"><span>③ wrong password</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-7-02/00_W5_U04.json" target="_blank">W5 U04</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-02/02_①_pages_anonymous_-_final_URL.json" target="_blank">① pages (anonymous) -&gt; final URL</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-02/03_①_API_anonymous_request_-_status.json" target="_blank">① API (anonymous) request -&gt; status</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-02/10_②_roles.json" target="_blank">② roles</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-02/12_③_W5_after_wrong_password.json" target="_blank">③ W5 after wrong password</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-7-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-7-03</b> แก้ ยืนยัน เปิดกลับ ตามบทบาท <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> U-04 และ U-05 ถูกปฏิเสธทุกคำขอ · S-06 ยังเป็นรอตรวจ ยอด 500.00 ไม่เปลี่ยน · S-02 ยังยืนยันแล้ว · ประวัติไม่มีแถวใหม่</p>
+<p class="muted">ที่มา: FR-11 · FR-12 · A-15 · เวลา 0.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"></div>
+<ul class="files"><li><a href="evidence/round1/TC-7-03/00_W5_U03.json" target="_blank">W5 U03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-03/01_W5_U04.json" target="_blank">W5 U04</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-03/02_W5_U05.json" target="_blank">W5 U05</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-03/03_requests_-_status.json" target="_blank">requests -&gt; status</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-03/04_after.json" target="_blank">after</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-7-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-7-04</b> ไฟล์สรุปตามบทบาท <span class="tag">P2</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> U-01 · U-03 ได้ไฟล์ยอด 1,340.00 เท่ากับของ U-04 · U-05 ถูกปฏิเสธ ไม่มีตัวเลข 999.00 ในคำตอบ</p>
+<p class="muted">ที่มา: FR-28 · FR-24 · เวลา 2.0 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-7-04/04_U01_reports_CL-01_2026-11.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-04/04_U01_reports_CL-01_2026-11.png" alt="U01 /reports CL-01 2026-11"><span>U01 /reports CL-01 2026-11</span></a><a href="evidence/round1/TC-7-04/08_U03_reports_CL-01_2026-11.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-7-04/08_U03_reports_CL-01_2026-11.png" alt="U03 /reports CL-01 2026-11"><span>U03 /reports CL-01 2026-11</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-7-04/00_W5_U04.json" target="_blank">W5 U04</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/01_W5_U05.json" target="_blank">W5 U05</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/02_U-04_W18_CL-01_2026-11_reference_.txt" target="_blank">U-04 W18 CL-01 2026-11 (reference)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-7-04/03_W5_U01.json" target="_blank">W5 U01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/05_U01_CSV_CL-01_2026-11_receiptdesk-CL-01-2026-11.csv_.txt" target="_blank">U01 CSV CL-01 2026-11 (receiptdesk-CL-01-2026-11.csv)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-7-04/06_U01_totals.json" target="_blank">U01 totals</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/07_W5_U03.json" target="_blank">W5 U03</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/09_U03_CSV_CL-01_2026-11_receiptdesk-CL-01-2026-11.csv_.txt" target="_blank">U03 CSV CL-01 2026-11 (receiptdesk-CL-01-2026-11.csv)</a> <span class="muted">text/plain</span></li><li><a href="evidence/round1/TC-7-04/10_U03_totals.json" target="_blank">U03 totals</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-7-04/11_U-05_W18_requests_-_status.json" target="_blank">U-05 W18 requests -&gt; status</a> <span class="muted">application/json</span></li></ul>
+</div></details><h2 id="g8">5.8 ลูกค้าภายนอก <small>ผ่าน 3 · ล้ม 2 · บล็อก 0</small></h2>
+<details class="tc s-fail" id="TC-8-01">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-8-01</b> ลูกค้า CL-01 ขอข้อมูลร้าน CL-02 ทุกช่องทาง <span class="tag">P1</span><span class="tag">A</span>
+<span class="badge v-plan">แผนผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ได้ `404 not_found` ทั้งคู่ · ① กับ ② ได้สถานะเดียวกันและ body เหมือนกันทีละคู่ (W12 ต่อ W12 · W13 ต่อ W13) ไม่มี `image_missing` ที่บอกได้ว่าใบมีอยู่ · ③ คืนเฉพาะใบ CL-01 (ไม่มีใบของ CL-02 ไม่มี 999.00) · ④ ยอดของ CL-01 หรือถูกปฏิเสธ ไม่มีของ CL-02 · ⑤ ถูกปฏิเสธทุกเส้น (`403` หรือ `404`) · ⑥ `200` ได้ข้อมูลและรูป · ไม่มีคำขอใดคืนข้อมูลของ CL-02</p>
+<p class="muted">ที่มา: FR-24 · NFR-07 · P-05 · เวลา 0.5 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> ③ W11 client_id=CL-02 ตอบ 404 not_found (ปฏิเสธ ไม่มีข้อมูลรั่ว) แต่แผนเขียนให้ต้องคืนรายการ CL-01 · ⑥ ตัวควบคุมใช้รูปของใบตั้งต้น S-02 ซึ่งข้อมูลรีเซ็ตไม่มีไฟล์รูป (404 image_missing) · ข้อด้านความเป็นส่วนตัวผ่านทั้งหมด: S-08 กับ id ปลอมได้ 404 not_found body เดียวกัน · ไม่มีข้อมูล CL-02 หลุด</p>
+<ul class="ann"><li><b>④ W19</b> ถูกปฏิเสธ 404</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ③ W11 client_id=CL-02: คืนรายการ (เฉพาะใบ CL-01)
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: 404
+
+  293 |       // ③ only CL-01 receipts
+  294 |       const cl01Ids = new Set((await officeReceipts(office, `&amp;client_id=${await clientId(office, &#x27;CL-01&#x27;)}`)).map(r =&gt; r.id));
+&gt; 295 |       expect.soft(w11.status, &#x27;③ W11 client_id=CL-02: คืนรายการ (เฉพาะใบ CL-01)&#x27;).toBe(200);
+      |                                                                                   ^
+  296 |       const w11ids: string[] = (w11.json?.receipts ?? []).map((r: any) =&gt; r.id);
+  297 |       expect.soft(w11ids.filter(id =&gt; !cl01Ids.has(id)), &#x27;③ W11: ทุกใบเป็นของ CL-01&#x27;).toEqual([]);
+  298 |       expect.soft(w11ids, &#x27;③ W11: ไม่มี S-08&#x27;).not.toContain(s08.id);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\58-portal.spec.ts:295:83</pre><pre>Error: ⑥ W13 S-02 (ร้านตัวเอง): HTTP
+
+expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: 404
+
+  317 |       expect.soft(w12s02.status, &#x27;⑥ W12 S-02 (ร้านตัวเอง): HTTP&#x27;).toBe(200);
+  318 |       expect.soft(w12s02.json?.receipt?.id ?? w12s02.json?.id, &#x27;⑥ W12 S-02 ได้ข้อมูล&#x27;).toBe(s02.id);
+&gt; 319 |       expect.soft(w13s02.status, &#x27;⑥ W13 S-02 (ร้านตัวเอง): HTTP&#x27;).toBe(200);
+      |                                                                   ^
+  320 |       expect.soft(w13s02.ct, &#x27;⑥ W13 S-02 ได้รูป&#x27;).toMatch(/^image\/|application\/pdf/);
+  321 |
+  322 |       // no request returns CL-02 data
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\58-portal.spec.ts:319:67</pre><pre>Error: ⑥ W13 S-02 ได้รูป
+
+expect(received).toMatch(expected)
+
+Expected pattern: /^image\/|application\/pdf/
+Received string:  &quot;application/json&quot;
+
+  318 |       expect.soft(w12s02.json?.receipt?.id ?? w12s02.json?.id, &#x27;⑥ W12 S-02 ได้ข้อมูล&#x27;).toBe(s02.id);
+  319 |       expect.soft(w13s02.status, &#x27;⑥ W13 S-02 (ร้านตัวเอง): HTTP&#x27;).toBe(200);
+&gt; 320 |       expect.soft(w13s02.ct, &#x27;⑥ W13 S-02 ได้รูป&#x27;).toMatch(/^image\/|application\/pdf/);
+      |                                                   ^
+  321 |
+  322 |       // no request returns CL-02 data
+  323 |       for (const [k, v] of Object.entries(all)) expect.soft(leaksCL02(v), `ไม่มีข้อมูลของ CL-02 ใน ${k}`).toEqual([]);
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\58-portal.spec.ts:320:51</pre></details>
+<div class="shots"></div>
+<ul class="files"><li><a href="evidence/round1/TC-8-01/00_U-04_จด_id.json" target="_blank">U-04 จด id</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-01/01_คำตอบทุกคำขอของ_U-05.json" target="_blank">คำตอบทุกคำขอของ U-05</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-01/02_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-8-01/03_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-8-02">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-8-02</b> ไม่มีตัวเลขของใบที่ยังไม่ยืนยัน <span class="tag">P1</span><span class="tag">A</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> แถว S-06 (ตาม ID) มีเฉพาะชื่อไฟล์ เวลาที่รับ สถานะ &quot;รับแล้ว รอสำนักงานตรวจ&quot; · ไม่มี `portal-receipt-total` ของ S-06 · JSON ของ S-06 ไม่มีฟิลด์ยอดรวม รายการ ราคา และค่าความมั่นใจ (ฟิลด์ไม่อยู่ หรือเป็น null) · ไม่มี 500.00 / 500 / 50000 ในหน้าและ JSON · `portal-summary-total` พ.ย. = 1,340.00 (ไม่ใช่ 1,840.00) · ยอดแยกหมวดรวม 1,340.00</p>
+<p class="muted">ที่มา: FR-25 · FR-27 · NFR-07 · P-07 · เวลา 108.7 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-8-02/00_U-05_portal_เดือน_2026-11.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-02/00_U-05_portal_เดือน_2026-11.png" alt="U-05 /portal เดือน 2026-11"><span>U-05 /portal เดือน 2026-11</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-8-02/01_แถว_S-06_สรุปบน_portal.json" target="_blank">แถว S-06 + สรุปบน /portal</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-02/02_U-05_W11_S-06_W12_S-06_W19_2026-11.json" target="_blank">U-05 W11 (S-06) · W12 S-06 · W19 2026-11</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-8-03">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-8-03</b> ลูกค้าส่งใบเอง <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① `portal-accepted-count` = 2 · ลูกค้าเห็น 2 แถว ชื่อไฟล์ เวลา สถานะ &quot;รับแล้ว รอสำนักงานตรวจ&quot; · U-01 เห็นทั้ง 2 ID ผูก CL-01 (การผูกร้านตัดสินที่จุดนี้ ไม่ขึ้นกับความเร็วการอ่าน) · ② ทั้ง 2 ID เป็นรอตรวจ (รวมกับ S-06 = 3 ใบรอตรวจของ CL-01) · ลูกค้ายังไม่เห็น 100.00 หรือรายการ/ราคา และไม่เห็นสถานะภายใน (`queued` · `review`) · ถ้าเกิน 5 นาทียังไม่เป็นรอตรวจ บันทึกเป็น &quot;หมดเวลาอ่าน&quot; แยกจากผลด้านการผูกร้านและสิทธิ์</p>
+<p class="muted">ที่มา: FR-26 · FR-27 · FR-25 · เวลา 12.4 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-8-03/01_①_U-05_portal_หลังส่ง_2_ไฟล์.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-03/01_①_U-05_portal_หลังส่ง_2_ไฟล์.png" alt="① U-05 /portal หลังส่ง 2 ไฟล์"><span>① U-05 /portal หลังส่ง 2 ไฟล์</span></a><a href="evidence/round1/TC-8-03/04_①_U-05_เห็น_2_แถว.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-03/04_①_U-05_เห็น_2_แถว.png" alt="① U-05 เห็น 2 แถว"><span>① U-05 เห็น 2 แถว</span></a><a href="evidence/round1/TC-8-03/05_①_U-01_receipts_กรอง_CL-01.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-03/05_①_U-01_receipts_กรอง_CL-01.png" alt="① U-01 /receipts กรอง CL-01"><span>① U-01 /receipts กรอง CL-01</span></a><a href="evidence/round1/TC-8-03/08_②_U-05_รีเฟรช_portal_หลังอ่านเสร็จ.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-03/08_②_U-05_รีเฟรช_portal_หลังอ่านเสร็จ.png" alt="② U-05 รีเฟรช /portal หลังอ่านเสร็จ"><span>② U-05 รีเฟรช /portal หลังอ่านเสร็จ</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-8-03/00_①_W7_จาก_portal_U-05_.json" target="_blank">① W7 จาก /portal (U-05)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/02_①_2_IDs_office_W11_.json" target="_blank">① 2 IDs (office W11)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/03_①_แถวบน_portal_ขณะพักการอ่าน.json" target="_blank">① แถวบน /portal ขณะพักการอ่าน</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/06_①_U-01_W11_client_id_CL-01.json" target="_blank">① U-01 W11 client_id=CL-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/07_②_ใบรอตรวจของ_CL-01_office_.json" target="_blank">② ใบรอตรวจของ CL-01 (office)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/09_②_แถวบน_portal.json" target="_blank">② แถวบน /portal</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/10_②_JSON_ok-100__001.jpg_W11_W12_ของลูกค้า_.json" target="_blank">② JSON ok-100__001.jpg (W11 + W12 ของลูกค้า)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-03/11_②_JSON_ok-100__002.jpg_W11_W12_ของลูกค้า_.json" target="_blank">② JSON ok-100__002.jpg (W11 + W12 ของลูกค้า)</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-pass" id="TC-8-04">
+<summary><span class="badge b-pass">ผ่าน</span>
+<b>TC-8-04</b> ตัวเลขขึ้นเมื่อยืนยัน และหายเมื่อเปิดกลับ <span class="tag">P1</span><span class="tag">M</span>
+</summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ใบ `__001` แสดงยอด 100.00 · ใบ `__002` ยังไม่มีตัวเลข · สรุป พ.ย. = 1,340.00 + 100.00 = **1,440.00** · CAT-01 = 1,200.50 + 100.00 = 1,300.50 · รวมหมวด 1,300.50 + 40.00 + 99.50 + 0.00 = 1,440.00 · ② ใบ `__001` ไม่มีตัวเลขอีก (ทั้งหน้าและ JSON) · สรุป พ.ย. กลับเป็น 1,340.00 · CAT-01 = 1,200.50</p>
+<p class="muted">ที่มา: FR-25 · FR-29 · BR-14 · A-15 · เวลา 16.6 วินาที · รอบ: round1: passed</p>
+
+
+
+<div class="shots"><a href="evidence/round1/TC-8-04/01_①_U-05_portal_หลังส่ง_2_ไฟล์.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/01_①_U-05_portal_หลังส่ง_2_ไฟล์.png" alt="① U-05 /portal หลังส่ง 2 ไฟล์"><span>① U-05 /portal หลังส่ง 2 ไฟล์</span></a><a href="evidence/round1/TC-8-04/04_①_U-05_เห็น_2_แถว.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/04_①_U-05_เห็น_2_แถว.png" alt="① U-05 เห็น 2 แถว"><span>① U-05 เห็น 2 แถว</span></a><a href="evidence/round1/TC-8-04/05_①_U-01_receipts_กรอง_CL-01.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/05_①_U-01_receipts_กรอง_CL-01.png" alt="① U-01 /receipts กรอง CL-01"><span>① U-01 /receipts กรอง CL-01</span></a><a href="evidence/round1/TC-8-04/08_①_U-01_ยืนยัน___001.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/08_①_U-01_ยืนยัน___001.png" alt="① U-01 ยืนยัน __001"><span>① U-01 ยืนยัน __001</span></a><a href="evidence/round1/TC-8-04/09_①_U-05_portal_หลังยืนยัน___001.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/09_①_U-05_portal_หลังยืนยัน___001.png" alt="① U-05 /portal หลังยืนยัน __001"><span>① U-05 /portal หลังยืนยัน __001</span></a><a href="evidence/round1/TC-8-04/13_②_U-03_เปิด___001_กลับ.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/13_②_U-03_เปิด___001_กลับ.png" alt="② U-03 เปิด __001 กลับ"><span>② U-03 เปิด __001 กลับ</span></a><a href="evidence/round1/TC-8-04/14_②_U-05_portal_หลังเปิดกลับ.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-04/14_②_U-05_portal_หลังเปิดกลับ.png" alt="② U-05 /portal หลังเปิดกลับ"><span>② U-05 /portal หลังเปิดกลับ</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-8-04/00_①_W7_จาก_portal_U-05_.json" target="_blank">① W7 จาก /portal (U-05)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/02_①_2_IDs_office_W11_.json" target="_blank">① 2 IDs (office W11)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/03_①_แถวบน_portal_ขณะพักการอ่าน.json" target="_blank">① แถวบน /portal ขณะพักการอ่าน</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/06_①_U-01_W11_client_id_CL-01.json" target="_blank">① U-01 W11 client_id=CL-01</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/07_①_W12___001_หลังยืนยัน_U-01_.json" target="_blank">① W12 __001 หลังยืนยัน (U-01)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/10_①_portal_หลังยืนยัน.json" target="_blank">① /portal หลังยืนยัน</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/11_①_W19_ของลูกค้า.json" target="_blank">① W19 ของลูกค้า</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/12_②_W12___001_หลังเปิดกลับ_office_.json" target="_blank">② W12 __001 หลังเปิดกลับ (office)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/15_②_portal_หลังเปิดกลับ.json" target="_blank">② /portal หลังเปิดกลับ</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/16_②___001_แถวบน_portal.json" target="_blank">② __001 แถวบน /portal</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/17_②___001_JSON_ok-100__001.jpg_W11_W12_ของลูกค้า_.json" target="_blank">② __001 JSON ok-100__001.jpg (W11 + W12 ของลูกค้า)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-04/18_②_W19_ของลูกค้า.json" target="_blank">② W19 ของลูกค้า</a> <span class="muted">application/json</span></li></ul>
+</div></details>
+<details class="tc s-fail" id="TC-8-05">
+<summary><span class="badge b-fail">ล้ม</span>
+<b>TC-8-05</b> ลูกค้าส่งใบเข้าร้านอื่นไม่ได้ และคิวเต็มจากหน้าลูกค้า <span class="tag">P2</span><span class="tag">A</span>
+<span class="badge v-web">เว็บผิด</span></summary>
+<div class="body">
+<p><b>ผลที่คาดหวัง (แผน):</b> ① ทางเลือกที่ยอมรับ: ปฏิเสธ → CL-01 = 7 · CL-02 = 1 · หรือรับแล้วผูกร้านของบัญชี → CL-01 = 7 + 1 = 8 · CL-02 = 1 · ทั้ง 2 ทาง CL-02 ต้องคงเป็น 1 · ② 309 + 100 = 409 เกิน 9 → `429` ข้อความ &quot;ลองใหม่ในอีก 2 นาที&quot; (ปัดขึ้น 9 ÷ 8 = 2) · รับ 0 ใบ · คำตอบไม่มีฟิลด์จำนวนใบค้างหรือเพดานของสำนักงาน [ข้อสมมติของแผน: ข้อมูลคิวเป็นของ W23 ซึ่งลูกค้าเรียกไม่ได้]</p>
+<p class="muted">ที่มา: FR-26 · FR-24 · FR-22 · BR-12 · เวลา 2.4 วินาที · รอบ: round1: failed</p>
+<p><b>คัดแยก:</b> คำตอบ 429 ที่ส่งถึงลูกค้ามีฟิลด์ pending=309 และ limit=400 ของคิวสำนักงาน [ข้อสมมติของแผน: ข้อมูลคิวเป็นของ W23] · ส่วนอื่นผ่าน: 429 queue_full · ลองใหม่ใน 2 นาที · รับ 0 · ส่งเข้าร้านอื่นไม่ได้</p>
+<ul class="ann"><li><b>① ทางที่เกิด</b> รับ (201) แล้วผูกร้านของบัญชี</li></ul>
+<details><summary>ข้อความที่ล้ม</summary><pre>Error: ② คำตอบไม่มีฟิลด์จำนวนใบค้างหรือเพดานของสำนักงาน [ข้อสมมติของแผน]
+
+expect(received).toEqual(expected) // deep equality
+
+- Expected  - 1
++ Received  + 4
+
+- Array []
++ Array [
++   &quot;pending=309&quot;,
++   &quot;limit=400&quot;,
++ ]
+
+  507 |       const walk = (o: any, p: string) =&gt; { if (o &amp;&amp; typeof o === &#x27;object&#x27;) for (const [k, v] of Object.entries(o)) { const kp = p ? `${p}.${k}` : k; if (/pending|limit|queue|capacity|workers/i.test(k)) queueKeys.push(`${kp}=${JSON.stringify(v)}`); walk(v, kp); } };
+  508 |       walk(r.json, &#x27;&#x27;);
+&gt; 509 |       expect.soft(queueKeys, &#x27;② คำตอบไม่มีฟิลด์จำนวนใบค้างหรือเพดานของสำนักงาน [ข้อสมมติของแผน]&#x27;).toEqual([]);
+      |                                                                                                   ^
+  510 |     } finally {
+  511 |       await context.close(); await office.dispose();
+  512 |     }
+    at C:\Users\oishi\Documents\GitHub\CWN\Teaching\03_week03\04_Agent_Team_End_to_End\02_receipt_desk\test\e2e\tests\58-portal.spec.ts:509:99</pre></details>
+<div class="shots"><a href="evidence/round1/TC-8-05/01_②_U-06_portal_ส่ง_100_ไฟล์.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-05/01_②_U-06_portal_ส่ง_100_ไฟล์.png" alt="② U-06 /portal ส่ง 100 ไฟล์"><span>② U-06 /portal ส่ง 100 ไฟล์</span></a><a href="evidence/round1/TC-8-05/03_screenshot.png" target="_blank"><img loading="lazy" src="evidence/round1/TC-8-05/03_screenshot.png" alt="screenshot"><span>screenshot</span></a></div>
+<ul class="files"><li><a href="evidence/round1/TC-8-05/00_①_U-05_W7_clientId_CL-02.json" target="_blank">① U-05 W7 clientId=CL-02</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-05/02_②_W7_จาก_portal_U-06_100_ไฟล์_.json" target="_blank">② W7 จาก /portal (U-06 · 100 ไฟล์)</a> <span class="muted">application/json</span></li><li><a href="evidence/round1/TC-8-05/04_error-context.md" target="_blank">error-context</a> <span class="muted">text/markdown</span></li><li><a href="evidence/round1/TC-8-05/05_trace.zip" target="_blank">trace</a> <span class="muted">application/zip</span> · เปิดด้วย npx playwright show-trace</li></ul>
+</div></details>
+</main></body></html>

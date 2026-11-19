@@ -27,7 +27,7 @@
 | Training | GPU 1 ใบ | GPU 2 ใบ เทียบกับ 1 ใบ |
 | Inference | GPU Worker 1 ตัว | vLLM 2 ตัวหลัง Load Balancer + GPU Worker 2 ตัว |
 | RabbitMQ | Work Queue 1 คิว | Priority Queue · Backpressure · Dead-letter Queue |
-| แผนงานของทีม | 10 บล็อก · 4 สกิล | 12–14 บล็อก · ครบ 6 สกิล |
+| แผนงานของทีม | 10 บล็อก · 4 สกิล | 14 บล็อก · ครบ 6 สกิล |
 | การทดสอบ | Functional Test + Bug Hunt | เพิ่ม Capacity Test ตาม SLO และ Failure Test |
 
 ทั้ง 2 หัวข้อใช้เว็บ **Next.js + PostgreSQL** ใน Docker บนเครื่องของเรา และเครื่อง GPU ที่เช่าจาก Vast.ai

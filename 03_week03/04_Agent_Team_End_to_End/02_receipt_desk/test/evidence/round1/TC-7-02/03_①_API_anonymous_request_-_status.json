@@ -1,0 +1,101 @@
+[
+  {
+    "w": "W5",
+    "request": "GET /api/me",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W6",
+    "request": "GET /api/clients",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W8",
+    "request": "GET /api/batches",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W9",
+    "request": "GET /api/batches/9516ab73-b241-4b9a-824b-c204c4237b3f",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W11",
+    "request": "GET /api/receipts",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W12",
+    "request": "GET /api/receipts/c38b0ef2-a0ec-41d0-864a-08168e7abfba",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W13",
+    "request": "GET /api/receipts/c38b0ef2-a0ec-41d0-864a-08168e7abfba/image",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W17",
+    "request": "GET /api/receipts/c38b0ef2-a0ec-41d0-864a-08168e7abfba/history",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W18",
+    "request": "GET /api/reports/monthly?clientId=ca093b37-f0d8-472a-a650-547dc270dbef&month=2026-11",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W19",
+    "request": "GET /api/reports/categories?month=2026-11&clientId=ca093b37-f0d8-472a-a650-547dc270dbef",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W20",
+    "request": "GET /api/reports/reconcile",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W21",
+    "request": "GET /api/reports/review-time",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W22",
+    "request": "GET /api/reports/gpu",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W23",
+    "request": "GET /api/queue",
+    "status": 401,
+    "error": "unauthenticated"
+  },
+  {
+    "w": "W1",
+    "request": "GET /api/health",
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "db": "ok",
+      "ai": {
+        "mode": "mock",
+        "reachable": true,
+        "workersAlive": 2
+      },
+      "version": "1.0.0"
+    }
+  }
+]

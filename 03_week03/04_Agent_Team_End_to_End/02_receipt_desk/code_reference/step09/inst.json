@@ -1,0 +1,50 @@
+{
+ "instance_id": 61389598,
+ "label": "e2e-receipt",
+ "rent_requested_at": "2026-11-19T13:07:33+07:00",
+ "start_date_unix": 1795068455.0427349,
+ "start_date": "2026-11-19T13:07:35.042735+07:00",
+ "gpu": "2x RTX 3090",
+ "price_per_hour_usd": 0.4142,
+ "image": "vastai/pytorch:cuda-13.0.3-auto",
+ "disk_gb": 80.0,
+ "geolocation": "Japan, JP",
+ "public_ip": "210.130.226.136",
+ "ssh_direct": {
+  "host": "210.130.226.136",
+  "port": "41519"
+ },
+ "ssh_proxy": {
+  "host": "ssh3.vast.ai",
+  "port": 18156
+ },
+ "ports": {
+  "22/tcp": "41519",
+  "8000/tcp": "41588",
+  "8080/tcp": "41457"
+ },
+ "previous_attempts": [
+  {
+   "instance_id": 61387698,
+   "offer": 38666239,
+   "price_per_hour_usd": 0.4201,
+   "result": "running but SSH key never accepted (Permission denied) -> destroyed",
+   "destroyed_at": "2026-11-19T13:02:09+07:00"
+  },
+  {
+   "instance_id": 61388901,
+   "offer": 58408228,
+   "price_per_hour_usd": 0.4862,
+   "result": "still loading after 5 min -> destroyed",
+   "destroyed_at": "2026-11-19T13:07:28+07:00"
+  }
+ ],
+ "checked_at": "2026-11-19T13:14:00+07:00",
+ "cost_so_far_usd": {
+  "this_instance": 0.044,
+  "attempt1_est": 0.063,
+  "attempt2_est_max": 0.045,
+  "total_est": 0.152
+ },
+ "status": "running"
+}

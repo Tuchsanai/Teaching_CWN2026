@@ -1,0 +1,111 @@
+{
+  "receiptId": "b043144c-99a4-4d32-96e4-ab315c769644",
+  "original": {
+    "merchant": "ร้านตัวอย่าง",
+    "receiptDate": "2026-11-18",
+    "total": "100.00",
+    "totalConfidence": "0.99",
+    "items": [
+      {
+        "lineNo": 1,
+        "name": "ข้าวสาร",
+        "price": "45.00"
+      },
+      {
+        "lineNo": 2,
+        "name": "น้ำมันพืช",
+        "price": "30.00"
+      },
+      {
+        "lineNo": 3,
+        "name": "น้ำตาลทราย",
+        "price": "25.00"
+      }
+    ]
+  },
+  "current": {
+    "merchant": "ร้านตัวอย่าง",
+    "receiptDate": "2026-11-18",
+    "total": "100.00",
+    "categoryId": "de810fa9-9a2f-449e-a8ad-af7c6d14cba3",
+    "categoryName": "อื่น ๆ",
+    "items": [
+      {
+        "lineNo": 1,
+        "name": "ข้าวสาร",
+        "price": "45.00",
+        "removed": false
+      },
+      {
+        "lineNo": 2,
+        "name": "น้ำมันพืช",
+        "price": "30.00",
+        "removed": false
+      },
+      {
+        "lineNo": 3,
+        "name": "น้ำตาลทราย",
+        "price": "25.00",
+        "removed": false
+      }
+    ]
+  },
+  "enteredManually": false,
+  "edits": [
+    {
+      "seq": 1,
+      "field": "category_id",
+      "oldValue": null,
+      "newValue": "de810fa9-9a2f-449e-a8ad-af7c6d14cba3",
+      "editedBy": "คุณพิมพ์",
+      "editedAt": "2026-11-19T10:11:04.413Z"
+    },
+    {
+      "seq": 2,
+      "field": "status",
+      "oldValue": "confirmed",
+      "newValue": "review",
+      "editedBy": "คุณกิตติ",
+      "editedAt": "2026-11-19T10:11:04.874Z"
+    }
+  ],
+  "events": [
+    {
+      "from": null,
+      "to": "queued",
+      "toLabel": "รออ่าน",
+      "actor": "คุณพิมพ์",
+      "at": "2026-11-19T10:10:56.325Z"
+    },
+    {
+      "from": "queued",
+      "to": "processing",
+      "toLabel": "กำลังอ่าน",
+      "actor": "ระบบ",
+      "at": "2026-11-19T10:11:03.254Z"
+    },
+    {
+      "from": "processing",
+      "to": "review",
+      "toLabel": "รอตรวจ",
+      "actor": "ระบบ",
+      "at": "2026-11-19T10:11:03.255Z"
+    },
+    {
+      "from": "review",
+      "to": "confirmed",
+      "toLabel": "ยืนยันแล้ว",
+      "actor": "คุณพิมพ์",
+      "at": "2026-11-19T10:11:04.414Z"
+    },
+    {
+      "from": "confirmed",
+      "to": "review",
+      "toLabel": "รอตรวจ",
+      "actor": "คุณกิตติ",
+      "at": "2026-11-19T10:11:04.873Z"
+    }
+  ],
+  "confirmedBy": null,
+  "confirmedAt": null
+}

@@ -1,0 +1,13 @@
+# ReceiptDesk training + evaluation (block B10). Tested: torch 2.15 (CPU) · transformers 5.23 · peft 0.21 · accelerate 1.16
+# On the GPU box install torch for its CUDA version first, e.g.  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+torch>=2.4
+torchvision            # Qwen2-VL/2.5-VL processors in transformers 5 need the video processor
+transformers>=5.0
+peft>=0.13
+accelerate>=1.0
+pillow>=10
+# optional
+# bitsandbytes          # --load-in-4bit (QLoRA)
+# flash-attn            # --attn-implementation flash_attention_2
+# pypdfium2             # PDF receipts in the Test Set
+# evaluate.py --backend vllm / predictions needs only Python 3.10+ and pillow (no torch)

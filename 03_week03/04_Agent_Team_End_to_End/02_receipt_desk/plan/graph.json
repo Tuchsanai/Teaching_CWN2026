@@ -1,0 +1,186 @@
+{
+ "goal": "สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language",
+ "defaults": {
+  "difficulty": 1,
+  "timeout": 600
+ },
+ "nodes": [
+  {
+   "id": "B01",
+   "depends_on": [],
+   "difficulty": 2,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 900,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B01 (1 ใน 14 บล็อก): โครงโปรเจกต์ + docker compose\nรายละเอียดงาน: คัดลอก /workspace/e2e_lab/receiptdesk/docs มาไว้ที่ docs/ แล้วอ่าน DESIGN หัวข้อ 1, 1.2, 9.7 สร้างเฉพาะโครง: web/ (Next.js + TypeScript build ได้), dispatcher ใช้ image เดียวกับ web, ai/gateway/, ai/worker/, ai/nginx/, ai/train/ แต่ละโฟลเดอร์มี Dockerfile และไฟล์ requirements ให้บล็อกถัดไปเติม\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/docker-compose.yml (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): docker compose config ผ่าน มีบริการ web, dispatcher, db และ volume uploads, pgdata · มี ai/docker-compose.yml (gateway, rabbitmq, worker0, worker1, nginx) · มี app/docs/ ครบ · .env.example ไม่มีค่า key จริง\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ docker-compose.yml\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "cyolo"
+  },
+  {
+   "id": "B13",
+   "depends_on": [],
+   "difficulty": 1,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 900,
+   "type": "image",
+   "account": "cyolo",
+   "path": "/workspace/plans/receiptdesk/app/web/public/logo.png",
+   "prompt": "โลโก้ ReceiptDesk. (ภาพสำหรับโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language) เงื่อนไขที่ต้องครบ: PNG โลโก้ใบเสร็จกับแว่นขยาย/เครื่องหมายถูก ชื่อ ReceiptDesk อ่านชัด พื้นโปร่ง ใช้บนหัวเว็บได้"
+  },
+  {
+   "id": "B02",
+   "depends_on": [
+    "B01"
+   ],
+   "difficulty": 2,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B02 (1 ใน 14 บล็อก): ฐานข้อมูล 11 ตาราง + ข้อมูลตั้งต้น\nรายละเอียดงาน: รวมทางรีเซ็ตข้อมูลทดสอบตาม DESIGN 9.4 (ทำงานเฉพาะเมื่อ ENABLE_TEST_RESET=1)\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/web/db/schema.sql (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): schema.sql สร้าง 11 ตารางตาม DESIGN หัวข้อ 2 ได้ใน PostgreSQL และ web/db/seed.sql ใส่ข้อมูลตาม TEST-DATA หัวข้อ 1–4 (ผู้ใช้ 6 · ลูกค้า 3 · หมวด 4 · ใบเสร็จ 8) ผลรวมตรงหัวข้อ 5\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/docker-compose.yml (ผลของ B01: โครงโปรเจกต์ + docker compose)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ web/db/schema.sql\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "cyolo"
+  },
+  {
+   "id": "B06",
+   "depends_on": [
+    "B01"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 900,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B06 (1 ใน 14 บล็อก): ออกแบบกติกาการแซงคิวของงานด่วน\nผลของบล็อกนี้คือเนื้อหาของไฟล์ /workspace/plans/receiptdesk/app/docs/urgent-policy.md — ตอบเป็นเนื้อหาไฟล์ฉบับเต็มในคำตอบ ไม่ต้องเขียนไฟล์เอง (ระบบบันทึกคำตอบที่ถูกลงไฟล์นี้ให้)\nเกณฑ์เสร็จ (ต้องตรวจได้): เลือกวิธีหยิบงานเดียว (2 คิวให้ Worker เลือก vs คิวเดียว x-max-priority) พร้อมเหตุผล และพิสูจน์ด้วยตัวเลขว่าผ่าน BR-08, BR-09, BR-10 (4:1), NFR-03 ≤ 5 นาที และ BR-13 ≤ 120 นาที ทั้งกรณี Worker 2 ตัวและ 1 ตัว\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/docker-compose.yml (ผลของ B01: โครงโปรเจกต์ + docker compose)\nห้ามแก้หรือลบไฟล์ใด ๆ ใน app/\nตอบเนื้อหาไฟล์ฉบับเต็มเท่านั้น",
+   "type": "debate",
+   "accounts": [
+    "yolo",
+    "cyolo"
+   ],
+   "judge": "yolo",
+   "judge_difficulty": 3
+  },
+  {
+   "id": "B03",
+   "depends_on": [
+    "B01"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B03 (1 ใน 14 บล็อก): โมดูลกติกา Business Rule\nรายละเอียดงาน: โมดูลกฎโมดูลเดียวของฝั่งเว็บ (DESIGN หลักข้อ 4) ไม่มี I/O ใช้เวลาไทยใน BR-09/BR-14\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/web/lib/rules.ts (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): rules.ts มีฟังก์ชันของ BR-01–BR-06, BR-08, BR-09, BR-11–BR-14 และ web/lib/rules.test.ts ผ่านครบ 62 กรณีขอบใน TEST-DATA หัวข้อ 6 รวมค่าขอบ 0.89/0.90, 1.00/1.01 บาท, 400/401 ใบ, นาทีลองใหม่ BR-12\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/docker-compose.yml (ผลของ B01: โครงโปรเจกต์ + docker compose)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ web/lib/rules.ts\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "type": "review",
+   "worker": "yolo",
+   "reviewer": "cyolo",
+   "criteria": "rules.ts มีฟังก์ชันของ BR-01–BR-06, BR-08, BR-09, BR-11–BR-14 และ web/lib/rules.test.ts ผ่านครบ 62 กรณีขอบใน TEST-DATA หัวข้อ 6 รวมค่าขอบ 0.89/0.90, 1.00/1.01 บาท, 400/401 ใบ, นาทีลองใหม่ BR-12 · ไฟล์ /workspace/plans/receiptdesk/app/web/lib/rules.ts มีอยู่จริงและตรงโจทย์ (เปิดไฟล์ตรวจเอง)",
+   "max_rounds": 3,
+   "review_difficulty": 3
+  },
+  {
+   "id": "B07",
+   "depends_on": [
+    "B06"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B07 (1 ใน 14 บล็อก): คิว RabbitMQ: Priority · Backpressure · DLQ\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/ai/queue/topology.py (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): ประกาศคิว durable receipts.urgent, receipts.normal และ receipts.dlq ผ่าน DLX receipts.dlx · เพดานคิวปกติ 400 / ด่วน 50 คืนสถานะเต็ม · ฟังก์ชันหยิบงาน 4:1 ตาม urgent-policy.md · มี test ที่จำลองคิวแล้วผ่าน BR-07 และ BR-10\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- {{file:B06}} (ผลของ B06: ออกแบบกติกาการแซงคิวของงานด่วน)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ ai/queue/topology.py\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "cyolo"
+  },
+  {
+   "id": "B05",
+   "depends_on": [
+    "B02"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B05 (1 ใน 14 บล็อก): dispatcher (Outbox) + ตัวอ่านจำลอง\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/web/dispatcher/index.ts (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): dispatcher อ่านใบที่ยังไม่ส่งจาก DB ส่งไป gateway ด้วย X-API-Key ถามสถานะทุก 5 วินาที เขียนผลกลับ เคารพ 429/Retry-After และ web/dispatcher/mock-reader.ts (AI_MODE=mock) คืนผล 5 ช่อง + ค่าความมั่นใจแบบกำหนดได้ ให้ทดสอบได้โดยไม่มี GPU\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/web/db/schema.sql (ผลของ B02: ฐานข้อมูล 11 ตาราง + ข้อมูลตั้งต้น)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ web/dispatcher/index.ts\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "cyolo"
+  },
+  {
+   "id": "B10",
+   "depends_on": [
+    "B01"
+   ],
+   "difficulty": 4,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 2700,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B10 (1 ใน 14 บล็อก): โค้ด Training LoRA (1 และ 2 GPU) + Evaluation\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/ai/train/train_lora.py (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): train_lora.py fine-tune โมเดล Vision-Language ด้วย LoRA รันได้ทั้ง 1 GPU และ 2 GPU (torchrun/accelerate) ด้วยอาร์กิวเมนต์เดียวกัน และ ai/train/evaluate.py วัดเกณฑ์ M1–M6 ของ NFR-01 ด้วยกฎธงเดียวกับเว็บ (0.90 และ 1.00 บาท) พร้อมโหมด --dry-run ที่รันบน CPU ได้\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/docker-compose.yml (ผลของ B01: โครงโปรเจกต์ + docker compose)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ ai/train/train_lora.py\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  },
+  {
+   "id": "B08",
+   "depends_on": [
+    "B07"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B08 (1 ใน 14 บล็อก): API gateway (FastAPI + SQLite)\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/ai/gateway/main.py (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): gateway มี 7 เส้นตาม DESIGN 5.2–5.7 และ 3 เส้นภายใน 5.8 ตรวจ X-API-Key เก็บสถานะใน SQLite publish ลงคิวผ่าน topology.py ตอบ 429 + Retry-After เมื่อเต็ม และไม่เก็บชื่อร้าน/ลูกค้า (NFR-07)\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/ai/queue/topology.py (ผลของ B07: คิว RabbitMQ: Priority · Backpressure · DLQ)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ ai/gateway/main.py\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  },
+  {
+   "id": "B04",
+   "depends_on": [
+    "B02",
+    "B03"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 2700,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B04 (1 ใน 14 บล็อก): สิทธิ์ 4 บทบาท + API ของเว็บ 23 เส้น\nรายละเอียดงาน: อัปโหลดชุดนับ BR-11 ในธุรกรรมเดียว (ล็อกระดับตาราง) ตอบ 429 + N นาที · BUG_MODE ตาม DESIGN 9.6 (อ่าน docs/BUGS-SECRET.md ได้เฉพาะตอนทำ BUG_MODE)\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/web/app/api/README.md (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): web/app/api/ มี route ครบ 23 เส้นตาม DESIGN 9.2 + /api/health (9.3) เรียก rules.ts ทุกครั้งที่ตัดสินใจ ผู้ไม่ล็อกอินได้ 401 ลูกค้าเห็นเฉพาะร้านตัวเอง และ README.md ระบุสิทธิ์ของแต่ละเส้น\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/web/db/schema.sql (ผลของ B02: ฐานข้อมูล 11 ตาราง + ข้อมูลตั้งต้น)\n- /workspace/plans/receiptdesk/app/web/lib/rules.ts (ผลของ B03: โมดูลกติกา Business Rule)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ web/app/api/README.md\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  },
+  {
+   "id": "B09",
+   "depends_on": [
+    "B07",
+    "B08"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B09 (1 ใน 14 บล็อก): GPU Worker + NGINX ไป vLLM 2 ตัว\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/ai/worker/worker.py (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): Worker หยิบงานทีละใบตามกติกา 4:1 จองงานกับ gateway เรียก vLLM ผ่าน NGINX least_conn (ai/nginx/nginx.conf) timeout 60 วินาที ล้มเหลวครบ 3 ครั้งส่ง DLQ และงานไม่หายเมื่อ Worker ล่ม (DESIGN หัวข้อ 7)\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/ai/queue/topology.py (ผลของ B07: คิว RabbitMQ: Priority · Backpressure · DLQ)\n- /workspace/plans/receiptdesk/app/ai/gateway/main.py (ผลของ B08: API gateway (FastAPI + SQLite))\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ ai/worker/worker.py\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  },
+  {
+   "id": "B11",
+   "depends_on": [
+    "B04"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 2700,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B11 (1 ใน 14 บล็อก): หน้าเว็บตามบทบาท (ยกเว้นหน้าตรวจแก้)\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/web/app/pages.md (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): มีทุกหน้าใน DESIGN 9.1 ยกเว้นหน้าตรวจแก้ใบเสร็จ (เข้าสู่ระบบ · อัปโหลดชุด · สถานะงาน · งานด่วน · ค้างเกินกำหนด · อ่านไม่ได้ · สรุปรายเดือน CSV) ใช้ data-testid ตาม 9.5 และ pages.md ระบุหน้า→บทบาท\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/web/app/api/README.md (ผลของ B04: สิทธิ์ 4 บทบาท + API ของเว็บ 23 เส้น)\nห้ามแก้หรือลบไฟล์ของบล็อกอื่น เขียนเฉพาะ web/app/pages.md\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  },
+  {
+   "id": "B12",
+   "depends_on": [
+    "B04"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B12 (1 ใน 14 บล็อก): หน้าจอตรวจแก้ใบเสร็จ\nผลของบล็อกนี้คือเนื้อหาของไฟล์ /workspace/plans/receiptdesk/app/web/app/review/page.tsx — ตอบเป็นเนื้อหาไฟล์ฉบับเต็มในคำตอบ ไม่ต้องเขียนไฟล์เอง (ระบบบันทึกคำตอบที่ชนะลงไฟล์นี้ให้)\nเกณฑ์เสร็จ (ต้องตรวจได้): แสดงรูปคู่ 5 ช่องแก้ไขได้ ธงพร้อมเหตุผลแยกจากใบปกติ ปุ่มยืนยันกดได้เมื่อยอดรวม ≥ 0.01 และติ๊ก 'เทียบยอดรวมกับรูปแล้ว' ใบติดธงต้องเปิดดูทุกช่องก่อน (FR-12) บันทึกร่องรอยการแก้ (NFR-10) และตรวจ 1 ใบได้เร็วตาม NFR-09\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/web/app/api/README.md (ผลของ B04: สิทธิ์ 4 บทบาท + API ของเว็บ 23 เส้น)\nห้ามแก้หรือลบไฟล์ใด ๆ ใน app/\nตอบเนื้อหาไฟล์ฉบับเต็มเท่านั้น",
+   "type": "best_of",
+   "accounts": [
+    "cyolo",
+    "yolo"
+   ],
+   "judge": "yolo",
+   "criteria": "แสดงรูปคู่ 5 ช่องแก้ไขได้ ธงพร้อมเหตุผลแยกจากใบปกติ ปุ่มยืนยันกดได้เมื่อยอดรวม ≥ 0.01 และติ๊ก 'เทียบยอดรวมกับรูปแล้ว' ใบติดธงต้องเปิดดูทุกช่องก่อน (FR-12) บันทึกร่องรอยการแก้ (NFR-10) และตรวจ 1 ใบได้เร็วตาม NFR-09",
+   "judge_difficulty": 3
+  },
+  {
+   "id": "B14",
+   "depends_on": [
+    "B05",
+    "B09",
+    "B10",
+    "B11",
+    "B12",
+    "B13"
+   ],
+   "difficulty": 3,
+   "cwd": "/workspace/plans/receiptdesk/app",
+   "timeout": 1800,
+   "prompt": "เป้าหมายรวมของโปรเจกต์: สร้างระบบ ReceiptDesk ตาม docs/REQUIREMENTS.md และ docs/DESIGN.md (ข้อมูลทดสอบ docs/TEST-DATA.md · ต้นฉบับอยู่ที่ /workspace/e2e_lab/receiptdesk/docs): ฝั่งเว็บรันด้วย docker compose (web Next.js + dispatcher + PostgreSQL + volume uploads) และฝั่ง AI บนเครื่อง GPU 2 ใบ (API gateway FastAPI + RabbitMQ คิว urgent/normal/dlq + GPU Worker 2 ตัว + NGINX + vLLM 2 ตัว) อ่านใบเสร็จเป็น 5 ช่อง ติดธงตาม BR-04/BR-05 ให้พนักงานตรวจแก้และยืนยัน งานด่วนแซงคิวแบบ 4:1 คิวเต็มแจ้งนาทีลองใหม่ ใบที่อ่านไม่ได้ไป Dead-letter Queue และมีโค้ด Training LoRA + Evaluation ของโมเดล Vision-Language\nคุณรับผิดชอบบล็อก B14 (1 ใน 14 บล็อก): รวมระบบ + ทดสอบเบื้องต้น\nไฟล์ผลที่ต้องเขียน: /workspace/plans/receiptdesk/app/TEST.md (โฟลเดอร์ทำงานร่วมของทีม = /workspace/plans/receiptdesk/app)\nเกณฑ์เสร็จ (ต้องตรวจได้): docker compose up ฝั่งเว็บขึ้นครบ /api/health ตอบ 200 ใช้ logo.png · ทดสอบด้วย AI_MODE=mock: อัปโหลดชุด → อ่าน → ตรวจแก้ → ยืนยัน → CSV ยอดตรง TEST-DATA หัวข้อ 5 · rules.test.ts ผ่าน · ทดสอบคิวเต็มได้ 429 + N นาที · บันทึกผลทุกข้อใน TEST.md\nไฟล์ของบล็อกก่อนหน้าที่ต้องอ่านก่อนเริ่ม (อ่านเองจากไฟล์ ไม่ต้องให้ใครส่งเนื้อหามา):\n- /workspace/plans/receiptdesk/app/web/dispatcher/index.ts (ผลของ B05: dispatcher (Outbox) + ตัวอ่านจำลอง)\n- /workspace/plans/receiptdesk/app/ai/worker/worker.py (ผลของ B09: GPU Worker + NGINX ไป vLLM 2 ตัว)\n- /workspace/plans/receiptdesk/app/ai/train/train_lora.py (ผลของ B10: โค้ด Training LoRA (1 และ 2 GPU) + Evaluation)\n- /workspace/plans/receiptdesk/app/web/app/pages.md (ผลของ B11: หน้าเว็บตามบทบาท (ยกเว้นหน้าตรวจแก้))\n- {{file:B12}} (ผลของ B12: หน้าจอตรวจแก้ใบเสร็จ)\n- /workspace/plans/receiptdesk/app/web/public/logo.png (ผลของ B13: โลโก้ ReceiptDesk)\nบล็อกนี้เป็นบล็อกรวมระบบ/ทดสอบสุดท้าย (รันคนเดียว) แก้ไฟล์ของบล็อกอื่นได้เท่าที่จำเป็นเพื่อรวมและทดสอบ\nห้ามทำงานนอกโฟลเดอร์ app/ ของแผนนี้\nเมื่อเสร็จ ตอบสั้น ๆ 1–2 บรรทัดว่าเขียนไฟล์อะไร (path) และผ่านเกณฑ์เสร็จหรือไม่",
+   "account": "yolo"
+  }
+ ]
+}
